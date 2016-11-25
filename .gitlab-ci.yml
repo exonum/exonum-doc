@@ -4,3 +4,11 @@ before_script:
 stages:
   - build
   - deploy
+
+test:
+    script:
+    - echo "test"
+    only:
+    - master
+    when: manual
+    stage: deploy
