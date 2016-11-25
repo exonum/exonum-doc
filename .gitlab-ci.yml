@@ -1,14 +1,35 @@
 before_script:
 - sudo apt-get -qq update
+- sudo apt-get -qq --yes install python-pip
+- pip install --upgrade pip
 
 stages:
   - build
   - deploy
 
-test:
-    script:
-    - echo "test"
-    only:
-    - master
-    when: manual
-    stage: deploy
+documentation-build:
+  script:
+  - sudo -H pip install mkdocs
+  - sudo -H pip install mkdocs-bootswatch
+  - mkdocs build
+  artifacts:
+    paths:
+    - site
+  stage: build
+
+documentation-frontend:
+  script:
+  - sudo rsync -rtv site/ /var/www/exonum.com/doc/
+  only:
+  - master
+  when: manual
+  stage: deploy
+
+documentation-frontend-preview:
+  script:
+  - sudo mkdir -p /var/www/exonum.com/doc/$CI_BUILD_REF_NAME
+  - sudo rsync -rtv site/ /var/www/exonum.com/doc/$CI_BUILD_REF_NAME
+  only:
+  - branches
+  when: manual
+  stage: deploy

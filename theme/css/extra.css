@@ -1,0 +1,60 @@
+@font-face {
+    font-family: "WeblySleek UI";
+    src: url("../fonts/ws-ui.eot");
+    src: local('WeblySleek UI Regular'), url("../fonts/ws-ui.woff") format("woff");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "WeblySleek UI";
+    src: url("../fonts/ws-ui-semibold.eot");
+    src: local('WeblySleek UI Bold'), url("../fonts/ws-ui-semibold.woff") format("woff");
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: "WeblySleek UI";
+    src: url("../fonts/ws-ui-light.eot");
+    src: local('WeblySleek UI Light'), url("../fonts/ws-ui-light.woff") format("woff");
+    font-weight: 100;
+}
+
+body {
+    font-family: 'WeblySleek UI', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    color: #4c5667;
+}
+
+.navbar-brand {
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 26px;
+    padding: 16.5px 15px;
+}
+
+.navbar-brand span {
+    color: #18bc9c;
+    text-transform: lowercase;
+}
+
+.well,
+code,
+pre {
+    background-color: #eef2f5;
+}
+
+pre {
+    border: none;
+}
+
+footer {
+    padding: 15px;
+    color: #cdd3dc;
+}
+
+footer a {
+    color: #b3bdbb;
+}
