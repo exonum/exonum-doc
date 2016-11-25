@@ -1,0 +1,6 @@
+before_script:
+- sudo apt-get -qq update
+
+stages:
+  - build
+  - deploy
