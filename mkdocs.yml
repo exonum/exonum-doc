@@ -6,6 +6,29 @@ extra_css:
     - css/extra.css
 pages:
     - 'Home': 'index.md'
-    - 'Anchoring':
-        - 'Implementation': 'anchoring-impl.md'
-        - 'Specification': 'anchoring-spec.md'
+    - 'Getting Started':
+        - 'Setup': 'get-started/setup.md'
+        - 'Timestamping Service': 'get-started/timestamping-service.md'
+        - 'Cryptocurrency': 'get-started/cryptocurrency.md'
+    - 'Architecture':
+        - 'Design Overview': 'architecture/overview.md'
+        - 'Data model': 'architecture/data-model.md'
+        - 'Transactions': 'architecture/transactions.md'
+        - 'Versioning': 'architecture/versioning.md'
+        - 'Consensus': 'architecture/consensus.md'
+        - 'Configuration': 'architecture/configuration.md'
+        - 'Anchoring': 'architecture/anchoring.md'
+        - 'Lightweight clients': 'architecture/lightweight-clients.md'
+    - 'Advanced Topics':
+        - 'Networking spec': 'advanced/networking-spec.md'
+        - 'Transaction processing': 'advanced/transaction-processing.md'
+        - 'Standard transactions': 'advanced/standard-transactions.md'
+        - 'Collections spec': 'advanced/collections-spec.md'
+        - 'Persistence': 'advanced/persistence.md'
+        - 'ORM bindings': 'advanced/orm.md'
+        - 'Anchoring spec': 'advanced/anchoring-spec.md'
+        - 'Glossary of Terms': 'advanced/glossary.md'
+    - 'Development':
+        - 'Roadmap': 'dev/roadmap.md'
+        - 'Contributing': 'dev/contributing.md'
+        - 'License': 'dev/license.md'

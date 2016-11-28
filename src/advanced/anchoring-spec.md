@@ -1,15 +1,13 @@
-Anchoring using Bitcoin multisignatures
-==============================
+# Anchoring using Bitcoin multisignatures
 
+**NB.** This document does not describe how anchoring (which tries to conform to this specification) 
+is implemented in Exonum. We have [a separate document](../architecture/anchoring.md) for that.
+
+```none
 Type: Process specification
-
 Status: Initial draft
-
 Author: Alex Ostrovski, Bitfury Group
-
-## Copyright
-
-(c) 2016, Bitfury Group
+```
 
 ## Abstract
 
@@ -20,10 +18,6 @@ accountability of private blockchain maintainers/validators (cf. accountability
 of the linked timestamping service as per [LinkedTS]), long-term non-
 repudiation, and resistance of the system to DoS, including (but not limited to) 
 a complete shutdown of the private blockchain infrastructure.
-
-**NB.** This document *does not* describe how anchoring (which tries 
-to conform to this specification) is implemented in Exonum. 
-We have [a separate document](/anchoring-impl) for that.
 
 ## 1. Introduction
 

@@ -1,6 +1,10 @@
+# Generic rules
+.*
+!.gitignore
+!.gitlab-ci.yml
+
 # IDE files
-.idea
-.vscode
+!.editorconfig
 *.iml
 
 # Doc
