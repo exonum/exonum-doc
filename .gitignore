@@ -1,6 +1,8 @@
+# Generic rules
+.*
+!.gitignore
+
 # IDE files
-.idea
-.vscode
 *.iml
 
 # Doc
