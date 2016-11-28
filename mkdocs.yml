@@ -6,12 +6,12 @@ extra_css:
     - css/extra.css
 pages:
     - 'Home': 'index.md'
-    - 'Getting Started'
-        - 'Setup': 'getting-started/setup.md'
-        - 'Timestamping Service': 'getting-started/timestamping-service.md'
-        - 'Cryptocurrency': 'getting-started/cryptocurrency.md'
+    - 'Getting Started':
+        - 'Setup': 'get-started/setup.md'
+        - 'Timestamping Service': 'get-started/timestamping-service.md'
+        - 'Cryptocurrency': 'get-started/cryptocurrency.md'
     - 'Architecture':
-        - 'Design Overview': 'architecture/design-overview.md'
+        - 'Design Overview': 'architecture/overview.md'
         - 'Data model': 'architecture/data-model.md'
         - 'Transactions': 'architecture/transactions.md'
         - 'Versioning': 'architecture/versioning.md'
@@ -21,15 +21,13 @@ pages:
         - 'Lightweight clients': 'architecture/lightweight-clients.md'
     - 'Advanced Topics':
         - 'Networking spec': 'advanced/networking-spec.md'
-        - 'Anchoring spec': 'advanced/anchoring-spec.md'
         - 'Transaction processing': 'advanced/transaction-processing.md'
+        - 'Standard transactions': 'advanced/standard-transactions.md'
+        - 'Collections spec': 'advanced/collections-spec.md'
         - 'Persistence': 'advanced/persistence.md'
-        - 'Transaction implementation': 'advanced/transaction-implementation.md'
         - 'ORM bindings': 'advanced/orm.md'
-        - 'Glossaries':
-            - 'Terms': 'glossary/terms.md'
-            - 'Built-in transactions': 'glossary/transactions.md'
-            - 'Collections': 'glossary/collections.md'
+        - 'Anchoring spec': 'advanced/anchoring-spec.md'
+        - 'Glossary of Terms': 'advanced/glossary.md'
     - 'Development':
         - 'Roadmap': 'dev/roadmap.md'
         - 'Contributing': 'dev/contributing.md'
