@@ -1,8 +1,10 @@
 # Generic rules
 .*
 !.gitignore
+!.gitlab-ci.yml
 
 # IDE files
+!.editorconfig
 *.iml
 
 # Doc
