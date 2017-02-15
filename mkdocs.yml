@@ -28,6 +28,7 @@ pages:
         - 'ORM bindings': 'advanced/orm.md'
         - 'Anchoring spec': 'advanced/anchoring-spec.md'
         - 'Glossary of Terms': 'advanced/glossary.md'
+        - 'Round Robin spec': 'advanced/round-robin-spec.md'
     - 'Development':
         - 'Roadmap': 'dev/roadmap.md'
         - 'Contributing': 'dev/contributing.md'
