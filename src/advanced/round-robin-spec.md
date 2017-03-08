@@ -9,12 +9,12 @@ The goal is to enrich the blockchain with following properties:
 1. **Censorship resistance**  
 	Any correct transaction broadcasted to every validator would be included into the new block somewhen.  
 2. **Liveness**  
-	New blocks would be generated and accepted even if some nodes behave unfairly.  
+	New blocks would be generated and accepted even if some nodes behaved unfairly.  
 3. **Chain quality**  
-	Among any consecutive K blocks in an honest node’s chain, a sufficient fraction of the blocks is mined by honest miners.  
+	Among any consecutive `K` blocks in an honest node’s chain, a sufficient fraction of the blocks is mined by honest miners.  
 
 *Wherein Censorship Resistance (point 1) is ensured by Chain Quality (point 3).*  
-*The current solution guarantees only weak form of chain quality: only `1 block out of F+1 blocks` is guaranteed to be mined by honest miners (instead of `sufficient fraction of K blocks`)*  
+*The current solution guarantees only weak form of chain quality: only `1 block out of F+1 blocks` is guaranteed to be mined by honest miners (instead of `sufficient fraction of K blocks`).*  
 
 ## Round Robin overview
 
@@ -24,8 +24,8 @@ For the height H, some order for validating nodes is introduced. The order defin
 
 The properties that are provided by the current algorithm:  
 
-1. *required* The algorithm should be common for all nodes. That is all nodes having actual assets-blockchain state should receive identical nodes order after executing Round Robin.  
-2. *required* The algorithm should essentially depend on factors that are not under the influence of some node (or some predefined nodes). For example, the correct algorithm should not depend on a prevblockhash, because such hash is directly defined by the leader node from the previous height.  
+1. *required* The algorithm should be common for all nodes, that is, all nodes having actual assets-blockchain state should receive identical nodes order after executing Round Robin.  
+2. *required* The algorithm should essentially depend on factors that are not under the influence of some node (or some predefined nodes). For example, the correct algorithm should not depend on a `prevblockhash`, because such hash is directly defined by the leader node from the previous height.  
 3. *desirable* Order of nodes should differ from one height to another. That property eliminates possibility that byzantine nodes would state in blocks all the time (multiple bysantine nodes one after another). If order would be changed for every height byzantine nodes would be randomly interspersed with fair nodes.  
 
 	
@@ -43,5 +43,5 @@ Such calculation provides uniform distribution of the orders, that is byzantine 
 The desired properties that are not provided by the current algorithm. It would be great if we could provide them somewhen:  
 
 1. *desired* The algorithm should not give preferences for any nodes (or artificially decrease priority for other nodes).  
-In our case, we give preferences for nodes that were less involved during last `F` blocks. Maybe such nodes do not give block proposals due to objective reasons (bad connection / server overloading / etc.)  
+In our case, we give preferences for nodes that were less involved in last `F` blocks. Perhaps such nodes do not give block proposals due to objective reasons: bad connection, server overloading, etc.  
 2. *desired* Round Robin orders could be calculated strictly after the previous block was accepted.  
