@@ -18,7 +18,7 @@ The goal is to enrich the blockchain with following properties:
 
 ## Round Robin overview
 
-For the height H, some order for validating nodes is introduced. The order defines node's `block proposal` priority, that is `block proposal` from node #2 would be accepted only if `block proposal` from node #1 is absent. Round Robin algorithm defines such nodes order for each height H.
+Round Robin algorithm defines how the order of validating nodes for the height `H` should be calculated. Such order determines node's `block proposal` priority. That is, block proposal from node #2 would be accepted only if `block proposal` from node #1 was absent.  
 	
 ## Algorithm properties
 
@@ -26,7 +26,7 @@ The properties that are provided by the current algorithm:
 
 1. *required* The algorithm should be common for all nodes, that is, all nodes having actual assets-blockchain state should receive identical nodes order after executing Round Robin.  
 2. *required* The algorithm should essentially depend on factors that are not under the influence of some node (or some predefined nodes). For example, the correct algorithm should not depend on a `prevblockhash`, because such hash is directly defined by the leader node from the previous height.  
-3. *desirable* Order of nodes should differ from one height to another. That property eliminates possibility that byzantine nodes would state in blocks all the time (multiple bysantine nodes one after another). If order would be changed for every height byzantine nodes would be randomly interspersed with fair nodes.  
+3. *desirable* Order of nodes should differ from one height to another. Due to this property, byzantine nodes would not follow one after the other in a series but would be randomly interspersed with fair nodes.  
 
 	
 ## Round Robin details
