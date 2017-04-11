@@ -1,7 +1,7 @@
 # Generic rules
 .*
 !.gitignore
-!.gitlab-ci.yml
+*.pdf
 
 # IDE files
 !.editorconfig
