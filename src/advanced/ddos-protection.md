@@ -1,10 +1,10 @@
 # DDoS Protection and Consensus Algorithm
 
-The DDoS protection is two-fold
+The DDoS protection is two-fold:
 
-* external. To prevent fails cased by net attacks and attacks from users
-* internal. To prevent fails cased by consensus algorithm messages and messages 
-from Byzantine validators.
+* External. To prevent fails cased by net attacks and attacks from users
+* Internal. To prevent fails cased by consensus algorithm messages and messages 
+  from Byzantine validators.
 
 ## External Protection
 
@@ -16,10 +16,10 @@ service and should be commented in the future versions of the documentation.
 The consensus algorithm provides new blocks for Blockchain via validators voting.
 Each committed to the Blockchain block must be signed by at least `+2/3` validators
 (see [Consensus](../architecture/consensus.md) for more details). And internal protection
-have to guarantee two property for each regular (not Byzantine validator)
+have to guarantee two property for each regular (not Byzantine validator):
 
-1. each message from regular validators would be processed in a finite time
-2. the unprocessed consensus messages queue is finite.
+1. Each message from regular validators would be processed in a finite time
+2. The unprocessed consensus messages queue is finite.
 
 ### Make finite message process time
 
