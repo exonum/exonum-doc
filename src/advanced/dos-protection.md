@@ -18,6 +18,7 @@ client-server architecture and should be described in the future versions of the
 ## Internal Protection
 
 The consensus algorithm provides proposals for new blocks, and one of these proposed 
+blocks should be included into the blockchain after other validators approval.
 Each block committed to the blockchain must be authorized by at least `+2/3` validators
 (see [Consensus](../architecture/consensus.md) for more details). Internal protection
 has to guarantee two properties for honest validators:
