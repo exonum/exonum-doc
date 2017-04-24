@@ -41,16 +41,26 @@ processed in a finite time, the first property is guaranteed.
 
 ### Bounded Consensus Message Queue
 
-The idea of how *Property 2* could be guaranteed in Exonum future releases is described in this section.
-A Byzantine validator could spam other validators with consensus messages such as `Propose`.
-Any such a message may influence a committed block. In order to prevent the queue overload,
-the number of useful propose/prevote/precommit messages should be limited at least
-for each round of voting. The honest validators send the only propose for each
-round they are leading. But the problem is that Byzantine ones could send an unlimited
-number of proposes and different proposes to the various validators. The possible
-solution is to store not more than one propose per pair `(validator, round)`. And
-for each pair `(validator, round)` one stores only the propose linked with the first
-propose/prevote/precommit/commit message from this validator at this round about
-this round proposes. As the number of proposes would be limited by the product of
-round number and the validators number and each correct prevote/precommit/commit
-is linked with propose, the number of useful consensus messages would be bounded.
+The problem with message queue is that a malicious validator could spam
+other validators with consensus messages such as `Propose`.
+The honest validators send the only `Propose` for each
+round they are leading; similarly, the number of other types of messages is also bounded
+for honest validators. However, a malicious validator could send an unlimited
+number of `Propose` messages in any given round in which he is a leader,
+and/or different `Propose` to the different validators.
+Any such message may influence an eventually committed block.
+
+In order to satisfy *Property 2* in the future releases of Exonum,
+consensus messages could be categorized in *useful* and *wasteful*.
+In order to prevent the queue overflow,
+the number of *useful* `Propose`, `Prevote` and `Precommit` messages could be limited
+for any given round of consensus. A possible solution is to store no more than one `Propose`
+per `(validator, round)` pair:
+
+**Proposition.** For each `(validator, round)` an honest validator 
+stores only the `Propose` linked with the first `Propose`, `Prevote`, `Precommit`, or `Commit` message
+from `validator` at this `round`.
+
+As the number of `Propose` messages is limited by the product of round number and the validators number
+and all other consensus messages are linked with `Propose`,
+the number of useful consensus messages would be bounded.
