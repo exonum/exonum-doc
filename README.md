@@ -4,38 +4,25 @@ This is the documentation repo for the Exonum platform. It contains source files
 used to build the documentation displayed on the [Exonum
 website](http://exonum.com/).
 
-## Build instructions
+## Build Instructions
 
-First of all you need to install [python-pip](https://pip.readthedocs.io/en/stable/installing/).
-
-Install `mkdocs`:
-
+First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
+Then, install `mkdocs` and the `bootswatch` theme:
 ```
-pip install mkdocs
+pip install mkdocs mkdocs-bootswatch
 ```
 
-Install theme:
-
-```
-pip install mkdocs-bootswatch
-```
-
-Run docs on local machine [127.0.0.1:8000](http://127.0.0.1:8000):
-
+In order to run a local web server serving docs, use:
 ```
 mkdocs serve
 ```
+The web server will be available on [127.0.0.1:8000](http://127.0.0.1:8000/).
 
-Build for production:
-
+To generate HTML files from the markdown source files, use:
 ```
 mkdocs build
 ```
-
-[Here](http://www.mkdocs.org/user-guide/writing-your-docs/) you can find more information 
-about docs writing such as [linking](http://www.mkdocs.org/user-guide/writing-your-docs/#linking-documents), 
-adding of [images and media](http://www.mkdocs.org/user-guide/writing-your-docs/#images-and-media), 
-[tables](http://www.mkdocs.org/user-guide/writing-your-docs/#tables) markdown and etc.
+The generated pages will be available in the **site/** directory.
 
 ## License
 
