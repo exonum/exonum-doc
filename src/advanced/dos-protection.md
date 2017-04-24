@@ -1,6 +1,11 @@
 # DoS Protection and Consensus Algorithm
 
-Understandably, spam protection is a high-priority feature to be implemented in 
+Like any other network, Exonum nodes can be susceptible to denial-of-service attacks 
+(DoS). The goal of such an attack is to render an Exonum node not responsive to 
+legitimate requests from other nodes and external clients. One of attack vectors 
+is spam, i.e., flooding a node with a ton of meaningless requests.
+
+*Note.* Understandably, spam protection is a high-priority feature to be implemented in 
 the nearest future.
 
 The DoS protection is two-fold:
