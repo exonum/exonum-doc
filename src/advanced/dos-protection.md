@@ -64,3 +64,6 @@ from `peer_validator` at this `round`.
 As the number of `Propose` messages is limited by the product of round number and the validators number
 and all other consensus messages are linked with `Propose`,
 the number of useful consensus messages would be bounded.
+
+Notice that the proposed modification to the consensus algorithm could potentially increase
+the number of rounds required to reach consensus, as some consensus messages get discarded.
