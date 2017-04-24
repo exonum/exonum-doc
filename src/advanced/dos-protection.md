@@ -17,8 +17,7 @@ client-server architecture and should be described in the future versions of the
 
 ## Internal Protection
 
-The consensus algorithm provides proposals for new blocks to be included into the blockchain, 
-which are then need to be approved by validators.
+The consensus algorithm provides proposals for new blocks, and one of these proposed 
 Each block committed to the blockchain must be authorized by at least `+2/3` validators
 (see [Consensus](../architecture/consensus.md) for more details). Internal protection
 has to guarantee two properties for honest validators:
@@ -30,7 +29,7 @@ has to guarantee two properties for honest validators:
 
 *Property 1* will be guaranteed in Exonum as follows. There is a unique queue for 
 messages from each validator. Messages to be processed are taken from these queues 
-in a round robin fashion. Thus, each time there is a finite number of messages to 
+in a circle. Thus, each time there is a finite number of messages to 
 be processed before any honest validator's message. As each consensus message is 
 processed in a finite time, the first property is guaranteed.
 
