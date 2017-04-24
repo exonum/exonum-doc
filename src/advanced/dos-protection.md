@@ -31,7 +31,7 @@ has to guarantee two properties for honest validators:
 *Property 1* will be guaranteed in Exonum as follows. There is a unique queue for 
 messages from each validator. Messages to be processed are taken from these queues 
 in a round robin fashion. Thus, each time there is a finite number of messages to 
-be processed before any honest validator’s message. As each consensus message is 
+be processed before any honest validator's message. As each consensus message is 
 processed in a finite time, the first property is guaranteed.
 
 ### Bounded Consensus Message Queue
