@@ -57,9 +57,9 @@ the number of *useful* `Propose`, `Prevote` and `Precommit` messages could be li
 for any given round of consensus. A possible solution is to store no more than one `Propose`
 per `(validator, round)` pair:
 
-**Proposition.** For each `(validator, round)` an honest validator 
+**Proposition.** For each `(peer_validator, round)` an honest validator 
 stores only the `Propose` linked with the first `Propose`, `Prevote`, `Precommit`, or `Commit` message
-from `validator` at this `round`.
+from `peer_validator` at this `round`.
 
 As the number of `Propose` messages is limited by the product of round number and the validators number
 and all other consensus messages are linked with `Propose`,
