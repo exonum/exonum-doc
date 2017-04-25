@@ -6,34 +6,34 @@ extra_css:
     - css/extra.css
 pages:
     - 'Home':
-        - 'Getting started': '' # How to read this document
-        - 'What is Exonum': '' # More technical speech, less marketing bullshit, not too specific 
-        - 'Design overview': 'home/system-overview.md' # Nodes, validators, clients, blocks, consensus, genesis block; links
+        - 'Getting started': 'home/get-started.md' # How to read this document
+        - 'What is Exonum': 'home/what-is-exonum.md' # More technical speech, less marketing bullshit, not too specific 
+        - 'Design overview': 'home/design-overview.md' # Nodes, validators, clients, blocks, consensus, genesis block; links
         - 'Glossary of Terms': 'home/glossary.md'
     - 'Cryptocurrency tutorial':
         - 'Introduction': 'cryptocurrency/intro.md'
         - 'Step 1': 'cryptocurrency/step1.md'
     - 'Architecture':
-        - 'Configuration' # LOCAL configuration - how to roughly configurate my lovely node
-        - 'Storage': 'architecture/storage.md' # Includes blockchain, genesis block, indexes, proofs
-        - 'Transactions' # What is transaction? (blah-blah-blah about purity, sequentual consistency, non-repliable attack, signatures)
+        - 'Configuration': 'architecture/configuration.md' # Local configuration - how to roughly configurate a node
+        - 'Storage': 'architecture/storage.md' # Includes blockchain, genesis block, indexes, proofs, etc.
+        - 'Transactions': 'architecture/transactions.md' # What is transaction? (purity, sequentual consistency, non-repliable attack, signatures)
         - 'Services': 'architecture/services.md' # Includes guidelines for services
         - 'Clients': 'architecture/clients.md' # How to make Public API communication (both server and client side) 
     - 'Services':
         - 'Configuration': 'services/configuration.md' # Configuration documentation
         - 'BTC Anchoring': 'services/anchoring.md' # Anchoring documentation
     - 'Consensus specification':
-        - 'Consensus': 'advanced/consensus.md' # Maybe need to split into several parts
-        - 'Leader election': 'advanced/leader-election.md'
-        - 'Requests': 'advanced/requests.md'
-        - 'Timeouts adjustment': 'advanced/timeouts-adjustment.md'
+        - 'Consensus': 'consensus/consensus.md' # Maybe need to split into several parts
+        - 'Leader election': 'consensus/leader-election.md'
+        - 'Requests': 'consensus/requests.md'
+        - 'Timeouts adjustment': 'consensus/timeouts-adjustment.md'
     - 'Advanced Topics':
         - 'Internode communication': 'advanced/network.md' 
         - 'Serialization': 'advanced/serialization.md'
-        - 'Merkle index': 'advances/merkle-trees.md'
-        - 'Merkle Patricia index': 'advances/merkle-trees.md'
+        - 'Merkle index': 'advanced/merkle-index.md'
+        - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
         - 'DoS attacks': 'advanced/dos-attacks.md'
-        - 'Sandbox testing': 'dev/testing.md'
+        - 'Sandbox testing': 'advanced/sandbox.md'
     - 'Development':
         - 'Roadmap': 'dev/roadmap.md' # Includes roadmap and features list
         - 'Contributing': 'dev/contributing.md'
