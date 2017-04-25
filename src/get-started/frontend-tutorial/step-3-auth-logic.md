@@ -1,6 +1,10 @@
-# Step 3: Login and register inerfaces
+# Step 3: Authorization inerfaces logic
 
-install exonum-client and write basic cryptocurrency logic to register and login
+install exonum-client
+
+write basic cryptocurrency logic to register and login
+
+add loaders
 
 ---
 

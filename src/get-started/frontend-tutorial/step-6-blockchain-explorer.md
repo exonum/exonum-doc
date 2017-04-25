@@ -1,3 +1,7 @@
 # Step 6: Blockchain explorer
 
-add markdown to render blockchain explorer and block page, add cryptocurrency logic
+add markdown to render blockchain explorer and block page
+
+add routing
+
+add cryptocurrency logic

@@ -1,6 +1,10 @@
 # Step 5: Transactions interfaces
 
-added markdown for add funds and transfer pages, add cryptocurrency logic
+added markdown for add funds and transfer pages
+
+set up routing
+
+add cryptocurrency logic
 
 ---
 
