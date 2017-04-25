@@ -9,7 +9,16 @@ pages:
     - 'Getting Started':
         - 'Setup': 'get-started/setup.md'
         - 'Timestamping Service': 'get-started/timestamping-service.md'
-        - 'Cryptocurrency': 'get-started/cryptocurrency.md'
+        - 'Cryptocurrency':
+            - 'Set up backend': 'get-started/cryptocurrency-backend.md'
+            - 'Set up frontend':
+                - 'Overview': 'get-started/frontend-tutorial/overview.md'
+                - 'Step 1: Set up basic dependencies': 'get-started/frontend-tutorial/step-1-basics.md'
+                - 'Step 2: Login and register inerfaces markdown': 'get-started/frontend-tutorial/step-2-auth-markdown.md'
+                - 'Step 3: Login and register inerfaces': 'get-started/frontend-tutorial/step-3-auth-logic.md'
+                - 'Step 4: Wallet interface': 'get-started/frontend-tutorial/step-4-wallet.md'
+                - 'Step 5: Transactions interfaces': 'get-started/frontend-tutorial/step-5-transactions.md'
+                - 'Step 6: Blockchain explorer': 'get-started/frontend-tutorial/step-6-blockchain-explorer.md'
     - 'Architecture':
         - 'Design Overview': 'architecture/overview.md'
         - 'Data model': 'architecture/data-model.md'
