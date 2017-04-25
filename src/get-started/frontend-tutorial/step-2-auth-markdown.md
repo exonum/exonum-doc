@@ -17,7 +17,6 @@ Fill `index.html` with basic markdown and include bower dependencies on it:
     <script src="bower_components/riot/riot+compiler.min.js"></script>
     <script src="bower_components/riot-route/dist/route.min.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/noty/js/noty/packaged/jquery.noty.packaged.min.js"></script>
 </body>
 </html>
 ```
@@ -63,7 +62,7 @@ Last thing is to mount `<app>` tag. Do it before end of `</body>` tag:
 
 ### Welcome interface markdown
 
-Welcome interface is used as application starting screen. Create `welcome.tag` with next content:
+Welcome interface is used as application starting screen. Create `welcome.tag`:
 
 ```html
 <welcome>
@@ -82,7 +81,7 @@ Welcome interface is used as application starting screen. Create `welcome.tag` w
 
 ### Dashboard interface markdown
 
-Dashboard interface allows user to login into account or register a new account. Create `dashboard.tag` with next content:
+Dashboard interface allows user to login into account or register a new account. Create `dashboard.tag`:
 
 ```html
 <dashboard>
@@ -114,7 +113,7 @@ Dashboard interface allows user to login into account or register a new account.
 
 ### Register interface markdown
 
-Create `register.tag` with next content:
+Create `register.tag`:
 
 ```html
 <register>
@@ -149,7 +148,7 @@ Create `register.tag` with next content:
 
 ### Login interface markdown
 
-Create `login.tag` with next content:
+Create `login.tag`:
 
 ```html
 <login>
@@ -184,7 +183,7 @@ Create `login.tag` with next content:
 
 ### Set up basic routing
 
-Set up routing for authorization interfaces inside `<app>` tag:
+Set up routing for authorization interfaces inside `app.tag` file before end of `</app>` tag:
 
 ```html
     ...

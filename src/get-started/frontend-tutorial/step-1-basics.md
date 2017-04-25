@@ -57,7 +57,7 @@ $ bower init
 Install bower dependencies used to build basic web application:
 
 ```
-$ bower install bootstrap query noty riot riot-route --save
+$ bower install bootstrap query riot riot-route --save
 ```
 
 ---
