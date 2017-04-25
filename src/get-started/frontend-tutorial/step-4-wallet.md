@@ -210,4 +210,4 @@ this.service.getWallet(self.opts.publicKey, function(block, wallet, transactions
 
 ---
 
-Next step: [Transactions interfaces →](step-5-transactions.md)
+Next step: [Add funds →](step-5-add-funds.md)

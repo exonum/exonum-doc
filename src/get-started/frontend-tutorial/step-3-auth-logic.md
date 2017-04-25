@@ -77,7 +77,7 @@ this.core
 
 ---
 
-### TODO: Write basic cryptocurrency logic to register and login
+### TODO: Write business logic
 
 waiting for implementation
 

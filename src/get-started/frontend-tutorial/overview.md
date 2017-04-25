@@ -13,5 +13,6 @@ Cryptocurrency demo application is a simple example of how Exonum blockchain fra
 - Step 2: [Authorization inerfaces markdown](step-2-auth-markdown.md)
 - Step 3: [Authorization inerfaces logic](step-3-auth-logic.md)
 - Step 4: [Wallet interface](step-4-wallet.md)
-- Step 5: [Transactions interfaces](step-5-transactions.md)
-- Step 6: [Blockchain explorer](step-6-blockchain-explorer.md)
+- Step 5: [Add funds](step-5-add-funds.md)
+- Step 6: [Transfer funds](step-6-transfer-funds.md)
+- Step 7: [Blockchain explorer](step-7-blockchain-explorer.md)

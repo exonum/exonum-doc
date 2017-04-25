@@ -17,8 +17,9 @@ pages:
                 - 'Step 2: Authorization inerfaces markdown': 'get-started/frontend-tutorial/step-2-auth-markdown.md'
                 - 'Step 3: Authorization inerfaces logic': 'get-started/frontend-tutorial/step-3-auth-logic.md'
                 - 'Step 4: Wallet interface': 'get-started/frontend-tutorial/step-4-wallet.md'
-                - 'Step 5: Transactions interfaces': 'get-started/frontend-tutorial/step-5-transactions.md'
-                - 'Step 6: Blockchain explorer': 'get-started/frontend-tutorial/step-6-blockchain-explorer.md'
+                - 'Step 5: Add funds': 'get-started/frontend-tutorial/step-5-add-funds.md'
+                - 'Step 6: Transfer funds': 'get-started/frontend-tutorial/step-6-transfer-funds.md'
+                - 'Step 7: Blockchain explorer': 'get-started/frontend-tutorial/step-7-blockchain-explorer.md'
     - 'Architecture':
         - 'Design Overview': 'architecture/overview.md'
         - 'Data model': 'architecture/data-model.md'
