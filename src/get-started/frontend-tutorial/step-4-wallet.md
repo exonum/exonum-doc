@@ -2,7 +2,7 @@
 
 ---
 
-### Wallet interface markdown
+### 4.1. Render wallet interface
 
 Create `wallet.tag`:
 
@@ -93,7 +93,7 @@ Wallet summary is moved into separate tag to be reusable. Create `wallet-summary
 
 ---
 
-### Set up route
+### 4.2. Set up route
 
 Add route into `app.tag`:
 
@@ -105,7 +105,7 @@ route('/user', function() {
 
 ---
 
-### TODO: Load wallet
+### TODO: 4.3. Write business logic
 
 add cryptocurrency logic to render wallet page (parsing of block with precommits)
 
@@ -113,7 +113,7 @@ do we need big-integer dependency here?
 
 ---
 
-### Format time
+### 4.4. Format time
 
 To beautify time use [Moment.js](http://momentjs.com/). Install it using `bower`:
 
@@ -135,7 +135,7 @@ Now time can be formatted as:
 
 ---
 
-### Format numbers
+### 4.5. Format numbers
 
 To beautify numbers such as balances use [Numeral.js](http://numeraljs.com/). Install it using `bower`:
 
@@ -157,7 +157,7 @@ Now balances can be formatted as:
 
 ---
 
-### Wallet transactions
+### 4.6. Render wallet transactions
 
 To render list of transaction insert next code into `wallet.tag` after `<wallet-summary>` tag including:
 
@@ -210,4 +210,6 @@ this.service.getWallet(self.opts.publicKey, function(block, wallet, transactions
 
 ---
 
-Next step: [Add funds →](step-5-add-funds.md)
+Now user can review his account. Next step is make it possible to add funds into account.
+
+[Add funds interface →](step-5-add-funds.md)

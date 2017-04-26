@@ -2,13 +2,13 @@
 
 ---
 
-### TODO: Blockchain explorer interface markdown
+### TODO: 7.1. Render blockchain explorer interface
 
 blockchain and block pages
 
 ---
 
-### Set up routes
+### 7.2. Set up routes
 
 Add routes into `app.tag`:
 
@@ -24,11 +24,11 @@ route('/blockchain/block/*', function(height) {
 
 ---
 
-### TODO: Write business logic
+### TODO: 7.3. Write business logic
 
 ---
 
-### Add links to Blockchain explorer
+### 7.4. Add links to blockchain explorer
 
 Add link from `dashboard.tag` interface:
 

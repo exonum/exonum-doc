@@ -12,7 +12,29 @@ $ npm init
 
 ---
 
-### 1.2. Configure express web server
+### 1.2. Install bower dependencies
+
+Install bower: 
+
+```
+$ npm install bower --save
+```
+
+Initialize bower:
+
+```
+$ bower init
+```
+
+Install bower dependencies used to build basic web application:
+
+```
+$ bower install bootstrap query riot riot-route --save
+```
+
+---
+
+### 1.3. Configure express web server
 
 Install [Express](https://expressjs.com/en/starter/installing.html) web framework as npm dependency.
 
@@ -40,26 +62,64 @@ app.listen(3000);
 
 ---
 
-### 1.3. Install bower dependencies
+### 1.4. Create Riot.js application
 
-Install bower: 
+Fill `index.html` with the basic markdown and include bower dependencies:
 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css.map">
+</head>
+<body>
+    <script src="bower_components/riot/riot+compiler.min.js"></script>
+    <script src="bower_components/riot-route/dist/route.min.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+</body>
+</html>
 ```
-$ npm install bower --save
+
+Then create subdirectory `tags` to store custom Riot.js tags.
+
+Create file `app.tag` and place it into `tags` subdirectory:
+
+```html
+<app>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div id="content" class="panel panel-default"></div>
+            </div>
+        </div>
+    </div>
+</app>
 ```
 
-Initialize bower:
+All interfaces will be rendered into `<app>` tag in `<div id="content"></div>` block.
 
-```
-$ bower init
-```
+Then include `<app>` tag and insert it after start of `<body>` tag:
 
-Install bower dependencies used to build basic web application:
+```html
+...
+<body>
+    <app></app>
+    ...
+``` 
 
-```
-$ bower install bootstrap query riot riot-route --save
+Last thing is to mount `<app>` tag. Do it before end of `</body>` tag:
+
+```html
+    ...
+    <script type="text/javascript">
+        riot.mount('app');
+    </script>
+</body>
 ```
 
 ---
 
-Next step: [Login and register inerfaces markdown →](step-2-auth-markdown.md)
+Now the very basic application is ready. Next step is to create login and registration interfaces.
+
+[Login and registration inerfaces markdown →](step-2-auth-markdown.md)

@@ -1,12 +1,12 @@
-# Step 5: Add funds
+# Step 5: Add funds interface
 
 ---
 
-### TODO: Add funds interface markdown
+### TODO: 5.1. Render add funds interface
 
 ---
 
-### Set up route
+### 5.2. Set up route
 
 Add routes into `app.tag`:
 
@@ -18,7 +18,7 @@ route('/user/add-funds', function() {
 
 ---
 
-### Add link to Add funds interface
+### 5.3. Add link to add funds interface
 
 Add link from `wallet.tag` interface right after `<wallet-summary>` tag:
 
@@ -35,8 +35,10 @@ Add link from `wallet.tag` interface right after `<wallet-summary>` tag:
 
 ---
 
-### TODO: Write business logic
+### TODO: 5.4. Write business logic
 
 ---
 
-Next step: [Transfer funds →](step-6-transfer-funds.md)
+Now user can add funds into account. Next step is make it possible to transfer funds into another account.
+
+[Transfer funds interface →](step-6-transfer-funds.md)

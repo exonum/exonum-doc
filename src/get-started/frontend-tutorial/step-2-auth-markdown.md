@@ -2,65 +2,7 @@
 
 ---
 
-### Basic Riot.js application
-
-Fill `index.html` with basic markdown and include bower dependencies on it:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css.map">
-</head>
-<body>
-    <script src="bower_components/riot/riot+compiler.min.js"></script>
-    <script src="bower_components/riot-route/dist/route.min.js"></script>
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-</body>
-</html>
-```
-
-Then create subdirectory `tags` to store custom Riot.js tags.
-
-Create file `app.tag` and place it into `tags` subdirectory:
-
-```html
-<app>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-6 col-sm-offset-3">
-                <div id="content" class="panel panel-default"></div>
-            </div>
-        </div>
-    </div>
-</app>
-```
-
-All interfaces will be rendered into `<app>` tag.
-
-Then include `<app>` tag and insert it after start of `<body>` tag:
-
-```html
-...
-<body>
-    <app></app>
-    ...
-``` 
-
-Last thing is to mount `<app>` tag. Do it before end of `</body>` tag:
-
-```html
-    ...
-    <script type="text/javascript">
-        riot.mount('app');
-    </script>
-</body>
-```
-
----
-
-### Welcome interface markdown
+### 2.1. Render welcome interface
 
 Welcome interface is used as application starting screen. Create `welcome.tag`:
 
@@ -79,7 +21,7 @@ Welcome interface is used as application starting screen. Create `welcome.tag`:
 
 ---
 
-### Dashboard interface markdown
+### 2.2. Render dashboard interface
 
 Dashboard interface allows user to login into account or register a new account. Create `dashboard.tag`:
 
@@ -111,7 +53,7 @@ Dashboard interface allows user to login into account or register a new account.
 
 ---
 
-### Register interface markdown
+### 2.3. Render registration interface
 
 Create `register.tag`:
 
@@ -146,7 +88,7 @@ Create `register.tag`:
 
 ---
 
-### Login interface markdown
+### 2.4. Render login interface
 
 Create `login.tag`:
 
@@ -181,7 +123,7 @@ Create `login.tag`:
 
 ---
 
-### Set up basic routing
+### 2.5. Set up routing
 
 Set up routing for authorization interfaces inside `app.tag` file before end of `</app>` tag:
 
@@ -215,4 +157,6 @@ Set up routing for authorization interfaces inside `app.tag` file before end of 
 
 ---
 
-Next step: [Login and register inerfaces →](step-3-auth-logic.md)
+Now the login and registration interfaces are available in browser. Next step is to make then work.
+
+[Login and registration inerfaces →](step-3-auth-logic.md)

@@ -1,12 +1,12 @@
-# Step 6: Transfer funds
+# Step 6: Transfer funds interface
 
 ---
 
-### TODO: Transfer funds interface markdown
+### TODO: 6.1. Render transfer funds interface
 
 ---
 
-### Set up route
+### 6.2. Set up route
 
 Add routes into `app.tag`:
 
@@ -18,7 +18,7 @@ route('/user/transfer', function() {
 
 ---
 
-### Add link to Transfer funds interface
+### 6.3. Add link to transfer funds interface
 
 Add link from `wallet.tag` interface right after `<wallet-summary>` tag:
 
@@ -46,8 +46,10 @@ transfer(e) {
 
 ---
 
-### TODO: Write business logic
+### TODO: 6.4. Write business logic
 
 ---
 
-Next step: [Blockchain explorer →](step-7-blockchain-explorer.md)
+Now user can transfer funds into another account. Next step is make it possible to review blockchain status.
+
+[Blockchain explorer →](step-7-blockchain-explorer.md)
