@@ -29,6 +29,7 @@ pages:
         - 'Anchoring spec': 'advanced/anchoring-spec.md'
         - 'Glossary of Terms': 'advanced/glossary.md'
         - 'Round Robin spec': 'advanced/round-robin-spec.md'
+        - 'DoS protection and Consensus': 'advanced/dos-protection.md'
     - 'Development':
         - 'Roadmap': 'dev/roadmap.md'
         - 'Contributing': 'dev/contributing.md'
