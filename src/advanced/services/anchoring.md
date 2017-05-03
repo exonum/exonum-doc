@@ -3,6 +3,8 @@
 **NB.** This document does not describe how anchoring (which tries to conform to this specification) 
 is implemented in Exonum. We have [a separate document](../architecture/anchoring.md) for that.
 
+**FIXME: the link doesn't work after changing the structure**
+
 ```none
 Type: Process specification
 Status: Initial draft
