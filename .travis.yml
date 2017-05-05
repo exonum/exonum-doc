@@ -24,6 +24,9 @@ before_install:
   - ~/.local/bin/mdl --version
 
 script:
-  - python -m mkdocs build && ./misc/test.sh
+  - python -m mkdocs build
+  - ./misc/lint.sh md
+  - ./misc/lint.sh html
+  - ./misc/lint.sh links
   # Kill mkdocs server if it's still running
-  - ./misc/test.sh kill
+  - ./misc/lint.sh kill
