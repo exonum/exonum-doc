@@ -28,5 +28,7 @@ script:
   - ./misc/lint.sh md
   - ./misc/lint.sh html
   - ./misc/lint.sh links
+
+after_script:
   # Kill mkdocs server if it's still running
   - ./misc/lint.sh kill
