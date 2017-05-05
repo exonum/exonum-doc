@@ -1,0 +1,4 @@
+[checking]
+threads=5
+timeout=20
+anchors=1

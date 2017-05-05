@@ -1,0 +1,29 @@
+dist: trusty
+sudo: false
+language: python # for mkdocs
+python:
+  - 2.7
+branches:
+  only:
+    - master
+    # tags
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+before_install:
+  - pip install --user mkdocs mkdocs-bootswatch
+  - python -m mkdocs --version
+  # Dirty hack for what seems like a bug in linkchecker
+  - |
+    pip install --user linkchecker && \
+      find ~/.local/lib -regex '.*/linkcheck/__init__.py' -print0 | \
+      xargs -0 sed -i -e "s/requests.__version__ <= '2.2.0'/map(int, requests.__version__.split('.')) <= [2, 2, 0]/"
+  - ~/.local/bin/linkchecker --version
+  - pip install --user html5validator
+  - ~/.local/bin/html5validator --version
+  # Markdown linter
+  - gem install mdl --bindir ~/.local/bin
+  - ~/.local/bin/mdl --version
+
+script:
+  - python -m mkdocs build && ./misc/test.sh
+  # Kill mkdocs server if it's still running
+  - ./misc/test.sh kill
