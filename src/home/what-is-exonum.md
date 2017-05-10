@@ -26,11 +26,16 @@ To create project with Exonum, you should implement the following pieces of code
 1. Data storage schema. What should Exonum save?
 2. Transactions executing procedure. What atomic transactions could be? How do they change the data?
 
-That's all, your first application is ready. **TODO: yes? nothing more?**
+That's all, your first application is ready.
 
 Though the previous steps are necessary, you save all the control over the network. You may add different handlers for events, such as block commitment, transaction executing, and so on.
 
-In addition, you may refer to our demos and tutorials that show the process step by step: **TODO: link to demos**
+All the outer applications may communicate with Exonum blockchain through REST API written on [IRON](http://ironframework.io/). That is, you may implement API endpoints for every type of query your application need in. For example, for cryptocurrency you may add endpoints like this:
+
+- `/getbalance?address=AAA` reads the current balance for the certain address;
+- `/send?from=AAA&to=BBB&sum=100` creates Exonum transaction and broadcasts it to the blockchain network
+
+In addition, you may refer to our demos and tutorials that show the process step by step: **TODO: link to tutorials**
 
 ### Private blockchain
 
