@@ -14,11 +14,11 @@ appropriate changes for the each of the following blocks. In the matter, a
 blockchain is just a data storage with additional properties and requirements 
 for the underlying data. **TODO: extend?** 
 
-Different to the usual databases, a blockchain do not hold the data tables content directly. 
-Instead, it holds every transaction that creates a new data value or changes the 
-already existed data. Therefore, we can see the whole history of any data chunk. 
-However, for the outer application, the blockchain represents just a usual 
-Key-Value storage. 
+Different to the usual databases, a blockchain do not hold the data tables 
+content directly. Instead, it holds every transaction that creates a new data 
+value or changes the already existed data. Therefore, we can see the whole 
+history of any data chunk. However, for the outer application, the blockchain 
+represents just a usual Key-Value storage. 
 
 Exonum blocks consist of the following parts. 
 
@@ -27,7 +27,9 @@ Exonum blocks consist of the following parts.
 block, they execute every transaction in the given order and apply changes to 
 its data storage. 
 3. The hash of a new data storage state. The state itself is not included; 
-however, transactions are applied deterministically and unequivocally. The agreement on the hash of data storage is a part of the Exonum consensus algorithm, so it is guaranteed to coincide for all validators.
+however, transactions are applied deterministically and unequivocally. The 
+agreement on the hash of data storage is a part of the Exonum consensus 
+algorithm, so it is guaranteed to coincide for all validators. 
 4. Service transactions. They do not participate in any business logic but are 
 necessary for Exonum to ensure network availability. 
 
@@ -36,21 +38,22 @@ abstraction. The Core provides transactions to be sent, received and executed;
 all the business logic should be implemented according to your needs. To build 
 an application upon Exonum, user should define: 
 
-- What is the scheme for a stored data (tables, fields, and so on)? 
-- What types of the transactions do exist? 
-- How should each transaction type be executed; what checks should be made 
+ - What is the scheme for a stored data (tables, fields, and so on)? 
+ - What types of the transactions do exist? 
+ - How should each transaction type be executed; what checks should be made 
 before adopting the transaction? 
 
-To go deeper, please refer to our demos and tutorials: **TODO: link to tutorials** 
+To go deeper, please refer to our demos and tutorials: **TODO: link to 
+tutorials** 
 
 ## 2. The network structure 
 
 The network consist of big amount of the connected peer-to-peer nodes. These 
 nodes have different rights and different functionality. 
 
-1. The full-nodes replicate the entire contents of the blockchain. They can generate new 
-transactions but they cannot choose which transactions should be adopted. They 
-cannot generate new blocks. 
+1. The full-nodes replicate the entire contents of the blockchain. They can 
+generate new transactions but they cannot choose which transactions should be 
+adopted. They cannot generate new blocks. 
 2. The validators do not implement business logics. They provide the network 
 stability. Despite of big amount of the nodes presented in the network, only 
 validators can generate new blocks or vote for other block proposals. Other 
@@ -70,7 +73,8 @@ services.
 
 Exonum uses the custom modification of Byzantine Fault-Tolerance Consensus to 
 guarantee that in any time there is just one true version of the blockchain. To 
-do so, the consensus between validators is needed in a decentralized environment where any node is allowed to fail.
+do so, the consensus between validators is needed in a decentralized environment 
+where any node is allowed to fail. 
 
 When the validator generates a new block proposal, it sends it to the other 
 validators. Every other validator checks the proposal and vote for it. After the 
@@ -82,8 +86,9 @@ Our BFT consensus gives the following properties:
 1. Up to `1/3` of validators can behave itself abnormally. They may be just 
 turned off or even be hacked. However the network prolongs its activity and 
 generates new blocks. No data or transactions are affected. 
-2. New block requires `+2/3` validators signatures to be adopted. Therefore, if the previous condition is satisfied,
-forks are impossible and the blockchain state is uniform for every node. 
+2. New block requires `+2/3` validators signatures to be adopted. Therefore, if 
+the previous condition is satisfied, forks are impossible and the blockchain 
+state is uniform for every node. 
 
 To generate new block and vote upon it, the time is divided into the rounds. For 
 every round, there is predefined Leader node. The Leader creates its block 
@@ -110,17 +115,19 @@ procedure, please refer to **TODO: links for consensus, leader election**
 Exonum Framework includes the Core and the set of optional pluggable services. 
 The Core is responsible for the consensus, and provides transactions and blocks 
 to be sent, received and processed. The services may be developed by third-party 
-developers and community; they extend Exonum functionality. To turn on a service 
-you should add its sources to the project and compile new binaries. 
+developers and community; they extend Exonum functionality. The service may be 
+turned on only before blockchain is stated; to include a service, you should add 
+its sources to the project and compile a binaries. However, we are working to 
+allow services turning on / off on the run. 
 
 We represent the following optional services just now: 
 
 1. Configuration Update service. Although every node has its own configuration 
 file, some setups should be changed for every node simultaneously. This service 
 allows updating configuration through the blockchain itself. In addition, 
-administrators may apply new configuration values without node restarting. 
-To get more about configuration service, please, refer to 
-**TODO: link to config-service**. 
+administrators may apply new configuration values without node restarting. To 
+get more about configuration service, please, refer to **TODO: link to 
+config-service**. 
 2. Anchoring service. It writes the hash of the current blockchain state to the 
 bitcoin blockchain. It brings new guarantees: even if the malefactor takes 
 control over every validator, he cannot rebuild blockchain and change old 
@@ -142,9 +149,10 @@ source license. You may use it free with respect to the license conditions.
 ## 7. Rust 
 
 Exonum Core is written on the [Rust](https://www.rust-lang.org/) language. This 
-language is security-oriented and compiles to the native code. Just now, you may write 
-your business logics on the Rust only, however we hardly work to release the bindings for Java soon. **TODO: CHECK, 
-PLEASE. Will it be to open-source? What else could be said here?** 
+language is security-oriented and compiles to the native code. Just now, you may 
+write your business logics on the Rust only, however we hardly work to release 
+the bindings for Java soon. **TODO: CHECK, PLEASE. Will it be to open-source? 
+What else could be said here?** 
 
 ## 8. Demos 
 
