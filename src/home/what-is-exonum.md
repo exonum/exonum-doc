@@ -1,66 +1,106 @@
-# What is Exonum
+# What is Exonum 
 
-Exonum is an extensible framework for blockchain software projects. Whether you want to make a supply chain solution or a land registry notarization, coupons market or electronic auction, procurement or P2P lending platform, Exonum provides you with all the necessary blockchain functionality. Simply add your business logic and you're ready to go.
+Exonum is an extensible framework for blockchain software projects. Whether you 
+want to make a supply chain solution or a land registry notarization, coupons 
+market or electronic auction, procurement or P2P lending platform, Exonum 
+provides you with all the necessary blockchain functionality. Simply add your 
+business logic and you're ready to go. 
 
-## Blockchain features
+## Blockchain features 
 
-Blockchain used as a data storage provides some key features:
-1. History saving. As the blockchain saves all transactions that change data state, we can always restore all history for every item in the data storage.
-2. Immutability. Data cannot be changed retroactively. No old transactions can be replaced or removed. 
-3. Distribution. Every node has its own copy of blockchain. If some nodes would be broken, the network itself will prolong its activity. 
-4. Consistency. New changes to data storage are approved by consensus of nodes. All nodes have just one blockchain state. If a node falls far behind it can easily and unequivocally reload new blocks.
+Blockchain used as a data storage provides some key features: 
 
-To get more info about blockchain structure, nodes, blocks and transactions, please refer to **TODO: link. read more about blockchain. Design overview?**
+1. History saving. As the blockchain saves all transactions that change data 
+state, we can always restore all history for every item in the data storage. 
+2. Immutability. Data cannot be changed retroactively. No old transactions can 
+be replaced or removed. 
+3. Distribution. Every node has its own copy of blockchain. If some nodes would 
+be broken, the network itself will prolong its activity. 
+4. Consistency. New changes to data storage are approved by consensus of nodes. 
+All nodes have just one blockchain state. If a node falls far behind it can 
+easily and unequivocally reload new blocks. 
 
-## Bitcoin and blockchain
+To get more info about blockchain structure, nodes, blocks and transactions, 
+please refer to **TODO: link. read more about blockchain. Design overview?** 
 
-Bitcoin is the most famous, most stable product used a blockchain technology. However Exonum allows you to create new projects not limited to the cryptocurrency thematic. Different projects and applications are represented in the Demos section: **TODO: link to the demos**. Of course, cryptocurrency can be created too:)
+## Bitcoin and blockchain 
 
-## Exonum features
+Bitcoin is the most famous, most stable product used a blockchain technology. 
+However Exonum allows you to create new projects not limited to the 
+cryptocurrency thematic. Different projects and applications are represented in 
+the Demos section: **TODO: link to the demos**. Of course, cryptocurrency can be 
+created too:) 
 
-### Smart contracts
+## Exonum features 
 
-Exonum allows uniting your business logic with blockchain advantages. As it works with "data storage" and "transactions" on the high-level of abstraction, you may implement any functionality you need. For now, the custom logic should be included in the built binaries and so distributed among nodes.
-To create project with Exonum, you should implement the following pieces of code:
+### Smart contracts 
 
-1. Data storage schema. What should Exonum save?
-2. Transactions executing procedure. What atomic transactions could be? How do they change the data?
+Exonum allows uniting your business logic with blockchain advantages. As it 
+works with "data storage" and "transactions" on the high-level of abstraction, 
+you may implement any functionality you need. For now, the custom logic should 
+be included in the built binaries and so distributed among nodes. To create 
+project with Exonum, you should implement the following pieces of code: 
 
-That's all, your first application is ready.
+1. Data storage schema. What should Exonum save? 
+2. Transactions executing procedure. What atomic transactions could be? How do 
+they change the data? 
 
-Though the previous steps are necessary, you save all the control over the network. You may add different handlers for events, such as block commitment, transaction executing, and so on.
+That's all, your first application is ready. 
 
-All the outer applications may communicate with Exonum blockchain through REST API written on [IRON](http://ironframework.io/). That is, you may implement API endpoints for every type of query your application need in. For example, for cryptocurrency you may add endpoints like this:
+Though the previous steps are necessary, you save all the control over the 
+network. You may add different handlers for events, such as block commitment, 
+transaction executing, and so on. 
 
-- `/getbalance?address=AAA` reads the current balance for the certain address;
-- `/send?from=AAA&to=BBB&sum=100` creates Exonum transaction and broadcasts it to the blockchain network
+All the outer applications may communicate with Exonum blockchain through REST 
+API written on [IRON](http://ironframework.io/). That is, you may implement API 
+endpoints for every type of query your application need in. For example, for 
+cryptocurrency you may add endpoints like this: 
 
-In addition, you may refer to our demos and tutorials that show the process step by step: **TODO: link to tutorials**
+ - `/getbalance?address=AAA` reads the current balance for the certain address; 
+ - `/send?from=AAA&to=BBB&sum=100` creates Exonum transaction and broadcasts it 
+to the blockchain network 
 
-### Private blockchain
+In addition, you may refer to our demos and tutorials that show the process step 
+by step: **TODO: link to tutorials** 
 
-Exonum builds a partly private blockchain. It means that only the limited list of nodes can generate new blocks. 
-While business transactions can be generated by any appropriate node, the restricted list of nodes called validators gather them and generate new block. Validators check every transaction and decide which of them should be applied to the real data storage.
+### Private blockchain 
 
-Validators sign every block. Consensus between validators is necessary for the new block to be approved; so, nobody can create a fake or parallel version of the blockchain. 
+Exonum builds a partly private blockchain. It means that only the limited list 
+of nodes can generate new blocks. While business transactions can be generated 
+by any appropriate node, the restricted list of nodes called validators gather 
+them and generate new block. Validators check every transaction and decide which 
+of them should be applied to the real data storage. 
 
-Normally there should be 4-15 validators.
+Validators sign every block. Consensus between validators is necessary for the 
+new block to be approved; so, nobody can create a fake or parallel version of 
+the blockchain. 
 
-### Byzantine Consensus
+Normally there should be 4-15 validators. 
 
-Exonum uses custom modification of Byzantine Fault-Tolerance (BFT) Consensus between validators. The main advantage of our consensus is that the network would proceed with a correct work even if up to 1/3 validators are hacked, broken or just turned off. If malefactor takes control over any node (or several nodes), it can not break the data or even stop the service. If some validators are stopped for the maintenance, the network behaves correctly.
+### Byzantine Consensus 
 
-### Technical characteristics
+Exonum uses custom modification of Byzantine Fault-Tolerance (BFT) Consensus 
+between validators. The main advantage of our consensus is that the network 
+would proceed with a correct work even if up to 1/3 validators are hacked, 
+broken or just turned off. If malefactor takes control over any node (or several 
+nodes), it can not break the data or even stop the service. If some validators 
+are stopped for the maintenance, the network behaves correctly. 
 
-The Core is written on the RUST that is safety-oriented language. It is compiled for LLVM, so it can be built for almost every operational system. From other side, compiled code is quick as native one.
+### Technical characteristics 
 
-The service built over the Exonum Core can handle 7000 transactions per second, with a clearance time about 2.5 sec.
-Normally you may want to generate new block each 1-10 seconds. The recommended hardware requirements for a validator are:
+The Core is written on the RUST that is safety-oriented language. It is compiled 
+for LLVM, so it can be built for almost every operational system. From other 
+side, compiled code is quick as native one. 
 
- - **TODO: system requirements for validator**
- - hdd ?
- - network ?
- - CPU ?
- - RAM ?
+The service built over the Exonum Core can handle 7000 transactions per second, 
+with a clearance time about 2.5 sec. Normally you may want to generate new block 
+each 1-10 seconds. The recommended hardware requirements for a validator are: 
+
+ - **TODO: system requirements for validator** 
+ - hdd ? 
+ - network ? 
+ - CPU ? 
+ - RAM ? 
  
-Exonum Core is released under the Apache 2.0 **TODO: is it correct?** open source license. You may use it free with respect to the license conditions.  
+Exonum Core is released under the Apache 2.0 **TODO: is it correct?** open source 
+license. You may use it free with respect to the license conditions. 
