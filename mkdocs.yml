@@ -1,4 +1,5 @@
 site_name: Exonum Documentation
+site_url: http://exonum.com/doc/
 docs_dir: src
 theme: flatly
 theme_dir: theme
