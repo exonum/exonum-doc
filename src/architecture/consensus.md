@@ -2,6 +2,7 @@
 
 This consensus algorithm is based on the [algorithm proposed in
 Tendermint][tendermint_consensus].
+**TODO:** Expand the intro
 
 ## Assumptions and definitions
 
@@ -42,8 +43,8 @@ of messages:
   correct, it is sent only by the leader node of the round.
   2. _Prevote_ - voting message, indicating that the node has a correctly formed
   offer and all the transactions specified in it. To be distributed by all nodes.
-  3. _Precommit_ - message expressing readiness to accept (**TODO:**
-  reformulate) the next block. To be distributed by all nodes.
+  3. _Precommit_ - message expressing readiness to include the next block into
+  blockchain. To be distributed by all nodes.
   4. _Status_ - information message about the current height. It is sent with a
   periodicity written in the `status_timeout` variable (consensus parameter).
   5. _Block_ - message containing a block (in the meaning of blockchain) and a
@@ -81,20 +82,13 @@ in one of the previous blocks as **committed**.
 
 ## Node states overview
 
-Since the proposed algorithm in many respects repeats the Tendermint algorithm,
-it is possible to make direct analogies of validating node states in the
-proposed approach with node states in Tendermint. However, the proposed
-algorithm is formulated not in terms of states, but in terms of the work of
-services for receiving and processing messages and sending them. We merge the
-states `Commit` and `NewHeight` into one `Commit` state, and also the states
-`Propose`, `Prevote` and `Precommit` to the `Round` state. Thus, the order of
-states in the proposed algorithm is as follows:
+The order of states in the proposed algorithm is as follows:
 
 ```
 Commit -> (Round)+ -> Commit -> ...
 ```
 
-In this case, on the timeline, these states look like this (for one of the
+So on the timeline, these states look like this (for one of the
 validator nodes):
 
 ```
