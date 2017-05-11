@@ -27,6 +27,28 @@ You can set up these tools locally (see the `install` step in [the Travis config
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
 `links`, or `all` arguments.
 
+## Meta-tags
+
+Add meta tags for OpenGraph and Twitter discovery into your articles. SEO optimization and ability to paste a link into a Slack channel (or Skype, or Twitter) and get responsive results are good things.
+
+Meta-tags consists of a series of keywords and values defined at the beginning of a markdown document like this:
+
+```markdown
+description: A brief description of my document
+image: img/preview.jpg
+twitterSite: @username
+twitterCreator: @username
+```
+
+Use the following properties:
+
+| Property | Description | Required |
+| --- | --- | --- |
+| **description** | A one to two sentence description of your article. | Yes |
+| **image** | Relative path to the image URL which should represent your article. | Yes |
+| **twitterSite** | @username for the website. | *No* |
+| **twitterCreator** | @username for the content creator / author. | *No* |
+
 ## Build Instructions
 
 It is a good idea to preview your changes locally before sending a pull request. 
