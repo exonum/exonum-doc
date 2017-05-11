@@ -1,4 +1,5 @@
 site_name: Exonum Documentation
+site_url: http://exonum.com/doc/
 docs_dir: src
 theme: flatly
 theme_dir: theme
@@ -9,7 +10,17 @@ pages:
     - 'Getting Started':
         - 'Setup': 'get-started/setup.md'
         - 'Timestamping Service': 'get-started/timestamping-service.md'
-        - 'Cryptocurrency': 'get-started/cryptocurrency.md'
+        - 'Cryptocurrency':
+            - 'Set up backend': 'get-started/cryptocurrency-backend.md'
+            - 'Set up frontend':
+                - 'Set up frontend': 'get-started/frontend-tutorial/overview.md'
+                - 'Step 1: Basic structure': 'get-started/frontend-tutorial/step-1-basics.md'
+                - 'Step 2: Authorization inerfaces markdown': 'get-started/frontend-tutorial/step-2-auth-markdown.md'
+                - 'Step 3: Authorization inerfaces logic': 'get-started/frontend-tutorial/step-3-auth-logic.md'
+                - 'Step 4: Wallet interface': 'get-started/frontend-tutorial/step-4-wallet.md'
+                - 'Step 5: Add funds interface': 'get-started/frontend-tutorial/step-5-add-funds.md'
+                - 'Step 6: Transfer funds interface': 'get-started/frontend-tutorial/step-6-transfer-funds.md'
+                - 'Step 7: Blockchain explorer': 'get-started/frontend-tutorial/step-7-blockchain-explorer.md'
     - 'Architecture':
         - 'Design Overview': 'architecture/overview.md'
         - 'Data model': 'architecture/data-model.md'
