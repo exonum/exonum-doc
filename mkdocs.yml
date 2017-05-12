@@ -5,37 +5,57 @@ theme_dir: theme
 extra_css:
     - css/extra.css
 pages:
-    - 'Home': 'index.md' # Short description of Exonum, documentation and how to use it
+    # Short description of Exonum, documentation and how to use it
+    - 'Home': 'index.md'
     - 'Getting started':
-        - 'What is Exonum': 'home/what-is-exonum.md' # What is Exonum 'as a box', from point of view of external developer
-        - 'Design overview': 'home/design-overview.md' # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block; links to necessary documentation parts.
+        # What is Exonum 'as a box', from point of view of external developer
+        - 'What is Exonum': 'home/what-is-exonum.md'
+        # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
+        # links to necessary documentation parts
+        - 'Design overview': 'home/design-overview.md'
         - 'Glossary of Terms': 'home/glossary.md'
         - 'Cryptocurrency tutorial':
             - 'Introduction': 'home/cryptocurrency/intro.md'
             - 'Step 1': 'home/cryptocurrency/step1.md'
     - 'Architecture':
-        - 'Configuration': 'architecture/configuration.md' # Local configuration - how to roughly configure a node (make it ready to run)
-        - 'Storage': 'architecture/storage.md' # Includes blockchain, genesis block, indexes, proofs, etc.
-        - 'Transactions': 'architecture/transactions.md' # What is transaction? (purity, sequentual consistency, non-repliability attack, signatures)
-        - 'Services': 'architecture/services.md' # Includes guidelines for services
-        - 'Clients': 'architecture/clients.md' # How to make Public API communication (both server and client side) 
+        # Local configuration - how to roughly configure a node (make it ready to run)
+        - 'Configuration': 'architecture/configuration.md'
+        # Includes blockchain, genesis block, indexes, proofs, etc.
+        - 'Storage': 'architecture/storage.md'
+        # What is transaction? (purity, sequential consistency, non-replayability, signatures)
+        - 'Transactions': 'architecture/transactions.md'
+        # Includes guidelines for services
+        - 'Services': 'architecture/services.md'
+        # How to make Public API communication (both server and client side)
+        - 'Clients': 'architecture/clients.md'
     - 'Advanced Topics':
-        - 'Internode communication': 'advanced/network.md' # How does the network module work: peer discovery, p2p connections
-        - 'Serialization': 'advanced/serialization.md' # How the data is serialised and deserialised  to be transfered through the network 
+        # How the network module works: peer discovery, p2p connections
+        - 'Internode communication': 'advanced/network.md'
+        # How the data is serialised and deserialised to be transfered through the network
+        - 'Serialization': 'advanced/serialization.md'
         - 'Merkle index': 'advanced/merkle-index.md'
         - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
         - 'Services':
-            - 'Configuration': 'advanced/services/configuration.md' # Configuration change service documentation
-            - 'BTC Anchoring': 'advanced/services/anchoring.md' # Anchoring service documentation
+            # Configuration change service documentation
+            - 'Configuration': 'advanced/services/configuration.md'
+            # Anchoring service documentation
+            - 'BTC Anchoring': 'advanced/services/anchoring.md'
         - 'Consensus specification':
-            - 'Consensus': 'advanced/consensus/consensus.md' # Consensus specification, including proofs
-            - 'Leader election': 'advanced/consensus/leader-election.md' # Leader election algorithm specification
-            - 'Requests': 'advanced/consensus/requests.md' # Requests specification
-            - 'Timeouts adjustment': 'advanced/consensus/timeouts-adjustment.md' # Timeout adjustment module specification
-        - 'DoS attacks': 'advanced/dos-attacks.md' # DoS attacks description. How we (are going to) protect the system from it 
-        - 'Sandbox testing': 'advanced/sandbox.md' # What is sandbox testing and simple example of one of sandbox tests
+            # Consensus specification, including proofs
+            - 'Consensus': 'advanced/consensus/consensus.md'
+            # Leader election algorithm specification
+            - 'Leader election': 'advanced/consensus/leader-election.md'
+            # Requests specification
+            - 'Requests': 'advanced/consensus/requests.md'
+            # Timeout adjustment module specification
+            - 'Timeouts adjustment': 'advanced/consensus/timeouts-adjustment.md'
+        # DoS attacks description. How we (are going to) protect the system from it
+        - 'DoS attacks': 'advanced/dos-attacks.md'
+        # What is sandbox testing and simple example of one of sandbox tests
+        - 'Sandbox testing': 'advanced/sandbox.md'
     - 'Development':
-        - 'Roadmap': 'dev/roadmap.md' # Includes roadmap and features list
-        - 'Contributing': 'dev/contributing.md' # How to contribute to Exonum repositories
+        # Includes roadmap and features list
+        - 'Roadmap': 'dev/roadmap.md'
+        # How to contribute to Exonum repositories
+        - 'Contributing': 'dev/contributing.md'
         - 'License': 'dev/license.md'
-
