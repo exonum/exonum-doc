@@ -313,6 +313,176 @@ expiration of `propose_timeout`.
 all validators.
 - Add a timeout for the next status send.
 
+## Proof of algorithm correctness
+
+In this version, we assume that messages are processed instantly. To get rid of
+this assumption, it is enough to guarantee the finality of the processed
+messages pertaining to each round, and the correct organization of the queue for
+messages from different rounds.
+
+**Proposition 1\. (Round beginning).** _All non-Byzantine nodes being at a
+height of not less than `H`, will be in the state `(H, R)`or higher (either
+bigger round or bigger height), where `R` is an arbitrary fixed constant._
+
+**Proof**
+
+We will prove the statement above for every single non-Byzantine node. That node
+shall move to a new height in a finite time (and in this case the condition will
+be satisfied) or remain at the height `H`. In the second case, the node
+increments the round counter at fixed intervals (by stopwatch). From the fact
+that the transition to a new round is carried out for a limited time `T` it
+follows that the round counter of any non-Byzantine validator will be increased
+to the value `R` no more than in finite time `F T`.
+
+Thus, all non-Byzantine validators will move to the state `(H, R)` or higher.
+
+**End of proof**
+
+**Proposition 2\. (Non-Byzantine leader).** _For each height `H` there exists a
+round in which the non-Byzantine node will become the leader._
+
+**Proof**
+
+**TODO:** Property of round robin.
+
+**End of proof**
+
+**Proposition 3\. (Deadlock absence)** _A certain non-Byzantine node will sooner
+or later send some message relating to the consensus algorithm (propose,
+prevote, precommit, commit)._
+
+**Proof**
+
+Let us prove it by contradiction. Assume that each non-Byzantine node send no
+messages for an arbitrarily long period of time; then that node updates neither
+the current height (otherwise it would send a message to _commit_) nor the PoL
+state (_prevote_ message would be sent for the new PoL upon the coming of a new
+round in the case of a PoL update, if no other message had been sent before this
+time). Consider the cases of PoL status:
+
+1. **Some non-Byzantine node has a saved PoL**. Then this node will send a
+_prevote_ message for the proposal saved in the PoL when the next round timeout
+occurs (unless it sends any other message earlier).
+2. **No one non-Byzantine node has a saved PoL**. Then there will always come
+another round in which some non-Byzantine node will be the leader (see the
+previous statement). In this case, the node will form a new proposal and send
+_propose_ and _prevote_ messages.
+
+**End of proof**
+
+**Consequence.** _If there exists an unlimited number of heights on which the
+validator can become a leader (property of round robin), then any non-Byzantine
+node will send an arbitrarily large number of messages related to the consensus
+algorithm (propose, prevote, precommit, commit)._
+
+--------------------------------------------------------------------------------
+
+**Proposition 4\. (Obligatory block acceptance, liveness)** _There necessarily
+will come a point in the system when the node adds the block to the blockchain._
+
+**Proof**
+
+Suppose the network be at a certain height `H`; then the maximum height of a
+non-Byzantine nodes' blockchain is equal to `H`. In accordance with the
+proposition 3, all non-Byzantine nodes will be able to move up to the height
+`H`. Next, the state is considered when all the non-Byzantine nodes are at the
+height `H`.
+
+Let `R(T)` denote the round following the maximum round with non-Byzantine
+validators, at the moment `T` by the clock of an outside observer.
+
+Similarly, `T(R)` is the time of coming of the `R` round by the clock of an
+outside observer for all non-Byzantine validators.
+
+Let the non-Byzantine node be the leader for the first time in the round with
+the number `R<R*` (where `R *` denote a uniform estimate of `R`). Then the
+coming time of the round `R*` for all non-Byzantine nodes on the outside
+observer's watch is `T(R*)`.
+
+Not later than at the moment `T(R*) + ?T + propose_timeout` each non-Byzantine
+node will receive a correct proposal from the` R` round. Further, not later than
+through `2 ?T`, that node will know all the transactions from this proposal
+(request mechanism). Denote this time `T* = T(R*) + propose_timeout + 3 ?t`.
+
+If no non-Byzantine node has PoL to the `R(T*)` round, then in this round the
+node  will receive PoL (for the proposal from the `R` round). Indeed, if no one
+has PoL, then the nodes could not send the _prevote_ message in the `R(T*)`
+round. In accordance with the algorithm for processing complete proposals, the
+confirming _prevote_ message will be sent.
+
+Thus, **by the time `T'= T(R(T*)) + ?T` at least one non-Byzantine node will
+have PoL**.
+
+**Not later than `T'' = T(R(T')) + 2 ?T` each non-Byzantine node will have some
+PoL**. Indeed, starting with the `R(T')` round, the non-Byzantine node will send
+_prevote_ messages for the proposal from its PoL. Non-Byzantine nodes that do
+not have PoL will be able to get this PoL through the request mechanism by the
+time `T''`.
+
+None of the non-Byzantine nodes will send _prevote_ for new proposals since the
+moment `T''`. Hence, new PoL will not appear in the network.
+
+During one iteration `T(R(...)) + 2 ?T` at least one non-Byzantine validator
+will increase its PoL. Indeed, all the non-Byzantine nodes already have some
+PoLs. In this case, they will always send _prevote_ messages for the
+corresponding proposals. And according to the logic of their processing, if the
+non-Byzantine node receives _prevote_ pointing to a larger PoL, a request for
+missing _prevote_ for this (bigger) PoL occurs.
+
+Since there exists finite number of the validators and possible proposals, it
+follows that in some finite time `T '''` + 2/3 of the non-Byzantine validators
+will receive PoL for the same proposal. After that they will be able to send
+_precommit_ messages.
+
+Not later than time `T(R(T''')) + ?T` at least one non-Byzantine validator will
+accept the new block and hence some node will correctly add the block to the
+blockchain.
+
+**End of proof**
+
+--------------------------------------------------------------------------------
+
+**Proposition 5\. (Absence of forks)** _If some non-Byzantine node adds a block
+to the blockchain, then no other node can add another block, confirmed with +2/3
+precommit messages, to the blockchain at the same height._
+
+**Proof**
+
+**TODO:** add proof
+
+**End of proof**
+
+**Consequence.** _The property of fork absence will be preserved also in the
+case of an asynchronous network ._
+
+**Proof**
+
+The proof of _Proposition 5_ did not in any way use the assumption of partial
+synchronism. Therefore, it is also true in an asynchronous network.
+
+**End of proof**
+
+--------------------------------------------------------------------------------
+
+**Proposition 6\. (Moving nodes up)** _Any non-Byzantine node can get all the
+blocks included in the blockchain by any other non-Byzantine node._
+
+**Proof**
+
+**TODO:** add proof
+
+**End of proof**
+--------------------------------------------------------------------------------
+
+**Proposition 7\. (Censorship resistance)** _Not less than once in `1/3` blocks
+the non-Byzantine node will be the leader of the accepted block._
+
+**Proof**
+
+**TODO:** Property of a new algorithm for choosing a leader.
+
+**End of proof**
+
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
 [public_and_private_blockchains]: https://blog.ethereum.org/2015/08/07/on-public-and-private-blockchains/
