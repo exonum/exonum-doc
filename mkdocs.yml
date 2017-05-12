@@ -13,7 +13,7 @@ pages:
         # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
         # links to necessary documentation parts
         - 'Design overview': 'home/design-overview.md'
-        - 'Glossary of Terms': 'home/glossary.md'
+        - 'Glossary of terms': 'home/glossary.md'
         - 'Cryptocurrency tutorial':
             - 'Introduction': 'home/cryptocurrency/intro.md'
             - 'Step 1': 'home/cryptocurrency/step1.md'
@@ -28,7 +28,7 @@ pages:
         - 'Services': 'architecture/services.md'
         # How to make Public API communication (both server and client side)
         - 'Clients': 'architecture/clients.md'
-    - 'Advanced Topics':
+    - 'Advanced topics':
         # How the network module works: peer discovery, p2p connections
         - 'Internode communication': 'advanced/network.md'
         # How the data is serialised and deserialised to be transfered through the network
@@ -39,7 +39,7 @@ pages:
             # Configuration change service documentation
             - 'Configuration': 'advanced/services/configuration.md'
             # Anchoring service documentation
-            - 'BTC Anchoring': 'advanced/services/anchoring.md'
+            - 'Bitcoin anchoring': 'advanced/services/anchoring.md'
         - 'Consensus specification':
             # Consensus specification, including proofs
             - 'Consensus': 'advanced/consensus/consensus.md'
