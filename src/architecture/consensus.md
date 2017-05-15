@@ -448,11 +448,41 @@ precommit messages, to the blockchain at the same height._
 
 **Proof**
 
-**TODO:** add proof
+Let some node added the `B` block to the blockchain. This could only happen if
+that node went into the **COMMIT** state. There exist three possibilities of the
+transition to the **COMMIT** state: from **LOCK**, **_Prevote _**
+**processing**, and **Availability of the full proposal**. In all these cases,
+the condition of the transition is the presence of +2/3 _precommit_ messages for
+some proposal `P` from the `R` round and the result of applying the
+corresponding block leads to the same `state_hash`. Since the number of
+Byzantine nodes is -1/3, +1/3 of the Neo-Byzantine nodes sent _precomit_
+messages in the corresponding round. Such a message could only be sent within
+the **LOCK** state in which the PoL was stored for the `P` proposal in the `R`
+round. This could happen only if these nodes did not send _prevote_ messages in
+rounds `R '> R` for `P'! = P` (special condition for sending the _precommit_
+message). Also, these nodes sent _prevote_ messages in all rounds after `R`
+until their current rounds. Thus, since the remaining nodes are -2/3, we have
+two consequences.
+
+1. In no rounds after `R` we can get PoL (in other words go to the ** LOCK **
+state) for the `P '! = P` proposal, because this requires +2/3 _prevote_
+messages.
+
+2. In all rounds of `R '> R`, new PoLs cannot emerge in the network, except for
+PoLs related to the `P` proposal (and, accordingly, to the `B` block). Indeed,
+at the beginning of the round following the current round, the specified +1/3 of
+the non-Byzantine nodes will be in the state with the saved PoL corresponding to
+the `P` proposal. And consequently they will send _prevote_ messages only for
+the saved `P` proposal according to the **Processing of the timeout of the
+round** state.
+
+Thus, messages of _precommit_ type can not be sent for any other block. This
+means that none of the non-Byzantine node can add another block to the
+blockchain.
 
 **End of proof**
 
-**Consequence.** _The property of fork absence will be preserved also in the
+**Corollary.** _The property of fork absence will be preserved also in the
 case of an asynchronous network ._
 
 **Proof**
@@ -469,7 +499,18 @@ blocks included in the blockchain by any other non-Byzantine node._
 
 **Proof**
 
-**TODO:** add proof
+Let the `A` node fall behind for some reason from the` B` node. And the `A` node
+is at the height `H`, while the `B` node is at the height `H + h`. We will show
+that in a finite time the `A` node can be pulled to the height `H + 1`.
+
+All messages described in the algorithm and related to the consensus algorithm
+(_propose_, _prevote_, _precommit_, _status_) contain the current height. Thus,
+as soon as the `B` node sends any of these messages and the message is delivered
+to `A`, the `A` node will understand that it is behind and will request the next
+block (it can do this not at the `B` node, but at any other node; if the block
+is added, then the block will be correct due to absence of forks
+(proposition 5)). In accordance with the corollary from proposition 3 (deadlock
+absence), the `B` node always sends some message of consensus algorithm .
 
 **End of proof**
 --------------------------------------------------------------------------------
