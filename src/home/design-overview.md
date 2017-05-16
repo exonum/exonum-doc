@@ -43,6 +43,15 @@ an application upon Exonum, user should define:
  - How should each transaction type be executed; what checks should be made 
 before adopting the transaction? 
 
+All the outer applications may communicate with Exonum blockchain through REST 
+API written on [IRON](http://ironframework.io/). That is, you may implement API 
+endpoints for every type of query your application need in. For example, for 
+cryptocurrency you may add endpoints like this: 
+
+ - `/getbalance?address=AAA` reads the current balance for the certain address; 
+ - `/send?from=AAA&to=BBB&sum=100` creates Exonum transaction and broadcasts it 
+to the blockchain network 
+
 To go deeper, please refer to our demos and tutorials: **TODO: link to 
 tutorials** 
 
