@@ -1,11 +1,5 @@
 # Consensus in Exonum
 
-This consensus algorithm is based on the [algorithm proposed in
-Tendermint][tendermint_consensus].
-**TODO:** Expand the intro
-
-## Assumptions
-
 Generally, a [consensus algorithm][wiki:consensus] is a process of
 obtaining an agreed result by a group of participants. In Exonum the
 consensus algorithm is used in order to agree on the list of transactions
@@ -13,10 +7,14 @@ in blocks added to the blockchain. The other goal of the algorithm is to ensure
 that the results of the transaction execution are interpreted in the same way
 by all nodes in the blockchain network.
 
+The consensus algorithm in Exonum is based on the [algorithm proposed in
+Tendermint][tendermint_consensus].
+
+## Assumptions
+
 Not all the nodes in the blockchain network may be actively involved in
 the consensus algorithm. Rather, there is a special role for active consensus
-participants – *validators* (**TODO:**
-decide which naming is better: validating nodes or consensus nodes).
+participants – *validators*.
 For example, in a [consortium blockchain][public_and_private_blockchains]
 validators could be controlled by companies participating in the consortium.
 
@@ -43,7 +41,32 @@ usual assumptions:
 The same assumptions are used in [PBFT][pbft] (the most well-known BFT consensus)
 and its successors.
 
-## Algorithm Operation
+Other assumptions:
+
+- +2/3 means "more than 2/3", and -1/3 means less than one third.
+
+- A set of +2/3 votes from _prevote_ state `(H, R)` will be called
+_Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
+one stored PoL.
+
+- We will say that PoL is more than recorded one (has a higher priority), in
+cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
+proposal with a smaller round number. So PoLs are [partially
+ordered][partial_ordering].
+
+- Some ordered numbering of validators (validator id) from 0 to N-1 exists and
+it is known to all network members. When moving to a new height, the validator
+number may change due to a change in the list of validators.
+
+- Nodes receive and exchange among themselves transactions that need to be added
+to the blockchain. Each node has a set of transactions that have not yet been
+added to the blockchain. This set will be called **pool of unconfirmed
+transactions** . In general, the pools of unconfirmed transactions are different
+for different nodes. If necessary, the nodes can request unknown transactions
+from other nodes. We will also refer to the transaction added to the blockchain
+in one of the previous blocks as **committed**.
+
+## Algorithm overview
 
 The process of reaching consensus on the next block (at the blockchain height `H`)
 consists of several **rounds**, numbered from 1\. The first round starts once the
@@ -75,8 +98,18 @@ To put it *very* simply, rounds proceed as follows:
 4. Finally, if a validator has collected a supermajority of precommits with the same state hash
    for the same proposal, the proposed block is committed to the blockchain.
 
+In reality, the algorithm is more complex. It uses *requests* to obtain unknown
+information from the other nodes. Such requests are sent to nodes that signal
+presence of unknown information (for example, messages are sent from heights
+greater than the current node height in the case of a lagging node). Sending and
+processing of such messages is algorithmized (**TODO:** insert link to request
+algorithm). The algorithm for sending requests is an integral part of the
+consensus algorithm.
 
-Validating nodes exchange messages. The consensus algorithm uses several types
+Also, consensus algorithm can process any type of message (message types are
+listed below) at any time.
+
+Validators exchange messages. The consensus algorithm uses several types
 of messages:
 
   1. _Propose_ - a set of transactions to include in the block (message includes
@@ -92,35 +125,22 @@ of messages:
   5. _Block_ - message containing a block (in the meaning of blockchain) and a
   set of _precommit_ messages that allowed that block to be accepted. To be sent
   on request.
-  6. _Request_ - request message for receiving certain information. Such
-  requests are sent to receive unknown information to nodes that signal its
-  presence (for example, messages are sent from heights greater than the current
-  node height - the case of a lagging node). Sending and processing of such
-  messages is algorithmized (**TODO:** insert link to request algorithm). The
-  algorithm for sending requests is an integral part of the consensus algorithm.
+  6. _Request_ - request message for receiving certain information using
+  *requests algorithm*.
 
-- +2/3 means "more than 2/3", and -1/3 means less than one third.
+In comparison with other *PBFT* algorithms, consensus algorithm in Exonum has
+such distinctive features:
 
-- A set of +2/3 votes from _prevote_ state `(H, R)` will be called
-_Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
-one stored PoL.
+- Rounds have a fixed start time but they do not have a definite end
+time (round ends when the next block is received). This reduces the effect of
+network delays.
 
-- We will say that PoL is more than recorded one (has a higher priority), in
-cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
-proposal with a smaller round number. So PoLs are [partially
-ordered][partial_ordering].
+- _Propose_ message includes only transaction hashes. Transactions are included
+into _Block_ message and executed only at the **_LOCK_** stage. This ensures
+system asynchrony.
 
-- Some ordered numbering of validators (validator id) from 0 to N-1 exists and
-it is known to all network members. When moving to a new height, the validator
-number may change due to a change in the list of validating nodes.
-
-- Nodes receive and exchange among themselves transactions that need to be added
-to the blockchain. Each node has a set of transactions that have not yet been
-added to the blockchain. This set will be called **pool of unconfirmed
-transactions** . In general, the pools of unconfirmed transactions are different
-for different nodes. If necessary, the nodes can request unknown transactions
-from other nodes. We will also refer to the transaction added to the blockchain
-in one of the previous blocks as **committed**.
+- *Requests algorithm* allows node to restore any consensus info from the other
+nodes.
 
 ## Node states overview
 
@@ -148,7 +168,7 @@ time (they end when the next block is received). This differs from the
 Tendermint algorithm, in which rounds are closed periods of time (messages
 marked with the round `R` are sent and received only during the round `R`).
 
-## Algorithm operation
+## Algorithm specification
 
 **TODO:** insert picture
 
