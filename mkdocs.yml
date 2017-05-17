@@ -4,6 +4,7 @@ theme: flatly
 theme_dir: theme
 extra_css:
     - css/extra.css
+copyright: © 2017 Bitfury Group Limited
 pages:
     # Short description of Exonum, documentation and how to use it
     - 'Home': 'index.md'
