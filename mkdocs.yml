@@ -16,7 +16,6 @@ pages:
         - 'Glossary of terms': 'home/glossary.md'
         - 'Cryptocurrency tutorial':
             - 'Introduction': 'home/cryptocurrency/intro.md'
-            - 'Step 1': 'home/cryptocurrency/step1.md'
     - 'Architecture':
         # Local configuration - how to roughly configure a node (make it ready to run)
         - 'Configuration': 'architecture/configuration.md'
