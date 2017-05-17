@@ -1,0 +1,1 @@
+# Exonum Serialization Format
