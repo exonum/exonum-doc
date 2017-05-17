@@ -1,0 +1,6 @@
+# Main dependencies
+mkdocs
+mkdocs-bootswatch
+# Linters
+linkchecker
+html5validator

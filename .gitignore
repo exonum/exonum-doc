@@ -1,11 +1,11 @@
 # Generic rules
 .*
 !.gitignore
-*.pdf
+!.travis.yml
 
 # IDE files
 !.editorconfig
 *.iml
 
-# Doc
+# Generated docs
 site/

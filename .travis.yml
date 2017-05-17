@@ -1,0 +1,32 @@
+dist: trusty
+sudo: false
+language: python # for mkdocs
+python:
+  - 2.7
+branches:
+  only:
+    - master
+    # tags
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+install:
+  - pip install -r requirements.txt
+  # Markdown linter
+  - gem install mdl --bindir ~/.local/bin
+  # Dirty hack for what seems like a bug in linkchecker
+  - |
+    find "$VIRTUAL_ENV" -regex '.*/linkcheck/__init__.py' -print0 | \
+      xargs -0 sed -i -e "s/requests.__version__ <= '2.2.0'/map(int, requests.__version__.split('.')) <= [2, 2, 0]/"
+  - python -m mkdocs --version
+  - linkchecker --version
+  - html5validator --version
+  - ~/.local/bin/mdl --version
+
+script:
+  - python -m mkdocs build
+  - bash ./misc/lint.sh md
+  - bash ./misc/lint.sh html
+  - bash ./misc/lint.sh links
+
+after_script:
+  # Kill mkdocs server if it's still running
+  - bash ./misc/lint.sh kill
