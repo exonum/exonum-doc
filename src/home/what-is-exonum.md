@@ -113,7 +113,7 @@ to Bitcoin blockchain endurance.
 
 ### Technical characteristics 
 
-The Core is written on the RUST that is safety-oriented language. It is compiled 
+The Core is written in RUST which is safety-oriented language. It is compiled 
 for LLVM, so it can be built for almost every operational system. From other 
 side, compiled code is quick as native one. 
 
