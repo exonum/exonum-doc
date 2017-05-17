@@ -4,38 +4,79 @@ This consensus algorithm is based on the [algorithm proposed in
 Tendermint][tendermint_consensus].
 **TODO:** Expand the intro
 
-## Assumptions and definitions
+## Assumptions
 
-- Hereinafter, we will call the **consensus algorithm** the process of
-obtaining an agreed result by a group of participants. In this system the
-consensus algorithm is used to obtain the next block, which will be added to the
-blockchain.
-- It is assumed that not all the nodes of the blockchain network are involved in
-the consensus algorithm, but only the specialized validating nodes (**TODO:**
-decide which naming is better: validating nodes or consensus nodes)
-(validators). The identities of validators are known; e.g., in a [consortium
-blockchain][public_and_private_blockchains] validators could be controlled by
-companies participating in the consortium. The code that runs on all the
-validators is identical. There are no single points of failure.
-- It is assumed that the processors of the validators are [partially
-synchronous][partial_synchrony] (difference in their performances does not
-exceed an unknown and finite number `F` times) and the network is partially
-synchronous. (time for message delivery does not exceed the unknown time `t`)
-- Each validator uses its own **stopwatch** to determine the time.
-- The process of reaching consensus on the next block (at the height `H`)
-consists of several **rounds**, numbered from 1\. Rounds may start in different
-time for different validators. The stopwatch starts counting from zero once the
-validator moves to a new height `H`. The onset of the next round is determined
-by a fixed timetable: rounds start after regular intervals. In each round a
-leader node is chosen. Leader node offers a proposal for the next block. The
-logic of selecting the leader node is described in the separate algorithm.
-(**TODO:** insert link to leader election algorithm)
-- When the round `R` comes, the previous rounds are not completed: round `R` for
-the validator means that validator can process messages related to a round with
-a number no greater than `R`.
-- We will call the current state of the validating node `(H, R)`, meaning the
-height `H` and the round `R` of negotiations for the next block acceptance.
-- Validating nodes exchange messages. The consensus algorithm uses several types
+Generally, a [consensus algorithm][wiki:consensus] is a process of
+obtaining an agreed result by a group of participants. In Exonum the
+consensus algorithm is used in order to agree on the list of transactions
+in blocks added to the blockchain. The other goal of the algorithm is to ensure
+that the results of the transaction execution are interpreted in the same way
+by all nodes in the blockchain network.
+
+Not all the nodes in the blockchain network may be actively involved in
+the consensus algorithm. Rather, there is a special role for active consensus
+participants – *validators* (**TODO:**
+decide which naming is better: validating nodes or consensus nodes).
+For example, in a [consortium blockchain][public_and_private_blockchains]
+validators could be controlled by companies participating in the consortium.
+
+The consensus algorithm must operate in the presence of faults, i.e., when
+participants in the network may behave abnormally. The Exonum consensus algorithm
+assumes the worst; it operates under the assumption that any individual node
+or even a group of nodes in the blockchain network can crash or can be compromised
+by a resourceful adversary (say, a hacker or a corrupt administator). This
+threat model is known in CS as [Byzantine faults][wiki:bft]; correspondingly,
+the Exonum consensus algorithm is Byzantine fault tolerant (BFT).
+
+From the computer science perspective, the Exonum consensus algorithm takes
+usual assumptions:
+
+- Validator nodes are assumed to be [partially synchronous][partial_synchrony],
+  i.e., their computation performances do not differ much
+- The network is partially synchronous, too. That is, all messages are delivered
+  in the finite time which, however, is unknown in advance
+- Each validator has an access to a local **stopwatch** to determine time intervals.
+  On the other hand, there is no global synchronized time in the system
+- Validators can be identified with the public-key cryptography; correspondingly,
+  the communication among validators is authenticated
+
+The same assumptions are used in [PBFT][pbft] (the most well-known BFT consensus)
+and its successors.
+
+## Algorithm Operation
+
+The process of reaching consensus on the next block (at the blockchain height `H`)
+consists of several **rounds**, numbered from 1\. The first round starts once the
+validator commits the block at height `H - 1`. The onsets of rounds are determined
+by a fixed timetable: rounds start after regular intervals. As there is no global time,
+rounds may start at a different time for different validators.
+
+When the round number `R` comes, the previous rounds are not completed.
+That is, round `R` means that the validator can process messages
+related to a round with a number no greater than `R`.
+The current state of a validator can be described as a tuple `(H, R)`.
+The `R` part may differ among validators, but the height `H` is generally the same.
+
+To put it *very* simply, rounds proceed as follows:
+
+1. Each round has a *leader node*. The round leader offers a *proposal* for the next block
+   and broadcasts it accross the network. The logic of selecting the leader node
+   is described in the separate algorithm
+2. Validators may vote for the proposal by broadcasting a *prevote* message. A prevote means that
+   that the validator has been able to parse the proposal and has all transactions specified
+   in it
+3. After a validator has collected enough prevotes from a supermajority of other validators,
+   it applies transactions specified in the prevoted proposal, and broadcasts a *precommit* message.
+   This message contains the result of the proposal execution in the form
+   of a new state hash (**TODO:** link to state hash/data model).
+   The precommit expresses that the sender is ready to commit the corresponding
+   proposed block to the blockchain, but needs to see what the other validators have to say
+   on the matter just to be sure
+4. Finally, if a validator has collected a supermajority of precommits with the same state hash
+   for the same proposal, the proposed block is committed to the blockchain.
+
+
+Validating nodes exchange messages. The consensus algorithm uses several types
 of messages:
 
   1. _Propose_ - a set of transactions to include in the block (message includes
@@ -528,3 +569,6 @@ the non-Byzantine node will be the leader of the accepted block._
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
 [public_and_private_blockchains]: https://blog.ethereum.org/2015/08/07/on-public-and-private-blockchains/
 [tendermint_consensus]: https://github.com/tendermint/tendermint/wiki/Byzantine-Consensus-Algorithm
+[wiki:consensus]: https://en.wikipedia.org/wiki/Consensus_(computer_science)
+[wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
+[pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
