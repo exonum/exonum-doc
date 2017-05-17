@@ -1,4 +1,12 @@
-# Assumptions and definitions
+# Requests algorithm
+
+The requests algorithm is used to obtain unknown information from nodes that
+signal the presence of such information (for example, messages are sent from
+heights greater than the current node height in the case of a lagging node).
+The requests algorithm is an integral part of the consensus algorithm
+(**TODO:** insert link to consensus algorithm).
+
+## Assumptions and definitions
 
 Receiving a message from the node gives us the opportunity to learn certain
 information about the state of the node, if the node is not Byzantine:
@@ -26,70 +34,7 @@ this sentence in the specified round.
 - On specified `addr` it is possible to address to a node with specified
 `pub_key`.
 
-# Messages
-
-_RequestPropose_ message:
-
-Field          | Type
--------------- | ----------
-`from`         | &PublicKey
-`to`           | &PublicKey
-`time`         | Timespec
-`height`       | u64
-`propose_hash` | Hash
-
-_RequestTransactions_ message:
-
-Field  | Type
------- | ----------
-`from` | &PublicKey
-`to`   | &PublicKey
-`time` | Timespec
-`txs`  | &[Hash]
-
-_RequestPrevotes_ message:
-
-Field          | Type
--------------- | ----------
-`from`         | &PublicKey
-`to`           | &PublicKey
-`time`         | Timespec
-`height`       | u64
-`round`        | u32
-`propose_hash` | &Hash
-`validators`   | &BitVet
-
-_RequestPrecommits_ message:
-
-Field          | Type
--------------- | ----------
-`from`         | &PublicKey
-`to`           | &PublicKey
-`time`         | Timespec
-`height`       | u64
-`round`        | u32
-`propose_hash` | &Hash
-`block_hash`   | &Hash
-`validators`   | &BitVet
-
-_RequestBlock_ message:
-
-Field    | Type
--------- | ----------
-`from`   | &PublicKey
-`to`     | &PublicKey
-`time`   | Timespec
-`height` | u64
-
-_RequestPeers_ message:
-
-Field  | Type
------- | ----------
-`from` | &PublicKey
-`to`   | &PublicKey
-`time` | Timespec
-
-# Sending query algorithm messages
+## Sending query algorithm messages
 
 **Getting any consensus message from a bigger height**
 
@@ -177,7 +122,7 @@ it and set the timer to wait for the data (`RequesTimeout`).
 **RequestState**.
 - Otherwise, execute the query and start a new timer.
 
-# Message processing
+## Message processing
 
 The processing of responses to requests is trivial:
 
