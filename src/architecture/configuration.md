@@ -1,6 +1,6 @@
 # System Configuration
 
-**System Configuration** is a set of settings that determine the access
+**System configuration** is settings that determine the access
 network parameters of a node and the behavior of the node while operating in the
 network.
 
@@ -9,14 +9,14 @@ Configuration is stored in [TOML][toml] format.
 Configuration may be changed using the global variables updater service or
 [by editing the configuration file](#changing-configuration).
 
-## Configuration parameters
+## Configuration Parameters
 
-System configuration should contain configuration parameters of following types:
+System configuration contains 2 types of configuration parameters:
 
-- **Global parameters** must be identical for all nodes
-- **Local parameters** may be tweaked for each node
+- **Global parameters** must be identical for all full nodes in the network
+- **Local parameters** may differ for each node
 
-### Global parameters
+### Global Parameters
 
 #### [genesis]
 
@@ -40,7 +40,7 @@ Consensus algorithm parameters.
 - **txs_block_limit**  
   Maximum number of transactions per block.
 
-### Local parameters
+### Local Parameters
 
 - **listen_address**  
   Address to be listened by this node.
@@ -66,10 +66,11 @@ Local connection settings.
 - **tcp_reconnect_timeout_max**  
   Maximum timeout (ms) for reconnect attempt.
 
-## Changing configuration
+## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
-service for all nodes simultaneously. If the global variables are changed by
+service. The service ensures that the configuration updates are synchronized
+among nodes in the network. If the global variables are changed by
 simply editing the configuration file of node not having a database, a node will
 treat the rest network's blocks as invalid.
 
@@ -78,7 +79,7 @@ and restarting the node to apply changes. So that the node retained its
 functionality when changing keys, you also need to update the list of validator
 keys using the global variables updater service.
 
-## Configuration file example
+## Sample Configuration File
 
 ```toml
 listen_address = "127.0.0.1:2000"
