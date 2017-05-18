@@ -1,3 +1,4 @@
 all
-rule 'MD013', :tables => false
-rule 'MD029', :style => 'ordered'
+rule 'line-length', :tables => false
+rule 'ol-prefix', :style => 'ordered'
+rule 'no-trailing-spaces', :br_spaces => 2
