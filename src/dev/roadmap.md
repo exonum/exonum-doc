@@ -1,3 +1,1 @@
 # Exonum Roadmap
-
-FIXME: roadmap
