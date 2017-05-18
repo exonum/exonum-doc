@@ -10,6 +10,10 @@ You can read about Markdown [here](https://guides.github.com/features/mastering-
 or [other](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 [places](http://www.mkdocs.org/user-guide/writing-your-docs/).
 
+[codehilite](https://github.com/squidfunk/mkdocs-material/blob/master/docs/extensions/codehilite.md) extension is used for syntax highlighting to code blocks.
+
+[PyMdown Extensions](https://github.com/squidfunk/mkdocs-material/blob/master/docs/extensions/pymdown.md) extensions pack is used for advanced markdown formatting such as: Tasklist, Emoji, TeX markup and other great features.
+
 ## Contributing
 
 In order to contribute, fork this repository, make some changes, and then submit
@@ -31,21 +35,39 @@ for more details) and run them using the `./misc/lint.sh` script with `md`, `htm
 
 It is a good idea to preview your changes locally before sending a pull request. 
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
-Then, install `mkdocs` and the `bootswatch` theme:
+Then, install `mkdocs`:
+
 ```
-pip install mkdocs mkdocs-bootswatch
+pip install mkdocs
+```
+
+Install [codehilite](https://github.com/squidfunk/mkdocs-material/blob/master/docs/extensions/codehilite.md) and [PyMdown Extensions](https://github.com/squidfunk/mkdocs-material/blob/master/docs/extensions/pymdown.md) extensions:
+
+```
+pip install pygments
+pip install pymdown-extensions
+```
+
+Install theme:
+
+```
+pip install mkdocs-material
 ```
 
 In order to run a local web server serving docs, use:
+
 ```
 mkdocs serve
 ```
+
 The web server will be available on [127.0.0.1:8000](http://127.0.0.1:8000/).
 
 To generate HTML files from the Markdown source files, use:
+
 ```
 mkdocs build
 ```
+
 The generated pages will be available in the **site/** directory.
 
 ## License
