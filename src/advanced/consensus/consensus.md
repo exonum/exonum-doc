@@ -52,16 +52,16 @@ and its successors.
 The process of reaching consensus on the next block (at the blockchain height `H`)
 consists of several **rounds**, numbered from 1\. The first round starts once the
 validator commits the block at height `H - 1`. The onsets of rounds are determined
-by a fixed timetable: rounds start after regular intervals. As there is no global time,
-rounds may start at a different time for different validators.
+by a fixed timetable: rounds start after regular intervals. As there is no
+global time, rounds may start at a different time for different validators.
 
 When the round number `R` comes, the previous rounds are not completed.
 That is, round `R` means that the validator can process messages
 related to a round with a number no greater than `R`.
 The current state of a validator can be described as a tuple `(H, R)`.
 The `R` part may differ among validators, but the height `H` is usually the same.
-If a specific validator is lagging (e.g., during its initial synchronization, or if
-it was switched off for some time), its height may be lower.
+If a specific validator is lagging (e.g., during its initial synchronization,
+or if it was switched off for some time), its height may be lower.
 In this case, the validator can request missing blocks from
 other validators and full nodes in order to quickly synchronize with the rest
 of the network.
@@ -77,60 +77,60 @@ To put it *very* simply, rounds proceed as follows:
   A prevote means that the validator has been able to parse the proposal
   and has all transactions specified in it
 3. After a validator has collected enough prevotes from a supermajority
-  of other validators, it applies transactions specified in the prevoted proposal, 
-  and broadcasts a *precommit* message. This message contains the result of the proposal
-  execution in the form of [a new state hash](../storage.md)
+  of other validators, it applies transactions specified in the prevoted proposal,
+  and broadcasts a *precommit* message. This message contains the result of
+  the proposal execution in the form of [a new state hash](../../architecture/storage.md).
   The precommit expresses that the sender is ready to commit the corresponding
   proposed block to the blockchain, but needs to see what the other validators
   have to say on the matter just to be sure
 4. Finally, if a validator has collected a supermajority of precommits with
   the same state hash for the same proposal, the proposed block is committed
   to the blockchain.
-  
+
 ### Back to Reality
 
 - +2/3 means "more than 2/3", and -1/3 means less than one third.
 
 - A set of +2/3 votes from _prevote_ state `(H, R)` will be called
-_Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
-one stored PoL.
+  _Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
+  one stored PoL.
 
 - We will say that *PoL is greater than recorded one* (has a higher priority), in
-cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
-proposal with a smaller round number. So PoLs are [partially
-ordered][partial_ordering].
+  cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
+  proposal with a smaller round number. So PoLs are [partially
+  ordered][partial_ordering].
 
 - Some ordered numbering of validators (validator id) from 0 to N-1 exists and
-it is known to all network members. When moving to a new height, the validator
-number may change due to a change in the list of validators.
+  it is known to all network members. When moving to a new height, the validator
+  number may change due to a change in the list of validators.
 
 - Nodes receive and exchange among themselves transactions that need to be added
-to the blockchain. Each node has a set of transactions that have not yet been
-added to the blockchain. This set will be called **pool of unconfirmed
-transactions** . In general, the pools of unconfirmed transactions are different
-for different nodes. If necessary, the nodes can request unknown transactions
-from other nodes. We will also refer to the transaction added to the blockchain
-in one of the previous blocks as **committed**.
+  to the blockchain. Each node has a set of transactions that have not yet been
+  added to the blockchain. This set will be called **pool of unconfirmed
+  transactions** . In general, the pools of unconfirmed transactions are different
+  for different nodes. If necessary, the nodes can request unknown transactions
+  from other nodes. We will also refer to the transaction added to the blockchain
+  in one of the previous blocks as **committed**.
 
 ### Node States Overview
 
 The order of states in the proposed algorithm is as follows:
 
-```
+```none
 Commit -> (Round)+ -> Commit -> ...
 ```
 
 On the timeline, these states look like this (for one of the
 validator nodes):
 
-```
-Commit: |  H  |                       | H+1 |               | H+2 |                              ...
-Round1: |     | R1                    |     | R1            |     | R1                           ...
-Round2: |          | R2               |          | R2       |          | R2                      ...
-Round3: |               | R3          |               | R3  |               | R3                 ...
-Round4: |                    | R4     |                    ||                    | R4            ...
+```none
+Commit: |  H  |                       | H+1 |                        ...
+Round1: |     | R1                    |     | R1                     ...
+Round2: |          | R2               |          | R2                ...
+Round3: |               | R3          |               | R3           ...
+Round4: |                    | R4     |                    | R4      ...
 ...
---------------------------------------------------------------------------------------------->  Time
+------------------------------------------------------------------>  Time
 ```
 
 Note that rounds have a fixed start time but they do not have a definite end
@@ -171,7 +171,7 @@ has a correctly formed `Propose` and all the transactions specified in it.
 
 `Precommit` is a message expressing readiness to include the next block into
 blockchain. To be distributed by all nodes.
-  
+
 #### Status
 
 `Status` is an information message about the current height. It is sent with a
@@ -202,8 +202,8 @@ the following distinctive features.
 ### Unbounded Rounds
 
 Rounds have a fixed start time but they do not have a definite end
-time (a round ends only when the next block is received). This reduces the effect of
-network delays.
+time (a round ends only when the next block is received). This reduces
+the effect of network delays.
 
 ### Compact Proposals
 
@@ -222,11 +222,11 @@ the stages of the algorithm:
   blockchain state
 - On the commit stage validators ensure that they achieved the same state
   after addition of new transactions
-  
+
 This split of work helps reduce the negative impact of byzantine nodes on the
 overall system performance.
 
-### Requests
+### Requests Algorithm
 
 Requests algorithm allows node to restore any consensus info from the other
 nodes.
