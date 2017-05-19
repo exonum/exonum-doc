@@ -7,10 +7,16 @@ in blocks added to the blockchain. The other goal of the algorithm is to ensure
 that the results of the transaction execution are interpreted in the same way
 by all nodes in the blockchain network.
 
-The consensus algorithm in Exonum is based on the [algorithm proposed in
-Tendermint][tendermint_consensus].
+The consensus algorithm in Exonum uses some ideas from
+the [algorithm proposed in Tendermint][tendermint_consensus], but has
+[several distinguishing characteristics](#distinguishing-features) compared to it
+and other consensus algorithms for blockchains.
 
 ## Assumptions
+
+The Exonum consensus algorithm assumes that the consensus participants
+can be identified. Thus, the algorithm fits for permissioned blockchains,
+which Exonum is oriented towards, rather than permissionless ones.
 
 Not all the nodes in the blockchain network may be actively involved in
 the consensus algorithm. Rather, there is a special role for active consensus
@@ -41,7 +47,47 @@ usual assumptions:
 The same assumptions are used in [PBFT][pbft] (the most well-known BFT consensus)
 and its successors.
 
-Other assumptions:
+## Algorithm Overview
+
+The process of reaching consensus on the next block (at the blockchain height `H`)
+consists of several **rounds**, numbered from 1\. The first round starts once the
+validator commits the block at height `H - 1`. The onsets of rounds are determined
+by a fixed timetable: rounds start after regular intervals. As there is no global time,
+rounds may start at a different time for different validators.
+
+When the round number `R` comes, the previous rounds are not completed.
+That is, round `R` means that the validator can process messages
+related to a round with a number no greater than `R`.
+The current state of a validator can be described as a tuple `(H, R)`.
+The `R` part may differ among validators, but the height `H` is usually the same.
+If a specific validator is lagging (e.g., during its initial synchronization, or if
+it was switched off for some time), its height may be lower.
+In this case, the validator can request missing blocks from
+other validators and full nodes in order to quickly synchronize with the rest
+of the network.
+
+### Strawman Version
+
+To put it *very* simply, rounds proceed as follows:
+
+1. Each round has a *leader node*. The round leader offers a *proposal*
+  for the next block and broadcasts it accross the network. The logic of selecting
+  the leader node is described [in a separate algorithm](leader-election.md)
+2. Validators may vote for the proposal by broadcasting a *prevote* message.
+  A prevote means that the validator has been able to parse the proposal
+  and has all transactions specified in it
+3. After a validator has collected enough prevotes from a supermajority
+  of other validators, it applies transactions specified in the prevoted proposal, 
+  and broadcasts a *precommit* message. This message contains the result of the proposal
+  execution in the form of [a new state hash](../storage.md)
+  The precommit expresses that the sender is ready to commit the corresponding
+  proposed block to the blockchain, but needs to see what the other validators
+  have to say on the matter just to be sure
+4. Finally, if a validator has collected a supermajority of precommits with
+  the same state hash for the same proposal, the proposed block is committed
+  to the blockchain.
+  
+### Back to Reality
 
 - +2/3 means "more than 2/3", and -1/3 means less than one third.
 
@@ -66,89 +112,7 @@ for different nodes. If necessary, the nodes can request unknown transactions
 from other nodes. We will also refer to the transaction added to the blockchain
 in one of the previous blocks as **committed**.
 
-## Algorithm overview
-
-The process of reaching consensus on the next block (at the blockchain height `H`)
-consists of several **rounds**, numbered from 1\. The first round starts once the
-validator commits the block at height `H - 1`. The onsets of rounds are determined
-by a fixed timetable: rounds start after regular intervals. As there is no global time,
-rounds may start at a different time for different validators.
-
-When the round number `R` comes, the previous rounds are not completed.
-That is, round `R` means that the validator can process messages
-related to a round with a number no greater than `R`.
-The current state of a validator can be described as a tuple `(H, R)`.
-The `R` part may differ among validators, but the height `H` is usually the same.
-If a specific validator is lagging (e.g., during its initial synchronization, or if
-it was switched off for some time), its height may be lower.
-In this case, the validator can request missing blocks from
-other validators and full nodes in order to quickly synchronize with the rest
-of the network.
-
-To put it *very* simply, rounds proceed as follows:
-
-1. Each round has a *leader node*. The round leader offers a *proposal*
-  for the next block and broadcasts it accross the network. The logic of selecting
-  the leader node is described [in a separate algorithm](leader-election.md)
-2. Validators may vote for the proposal by broadcasting a *prevote* message.
-  A prevote means that the validator has been able to parse the proposal
-  and has all transactions specified in it
-3. After a validator has collected enough prevotes from a supermajority
-  of other validators, it applies transactions specified in the prevoted proposal, 
-  and broadcasts a *precommit* message. This message contains the result of the proposal
-  execution in the form of [a new state hash](../storage.md)
-  The precommit expresses that the sender is ready to commit the corresponding
-  proposed block to the blockchain, but needs to see what the other validators
-  have to say on the matter just to be sure
-4. Finally, if a validator has collected a supermajority of precommits with
-  the same state hash for the same proposal, the proposed block is committed
-  to the blockchain.
-
-In reality, the algorithm is more complex. It uses *requests* to obtain unknown
-information from the other nodes. Such requests are sent to nodes that signal
-presence of unknown information (for example, messages are sent from heights
-greater than the current node height in the case of a lagging node). Sending and
-processing of such messages is algorithmized (**TODO:** insert link to request
-algorithm). The algorithm for sending requests is an integral part of the
-consensus algorithm.
-
-Also, consensus algorithm can process any type of message (message types are
-listed below) at any time.
-
-Validators exchange messages. The consensus algorithm uses several types
-of messages:
-
-  1. _Propose_ - a set of transactions to include in the block (message includes
-  not whole transactions but only transaction hashes). If the behavior is
-  correct, it is sent only by the leader node of the round.
-  2. _Prevote_ - voting message, indicating that the node has a correctly formed
-  proposal and all the transactions specified in it. To be distributed by all
-  nodes.
-  3. _Precommit_ - message expressing readiness to include the next block into
-  blockchain. To be distributed by all nodes.
-  4. _Status_ - information message about the current height. It is sent with a
-  periodicity written in the `status_timeout` variable (consensus parameter).
-  5. _Block_ - message containing a block (in the meaning of blockchain) and a
-  set of _precommit_ messages that allowed that block to be accepted. To be sent
-  on request.
-  6. _Request_ - request message for receiving certain information using
-  *requests algorithm*.
-
-In comparison with other BFT algorithms, the consensus algorithm in Exonum has
-such distinctive features:
-
-- Rounds have a fixed start time but they do not have a definite end
-time (round ends when the next block is received). This reduces the effect of
-network delays.
-
-- _Propose_ message includes only transaction hashes. Transactions are included
-into _Block_ message and executed only at the **_LOCK_** stage. This ensures
-system asynchrony.
-
-- *Requests algorithm* allows node to restore any consensus info from the other
-nodes.
-
-## Node states overview
+### Node States Overview
 
 The order of states in the proposed algorithm is as follows:
 
@@ -156,7 +120,7 @@ The order of states in the proposed algorithm is as follows:
 Commit -> (Round)+ -> Commit -> ...
 ```
 
-So on the timeline, these states look like this (for one of the
+On the timeline, these states look like this (for one of the
 validator nodes):
 
 ```
@@ -175,6 +139,98 @@ behavior of partially synchoronous consensus algorithms, in which rounds have
 a definite conclusion (i.e., messages generated during the round `R`
 must be processed only during the round `R`).
 
+## Network Communication
+
+### Messages
+
+The consensus algorithm makes use several types of messages. All messages
+are authenticated with the help of public-key digital signatures, so that
+the sender of the message is unambiguously known and cannot be forged.
+Furthermore, the use of digital signatures (instead of, say, [HMACs][wiki:hmac])
+ensures that messages can be freely retransmitted across the network.
+Moreover, this can be done by load balancers that have no idea whatsoever
+as to the content of messages.
+
+#### Propose
+
+`Propose` message is a set of transactions proposed by the round leader
+for inclusion into the next block.
+Instead of whole transactions, `Propose` messages include only transaction hashes.
+A validator that received a `Propose` message can request missing transactions
+from its peers.
+
+If the behavior is correct, `Propose` is sent only by the leader node of the round.
+
+#### Prevote
+
+`Prevote` is a vote for a `Propose` message. `Prevote` indicates that the node
+has a correctly formed `Propose` and all the transactions specified in it.
+`Prevote` is broadcast to all validators.
+
+#### Precommit
+
+`Precommit` is a message expressing readiness to include the next block into
+blockchain. To be distributed by all nodes.
+  
+#### Status
+
+`Status` is an information message about the current height. It is sent with a
+periodicity written in the `status_timeout` variable (consensus parameter).
+
+#### Block
+
+A `Block` message contains a block (in the meaning of blockchain) and a
+set of `Precommit` messages that allowed that block to be accepted.
+To be sent on request.
+
+### Requests
+
+The Exonum consensus uses the *requests* mechanism to obtain unknown
+information from the other nodes. A request is sent by the node to its peer
+if the peer has information of interest, which is unknown to the node,
+and which has been discovered during the previous communcation with the peer.
+For example, a request is sent if the node receives
+a consensus message from a height greater than the local height.
+
+Sending and processing of such messages is algorithmized.
+
+## Distinguishing Features
+
+In comparison with other BFT algorithms, the consensus algorithm in Exonum has
+the following distinctive features.
+
+### Unbounded Rounds
+
+Rounds have a fixed start time but they do not have a definite end
+time (a round ends only when the next block is received). This reduces the effect of
+network delays.
+
+### Compact Proposals
+
+`Propose` messages include only transaction hashes. (Transactions are included
+directly into `Block` messages.) Furthermore, transaction execution is delayed;
+transactions are applied only at the when a node locks on a `Propose`.
+
+Delayed transaction processing reduces nagtive impact of malicious nodes on
+the system througput and latency. Indeed, it splits transaction processing among
+the stages of the algorithm:
+
+- On the prevote stage validators only ensure that a list of transactions
+  included in a proposal is correct (i.e., all transactions in the `Propose` exist
+  and are internally correct)
+- On the precommit stage validators apply transactions to the current
+  blockchain state
+- On the commit stage validators ensure that they achieved the same state
+  after addition of new transactions
+  
+This split of work helps reduce the negative impact of byzantine nodes on the
+overall system performance.
+
+### Requests
+
+Requests algorithm allows node to restore any consensus info from the other
+nodes.
+
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
 [public_and_private_blockchains]: https://blog.ethereum.org/2015/08/07/on-public-and-private-blockchains/
@@ -182,3 +238,4 @@ must be processed only during the round `R`).
 [wiki:consensus]: https://en.wikipedia.org/wiki/Consensus_(computer_science)
 [wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
+[wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
