@@ -3,6 +3,9 @@ site_url: http://exonum.com/doc/
 docs_dir: src
 theme: flatly
 theme_dir: theme
+image: theme/img/wallpaper.png
+twitter_site: 'BitFuryGroup'
+twitter_creator: 'BitFuryGroup'
 extra_css:
   - css/extra.css
 copyright: © 2017 Bitfury Group Limited

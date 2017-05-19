@@ -10,6 +10,20 @@
     {% if favicon %}<link rel="shortcut icon" href="{{ favicon }}">
     {% else %}<link rel="shortcut icon" href="{{ base_url }}/img/favicon.ico">{% endif %}
 
+    {%- block seo_meta %}
+    {% if page and page.meta %}
+    {% for value in page.meta.description %}<meta name="description" content="{{ value }}">{% endfor %}
+    {% if page_title %}<meta name="og:title" content="{{ page_title }}">{% endif %}
+    {% if canonical_url %}<meta name="og:url" content="{{ canonical_url }}">{% endif %}
+    <meta property="og:type" content="article">
+    {% for value in page.meta.description %}<meta name="og:description" content="{{ value }}">{% endfor %}
+    <meta name="og:image" content="{{ site_url }}{{ config.image }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="{{ config.twitter_site }}">
+    <meta name="twitter:creator" content="{{ config.twitter_creator }}">
+    {% endif %}
+    {%- endblock %}
+
     <title>{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}</title>
 
     <link href="{{ base_url }}/css/bootstrap-custom.min.css" rel="stylesheet">

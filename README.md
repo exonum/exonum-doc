@@ -27,27 +27,22 @@ You can set up these tools locally (see the `install` step in [the Travis config
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
 `links`, or `all` arguments.
 
-## Meta-tags
+## SEO optimization
 
-Add meta tags for OpenGraph and Twitter discovery into your articles. SEO optimization and ability to paste a link into a Slack channel (or Skype, or Twitter) and get responsive results are good things.
-
-Meta-tags consists of a series of keywords and values defined at the beginning of a markdown document like this:
+To make article more SEO-optimised and to make it possible to paste beautiful links into a Slack/Skype/Twitter/Facebook add `description` field into the beginning of the document:
 
 ```markdown
-description: A brief description of my document
-image: img/preview.jpg
-twitterSite: @username
-twitterCreator: @username
+description: A brief description of my article
+
+# Some title
+
+Some content begins here...
 ```
 
-Use the following properties:
+Description should contain a one to two sentence description of the article.
+Place it at the very beginning of the document.
 
-| Property | Description | Required |
-| --- | --- | --- |
-| **description** | A one to two sentence description of your article. | Yes |
-| **image** | Relative path to the image URL which should represent your article. | Yes |
-| **twitterSite** | @username for the website. | *No* |
-| **twitterCreator** | @username for the content creator / author. | *No* |
+Note, it should be blank line between description section and beginning of document.
 
 ## Build Instructions
 
