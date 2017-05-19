@@ -2,7 +2,7 @@
 
 Generally, a [consensus algorithm][wiki:consensus] is a process of
 obtaining an agreed result by a group of participants. In Exonum the
-consensus algorithm is used in order to agree on the list of transactions
+consensus algorithm is used to agree on the list of transactions
 in blocks added to the blockchain. The other goal of the algorithm is to ensure
 that the results of the transaction execution are interpreted in the same way
 by all nodes in the blockchain network.
@@ -14,17 +14,17 @@ Tendermint][tendermint_consensus].
 
 Not all the nodes in the blockchain network may be actively involved in
 the consensus algorithm. Rather, there is a special role for active consensus
-participants – *validators*.
+participants – *validators* or *validator nodes*.
 For example, in a [consortium blockchain][public_and_private_blockchains]
-validators could be controlled by companies participating in the consortium.
+validators could be controlled by the companies participating in the consortium.
 
 The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus algorithm
 assumes the worst; it operates under the assumption that any individual node
 or even a group of nodes in the blockchain network can crash or can be compromised
 by a resourceful adversary (say, a hacker or a corrupt administator). This
-threat model is known in CS as [Byzantine faults][wiki:bft]; correspondingly,
-the Exonum consensus algorithm is Byzantine fault tolerant (BFT).
+threat model is known in computer science as [Byzantine faults][wiki:bft];
+correspondingly, the Exonum consensus algorithm is Byzantine fault tolerant (BFT).
 
 From the computer science perspective, the Exonum consensus algorithm takes
 usual assumptions:
@@ -49,7 +49,7 @@ Other assumptions:
 _Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
 one stored PoL.
 
-- We will say that PoL is more than recorded one (has a higher priority), in
+- We will say that *PoL is greater than recorded one* (has a higher priority), in
 cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
 proposal with a smaller round number. So PoLs are [partially
 ordered][partial_ordering].
@@ -78,25 +78,31 @@ When the round number `R` comes, the previous rounds are not completed.
 That is, round `R` means that the validator can process messages
 related to a round with a number no greater than `R`.
 The current state of a validator can be described as a tuple `(H, R)`.
-The `R` part may differ among validators, but the height `H` is generally the same.
+The `R` part may differ among validators, but the height `H` is usually the same.
+If a specific validator is lagging (e.g., during its initial synchronization, or if
+it was switched off for some time), its height may be lower.
+In this case, the validator can request missing blocks from
+other validators and full nodes in order to quickly synchronize with the rest
+of the network.
 
 To put it *very* simply, rounds proceed as follows:
 
-1. Each round has a *leader node*. The round leader offers a *proposal* for the next block
-   and broadcasts it accross the network. The logic of selecting the leader node
-   is described in the separate algorithm
-2. Validators may vote for the proposal by broadcasting a *prevote* message. A prevote means that
-   that the validator has been able to parse the proposal and has all transactions specified
-   in it
-3. After a validator has collected enough prevotes from a supermajority of other validators,
-   it applies transactions specified in the prevoted proposal, and broadcasts a *precommit* message.
-   This message contains the result of the proposal execution in the form
-   of a new state hash (**TODO:** link to state hash/data model).
-   The precommit expresses that the sender is ready to commit the corresponding
-   proposed block to the blockchain, but needs to see what the other validators have to say
-   on the matter just to be sure
-4. Finally, if a validator has collected a supermajority of precommits with the same state hash
-   for the same proposal, the proposed block is committed to the blockchain.
+1. Each round has a *leader node*. The round leader offers a *proposal*
+  for the next block and broadcasts it accross the network. The logic of selecting
+  the leader node is described [in a separate algorithm](leader-election.md)
+2. Validators may vote for the proposal by broadcasting a *prevote* message.
+  A prevote means that the validator has been able to parse the proposal
+  and has all transactions specified in it
+3. After a validator has collected enough prevotes from a supermajority
+  of other validators, it applies transactions specified in the prevoted proposal, 
+  and broadcasts a *precommit* message. This message contains the result of the proposal
+  execution in the form of [a new state hash](../storage.md)
+  The precommit expresses that the sender is ready to commit the corresponding
+  proposed block to the blockchain, but needs to see what the other validators
+  have to say on the matter just to be sure
+4. Finally, if a validator has collected a supermajority of precommits with
+  the same state hash for the same proposal, the proposed block is committed
+  to the blockchain.
 
 In reality, the algorithm is more complex. It uses *requests* to obtain unknown
 information from the other nodes. Such requests are sent to nodes that signal
@@ -128,7 +134,7 @@ of messages:
   6. _Request_ - request message for receiving certain information using
   *requests algorithm*.
 
-In comparison with other *PBFT* algorithms, consensus algorithm in Exonum has
+In comparison with other BFT algorithms, the consensus algorithm in Exonum has
 such distinctive features:
 
 - Rounds have a fixed start time but they do not have a definite end
@@ -164,9 +170,10 @@ Round4: |                    | R4     |                    ||                   
 ```
 
 Note that rounds have a fixed start time but they do not have a definite end
-time (they end when the next block is received). This differs from the
-Tendermint algorithm, in which rounds are closed periods of time (messages
-marked with the round `R` are sent and received only during the round `R`).
+time (they end when the next block is received). This differs from common
+behavior of partially synchoronous consensus algorithms, in which rounds have
+a definite conclusion (i.e., messages generated during the round `R`
+must be processed only during the round `R`).
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
