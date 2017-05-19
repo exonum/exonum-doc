@@ -1,13 +1,16 @@
 # System Configuration
 
-**System configuration** is settings that determine the access
+**System configuration** is parameters that determine the access
 network parameters of a node and the behavior of the node while operating in the
 network.
 
-Configuration is stored in [TOML][toml] format.
+Configuration is stored in [TOML][toml] format. Path to configuration file
+should be specified on node's start up.
 
 Configuration may be changed using the global variables updater service or
 [by editing the configuration file](#changing-configuration).
+
+Services may have their own configuration settings.
 
 ## Configuration Parameters
 
@@ -70,9 +73,9 @@ Local connection settings.
 
 Global parameters should be changed by using the global variables updater
 service. The service ensures that the configuration updates are synchronized
-among nodes in the network. If the global variables are changed by
-simply editing the configuration file of node not having a database, a node will
-treat the rest network's blocks as invalid.
+among nodes in the network. Global parameters should not be changed
+by editing the configuration file because this may cause improper behavior of
+node.
 
 Local parameters may be changed by editing the configuration file
 and restarting the node to apply changes. So that the node retained its
@@ -85,7 +88,8 @@ keys using the global variables updater service.
 listen_address = "127.0.0.1:2000"
 peers = ["127.0.0.1:2000", "127.0.0.1:2001", "127.0.0.1:2002", "127.0.0.1:2003"]
 public_key = "99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1"
-secret_key = "e319e88128e4e3588ae3c01d80de95a40082f5bc4fa899cf5401fee033a9b78399ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1"
+secret_key = """e319e88128e4e3588ae3c01d80de95a40082f5bc4fa899cf5401fee033a9b\
+78399ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1"""
 
 [genesis]
 validators = ["99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1",
