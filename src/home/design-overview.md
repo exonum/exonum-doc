@@ -1,4 +1,4 @@
-## About this page 
+# About this page 
 
 This page describes a brief overview of the Exonum framework structure. Every 
 section describes specific component or idea: how is it implemented, or how can 
