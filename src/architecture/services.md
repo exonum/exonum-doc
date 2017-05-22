@@ -25,7 +25,7 @@ The implementation may read and write data from the blockchain state
 in order to simplify data management) and can also access the local node configuration.
 
 Services are executed on each validator and each auditing node of the
-blockchain network. The order of transaction processing ant the resulting changes
+blockchain network. The order of transaction processing and the resulting changes
 to the service state are a part of [the consensus algorithm](../advanced/consensus/consensus.md).
 They are guaranteed to be the same for all nodes in the blockchain network.
 
@@ -81,9 +81,10 @@ of the consensus algorithm; they are processed locally by the node that
 received the request.
 
 One of distinguishing features of the Exonum framework is that it provides
-a rich set of tools to bundle responses to reads with [cryptographic](../advanced/merkle-index.md)
-[proofs](../advanced/merkle-patricia-index.md). Proofs allow thin clients
-to minimize their trust to the responding node; essentially, a retrieved response
+a rich set of tools to bundle responses to reads with cryptographic proofs;
+see [Merkle index](../advanced/merkle-index.md) and [Merkle Patricia index](../advanced/merkle-patricia-index.md)
+for more details. Proofs allow thin clients
+to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
 **Trivia.** In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
