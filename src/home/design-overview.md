@@ -24,7 +24,7 @@ Exonum blocks consist of the following parts:
 
 2. The list of the approved transactions. When the other nodes execute the 
   block, they execute every transaction in the given order and apply changes to 
-  its data storage. 
+  their data storages. 
 3. The hash of a new data storage state. The state itself is not included; 
   however, transactions are applied deterministically and unequivocally. The 
   agreement on the hash of data storage is a part of the Exonum consensus 
@@ -35,13 +35,13 @@ Exonum blocks consist of the following parts:
 
 ## 2. The network structure 
 
-The network consist of big amount of the connected peer-to-peer nodes. These 
+The network consist of a big amount of the connected peer-to-peer nodes. These 
 nodes have different rights and different functionality. 
 
 1. The full-nodes replicate the entire contents of the blockchain. They can 
   generate new transactions but they cannot choose which transactions should be 
   adopted. They cannot generate new blocks. 
-2. The validators provide the network liveness. Despite of big amount of the 
+2. The validators provide the network liveness. Despite of the big amount of the 
   nodes presented in the network, only validators can generate new blocks or vote 
   for other block proposals. Other nodes just create business transactions and 
   send them to the network. Validators receive these txs, check them, and include 
@@ -49,9 +49,9 @@ nodes have different rights and different functionality.
   should consist of 4-15 nodes. 
 3. Thin clients do not need an every byte of the blockchain, so they held only 
   part they are interested in. To get new (or absent) information they call to the 
-  full-nodes. Exonum provides a "proofs mechanism" allowing Thin clients to check 
+  full-nodes. Exonum provides a "proofs mechanism", allowing Thin clients to check 
   if the full-node answered fairly. Basing on Merkle / Merkle Patricia tables, 
-  such mechanism allow to check if the node really keeps a shown value in its daa 
+  such mechanism allow checking if the node really keeps a shown value in its data 
   storage. Full-node cannot generate "fake" answer or fool around the client. 
 
 ## 3. Consensus 
@@ -66,7 +66,7 @@ validators. Every other validator checks the proposal and vote for it. After the
 new block proposal gets supermajority of votes, this block is considered to be 
 adopted. Validators broadcast it to other full-nodes. 
 
-To generate new block and vote upon it, the time is divided into the rounds. For 
+To generate a new block and vote upon it, the time is divided into the rounds. For 
 every round, there is predefined Leader node. The Leader creates its block 
 proposal in his round and sends it to other validators. Others check the 
 proposal, and if it is correct, vote for it. If there is a supermajority of 
@@ -79,7 +79,7 @@ the new round starts and the new Leader node appears.
 If you are interested in the Consensus, Leader Election procedure or Block 
 Generation procedure, you may refer to [Consensus 
 details](../advanced/consensus/consensus), [Leader Election 
-alrotihm](../advanced/consensus/leader-election) 
+algorithm](../advanced/consensus/leader-election) 
 
 ## 4. Data Storage 
 
@@ -96,7 +96,7 @@ storage. Both of them support persistency and proofs mechanism.
 
 Arrays are stored in the [Merkle Tree](../advanced/merkle-index) tables. Such a 
 tree is binary and balanced, although not necessarily efficiently binary. The 
-leafs keeps the actual values, while the nodes keep the hashes from concatenated 
+leafs keep the actual values, while the nodes keep the hashes from concatenated 
 children data. It is allowed only to append the data or update the cells already 
 stored. 
 
@@ -109,11 +109,11 @@ values. The intermediary nodes values consist of the following 4 parts:
 - Key for the left child node 
 - Key for the right child node 
 
-KVS allow to insert, update or delete key-value pairs. 
+KVS allow inserting, updating or deleting key-value pairs. 
 
 ### Proofs 
 
-Tree structures allows to create a proof that specific values are saved in the 
+Tree structures allows creating a proof that specific values are saved in the 
 particular data cells. To prove that, it is sufficient to return a list of 
 hashes from the tree root to the particular cell. Wherein, the Merkle Patricia 
 Tables also allow to generate proofs that there is no data in the database with 
