@@ -1,17 +1,18 @@
 # Transactions
 
-A transaction in a Blockchain (as in usual databases) is a group of sequential
-operations with the database and is a logical unit of work with data. So any
-business logic of the project with Exomum should be formulated using different
-types of transactions. A transaction can be either executed either entirely and
-successfully, respecting the integrity of the data and regardless of the other
-transactions going in parallel, or a transaction can be not performed at all,
-and then it should not have any effect. A transaction could be created by the
-allowed entities (for example, a private key owner could initialize its coins
-transfer for cryptocurrency) and sent for the distributed system of validators
-for the consideration. If the transaction is correct, it would be included in a
-block of the Blockchain through the validators voting process via the Consensus
-algorithm work.
+A transaction in a Blockchain
+(as in [usual databases](https://en.wikipedia.org/wiki/Database_transaction))
+is a group of sequential operations with the database and is a logical unit of
+work with data. So any business logic of the project with Exomum should be
+formulated using different types of transactions. A transaction can be either
+executed either entirely and successfully, respecting the integrity of the data
+and regardless of the other transactions going in parallel, or a transaction
+can be not performed at all, and then it should not have any effect. A
+transaction could be created by the allowed entities (for example, a private
+key owner could initialize its coins transfer for cryptocurrency) and sent for
+the distributed system of validators for the consideration. If the transaction
+is correct, it would be included in a block of the Blockchain through the
+validators voting process via the Consensus algorithm work.
 
 A transaction consists of
 
