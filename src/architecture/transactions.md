@@ -1,6 +1,6 @@
 # Transactions
 
-A transaction in a Blockchain
+A transaction in a blockchain
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
 is a group of sequential operations with the database and is a logical unit of
 work with data. So any business logic of the project with Exomum should be
@@ -11,19 +11,19 @@ can be not performed at all, and then it should not have any effect. A
 transaction could be created by the allowed entities (for example, a private
 key owner could initialize its coins transfer for cryptocurrency) and sent for
 the distributed system of validators for the consideration. If the transaction
-is correct, it would be included in a block of the Blockchain through the
+is correct, it would be included in a block of the blockchain through the
 validators voting process via the Consensus algorithm work.
 
 A transaction consists of
 
 1. `service_id`: sets the **TODO** ref service to make a deal with (for
   example, configuration or cryptocurrency). All the transactions are stored in
-  the Blockchain sequentially. But such a manner is not useful for queries. So
-  any fat client also duplicates information from the Blockchain in the special
+  the blockchain sequentially. But such a manner is not useful for queries. So
+  any fat client also duplicates information from the blockchain in the special
   databases (one per service) those support queries and also provides proofs of
-  consistency with the Blockchain (see **TODO** ref Merkle index and ref Merkle
+  consistency with the blockchain (see **TODO** ref Merkle index and ref Merkle
   Patricia index.
-2. `message_id`: the nodes of the Blockchain network sends and receives messages
+2. `message_id`: the nodes of the blockchain network sends and receives messages
   to communicate. The `message_id` defines the message type. For the transaction,
   it means the type of transaction in the service. For example, service
   *cryptocurrency* could include different types of transactions:
@@ -57,7 +57,7 @@ A transaction consists of
   transactions for a block proposal and under certain conditions which imply
   that the considered proposal is going to be accepted in nearly future
 6. Finally, when a certain *precommit* gathers necessary approval among
-  validators, the block is committed to the Blockchain. This means that
+  validators, the block is committed to the blockchain. This means that
   transactions from the committed block change the blockchain state, are
   executed sequentially and in the same exact order on every node
 
@@ -70,11 +70,11 @@ transaction source.
 
 ### Sequential consistency
 
-Any valid copy of the Blockchain has the same order of blocks and transactions
+Any valid copy of the blockchain has the same order of blocks and transactions
 in it. Such a property is guaranteed by the **TODO** ref Consensus algorithm.
 
 ### Non-replayability
 
-Any transaction could be included into the Blockchain only once. The `seed`
+Any transaction could be included into the blockchain only once. The `seed`
 field inside the transaction and ignoring the transactions, already included
-into the Blockchain, for the new blocks guarantees this property.
+into the blockchain, for the new blocks guarantees this property.
