@@ -16,13 +16,15 @@ validators voting process via the Consensus algorithm work.
 
 A transaction consists of
 
-1. `service_id`: sets the **TODO** ref service to make a deal with (for
+1. `service_id`: sets the [service](services.md) to make a deal with (for
   example, configuration or cryptocurrency). All the transactions are stored in
   the blockchain sequentially. But such a manner is not useful for queries. So
   any fat client also duplicates information from the blockchain in the special
   databases (one per service) those support queries and also provides proofs of
-  consistency with the blockchain (see **TODO** ref Merkle index and ref Merkle
-  Patricia index.
+  consistency with the blockchain (see
+  [Merkle index](../advanced/merkle-index.md) and
+  [Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
+  details).
 2. `message_id`: the nodes of the blockchain network sends and receives messages
   to communicate. The `message_id` defines the message type. For the transaction,
   it means the type of transaction in the service. For example, service
@@ -71,7 +73,8 @@ transaction source.
 ### Sequential consistency
 
 Any valid copy of the blockchain has the same order of blocks and transactions
-in it. Such a property is guaranteed by the **TODO** ref Consensus algorithm.
+in it. Such a property is guaranteed by the
+[consensus algorithm](../advanced/consensus/consensus.md).
 
 ### Non-replayability
 
