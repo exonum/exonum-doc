@@ -184,6 +184,41 @@ or updating local parameters
 will be added in the future, including possibility for services to define and emit
 events and for services and thin clients to subscribe to events emitted by the services.
 
+## Service Development
+
+**Notice.** As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
+Rust is probably the safest general-purpose programming language, but it’s
+not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
+
+Here’s a list of things to figure out when developing an Exonum service:
+
+- What types of actions will the service perform? What variable parameters
+  do these actions have? (Determines the endpoints the service will have.)
+- Who will authorize each of these actions? (You might want to use some kind
+  of [public key infrastructure][wiki:pki] for serious applications
+  in order to make the security of the blockchain fully decentralized.)
+- What data will the service persist? What are the main persisted entities?
+  How are these entities organized into data collections (maps
+  and append-only lists)?
+- Are there any foreign key relationships among stored entities? (Exonum data model
+  supports relationships among entities via hash links;
+  see organization of wallet history in the cryptocurrency tutorial for more details.)
+- What persistent data will be returned to external clients? (You might want
+  to use merklized data collections for this data and create corresponding
+  read request endpoints.)
+- Are there any maintenance tasks needed for the service? Do the tasks need
+  to be invoked automatically, or authorized by system administrators?
+  (These tasks could be implemented in the commit event handler of the service,
+  or as private API endpoints.)
+- What parameters do maintenance tasks require? Are these parameters local
+  to each node that the service runs on, or do they need to be agreed
+  by the blockchain maintainers? (The answer determines whether a parameter
+  should be a part of the local configuration or stored in the blockchain.)
+
+**Tip.** [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+provides a hands-on guide how to build an Exonum service that implements
+a minimalistic crypto-token.
+
 ## Tips and Tricks
 
 ### Communication with External World
@@ -230,3 +265,4 @@ running the service might not know this information.
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
+[wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
