@@ -10,7 +10,9 @@ should be specified on node's start up.
 Configuration may be changed using the global variables updater service or
 [by editing the configuration file](#changing-configuration).
 
-Services may have their own configuration settings.
+Services may have their own configuration settings (for example, _Anchoring
+service_ stores _Remote Procedure Call_ parameters and _bitcoin network status
+check frequency_ in the configuration file).
 
 ## Configuration Parameters
 
