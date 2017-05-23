@@ -1,19 +1,19 @@
 # System Configuration
 
-**System configuration** is parameters that determine the access
+**System configuration** is a set parameters that determine the access
 network parameters of a node and the behavior of the node while operating in the
 network.
 
-Configuration is stored in [TOML][toml] format. Path to configuration file
-should be specified on node's start up.
+Configuration is stored in the [TOML][toml] format. Path to configuration file
+should be specified on the node start up.
 
 Configuration may be changed using the global variables updater service or
 [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings (for example, _Anchoring
 service_ stores _Remote Procedure Call_ parameters and _bitcoin network status
-check frequency_ in the configuration file). Initialization on node's start up
-passes configuration to the services.
+check frequency_ in the configuration file). Initialization on the node start up
+passes the configuration to all services deployed on the blockchain.
 
 ## Configuration Parameters
 
@@ -81,9 +81,12 @@ by editing the configuration file because this may cause improper behavior of
 node.
 
 Local parameters may be changed by editing the configuration file
-and restarting the node to apply changes. So that the node retained its
-functionality when changing keys, you also need to update the list of validator
-keys using the global variables updater service.
+and restarting the node to apply changes. In certain cases, additional actions
+may be required to keep the system operational.
+
+**Example.** To keep a node operating when changing its validator key,
+you also need to update the corresponding global variable (the list of
+validator keys) using the global variables updater service.
 
 ## Sample Configuration File
 
