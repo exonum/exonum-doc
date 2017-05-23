@@ -28,7 +28,7 @@ This categorization holds both for core and service parameters.
 
 **Example.** The following table shows all 4 possible parameter categories.
 
-| Scope   | Core | Anchoring service | 
+| Scope   | Core | Anchoring service |
 |---------|------|-------------------|
 | Global  | Validators’ public keys | Anchoring address |
 | Local   | Validator’s private key | RPC params for Bitcoin Core |
@@ -44,7 +44,7 @@ The configuration used to create a genesis block.
 
 #### [genesis.consensus]
 
-Consensus algorithm parameters.
+[Consensus algorithm](../advanced/consensus/consensus.md) parameters.
 
 - **peers_timeout**  
   Peer exchange timeout (in ms).
@@ -70,7 +70,7 @@ Consensus algorithm parameters.
 
 #### [network]
 
-Local connection settings.
+[Local connection](../advanced/network.md) parameters.
 
 - **max_incoming_connections**  
   Maximum number of incoming connections.
