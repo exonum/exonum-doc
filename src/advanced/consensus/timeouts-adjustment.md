@@ -23,21 +23,24 @@ timeout increases. And vice versa, if **_block load_** is greater than
 
 Next round timeout is calculated using the following formula:
 
-```
+```Text
 next_timeout = target_timeout * adjustment_speed + previous_timeout *
                (1 - adjustment_speed),
 ```
+
 where
 
 _adjustment_speed_ determines how fast the timeout changes when the number of
 transactions per second changes;
 
 _previous_timeout_ is previous timeout value;
-```
+
+```Text
 target_timeout = max_timeout - (max_timeout - previous_timeout) * load_percent,
 if current_load < optimal_load;
 ```
-```
+
+```Text
 target_timeout = previous_timeout - (previous_timeout - min_timeout) *
                  (load_percent - 1) / (1 / optimal_block_load - 1),
 if current_load >= optimal_load;
@@ -46,13 +49,13 @@ if current_load >= optimal_load;
 _max_timeout_ and _min_timeout_ are respectively upper bound and lower bound of
 the possible timeout values;
 
-```
+```Text
 optimal_load = txs_block_limit * optimal_block_load;
 ```
 
 _txs_block_limit_ is the maximum number of transactions in a block;
 
-```
+```Text
 load_percent = current_load / optimal_load;
 ```
 
