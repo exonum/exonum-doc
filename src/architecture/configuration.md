@@ -12,7 +12,8 @@ Configuration may be changed using the global variables updater service or
 
 Services may have their own configuration settings (for example, _Anchoring
 service_ stores _Remote Procedure Call_ parameters and _bitcoin network status
-check frequency_ in the configuration file).
+check frequency_ in the configuration file). Initialization on node's start up
+passes configuration to the services.
 
 ## Configuration Parameters
 
