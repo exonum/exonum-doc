@@ -197,7 +197,7 @@ even if all the blockchain maintainers collude. Moreover, anchoring is a fallbac
 mechanism: even if the Exonum blockchain stops working, the authenticity of data
 stored in thin clients could still be verified.
 
-## What’s Next?
+## What’s Next
 
 - [Read about the Exonum design](design-overview.md)
 - [Build your first Exonum application](cryptocurrency/intro.md)
