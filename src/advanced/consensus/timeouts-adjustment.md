@@ -7,7 +7,7 @@ smaller round timeout, the smaller acceptance time expectation.
 Creating blocks with too low timeout leads to increase in the consumption of
 resources for blocks storage (even a block without transactions requires
 significant amount of memory to store in the blockchain). Creating blocks with
-too high timeout leads to delay increase in the applying of transactions.
+too high timeout leads to delay increase in the applying of new transactions.
 **Timeout adjustment algorithm** allows to optimize the frequency of creating
 blocks, in order to include the maximum number of transactions per block if
 there are a lot of transactions, and on the other hand, to do not create new
