@@ -8,8 +8,8 @@ main differences between Exonum and other distributed ledger solutions.
 ## Why Blockchain
 
 In the terms of data management, blockchains provide [OLTP][wiki:oltp] capabilities;
-a blockchain processes transactions (which are quite similar to transactions in
-ordinary database management systems) and changes the stored values correspondingly.
+a blockchain processes transactions (which are quite similar to [transactions][wiki:tx]
+in ordinary database management systems) and changes the stored values correspondingly.
 
 Compared to commonplace OLTP solutions, the use of blockchain brings several distinctive
 advantages.
@@ -39,7 +39,7 @@ and in other security-critical applications.
 The reliable audit trail is needed in many regulated industries (e.g., finance
 and public registries), but it could be useful in other areas as well. The immutability
 of the transaction log provides *provenance* for any data piece in the blockchain,
-i.e., allows to reliably trace its history.
+allowing to reliably trace its history.
 
 ### Cryptography
 
@@ -48,7 +48,7 @@ rely on trust and informal relationships among participants of the system.
 The most prominent example of this is transaction authentication. Blockchains
 use [public-key cryptography][wiki:pkc] to ensure authenticity and integrity
 of transactions (instead of, say, password-based authentication). This corresponds
-to the best practices in security-critical industries (e.g., finance) and also
+to the best practices in security-critical industries and also
 ensures that the transaction log is completely verifiable.
 
 ## Exonum Design Goals
@@ -103,8 +103,8 @@ effectively.
 
 As several high-profile blockchain heists have shown, transaction processing
 on blockchains may be vulnerable to logic bombs and difficult-to-detect marginal
-cases. Exonum uses the Rust programming language, which guarantees the highest
-degree of memory safety.
+cases. Exonum uses [the Rust programming language](https://www.rust-lang.org/),
+which guarantees the highest degree of memory safety.
 
 **Example.** [Mutability][rust-mut], [references and borrowing][rust-ref] in Rust
 help enforce access restrictions. For example, if a variable is passed
@@ -114,8 +114,8 @@ in Rust helps preventing undefined behavior and memory access violations.
 
 ### Performance
 
-Exonum is geared towards peak throughputs of 1,000 transactions per second (tps).
-During a test benchmark, Exonum handles up to 7,000 tps, with a clearing delay
+Exonum is geared towards peak throughput of thousands of transactions per second (tps).
+During test benchmarks, Exonum handles up to 7,000 tps, with a clearing delay
 (the interval between transaction generation and its inclusion into a block)
 2.5 sec.
 
@@ -175,7 +175,7 @@ which the client is interested in. Thin clients allow to provide access to block
 through web or mobile apps. A thin client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
-**Example.** [In a cryptocurrency tutorial](cryptocurrency/intro.md),
+**Example.** [In the cryptocurrency tutorial](cryptocurrency/intro.md),
 a client corresponds to an owner of currency; it is only interested in transactions
 that involve the owner.
 
@@ -205,5 +205,6 @@ stored in thin clients could still be verified.
 [wiki:mvc]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
+[wiki:tx]: https://en.wikipedia.org/wiki/Database_transaction
 [rust-mut]: https://doc.rust-lang.org/book/mutability.html
 [rust-ref]: https://doc.rust-lang.org/book/references-and-borrowing.html
