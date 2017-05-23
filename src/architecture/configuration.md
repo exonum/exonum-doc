@@ -85,6 +85,17 @@ The configuration used to create a genesis block.
 - **tcp_reconnect_timeout_max**  
   Maximum timeout (ms) for reconnect attempt.
 
+#### [node.api]
+
+An api configuration options
+
+- **enable_blockchain_explorer**
+  Enable api endpoints for the `blockchain_explorer` on public api address.
+- **public_api_address**
+  Listen address for public api endpoints.
+- **private_api_address**
+  Listen address for private api endpoints.
+
 ## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
@@ -130,6 +141,11 @@ max_outgoing_connections = 128
 tcp_nodelay = false
 tcp_reconnect_timeout = 500
 tcp_reconnect_timeout_max = 600000
+
+[node.api]
+enable_blockchain_explorer = true
+public_api_address = "127.0.0.1:1024"
+private_api_address = "127.0.0.1:1025"
 ```
 
 [toml]: https://en.wikipedia.org/wiki/TOML
