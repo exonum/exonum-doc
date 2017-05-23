@@ -21,7 +21,8 @@ a Bitcoin Core node, as well as the Bitcoin address used for anchoring.
 
 System configuration contains 2 types of configuration parameters:
 
-- **Global parameters** must be identical for all full nodes in the network
+- **Global parameters** must be identical for all full nodes in the network. The
+  global parameters are saved in the blockchain on the genesis block creation
 - **Local parameters** may differ for each node
 
 This categorization holds both for core and service parameters.
@@ -89,7 +90,8 @@ Global parameters should be changed by using the global variables updater
 service. The service ensures that the configuration updates are synchronized
 among nodes in the network. Global parameters should not be changed
 by editing the configuration file because this may cause improper behavior of
-node.
+node. Global parameters can be influenced by the configuration file editing only
+before genesis block creation.
 
 Local parameters may be changed by editing the configuration file
 and restarting the node to apply changes. In certain cases, additional actions
