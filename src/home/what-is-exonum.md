@@ -114,8 +114,8 @@ in Rust helps preventing undefined behavior and memory access violations.
 
 ### Performance
 
-Exonum is geared towards peak throughput of thousands of transactions per second (tps).
-During test benchmarks, Exonum handles up to 7,000 tps, with a clearing delay
+Exonum is geared towards peak throughput of thousands of transactions per second
+(tps). During test benchmarks, Exonum handles up to 7,000 tps, with a clearing delay
 (the interval between transaction generation and its inclusion into a block)
 2.5 sec.
 
@@ -196,6 +196,13 @@ history or to supply different clients with differing versions of the blockchain
 even if all the blockchain maintainers collude. Moreover, anchoring is a fallback
 mechanism: even if the Exonum blockchain stops working, the authenticity of data
 stored in thin clients could still be verified.
+
+## What’s Next?
+
+- [Read about the Exonum design](design-overview.md)
+- [Build your first Exonum application](cryptocurrency/intro.md)
+- [Find out about Exonum planned features and milestones](../dev/roadmap.md)
+- [Learn how to contribute to Exonum development](../dev/contributing.md)
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
 [wiki:ca]: https://en.wikipedia.org/wiki/Certificate_authority
