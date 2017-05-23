@@ -1,19 +1,21 @@
 # System Configuration
 
-**System configuration** is a set parameters that determine the access
+**System configuration** is a set of parameters that determine the access
 network parameters of a node and the behavior of the node while operating in the
 network.
 
-Configuration is stored in the [TOML][toml] format. Path to configuration file
-should be specified on the node start up.
+The configuration is stored in the [TOML][toml] format. Path to the configuration
+file should be specified on the node start up.
 
-Configuration may be changed using the global variables updater service or
-[by editing the configuration file](#changing-configuration).
+The configuration may be changed using [the global variables updater service](../advanced/services/configuration.md)
+or [by editing the configuration file](#changing-configuration).
 
-Services may have their own configuration settings (for example, _Anchoring
-service_ stores _Remote Procedure Call_ parameters and _bitcoin network status
-check frequency_ in the configuration file). Initialization on the node start up
-passes the configuration to all services deployed on the blockchain.
+Services may have their own configuration settings. Initialization on the node
+start up passes the configuration to all services deployed on the blockchain.
+
+**Example.** [The anchoring service](../advanced/services/anchoring.md)
+stores in the configuration parameters of the RPC connection to
+a Bitcoin Core node, as well as the Bitcoin address used for anchoring.
 
 ## Configuration Parameters
 
@@ -22,6 +24,15 @@ System configuration contains 2 types of configuration parameters:
 - **Global parameters** must be identical for all full nodes in the network
 - **Local parameters** may differ for each node
 
+This categorization holds both for core and service parameters.
+
+**Example.** The following table shows all 4 possible parameter categories.
+
+| Scope   | Core | Anchoring service | 
+|---------|------|-------------------|
+| Global  | Validators’ public keys | Anchoring address |
+| Local   | Validator’s private key | RPC params for Bitcoin Core |
+
 ### Global Parameters
 
 #### [genesis]
@@ -29,7 +40,7 @@ System configuration contains 2 types of configuration parameters:
 The configuration used to create a genesis block.
 
 - **validators**  
-  List of validators' public keys as hex strings
+  List of validators’ public keys as hex strings
 
 #### [genesis.consensus]
 
@@ -54,7 +65,7 @@ Consensus algorithm parameters.
   List of known peers.
 - **public_key**  
   Node's public key (hex) for the current configuration.
-- **_secret_key_**  
+- **secret_key**  
   Node's private key (hex) for the current configuration.
 
 #### [network]
