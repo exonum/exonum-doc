@@ -5,23 +5,29 @@ A transaction in a blockchain
 is a group of sequential operations with the database and is a logical unit of
 work with data. So any business logic of the project with Exomum should be
 formulated using different types of transactions. A transaction can be either
-executed either entirely and successfully, respecting the integrity of the data
-and regardless of the other transactions going in parallel, or a transaction
-can be not performed at all, and then it should not have any effect. A
-transaction could be created by the allowed entities (for example, a private
-key owner could initialize its coins transfer for cryptocurrency) and sent for
-the distributed system of validators for the consideration. If the transaction
-is correct, it would be included in a block of the blockchain through the
-validators voting process via the Consensus algorithm work.
+executed either entirely and successfully, respecting the integrity of the
+data, or a transaction can be not performed at all, and then it should not have
+any effect. A transaction could be created by the allowed entities (for
+example, a private key owner could initialize his coins transfer for
+[cryptocurrency](https://github.com/exonum/cryptocurrency)) and sent for the
+distributed system of validators for the consideration. If the transaction is
+correct, it would be included in a block of the blockchain through the
+validators voting process via the
+[consensus algorithm](./advanced/consensus/consensus.md) work. All transactions
+are executed one by one in the order in which they are placed into the
+blockchain.
 
 A transaction consists of
 
 1. `service_id`: sets the [service](services.md) to make a deal with (for
-  example, configuration or cryptocurrency). All the transactions are stored in
-  the blockchain sequentially. But such a manner is not useful for queries. So
-  any fat client also duplicates information from the blockchain in the special
-  databases (one per service) those support queries and also provides proofs of
-  consistency with the blockchain (see
+  example, configuration or *cryptocurrency*). Such information is redundant
+  but helpful to find methods to process transaction (such as `verify` and
+  `execute`). All the transactions are stored in the blockchain sequentially.
+  But such a manner is not useful for queries. So any fat client also
+  duplicates information from the blockchain in the special tables of the
+  blockchain-level key-value storage (implemented with
+  [LevelDB](http://leveldb.org/) those support queries and also provides proofs
+  of consistency with the blockchain (see
   [Merkle index](../advanced/merkle-index.md) and
   [Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
   details).
@@ -36,13 +42,16 @@ A transaction consists of
   service with `service_id`. For example, the body of `TransferTransaction`
   should include field `from` for coins sender, `to` for coins recipient,
   `amount` for the sending amount and `seed` to distinct different transactions
-  with the same previous three fields
+  with the same previous three fields. The message body is serialized according
+  to the binary serialization specification from its type specification in the
+  service
 4. `signature`: the cryptographic signature for the message with a transaction.
   Any author of the transaction (as any other message) should have the private
   and public keys which allow him to generate a correct transaction. He
   shouldn't provide any other person his private key but should use it to sign
-  messages. The signature of a particular person could be verified using by
-  anyone using the public key.
+  messages. The signature of a particular person could be verified by anyone
+  using the public key and `Exonum.verifySignature` function. See
+  [Exonum client](https://github.com/exonum/exonum-client) for details.
 
 ## Transaction lifecycle
 
@@ -67,17 +76,29 @@ A transaction consists of
 
 ### Purity
 
-The right to send transaction could be checked using cryptography no matter the
-transaction source.
+Purity means that the transaction could be serialized (i.e. at least all
+methods `verify`, `execute` and `info` could be applied) no matter the
+blockchain state (but the result of such methods application could depend on
+blockchain state).
 
 ### Sequential consistency
 
-Any valid copy of the blockchain has the same order of blocks and transactions
-in it. Such a property is guaranteed by the
+[Sequential consistency](https://en.wikipedia.org/wiki/Sequential_consistency)
+essentially means that the blockchain looks like a centralized system for an
+external observer (e.g., a thin client). All transactions in the blockchain
+affect the blockchain state as if they were executed one by one in the order
+specified by their ordering in blocks. Such a property is guaranteed by the
 [consensus algorithm](../advanced/consensus/consensus.md).
 
 ### Non-replayability
 
-Any transaction could be included into the blockchain only once. The `seed`
-field inside the transaction and ignoring the transactions, already included
-into the blockchain, for the new blocks guarantees this property.
+Non-replayability means that an attacker cannot take an old legitimate
+transaction from the blockchain and apply it to the blockchain state again.
+Assume Alice pays Bob 10 coins using the Exonum
+[cryptocurrency service](https://github.com/exonum/cryptocurrency).
+Non-replayability prevents Bob from taking the Alice's transaction and
+submitting it to the network again to get extra coins. Naturally,
+non-replayability is also a measure against DoS attacks; it prevents an
+attacker from spamming the network with his own or others' transactions.
+The `seed` field inside the transaction and ignoring the transactions, already
+included into the blockchain, for the new blocks guarantees this property.
