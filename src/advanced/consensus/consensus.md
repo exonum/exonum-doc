@@ -91,6 +91,27 @@ To put it *very* simply, rounds proceed as follows:
 
 - +2/3 means "more than 2/3", and -1/3 means less than one third.
 
+- The system may contain -1/3 Byzantine nodes. Byzantine nodes may violate the
+  algorithm specification.
+
+- A node that has collected a +2/3 prevotes for some proposal switches to the
+  _LOCK_ state. Then such a node is called locked on that proposal. A node in
+  the LOCK state does not vote for any other proposal except for the proposal on
+  which it is locked. Locks are necessary to ensure the absence of forks
+  (consensus finality). Since there are -1/3 Byzantine nodes in the system, at
+  least +1/3 prevotes from the collected +2/3 were sent by non-Byzantine nodes.
+  There are -2/3 remaining nodes, so there will not be able locks for other
+  proposals in the system, hence no other proposal can be accepted.
+
+- When a new round onsets, the locked node immediately sends prevote indicating
+  the presence of the lock for the offer on which the node is locked. Other
+  nodes may request from him to forward missing prevotes (for example, node A
+  could get prevotes from nodes B and C, and they do not get prevotes from each
+  other because of the connection problems; then nodes B and C can request each
+  other's prevotes from node A). If the node became the leader at the new round
+  onset, then the node still does not send a new proposal, but immediately sends
+  prevote for the proposal on which that node is locked.
+
 - A set of +2/3 votes from _prevote_ state `(H, R)` will be called
   _Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
   one stored PoL.
