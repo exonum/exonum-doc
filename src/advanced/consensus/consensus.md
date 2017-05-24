@@ -265,8 +265,8 @@ delay.
 directly into `Block` messages.) Furthermore, transaction execution is delayed;
 transactions are applied only at the when a node locks on a `Propose`.
 
-Delayed transaction processing reduces nagtive impact of malicious nodes on
-the system througput and latency. Indeed, it splits transaction processing among
+Delayed transaction processing reduces the negative impact of malicious nodes on
+the system throughput and latency. Indeed, it splits transaction processing among
 the stages of the algorithm:
 
 - On the prevote stage validators only ensure that a list of transactions
@@ -275,16 +275,17 @@ the stages of the algorithm:
 - On the precommit stage validators apply transactions to the current
   blockchain state
 - On the commit stage validators ensure that they achieved the same state
-  after addition of new transactions
+  after applying the transactions in the proposal
 
-If the Byzantine node sends out proposals with different transaction order to
-different nodes, the nodes do not spend time checking the order and applying
-transactions in the prevote stage. A different transaction order will be
-detected when comparing block_hash received in the prevote messages from other
-nodes and block_hash received in the proposal message.
+If the Byzantine validator sends out proposals with a different transaction order
+to different validators, the validators do not need to spend time checking
+the order and applying transactions on the prevote stage.
+A different transaction order will be detected when comparing `block_hash` received
+in the prevote messages from other validators and `block_hash` received
+in the proposal message.
 
-So, this split of work helps reduce the negative impact of byzantine nodes on the
-overall system performance.
+Thus, the split of work helps reduce the negative impact of Byzantine nodes
+on the overall system performance.
 
 ### Requests Algorithm
 
