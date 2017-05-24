@@ -182,6 +182,9 @@ must be processed only during the round `R`).
 
 ## Network Communication
 
+**Tip.** See [source code][src-messages] for more technical details on
+consensus messages.
+
 ### Messages
 
 The consensus algorithm makes use several types of messages. All messages
@@ -200,34 +203,36 @@ Instead of whole transactions, `Propose` messages include only transaction hashe
 A validator that received a `Propose` message can request missing transactions
 from its peers.
 
-If the behavior is correct, `Propose` is sent only by the leader node of the round.
+If all validators behave correctly, `Propose` is sent only by the leader node
+of the round.
 
 #### Prevote
 
-`Prevote` is a vote for a `Propose` message. `Prevote` indicates that the node
+`Prevote` is a vote for a `Propose` message. `Prevote` indicates that a validator
 has a correctly formed `Propose` and all the transactions specified in it.
 `Prevote` is broadcast to all validators.
 
 #### Precommit
 
-`Precommit` is a message expressing readiness to include the next block into
-blockchain. To be distributed by all nodes.
+`Precommit` is a message expressing readiness to include a certain proposal
+as the next block into blockchain. `Precommit` is broadcast to all validators.
 
 #### Status
 
 `Status` is an information message about the current height. It is sent with a
-periodicity written in the `status_timeout` variable (consensus parameter).
+periodicity written in the `status_timeout`
+[global configuration parameter](../../architecture/configuration.md).
 
 #### Block
 
 A `Block` message contains a block (in the meaning of blockchain) and a
 set of `Precommit` messages that allowed that block to be accepted.
-To be sent on request.
+`Block` messages are sent upon request.
 
 ### Request Messages
 
 There are request messages for transactions, `Propose` and `Prevote` messages, and
-blocks. The rules of generation and processing for these messages are fairly obvious.
+blocks. The generation and processing rules for these messages are fairly obvious.
 
 **Example.** A `RequestPropose` message is generated if a validator receives a consensus
 message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
@@ -289,8 +294,8 @@ on the overall system performance.
 
 ### Requests Algorithm
 
-Requests algorithm allows node to restore any consensus info from the other
-nodes.
+Requests algorithm allows a validator to restore any consensus info from the other
+validators. This has a positive effect on system liveness.
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
@@ -300,3 +305,4 @@ nodes.
 [wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
+[src-messages]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
