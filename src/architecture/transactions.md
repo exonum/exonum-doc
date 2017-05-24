@@ -13,9 +13,9 @@ example, a private key owner could initialize his coins transfer for
 distributed system of validators for the consideration. If the transaction is
 correct, it would be included in a block of the blockchain through the
 validators voting process via the
-[consensus algorithm](./advanced/consensus/consensus.md) work. All transactions
-are executed one by one in the order in which they are placed into the
-blockchain.
+[consensus algorithm](../advanced/consensus/consensus.md) work. All
+transactions are executed one by one in the order in which they are placed into
+the blockchain.
 
 A transaction consists of
 
