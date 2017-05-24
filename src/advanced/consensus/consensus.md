@@ -135,6 +135,24 @@ There are -2/3 remaining nodes, so an honest validator cannot lock on another pr
 Thus, once a single honest validator is locked on a proposal, no other proposal
 can be accepted.
 
+### Requests
+
+As consensus messages may be lost or come out of order, the Exonum consensus
+uses the *requests* mechanism to obtain unknown information from the other validators.
+A request is sent by a validator to its peer
+if the peer has information of interest, which is unknown to the validator,
+and which has been discovered during the previous communication with the peer.
+
+**Example.** A request is sent if the node receives a consensus message from
+a height greater than the local height. The peer is supposed to respond with
+a message that contains transactions in an accepted block, together with a proof
+that the block is indeed accepted (i.e., precommits of +2/3 validators corresponding
+to the block).
+
+There are requests for all consensus messages: proposals, prevotes, and precommits.
+As consensus messages are authenticated with digital signatures, they can be sent
+directly in response to requests.
+
 ### Node States Overview
 
 The order of states in the proposed algorithm is as follows:
@@ -208,14 +226,13 @@ To be sent on request.
 
 ### Requests
 
-The Exonum consensus uses the *requests* mechanism to obtain unknown
-information from the other nodes. A request is sent by the node to its peer
-if the peer has information of interest, which is unknown to the node,
-and which has been discovered during the previous communcation with the peer.
-For example, a request is sent if the node receives
-a consensus message from a height greater than the local height.
+There are request messages for transactions, `Propose` and `Prevote` messages, and
+blocks. The rules of generation and processing for these messages are fairly obvious.
 
-Sending and processing of such messages is algorithmized.
+**Example.** A `RequestPropose` message is generated if a validator receives a consensus
+message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
+is unknown to the validator. A receiver of a `RequestPropose` message sends a requested
+`Propose` in response.
 
 ## Distinguishing Features
 
