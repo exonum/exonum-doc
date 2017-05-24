@@ -259,7 +259,13 @@ the stages of the algorithm:
 - On the commit stage validators ensure that they achieved the same state
   after addition of new transactions
 
-This split of work helps reduce the negative impact of byzantine nodes on the
+If the Byzantine node sends out proposals with different transaction order to
+different nodes, the nodes do not spend time checking the order and applying
+transactions in the prevote stage. A different transaction order will be
+detected when comparing block_hash received in the prevote messages from other
+nodes and block_hash received in the proposal message.
+
+So, this split of work helps reduce the negative impact of byzantine nodes on the
 overall system performance.
 
 ### Requests Algorithm
