@@ -87,51 +87,53 @@ To put it *very* simply, rounds proceed as follows:
   the same state hash for the same proposal, the proposed block is committed
   to the blockchain.
 
-### Back to Reality
+### Non-Strawman Version
 
-- +2/3 means "more than 2/3", and -1/3 means less than one third.
+**Note.** In the following description, +2/3 means more than two thirds of the validators,
+and -1/3 means less than one third.
 
-- The system may contain -1/3 Byzantine nodes. Byzantine nodes may violate the
-  algorithm specification.
+The algorithm above is overly simplified:
 
-- A node that has collected a +2/3 prevotes for some proposal switches to the
-  _LOCK_ state. Then such a node is called locked on that proposal. A node in
-  the LOCK state does not vote for any other proposal except for the proposal on
-  which it is locked. Locks are necessary to ensure the absence of forks
-  (consensus finality). Since there are -1/3 Byzantine nodes in the system, at
-  least +1/3 prevotes from the collected +2/3 were sent by non-Byzantine nodes.
-  There are -2/3 remaining nodes, so there will not be able locks for other
-  proposals in the system, hence no other proposal can be accepted.
+- A validator may receive messages in any order because of network delays.
+  For example, a validator may receive a prevote or precommit for a block proposal
+  that the validator doesn’t know
+- There can be validators acting not according to the consensus algorithm.
+  Validators may be offline, or they can be corrupted by an adversary. To formalize
+  this assumption, it’s assumed that -1/3 validators at any moment of time may be
+  acting arbitrarily. Such validators are called *Byzantine* in computer science;
+  all other validators are *honest*
 
-- When a new round onsets, the locked node immediately sends prevote indicating
-  the presence of the lock for the offer on which the node is locked. Other
-  nodes may request from him to forward missing prevotes (for example, node A
-  could get prevotes from nodes B and C, and they do not get prevotes from each
-  other because of the connection problems; then nodes B and C can request each
-  other's prevotes from node A). If the node became the leader at the new round
-  onset, then the node still does not send a new proposal, but immediately sends
-  prevote for the proposal on which that node is locked.
+The 3-phase consensus (proposals, prevotes and precommits) described above
+is there to make the consensus algorithm operational under these conditions.
+More precisely, the algorithm is required to maintain *safety* and *liveness*:
 
-- A set of +2/3 votes from _prevote_ state `(H, R)` will be called
-  _Proof-of-Lock_ (_PoL_). Nodes should store PoL. The node can have no more than
-  one stored PoL.
+- Safety means that once a single honest validator has committed a block, no
+  other honest validator will ever commit any other block at the same height
+- Liveness means that honest validators keep committing blocks from time to time
 
-- We will say that *PoL is greater than recorded one* (has a higher priority), in
-  cases when 1) there is no PoL recorded 2) the recorded PoL corresponds to a
-  proposal with a smaller round number. So PoLs are [partially
-  ordered][partial_ordering].
+#### Locks
 
-- Some ordered numbering of validators (validator id) from 0 to N-1 exists and
-  it is known to all network members. When moving to a new height, the validator
-  number may change due to a change in the list of validators.
+Byzantine validators may send different messages to different validators.
+To maintain safety under these conditions, the Exonum consensus algorithm uses
+the concept of *locks*.
 
-- Nodes receive and exchange among themselves transactions that need to be added
-  to the blockchain. Each node has a set of transactions that have not yet been
-  added to the blockchain. This set will be called **pool of unconfirmed
-  transactions** . In general, the pools of unconfirmed transactions are different
-  for different nodes. If necessary, the nodes can request unknown transactions
-  from other nodes. We will also refer to the transaction added to the blockchain
-  in one of the previous blocks as **committed**.
+A validator that has collected a +2/3 prevotes for some block proposal locks on
+that proposal. A locked validator does not vote for any other proposal except
+for the proposal on which it is locked. When a new round starts,
+a locked validator immediately sends a prevote indicating
+the it’s locked on a certain proposal. Other validators may request prevotes
+that led to the lock from a locked validator, if they do not have them locally
+(these proposals are known as *proof of lock*).
+
+**Example.** Validator A gets prevotes from validators B and C,
+and they do not get prevotes from each other because of the connection problems.
+Then validators B and C can request each other’s prevotes from validator A.
+
+Since there are -1/3 Byzantine validators, at least +1/3 prevotes from the
++2/3 prevotes collected for the lock were sent by honest validators.
+There are -2/3 remaining nodes, so an honest validator cannot lock on another proposal.
+Thus, once a single honest validator is locked on a proposal, no other proposal
+can be accepted.
 
 ### Node States Overview
 
