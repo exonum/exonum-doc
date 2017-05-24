@@ -87,14 +87,14 @@ The configuration used to create a genesis block.
 
 #### [node.api]
 
-An api configuration options
+API configuration parameters.
 
-- **enable_blockchain_explorer**
-  Enable api endpoints for the `blockchain_explorer` on public api address.
-- **public_api_address**
-  Listen address for public api endpoints.
-- **private_api_address**
-  Listen address for private api endpoints.
+- **enable_blockchain_explorer**  
+  Enable api endpoints for the blockchain explorer on the public API address.
+- **public_api_address**  
+  Listen address for public API endpoints.
+- **private_api_address**  
+  Listen address for private API endpoints.
 
 ## Changing Configuration
 
