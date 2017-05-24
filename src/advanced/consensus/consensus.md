@@ -223,8 +223,23 @@ the following distinctive features.
 ### Unbounded Rounds
 
 Rounds have a fixed start time but they do not have a definite end
-time (a round ends only when the next block is received). This reduces
-the effect of network delays.
+time (a round ends only when the next block is received).
+
+Partial synchrony of the network means that any message will be delivered within
+some finite (but beforehand unknown) time.
+
+Let the time of the round is fixed, the state of the network has deteriorated at
+the moment, and the network did not manage to accept the proposal until the end
+of the round. Then in the next round, the entire process of nominating a
+proposal and voting for it must begin again. In this case, the timeout of the
+next round should be increased so that the block could be accepted during new
+round timeout under the poor connection. The need to repeat anew the work that
+has already been done and the increase in the timeout leads to additional time
+consuming to accept the proposal.
+
+In contrast to the case discussed in the previous paragraph, the absence of a
+fixed round end time allows to accept the proposal within the minimum necessary
+time.
 
 ### Compact Proposals
 
