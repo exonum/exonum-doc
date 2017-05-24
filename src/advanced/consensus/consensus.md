@@ -224,7 +224,7 @@ A `Block` message contains a block (in the meaning of blockchain) and a
 set of `Precommit` messages that allowed that block to be accepted.
 To be sent on request.
 
-### Requests
+### Request Messages
 
 There are request messages for transactions, `Propose` and `Prevote` messages, and
 blocks. The rules of generation and processing for these messages are fairly obvious.
@@ -243,22 +243,21 @@ the following distinctive features.
 
 Rounds have a fixed start time but they do not have a definite end
 time (a round ends only when the next block is received).
+This helps decrease delays when the network connection among validators is unstable.
 
-Partial synchrony of the network means that any message will be delivered within
-some finite (but beforehand unknown) time.
-
-Let the time of the round is fixed, the state of the network has deteriorated at
-the moment, and the network did not manage to accept the proposal until the end
+Assume that consensus messages from a certain round need to be processed within
+the round. If the state of the network deteriorates,
+the network might not manage to accept the proposal until the end
 of the round. Then in the next round, the entire process of nominating a
-proposal and voting for it must begin again. In this case, the timeout of the
+proposal and voting for it must begin again. The timeout of the
 next round should be increased so that the block could be accepted during new
-round timeout under the poor connection. The need to repeat anew the work that
-has already been done and the increase in the timeout leads to additional time
-consuming to accept the proposal.
+round timeout with a poor network connectivity. The need to repeat anew the work
+that has already been done and the increase in the timeout would lead to
+additional delays in accepting the block proposal.
 
 In contrast to the case discussed in the previous paragraph, the absence of a
-fixed round end time allows to accept the proposal within the minimum necessary
-time.
+fixed round ends in Exonum allows to accept the proposal with a minimum necessary
+delay.
 
 ### Compact Proposals
 
