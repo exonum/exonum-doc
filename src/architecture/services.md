@@ -11,7 +11,7 @@ If you want to create an instance of the Exonum, services are *the* way to go.
 Like smart contracts in some other blockchain platforms, Exonum services
 encapsulate business logic of the blockchain application.
 
-- A service specifies **the rules of transaction processing,** namely, how
+- A service specifies **the rules of transaction processing**, namely, how
   [transactions](transactions.md) influence the state of the service
 - The state transformed by transactions is **persisted** as a part of the overall
   [blockchain key-value storage](storage.md)
@@ -28,6 +28,12 @@ Services are executed on each validator and each auditing node of the
 blockchain network. The order of transaction processing and the resulting changes
 to the service state are a part of [the consensus algorithm](../advanced/consensus/consensus.md).
 They are guaranteed to be the same for all nodes in the blockchain network.
+
+**Tip.** When developing a service, you should keep in mind that
+calls to service endpoints must produce an identical result
+on all nodes in the network given the same blockchain
+state. If the call results differ, the consensus algorithm may stall,
+or an audit of the blockchain by auditing nodes may fail.
 
 **Notice.** Unlike smart contract in certain blockchains, services in Exonum
 are not isolated in a virtual machine environment and are not containerized.
@@ -179,7 +185,8 @@ of the consensus (this concerns validators only) or when a node receives a block
 Services may subscribe to events (such as a block being committed) and perform
 some work in the event handler. The event handlers cannot modify the blockchain
 state, but can be used for various tasks such as logging, data migrations,
-or updating local parameters
+updating local parameters, and/or generating and broadcasting transactions to the
+blockchain network
 
 **Notice.** As of Exonum 0.1, the only built-in event is block commit. More events
 will be added in the future, including possibility for services to define and emit
@@ -203,7 +210,8 @@ Here’s a list of things to figure out when developing an Exonum service:
   and append-only lists)?
 - Are there any foreign key relationships among stored entities? (Exonum data model
   supports relationships among entities via hash links;
-  see organization of wallet history in the cryptocurrency tutorial for more details.)
+  see organization of wallet history in [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+  for more details.)
 - What persistent data will be returned to external clients? (You might want
   to use merklized data collections for this data and create corresponding
   read request endpoints.)
