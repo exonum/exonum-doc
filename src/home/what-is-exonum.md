@@ -87,8 +87,9 @@ and allows external parties (e.g., regulators, auditors and end clients of the s
 to continuously verify the system operation against these definitions.
 
 **Example.** In a [sample cryptocurrency implementation](cryptocurrency/intro.md),
-users can monitor the state of their wallet in real time;
-the state returned by serves is supplied with an unforgeable cryptographic proof.
+users can monitor the state of their wallet in real time.
+The state returned to a user by network nodes is supplied with an unforgeable
+cryptographic proof.
 
 ### Flexibility
 
@@ -163,9 +164,8 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../advanced/consensus/consensus.md)
 to synchronize data among the nodes in the network.
 The Exonum network would continue operating even if up to 1/3 validators are hacked,
-compromised or switched off. There is no single point point of failure, no
-single node which controls the operation of the network.
-The whole process of transaction processing is fully decentralized.
+compromised or switched off. Hence, there is no single point of failure
+in the network; the whole process of transaction processing is fully decentralized.
 
 ### Thin Clients
 
