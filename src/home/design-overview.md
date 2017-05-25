@@ -129,36 +129,41 @@ Other databases will be also featured in the future releases.
 
 ### Data storage table types
 
-Two types of data tables may be used in the project: Array and Key-Value
-storage. Both of them support persistency and proofs mechanism.
+Exonum support multiple types of data tables. While List and Map are the
+usual ways to store data, the following two are more complicated and
+interesting. Their main purpose is to provide a proofs mechanism for
+stored values.
 
-Arrays are stored in the [Merkle Tree](../advanced/merkle-index) tables.
-Such a tree is binary and balanced, although not necessarily efficiently
-binary. The leafs keep the actual values, while the nodes keep the
-hashes from concatenated children data. It is allowed only to append the
-data or update the cells already stored.
+1. `ListTable` implements a array list.
+2. `MapTable` represents a usual Key-Value storage.
+3. [`MerkleTable`](../advanced/merkle-index) is an enchanced version of
+array storage. It implements the Merkle Tree, which is binary and
+balanced, although not necessarily full binary. The leafs keep the
+actual values, while the nodes keep the hashes from concatenated
+children data. It is allowed only to append the data or update the cells
+already stored.
+4. [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extend the
+map. It is based on the Merkle Patricia Tree. The leafs keep the actual
+values. The intermediary nodes values consist of the following 4 parts:
 
-Key-Value Storages are stored in the [Merkle Patricia
-Tree](../advanced/merkle-patricia-index) tables. The leafs keep the
-actual values. The intermediary nodes values consist of the following 4
-parts:
+  - Hash from the left child value
+  - Hash from the right child value
+  - Key for the left child node
+  - Key for the right child node
 
-- Hash from the left child value
-- Hash from the right child value
-- Key for the left child node
-- Key for the right child node
-
-KVS allow inserting, updating or deleting key-value pairs.
+Both `ListTable` and `MerkleTable` support updating-by-index and
+appending only; `Maptable` and `MerklePatriciaTable` allow inserting,
+updating or deleting key-value pairs.
 
 ### Proofs
 
-Tree structures allows creating a proof that specific values are saved
-in the particular data cells. To prove that, it is sufficient to return
-a list of hashes from the tree root to the particular cell. Wherein, the
-Merkle Patricia Tables also allow to generate proofs that there is no
-data in the database with specific key `K`. That is, when the full nodes
-send info to the thin client, it also add a proof that actual value is
-shown one.
+Tree structures at `MerkleTable` and `MerklePatriciaTable` allows
+creating a proof that specific values are saved in the particular data
+cells. To prove that, it is sufficient to return a list of hashes from
+the tree root to the particular cell. Wherein, the Merkle Patricia
+Tables also allow to generate proofs that there is no data in the
+database with specific key `K`. That is, when the full nodes send info
+to the thin client, it also add a proof that actual value is shown one.
 
 You may delve into the details about data storage and proofs mechanism
 here: [Data Storage, Merkle trees and proofs](../architecture/storage)
