@@ -137,14 +137,14 @@ stored values.
 1. `ListTable` implements an array list.
 2. `MapTable` represents a usual Key-Value storage.
 3. [`MerkleTable`](../advanced/merkle-index) is an enhanced version of
-array storage. It implements the Merkle Tree, which is binary and
-balanced, although not necessarily full binary. Leafs keep the
-actual values, while the nodes keep the hashes from concatenated
-children data. It is allowed only to append the data or update the cells
-already stored.
+  array storage. It implements the Merkle Tree, which is binary and
+  balanced, although not necessarily full binary. Leafs keep the
+  actual values, while the nodes keep the hashes from concatenated
+  children data. It is allowed only to append the data or update the cells
+  already stored.
 4. [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extend the
-map. It is based on the Merkle Patricia Tree. Leafs keep the actual
-values. The intermediary nodes values consist of the following four parts:
+  map. It is based on the Merkle Patricia Tree. Leafs keep the actual
+  values. The intermediary nodes values consist of the following four parts:
 
   - Hash from the left child value
   - Hash from the right child value
