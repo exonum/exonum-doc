@@ -36,11 +36,20 @@ without the appropriate changes for the each of the following blocks. In
 the matter, a blockchain is just a data storage with additional
 properties and requirements for the underlying data.
 
-Different to the usual databases, a blockchain do not hold the data
-tables content directly. Instead, it holds every transaction that
-creates a new data value or changes the already existed data. Therefore,
-we can see the whole history of any data chunk. However, for the outer
-application, the blockchain represents just a usual Key-Value storage.
+All data in the Exonum may be divided into two parts. First part is the
+users data, all the values that are stored in the data tables. The
+second part is a history of transactions already applied to the data
+storage. As transactions include any atomic operations such as creating
+new value, or updating already saved values, actual state of the data
+tables can be easily and deterministically restored from the list of the
+transactions. When new node in the Exonum network appears, it loads
+already generated blocks and applies its transactions to the data
+storage one by one. Finally, coincidence of data storage states among
+nodes is guaranteed by Exonum.
+
+Such approach allows to see the whole history of any data chunk and
+simplify audit. However, for the outer application, the blockchain
+represents just a usual Key-Value storage.
 
 Exonum blocks consist of the following parts:
 
