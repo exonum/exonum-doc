@@ -21,9 +21,9 @@ be used in the development on top of Exonum.
 ## Transaction processing
 
 Transactions are the main entity Exonum works with. They represent
-atomic patch that should be applied to users data. Any node can generate
+atomic patch that should be applied to users' data. Any node can generate
 transactions, however these transactions need to be checked and approved
-before they will be concidered as accepted ones.
+before they will be considered as accepted ones.
 
 Exonum gathers transactions into blocks and approve the whole block
 atomically. If transaction has not been written to any block yet, it is
@@ -37,23 +37,23 @@ the matter, a blockchain is just a data storage with additional
 properties and requirements for the underlying data.
 
 All data in the Exonum may be divided into two parts. First part is the
-users data, all the values that are stored in the data tables. The
+users' data, all the values that are stored in the data tables. The
 second part is a history of transactions already applied to the data
 storage. As transactions include any atomic operations such as creating
 new value, or updating already saved values, actual state of the data
-tables can be easily and deterministically restored from the list of the
-transactions. When new node in the Exonum network appears, it loads
+tables can be restored from the list of the transactions easily and
+deterministically. When new node in the Exonum network appears, it loads
 already generated blocks and applies its transactions to the data
-storage one by one. Finally, coincidence of data storage states among
-nodes is guaranteed by Exonum.
+storage one by one. Finally, Exonum guarantees coincidence of data
+storage states among nodes.
 
-Such approach allows to see the whole history of any data chunk and
+Such approach allows seeing the whole history of any data chunk and
 simplify audit. However, for the outer application, the blockchain
 represents just a usual Key-Value storage.
 
 Exonum blocks consist of the following parts:
 
-1. The hash of the previous exonum block.
+1. The hash of the previous Exonum block.
 2. The list of the approved transactions. When the other nodes execute
   the block, they execute every transaction in the given order and apply
   changes to their data storages. Every transaction type is executed by
@@ -131,20 +131,20 @@ Other databases will be also featured in the future releases.
 
 Exonum support multiple types of data tables. While List and Map are the
 usual ways to store data, the following two are more complicated and
-interesting. Their main purpose is to provide a proofs mechanism for
+interesting. Their main purpose is to provide a proof mechanism for
 stored values.
 
-1. `ListTable` implements a array list.
+1. `ListTable` implements an array list.
 2. `MapTable` represents a usual Key-Value storage.
-3. [`MerkleTable`](../advanced/merkle-index) is an enchanced version of
+3. [`MerkleTable`](../advanced/merkle-index) is an enhanced version of
 array storage. It implements the Merkle Tree, which is binary and
-balanced, although not necessarily full binary. The leafs keep the
+balanced, although not necessarily full binary. Leafs keep the
 actual values, while the nodes keep the hashes from concatenated
 children data. It is allowed only to append the data or update the cells
 already stored.
 4. [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extend the
-map. It is based on the Merkle Patricia Tree. The leafs keep the actual
-values. The intermediary nodes values consist of the following 4 parts:
+map. It is based on the Merkle Patricia Tree. Leafs keep the actual
+values. The intermediary nodes values consist of the following four parts:
 
   - Hash from the left child value
   - Hash from the right child value
@@ -152,7 +152,7 @@ values. The intermediary nodes values consist of the following 4 parts:
   - Key for the right child node
 
 Both `ListTable` and `MerkleTable` support updating-by-index and
-appending only; `Maptable` and `MerklePatriciaTable` allow inserting,
+appending only; `MapTable` and `MerklePatriciaTable` allow inserting,
 updating or deleting key-value pairs.
 
 ### Proofs
@@ -187,7 +187,7 @@ Services are used for two main purposes:
 2. Services may implement event handlers and listen for the different
   blockchain actions. For example, `handle_commit` is executed after new
   block applies to the data storage.
- 
+
 Outer applications may communicate with services using REST-API written
 on [IRON][iron].
 
@@ -217,9 +217,9 @@ the hacker should hack bitcoin blockchain, and it is impossible just
 now. To get more about anchoring, you may refer to [Anchoring service
 specification](../advanced/services/anchoring.md).
 
-As services are just a modules, they can be reused in the different
-Exonum projects. You may take a open-source services already written by
-the community, or open your service for other users.
+As services are just modules, they can be reused in the different Exonum
+projects. You may take a open-source services already written by the
+community, or open your service for other users.
 
 To get more how services may be written, you may refer to [Services
 section](../architecture/services).
