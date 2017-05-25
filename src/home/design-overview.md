@@ -209,6 +209,10 @@ We represent the following optional services just now:
   is impossible just now. To get more about anchoring, you may refer to
   [Anchoring service specification](../advanced/services/anchoring.md).
 
+As services are just a modules, they can be reused in the different
+Exonum projects. You may take a open-source services already written by
+the community, or open your service for other users.
+
 To get more how services may be written, you may refer to [Services
 section](../architecture/services).
 
