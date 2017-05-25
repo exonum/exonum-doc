@@ -1,10 +1,22 @@
 # About this page
 
-This page describes a brief overview of the Exonum framework structure.
-Every section describes specific component or idea: how is it
-implemented, or how can it be used in custom projects.
+The Exonum framework is structured as follows: 
 
-## 1. Blockchain
+- [Transaction processing](#transaction-processing) describes **TODO**
+- [The network structure](#the-network-structure) lists types on which
+  Exonum nodes are divided.
+- [Consensus](#consensus) explains how nodes agree on the blockchain
+  state.
+- [Data Storage](#data-storage) describes how data is saved locally and
+  introduces the proofs mechanism.
+- [Smart contracts](#smart-contracts) shows how Exonum execute custom
+  logic.
+- [Modularity and services](#modularity-and-services) introduces services
+  and explains what they are used for.
+
+This page describes the operation of these components and how they can be used in the development on top of Exonum.
+
+## Transaction processing
 
 Blockchain is literally a chain of blocks. Every next block includes the
 hash of the previous block; so, it is impossible to change one block
@@ -31,7 +43,7 @@ Exonum blocks consist of the following parts:
   the Exonum consensus algorithm, so it is guaranteed to coincide for all
   validators.
 
-## 2. The network structure
+## The network structure
 
 The network consist of a big amount of the connected peer-to-peer nodes.
 These nodes have different rights and different functionality.
@@ -54,7 +66,7 @@ These nodes have different rights and different functionality.
   checking if the node really keeps a shown value in its data storage.
   Full-node cannot generate "fake" answer or fool around the client.
 
-## 3. Consensus
+## Consensus
 
 Exonum uses the custom modification of Byzantine Fault-Tolerance
 Consensus to guarantee that in any time there is just one true version
@@ -82,7 +94,7 @@ Block Generation procedure, you may refer to [Consensus
 details](../advanced/consensus/consensus), [Leader Election
 algorithm](../advanced/consensus/leader-election)
 
-## 4. Data Storage
+## Data Storage
 
 ### LevelDB
 
@@ -126,11 +138,11 @@ shown one.
 You may delve into the details about data storage and proofs mechanism
 here: [Data Storage, Merkle trees and proofs](../architecture/storage)
 
-## 5. Smart contracts
+## Smart contracts
 
 Here should be a deep text about smart contracts. **TODO: do**
 
-## 6. Modularity and services
+## Modularity and services
 
 Exonum Framework includes the Core and the set of optional pluggable
 services. While the Core is responsible for the consensus, and provides
