@@ -186,28 +186,36 @@ Services are used for two main purposes:
   services, and each of them processes its own transactions list.
 2. Services may implement event handlers and listen for the different
   blockchain actions. For example, `handle_commit` is executed after new
-  block applies to the data storage. Outer applications may communicate
-  with services using REST-API written on [IRON][iron].
+  block applies to the data storage.
+ 
+Outer applications may communicate with services using REST-API written
+on [IRON][iron].
+
+### Existing services
 
 We represent the following optional services just now:
 
-1. Configuration Update service. Although every node has its own
-  configuration file, some setups should be changed for every node
-  simultaneously. This service allows updating configuration through the
-  blockchain itself. In addition, administrators may apply new
-  configuration values without node restarting. More detailed description
-  can be found here: [Configuration
-  service](../advanced/services/configuration).
-2. Anchoring service. It writes the hash of the current blockchain state
-  to the bitcoin blockchain. It brings new guarantees: even if the
-  malefactor takes control over every validator, he cannot rebuild
-  blockchain and change old transactions quietly. If he tries so, then the
-  hash of the new block would differ from the one written in the bitcoin
-  blockchain. Every other node would check it and alert about a mismatch.
-  Therefore, the anchoring service gives additional durability: to change
-  the data retroactively the hacker should hack bitcoin blockchain, and it
-  is impossible just now. To get more about anchoring, you may refer to
-  [Anchoring service specification](../advanced/services/anchoring.md).
+#### Configuration Update service
+
+Although every node has its own configuration file, some setups should
+be changed for every node simultaneously. This service allows updating
+configuration through the blockchain itself. In addition, administrators
+may apply new configuration values without node restarting. More
+detailed description can be found here: [Configuration
+service](../advanced/services/configuration).
+
+#### Anchoring service
+
+It writes the hash of the current blockchain state to the bitcoin
+blockchain. It brings new guarantees: even if the malefactor takes
+control over every validator, he cannot rebuild blockchain and change
+old transactions quietly. If he tries so, then the hash of the new block
+would differ from the one written in the bitcoin blockchain. Every other
+node would check it and alert about a mismatch. Therefore, the anchoring
+service gives additional durability: to change the data retroactively
+the hacker should hack bitcoin blockchain, and it is impossible just
+now. To get more about anchoring, you may refer to [Anchoring service
+specification](../advanced/services/anchoring.md).
 
 As services are just a modules, they can be reused in the different
 Exonum projects. You may take a open-source services already written by
