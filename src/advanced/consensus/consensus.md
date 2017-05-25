@@ -129,11 +129,8 @@ that led to the lock from a locked validator, if they do not have them locally
 and they do not get prevotes from each other because of the connection problems.
 Then validators B and C can request each other’s prevotes from validator A.
 
-Since there are -1/3 Byzantine validators, at least +1/3 prevotes from the
-+2/3 prevotes collected for the lock were sent by honest validators.
-There are -2/3 remaining nodes, so an honest validator cannot lock on another proposal.
-Thus, once a single honest validator is locked on a proposal, no other proposal
-can be accepted.
+Locks can be changed: if A locked on a propose and during next round all other
+validators locked on the next proposal, A would update its lock eventually.
 
 ### Requests
 
@@ -146,8 +143,7 @@ and which has been discovered during the previous communication with the peer.
 **Example.** A request is sent if the node receives a consensus message from
 a height greater than the local height. The peer is supposed to respond with
 a message that contains transactions in an accepted block, together with a proof
-that the block is indeed accepted (i.e., precommits of +2/3 validators corresponding
-to the block).
+that the block is indeed accepted (i.e., precommits of +2/3 validators).
 
 There are requests for all consensus messages: proposals, prevotes, and precommits.
 As consensus messages are authenticated with digital signatures, they can be sent
@@ -187,7 +183,7 @@ consensus messages.
 
 ### Messages
 
-The consensus algorithm makes use several types of messages. All messages
+The consensus algorithm makes use of several types of messages. All messages
 are authenticated with the help of public-key digital signatures, so that
 the sender of the message is unambiguously known and cannot be forged.
 Furthermore, the use of digital signatures (instead of, say, [HMACs][wiki:hmac])
@@ -264,19 +260,20 @@ In contrast to the case discussed in the previous paragraph, the absence of a
 fixed round ends in Exonum allows to accept the proposal with a minimum necessary
 delay.
 
-### Compact Proposals
+### Work Split
 
 `Propose` messages include only transaction hashes. (Transactions are included
 directly into `Block` messages.) Furthermore, transaction execution is delayed;
-transactions are applied only at the when a node locks on a `Propose`.
+transactions are applied only at the moment when a node locks on a `Propose`.
 
 Delayed transaction processing reduces the negative impact of malicious nodes on
 the system throughput and latency. Indeed, it splits transaction processing among
 the stages of the algorithm:
 
 - On the prevote stage validators only ensure that a list of transactions
-  included in a proposal is correct (i.e., all transactions in the `Propose` exist
-  and are internally correct)
+  included in a proposal is correct (validator checks that all transactions in
+  the `Propose` are already stored by this node. Correctness of transaction is
+  verified when a transaction is received; nodes don't store incorrect transactions.)
 - On the precommit stage validators apply transactions to the current
   blockchain state
 - On the commit stage validators ensure that they achieved the same state
@@ -285,8 +282,8 @@ the stages of the algorithm:
 If the Byzantine validator sends out proposals with a different transaction order
 to different validators, the validators do not need to spend time checking
 the order and applying transactions on the prevote stage.
-A different transaction order will be detected when comparing `block_hash` received
-in the prevote messages from other validators and `block_hash` received
+A different transaction order will be detected when comparing `propose_hash` received
+in the prevote messages from other validators and `propose_hash` received
 in the proposal message.
 
 Thus, the split of work helps reduce the negative impact of Byzantine nodes
