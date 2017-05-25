@@ -1,8 +1,9 @@
 # About this page
 
-The Exonum framework is structured as follows: 
+The Exonum framework is structured as follows:
 
-- [Transaction processing](#transaction-processing) describes **TODO**
+- [Transaction processing](#transaction-processing) describes Exonum blocks
+  and transactions lifecycle.
 - [The network structure](#the-network-structure) lists types on which
   Exonum nodes are divided.
 - [Consensus](#consensus) explains how nodes agree on the blockchain
@@ -14,11 +15,22 @@ The Exonum framework is structured as follows:
 - [Modularity and services](#modularity-and-services) introduces services
   and explains what they are used for.
 
-This page describes the operation of these components and how they can be used in the development on top of Exonum.
+This page describes the operation of these components and how they can
+be used in the development on top of Exonum.
 
 ## Transaction processing
 
-Blockchain is literally a chain of blocks. Every next block includes the
+Transactions are the main entity Exonum works with. They represent
+atomic patch that should be applied to users data. Any node can generate
+transactions, however these transactions need to be checked and approved
+before they will be concidered as accepted ones.
+
+Exonum gathers transactions into blocks and approve the whole block
+atomically. If transaction has not been written to any block yet, it is
+not regarded as accepted. After block approving, every transaction is
+executed by appropriate Exonum service and is applied to data tables.
+
+Blocks are combined into the blockchain. Every next block includes the
 hash of the previous block; so, it is impossible to change one block
 without the appropriate changes for the each of the following blocks. In
 the matter, a blockchain is just a data storage with additional
@@ -42,6 +54,9 @@ Exonum blocks consist of the following parts:
   unequivocally. The agreement on the hash of data storage is a part of
   the Exonum consensus algorithm, so it is guaranteed to coincide for all
   validators.
+
+You may find more details about transactions in the separate article:
+[Transactions](../architecture/transactions)
 
 ## The network structure
 
