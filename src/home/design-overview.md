@@ -61,8 +61,8 @@ Exonum blocks consist of the following parts:
 3. The hash of a new data storage state. The state itself is not
   included; however, transactions are applied deterministically and
   unequivocally. The agreement on the hash of data storage is a part of
-  the Exonum consensus algorithm, so it is guaranteed to coincide for all
-  validators.
+  the Exonum consensus algorithm, so the hash is guaranteed to coincide
+  for all validators.
 
 You may find more details about transactions in the separate article:
 [Transactions](../architecture/transactions)
