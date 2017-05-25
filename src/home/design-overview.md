@@ -80,8 +80,9 @@ These nodes have different rights and different functionality.
   generate new blocks or vote for other block proposals. Other nodes just
   create business transactions and send them to the network. Validators
   receive these txs, check them, and include into the new block. The list
-  of the validators is strictly limited, and normally should consist of
-  4-15 nodes.
+  of the validators is restricted by network maintainers, and normally
+  should consist of 4-15 nodes.
+
 3. Thin clients do not need an every byte of the blockchain, so they
   held only part they are interested in. To get new (or absent)
   information they call to the full-nodes. Exonum provides a "proofs
