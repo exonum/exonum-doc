@@ -19,8 +19,8 @@ It also contains auxiliary fields. These fields are used to identify nodes that
 can vote for this configuration and determining the activation time of the
 configuration in all nodes simultaneously:
 
-- `actual_from` - blockchain height, upon reaching which current configuration is to
-  become actual.
+- `actual_from` - blockchain height, upon reaching which current configuration is
+  to become actual.
 - `previous_cfg_hash` - hash of previous configuration, which validators' set is
   allowed to cast votes for current configuration.
 
@@ -33,6 +33,8 @@ tutorial][http_api] for more details on http api.
 
 **{basePath}** below stands for `/api/services/configuration/v1`
 
+Response samples may be found [here][response_samples].
+
 ### Actual Configuration
 
     GET {basePath}/configs/actual
@@ -43,9 +45,14 @@ Looks up the actual global configuration.
 
 None.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseConfigHashInfo object](#configuration-object).
+```JSON
+{
+  "config": config-body,
+  "hash": config-hash
+}
+```
 
 ### Following Configuration
 
@@ -58,9 +65,14 @@ Returns `null` if no configuration is scheduled.
 
 None.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseConfigHashInfo object](#configuration-object).
+```JSON
+{
+  "config": config-body,
+  "hash": config-hash
+}
+```
 
 ### Configuration by Hash
 
@@ -75,9 +87,22 @@ json-object values, that match **propose-template**.
 
 `{config-hash}` - hash of configuration to look up.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseConfigInfo object](#configuration-object).
+```JSON
+{
+ "committed_config": config_body,
+ "propose": {
+  "num_votes": integer,
+  "tx_propose": {
+   "cfg": config_body,
+   "from": validator-public-key,
+   "signature": validator-signature
+  },
+ "votes_history_hash": vote-history-hash
+ }
+}
+```
 
 ### Votes for Configuration
 
@@ -91,9 +116,21 @@ json array.
 
 `{config-hash}` - hash of configuration to look up.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseVotesInfo object](#configuration-object).
+```JSON
+{
+ "Votes": [
+  {
+   "cfg_hash": config-hash,
+   "from": validator-public-key,
+   "signature": validator-signature
+  },
+  null,
+  ...
+ ]
+}
+```
 
 ### Committed Configurations
 
@@ -111,9 +148,21 @@ committed as transactions to the Exonum blockchain.
   Filters configurations by the specified minimum for the height from which the
   configuration became actual.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseConfigHashInfo object](#configuration-object).
+```JSON
+[
+ {
+  "config": config-body,
+  "hash": config-hash
+ },
+ {
+  "config": config-body,
+  "hash": config-hash
+ },
+ ...
+]
+```
 
 ### Proposed Configurations
 
@@ -129,9 +178,21 @@ committed as transactions to the Exonum blockchain.
 equals the corresponding parameter. It's included if its _actual_from_ field is
 greater or equal than corresponding parameter.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseProposeHashInfo object](#configuration-object).
+```JSON
+[
+ {
+  "propose-data": propose-template,
+  "hash": config-hash
+ },
+ {
+  "propose-data": propose-template,
+  "hash": config-hash
+ },
+ ...
+]
+```
 
 ### Private endpoints
 
@@ -155,9 +216,14 @@ Posts proposed configuration body.
 
 None.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseProposePost object](#configuration-object).
+```JSON
+{
+ "cfg_hash": configuration-hash,
+ "tx_hash": transaction-hash
+}
+```
 
 ### Vote for Configuration
 
@@ -169,9 +235,14 @@ Votes for a configuration having specific hash.
 
 `{config-hash-vote-for}` is a configuration hash to vote for.
 
-#### Returned Value
+#### Response template
 
-[ApiResponseVotePost object](#configuration-object).
+```JSON
+{
+ "tx_hash": transaction-hash
+}
+```
 
 [stored_configuration]: http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html
 [http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
+[response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
