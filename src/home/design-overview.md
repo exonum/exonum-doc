@@ -23,15 +23,13 @@ Exonum blocks consist of the following parts:
 1. The hash of the previous exonum block.
 2. The list of the approved transactions. When the other nodes execute
   the block, they execute every transaction in the given order and apply
-  changes to their data storages.
+  changes to their data storages. Every transaction type is executed by
+  the appropriate Exonum service.
 3. The hash of a new data storage state. The state itself is not
   included; however, transactions are applied deterministically and
   unequivocally. The agreement on the hash of data storage is a part of
   the Exonum consensus algorithm, so it is guaranteed to coincide for all
   validators.
-4. Service transactions. Different Exonum services may define its own
-  transactions. Such transactions are executed not by the Core, but by the
-  appropriate service.
 
 ## 2. The network structure
 
@@ -135,19 +133,21 @@ Here should be a deep text about smart contracts. **TODO: do**
 ## 6. Modularity and services
 
 Exonum Framework includes the Core and the set of optional pluggable
-services. Services extends Exonum functionality. While the Core is
-responsible for the consensus, and provides transactions and blocks to
-be sent, received and processed, services implement additional business
-logics for control and monitoring network behavior.
+services. While the Core is responsible for the consensus, and provides
+transactions and blocks to be sent and received, services implement all
+the custom logics and are the main point to extend Exonum functionality.
 
-Services implement event handlers and listen for the different
-blockchain actions. For example, `handle_commit` is executed after new
-block applies to the data storage. To communicate between nodes, service
-may define its own transaction type. During block execution, such
-transaction is processed by the same service on the other nodes.
+Services are used for two main purposes:
 
-Outer applications may communicate with services using REST-API written
-on [IRON][iron]. We represent the following optional services just now:
+1. They define types of transactions proceeded by Exonum, and implement
+  its execution logics. The application may include multiple independent
+  services, and each of them processes its own transactions list.
+2. Services may implement event handlers and listen for the different
+  blockchain actions. For example, `handle_commit` is executed after new
+  block applies to the data storage. Outer applications may communicate
+  with services using REST-API written on [IRON][iron].
+
+We represent the following optional services just now:
 
 1. Configuration Update service. Although every node has its own
   configuration file, some setups should be changed for every node
