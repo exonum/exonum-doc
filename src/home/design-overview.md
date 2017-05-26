@@ -82,13 +82,13 @@ These nodes have different rights and different functionality.
   receive these txs, check them, and include into the new block. The list
   of the validators is restricted by network maintainers, and normally
   should consist of 4-15 nodes.
-
 3. Thin clients do not need an every byte of the blockchain, so they
   held only part they are interested in. To get new (or absent)
   information they call to the full-nodes. Exonum provides a "proofs
-  mechanism", allowing Thin clients to check if the full-node answered
+  mechanism", allowing thin clients to check if the full-node answered
   fairly. Basing on Merkle / Merkle Patricia tables, such mechanism allow
-  checking if the node really keeps a shown value in its data storage.
+  checking if the value kept by node in its data storage is really
+  authorized by supermajority of validators.
   Full-node cannot generate "fake" answer or fool around the client.
 
 ## Consensus
