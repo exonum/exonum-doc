@@ -1,6 +1,7 @@
 # About this page
 
-The Exonum framework is structured as follows:
+This page describes the core ideas of Exonum architecture. It is structured
+as follows:
 
 - [Transaction processing](#transaction-processing) describes Exonum blocks
   and transactions lifecycle.
@@ -15,8 +16,8 @@ The Exonum framework is structured as follows:
 - [Modularity and services](#modularity-and-services) introduces services
   and explains what they are used for.
 
-This page describes the operation of these components and how they can
-be used in the development on top of Exonum.
+Every section uncovers the operation of component and how it can be used
+in the development on top of Exonum.
 
 ## Transaction processing
 
