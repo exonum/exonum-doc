@@ -129,7 +129,7 @@ Other databases will be also featured in the future releases.
 
 ### Data storage table types
 
-Exonum support multiple types of data tables. While List and Map are the
+Exonum supports multiple types of data tables. While List and Map are the
 usual ways to store data, the following two are more complicated and
 interesting. Their main purpose is to provide a proof mechanism for
 stored values.
@@ -182,8 +182,9 @@ the custom logics and are the main point to extend Exonum functionality.
 Services are used for two main purposes:
 
 1. They define types of transactions proceeded by Exonum, and implement
-  its execution logics. The application may include multiple independent
-  services, and each of them processes its own transactions list.
+  the execution logics for each type. The application may include multiple
+  independent services, and each of them processes its own transactions
+  list.
 2. Services may implement event handlers and listen for the different
   blockchain actions. For example, `handle_commit` is executed after new
   block applies to the data storage.
@@ -198,7 +199,7 @@ We represent the following optional services just now:
 #### Configuration Update service
 
 Although every node has its own configuration file, some setups should
-be changed for every node simultaneously. This service allows updating
+be changed for all nodes simultaneously. This service allows updating
 configuration through the blockchain itself. In addition, administrators
 may apply new configuration values without node restarting. More
 detailed description can be found here: [Configuration
@@ -206,7 +207,7 @@ service](../advanced/services/configuration).
 
 #### Anchoring service
 
-It writes the hash of the current blockchain state to the bitcoin
+It writes the hash of the current Exonum blockchain state to the bitcoin
 blockchain. It brings new guarantees: even if the malefactor takes
 control over every validator, he cannot rebuild blockchain and change
 old transactions quietly. If he tries so, then the hash of the new block
