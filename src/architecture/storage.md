@@ -6,10 +6,9 @@ This page reveals how Exonum stores different data, from the lowest (LevelDB) to
 2. [Low-level storage](#low-level-storage) shows, how Exonum keeps the data on the hard disk. Now LevelDB is used.
 3. [DBView layer](#dbview-layer) introduces the wrapper over DB engine. This layer  implement a "sandbox" above the real data and provides block applying atomically.
 4. [Table naming convention](#table-naming-convention) elaborates how user tables should be called, and shows how the Exonum tables are matched into LevelDB.
-4. [List of system tables](#list-of-system-tables) describes what tables are used directly by Exonum Core.
+5. [List of system tables](#list-of-system-tables) describes what tables are used directly by Exonum Core.
 6. [Indices](#indices) reveals how indices can be built.
-5. [Genesis block](#genesis-block) describes how tables are initialized.
-6. [Proofs mechanism](#proofs-mechanism) описывает, как строятся и пруфы по Merkle / Merkle Patricia таблицам.
+7. [Genesis block](#genesis-block) describes how tables are initialized.
 
 ## Exonum table types
 
@@ -60,62 +59,61 @@ Exonum uses third-party database engines to save blockchain data locally. To use
 - delete pair by key;
 - find the nearest key to the requested one.
 
-In the current moment, key-value storage [LevelDB]() v1.20 is used. Also we plan to add [RocksDB]() support in the near future.
+At this moment, key-value storage [LevelDB]() v1.20 is used. Also we plan to add [RocksDB]() support in the near future.
 
 ## DBView layer
 
-Для работы с незаппрувленными изменениями введен дополнительный слой Views [src](). Он позволяет форкать и там всякое такое. Патчи, implement Map interface
+Exonum introduces additional layer over database to handle with unapplied changes. `View` [src]() transparently wrap the real database state, and add some additional changes. From the outer point of view, the changes are already applied to the data storage; however, these changes may be easily abolished. Moreover, there may be different forks of database state. 
+This technology is used during block creation: Validator node apply some transactions, check its correctness, apply another ones, and finaly decides which transactions should be applied to the data and which should not. If one of the transactions falls with error during validation, its changes are promptly reverted.
+During the block execution View layer allows to create the list of changes and, if all changes are accurate, apply it to the data storage atomically.
+
 
 ## Table naming convention
 
-Все таблицы делятся на системные и таблицы сервисов. У каждого сервиса своя область видимости таблиц. При этом, разные сервисы могут иметь таблицы c одинаковыми именами. Аналогом из мира реляционных БД являются схемы: каждому сервису соответствует своя схема.
+Exonum tables are divided into two groups.
 
-На уровне LevelDB, все данные всех таблиц Exonum сохраняются в одну LevelDB map.
-При этом, ключом является последовательность байт, а значением - сериализованные объекты (тоже, по факту, последовательность байт).
+- System tables are used directly by the Core and provide Exonum operation.
+- Services tables belong to the appropriate service. 
+
+Such differentiation corresponds to schemas in the relational database world. There may be different tables with the same name, located in the different schemas.
+
+At the LevelDB scale, all values from all Exonum tables are saved into one big LevelDB map, wherein the keys are represented as bytes sequence, and values are serialized objects ,in fact, byte sequences too.
 
 To distinguish values from different tables, additional prefix is used for every key. Such prefix consist of service name and table name.
 
-Сервисы именуются именуются байтовыми последовательностями, начиная с `x01`. Длина имени не ограничена. Имя `x00x00` соответствует Ядру.
-Таблицы внутри сервиса именуются байтовыми последовательностями.
+Services are named with a byte arrays, starting from `x01`. Name length is not limited. `x00x00` name is reserved to the Core.
+Tables inside services are named with a byte sequences.
 
-Таким образом, ключу `key` в таблице `x00` для сервиса `x00x01` будет соответствовать следующий ключ в LevelDB:
+Thus, key `key` at the table `x00` for the `x00x01` service matches with  the following key in the LevelDB map:
 ```
 x00x01|x00|key
 ```
- где `|` - это конкатенация байтовых последовательностей.
 
-При именовании таблиц внутри одного сервиса, старайтесь, чтобы имена не были префиксом друг друга.
+here, `|` stands for bytes sequences concatenation.
+
+It is strongly advised not to admit situation when one table name inside the service is a prefix for the other table in the same service. Such cases may cause the ineligible coincidences between the different keys and elements.
 
 ## List of system tables
 
-Ядро имеет свой список таблиц, нужных для обеспечения работоспособности блокчейна. Эти таблицы создаются вот здесь: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs#L47)
+The Core owns its own tables that are used for providing the service. These tables are created here: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs#L47)
 
+There are the following system tables:
 
-Следующие таблицы принадлежат ядру:
-
-- transactions
-- tx_location_by_hash
-- blocks
-- block_hashes_by_height
-- block_txs
-- precommits
-- configs
-- configs_actual_from
-- state_hash_aggregator
+- `transactions`, `MapTable`. It represents a map from transaction hash into raw transaction structure
+- `tx_location_by_hash`, `MapTable`. It keeps the block height and tx position inside block for every transaction hash. 
+- `blocks`, `MapTable`. It stores block object for every block height.
+- `block_hashes_by_height`, `ListTable`. It saves a list of block hashes which had the requested height.
+- `block_txs`, `MerkleTable`. It keeps a list of transactions for the each block.
+- `precommits`, `ListTable`. The list of validators' precommits is stored here. 
+- `configs`, `MerklePatriciaTable`. It stores the actual configuration in the JSON format for block heights.
+- `configs_actual_from`, `ListTable`. It builds an index to get config starting height quickly.
+- `state_hash_aggregator`, `MerklePatriciaTable`. It is the accessory table for calculating patches in the DBView layer.
 
 ## Indices
 
-Экзонум не поддерживает индексы как отдельную сущность. Однако, вы всегда можете создать дополнительную таблицу со смыслом "индекс". Например, среди системных таблиц `block_txs` - это список транзакций для блока; а `tx_location_by_hash` обеспечивает обратную операцию, высота блока по хешу транзакции.
+Exonum does not support indices as the individual entity. However, you can always creat additional table with an index meaning. For example, there are system table `block_txs` that stores a list of transactions for every block. In relational databases, we may want to create a backward index over tx, to quickly get a block height at which transaction was approved. In the Exonum, we just create a `tx_location_by_hash` map table, that provides with this operation.
 
 ## Genesis block
 
-При создании генезис-блока, сервисы могут проинициализировать свои таблицы. Для этого сервис должен хэндлить ивент handle_genesis_block: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92)
-Примите во внимание, что эта процедура вызывается при каждом включении ноды. Примеры реализации вы можете посмотреть в [cryptocurrency-service-genesis-block]()
-
-## Proofs mechanism
-
-`MerklePatriciaTable` and `MerkleTable` позводяют строить доказательства того, что в таблице по данному ключу / индексу лежит именно такое значение. Детали и теория proofs mechanism описаны здесь: [merkle-trees](), [merkle-patricia-trees]()
-
-### MerkleTable proofs
-
-Функция `construct_path_for_range` строит дерево с доказательством. Такое дерево сериализуется в JSON для отправки легкому клиенту. 
+At the very start of the blockchain, services should initialize its tables. It should be done during Genesis block creation. To set up its data tables, service should handle `genesis_block` event: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92). Take in the attention, that Genesis Block creation procedure is called every time Exonum node starts.
+You may find implementation examples in the our tutorial: [cryptocurrency-service-genesis-block]()
