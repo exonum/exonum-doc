@@ -70,7 +70,7 @@ format](../advanced/serialization.md). This is done for several reasons:
 **Notice.**  In the case user authentication in needed (for example, for data
 access management), requests can be *digitally signed*.
 
-# Motivation
+## Motivation
 
 Blockchain, as a technology that expands the capabilities of distributed
 databases, implies the possibility of auditing or validating stored
