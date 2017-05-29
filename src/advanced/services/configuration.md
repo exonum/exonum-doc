@@ -113,7 +113,9 @@ json-object values, that match **propose-template**.
 
 Looks up votes for a configuration propose by configuration hash. If a vote from
 the validator is absent, then `null` is returned at the corresponding index in
-json array.
+json array. Indexing of the `Votes` array corresponds to the indexing of
+validators public keys in [actual
+configuration](../../architecture/configuration.md#genesis).
 
 #### Parameters
 
