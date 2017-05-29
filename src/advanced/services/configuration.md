@@ -26,8 +26,8 @@ configuration in all nodes simultaneously:
 
 ## Global variable service http api
 
-All `hash`es, `public-key`s and `signature`s in tables are hexadecimal strings.
-`config-body` is a valid json, corresponding to [exonum
+All `hash`es in tables are hexadecimal strings.
+`config_body` is a valid json, corresponding to [exonum
 config][stored_configuration] serialization. See [Configuration service
 tutorial][http_api] for more details on http api.
 
@@ -49,8 +49,8 @@ None.
 
 ```JSON
 {
-  "config": config-body,
-  "hash": config-hash
+  "config": config_body,
+  "hash": config_hash
 }
 ```
 
@@ -69,14 +69,14 @@ None.
 
 ```JSON
 {
-  "config": config-body,
-  "hash": config-hash
+  "config": config_body,
+  "hash": config_hash
 }
 ```
 
 ### Configuration by Hash
 
-    GET {basePath}/configs/{config-hash}
+    GET {basePath}/configs/{config_hash}
 
 Looks up configuration by configuration hash. If no propose was submitted for a
 configuration (genesis configuration), then `propose` field is `null`. If only
@@ -85,28 +85,24 @@ json-object values, that match **propose-template**.
 
 #### Parameters
 
-`{config-hash}` - hash of configuration to look up.
+`config_hash` - hash of configuration to look up.
 
 #### Response template
 
 ```JSON
 {
- "committed_config": config_body,
- "propose": {
-  "num_votes": integer,
-  "tx_propose": {
-   "cfg": config_body,
-   "from": validator-public-key,
-   "signature": validator-signature
-  },
- "votes_history_hash": vote-history-hash
- }
+  "committed_config":config_body,
+  "propose":{  
+    "num_votes":integer,
+    "tx_propose":propose_transaction_body,
+    "votes_history_hash":vote_history_hash
+  }
 }
 ```
 
 ### Votes for Configuration
 
-    GET {basePath}/configs/{config-hash}/votes
+    GET {basePath}/configs/{config_hash}/votes
 
 Looks up votes for a configuration propose by configuration hash. If a vote from
 the validator is absent, then `null` is returned at the corresponding index in
@@ -114,37 +110,33 @@ json array.
 
 #### Parameters
 
-`{config-hash}` - hash of configuration to look up.
+`config_hash` - hash of configuration to look up.
 
 #### Response template
 
 ```JSON
 {
- "Votes": [
-  {
-   "cfg_hash": config-hash,
-   "from": validator-public-key,
-   "signature": validator-signature
-  },
-  null,
-  ...
- ]
+  "Votes":[  
+    vote_for_propose_transaction_body,
+    null,
+    ...
+  ]
 }
 ```
 
 ### Committed Configurations
 
-    GET {basePath}/configs/committed?previous_cfg_hash={previous-config-hash}&actual_from={lowest-actual-from}
+    GET {basePath}/configs/committed?previous_cfg_hash={previous_config_hash}&actual_from={lowest_actual_from}
 
 Looks up all committed configurations in the order configuration proposals are
 committed as transactions to the Exonum blockchain.
 
 #### Parameters
 
-- `{previous-config-hash}`: hash (optional)  
+- `previous_config_hash`: hash (optional)  
   Filters configurations by the specified previous configuration hash.
 
-- `{lowest_actual_from}`: hash (optional)
+- `lowest_actual_from`: hash (optional)
   Filters configurations by the specified minimum for the height from which the
   configuration became actual.
 
@@ -152,21 +144,21 @@ committed as transactions to the Exonum blockchain.
 
 ```JSON
 [
- {
-  "config": config-body,
-  "hash": config-hash
- },
- {
-  "config": config-body,
-  "hash": config-hash
- },
- ...
+  {  
+    "config":config_body,
+    "hash":config_hash
+  },
+  {  
+    "config":config_body,
+    "hash":config_hash
+  },
+  ...
 ]
 ```
 
 ### Proposed Configurations
 
-    GET {basePath}/configs/proposed?previous_cfg_hash={config-hash}&actual_from={lowest-actual-from}
+    GET {basePath}/configs/proposed?previous_cfg_hash={config_hash}&actual_from={lowest_actual_from}
 
 Looks up all proposed configurations in the order configuration proposals are
 committed as transactions to the Exonum blockchain.
@@ -174,23 +166,23 @@ committed as transactions to the Exonum blockchain.
 #### Parameters
 
 `{previous_cfg_hash}` and `{lowest_actual_from}` are optional filtering parameters.
-**propose-template** is included in response if its _previous_cfg_hash_ field
+**propose_template** is included in response if its _previous_cfg_hash_ field
 equals the corresponding parameter. It's included if its _actual_from_ field is
 greater or equal than corresponding parameter.
 
 #### Response template
 
 ```JSON
-[
- {
-  "propose-data": propose-template,
-  "hash": config-hash
- },
- {
-  "propose-data": propose-template,
-  "hash": config-hash
- },
- ...
+[  
+  {  
+    "propose-data":propose_template,
+    "hash":config_hash
+  },
+  {  
+    "propose-data":propose_template,
+    "hash":config_hash
+  },
+  ...
 ]
 ```
 
@@ -204,11 +196,11 @@ endpoint.
   propose is being submitted.
 
 - `cfg_hash`, returned in response to `postpropose` request, should be used as
-  `{config-hash-vote-for}` parameter of `postvote` request.
+  `{config_hash_vote_for}` parameter of `postvote` request.
 
 ### Propose Configuration
 
-    GET {basePath}/configs/postpropose
+    POST {basePath}/configs/postpropose
 
 Posts proposed configuration body.
 
@@ -220,26 +212,26 @@ None.
 
 ```JSON
 {
- "cfg_hash": configuration-hash,
- "tx_hash": transaction-hash
+  "cfg_hash": configuration_hash,
+  "tx_hash": transaction_hash
 }
 ```
 
 ### Vote for Configuration
 
-    GET {basePath}/configs/{config-hash-vote-for}/postvote
+    POST {basePath}/configs/{config_hash_vote_for}/postvote
 
 Votes for a configuration having specific hash.
 
 #### Parameters
 
-`{config-hash-vote-for}` is a configuration hash to vote for.
+`config_hash_vote_for` is a configuration hash to vote for.
 
 #### Response template
 
 ```JSON
 {
- "tx_hash": transaction-hash
+  "tx_hash": transaction_hash
 }
 ```
 
