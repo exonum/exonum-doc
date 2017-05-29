@@ -12,7 +12,8 @@ the shorter the round timeout, the smaller the expected acceptance time.
 Creating blocks with too low timeout leads to increase in the consumption of
 resources for blocks storage and (more crucial) for processing cryptographic
 proofs when checking that blocks. Creating blocks with too high timeout leads to
-delay increase in the applying of new transactions.
+delay increase in the applying of new transactions. Moreover, the accumulation of
+unprocessed transactions can begin if their incoming traffic is too large.
 
 Timeout adjustment is executed after each block acceptance.
 
