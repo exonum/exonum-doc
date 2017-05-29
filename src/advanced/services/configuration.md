@@ -191,12 +191,57 @@ greater or equal than corresponding parameter.
 Posting a new configuration can be performed by any validator maintainer via private
 endpoint.
 
-- it's important to specify `previous_cfg_hash` in new configuration body, which
-  should be equal to `hash` of a configuration, actual at the moment when the new
-  propose is being submitted.
+`cfg_hash`, returned in response to `postpropose` request, should be used as
+`config_hash_vote_for` parameter of `postvote` request.
 
-- `cfg_hash`, returned in response to `postpropose` request, should be used as
-  `config_hash_vote_for` parameter of `postvote` request.
+#### Propose and vote transactions restrictions
+
+  - Propose transactions will only get submitted and executed with state change
+    if all of the following conditions take place:
+     1. new config body constitutes a valid json string and corresponds to
+        [StoredConfiguration](http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html)
+        format.
+
+     1. `previous_cfg_hash` in proposed config body equals to hash of *actual*
+        config.
+
+     1. `actual_from` in proposed config body is greater than *current height*.
+        *current height* is determined as the height of last
+        committed block + 1. This is important to obtain sequential view of
+        configs commit history. And, more important, the linear view of history
+        of votes which conditioned scheduling of a config.
+
+     1. a *following* config isn't  already present.
+
+     1. *actual* config contains the node-sender's public key in array of
+        `validators` field, as specified in `from` field of propose
+        transaction. The `from` field is determined by public key of node whose
+        `postpropose` endpoint is accessed for signing the transaction on
+        maintainter's behalf.
+
+     1. propose of config, which evaluates to the same hash, hasn't already
+        been submitted.
+
+  - Vote transactions will only get submitted and executed with state change
+    if all of the following conditions take place:
+     1. the vote transaction references a config propose with known config
+        hash.
+
+     1. a *following* config isn't  already present.
+
+     1. *actual* config contains the node-sender's public key in
+        `validators` field, as specified in `from` field of vote transaction.
+        The `from` field is determined by public key of node whose
+        `postvote` endpoint is accessed for signing the transaction on
+        maintainter's behalf.
+
+     1. `previous_cfg_hash` in the config propose, which is referenced by
+        vote transaction, is equal to hash of *actual* config.
+
+     1. `actual_from` in the config propose, which is referenced by vote
+        transaction, is greater than *current height*.
+
+     1. no vote from the same node's public key has been submitted previously.
 
 ### Propose Configuration
 
