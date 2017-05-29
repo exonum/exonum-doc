@@ -4,10 +4,17 @@ Configuration service of Exonum blockchain allows modifying Exonum blockchain
 configuration by means of propose configuration and vote for proposed configuration
 transactions signed by validators who are actual blockchain participants.
 
+Any validator node can propose a new configuration. Other validators can vote for
+the proposal. If the proposal gets the majority of votes, then all the validators
+switch to the new configuration as soon as they reach the height from which this
+configuration become actual.
+
 Configuration service contains http api implementation for public queries (get
 actual/following configuration, etc.) and private queries, intended for use only
 by validator nodes' maintainers (post configuration propose, post vote for a
-configuration propose).
+configuration propose). When processing a POST request, its validity must be
+checked (see [Propose and vote transactions
+restrictions](#propose-and-vote-transactions-restrictions) section).
 
 Exonum blockchain configuration is composed of:
 
@@ -211,7 +218,7 @@ endpoint.
         configs commit history. And, more important, the linear view of history
         of votes which conditioned scheduling of a config.
 
-     1. a *following* config isn't  already present.
+     1. a *following* config isn't already present.
 
      1. *actual* config contains the node-sender's public key in array of
         `validators` field, as specified in `from` field of propose
@@ -227,7 +234,7 @@ endpoint.
      1. the vote transaction references a config propose with known config
         hash.
 
-     1. a *following* config isn't  already present.
+     1. a *following* config isn't already present.
 
      1. *actual* config contains the node-sender's public key in
         `validators` field, as specified in `from` field of vote transaction.
