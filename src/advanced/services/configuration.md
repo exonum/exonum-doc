@@ -165,7 +165,7 @@ committed as transactions to the Exonum blockchain.
 
 #### Parameters
 
-`{previous_cfg_hash}` and `{lowest_actual_from}` are optional filtering parameters.
+`previous_cfg_hash` and `lowest_actual_from` are optional filtering parameters.
 **propose_template** is included in response if its _previous_cfg_hash_ field
 equals the corresponding parameter. It's included if its _actual_from_ field is
 greater or equal than corresponding parameter.
@@ -196,7 +196,7 @@ endpoint.
   propose is being submitted.
 
 - `cfg_hash`, returned in response to `postpropose` request, should be used as
-  `{config_hash_vote_for}` parameter of `postvote` request.
+  `config_hash_vote_for` parameter of `postvote` request.
 
 ### Propose Configuration
 
@@ -206,7 +206,7 @@ Posts proposed configuration body.
 
 #### Parameters
 
-None.
+`config_body` to propose. It should be sent as a request body.
 
 #### Response template
 
