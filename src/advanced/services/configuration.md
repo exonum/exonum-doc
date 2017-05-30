@@ -123,10 +123,10 @@ None.
 
     GET {base_path}/configs/{config_hash}
 
-Looks up configuration by configuration hash. If no propose was submitted for a
-configuration (genesis configuration), then `propose` field is `null`. If only
-propose is present, then `committed_config` field is `null`. `propose` key has
-json-object values, that match `propose_template`.
+Looks up configuration (including proposals) by configuration hash. If no propose
+was submitted for a configuration (genesis configuration), then `propose` field
+is `null`. If only propose is present, then `committed_config` field is `null`.
+`propose` key has json-object values, that match `propose_template`.
 
 #### Parameters
 
