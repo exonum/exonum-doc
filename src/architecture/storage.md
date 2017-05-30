@@ -15,7 +15,7 @@ This page reveals how Exonum stores different data, from the lowest (LevelDB) to
 Multiple table types may be used in the Exonum applications.
 
 1. `MapTable`
-  `Maptable` [\[src\]](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_table.rs) is implementation of Key-Value storage. The following actions are supported:
+  [`Maptable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_table.rs) is implementation of Key-Value storage. The following actions are supported:
   - `get(key: &K)` receives a value by key. If Key is not found, error is returned.
   - `put(key: &K, value: V)` inserts new value by key. If such key is already exists, old value is overwritten with new one.
   - `delete(key: &K)` removes appropriate key-value pair. If Key is not found, error is returned.
@@ -23,7 +23,7 @@ Multiple table types may be used in the Exonum applications.
   
   `Maptable` represents the most basic table type. Although other table types do not inherit from it directly, they wrap around `map` field.
 2. `ListTable`
-  `ListTable` [\[src\]]() represesnts an array list. The following actions are supported:
+  [`ListTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_table.rs) represesnts an array list. The following actions are supported:
   - `values()` returns the copy of all values stored in the list. Be careful, values are copied into the memory. It is not advised to use on the big tables.
   - `append(value: V)` adds new value to the end of the list.
   - `extend<I>(iter: I)` appends values from the iterator to the list one-by-one.
@@ -37,36 +37,35 @@ Multiple table types may be used in the Exonum applications.
   Inside, a `ListTable` wraps around `map` storage; usually `MapTable` is used. `ListTable` saves its elements to this map with an element indices as keys.
   
 3. `MerkleTable`
-  `MerkleTable` [src]() is an extended version for array list. It implements the `ListTable` interface, however adds additional feature. Basing on Merkle Trees, such table allows to create a proofs of existence for its values. 
+  [`MerkleTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/mod.rs) is an extended version for array list. It implements the `ListTable` interface, however adds additional feature. Basing on Merkle Trees, such table allows to create a proofs of existence for its values. 
   The table cells are divided into leafs and and intermediate nodes. Leafs store the data itself; inner nodes values are calculated as `hash(left_child_value | right_child_value)`.
-  You may read more detailed specification at [merkle-trees](). The following procedures are implemented:
+  You may read more detailed specification at [Merkle Trees](../advanced/merkle-index). The following procedures are implemented:
   - `root_hash()` returns the value of root element (that contains the hash of root node's children).
-  - `construct_path_for_range(range_start: u64, range_end: u64)` builds a proof tree for data values at indices `[range_start..range_end - 1]`. The tree consists of `Proofnode` [src]() objects.
+  - `construct_path_for_range(range_start: u64, range_end: u64)` builds a proof tree for data values at indices `[range_start..range_end - 1]`. The tree consists of `Proofnode` [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/proofnode.rs) objects.
   
   When thin client asks Exonum full-node about some data, the proof is built and sent along with the actual data values. Having block headers and such proof, thin client may check that received data was really authorized by the validators.
   
-4. `MerklePatriciaTable` [src]() is an extended version for a map. It implements the `Map` interface, adding the ability to create a proofs of existence for its key-value pairs. For a more detailed description, see [merkle-patricia-trees](). The following procedures are supported:
+4. [`MerklePatriciaTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs) is an extended version for a map. It implements the `Map` interface, adding the ability to create a proofs of existence for its key-value pairs. For a more detailed description, see [Merkle Patricia Trees](../advanced/merkle-patricia-index). The following procedures are supported:
   - `root_hash()` returns the root node's value.
   - `construct_path_to_key(searched_key: A)` builds a proof tree for the requested key. Tree proves either key presence (and its according value), or key absence. The proof tree is used in the same way as in the Merkle Table: it is sent to the client along with the requested data.
 
 
 ## Low-level storage
 
-Exonum uses third-party database engines to save blockchain data locally. To use the particular database, `Map`[src]() inteface should be implemented for it. It means that database should support the following procedures:
+Exonum uses third-party database engines to save blockchain data locally. To use the particular database, [`Map`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/mod.rs#L55) inteface should be implemented for it. It means that database should support the following procedures:
 
 - get value by key;
 - put new value at the key (insert or update already saved one);
 - delete pair by key;
 - find the nearest key to the requested one.
 
-At this moment, key-value storage [LevelDB]() v1.20 is used. Also we plan to add [RocksDB]() support in the near future.
+At this moment, key-value storage [LevelDB][level-db] v1.20 is used. Also we plan to add [RocksDB][rocks-db] support in the near future.
 
 ## DBView layer
 
-Exonum introduces additional layer over database to handle with unapplied changes. `View` [src]() transparently wrap the real database state, and add some additional changes. From the outer point of view, the changes are already applied to the data storage; however, these changes may be easily abolished. Moreover, there may be different forks of database state. 
-This technology is used during block creation: Validator node apply some transactions, check its correctness, apply another ones, and finaly decides which transactions should be applied to the data and which should not. If one of the transactions falls with error during validation, its changes are promptly reverted.
+Exonum introduces additional layer over database to handle with unapplied changes. `View` [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/leveldb.rs#L30) implements the same interfaces as the database underneath, transparently wrapping the real data storage state, and add some additional changes. From the outer point of view, the changes are already applied to the data storage; however, these changes may be easily abolished. Moreover, there may be different forks of database state. 
+This technology is used during block creation: validator node apply some transactions, check its correctness, apply another ones, and finaly decides which transactions should be applied to the data and which should not. If one of the transactions falls with error during validation, its changes are promptly reverted.
 During the block execution View layer allows to create the list of changes and, if all changes are accurate, apply it to the data storage atomically.
-
 
 ## Table naming convention
 
@@ -89,7 +88,7 @@ Thus, key `key` at the table `x00` for the `x00x01` service matches with  the fo
 x00x01|x00|key
 ```
 
-here, `|` stands for bytes sequences concatenation.
+Here, `|` stands for bytes sequences concatenation.
 
 It is strongly advised not to admit situation when one table name inside the service is a prefix for the other table in the same service. Such cases may cause the ineligible coincidences between the different keys and elements.
 
@@ -117,3 +116,6 @@ Exonum does not support indices as the individual entity. However, you can alway
 
 At the very start of the blockchain, services should initialize its tables. It should be done during Genesis block creation. To set up its data tables, service should handle `genesis_block` event: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92). Take in the attention, that Genesis Block creation procedure is called every time Exonum node starts.
 You may find implementation examples in the our tutorial: [cryptocurrency-service-genesis-block]()
+
+[level-db]: http://leveldb.org/
+[rocks-db]: http://rocksdb.org/
