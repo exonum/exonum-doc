@@ -58,6 +58,21 @@ config][stored_configuration] serialization.
 }
 ```
 
+`propose_template` is a valid json corresponding to [exonum
+config][config_propose] serialization.
+
+```JSON
+{
+  "propose_template": {
+    "tx_propose": {
+      "from": public_key,
+      "cfg": str,
+    },
+    "votes_history_hash": hash,
+    "num_votes": integer
+  }
+}
+```
 
 See [Configuration service tutorial][http_api] for more details on http api.
 
@@ -111,7 +126,7 @@ None.
 Looks up configuration by configuration hash. If no propose was submitted for a
 configuration (genesis configuration), then `propose` field is `null`. If only
 propose is present, then `committed_config` field is `null`. `propose` key has
-json-object values, that match **propose_template**.
+json-object values, that match `propose_template`.
 
 #### Parameters
 
@@ -124,7 +139,7 @@ json-object values, that match **propose_template**.
   "committed_config": config_body,
   "propose": {  
     "num_votes": integer,
-    "tx_propose": propose_transaction_body,
+    "tx_propose": propose_template,
     "votes_history_hash": vote_history_hash
   }
 }
@@ -148,8 +163,11 @@ configuration](../../architecture/configuration.md#genesis).
 
 ```JSON
 {
-  "Votes": [  
-    vote_for_propose_transaction_body,
+  "Votes": [
+    {
+      "from": public_key,
+      "cfg_hash": config_hash
+    },
     null,
     ...
   ]
@@ -316,5 +334,6 @@ Votes for a configuration having specific hash.
 ```
 
 [stored_configuration]: http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html
+[config_propose]: http://exonum.com/doc/crates/configuration_service/struct.StorageValueConfigProposeData.html
 [http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
