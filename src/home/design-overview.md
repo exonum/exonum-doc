@@ -54,10 +54,10 @@ properties and requirements for the underlying data.
 Exonum blocks consist of the following parts:
 
 1. The hash of the previous Exonum block.
-2. The list of the approved transactions. When the other nodes execute
-  the block, they execute every transaction in the given order and apply
-  changes to their data storages. Every transaction type is executed by
-  the appropriate Exonum service.
+2. The list of the approved transactions. When the nodes execute the block,
+  they execute every transaction in the given order and apply changes to
+  their data storages. Every transaction type is executed by the
+  appropriate Exonum service.
 3. The hash of a new data storage state. The state itself is not
   included; however, transactions are applied deterministically and
   unequivocally. The agreement on the hash of data storage is a part of
