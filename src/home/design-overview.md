@@ -75,6 +75,7 @@ These nodes have different rights and different functionality.
 1. The full-nodes replicate the entire contents of the blockchain. They
   can generate new transactions but they cannot choose which transactions
   should be adopted. They cannot generate new blocks.
+  All the full nodes are authenticated with public-key cryptography.
 2. The validators provide the network liveness. Despite of the big
   amount of the nodes presented in the network, only validators can
   generate new blocks or vote for other block proposals. Other nodes just
