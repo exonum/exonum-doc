@@ -143,7 +143,7 @@ stored values.
 3. [`MerkleTable`](../advanced/merkle-index) is an enhanced version of
   array storage. It implements the Merkle Tree, which is binary and
   balanced, although not necessarily full binary. Leafs keep the
-  actual values, while the nodes keep the hashes from concatenated
+  actual array items, while the nodes keep the hashes from concatenated
   children data. It is allowed only to append the data or update the cells
   already stored.
 4. [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extend the
