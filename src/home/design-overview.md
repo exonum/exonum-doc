@@ -154,10 +154,10 @@ stored values.
   map. It is based on the Merkle Patricia Tree. Leafs keep the actual
   values. The intermediary nodes values consist of the following four parts:
 
-  - Hash from the left child value
-  - Hash from the right child value
-  - Key for the left child node
-  - Key for the right child node
+    - Hash from the left child value
+    - Hash from the right child value
+    - Key for the left child node
+    - Key for the right child node
 
 Both `ListTable` and `MerkleTable` support updating-by-index and
 appending only; `MapTable` and `MerklePatriciaTable` allow inserting,
