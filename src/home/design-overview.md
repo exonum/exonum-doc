@@ -124,9 +124,12 @@ algorithm](../advanced/consensus/leader-election)
 
 ### LevelDB
 
-LevelDB is used to persist locally the data that transactions operate with.
-It was chosen for its high efficiency and minimal storage overhead.
-Other databases will be also featured in the future releases.
+[LevelDB][level-db] is used to persist locally the data that
+transactions operate with. It was chosen for its high efficiency and
+minimal storage overhead. However, other databases may be supported. In
+particular, [RocksDB][rocks-db] will be also featured in the future
+releases. To get, how to integrate other databases, you may refer to the
+separate [Data Storage](../architecture/storage) section.
 
 ### Data storage table types
 
