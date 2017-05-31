@@ -246,6 +246,51 @@ endpoint.
 `cfg_hash`, returned in response to `postpropose` request, should be used as
 `config_hash_vote_for` parameter of `postvote` request.
 
+### Configuration update service transactions
+
+Private endpoints are essentially helpers for creating the configuration update
+service transactions.
+
+#### Transactions data layout
+
+`TxVote` is vote for proposed configuration.
+```JSON
+{
+  "cfg_hash": config_hash,
+  "from": public_key
+}
+```
+
+`TxConfigPropose` is new configuration proposal.
+```JSON
+{
+  "cfg": config_body,
+  "from": public_key
+}
+```
+
+#### Transaction parameters
+
+`config_hash` is hex string with hash of configuration to vote for.
+
+`public_key` is hex string with public key of transaction author.
+
+`config_body` is string containing JSON with proposed configuration. Its format
+was described above.
+
+#### Verify step
+
+At this step, only signature verification takes place. If any there is valid
+signature on message, message gets committed to database. So the message
+participates in the `tx_hash` field of the block, regardless of the further
+checks results.
+
+#### Execute step
+
+If all the checks detailed [below](#propose-and-vote-transactions-restrictions)
+pass, execution results in modifying some tables and `state_hash` field (apart
+from `tx_hash`).
+
 #### Propose and vote transactions restrictions
 
 - Propose transactions will only get submitted and executed with state change
