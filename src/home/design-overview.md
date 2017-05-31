@@ -124,7 +124,7 @@ algorithm](../advanced/consensus/leader-election)
 
 ### LevelDB
 
-LevelDB is used to keep locally the data that transactions operate with.
+LevelDB is used to persist locally the data that transactions operate with.
 It was chosen for its high efficiency and minimal storage overhead.
 Other databases will be also featured in the future releases.
 
