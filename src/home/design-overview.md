@@ -92,6 +92,10 @@ These nodes have different rights and different functionality.
   authorized by supermajority of validators.
   Full-node cannot generate "fake" answer or fool around the client.
 
+The details about nodes communication and authentication with each
+other, you may refer to the separate page: [Networking in the
+Exonum](../advanced/network)
+
 ## Consensus
 
 Exonum uses the custom modification of Byzantine Fault-Tolerance
