@@ -1,7 +1,6 @@
 # About this page
 
-This page describes the core ideas of Exonum architecture. It is structured
-as follows:
+This page describes the core ideas of Exonum architecture.
 
 - [Transaction processing](#transaction-processing) describes Exonum blocks
   and transactions lifecycle.
@@ -21,6 +20,21 @@ in the development on top of Exonum.
 
 ## Transaction processing
 
+For the outer application blockchain represents just a Key-Value
+storage. It saves data as well as other databases do.
+
+All data in the Exonum may be divided into two parts. First part is the
+users' data, all the values that are stored in the data tables. The
+second part is a history of transactions already applied to the data
+storage. As transactions include any atomic operations such as creating
+new value, or updating already saved values, actual state of the data
+tables can be restored from the list of the transactions easily and
+deterministically. When new node in the Exonum network appears, it loads
+already generated blocks and applies its transactions to the data
+storage one by one. Finally, Exonum guarantees coincidence of data
+storage states among nodes. Such approach allows seeing the whole
+history of any data chunk and simplify audit.
+
 Transactions are the main entity Exonum works with. They represent
 atomic patch that should be applied to users' data. Any node can generate
 transactions, however these transactions need to be checked and approved
@@ -36,21 +50,6 @@ hash of the previous block; so, it is impossible to change one block
 without the appropriate changes for the each of the following blocks. In
 the matter, a blockchain is just a data storage with additional
 properties and requirements for the underlying data.
-
-All data in the Exonum may be divided into two parts. First part is the
-users' data, all the values that are stored in the data tables. The
-second part is a history of transactions already applied to the data
-storage. As transactions include any atomic operations such as creating
-new value, or updating already saved values, actual state of the data
-tables can be restored from the list of the transactions easily and
-deterministically. When new node in the Exonum network appears, it loads
-already generated blocks and applies its transactions to the data
-storage one by one. Finally, Exonum guarantees coincidence of data
-storage states among nodes.
-
-Such approach allows seeing the whole history of any data chunk and
-simplify audit. However, for the outer application, the blockchain
-represents just a usual Key-Value storage.
 
 Exonum blocks consist of the following parts:
 
