@@ -109,10 +109,10 @@ Patricia](http://exonum.com/doc/advanced/merkle-patricia-index) indexes.
 
 Advantages of this approach are:
 
-- **No need to trust third parties**: verification of
+- **Decreased trust in third parties**: verification of
   all data returned by a blockchain in response to queries is performed by the
   user himself on his machine
-- Constant audit of the system is possible without requiring
+- Constant (albeit partial) audit of the system is possible without requiring
   computational resources comparable to validators in terms of performance. Only
   the relevant data is audited
 - To start or resume the audit of the system, no synchronization period is
@@ -126,6 +126,14 @@ third parties completely.
 The presence of light clients does not mean the absence of auditor nodes, since
 their tasks are different. Light clients verify particular user's data, while
 auditor nodes verify a blockchain as a whole.
+
+Light client security could be compared to [TLS][wiki:tls] security checks
+embedded into web browsers. It is not a direct substitute to auditing performed
+by auditor nodes, but it provides a measurable degree of security against
+[MitM attacks][wiki:mitm] and maliciously acting nodes that the client may communicate
+with. At the same time, if light clients cover all blockchain transactions,
+their *collective* security can become comparable to the security provided by the
+auditor nodes.
 
 The presence of light clients in a blockchain-based system leads to certain
 difficulties during development:
@@ -143,5 +151,8 @@ schema, stated in a language independent format (see [Exonum
 roadmap](../dev/roadmap.md))
 
 Despite the complexity of the development, **the presence of
-light clients in a blockchain-based system is the only practical way to remove
-the necessity of trust to third parties**.
+light clients in a blockchain-based system is the only practical way to
+largely remove the necessity of trust to third parties**.
+
+[wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
+[wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
