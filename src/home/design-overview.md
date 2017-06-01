@@ -20,6 +20,9 @@ in the development on top of Exonum.
 
 ## Transaction processing
 
+**Tip.** See the [*Transactions*](../architecture/transactions.md) article
+for more details.
+
 For the outer application blockchain represents just a Key-Value
 storage. It saves data as well as other databases do.
 
@@ -70,10 +73,10 @@ Exonum blocks consist of the following parts:
   the Exonum consensus algorithm, so the hash is guaranteed to coincide
   for all validators.
 
-You may find more details about transactions in the separate article:
-[Transactions](../architecture/transactions)
-
 ## The network structure
+
+**Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
+[*Clients*](../architecture/clients.md).
 
 The network consist of a big amount of the connected peer-to-peer nodes.
 These nodes have different rights and different functionality.
@@ -98,11 +101,10 @@ These nodes have different rights and different functionality.
   authorized by supermajority of validators.
   Full-node cannot generate "fake" answer or fool around the client.
 
-The details about nodes communication and authentication with each
-other, you may refer to the separate page: [Networking in the
-Exonum](../advanced/network)
-
 ## Consensus
+
+**Tip.** See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
+[*Leader Election*](../advanced/consensus/leader-election.md).
 
 Exonum uses the custom modification of Byzantine Fault-Tolerance
 Consensus to guarantee that in any time there is just one true version
@@ -125,12 +127,10 @@ proposal, the one is appointed to be a new block.
 If the Leader is turned off or did not generate appropriate block
 proposal, then the new round starts and the new Leader node appears.
 
-If you are interested in the Consensus, Leader Election procedure or
-Block Generation procedure, you may refer to [Consensus
-details](../advanced/consensus/consensus), [Leader Election
-algorithm](../advanced/consensus/leader-election)
-
 ## Data Storage
+
+**Tip.** See the [*Data Storage*](../architecture/storage.md) article
+for more details.
 
 ### LevelDB
 
@@ -138,8 +138,7 @@ algorithm](../advanced/consensus/leader-election)
 transactions operate with. It was chosen for its high efficiency and
 minimal storage overhead. However, other databases may be supported. In
 particular, [RocksDB][rocks-db] will be also featured in the future
-releases. To get, how to integrate other databases, you may refer to the
-separate [Data Storage](../architecture/storage) section.
+releases.
 
 ### Data storage table types
 
@@ -179,14 +178,14 @@ Tables also allow to generate proofs that there is no data in the
 database with specific key `K`. That is, when the full nodes send info
 to the thin client, it also add a proof that actual value is shown one.
 
-You may delve into the details about data storage and proofs mechanism
-here: [Data Storage, Merkle trees and proofs](../architecture/storage)
-
 ## Smart contracts
 
 Here should be a deep text about smart contracts. **TODO: do**
 
 ## Modularity and services
+
+**Tip.** See the [*Services*](../architecture/services.md) article
+for more details.
 
 Exonum Framework includes the Core and the set of optional pluggable
 services. While the Core is responsible for the consensus, and provides
@@ -212,6 +211,9 @@ We represent the following optional services just now:
 
 #### Configuration Update service
 
+**Tip.** See the [*Configuration Service*](../advanced/services/configuration.md)
+article for more details.
+
 Although every node has its own configuration file, some setups should
 be changed for all nodes simultaneously. This service allows updating
 configuration through the blockchain itself.
@@ -223,10 +225,10 @@ current settings are still used. New configuration includes
 `actual_from` parameter pointing to the blockchain height, upon reaching
 which this configuration activates.
 
-More detailed description can be found here: [Configuration
-service](../advanced/services/configuration).
-
 #### Anchoring service
+
+**Tip.** See the [*Anchoring Service*](../advanced/services/anchoring.md)
+article for more details.
 
 It writes the hash of the current Exonum blockchain state to the bitcoin
 blockchain. It brings new guarantees: even if the malefactor takes
@@ -236,15 +238,11 @@ would differ from the one written in the bitcoin blockchain. Every other
 node would check it and alert about a mismatch. Therefore, the anchoring
 service gives additional durability: to change the data retroactively
 the hacker should hack bitcoin blockchain, and it is impossible just
-now. To get more about anchoring, you may refer to [Anchoring service
-specification](../advanced/services/anchoring.md).
+now.
 
 As services are just modules, they can be reused in the different Exonum
 projects. You may take a open-source services already written by the
 community, or open your service for other users.
-
-To get more how services may be written, you may refer to [Services
-section](../architecture/services).
 
 [iron]: http://ironframework.io/
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
