@@ -254,5 +254,6 @@ Additionally, the anchored data together with proofs remains
 verifiable even if the underlying Exonum blockchain would become inaccessible
 for some reason. This property could be used to provide durable electronic receipts.
 
-
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
+[level-db]: http://leveldb.org/
+[rocks-db]: http://rocksdb.org/
