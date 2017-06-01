@@ -105,21 +105,26 @@ consensus (similar to PBFT) to guarantee that in any time there is one agreed ve
 of the blockchain. It is assumed that the environment is decentralized,
 i.e., any node is allowed to fail or be compromised.
 
-When the validator generates a new block proposal, it sends it to the
-other validators. Every other validator checks the proposal and vote for
-it. After the new block proposal gets supermajority of votes, this block
-is considered to be adopted. Validators broadcast it to other
-full-nodes.
+To generate a new block and vote upon it, a 3-phase approach is used.
 
-To generate a new block and vote upon it, the time is divided into the
-rounds. For every round, there is predefined Leader node. The Leader
-creates its block proposal in his round and sends it to other
-validators. Others check the proposal, and if it is correct, vote for
-it. If there is a supermajority of validators voted for any common
-proposal, the one is appointed to be a new block.
+- The consensus algorithm is divided into rounds, the beginning of which is determined
+  by each validator based on its local clock.
+  For every round, there is a predefined leader validator. The leader
+  creates a *block proposal* and sends it to other validators.
+- Other validators check the proposal, and if it is correct, vote for
+  it by broadcasting *prevote* messages to the validators.
+- If a validator collects prevote messages for the same proposal from a supermajority
+  of validators, it executes transactions in the proposal, creates a *precommit*
+  message with the resulting data storage state and broadcasts it to the validators.
+- Finally, if there are precommits from a supermajority of validators for a common
+  proposal, the proposal becomes a new block.
 
-If the Leader is turned off or did not generate appropriate block
-proposal, then the new round starts and the new Leader node appears.
+The consensus algorithm can withstand up to 1/3 of the validators acting maliciously,
+being switched off or isolated from the rest of the network.
+This is the best possible amount under the conditions in which the Exonum
+consensus operates. For example, a leader may not generate a proposal in time,
+or send different proposals to different validators; eventually, all honestly
+acting validators will agree on the same new block.
 
 ## Data Storage
 
