@@ -208,9 +208,16 @@ We represent the following optional services just now:
 
 Although every node has its own configuration file, some setups should
 be changed for all nodes simultaneously. This service allows updating
-configuration through the blockchain itself. In addition, administrators
-may apply new configuration values without node restarting. More
-detailed description can be found here: [Configuration
+configuration through the blockchain itself.
+
+Using Configuration Update service, any validator may propose new
+configuration and other validator vote for it. Proposal needs validators
+supermajority to become accepted; however, it still is inactive and
+current settings are still used. New configuration includes
+`actual_from` parameter pointing to the blockchain height, upon reaching
+which this configuration activates.
+
+More detailed description can be found here: [Configuration
 service](../advanced/services/configuration).
 
 #### Anchoring service
