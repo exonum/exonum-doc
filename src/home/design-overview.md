@@ -14,6 +14,8 @@ This page describes the core design decisions of the Exonum framework.
   logic
 - [Modularity and services](#modularity-and-services) introduces services
   and explains what they are used for
+- [Cryptography](#cryptography) briefly describes main crypto-primitives used
+  in Exonum
 
 ## Transaction Processing
 
@@ -25,9 +27,9 @@ storage. Its core functions are persisting data and responding to
 read queries from external clients.
 
 **Transactions** are the main entity Exonum works with. A transaction represents
-an atomic patch that should be applied to the key-value storage. Any node can generate
-transactions, however these transactions need to be verified and ordered
-before they are considered accepted / committed.
+an atomic patch that should be applied to the key-value storage. Transactions need
+to be verified and ordered before they are considered accepted / committed.
+Both these tasks are performed by [the consensus algorithm](#consensus).
 
 All data in the Exonum blockchain is divided into two parts:
 
@@ -254,6 +256,52 @@ Additionally, the anchored data together with proofs remains
 verifiable even if the underlying Exonum blockchain would become inaccessible
 for some reason. This property could be used to provide durable electronic receipts.
 
+## Cryptography
+
+### Hashing
+
+Exonum uses [SHA-256][wiki:sha256] for all hash operations, including creating
+transaction and block identifiers, computing Merkle and Merkle Patricia trees,
+and mapping keys for Merkle Patricia trees to fixed-length byte buffers.
+
+### Public-key Cryptography and Key Management
+
+Both transactions and consensus messages are authenticated with the help
+of [Ed25519 digital signatures][wiki:ed25519] implemented using [sodiumoxide][sodiumoxide]
+(a [libsodium][libsodium] wrapper for Rust).
+In most cases, transactions are created by the external entities
+(such as light clients); these entities are assumed to manage the corresponding
+signing keys. Keys can also be managed by full nodes themselves. In this case,
+a private key is stored in the local configuration of the node, does not enter
+the blockchain and is specific to a particular node. It's a good practice
+to manage such keys locally via private APIs of the corresponding service.
+
+The core uses two pairs of Ed25519 keys:
+
+- **Consensus key** is used for signing consensus messages (for validators) and
+  signing network messages (for validators and auditors)
+- **Administrative key** is specific to validators and is used for administrative
+  tasks (such as voting for configuration updates)
+
+Services may utilize additional key pairs, including from other cryptosystems.
+For example, the anchoring service defines an additional secp256k1 key pair
+for signing anchoring transactions in Bitcoin.
+
+**Warning.** Presently, the local configuration of the node (which includes all
+its private keys, both used in consensus and by the services) is stored in plaintext.
+This is going to be fixed soon.
+
+**Notice.** Presently, the administrative keys are hot (i.e., stored in the unencrypted
+form during the node operation). In the future releases, they will be able to
+be managed as externally stored cold keys (i.e., the node would not have
+access to the administrative key at all). Additionally, the 1-to-1 correspondence
+between consensus and administrative keys will be generalized to support various
+administrative settings.
+
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
+[wiki:sha256]: https://en.wikipedia.org/wiki/SHA-2
+[wiki:ed25519]: https://en.wikipedia.org/wiki/EdDSA
+[libsodium]: https://download.libsodium.org/doc/
+[sodiumoxide]: https://dnaq.github.io/sodiumoxide/sodiumoxide/
