@@ -8,8 +8,8 @@ created already "serialized" and Exonum works directly with the serialized data
 In Exonum, the binary format is used for two purposes:
 
 - **Message serialization**: everything that passes in the network between nodes
-turns into messages (the `message!` macro). Data received as a message is
-validated.
+  turns into messages (the `message!` macro). Data received as a message is
+  validated.
 
 - **Serialization of data stored in the blockchain** (the `storage_value!`
   macro). Data obtained from the blockchain is not validated, since it is assumed
