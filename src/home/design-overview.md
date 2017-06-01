@@ -237,13 +237,22 @@ which the new configuration activates.
 article for more details.
 
 The anchoring service writes the hash of the current Exonum blockchain state
-to the Bitcoin blockchain. It brings new guarantees: even if the malefactor takes
-control over every validator, he cannot rebuild blockchain and change
-old transactions quietly. If he tries so, then the hash of the new block
-would differ from the one written in the Bitcoin blockchain. Every other
-node would check it and alert about a mismatch. Therefore, the anchoring
-service gives additional durability: to change the data retroactively
-the hacker should hack the Bitcoin blockchain, and it is impossible just
-now.
+to the Bitcoin blockchain with a certain time interval. The anchored data is
+authenticated by the supermajority of validators using digital signature tools
+available in Bitcoin.
+
+Anchoring increases security; even if a malefactor takes
+control over every validator or all validators collude,
+it's impossible to change the transaction log unnoticeably. After any change,
+retroactively modified block hashes would differ from the one recorded on
+the Bitcoin blockchain.
+To change the data on the Exonum blockchain retroactively, an attacker would need
+to compromise the Bitcoin blockchain too. The cost of such an attack would measure
+in billions of US dollars.
+
+Additionally, the anchored data together with proofs remains
+verifiable even if the underlying Exonum blockchain would become inaccessible
+for some reason. This property could be used to provide durable electronic receipts.
+
 
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
