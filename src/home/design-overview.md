@@ -24,33 +24,36 @@ For an outer application, an Exonum blockchain represents a key-value
 storage. Its core functions are persisting data and responding to
 read queries from external clients.
 
-All data in the Exonum may be divided into two parts:
+**Transactions** are the main entity Exonum works with. A transaction represents
+an atomic patch that should be applied to the key-value storage. Any node can generate
+transactions, however these transactions need to be verified and ordered
+before they are considered accepted / committed.
+
+All data in the Exonum blockchain is divided into two parts:
 
 - **Data storage**, which contains data structured into tables
-- **History of transactions** applied to the data storage
+- **Trasaction log**, i.e., the complete history of all transactions ever applied
+  to the data storage
 
-As transactions include any atomic operations such as creating
-new value, or updating already saved values, actual state of the data
-tables can be restored completely from the list of the transactions.
+As transactions include operations on the key-value storage such as creating
+new value, or updating already saved values, the actual data storage state
+can be restored completely from the list of the transactions.
 When a new node in the Exonum network appears, it loads
 already generated blocks and applies its transactions to the data
 storage one by one. Such approach allows seeing the whole history of any
-data chunk and simplify audit.
+data chunk and simplify auditing.
 
 By using a transaction log, Exonum implements [state machine
-replication][wiki:state-machine-repl]. It guarantees coincidence of data
-storage states among nodes. The same approach is often used by
+replication][wiki:state-machine-repl]. It guarantees agreement of data
+storage states among nodes in the network. The same approach is often used by
 non-blockchain distributed DBs, such as Mongo or PostgreSQL.
 
-Transactions are the main entity Exonum works with. A transaction represents
-an atomic patch that should be applied to the persistent state. Any node can generate
-transactions, however these transactions need to be verified and ordered
-before they will be considered as accepted ones.
+### Blocks
 
-Exonum gathers transactions into blocks; the whole block is approved
+Exonum gathers transactions into **blocks**; the whole block is approved
 atomically. If a transaction has not been written to any block yet, it is
 not regarded as accepted. After a block is approved, every transaction in it is
-executed by the corresponding Exonum service and is applied to data tables.
+executed sequentially, with changes applied to the data storage.
 
 Exonum blocks consist of the following parts:
 
@@ -65,9 +68,12 @@ Exonum blocks consist of the following parts:
   the Exonum consensus algorithm, so the hash is guaranteed to coincide
   for all validators
 
-As every next block includes the hash of the previous block,
+As every block includes the hash of the previous block,
 it is impossible to change one block
 without the appropriate changes for the each of the following blocks.
+This ensures immutability of the transaction log; once a transaction is committed,
+it cannot be retroactively modified or evicted from the log. Similarly,
+it's impossible to insert a transaction in the middle of the log.
 
 ## Network Structure
 
