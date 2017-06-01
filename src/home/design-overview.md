@@ -1,14 +1,14 @@
-# About this page
+# Design Overview
 
 This page describes the core ideas of Exonum architecture.
 
 - [Transaction processing](#transaction-processing) describes Exonum blocks
   and transactions lifecycle.
-- [The network structure](#the-network-structure) lists types on which
+- [Network structure](#network-structure) lists types on which
   Exonum nodes are divided.
 - [Consensus](#consensus) explains how nodes agree on the blockchain
   state.
-- [Data Storage](#data-storage) describes how data is saved locally and
+- [Data storage](#data-storage) describes how data is saved locally and
   introduces the proofs mechanism.
 - [Smart contracts](#smart-contracts) shows how Exonum execute custom
   logic.
@@ -18,7 +18,7 @@ This page describes the core ideas of Exonum architecture.
 Every section uncovers the operation of component and how it can be used
 in the development on top of Exonum.
 
-## Transaction processing
+## Transaction Processing
 
 **Tip.** See the [*Transactions*](../architecture/transactions.md) article
 for more details.
@@ -73,7 +73,7 @@ Exonum blocks consist of the following parts:
   the Exonum consensus algorithm, so the hash is guaranteed to coincide
   for all validators.
 
-## The network structure
+## Network Structure
 
 **Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
 [*Clients*](../architecture/clients.md).
@@ -140,7 +140,7 @@ minimal storage overhead. However, other databases may be supported. In
 particular, [RocksDB][rocks-db] will be also featured in the future
 releases.
 
-### Data storage table types
+### Table Types
 
 Exonum supports multiple types of data tables. While List and Map are the
 usual ways to store data, the following two are more complicated and
@@ -178,11 +178,11 @@ Tables also allow to generate proofs that there is no data in the
 database with specific key `K`. That is, when the full nodes send info
 to the thin client, it also add a proof that actual value is shown one.
 
-## Smart contracts
+## Smart Contracts
 
 Here should be a deep text about smart contracts. **TODO: do**
 
-## Modularity and services
+## Modularity and Services
 
 **Tip.** See the [*Services*](../architecture/services.md) article
 for more details.
@@ -205,11 +205,11 @@ Services are used for two main purposes:
 Outer applications may communicate with services using REST-API written
 on [IRON][iron].
 
-### Existing services
+### Existing Services
 
 We represent the following optional services just now:
 
-#### Configuration Update service
+#### Configuration Update Service
 
 **Tip.** See the [*Configuration Service*](../advanced/services/configuration.md)
 article for more details.
@@ -225,7 +225,7 @@ current settings are still used. New configuration includes
 `actual_from` parameter pointing to the blockchain height, upon reaching
 which this configuration activates.
 
-#### Anchoring service
+#### Anchoring Service
 
 **Tip.** See the [*Anchoring Service*](../advanced/services/anchoring.md)
 article for more details.
