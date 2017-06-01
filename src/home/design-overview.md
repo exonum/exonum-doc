@@ -31,9 +31,15 @@ new value, or updating already saved values, actual state of the data
 tables can be restored from the list of the transactions easily and
 deterministically. When new node in the Exonum network appears, it loads
 already generated blocks and applies its transactions to the data
-storage one by one. Finally, Exonum guarantees coincidence of data
-storage states among nodes. Such approach allows seeing the whole
-history of any data chunk and simplify audit.
+storage one by one. Such approach allows seeing the whole history of any
+data chunk and simplify audit.
+
+In fact, Exonum implements a [state machine
+replication][wiki:state-machine-repl]. It guarantees coincidence of data
+storage states among nodes. The same approach is often used by some
+other non-blockchain DBs, such as Mongo, Postgres and others. During
+usual master-slave replication, master sends its WAL which consist of
+transactions needed to be applied.
 
 Transactions are the main entity Exonum works with. They represent
 atomic patch that should be applied to users' data. Any node can generate
@@ -241,4 +247,4 @@ To get more how services may be written, you may refer to [Services
 section](../architecture/services).
 
 [iron]: http://ironframework.io/
-
+[wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
