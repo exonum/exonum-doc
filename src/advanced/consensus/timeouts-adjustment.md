@@ -40,7 +40,9 @@ maximum number of transactions in the block.
   `block_load` is greater than `OPTIMAL_BLOCK_LOAD`, then the timeout decreases;
 
 - `TXS_BLOCK_LIMIT`: floating-point value.
-  Is the maximum number of transactions in a block;
+  Is the maximum number of transactions in a block. It is consensus algorithm
+  parameter defined in [system
+  configuration](../../architecture/configuration.md#genesisconsensus).
 
 - `OPTIMAL_LOAD`: floating-point value.
   Is the number of transactions in the optimally loaded block:
