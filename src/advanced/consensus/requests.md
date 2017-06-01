@@ -1,1 +1,1 @@
-# Requests in Consensus Algorithm
+# Requests algorithm
