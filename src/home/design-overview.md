@@ -211,7 +211,7 @@ be changed for all nodes simultaneously. This service allows updating
 configuration through the blockchain itself.
 
 Using Configuration Update service, any validator may propose new
-configuration and other validator vote for it. Proposal needs validators
+configuration and other validators vote for it. Proposal needs validators
 supermajority to become accepted; however, it still is inactive and
 current settings are still used. New configuration includes
 `actual_from` parameter pointing to the blockchain height, upon reaching
