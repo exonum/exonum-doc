@@ -6,42 +6,49 @@ applications. Storage architecture can be overlooked from different
 points.
 
 1. [Exonum table types](#exonum-table-types) lists supported types for
-data storage. These tables represent the highest level at the data
-storage architecture.
+  data storage. These tables represent the highest level at the data
+  storage architecture.
 2. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
-data on the hard disk. Now LevelDB is used.
+  data on the hard disk. Now LevelDB is used.
 3. [DBView layer](#dbview-layer) introduces the wrapper over DB engine.
-This layer implements a "sandbox" above the real data and provides block
-is applied atomically: either whole block is applied, or whole block is 
-discarded.
+  This layer implements a "sandbox" above the real data and provides block
+  is applied atomically: either whole block is applied, or whole block is
+  discarded.
 4. [Table naming convention](#table-naming-convention) elaborates how
-user tables should be called, and shows how the Exonum tables are
-matched into LevelDB.
+  user tables should be called, and shows how the Exonum tables are
+  matched into LevelDB.
 5. [List of system tables](#list-of-system-tables) describes what tables
-are used directly by Exonum Core.
+  are used directly by Exonum Core.
 6. [Indices](#indices) reveals how indices can be built.
 7. [Genesis block](#genesis-block) describes how tables are initialized.
 
 ## Exonum table types
 
-Multiple table types may be used in the Exonum applications. 
+Multiple table types may be used in the Exonum applications.
 
 ### Used parameter types
 
 In the table descriptions the following parameters types are used:
 
-- `K`: key type at the map definitions. Exonum uses byte sequences for the keys.
-- `V`: value type at the map definitions. Map stores the objects of particular class defined by user in the table initialization. At the bottom level objects are serialized and are stored as byte sequences.
+- `K`: key type at the map definitions. Exonum uses byte sequences for
+  the keys.
+- `V`: value type at the map definitions. Map stores the objects of
+  particular class defined by user in the table initialization. At the
+  bottom level objects are serialized and are stored as byte sequences.
 - `u64`: unsigned 64-bit int type.
 - `I`: an Iterator object.
 - `Hash`: `sha-256` hash object
-- `Proofnode`: a custom class representing nodes from `MerkleTable` proof trees.
-- `RootProofNode`: a custom class representing nodes from `MerklePatriciaTable` proof trees.
+- `Proofnode`: a custom class representing nodes from `MerkleTable`
+  proof trees.
+- `RootProofNode`: a custom class representing nodes from
+  `MerklePatriciaTable` proof trees.
 
 ### MapTable
 
 [`Maptable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_table.rs)
-is implementation of Key-Value storage. It represents the most basic table type. Although other table types do not inherit from it directly, they wrap around `map` field.
+is implementation of Key-Value storage. It represents the most basic
+table type. Although other table types do not inherit from it directly,
+they wrap around `map` field.
 
 The following actions are supported:
 
@@ -51,27 +58,29 @@ The following actions are supported:
   already exists, old value is overwritten with new one.
 - `delete(key: &K)` removes appropriate key-value pair. If Key is not
   found, error is returned.
-- `find_key(origin_key: &K): K` returns the biggest existed key that is less or equal to the `origin_key`.
+- `find_key(origin_key: &K): K` returns the biggest existed key that is
+  less or equal to the `origin_key`.
 
 ### ListTable
 
 [`ListTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_table.rs)
 represesnts an array list. The following actions are supported:
 
-- `values(): Vec<V>` returns the copy of all values stored in the list. Be careful,
-  values are copied into the memory. It is not advised to use on the big
-  tables.
+- `values(): Vec<V>` returns the copy of all values stored in the list.
+  Be careful, values are copied into the memory. It is not advised to use
+  on the big tables.
 - `append(value: V)` adds new value to the end of the list.
 - `extend<I>(iter: I)` appends values from the iterator to the list
   one-by-one.
-- `get( index: u64): V` returns a value already saved in the list. If index
-  is bigger then the list size, error is returned.
+- `get( index: u64): V` returns a value already saved in the list. If
+  index is bigger then the list size, error is returned.
 - `set(index: u64, value: V)` updates a value already saved in the list.
 - `last(): V` returns the latest value in the list.
 - `is_empty(): bool` returns True if nothing was written; else, False.
 - `len(): u64` returns the number of elements stored in the list.
 
-List value does not support neither inserting in the middle (although it is still possible), nor deleting.
+List value does not support neither inserting in the middle (although it
+is still possible), nor deleting.
 
 Inside, a `ListTable` wraps around `map` storage; usually `MapTable` is
 used. `ListTable` saves its elements to this map with element indices as
@@ -82,16 +91,19 @@ keys.
 [`MerkleTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/mod.rs)
 is an extended version for array list. It implements the `ListTable`
 interface, however adds additional feature. Basing on Merkle Trees, such
-table allows creating a proofs of existence for its values. The table cells
-are divided into leafs and intermediate nodes. Leafs store the data itself;
-inner nodes values are calculated as `hash(concatenate(left_child_value, 
-right_child_value)`. You may read more detailed specification at [Merkle Trees](../advanced/merkle-index). The following procedures are implemented:
+table allows creating a proofs of existence for its values. The table
+cells are divided into leafs and intermediate nodes. Leafs store the
+data itself; inner nodes values are calculated as
+`hash(concatenate(left_child_value, right_child_value)`. You may read
+more detailed specification at [Merkle Trees](../advanced/merkle-index).
+The following procedures are implemented:
 
 - `root_hash(): Hash` returns the value of root element (that contains the hash
   of root node's children).
-- `construct_path_for_range(range_start: u64, range_end: u64): Proofnode` builds a
-  proof tree for data values at indices `[range_start..range_end - 1]`.
-  The tree consists of [`Proofnode`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/proofnode.rs)
+- `construct_path_for_range(range_start: u64, range_end: u64): Proofnode`
+  builds a proof tree for data values at indices
+  `[range_start..range_end - 1]`. The tree consists of
+  [`Proofnode`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/proofnode.rs)
   objects.
 
 When thin client asks Exonum full-node about some data, the proof is
@@ -102,16 +114,19 @@ authorized by the validators.
 ### MerklePatriciaTable
 
 [`MerklePatriciaTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs)
-is an extended version for a map. It implements the `Map` interface, adding
-the ability to create proofs of existence for its key-value pairs, or proofs of absense if requested key do not exist in this table. For
-a more detailed description, see
-[Merkle Patricia Trees](../advanced/merkle-patricia-index). The following procedures are supported:
+is an extended version for a map. It implements the `Map` interface,
+adding the ability to create proofs of existence for its key-value
+pairs, or proofs of absense if requested key do not exist in this table.
+For a more detailed description, see [Merkle Patricia
+Trees](../advanced/merkle-patricia-index). The following procedures are
+supported:
 
 - `root_hash(): Hash` returns the root node's value.
-- `construct_path_to_key(searched_key: K): RootProofNode` builds a proof tree for the
-  requested key. Tree proves either key presence (and its according
-  value), or key absence. The proof tree is used in the same way as in the
-  Merkle Table: it is sent to the client along with the requested data.
+- `construct_path_to_key(searched_key: K): RootProofNode` builds a proof
+  tree for the requested key. Tree proves either key presence (and its
+  according value), or key absence. The proof tree is used in the same way
+  as in the Merkle Table: it is sent to the client along with the
+  requested data.
 
 ## Low-level storage
 
@@ -126,7 +141,8 @@ the following procedures:
 - Find the nearest key to the requested one.
 
 At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
-Also we plan to add [RocksDB][rocks-db] support in the [future](../dev/roadmap).
+Also we plan to add [RocksDB][rocks-db] support in the
+[future](../dev/roadmap).
 
 ## DBView layer
 
@@ -171,12 +187,10 @@ Services are named with a byte arrays, starting from `0x01`. Name length
 is not limited. `0x00 0x00` name is reserved to the Core. Tables inside
 services are named with a byte sequences.
 
-Thus, key `key` at the table `0x00` for the `0x00 0x01` service matches with
-the following key in the LevelDB map:
+Thus, key `key` at the table `0x00` for the `0x00 0x01` service matches
+with the following key in the LevelDB map:
 
-```
-0x00 0x01 | 0x00 | key
-```
+`0x00 0x01 | 0x00 | key`
 
 Here, `|` stands for bytes sequences concatenation.
 
@@ -226,11 +240,11 @@ At the very start of the blockchain, services should initialize its
 tables. It should be done during Genesis block creation. To set up its
 data tables, service should handle `genesis_block` event:
 [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92).
-**Notice.** Genesis Block creation procedure is called
-every time Exonum node starts.
+**Notice.** Genesis Block creation procedure is called every time Exonum
+node starts.
 
 You may find implementation examples in the our tutorial:
-[cryptocurrency-service-genesis-block](**TODO: fill**)
+[cryptocurrency-service-genesis-block]() **TODO: fill the link**
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
