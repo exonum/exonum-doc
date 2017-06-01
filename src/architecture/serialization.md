@@ -27,4 +27,30 @@ copying until there is no access to the fields.
 
 ## Serialization Principles
 
-## Examples
+Binary representation structure is splitted into two main parts:
+
+- **Header** is a fixed sized part.
+
+- **Body** is a dynamic sized part, it can be read only after parsing header.
+
+### Data types
+
+Data fields can be one of following types:
+
+#### Primitive types
+
+Data of primitive types is fixed sized, and located fully in header. Primitive
+types are listed here(**TODO** link)
+
+#### Segment fields
+
+All segment types take 8 bytes in header: 4 for position in buffer, and 4 for
+segment field size. Segment field examples: string, array of bytes, array of
+other values.
+
+#### Custom fields
+
+This types could be implemented arbitrarily, but the creator should declare
+size of custom field's header.
+
+Examples of data serialization can be found here(**TODO** link)
