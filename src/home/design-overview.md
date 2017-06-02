@@ -206,11 +206,24 @@ with the requested data. This allows to prove data authenticity efficiently.
 **Tip.** See the [*Services*](../architecture/services.md) article
 for more details.
 
-Exonum includes the Core and the set of optional pluggable
-services. While the Core is responsible for the consensus, and provides middleware
+Exonum includes the Core and the set of optional pluggable services.
+While the Core is responsible for the consensus, and provides middleware
 functionality for sending and receiving transactions and blocks,
-services implement all
-the custom logics and are the main point to extend Exonum functionality.
+services implement all the custom logics and are the main point to
+extend Exonum functionality. In fact, Services implement smart contracts
+model in the framework.
+
+The key points, differentiating Exonum smart contracts from other
+models, are:
+
+- Fixed smart contracts. Exonum executes only predefined transactions,
+not allowing to execute arbitrary code received from the client.
+- Non-isolation. Transactions are executed at the same codespace as the
+Core is.
+- Transactions verification. It may include authentication /
+authorization (for example, checking transaction signatures), as well as
+logical checks (for example, spending transaction in the cryptocurrency
+may be discarded if source account balance is empty).
 
 Services have two main purposes:
 
