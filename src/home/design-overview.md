@@ -22,13 +22,23 @@ This page describes the core design decisions of the Exonum framework.
 for more details.
 
 For an outer application, an Exonum blockchain represents a key-value
-storage. Its core functions are persisting data and responding to
-read queries from external clients.
+storage and an [online transaction processing][wiki:oltp] facility managing
+this storage. Its core functions are processing transactions, persisting data,
+and responding to read queries from external clients.
 
 **Transactions** are the main entity Exonum works with. A transaction represents
-an atomic patch that should be applied to the key-value storage. Transactions need
-to be verified and ordered before they are considered accepted / committed.
-Both these tasks are performed by [the consensus algorithm](#consensus).
+an atomic patch that should be applied to the key-value storage.
+Transactions are authenticated with the help of public-key digital signatures.
+Transactions need to be verified and ordered before they are considered
+accepted / committed. Both these tasks are performed by
+[the consensus algorithm](#consensus).
+
+Transactions are templated; each transaction template has a set of variable parameters,
+which influence the transaction execution and are used to serialize transactions
+for network transmission and persistence. (Hence, transactions could be compared to
+stored procedures in RDMBSs.)
+Transaction templates and the processing rules for each template
+are defined by [services](#modularity-and-services).
 
 All data in the Exonum blockchain is divided into two parts:
 
@@ -306,6 +316,7 @@ access to the administrative key at all). Additionally, the 1-to-1 correspondenc
 between consensus and administrative keys will be generalized to support various
 administrative settings.
 
+[wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
