@@ -9,8 +9,6 @@ This page describes the core design decisions of the Exonum framework.
   state
 - [Data storage](#data-storage) describes how data is saved locally and
   introduces the proofs mechanism
-- [Smart contracts](#smart-contracts) shows how Exonum execute custom
-  logic
 - [Modularity and services](#modularity-and-services) introduces services
   and explains what they are used for
 - [Cryptography](#cryptography) briefly describes main crypto-primitives used
@@ -202,10 +200,6 @@ database with a specific key.
 
 When a full node communicates with a thin client, proofs are returned together
 with the requested data. This allows to prove data authenticity efficiently.
-
-## Smart Contracts
-
-Here should be a deep text about smart contracts. **TODO: do**
 
 ## Modularity and Services
 
