@@ -34,22 +34,31 @@ config][stored_configuration] serialization. It has the following fields:
 
 - **previous_cfg_hash**: Hash  
   Hash of the previous active configuration.
+
 - **actual_from**: Integer
   The height from which the configuration became actual.
+
 - **validators**: Array\<PublicKey\>  
   List of validators' public keys.
+
 - **consensus**: Object  
   Consensus-specific configuration parameters.
+
 - **consensus.peers_timeout**  
   Peer exchange timeout (in ms).
+
 - **consensus.propose_timeout**  
   Proposal timeout (ms) after the new height beginning.
+
 - **consensus.round_timeout**  
   Interval (ms) between rounds.
+
 - **consensus.status_timeout**  
   Period (ms) of sending a `Status` message.
+
 - **consensus.txs_block_limit**  
   Maximum number of transactions per block.
+  
 - **services**: Object  
   Services-specific configuration parameters.
 
