@@ -74,15 +74,15 @@ config][stored_configuration] serialization. It has the following fields:
 `Proposal` is a JSON object corresponding to the [Exonum
 config][config_propose] serialization. It has the following fields:
 
-- **tx_propose**: Object
+- **tx_propose**: Object  
   Information about configuration and its author.
-- **tx_propose.from**: PublicKey
+- **tx_propose.from**: PublicKey  
   Author's public key.
-- **tx_propose.cfg**: ConfigBody
-  String containing `ConfigBody` of proposed configuration.
-- **votes_history_hash**: Hash
+- **tx_propose.cfg**: string  
+  String containing JSON serialization of proposed configuration.
+- **votes_history_hash**: Hash  
   Hash of the proposed configuration.
-- **num_votes**: integer
+- **num_votes**: integer  
   Number of votes for the proposed configuration.
 
 **{base_path}** below stands for `/api/services/configuration/v1`.
