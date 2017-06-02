@@ -4,8 +4,7 @@ This page describes the core design decisions of the Exonum framework.
 
 - [Transaction processing](#transaction-processing) describes Exonum blocks
   and transactions lifecycle
-- [Network structure](#network-structure) lists types on which
-  Exonum nodes are divided
+- [Network structure](#network-structure) describes how Exonum network operates
 - [Consensus](#consensus) explains how nodes agree on the blockchain
   state
 - [Data storage](#data-storage) describes how data is saved locally and
@@ -82,26 +81,34 @@ it's impossible to insert a transaction in the middle of the log.
 **Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
 [*Clients*](../architecture/clients.md).
 
-The Exonum network consists of nodes connected via peer-to-peer connections.
-These nodes have different rights and different functionality.
+The Exonum network consists of *full nodes* connected via peer-to-peer connections,
+and *thin clients*.
 
-- **Full nodes** replicate the entire contents of the blockchain. They
-  can generate new transactions but they cannot choose which transactions
-  should be adopted. They cannot generate new blocks.
-  All the full nodes are authenticated with public-key cryptography
-- **Validators** provide the network liveness. Only validators can
-  generate new blocks or vote for other block proposals. Other nodes just
-  create transactions and send them to the network. Validators
-  receive these transactions, verify them, and include into a new block. The list
-  of the validators is restricted by network maintainers, and normally
+### Full Nodes
+
+**Full nodes** replicate the entire contents of the blockchain
+and correspond to replicas in distributed databases.
+All the full nodes are authenticated with public-key cryptography.
+Full nodes are further subdivided into 2 categories:
+
+- **Auditors** replicate the entire contents of the blockchain. They
+  can generate new transactions but cannot choose which transactions
+  should be committed (i.e., cannot generate new blocks)
+- **Validators** provide the network liveness. Only validators can generate
+  new blocks by using a [Byzantine fault tolerant consensus algorithm](#consensus).
+  Validators receive transactions, verify them, and include into a new block.
+  The list of the validators is restricted by network maintainers, and normally
   should consist of 4-15 nodes
-- **Thin clients** do not need an every byte of the blockchain, so they
-  held only part they are interested in. To get
-  information, they request it from the full nodes. Exonum provides a "proofs
-  mechanism", allowing thin clients to check if the full-node answered
-  fairly. Basing on Merkle / Merkle Patricia tables, such mechanism allow
-  checking if the value kept by node in its data storage is really
-  authorized by supermajority of validators
+
+### Thin Clients
+
+**Thin clients** represent clients in the client-server paradigm; they connect
+to full nodes to retrieve information from the blockchain they are
+interested in, and to send transactions. Exonum provides a "proofs
+mechanism", allowing thin clients to check if the full-node answered
+fairly. Based on cryptographic commitments via Merkle / Merkle Patricia trees,
+this mechanism allows verifying that a response from the full node
+has been really authorized by supermajority of validators.
 
 ## Consensus
 
@@ -118,21 +125,22 @@ To generate a new block and vote upon it, a 3-phase approach is used.
 - The consensus algorithm is divided into rounds, the beginning of which is determined
   by each validator based on its local clock.
   For every round, there is a predefined leader validator. The leader
-  creates a *block proposal* and sends it to other validators.
+  creates a *block proposal* and sends it to other validators
 - Other validators check the proposal, and if it is correct, vote for
-  it by broadcasting *prevote* messages to the validators.
+  it by broadcasting *prevote* messages to the validators
 - If a validator collects prevote messages for the same proposal from a supermajority
   of validators, it executes transactions in the proposal, creates a *precommit*
-  message with the resulting data storage state and broadcasts it to the validators.
+  message with the resulting data storage state and broadcasts it to the validators
 - Finally, if there are precommits from a supermajority of validators for a common
-  proposal, the proposal becomes a new block.
+  proposal, the proposal becomes a new block
 
 The consensus algorithm can withstand up to 1/3 of the validators acting maliciously,
 being switched off or isolated from the rest of the network.
 This is the best possible amount under the conditions in which the Exonum
-consensus operates. For example, a leader may not generate a proposal in time,
-or send different proposals to different validators; eventually, all honestly
-acting validators will agree on the same new block.
+consensus operates (partial synchrony, which can be roughly summarized as
+the absence of reference time in the system). For example, a leader may not
+generate a proposal in time, or send different proposals to different validators;
+eventually, all honestly acting validators will agree on the same new block.
 
 ## Data Storage
 
