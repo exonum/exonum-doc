@@ -173,12 +173,12 @@ configuration](../../architecture/configuration.md#genesis).
 
 ### Committed Configurations
 
-    GET {base_path}/configs/committed?previous_cfg_hash={previous_config_hash}&actual_from={lowest_actual_from}
+    GET {base_path}/configs/committed?previous_cfg_hash
 
 Looks up all committed configurations in the order configuration proposals are
 committed as transactions to the Exonum blockchain.
 
-#### Parameters
+#### Query Parameters
 
 - `previous_config_hash`: hash (optional)  
   Filters configurations by the specified previous configuration hash.
@@ -205,12 +205,12 @@ committed as transactions to the Exonum blockchain.
 
 ### Proposed Configurations
 
-    GET {base_path}/configs/proposed?previous_cfg_hash={config_hash}&actual_from={lowest_actual_from}
+    GET {base_path}/configs/proposed?previous_cfg_hash
 
 Looks up all proposed configurations in the order configuration proposals are
 committed as transactions to the Exonum blockchain.
 
-#### Parameters
+#### Query Parameters
 
 - `previous_config_hash`: hash (optional)  
   Filters configurations by the specified previous configuration hash.
