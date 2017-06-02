@@ -217,13 +217,13 @@ The key points, differentiating Exonum smart contracts from other
 models, are:
 
 - Fixed smart contracts. Exonum executes only predefined transactions,
-not allowing to execute arbitrary code received from the client.
+  not allowing to execute arbitrary code received from the client.
 - Non-isolation. Transactions are executed at the same codespace as the
-Core is.
+  Core is.
 - Transactions verification. It may include authentication /
-authorization (for example, checking transaction signatures), as well as
-logical checks (for example, spending transaction in the cryptocurrency
-may be discarded if source account balance is empty).
+  authorization (for example, checking transaction signatures), as well as
+  logical checks (for example, spending transaction in the cryptocurrency
+  may be discarded if source account balance is empty).
 
 Services have two main purposes:
 
