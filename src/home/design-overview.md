@@ -35,8 +35,8 @@ accepted / committed. Both these tasks are performed by
 
 Transactions are templated; each transaction template has a set of variable parameters,
 which influence the transaction execution and are used to serialize transactions
-for network transmission and persistence. (Hence, transactions could be compared to
-stored procedures in RDMBSs.)
+for network transmission and persistence. (Hence, transactions could be
+compared to stored procedures in RDMBSs.)
 Transaction templates and the processing rules for each template
 are defined by [services](#modularity-and-services).
 
@@ -166,23 +166,24 @@ minimal storage overhead.
 
 ### Table Types
 
-Exonum supports multiple types of data tables, representing typed collections:
-lists and maps:
+Exonum supports several types of data tables, representing typed collections
+(lists and maps):
 
 - `ListTable` implements an array list
-- `MapTable` represents a usual key-value storage
+- `MapTable` represents a map / key-value storage
 - [`MerkleTable`](../advanced/merkle-index) is an enhanced version of
   array storage. It implements a balanced (but not necessarily full) binary
   Merkle tree. Leaves of the tree keep the
-  actual array items, while the nodes keep the hashes from concatenated
-  children data. It is allowed only to append the data or update the cells
-  already stored
-- [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extend the
-  map. It is based on the Merkle Patricia Tree. Leaves keep the actual
-  values. The intermediary nodes values consist of the following four parts:
+  actual array items, while the intermediate nodes keep the hashes from concatenated
+  children data. `MerkleTable` only allows to append the data or update the
+  already stored items
+- [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extends the
+  map. It is based on a Merkle Patricia tree, implemented as a binary tree.
+  Leaves of the tree keep the actual
+  values from the map. Intermediate nodes consist of the following four parts:
 
-    - Hash from the left child value
-    - Hash from the right child value
+    - Hash of the left child value
+    - Hash of the right child value
     - Key for the left child node
     - Key for the right child node
 
@@ -192,12 +193,12 @@ updating or deleting key-value pairs.
 
 ### Proofs
 
-`MerkleTable` and `MerklePatriciaTable` allow
+`MerkleTable` and `MerklePatriciaTable` allow efficiently
 creating a proof that specific values are saved under particular keys.
 To prove that, it is sufficient to return a list of hashes from
-the tree root to the particular cell (a Merkle path). Merkle Patricia
-Tables also allow to generate proofs that there is no data in the
-database with a specific key `K`.
+the tree root to a particular cell (a Merkle path). Merkle Patricia
+tables also allow to generate proofs that there is no data in the
+database with a specific key.
 
 When a full node communicates with a thin client, proofs are returned together
 with the requested data. This allows to prove data authenticity efficiently.
