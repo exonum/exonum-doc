@@ -206,40 +206,75 @@ with the requested data. This allows to prove data authenticity efficiently.
 **Tip.** See the [*Services*](../architecture/services.md) article
 for more details.
 
-Exonum includes the Core and the set of optional pluggable services.
+Besides the core, Exonum includes the framework for building **services**.
 While the Core is responsible for the consensus, and provides middleware
 functionality for sending and receiving transactions and blocks,
-services implement all the custom logics and are the main point to
-extend Exonum functionality. In fact, Services implement smart contracts
-model in the framework.
+services implement all business logic of the blockchain
+and are the main point to extend Exonum functionality.
 
-The key points, differentiating Exonum smart contracts from other
-models, are:
+Exonum services interact with the external world with the help of *endpoints*.
+A service may define 3 types of endpoints:
 
-- Fixed smart contracts. Exonum executes only predefined transactions,
-  not allowing to execute arbitrary code received from the client.
-- Non-isolation. Transactions are executed at the same codespace as the
-  Core is.
-- Transactions verification. It may include authentication /
-  authorization (for example, checking transaction signatures), as well as
-  logical checks (for example, spending transaction in the cryptocurrency
-  may be discarded if source account balance is empty).
+- **Transactions** correspond to `POST`/`PUT` methods for
+  RESTful web services. They transform the blockchain state. All transactions
+  within the blockchain are completely ordered as described above,
+  and the result of their execution is agreed among the full nodes in the
+  blockchain network
+- **Read requests** correspond to the `GET` method for web services. They
+  retrieve information from the blockchain, possibly together with proofs.
+  Read requests are executed locally, are not globally ordered,
+  and cannot modify the blockchain state
+- **Private endpoints** provide an administrative interface to the local
+  instance of the service. They could be used to adjust local service
+  configutation, e.g., manage secret keys specific to the service.
+  Private endpoints are executed locally, are not globally ordered, and
+  cannot modify the blockchain state directly (although they
+  can generate transactions and push them to the network)
 
-Services have two main purposes:
+**Notice.** Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
+Events will implement the [pub/sub architecure pattern][wiki:pubsub],
+allowing thin clients and services to subscribe to events emitted
+by services.
 
-- Services define types of transactions processed by Exonum, and implement
-  the execution logics for each type. The application may include multiple
-  independent services, and each of them processes its own transactions
-  list
-- Services may implement event handlers and listen for the different
-  blockchain actions. For example, `handle_commit` is executed after new
-  block applies to the data storage.
+External applications may communicate with service endpoints
+via HTTP REST API, using JSON as the serialization format.
+Exonum facilitates middleware tasks for services, such as listening to HTTP requests,
+dispatching incoming transactions and read requests to an appropriate service,
+performing conversion to and from JSON, etc.
 
-Outer applications may communicate with services via HTTP REST API.
-
-As services are just Rust modules, they can be reused in the different Exonum
-projects. You may take a open source services already written by the
+As services are Rust modules, they can be easily reused across Exonum
+projects. You may use open source services already written by the
 community, or open your service for other users.
+
+### Smart Contracting
+
+Endpoints defined by services fulfill the same role as smart contracts
+in other blockchain platforms. They define business logic of the blockchain,
+allow to retrieve data from the blockchain, and can be reused accross
+different projects. Partial analogies for this execution model are
+endpoints of RESTful web services and stored procedures for DBMSs.
+
+The key points differentiating Exonum smart contracts from other models
+used in blockchains are as follows:
+
+- **Restricted environment.** Exonum executes only predefined request types,
+  not allowing to execute arbitrary code received from a client
+- **No isolation.** Request processing is performed
+  in the same execution context as the core of the system
+- **Local state.** Exonum services may define a local state, which is
+  specific to the node on which the service is running. The local state
+  can be used to manage secret information (e.g., private keys). The local
+  state may be managed by private service endpoints. By utilizing
+  the local state, services can be more proactive than their counterparts
+  in other blockchains. For example, [the anchoring service](#anchoring-service)
+  uses the local state to fully automate anchoring transaction signing
+- **Split transaction processing.** Transaction verification is a separate step
+  of transaction processing. It is performed immediately after receiving
+  the transaction, before applying the transaction to the blockchain state. Verification
+  may include authentication checks (for example, verifying the transaction signature),
+  as well as other structural checks over the transaction contents.
+  At the same time, transaction verification has no access to the current
+  blockchain state
 
 ### Existing Services
 
@@ -332,3 +367,4 @@ administrative settings.
 [wiki:ed25519]: https://en.wikipedia.org/wiki/EdDSA
 [libsodium]: https://download.libsodium.org/doc/
 [sodiumoxide]: https://dnaq.github.io/sodiumoxide/sodiumoxide/
+[wiki:pubsub]: https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern
