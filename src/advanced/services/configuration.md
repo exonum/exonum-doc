@@ -29,47 +29,47 @@ configuration in all nodes simultaneously:
 
 All `hash`es and `public_key`s below are hexadecimal strings.
 
-`config_body` is a valid json, corresponding to [exonum
-config][stored_configuration] serialization.
+`ConfigBody` is a JSON object corresponding to the [Exonum
+config][stored_configuration] serialization. It has the following fields:
 
-```JSON
-{
-  "previous_cfg_hash": hash,
-  "actual_from": integer,
-  "validators": [
-    public_key1,
-    public_key2,
-    ...
-  ],
-  "consensus": {
-    "round_timeout": integer,
-    "status_timeout": integer,
-    "peers_timeout": integer,
-    "propose_timeout": integer,
-    "txs_block_limit": integer,
-  },
-  "services": {
-    "service_parameter1": service_parameter1_value,
-    "service_parameter2": service_parameter2_value,
-    ...
-  }
-}
+- **previous_cfg_hash**: Hash  
+  Hash of the previous active configuration.
+- **actual_from**: Integer
+  The height from which the configuration became actual.
+- **validators**: Array\<PublicKey\>  
+  List of validators' public keys.
+- **consensus**: Object  
+  Consensus-specific configuration parameters.
+- **consensus.peers_timeout**  
+  Peer exchange timeout (in ms).
+- **consensus.propose_timeout**  
+  Proposal timeout (ms) after the new height beginning.
+- **consensus.round_timeout**  
+  Interval (ms) between rounds.
+- **consensus.status_timeout**  
+  Period (ms) of sending a `Status` message.
+- **consensus.txs_block_limit**  
+  Maximum number of transactions per block.
+- **services**: Object  
+  Services-specific configuration parameters.
 
-```
+`propose_template` is a JSON object corresponding to the [Exonum
+config][config_propose] serialization. It has the following fields:
 
-`propose_template` is a valid json corresponding to [exonum
-config][config_propose] serialization.
+- **tx_propose**: Object
+  Information about configuration and its author.
 
-```JSON
-{
-  "tx_propose": {
-    "from": public_key,
-    "cfg": str,
-  },
-  "votes_history_hash": hash,
-  "num_votes": integer
-}
-```
+- **tx_propose.from**: PublicKey
+  Author's public key.
+
+- **tx_propose.cfg**: ConfigBody
+  String containing `ConfigBody` of proposed configuration.
+
+- **votes_history_hash**: Hash
+  Hash of the proposed configuration.
+
+- **num_votes**: Integer
+  Number of votes for the proposed configuration.
 
 See [Configuration service tutorial][http_api] for more details on http api.
 
@@ -134,11 +134,7 @@ is `null`. If only propose is present, then `committed_config` field is `null`.
 ```JSON
 {
   "committed_config": config_body,
-  "propose": {  
-    "num_votes": integer,
-    "tx_propose": propose_template,
-    "votes_history_hash": vote_history_hash
-  }
+  "propose": propose_template
 }
 ```
 
