@@ -4,54 +4,105 @@ A transaction in a blockchain
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
 is a group of sequential operations with the database and is a logical unit of
 work with data. So any business logic of the project with Exomum should be
-formulated using different types of transactions. A transaction can be either
-executed either entirely and successfully, respecting the integrity of the
-data, or a transaction can be not performed at all, and then it should not have
-any effect. A transaction could be created by the allowed entities (for
-example, a private key owner could initialize his coins transfer for
-[cryptocurrency](https://github.com/exonum/cryptocurrency)) and sent for the
-distributed system of validators for the consideration. If the transaction is
-correct, it would be included in a block of the blockchain through the
-validators voting process via the
+formulated using different types of transactions. A transaction must be
+executed entirely, respecting the integrity of the data. If the transaction
+execution is unsuccessful, then the transaction must be not performed at all,
+so that it shall not have any effect. A transaction could be created by the
+allowed entities and sent for the distributed system of validators for the
+consideration.
+
+!!! Example
+    A private key owner could initialize his coins transfer for
+    [cryptocurrency](https://github.com/exonum/cryptocurrency).
+
+If the transaction is correct, it would be included in a block of the
+blockchain through the validators voting process via the
 [consensus algorithm](../advanced/consensus/consensus.md) work. All
 transactions are executed one by one in the order in which they are placed into
 the blockchain.
 
-A transaction consists of
+## Serialization
 
-1. `service_id`: sets the [service](services.md) to make a deal with (for
-  example, configuration or *cryptocurrency*). Such information is redundant
-  but helpful to find methods to process transaction (such as `verify` and
-  `execute`). All the transactions are stored in the blockchain sequentially.
-  But such a manner is not useful for queries. So any fat client also
-  duplicates information from the blockchain in the special tables of the
-  blockchain-level key-value storage (implemented with
-  [LevelDB](http://leveldb.org/) those support queries and also provides proofs
-  of consistency with the blockchain (see
-  [Merkle index](../advanced/merkle-index.md) and
-  [Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
+All transaction messages are serialized in a uniform format. Serialization is used
+to send transactions among nodes in the blockchain network, and also to sign
+and verify transaction messages.
+
+### Service ID
+
+Sets the [service](services.md) to make a deal with (for example,
+*configuration* or *cryptocurrency*). Such information is redundant but helpful
+to find methods to process transaction (such as `verify` and `execute`). All
+the transactions are stored in the blockchain sequentially. But such a manner
+is not useful for queries. So any fat client also duplicates information from
+the blockchain in the special tables of the blockchain-level key-value storage
+(implemented with [LevelDB](http://leveldb.org/) those support queries and also
+provides proofs of consistency with the blockchain (see
+[Merkle index](../advanced/merkle-index.md) and
+[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
   details).
-2. `message_id`: the nodes of the blockchain network sends and receives messages
-  to communicate. The `message_id` defines the message type. For the transaction,
-  it means the type of transaction in the service. For example, service
-  *cryptocurrency* could include different types of transactions:
-  `AddFundsTransaction` for coins emission and `TransferTransaction` for money
-  transfer et. al.
-3. `body`: the body of the transaction, which includes specific for a given
-  transaction type (`message_id`) data and a format of which is specified by
-  service with `service_id`. For example, the body of `TransferTransaction`
-  should include field `from` for coins sender, `to` for coins recipient,
-  `amount` for the sending amount and `seed` to distinct different transactions
-  with the same previous three fields. The message body is serialized according
-  to the binary serialization specification from its type specification in the
-  service
-4. `signature`: the cryptographic signature for the message with a transaction.
-  Any author of the transaction (as any other message) should have the private
-  and public keys which allow him to generate a correct transaction. He
-  shouldn't provide any other person his private key but should use it to sign
-  messages. The signature of a particular person could be verified by anyone
-  using the public key and `Exonum.verifySignature` function. See
-  [Exonum client](https://github.com/exonum/exonum-client) for details.
+
+### Message ID
+
+The nodes of the blockchain network sends and receives messages to communicate.
+The `message_id` defines the message type. For the transaction, it means the
+type of transaction in the service.
+
+!!! Example
+    The service *cryptocurrency* could include different types of transactions:
+    `AddFundsTransaction` for coins emission and `TransferTransaction` for
+    money transfer et. al.
+
+### Body
+
+The body of the transaction, which includes specific for a given transaction
+type (`message_id`) data and a format of which is specified by service with
+`service_id`.
+
+!!! Example
+    the body of `TransferTransaction` should include field `from` for coins
+    sender, `to` for coins recipient, `amount` for the sending amount and
+    `seed` to distinct different transactions with the same previous three
+    fields.
+
+The message body is serialized according to the binary serialization
+specification from its type specification in the service.
+
+### Signature
+
+The cryptographic signature for the message with a transaction. Any author of
+the transaction (as any other message) should have the private and public keys
+which allow him to generate a correct transaction. He shouldn't provide any
+other person his private key but should use it to sign messages. The signature
+of a particular person could be verified by anyone using the public key and
+`Exonum.verifySignature` function. See
+[Exonum client](https://github.com/exonum/exonum-client) for details.
+
+## Interface
+
+All transactions have at least three methods: `verify`, `execute` and `info`.
+
+### Verify
+
+The `verify` method verifies the transaction, which includes the message signature
+verification and other specific for a given transaction type checks. `Verify`
+checks internal consistency of a transaction and has no access to the blockchain state.
+
+!!! Example
+    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
+    a `TransactionSend` also checks if the sender is not same as the receiver.
+
+### Execute
+
+The `execute` method given the blockchain state and can modify it (but can
+choose not to if certain conditions are not met).
+
+!!! Note.
+    `Verify` and `execute` are triggered at different times.
+
+### Info
+
+The `info` method returns the useful information about transaction and has no
+access to the blockchain state as the `verify`.
 
 ## Transaction lifecycle
 
@@ -62,8 +113,7 @@ A transaction consists of
   which it reaches (by transaction's method `verify` which includes at least
   signature verification) and is added to the pool of unconfirmed transactions
 4. The transaction is included into a block proposal (or multiple proposals)
-5. The transaction is executed (by transaction's method `execute` which
-  includes necessary changes of the corresponding service database) during the
+5. The transaction is executed (by transaction's method `execute`) during the
   lock step of the consensus algorithm, when a validator node has collected all
   transactions for a block proposal and under certain conditions which imply
   that the considered proposal is going to be accepted in nearly future
@@ -76,10 +126,8 @@ A transaction consists of
 
 ### Purity
 
-Purity means that the transaction could be serialized (i.e. at least all
-methods `verify`, `execute` and `info` could be applied) no matter the
-blockchain state (but the result of such methods application could depend on
-blockchain state).
+The purity means that the `verify` method of transactions does not depend on
+the blockchain state. And it is true by design.
 
 ### Sequential consistency
 
