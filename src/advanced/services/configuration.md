@@ -34,28 +34,27 @@ config][stored_configuration] serialization.
 
 ```JSON
 {
-  "config_body" : {
-    "previous_cfg_hash": hash,
-    "actual_from": integer,
-    "validators": [
-      public_key1,
-      public_key2,
-      ...
-    ],
-    "consensus": {
-      "round_timeout": integer,
-      "status_timeout": integer,
-      "peers_timeout": integer,
-      "propose_timeout": integer,
-      "txs_block_limit": integer,
-    },
-    "services": {
-      "service_parameter1": service_parameter1_value,
-      "service_parameter2": service_parameter2_value,
-      ...
-    }
+  "previous_cfg_hash": hash,
+  "actual_from": integer,
+  "validators": [
+    public_key1,
+    public_key2,
+    ...
+  ],
+  "consensus": {
+    "round_timeout": integer,
+    "status_timeout": integer,
+    "peers_timeout": integer,
+    "propose_timeout": integer,
+    "txs_block_limit": integer,
+  },
+  "services": {
+    "service_parameter1": service_parameter1_value,
+    "service_parameter2": service_parameter2_value,
+    ...
   }
 }
+
 ```
 
 `propose_template` is a valid json corresponding to [exonum
@@ -63,14 +62,12 @@ config][config_propose] serialization.
 
 ```JSON
 {
-  "propose_template": {
-    "tx_propose": {
-      "from": public_key,
-      "cfg": str,
-    },
-    "votes_history_hash": hash,
-    "num_votes": integer
-  }
+  "tx_propose": {
+    "from": public_key,
+    "cfg": str,
+  },
+  "votes_history_hash": hash,
+  "num_votes": integer
 }
 ```
 
