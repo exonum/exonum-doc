@@ -25,64 +25,67 @@ configuration in all nodes simultaneously:
 - `previous_cfg_hash` - hash of previous configuration, which validators' set is
   allowed to cast votes for current configuration.
 
-## Global variable service http api
+## REST API
 
-All `hash`es and `public_key`s below are hexadecimal strings.
+**Tip.** See [Configuration service tutorial][http_api] for more details
+on the config update service API.
+
+### Types
+
+As per [Google Closure Compiler][closurec] conventions,
+`?` before the type denotes a nullable type, and `=` after the type denotes
+an optional type.
+
+`integer` type denotes a non-negative integer number.
+
+#### Hash, PublicKey
+
+`Hash` and `PublicKey`s below are hexadecimal strings of the appropriate length
+(64 hex digits, i.e., 32 bytes).
+
+#### ConfigBody
 
 `ConfigBody` is a JSON object corresponding to the [Exonum
 config][stored_configuration] serialization. It has the following fields:
 
 - **previous_cfg_hash**: Hash  
   Hash of the previous active configuration.
-
-- **actual_from**: Integer
+- **actual_from**: integer  
   The height from which the configuration became actual.
-
 - **validators**: Array\<PublicKey\>  
   List of validators' public keys.
-
 - **consensus**: Object  
   Consensus-specific configuration parameters.
-
-- **consensus.peers_timeout**  
+- **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
-
-- **consensus.propose_timeout**  
+- **consensus.propose_timeout**: integer  
   Proposal timeout (ms) after the new height beginning.
-
-- **consensus.round_timeout**  
+- **consensus.round_timeout**: integer  
   Interval (ms) between rounds.
-
-- **consensus.status_timeout**  
+- **consensus.status_timeout**: integer  
   Period (ms) of sending a `Status` message.
-
-- **consensus.txs_block_limit**  
+- **consensus.txs_block_limit**: integer  
   Maximum number of transactions per block.
-
 - **services**: Object  
-  Services-specific configuration parameters.
+  Service-specific configuration parameters.
 
-`propose_template` is a JSON object corresponding to the [Exonum
+#### Propose
+
+`Proposal` is a JSON object corresponding to the [Exonum
 config][config_propose] serialization. It has the following fields:
 
 - **tx_propose**: Object
   Information about configuration and its author.
-
 - **tx_propose.from**: PublicKey
   Author's public key.
-
 - **tx_propose.cfg**: ConfigBody
   String containing `ConfigBody` of proposed configuration.
-
 - **votes_history_hash**: Hash
   Hash of the proposed configuration.
-
-- **num_votes**: Integer
+- **num_votes**: integer
   Number of votes for the proposed configuration.
 
-See [Configuration service tutorial][http_api] for more details on http api.
-
-**{base_path}** below stands for `/api/services/configuration/v1`
+**{base_path}** below stands for `/api/services/configuration/v1`.
 
 Response samples may be found [here][response_samples].
 
@@ -96,14 +99,14 @@ Looks up the actual global configuration.
 
 None.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "config": config_body,
-  "hash": config_hash
-}
-```
+JSON object with the following fields:
+
+- **config**: ConfigBody  
+  Global configuration presently in use.
+- **hash**: Hash  
+  Hash of the actual configuration.
 
 ### Following Configuration
 
@@ -116,97 +119,81 @@ Returns `null` if no configuration is scheduled.
 
 None.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "config": config_body,
-  "hash": config_hash
-}
-```
+JSON object with the following fields:
+
+- **config**: ConfigBody  
+  Global configuration scheduled to take effect in the future.
+- **hash**: Hash  
+  Hash of the scheduled configuration.
 
 ### Configuration by Hash
 
     GET {base_path}/configs/{config_hash}
 
-Looks up configuration (including proposals) by configuration hash. If no propose
-was submitted for a configuration (genesis configuration), then `propose` field
-is `null`. If only propose is present, then `committed_config` field is `null`.
-`propose` key has json-object values, that match `propose_template`.
+Looks up configuration (including proposals) by configuration hash.
 
 #### Parameters
 
-`config_hash` - hash of configuration to look up.
+- **config_hash**: Hash  
+  Hash of configuration to look up.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "committed_config": config_body,
-  "propose": propose_template
-}
-```
+JSON object with the following fields:
+
+- **committed_config**: ?ConfigBody  
+  Configuration with the specified hash.
+  If only proposal is present, `null`.
+- **propose**: ?Propose  
+  Proposal for the retrieved configuration.
+  If no proposal was submitted for a configuration (genesis configuration),
+  `null`.
 
 ### Votes for Configuration
 
     GET {base_path}/configs/{config_hash}/votes
 
-Looks up votes for a configuration propose by configuration hash. If a vote from
-the validator is absent, then `null` is returned at the corresponding index in
-json array. Indexing of the `Votes` array corresponds to the indexing of
-validators public keys in [actual
-configuration](../../architecture/configuration.md#genesis).
+Looks up votes for a configuration propose by configuration hash.
 
 #### Parameters
 
 `config_hash` - hash of configuration to look up.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "Votes": [
-    {
-      "from": public_key,
-      "cfg_hash": config_hash
-    },
-    null,
-    ...
-  ]
-}
-```
+JSON object with the following fields:
+
+- **Votes**: Array\<?Vote\>  
+  Votes for the configuration. Indexing of the `Votes` array corresponds
+  to the indexing of validators public keys in [actual configuration](../../architecture/configuration.md#genesis).
+  If a vote from the validator is absent, then `null` is returned
+  at the corresponding index.
 
 ### Committed Configurations
 
-    GET {base_path}/configs/committed?previous_cfg_hash
+    GET {base_path}/configs/committed
 
 Looks up all committed configurations in the order configuration proposals are
 committed as transactions to the Exonum blockchain.
 
 #### Query Parameters
 
-- `previous_config_hash`: hash (optional)  
-  Filters configurations by the specified previous configuration hash.
+- **previous_config_hash**: Hash=  
+  If present, filters configurations by the specified previous configuration hash.
+- **actual_from**: integer=  
+  If present, filters configurations by the specified minimum for the height
+  from which the configuration became actual.
 
-- `lowest_actual_from`: integer (optional)
-  Filters configurations by the specified minimum for the height from which the
-  configuration became actual.
+#### Response
 
-#### Response template
+Array of objects with the following fields:
 
-```JSON
-[
-  {  
-    "config": config_body,
-    "hash": config_hash
-  },
-  {  
-    "config": config_body,
-    "hash": config_hash
-  },
-  ...
-]
-```
+- **config**: ConfigBody  
+  Committed configuration satisfying filter criteria.
+- **hash**: Hash  
+  Hash of the configuration.
 
 ### Proposed Configurations
 
@@ -217,30 +204,22 @@ committed as transactions to the Exonum blockchain.
 
 #### Query Parameters
 
-- `previous_config_hash`: hash (optional)  
-  Filters configurations by the specified previous configuration hash.
+- **previous_config_hash**: Hash=  
+  If present, filters configurations by the specified previous configuration hash.
+- **actual_from**: integer=  
+  If present, filters configurations by the specified minimum for the height
+  from which the configuration became actual.
 
-- `lowest_actual_from`: integer (optional)
-  Filters configurations by the specified minimum for the height from which the
-  configuration became actual.
+#### Response
 
-#### Response template
+Array of objects with the following fields:
 
-```JSON
-[  
-  {  
-    "propose-data": propose_template,
-    "hash": config_hash
-  },
-  {  
-    "propose-data": propose_template,
-    "hash": config_hash
-  },
-  ...
-]
-```
+- **config**: ConfigBody  
+  Proposed configuration satisfying filter criteria.
+- **hash**: Hash  
+  Hash of the configuration.
 
-### Private endpoints
+### Private Endpoints
 
 Posting a new configuration can be performed by any validator maintainer via private
 endpoint.
@@ -403,3 +382,4 @@ If all the checks pass, execution results in modifying some tables and
 [config_propose]: http://exonum.com/doc/crates/configuration_service/struct.StorageValueConfigProposeData.html
 [http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
+[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
