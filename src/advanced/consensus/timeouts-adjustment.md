@@ -37,7 +37,13 @@ maximum number of transactions in the block.
 - `OPTIMAL_BLOCK_LOAD`: floating-point value in (0.0, 1.0).
   Is the equilibrium point. If `block_load` is less than
   the `OPTIMAL_BLOCK_LOAD`, then the timeout increases. And vice versa, if
-  `block_load` is greater than `OPTIMAL_BLOCK_LOAD`, then the timeout decreases;
+  `block_load` is greater than `OPTIMAL_BLOCK_LOAD`, then the timeout decreases.
+  `OPTIMAL_BLOCK_LOAD` should be selected in accordance with the loads
+  specificity in the particular network. Small `OPTIMAL_BLOCK_LOAD` results
+  in the generation of almost empty blocks and therefore allows to cope with a
+  sharp increase in the transactions flow. Large `OPTIMAL_BLOCK_LOAD` allows to
+  reduce the overhead associated with the number of blocks, but makes the system
+  vulnerable to increase in the number of incoming transactions.
 
 - `TXS_BLOCK_LIMIT`: floating-point value.
   Is the maximum number of transactions in a block. It is consensus algorithm
@@ -80,12 +86,6 @@ next_timeout = target_timeout * ADJUSTMENT_SPEED + previous_timeout *
 ### Dependency of `target_timeout` from `block_load`
 
 **TODO** add graph
-
-Here, the constant `OPTIMAL_BLOCK_LOAD` and the slope of [line
-segments][line_segment] are chosen to enable the system operating at the point
-`OPTIMAL_BLOCK_LOAD` to respond with a timeout change for both cases of sharp
-increase (timeout should be decreased) and for a sharp decrease (timeout should
-be increased) in `block_load`.
 
 [exponential_smoothing]: https://en.wikipedia.org/wiki/Exponential_smoothing
 [line_segment]: https://en.wikipedia.org/wiki/Line_segment
