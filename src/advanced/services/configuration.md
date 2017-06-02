@@ -183,7 +183,7 @@ committed as transactions to the Exonum blockchain.
 - `previous_config_hash`: hash (optional)  
   Filters configurations by the specified previous configuration hash.
 
-- `lowest_actual_from`: hash (optional)
+- `lowest_actual_from`: integer (optional)
   Filters configurations by the specified minimum for the height from which the
   configuration became actual.
 
@@ -215,7 +215,7 @@ committed as transactions to the Exonum blockchain.
 - `previous_config_hash`: hash (optional)  
   Filters configurations by the specified previous configuration hash.
 
-- `lowest_actual_from`: hash (optional)
+- `lowest_actual_from`: integer (optional)
   Filters configurations by the specified minimum for the height from which the
   configuration became actual.
 
