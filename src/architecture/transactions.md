@@ -85,7 +85,8 @@ All transactions have at least three methods: `verify`, `execute` and `info`.
 
 The `verify` method verifies the transaction, which includes the message signature
 verification and other specific for a given transaction type checks. `Verify`
-checks internal consistency of a transaction and has no access to the blockchain state.
+checks internal consistency of a transaction and has no access to the
+blockchain state.
 
 !!! Example
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
