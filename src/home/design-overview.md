@@ -113,9 +113,8 @@ Full nodes are further subdivided into 2 categories:
 **Thin clients** represent clients in the client-server paradigm; they connect
 to full nodes to retrieve information from the blockchain they are
 interested in, and to send transactions. Exonum provides a “proofs
-mechanism”, allowing thin clients to check if the full-node answered
-fairly. Based on cryptographic commitments via Merkle / Merkle Patricia trees,
-this mechanism allows verifying that a response from the full node
+mechanism”, based on cryptographic commitments via Merkle / Merkle Patricia
+trees. This mechanism allows verifying that a response from the full node
 has been really authorized by supermajority of validators.
 
 ## Consensus
