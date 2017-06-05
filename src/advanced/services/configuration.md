@@ -235,7 +235,7 @@ transaction, the signature is automatically added.
 - **cfg**: ConfigBody  
   Contains JSON with proposed configuration. Its format was described above.
 
--  **from**: PublicKey
+- **from**: PublicKey  
   Public key of transaction author.
 
 ### Verification
@@ -302,10 +302,10 @@ JSON object with the following fields:
 
 ### Data Layout
 
-- **cfg_hash**: Hash
+- **cfg_hash**: Hash  
   Hash of configuration to vote for
 
--  **from**: PublicKey
+- **from**: PublicKey  
   Public key of transaction author.
 
 ### Verification
