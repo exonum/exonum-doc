@@ -69,7 +69,7 @@ an optional type.
 
 #### Hash, PublicKey
 
-`Hash` and `PublicKey`s below are hexadecimal strings of the appropriate length
+`Hash` and `PublicKey` types are hexadecimal strings of the appropriate length
 (64 hex digits, i.e., 32 bytes).
 
 #### ConfigBody
@@ -100,7 +100,7 @@ config][stored_configuration] serialization. It has the following fields:
 
 #### Propose
 
-`Proposal` is a JSON object corresponding to the [Exonum
+`Propose` is a JSON object corresponding to the [Exonum
 config][config_propose] serialization. It has the following fields:
 
 - **tx_propose**: Object  
@@ -113,6 +113,8 @@ config][config_propose] serialization. It has the following fields:
   Hash of the proposed configuration.
 - **num_votes**: integer  
   Number of votes for the proposed configuration.
+
+## Read Requests
 
 ### Actual Configuration
 
@@ -137,8 +139,8 @@ JSON object with the following fields:
 
     GET {base_path}/configs/following
 
-Looks up already scheduled following configuration which hasn't yet taken effect.
-Returns `null` if no configuration is scheduled.
+Looks up the locked-in following configuration which hasn’t taken effect yet.
+Returns `null` if no configuration is locked in.
 
 #### Parameters
 
@@ -149,15 +151,15 @@ None.
 JSON object with the following fields:
 
 - **config**: ConfigBody  
-  Global configuration scheduled to take effect in the future.
+  Global configuration locked in to take effect in the future.
 - **hash**: Hash  
-  Hash of the scheduled configuration.
+  Hash of the following configuration.
 
 ### Configuration by Hash
 
     GET {base_path}/configs/{config_hash}
 
-Looks up configuration (including proposals) by configuration hash.
+Looks up configuration (including proposals) by the hash.
 
 #### Parameters
 
@@ -170,21 +172,22 @@ JSON object with the following fields:
 
 - **committed_config**: ?ConfigBody  
   Configuration with the specified hash.
-  If only proposal is present, `null`.
+  If only a proposal is present, `null`.
 - **propose**: ?Propose  
   Proposal for the retrieved configuration.
-  If no proposal was submitted for a configuration (genesis configuration),
+  If the configuration is not a result of a proposal (the genesis configuration),
   `null`.
 
 ### Votes for Configuration
 
     GET {base_path}/configs/{config_hash}/votes
 
-Looks up votes for a configuration propose by configuration hash.
+Looks up votes for a configuration proposal by the configuration hash.
 
 #### Parameters
 
-`config_hash` - hash of configuration to look up.
+- **config_hash**: Hash  
+  Hash of configuration to look up
 
 #### Response
 
@@ -192,7 +195,7 @@ JSON object with the following fields:
 
 - **Votes**: Array\<?Vote\>  
   Votes for the configuration. Indexing of the `Votes` array corresponds
-  to the indexing of validators public keys in [actual configuration](../../architecture/configuration.md#genesis).
+  to the indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
   If a vote from the validator is absent, then `null` is returned
   at the corresponding index.
 
@@ -200,8 +203,8 @@ JSON object with the following fields:
 
     GET {base_path}/configs/committed
 
-Looks up all committed configurations in the order configuration proposals are
-committed as transactions to the Exonum blockchain.
+Looks up all committed configurations, optionally filtered by
+the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
@@ -220,12 +223,15 @@ Array of objects with the following fields:
 - **hash**: Hash  
   Hash of the configuration.
 
+The elements of the array are ordered by the order, in which
+configuration proposals were committed as transactions to the Exonum blockchain.
+
 ### Proposed Configurations
 
     GET {base_path}/configs/proposed?previous_cfg_hash
 
-Looks up all proposed configurations in the order configuration proposals are
-committed as transactions to the Exonum blockchain.
+Looks up all proposed configurations, optionally filtered by
+the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
@@ -233,7 +239,7 @@ committed as transactions to the Exonum blockchain.
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
-  from which the configuration became actual.
+  from which the configuration will become actual.
 
 #### Response
 
@@ -243,6 +249,9 @@ Array of objects with the following fields:
   Proposed configuration satisfying filter criteria.
 - **hash**: Hash  
   Hash of the configuration.
+
+The elements of the array are ordered by the order, in which
+configuration proposals were committed as transactions to the Exonum blockchain.
 
 ## Configuration update service transactions
 
