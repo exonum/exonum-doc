@@ -2,8 +2,8 @@
 
 This page describes the core design decisions of the Exonum framework.
 
-- [Transaction processing](#transaction-processing) describes Exonum blocks
-  and transactions lifecycle
+- [Transaction processing](#transaction-processing) describes the lifecycle of
+  transactions and blocks in Exonum
 - [Network structure](#network-structure) describes how Exonum network operates
 - [Consensus](#consensus) explains how nodes agree on the blockchain
   state
@@ -28,7 +28,7 @@ and responding to read queries from external clients.
 an atomic patch that should be applied to the key-value storage.
 Transactions are authenticated with the help of public-key digital signatures.
 Transactions need to be verified and ordered before they are considered
-accepted / committed. Both these tasks are performed by
+accepted / committed. Both verification and ordering are performed by
 [the consensus algorithm](#consensus).
 
 Transactions are templated; each transaction template has a set of variable parameters,
@@ -46,7 +46,7 @@ All data in the Exonum blockchain is divided into two parts:
 
 As transactions include operations on the key-value storage such as creating
 new value, or updating already saved values, the actual data storage state
-can be restored completely from the list of the transactions.
+can be restored completely from the transaction log.
 When a new node in the Exonum network appears, it loads
 already generated blocks and applies its transactions to the data
 storage one by one. Such approach allows seeing the whole history of any
@@ -79,10 +79,10 @@ Exonum blocks consist of the following parts:
 
 As every block includes the hash of the previous block,
 it is impossible to change one block
-without the appropriate changes for the each of the following blocks.
+without the appropriate changes to each of the following blocks.
 This ensures immutability of the transaction log; once a transaction is committed,
 it cannot be retroactively modified or evicted from the log. Similarly,
-it's impossible to insert a transaction in the middle of the log.
+it’s impossible to insert a transaction in the middle of the log.
 
 ## Network Structure
 
@@ -100,7 +100,7 @@ All the full nodes are authenticated with public-key cryptography.
 Full nodes are further subdivided into 2 categories:
 
 - **Auditors** replicate the entire contents of the blockchain. They
-  can generate new transactions but cannot choose which transactions
+  can generate new transactions, but cannot choose which transactions
   should be committed (i.e., cannot generate new blocks)
 - **Validators** provide the network liveness. Only validators can generate
   new blocks by using a [Byzantine fault tolerant consensus algorithm](#consensus).
@@ -112,8 +112,8 @@ Full nodes are further subdivided into 2 categories:
 
 **Thin clients** represent clients in the client-server paradigm; they connect
 to full nodes to retrieve information from the blockchain they are
-interested in, and to send transactions. Exonum provides a "proofs
-mechanism", allowing thin clients to check if the full-node answered
+interested in, and to send transactions. Exonum provides a “proofs
+mechanism”, allowing thin clients to check if the full-node answered
 fairly. Based on cryptographic commitments via Merkle / Merkle Patricia trees,
 this mechanism allows verifying that a response from the full node
 has been really authorized by supermajority of validators.
@@ -123,7 +123,7 @@ has been really authorized by supermajority of validators.
 **Tip.** See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
 [*Leader Election*](../advanced/consensus/leader-election.md).
 
-Exonum uses the custom modification of Byzantine fault tolerant
+Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
 of the blockchain. It is assumed that the environment is decentralized,
 i.e., any node is allowed to fail or be compromised.
@@ -220,7 +220,7 @@ A service may define 3 types of endpoints:
   within the blockchain are completely ordered as described above,
   and the result of their execution is agreed among the full nodes in the
   blockchain network
-- **Read requests** correspond to the `GET` method for web services. They
+- **Read requests** correspond to `GET` methods for web services. They
   retrieve information from the blockchain, possibly together with proofs.
   Read requests are executed locally, are not globally ordered,
   and cannot modify the blockchain state
@@ -244,7 +244,7 @@ performing conversion to and from JSON, etc.
 
 As services are Rust modules, they can be easily reused across Exonum
 projects. You may use open source services already written by the
-community, or open your service for other users.
+community, or open your service for other uses.
 
 ### Smart Contracting
 
@@ -280,16 +280,17 @@ used in blockchains are as follows:
 
 #### Configuration Update Service
 
-**Tip.** See the [*Configuration Service*](../advanced/services/configuration.md)
+**Tip.** See the [*Configuration Update Service*](../advanced/services/configuration.md)
 article for more details.
 
-Although every node has its own configuration file, some setups should
+Although every node has its own configuration file, some settings should
 be changed for all nodes simultaneously. This service allows updating
 configuration through the blockchain itself.
 
 Using the configuration update service, any validator may propose new
-configuration and other validators vote for it. Proposal needs validators
-supermajority to become accepted; however, it still is inactive and
+configuration and other validators vote for it. A proposal needs approval
+from the supermajority of the validators to become accepted;
+however, it still is inactive and
 current settings are still used. New configuration includes
 `actual_from` parameter pointing to the blockchain height, upon reaching
 which the new configuration activates.
@@ -306,7 +307,7 @@ available in Bitcoin.
 
 Anchoring increases security; even if a malefactor takes
 control over every validator or all validators collude,
-it's impossible to change the transaction log unnoticeably. After any change,
+it’s impossible to change the transaction log unnoticeably. After any change,
 retroactively modified block hashes would differ from the one recorded on
 the Bitcoin blockchain.
 To change the data on the Exonum blockchain retroactively, an attacker would need
@@ -334,7 +335,7 @@ In most cases, transactions are created by the external entities
 (such as light clients); these entities are assumed to manage the corresponding
 signing keys. Keys can also be managed by full nodes themselves. In this case,
 a private key is stored in the local configuration of the node, does not enter
-the blockchain and is specific to a particular node. It's a good practice
+the blockchain and is specific to a particular node. It’s a good practice
 to manage such keys locally via private APIs of the corresponding service.
 
 The core uses two pairs of Ed25519 keys:
