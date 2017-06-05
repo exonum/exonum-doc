@@ -4,10 +4,12 @@ A transaction in a blockchain
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
 is a group of sequential operations with the database and is a logical unit of
 work with data. So any business logic of the project with Exomum should be
-formulated using different types of transactions. A transaction must be
-executed entirely, respecting the integrity of the data. If the transaction
-execution is unsuccessful, then the transaction must be not performed at all,
-so that it shall not have any effect. A transaction could be created by the
+formulated using different types of transactions in different types of
+services. A transaction must be executed entirely, respecting the integrity of
+the data (the correct transaction execution workflow should be implemented by
+this transaction type developer). If the transaction execution is unsuccessful,
+then the transaction must be not performed at all, so that it shall not have any effect.
+And it is guaranteed by Exonum core. A transaction could be created by the
 allowed entities and sent for the distributed system of validators for the
 consideration.
 
@@ -23,9 +25,35 @@ the blockchain.
 
 ## Serialization
 
-All transaction messages are serialized in a uniform format. Serialization is used
-to send transactions among nodes in the blockchain network, and also to sign
-and verify transaction messages.
+All transaction messages are serialized in a uniform format. There are 2
+serialization formats - binary and [JSON](https://en.wikipedia.org/wiki/JSON);
+the first one is used in communication among nodes and
+[storage](../storage.md), the second one is used to communicate with
+[light clients](../clients.md). All fields to serialize and deserialize
+transactions are listed in the table below:
+
+| Field | Binary format | Binary offset | JSON |
+|-------|:--------------:|-------:|:-------:|
+| `network_id` | `u8` | 0 | number |
+| `protocol_version` | `u8` | 1 | number |
+| `service_id` | `u16` | 2 | number |
+| `message_id` | `u16` | 4 | number |
+| `body` | `k` | 6 | JSON |
+| `signature` | Ed25519 signature | -64 | hex string |
+
+### Network ID
+
+**TODO** What for?
+
+**Binary presentation:** `u8` (unsigned 1 byte).
+**JSON presentation:** number
+
+### Protocol Version
+
+The major version of the Exonum serialization protocol. Currently, `0`.
+
+**Binary presentation:** `u8` (unsigned 1 byte).
+**JSON presentation:** number.
 
 ### Service ID
 
@@ -38,8 +66,10 @@ the blockchain in the special tables of the blockchain-level key-value storage
 (implemented with [LevelDB](http://leveldb.org/) those support queries and also
 provides proofs of consistency with the blockchain (see
 [Merkle index](../advanced/merkle-index.md) and
-[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
-  details).
+[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more details).
+
+**Binary presentation:** `u16` (unsigned 2 bytes).
+**JSON presentation:** number.
 
 ### Message ID
 
@@ -51,6 +81,9 @@ type of transaction in the service.
     The service *cryptocurrency* could include different types of transactions:
     `AddFundsTransaction` for coins emission and `TransferTransaction` for
     money transfer et. al.
+
+**Binary presentation:** `u16` (unsigned 2 bytes).
+**JSON presentation:** number.
 
 ### Body
 
@@ -67,19 +100,28 @@ type (`message_id`) data and a format of which is specified by service with
 The message body is serialized according to the binary serialization
 specification from its type specification in the service.
 
+**Binary presentation:** binary sequence with the fixed length.
+**JSON presentation:** JSON.
+
 ### Signature
 
-The cryptographic signature for the message with a transaction. Any author of
-the transaction (as any other message) should have the private and public keys
-which allow him to generate a correct transaction. He shouldn't provide any
-other person his private key but should use it to sign messages. The signature
-of a particular person could be verified by anyone using the public key and
-`Exonum.verifySignature` function. See
-[Exonum client](https://github.com/exonum/exonum-client) for details.
+[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
+serialization of the transaction (excluding the signature bytes, i.e.,
+the last 64 bytes of the serialization). The cryptographic signature for the
+message with a transaction. Any author of the transaction (as any other
+message) should have the private and public keys which allow him to generate a
+correct transaction. He shouldn't provide any other person his private key but
+should use it to sign messages. The signature of a particular person could be
+verified by anyone using the public key and `Exonum.verifySignature` function.
+See [Exonum client](https://github.com/exonum/exonum-client) for details.
+
+**Binary presentation:** Ed25519 signature.
+**JSON presentation:** hex string.
 
 ## Interface
 
-All transactions have at least three methods: `verify`, `execute` and `info`.
+All transactions have at least three methods: `verify`, `execute` and `info`
+(see `src/blockchain/service.rs` from [Exonum core](https://github.com/exonum/exonum-core)).
 
 ### Verify
 
@@ -98,7 +140,13 @@ The `execute` method given the blockchain state and can modify it (but can
 choose not to if certain conditions are not met).
 
 !!! Note.
-    `Verify` and `execute` are triggered at different times.
+    `Verify` and `execute` are triggered at different times:
+      - `verify` checks internal consistency of a transaction before the
+        transaction is included into the
+        [proposal block](../advanced/consensus/consensus.md)
+      - `execute` performs
+        [almost at the same time](../advanced/consensus/consensus.md) as the
+        block with the given transaction is committed into the blockchain.
 
 ### Info
 
@@ -127,8 +175,14 @@ access to the blockchain state as the `verify`.
 
 ### Purity
 
-The purity means that the `verify` method of transactions does not depend on
-the blockchain state. And it is true by design.
+The purity of the function means that
+
+- the function always evaluates the same result value given the same argument
+  value
+- evaluation of the result does not cause any semantically observable side effect or output
+  the `verify` method of transactions does not depend on.
+
+And both properties should be true by design.
 
 ### Sequential consistency
 
