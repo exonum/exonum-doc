@@ -237,14 +237,15 @@ Posts proposed configuration body.
 
 `config_body` to propose. It should be sent as a request body.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "cfg_hash": configuration_hash,
-  "tx_hash": transaction_hash
-}
-```
+JSON object with the following fields:
+
+- **cfg_hash**: Hash  
+  Hash of the proposed configuration.
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `TxConfigPropose` transaction.
 
 ### Vote for Configuration
 
@@ -256,13 +257,12 @@ Votes for a configuration having specific hash.
 
 `config_hash_vote_for` is a configuration hash to vote for.
 
-#### Response template
+#### Response
 
-```JSON
-{
-  "tx_hash": transaction_hash
-}
-```
+JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `TxVote` transaction.
 
 ### Configuration update service transactions
 
@@ -275,17 +275,11 @@ service transactions.
 
 #### Data Layout
 
-```JSON
-{
-  "cfg": config_body,
-  "from": public_key
-}
-```
+- **cfg**: ConfigBody  
+  Contains JSON with proposed configuration. Its format was described above.
 
-`config_body` is string containing JSON with proposed configuration. Its format
-was described above.
-
-`public_key` is hex string with public key of transaction author.
+-  **from**: PublicKey
+  Public key of transaction author.
 
 #### Verification
 
@@ -330,16 +324,11 @@ If all the checks pass, execution results in modifying some tables and
 
 #### Data Layout
 
-```JSON
-{
-  "cfg_hash": config_hash,
-  "from": public_key
-}
-```
+- **cfg_hash**: Hash
+  Hash of configuration to vote for
 
-`config_hash` is hex string with hash of configuration to vote for.
-
-`public_key` is hex string with public key of transaction author.
+-  **from**: PublicKey
+  Public key of transaction author.
 
 #### Verification
 
