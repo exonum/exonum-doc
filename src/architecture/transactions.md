@@ -28,8 +28,8 @@ the blockchain.
 All transaction messages are serialized in a uniform format. There are 2
 serialization formats - binary and [JSON](https://en.wikipedia.org/wiki/JSON);
 the first one is used in communication among nodes and
-[storage](../storage.md), the second one is used to communicate with
-[light clients](../clients.md). All fields to serialize and deserialize
+[storage](./storage.md), the second one is used to communicate with
+[light clients](./clients.md). All fields to serialize and deserialize
 transactions are listed in the table below:
 
 | Field | Binary format | Binary offset | JSON |
