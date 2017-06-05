@@ -126,6 +126,8 @@ Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
 of the blockchain. It is assumed that the environment is decentralized,
 i.e., any node is allowed to fail or be compromised.
+Consensus is *authenticated*; consensus paritcipants (i.e., validators)
+are identified with the help of public-key cryptography.
 
 To generate a new block and vote upon it, a 3-phase approach is used.
 
@@ -148,6 +150,11 @@ consensus operates (partial synchrony, which can be roughly summarized as
 the absence of reference time in the system). For example, a leader may not
 generate a proposal in time, or send different proposals to different validators;
 eventually, all honestly acting validators will agree on the same new block.
+
+Validators can be changed during the blockchain operation by [updating](#configuration-update-service)
+the global blockchain configuration. This mechanism can be used to rotate
+validators’ keys, and to add, replace or remove validator nodes without
+having to start a blockchain anew.
 
 ## Data Storage
 
