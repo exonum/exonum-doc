@@ -1,31 +1,41 @@
 # Configuration Update Service
 
-Configuration service of Exonum blockchain allows modifying Exonum blockchain
-configuration by means of propose configuration and vote for proposed configuration
-transactions signed by validators who are actual blockchain participants.
+**Configuration update service** allows modifying [the global configuration](../../architecture/configuration.md)
+by the means of *proposing* a new configuration and *voting* for proposed configurations
+among the validators.
 
-Any validator node can propose a new configuration. Other validators can vote for
-the proposal. If the proposal gets the majority of votes, then all the validators
-switch to the new configuration as soon as they reach the height from which this
-configuration become actual.
+## General Idea
 
-Configuration service contains http api implementation for public queries (get
-actual/following configuration, etc.) and private queries, intended for use only
-by validator nodes' maintainers (post configuration propose, post vote for a
-configuration propose). When processing a POST request, configuration service
-checks validity of the request (see [Propose and vote transactions
-restrictions](#propose-and-vote-transactions-restrictions) section).
+Any validator node can propose a new configuration, by broadcasting a corresponding
+propose transaction to the network. The transaction includes a new configuration
+in the JSON format, along with two auxiliary fields:
 
-It also contains auxiliary fields. These fields are used to identify nodes that
-can vote for this configuration and determining the activation time of the
-configuration in all nodes simultaneously:
+- `actual_from` is a non-negative integer height,
+  upon reaching which the new configuration (if accepted) will activate.
+- `previous_cfg_hash` is the hash of the configuration that the proposal updates
 
-- `actual_from` - blockchain height, upon reaching which current configuration is
-  to become actual.
-- `previous_cfg_hash` - hash of previous configuration, which validators' set is
-  allowed to cast votes for current configuration.
+Validators may vote for configuration proposals by submitting vote transactions
+to the network. Each validator can cast
+a single vote for any configuration proposal. If the proposal gets a supermajority
+of votes (more than 2/3 of the validators), then the proposal becomes locked in,
+and is referred to as the *following configuration*. All the validators
+switch to the following configuration (activate it) as soon as they reach
+the `actual_from` specified in the proposal.
+
+There may be several proposals with the same `previous_cfg_hash`; the transaction
+execution rules guarantee that only one of them will get activated.
+
+**Notice.** The threshold of 2/3 of validators is chosen to reflect the security
+model used in [the consensus algorithm](../consensus/consensus.md). According
+to this model, up to 1/3 of validators may be compromised or be non-responsive at
+any time.
 
 ## REST API
+
+Configuration service specifies REST API for public queries (get
+actual/following configuration, etc.) and private queries, intended for use only
+by the administrators of validator nodes (post a configuration proposal;
+vote for a configuration proposal).
 
 **Tip.** See [Configuration service tutorial][http_api] for more details
 on the config update service API.
