@@ -290,9 +290,7 @@ was described above.
 #### Verification
 
 Signature verification takes place. If any there is valid
-signature on message, message gets committed to database. So the message
-participates in the `tx_hash` field of the block, regardless of the further
-checks results.
+signature on message, message gets committed to database.
 
 #### Execution
 
@@ -346,9 +344,7 @@ If all the checks pass, execution results in modifying some tables and
 #### Verification
 
 Signature verification takes place. If any there is valid
-signature on message, message gets committed to database. So the message
-participates in the `tx_hash` field of the block, regardless of the further
-checks results.
+signature on message, message gets committed to database.
 
 #### Execution
 
