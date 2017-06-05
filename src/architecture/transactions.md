@@ -8,9 +8,9 @@ formulated using different types of transactions in different types of
 services. A transaction must be executed entirely, respecting the integrity of
 the data (the correct transaction execution workflow should be implemented by
 this transaction type developer). If the transaction execution is unsuccessful,
-then the transaction must be not performed at all, so that it shall not have any effect.
-And it is guaranteed by Exonum core. A transaction could be created by the
-allowed entities and sent for the distributed system of validators for the
+then the transaction must be not performed at all, so that it shall not have any
+effect. And it is guaranteed by Exonum core. A transaction could be created by
+the allowed entities and sent for the distributed system of validators for the
 consideration.
 
 !!! Example
@@ -66,7 +66,8 @@ the blockchain in the special tables of the blockchain-level key-value storage
 (implemented with [LevelDB](http://leveldb.org/) those support queries and also
 provides proofs of consistency with the blockchain (see
 [Merkle index](../advanced/merkle-index.md) and
-[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more details).
+[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
+details).
 
 **Binary presentation:** `u16` (unsigned 2 bytes).
 **JSON presentation:** number.
@@ -121,13 +122,14 @@ See [Exonum client](https://github.com/exonum/exonum-client) for details.
 ## Interface
 
 All transactions have at least three methods: `verify`, `execute` and `info`
-(see `src/blockchain/service.rs` from [Exonum core](https://github.com/exonum/exonum-core)).
+(see `src/blockchain/service.rs` from
+[Exonum core](https://github.com/exonum/exonum-core)).
 
 ### Verify
 
-The `verify` method verifies the transaction, which includes the message signature
-verification and other specific for a given transaction type checks. `Verify`
-checks internal consistency of a transaction and has no access to the
+The `verify` method verifies the transaction, which includes the message
+signature verification and other specific for a given transaction type checks.
+`Verify` checks internal consistency of a transaction and has no access to the
 blockchain state.
 
 !!! Example
@@ -179,8 +181,8 @@ The purity of the function means that
 
 - the function always evaluates the same result value given the same argument
   value
-- evaluation of the result does not cause any semantically observable side effect or output
-  the `verify` method of transactions does not depend on.
+- evaluation of the result does not cause any semantically observable side
+  effect or output the `verify` method of transactions does not depend on.
 
 And both properties should be true by design.
 
