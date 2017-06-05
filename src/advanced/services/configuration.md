@@ -32,19 +32,38 @@ any time.
 
 ## REST API
 
-Configuration service specifies REST API for public queries (get
-actual/following configuration, etc.) and private queries, intended for use only
-by the administrators of validator nodes (post a configuration proposal;
-vote for a configuration proposal).
+Configuration service specifies a set of public and private endpoints.
 
-**Tip.** See [Configuration service tutorial][http_api] for more details
-on the config update service API.
+- Public read requests:
+
+    - [Actual configuration](#actual-configuration)
+    - [Following configuration](#following-configuration)
+    - [Configuration by hash](#configuration-by-hash)
+    - [Votes for a configuration](#votes-for-configuration)
+    - [List committed configurations](#committed-configurations)
+    - [List proposed configurations](#proposed-configurations)
+
+- Transactions with corresponding private APIs:
+
+    - [Propose configuration](#txconfigpropose)
+    - [Vote for configuration](#txvote)
+
+All endpoints share the same base path, denoted **{base_path}**,
+equal to `/api/services/configuration/v1`.
+
+**Tip.** See [*Services*](../../architecture/services.md) for a description of
+types of endpoints in services.
+
+**Tip.** See [the configuration service tutorial][http_api] for more details
+on the config update service API, and [here][response_samples] for API examples.
 
 ### Types
 
 As per [Google Closure Compiler][closurec] conventions,
 `?` before the type denotes a nullable type, and `=` after the type denotes
 an optional type.
+
+#### Integer
 
 `integer` type denotes a non-negative integer number.
 
@@ -94,10 +113,6 @@ config][config_propose] serialization. It has the following fields:
   Hash of the proposed configuration.
 - **num_votes**: integer  
   Number of votes for the proposed configuration.
-
-**{base_path}** below stands for `/api/services/configuration/v1`.
-
-Response samples may be found [here][response_samples].
 
 ### Actual Configuration
 
