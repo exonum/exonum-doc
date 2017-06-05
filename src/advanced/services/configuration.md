@@ -219,61 +219,18 @@ Array of objects with the following fields:
 - **hash**: Hash  
   Hash of the configuration.
 
-### Private Endpoints
+## Configuration update service transactions
 
-Posting a new configuration can be performed by any validator maintainer via private
-endpoint.
+Transactions are used to for agreement of new configuration by validators voting
+mechanism. Configuration update service transactions can be created using private
+POST endpoints by any validator maintainer. When converting POST endpoint into a
+transaction, the signature is automatically added.
 
-`cfg_hash`, returned in response to `postpropose` request, should be used as
-`config_hash_vote_for` parameter of `postvote` request.
-
-### Propose Configuration
-
-    POST {base_path}/configs/postpropose
-
-Posts proposed configuration body.
-
-#### Parameters
-
-`config_body` to propose. It should be sent as a request body.
-
-#### Response
-
-JSON object with the following fields:
-
-- **cfg_hash**: Hash  
-  Hash of the proposed configuration.
-
-- **tx_hash**: Hash  
-  Hash of the corresponding `TxConfigPropose` transaction.
-
-### Vote for Configuration
-
-    POST {base_path}/configs/{config_hash_vote_for}/postvote
-
-Votes for a configuration having specific hash.
-
-#### Parameters
-
-`config_hash_vote_for` is a configuration hash to vote for.
-
-#### Response
-
-JSON object with the following fields:
-
-- **tx_hash**: Hash  
-  Hash of the corresponding `TxVote` transaction.
-
-### Configuration update service transactions
-
-Private endpoints are essentially helpers for creating the configuration update
-service transactions.
-
-### TxConfigPropose
+## TxConfigPropose
 
 `TxConfigPropose` is new configuration proposal.
 
-#### Data Layout
+### Data Layout
 
 - **cfg**: ConfigBody  
   Contains JSON with proposed configuration. Its format was described above.
@@ -281,12 +238,12 @@ service transactions.
 -  **from**: PublicKey
   Public key of transaction author.
 
-#### Verification
+### Verification
 
 Signature verification takes place. If any there is valid
 signature on message, message gets committed to database.
 
-#### Execution
+### Execution
 
 Propose transactions will only get submitted and executed with state change
 if all of the following conditions take place:
@@ -318,11 +275,32 @@ if all of the following conditions take place:
 If all the checks pass, execution results in modifying some tables and
 `state_hash` field (apart from `tx_hash`).
 
-### TxVote
+### Endpoint
+
+    POST {base_path}/configs/postpropose
+
+Posts proposed configuration body.
+
+#### Parameters
+
+`config_body` to propose. It should be sent as a request body.
+
+#### Response
+
+JSON object with the following fields:
+
+- **cfg_hash**: Hash  
+  Hash of the proposed configuration. Should be used as `config_hash_vote_for`
+  parameter of `postvote` request.
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `TxConfigPropose` transaction.
+
+## TxVote
 
 `TxVote` is vote for proposed configuration.
 
-#### Data Layout
+### Data Layout
 
 - **cfg_hash**: Hash
   Hash of configuration to vote for
@@ -330,12 +308,12 @@ If all the checks pass, execution results in modifying some tables and
 -  **from**: PublicKey
   Public key of transaction author.
 
-#### Verification
+### Verification
 
 Signature verification takes place. If any there is valid
 signature on message, message gets committed to database.
 
-#### Execution
+### Execution
 
 Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
@@ -362,6 +340,23 @@ if all of the following conditions take place:
 
 If all the checks pass, execution results in modifying some tables and
 `state_hash` field (apart from `tx_hash`).
+
+### Endpoint
+
+    POST {base_path}/configs/{config_hash_vote_for}/postvote
+
+Votes for a configuration having specific hash.
+
+#### Parameters
+
+`config_hash_vote_for` is a configuration hash to vote for.
+
+#### Response
+
+JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `TxVote` transaction.
 
 [stored_configuration]: http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html
 [config_propose]: http://exonum.com/doc/crates/configuration_service/struct.StorageValueConfigProposeData.html
