@@ -28,8 +28,8 @@ the Internet) as much as possible. So, instead of sending an entire file over
 the network, we just send a hash of the file to see if it matches.
 
 Currently, their main uses of Merkle indexes are in peer-to-peer networks such
-as [Tor][tor], [Bitcoin][bitcoin], and [Git][wiki:git]. The usage of Merkle index for
-blockchains (including Bitcoin and Exonum) is twofold
+as [Tor][tor], [Bitcoin][bitcoin], and [Git][wiki:git]. The usage of Merkle
+index for blockchains (including Bitcoin and Exonum) is twofold
 
 1. minimization of the data transfer during the
   [consensus algorithm](../consensus/consensus.md)
@@ -60,16 +60,16 @@ parameters for each element: **height** and **index**.
   **index** = __len(**merkle\_table**)__
 - On all of (**height** > **1**, **index**) hashes of 2 or 1 child hashes are
   stored.
-  + If both (**height** - **1**, **index** \* **2**) and (**height** -
+  - If both (**height** - **1**, **index** \* **2**) and (**height** -
     **1**, **index** \* **2** + **1**) nodes are present, the node
     (**height**, **index**) has 2 children hashes.
-  + If only (**height** - **1**, **index** \* **2**) node is present, the
+  - If only (**height** - **1**, **index** \* **2**) node is present, the
     node at (**height** , **index**) has single child hash.
 - **max\_height** is the height where only a single hash is stored at **index**
   = **0**.
-    + **max\_height** = **pow** + **1** , where **2**^**pow** >=
-      __len(**merkle\_table**)__
-    + (**max\_height**, **0**) is the root hash of the Merkle tree.
+  - **max\_height** = **pow** + **1** , where **2**^**pow** >=
+    __len(**merkle\_table**)__
+  - (**max\_height**, **0**) is the root hash of the Merkle tree.
 
 An example of key -> value mappings in db.
 
@@ -86,6 +86,7 @@ Below is an illustration of logical representation of a Merkle tree, containing
 **TODO** ![Tree Structure](table.png)
 
 ### Hashing rules
+
 1. Hash of empty tree is defined as [**0\*HASH\_SIZE**].
 2. Hash of a value, contained in ( **height** = **0**, **index** ), is defined
   as:
@@ -104,6 +105,7 @@ Below is an illustration of logical representation of a Merkle tree, containing
 ## Merkle Tree range proofs structure: *Proofnode*
 
 ### General description
+
 *Proofnode* is a recursively defined structure that's designed to provide
 evidence to client that a certain set of values is contained in a contiguos
 range of indices.
