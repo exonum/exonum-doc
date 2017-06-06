@@ -130,13 +130,13 @@ Variant | Child *Proofnode* (s) indices | Hashing rule
 { "val": *ValueJson* } | **val\_i** = **i** | [2](#hashing-rules)
 
 1. **Hash** is a hex encoded string, representing the array of bytes of a hash.
-2. An option without the right hash {"left": *Proofnode*} is present due to how
-trees, which are not full binary, are handled in this implementation.
+2. An option without the right hash \{"left": *Proofnode*\} is present due to how
+  trees, which are not full binary, are handled in this implementation.
 3. **i** is the index of a *Proofnode* itself. **left\_i**, **right\_i**,
   **val\_i** are the indices of the nested (child) *Proofnode* (s).
 4. **i** for the outmost proofnode is **0**.
 5. Custom functions to compute "val" hash for each individual entity type are
-required on client. Each function should construct a byte array from
+  required on client. Each function should construct a byte array from
   *ValueJson* fields (same as that used in *serialized value [..]* on backend)
   and compute "val" hash according to [2](#hashing-rules).
 
@@ -199,13 +199,15 @@ Which corresponds to the following json representation of *Proofnode*.
 
 ## See Also
 
-https://link.springer.com/chapter/10.1007/978-3-540-24676-3_32
+1. Merkle, R. C. — A Digital Signature Based on a Conventional Encryption
+  Function // Advances in Cryptology — CRYPTO '87. Lecture Notes in Computer
+  Science, Vol. 293, pp. 369-378, 1988.
+2. Szydlo, M. — Merkle Tree Traversal in Log Space and Time // Lecture Notes in
+  Computer Science, Vol. 3027, pp. 541-554, 2004.
+3. [Merkle tree on Brilliant](https://brilliant.org/wiki/merkle-tree/).
 
-Merkle, R. C. (1988). "A Digital Signature Based on a Conventional Encryption
-Function". Advances in Cryptology — CRYPTO '87. Lecture Notes in Computer
-Science. 293. p. 369. doi:10.1007/3-540-48184-2_32. ISBN 978-3-540-18796-7.
 
-https://brilliant.org/wiki/merkle-tree/
+
 
 [wiki-merkle-index]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki-tree]: https://en.wikipedia.org/wiki/Tree_(data_structure)
