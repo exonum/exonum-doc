@@ -93,7 +93,7 @@ it’s impossible to insert a transaction in the middle of the log.
 [*Clients*](../architecture/clients.md).
 
 The Exonum network consists of *full nodes* connected via peer-to-peer connections,
-and *thin clients*.
+and *light clients*.
 
 ### Full Nodes
 
@@ -111,9 +111,9 @@ Full nodes are further subdivided into 2 categories:
   The list of the validators is restricted by network maintainers, and normally
   should consist of 4-15 nodes
 
-### Thin Clients
+### Light Clients
 
-**Thin clients** represent clients in the client-server paradigm; they connect
+**Light clients** represent clients in the client-server paradigm; they connect
 to full nodes to retrieve information from the blockchain they are
 interested in, and to send transactions. Exonum provides a “proofs
 mechanism”, based on cryptographic commitments via Merkle / Merkle Patricia
@@ -213,7 +213,7 @@ the tree root to a particular cell (a Merkle path). Merkle Patricia
 tables also allow to generate proofs that there is no data in the
 database with a specific key.
 
-When a full node communicates with a thin client, proofs are returned together
+When a full node communicates with a light client, proofs are returned together
 with the requested data. This allows to prove data authenticity efficiently.
 
 ## Modularity and Services
@@ -248,7 +248,7 @@ A service may define 3 types of endpoints:
 
 **Notice.** Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
 Events will implement the [pub/sub architecure pattern][wiki:pubsub],
-allowing thin clients and services to subscribe to events emitted
+allowing light clients and services to subscribe to events emitted
 by services.
 
 External applications may communicate with service endpoints
