@@ -28,15 +28,18 @@ and responding to read queries from external clients.
 an atomic patch that should be applied to the key-value storage.
 Transactions are authenticated with the help of public-key digital signatures.
 Transactions need to be verified and ordered before they are considered
-accepted / committed. Both verification and ordering are performed by
-[the consensus algorithm](#consensus).
+accepted / committed. Ordering is performed by
+[the consensus algorithm](#consensus); the algorithm is also responsible that
+only successfully verified transactions are committed.
 
 Transactions are templated; each transaction template has a set of variable parameters,
 which influence the transaction execution and are used to serialize transactions
 for network transmission and persistence. (Hence, transactions could be
 compared to stored procedures in RDMBSs.)
 Transaction templates and the processing rules for each template
-are defined by [services](#modularity-and-services).
+are defined by [services](#modularity-and-services). In particular,
+services define verification rules for transactions and the way transactions
+are applied to the key-value storage.
 
 All data in the Exonum blockchain is divided into two parts:
 
