@@ -35,7 +35,7 @@ only successfully verified transactions are committed.
 Transactions are templated; each transaction template has a set of variable parameters,
 which influence the transaction execution and are used to serialize transactions
 for network transmission and persistence. (Hence, transactions could be
-compared to stored procedures in RDMBSs.)
+compared to stored procedures in RDBMSs.)
 Transaction templates and the processing rules for each template
 are defined by [services](#modularity-and-services). In particular,
 services define verification rules for transactions and the way transactions
@@ -58,7 +58,7 @@ data chunk and simplify auditing.
 By using a transaction log, Exonum implements [state machine
 replication][wiki:state-machine-repl]. It guarantees agreement of data
 storage states among nodes in the network. The same approach is often used by
-non-blockchain distributed DBs, such as Mongo or PostgreSQL.
+non-blockchain distributed DBs, such as MongoDB or PostgreSQL.
 
 ### Blocks
 
@@ -183,8 +183,8 @@ Technically speaking, the consensus algorithm used in Exonum guarantees
 
 These properties are formally proven to hold for the consensus algorithm
 in a partially synchronous network with up to 1/3 of validator nodes
-being compromised or non-responsive. If the network is asynchronous (i.e., there are
-arbitrary high connection latencies among validators), the algorithm
+being compromised or non-responsive. If the network is asynchronous (i.e.,
+there are arbitrary high connection latencies among validators), the algorithm
 guarantees safety, but may lose liveness. The same happens in most scenarios in which
 more than 1/3 (but less than 2/3) of the validators are compromised.
 
