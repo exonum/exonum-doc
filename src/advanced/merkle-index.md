@@ -1,6 +1,6 @@
 # Merkle Index
 
-A [Merkle index][wiki-merkle-index] (Merkle tree, hash tree or Tiger tree hash)
+A [Merkle tree][wiki-merkle-index] (hash tree or Tiger tree hash)
 is a [tree][wiki-tree] in which every non-leaf node is labelled with the hash
 of the labels or values (in case of leaves) of its child nodes. Hash trees are
 a generalization of hash lists and chains. Merkle trees include both benefits of
@@ -8,6 +8,10 @@ a generalization of hash lists and chains. Merkle trees include both benefits of
 1. **trees**: single element operations for `log_2(N)` where `N` is number of
   elements (transactions in case of the blockchain)
 2. **hashes**: verification of the (blockchain) copes.
+
+Merkle trees are *trees* by design inside the Exonum core but they also are
+*tables* with verifiable content from the users point of view and *databases*
+(db) with only few *indexes* for Exonum application developers.
 
 ## Motivation and Usage
 
@@ -29,7 +33,8 @@ blockchains (including Bitcoin and Exonum) is twofold
 
 1. minimization of the data transfer during the
   [consensus algorithm](../consensus/consensus.md)
-2. the possibility of [lightweight clients](.../architecture/clients.md) implementation.
+2. the possibility of [lightweight clients](.../architecture/clients.md)
+  implementation.
 
 ## Merkle Tree db storage structure: *MerkleTable*
 
@@ -43,28 +48,28 @@ parameters for each element: **height** and **index**.
 
 - Each merkle tree element is addressed by **db\_key**= **height** ||
   **index**.
-    - **db\_key** is a byte array; **height** and **index** are written to byte
-      array as BigEndian.
+  - **db\_key** is a byte array; **height** and **index** are written to byte
+    array as [BigEndian][wiki:big-endian].
 - The actual values are stored in ( **height** = **0**, **index** ) cells,
-  where **index** is in interval [ **0**, _len( **merkle\_table** )_ ).
-- Hash of an individual value is stored in ( **height** = **1**, **index** ).
-  It corresponds to the value, stored in ( **height** = **0**, **index** ) cell.
+  where **index** is in interval [ **0**, __len(**merkle\_table**)__ ).
+- Hash of an individual value is stored in (**height** = **1**, **index**).
+  It corresponds to the value, stored in (**height** = **0**, **index**) cell.
 - Some of the rightmost values on different heights may be absent, it's not
   required that the obtained tree is full binary. New values on **height** =
   **0** are always appended to the right end - new value is written to
-  **index** = _len( **merkle\_table** )_
-- On all of ( **height** > **1**, **index** ) hashes of 2 or 1 child hashes are
+  **index** = __len(**merkle\_table**)__
+- On all of (**height** > **1**, **index**) hashes of 2 or 1 child hashes are
   stored.
-    + If both ( **height** - **1**, **index** \* **2** ) and ( **height** -
-      **1**, **index** \* **2** + **1** ) nodes are present, the node
-      (**height**, **index**) has 2 children hashes. 
-    + If only ( **height** - **1**, **index** \* **2** ) node is present, the
-      node at ( **height** , **index** ) has single child hash.
+  + If both (**height** - **1**, **index** \* **2**) and (**height** -
+    **1**, **index** \* **2** + **1**) nodes are present, the node
+    (**height**, **index**) has 2 children hashes.
+  + If only (**height** - **1**, **index** \* **2**) node is present, the
+    node at (**height** , **index**) has single child hash.
 - **max\_height** is the height where only a single hash is stored at **index**
   = **0**.
     + **max\_height** = **pow** + **1** , where **2**^**pow** >=
-      _len( **merkle\_table** )_
-    + ( **max\_height**, **0** ) is the root hash of the merkle tree.
+      __len(**merkle\_table**)__
+    + (**max\_height**, **0**) is the root hash of the Merkle tree.
 
 An example of key -> value mappings in db.
 
@@ -75,30 +80,44 @@ Key (db\_key) | Value
 [_0003_**000A**]  **height** = **3**, **index** = **10**   | hash [..]
 
 ### Logical representation
-Below is an illustration of logical representation of a merkle tree, containing 6 values **v0**...**v5**.
-![Tree Structure](table.png)
 
-###### Hashing rules
+Below is an illustration of logical representation of a Merkle tree, containing
+5 values **v0**...**v5**.
+**TODO** ![Tree Structure](table.png)
+
+### Hashing rules
 1. Hash of empty tree is defined as [**0\*HASH\_SIZE**].
-2. Hash of a value, contained in ( **height** = **0**, **index** ), is defined as:
-    - ( **height** = **1**, **index** ) = _hash( ( **height** = **0**, **index** ) )_.
-3. Hash of 2 values, contained in ( **height** - **1**, **index** \* **2** ) and ( **height** - **1**, **index** \* **2** + **1** ), is defined as:
-    - ( **height** > **1**, **index** ) = _hash( ( **height** - **1**, **index** \* **2** ) || ( **height** - **1**, **index** \* **2** + **1** ) )_
-4. Hash of single value, contained in ( **height** - **1**, **index** \* **2** ), when ( **height** - **1**, **index** \* **2** + **1** ) is absent in the table, is defined as:
-    - ( **height** > **1**, **index** ) = _hash( ( **height** - **1**, **index** \* **2** ) )_
+2. Hash of a value, contained in ( **height** = **0**, **index** ), is defined
+  as:
+  - (**height** = **1**, **index**) = _hash((**height** = **0**, **index**))_.
+3. Hash of 2 values, contained in (**height** - **1**, **index** \* **2**) and
+  (**height** - **1**, **index** \* **2** + **1**), is defined as:
+  - (**height** > **1**, **index**) = _hash((**height** - **1**, **index** \*
+    **2**) || (**height** - **1**, **index** \* **2** + **1**))_
+4. Hash of single value, contained in (**height** - **1**, **index** \* **2**),
+  when ( **height** - **1**, **index** \* **2** + **1** ) is absent in the
+  table, is defined as:
+  - (**height** > **1**, **index**) = _hash((**height** - **1**, **index** \* **2**))_
 
-> TODO: change empty tree hash to the documented.
+**TODO**: change empty tree hash to the documented.
 
+## Merkle Tree range proofs structure: *Proofnode*
 
-##### Merkle Tree range proofs structure: *Proofnode*
+### General description
+*Proofnode* is a recursively defined structure that's designed to provide
+evidence to client that a certain set of values is contained in a contiguos
+range of indices.
 
-###### General description
-*Proofnode* is a recursively defined structure that's designed to provide evidence to client that a certain set of values is contained in a contiguos range of indices.
+For a given range of indices [**start\_index**, **end\_index**) the proof
+contains binary-tree-like structure, containing **values** of elements from
+the leaves with requested indices and **hashes** of all neighbour leaves/nodes
+on the way up to the root of tree (excluding the root itself). It doesn't
+contain the **indices** themselves, as they can be deduced from the structure's
+form.
 
-For a given range of indices [ **start\_index**, **end\_index** ) the proof contains binary-tree-like structure, containing **values** of elements from the leaves with requested indices and **hashes** of all neighbour leaves/nodes on the way up to the root of tree (excluding the root itself). It doesn't contain the **indices** themselves, as they can be deduced from the structure's form.
+### Format
 
-###### Format
-A *Proofnode<Value>* is defined to be one of the following (in terms of json values):
+A *Proofnode<Value>* is defined to be one of the following (in terms of JSON values):
 
 Variant | Child *Proofnode* (s) indices | Hashing rule
 ------------ | ------------- | -------------
@@ -109,27 +128,43 @@ Variant | Child *Proofnode* (s) indices | Hashing rule
 { "val": *ValueJson* } | **val\_i** = **i** | [2](#hashing-rules)
 
 1. **Hash** is a hex encoded string, representing the array of bytes of a hash.
-2. An option without the right hash { "left": *Proofnode* } is present due to how trees, which are not full binary, are handled in this implementation.
-3. **i** is the index of a *Proofnode* itself. **left\_i**, **right\_i**, **val\_i** are the indices of the nested (child) *Proofnode* (s).
+2. An option without the right hash {"left": *Proofnode*} is present due to how
+trees, which are not full binary, are handled in this implementation.
+3. **i** is the index of a *Proofnode* itself. **left\_i**, **right\_i**,
+  **val\_i** are the indices of the nested (child) *Proofnode* (s).
 4. **i** for the outmost proofnode is **0**.
-5. Custom functions to compute "val" hash for each individual entity type are required on client. Each function should construct a byte array from *ValueJson* fields (same as that used in *serialized value [..]* on backend) and compute "val" hash according to [2](#hashing-rules).
+5. Custom functions to compute "val" hash for each individual entity type are
+required on client. Each function should construct a byte array from
+  *ValueJson* fields (same as that used in *serialized value [..]* on backend)
+  and compute "val" hash according to [2](#hashing-rules).
 
-###### Proof verification
+### Proof verification
+
 While validating the proof a client has to verify following conditions:
 
-1. All of the { "val": ... } variants are located at the same depth in the retrieved json.
-2. If either of 2 variants { "left": *BalancedProofnode*, "right": ... } is met, neither *BalancedProofnode* nor its children at arbitrary depth can be a { "left": ... } variant. It means that the subtree represented by *BalancedProofnode* must be full binary.
-3. Collected indices of *ValueJson* (s) in proof correspond to the requested range of indices [ **start\_index**, **end\_index** ).
-4. The root hash of the proof evaluates to the root hash of the *MerkleTable* in question.
+1. All of the { "val": ... } variants are located at the same depth in the
+  retrieved json.
+2. If either of 2 variants { "left": *BalancedProofnode*, "right": ... } is
+  met, neither *BalancedProofnode* nor its children at arbitrary depth can be a
+  { "left": ... } variant. It means that the subtree represented by
+  *BalancedProofnode* must be full binary.
+3. Collected indices of *ValueJson* (s) in proof correspond to the requested
+  range of indices [ **start\_index**, **end\_index** ).
+4. The root hash of the proof evaluates to the root hash of the *MerkleTable*
+  in question.
 
 If either of these verifications fails, the proof is deemed invalid.
 
-###### Example
-Below is depicted a merkle tree with 6 elements (*not full binary*) with elements, that are a saved inside a proof for range [**3**, **5**) in **[bold_and_underscored]**.
+### Example
 
-![Proof_Structure](proof.png)
+Below is depicted a Merkle tree with 5 elements (*not full binary*) with
+elements, that are a saved inside a proof for range [**3**, **5**) in
+**[bold_and_underscored]**.
+
+**TODO**![Proof_Structure](proof.png)
 
 Which corresponds to the following json representation of *Proofnode*.
+
 ```javascript
 {
     "left": {
@@ -176,3 +211,4 @@ https://brilliant.org/wiki/merkle-tree/
 [bitcoin]: https://bitcoin.org/bitcoin.pdf
 [tor]: https://www.torproject.org/
 [wiki:git]: https://en.wikipedia.org/wiki/Git
+[wiki:big-endian]: https://en.wikipedia.org/wiki/Endianness
