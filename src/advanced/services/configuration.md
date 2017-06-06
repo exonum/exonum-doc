@@ -45,10 +45,10 @@ Configuration service specifies a set of public and private endpoints.
 
 - Transactions with corresponding private APIs:
 
-    - [Propose configuration](#txconfigpropose)
-    - [Vote for configuration](#txvote)
+    - [Propose configuration](#configuration-proposal), [private API](#submit-configuration-proposal)
+    - [Vote for configuration](#vote-for-proposal), [private API](#submit-vote-for-proposal)
 
-All endpoints share the same base path, denoted **{base_path}**,
+All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
 
 **Tip.** See [*Services*](../../architecture/services.md) for a description of
@@ -265,73 +265,91 @@ Array of objects with the following fields:
 The elements of the array are ordered by the order, in which
 configuration proposals were committed as transactions to the Exonum blockchain.
 
-## Configuration update service transactions
+## Transactions
 
-Transactions are used to for agreement of new configuration by validators voting
-mechanism. Configuration update service transactions can be created using private
-POST endpoints by any validator maintainer. When converting POST endpoint into a
-transaction, the signature is automatically added.
+### Configuration Proposal
 
-## TxConfigPropose
+`TxConfigPropose` transaction is a new configuration proposal.
 
-`TxConfigPropose` is new configuration proposal.
+#### Data Layout
 
-### Data Layout
-
-- **cfg**: ConfigBody  
-  Contains JSON with proposed configuration. Its format was described above.
-
+- **cfg**: string  
+  String serialization of the `ConfigBody` JSON object,
+  which describes the proposed configuration.
 - **from**: PublicKey  
-  Public key of transaction author.
+  Public key of the transaction author.
 
-### Verification
+#### Verification
 
-Signature verification takes place. If any there is valid
-signature on message, message gets committed to database.
+Signature of the transaction is verified against the public key
+specified in `from`.
 
-### Execution
+#### Execution
 
-Propose transactions will only get submitted and executed with state change
+A `TxConfigPropose` transaction is only successfully executed
+with a state change if all of the following conditions take place:
+
+1. `cfg` is a valid stringified JSON object corresponding to the `ConfigBody`
+  format.
+2. `cfg.previous_cfg_hash` equals to hash of the *actual* configuration.
+3. `cfg.actual_from` is greater than the *current height* of the blockchain,
+  determined as the height of the latest committed block + 1.
+4. A *following* configuration isn't present.
+5. The *actual* configuration contains the `from` public key in the array of
+  validator keys.
+6. There isn't a previously submitted configuration proposal, which evaluates
+  to the same configuration hash.
+
+If all the checks pass, the execution results in modifying some tables.
+
+### Vote for Proposal
+
+`TxVote` implements voting for a previously proposed configuration.
+
+#### Data Layout
+
+- **cfg_hash**: Hash  
+  Hash of configuration to vote for.
+- **from**: PublicKey  
+  Public key of the transaction author.
+
+#### Verification
+
+Signature of the transaction is verified against the public key
+specified in `from`.
+
+#### Execution
+
+Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
-1. new config body constitutes a valid JSON string and corresponds to
-  [StoredConfiguration](http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html)
-  format.
+1. `cfg_hash` references a known proposed configuration `cfg`.
+2. A *following* configuration isn't present.
+3. The *actual* configuration contains the `from` public key in the array of
+  validator keys.
+4. `cfg.previous_cfg_hash`, is equal to hash of the *actual* configuration.
+5. `cfg.actual_from` is greater than the *current height*.
+6. No vote for the same proposal from the same `from` has been
+  submitted previously.
 
-2. `previous_cfg_hash` in proposed config body equals to hash of *actual*
-  config.
+If all the checks pass, execution results in modifying some tables.
 
-3. `actual_from` in proposed config body is greater than *current height*.
-  *current height* is determined as the height of last
-  committed block + 1. This is important to obtain sequential view of
-  configs commit history. And, more important, the linear view of history
-  of votes which conditioned scheduling of a config.
+## Private APIs
 
-4. a *following* config isn't already present.
-
-5. *actual* config contains the node-sender's public key in array of
-  `validators` field, as specified in `from` field of propose
-  transaction. The `from` field is determined by public key of node whose
-  `postpropose` endpoint is accessed for signing the transaction on
-  maintainter's behalf.
-
-6. propose of config, which evaluates to the same hash, hasn't already
-  been submitted.
-
-If all the checks pass, execution results in modifying some tables and
-`state_hash` field (apart from `tx_hash`).
-
-### Endpoint
+### Submit Configuration Proposal
 
 ```none
 POST {base_path}/configs/postpropose
 ```
 
-Posts proposed configuration body.
+Creates a [`TxConfigPropose` transaction](#configuration-proposal).
+The `from` field of the transaction and its signature are computed
+automatically
 
 #### Parameters
 
-`config_body` to propose. It should be sent as a request body.
+- **config_body**: ConfigBody  
+  Body of the request; the proposed configuration in the JSON format.
 
 #### Response
 
@@ -339,67 +357,21 @@ JSON object with the following fields:
 
 - **cfg_hash**: Hash  
   Hash of the proposed configuration. Should be used as `config_hash_vote_for`
-  parameter of `postvote` request.
-
+  parameter of [`postvote` requests](#submit-vote-for-proposal).
 - **tx_hash**: Hash  
   Hash of the corresponding `TxConfigPropose` transaction.
 
-## TxVote
-
-`TxVote` is vote for proposed configuration.
-
-### Data Layout
-
-- **cfg_hash**: Hash  
-  Hash of configuration to vote for
-
-- **from**: PublicKey  
-  Public key of transaction author.
-
-### Verification
-
-Signature verification takes place. If any there is valid
-signature on message, message gets committed to database.
-
-### Execution
-
-Vote transactions will only get submitted and executed with state change
-if all of the following conditions take place:
-
-1. the vote transaction references a config propose with known config
-  hash.
-
-2. a *following* config isn't already present.
-
-3. *actual* config contains the node-sender's public key in
-  `validators` field, as specified in `from` field of vote transaction.
-  The `from` field is determined by public key of node whose
-  `postvote` endpoint is accessed for signing the transaction on
-  maintainter's behalf.
-
-4. `previous_cfg_hash` in the config propose, which is referenced by
-  vote transaction, is equal to hash of *actual* config.
-
-5. `actual_from` in the config propose, which is referenced by vote
-  transaction, is greater than *current height*.
-
-6. no vote for the same proposal from the same node's public key has been
-  submitted previously.
-
-If all the checks pass, execution results in modifying some tables and
-`state_hash` field (apart from `tx_hash`).
-
-### Endpoint
+### Submit Vote for Proposal
 
 ```none
 POST {base_path}/configs/{config_hash_vote_for}/postvote
 ```
-
-Votes for a configuration having specific hash.
+Creates a [`TxVote` transaction](#configuration-proposal).
 
 #### Parameters
 
-`config_hash_vote_for` is a configuration hash to vote for.
+ - **config_hash_vote_for**: Hash  
+   Hash of the configuration to vote for.
 
 #### Response
 
