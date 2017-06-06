@@ -353,7 +353,7 @@ a private key is stored in the local configuration of the node, does not enter
 the blockchain and is specific to a particular node. It’s a good practice
 to manage such keys locally via private APIs of the corresponding service.
 
-The core uses two pairs of Ed25519 keys:
+The Exonum core defines two pairs of Ed25519 keys for full nodes:
 
 - **Consensus key** is used for signing consensus messages (for validators) and
   signing network messages (for validators and auditors)
