@@ -37,7 +37,7 @@ The source code of the tutorial [is available on GitHub][tutorial].
 
 Refer to [*What is Exonum*](home/what-is-exonum.md) for the motivations behind building
 yet another permissioned blockchain framework. [*Design Overview*](home/design-overview.md)
-takes a more technical approach and gives in-depth description of the Exonum framework.
+takes a more technical approach and gives in-depth description of the Exonum design.
 
 ### Services & Clients
 
