@@ -344,7 +344,9 @@ POST {base_path}/configs/postpropose
 
 Creates a [`TxConfigPropose` transaction](#configuration-proposal).
 The `from` field of the transaction and its signature are computed
-automatically
+automatically based on the identity of the node that processes the POST request:
+`from` is set to the node’s public key, and the signature is computed
+based on the corresponding private key stored in [the local configuration](../../architecture/configuration.md).
 
 #### Parameters
 
@@ -366,12 +368,15 @@ JSON object with the following fields:
 ```none
 POST {base_path}/configs/{config_hash_vote_for}/postvote
 ```
+
 Creates a [`TxVote` transaction](#configuration-proposal).
+As with the previous endpoint, the `from` field of the transaction
+and its signature are computed automatically.
 
 #### Parameters
 
- - **config_hash_vote_for**: Hash  
-   Hash of the configuration to vote for.
+- **config_hash_vote_for**: Hash  
+  Hash of the configuration to vote for.
 
 #### Response
 
