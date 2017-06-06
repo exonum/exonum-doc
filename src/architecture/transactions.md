@@ -36,15 +36,15 @@ transactions are listed in the table below:
 |-------|:--------------:|-------:|:-------:|
 | `network_id` | `u8` | 0 | number |
 | `protocol_version` | `u8` | 1 | number |
-| `service_id` | `u16` | 2 | number |
-| `message_id` | `u16` | 4 | number |
-| `body` | `k` | 6 | JSON |
+| `service_id` | `u16` | 4 | number |
+| `message_id` | `u16` | 2 | number |
+| `body` | `&[u8]` | 10 | JSON |
 | `signature` | Ed25519 signature | -64 | hex string |
 
 ### Network ID
 
-Useless right now. It would be used to send messages over networks in the
-future releases.
+This field is useless right now. It would be used to send messages over
+networks in the future releases.
 
 **Binary presentation:** `u8` (unsigned 1 byte).
 **JSON presentation:** number
@@ -59,25 +59,15 @@ The major version of the Exonum serialization protocol. Currently, `0`.
 ### Service ID
 
 Sets the [service](services.md) to make a deal with (for example,
-*configuration* or *cryptocurrency*). Such information is redundant but helpful
-to find methods to process transaction (such as `verify` and `execute`). All
-the transactions are stored in the blockchain sequentially. But such a manner
-is not useful for queries. So any fat client also duplicates information from
-the blockchain in the special tables of the blockchain-level key-value storage
-(implemented with [LevelDB](http://leveldb.org/) those support queries and also
-provides proofs of consistency with the blockchain (see
-[Merkle index](../advanced/merkle-index.md) and
-[Merkle Patricia index](../advanced/merkle-patricia-index.md) for more
-details).
+*configuration* or *cryptocurrency*). The pair (`service_id`, `message_id`) is
+a key to process transaction (to find such methods as `verify` and `execute`).
 
 **Binary presentation:** `u16` (unsigned 2 bytes).
 **JSON presentation:** number.
 
 ### Message ID
 
-The nodes of the blockchain network sends and receives messages to communicate.
-The `message_id` defines the message type. For the transaction, it means the
-type of transaction in the service.
+The `message_id` defines the type of message in the service.
 
 !!! Example
     The service *cryptocurrency* could include different types of transactions:
@@ -90,8 +80,8 @@ type of transaction in the service.
 ### Body
 
 The body of the transaction, which includes specific for a given transaction
-type (`message_id`) data and a format of which is specified by service with
-`service_id`.
+(`service_id`, `message_id`) type data and a format of which is specified by
+service with `service_id`.
 
 !!! Example
     the body of `TransferTransaction` should include field `from` for coins
@@ -144,17 +134,18 @@ choose not to if certain conditions are not met).
 
 !!! Note.
     `Verify` and `execute` are triggered at different times:
-      - `verify` checks internal consistency of a transaction before the
-        transaction is included into the
-        [proposal block](../advanced/consensus/consensus.md)
-      - `execute` performs
-        [almost at the same time](../advanced/consensus/consensus.md) as the
-        block with the given transaction is committed into the blockchain.
+    - `verify` checks internal consistency of a transaction before the
+      transaction is included into the
+      [proposal block](../advanced/consensus/consensus.md)
+    - `execute` performs
+      [almost at the same time](../advanced/consensus/consensus.md) as the
+      block with the given transaction is committed into the blockchain.
 
 ### Info
 
-The `info` method returns the useful information about transaction and has no
-access to the blockchain state as the `verify`.
+The `info` method returns the useful information (from service developers point
+of view) about transaction and has no access to the blockchain state as the
+`verify`.
 
 ## Transaction lifecycle
 
