@@ -6,11 +6,66 @@ correctness](proof-of-algorithm-correctness)
 
 ## Algorithm Specification
 
+### variables
+
+- `current_height`
+  Current blockchain height.
+
+- `queued`
+  Queue for messages from next height or round.
+
+- `validator_id`
+  Index of specific validator in `validators` list of configuration.
+
+- `proposes`
+  HashMap with known block proposals.
+
+- `locked_round`
+  Round in which **LOCK** was executed.
+
+- `propose.round`
+  Round in which `propose` was created.
+
+- `current_round`
+  Number of current round.
+
+- `state_hash`
+  Hash of blockchain state.
+
+- `propose_hash`
+  Hash of `propose`.
+
+- `prevote.propose_hash`
+  Hash of the `propose` to which `prevote` belongs.
+
+- `prevote.round`
+  Round when `prevote` was created.
+
+- `prevote.hash`
+  Hash of `prevote`.
+
+- `locked_propose`
+  `propose` on which node is locked.
+
+- `propose_timeout`
+  Proposal timeout after the new height beginning.
+
+- `BLOCK_ALIVE`
+  _Block_ message lifetime.
+
+- `block.prev_hash`
+  Hash of the previous block.
+
+- `block.time`
+  Block formation time.
+
 **TODO:** insert picture
+
+### Algorithm Itself
 
 Let us explain in more detail the transitions between states.
 
-**Receiving an incoming message**
+#### Receiving an incoming message
 
 At the very beginning, the message is checked against the [serialization
 format](../serialization.md).
@@ -19,12 +74,11 @@ If any problems are detected, such a message is ignored as something that we can
 not correctly interpret. If everything is OK, proceed to **Consensus messages
 processing** or **Transaction processing**.
 
-**Consensus messages processing**
+#### Consensus messages processing
 
 - We do not process the message if it belongs to a future round or height. In
-  this case, if the message refers to the height no greater than
-  `current_height + y` (**TODO** check y in the code), where `y` is some small
-  natural number, the message is added to the `queued` queue. If the message is
+  this case, if the message refers to the height `current_height + 1`, the
+  message is added to the `queued` queue. If the message is
   related to the future height and includes updated information about the
   validator (validator current height), this information is saved according to
   [requests algorithm](requests.md).
@@ -38,19 +92,19 @@ processing** or **Transaction processing**.
 
 - If everything is OK, proceed to the message processing according to its type.
 
-**_Propose_** **message processing**
+#### _Propose_ message processing
 
 - If we already know this proposal, ignore the message.
-- Check `prev_hash` (the hash of the previous block) correctness.
-- Check `time` (block formation time) correctness.
+- Check `block.prev_hash` correctness.
+- Check `block.time` correctness.
 - Make sure that the specified validator is the leader for the given round.
 - Make sure that the proposal does not contain any previously committed
   transaction.
-- Add the proposal to the `proposes` structure
+- Add the proposal to the `proposes` HashMap.
 - Form a list of transactions we do not know from this proposal.
 - If all transactions are known, go to **Full proposal**.
 
-**Transaction processing**
+#### Transaction processing
 
 - If the transaction is already committed, ignore the message.
 - If such a transaction is already in the pool of unconfirmed transactions,
@@ -61,7 +115,7 @@ processing** or **Transaction processing**.
   of unknown transactions becomes zero, proceed to **Availability of the full
   proposal** for current proposal.
 
-**Full proposal**
+#### Full proposal
 
 - If we do not have a saved PoL, send _prevote_ in the round to which the
   proposal belongs.
@@ -81,7 +135,7 @@ processing** or **Transaction processing**.
       majority.
     - Proceed to **COMMIT** for this block.
 
-**Availability of +2/3** **_Prevote_**
+#### Availability of +2/3 _Prevote_
 
 - Delete **Prevotes** request, if available for `prevote.round` and
   `propose_hash`
@@ -89,7 +143,7 @@ processing** or **Transaction processing**.
   `propose` is the same as `prevote.propose_hash`, then proceed to **LOCK** for
   this very proposal.
 
-**_Prevote_** **message processing**
+#### _Prevote_ message processing
 
 - Add the message to the list of known _prevote_ for this proposal in this round.
 - If:
@@ -104,7 +158,7 @@ processing** or **Transaction processing**.
 
 - If we do not know `Propose` or any transactions, request them.
 
-**_Precommit_** **message processing**
+#### _Precommit_ message processing
 
 - Add the message to the list of known _precommit_ for this proposal in this
   round with the given `state_hash`.
@@ -127,15 +181,15 @@ processing** or **Transaction processing**.
   - If the message round is bigger than `locked_round`, request _prevotes_ from
     the message round.
 
-**_LOCK_**
+#### _LOCK_
 
 - For all rounds in the interval `[locked_round, current_round]`:
 
   - If we have not sent _prevote_ in this round, send it for `locked_propose`.
   - If we have formed +2/3 _prevote_ in this round, then execute **LOCK** for
-    this round and `locked_propose`, assign`locked_round` to `current_round`.
+    this round and `locked_propose`, assign `locked_round` to `current_round`.
   - If we did not send _prevote_ messages such that
-    `prevote.hash != Locked_propose`, in rounds>`locked_round` (that is, if we
+    `prevote.hash != locked_propose`, in rounds>`locked_round` (that is, if we
     did not vote _prevote_ for other proposals in subsequent rounds after
     `locked_round`), then:
 
@@ -143,9 +197,9 @@ processing** or **Transaction processing**.
     - Send _precommit_ for `locked_propose` in this round.
     - If we have 2/3 _precommit_, then proceed to **COMMIT**.
 
-**_COMMIT_**
+#### _COMMIT_
 
-- Remove `precommits` request, if there was one.
+- Remove _RequestPrecommits_, if there was one.
 - Push all the changes to the storage.
 - Update current height.
 - Set the value of the variable `locked_round` to `0` at the new height.
@@ -157,7 +211,7 @@ processing** or **Transaction processing**.
   become relevant.
 - Add a timeout for the next round of new height.
 
-**_Block_** **message processing**
+#### _Block_ message processing
 
 Only for the case if a validator is behind the majority of the network:
 
@@ -189,7 +243,7 @@ Only for the case if a validator is behind the majority of the network:
 - If there are validators who claim that they are at a bigger height, then turn
   to the request of the block from the higher height.
 
-**Round timeout processing**
+#### Round timeout processing
 
 - If the timeout does not match the current height and round, ignore it
   (**TODO** specify exit() after a point or proceed to the next point).
@@ -201,7 +255,7 @@ Only for the case if a validator is behind the majority of the network:
   expiration of `propose_timeout`.
 - Process all messages from the queue, if they become relevant.
 
-**Status timeout processing**
+#### Status timeout processing
 
 - If the node has at least one received block, then send out a status message to
   all validators.
@@ -220,7 +274,7 @@ _All non-Byzantine nodes being at a height of not less than `H`, will be in the
 state `(H, R)`or higher (either bigger round or bigger height), where `R` is an
 arbitrary fixed constant._
 
-**Proof**
+#### Proof
 
 We will prove the statement above for every single non-Byzantine node. That node
 shall move to a new height in a finite time (and in this case the condition will
@@ -232,25 +286,21 @@ to the value `R` no more than in finite time `R * T`.
 
 Thus, all non-Byzantine validators will move to the state `(H, R)` or higher.
 
-**End of proof**
-
 ### Proposition 2: Non-Byzantine Leader
 
 _For each height `H` there exists a round in which the non-Byzantine node will
 become the leader._
 
-**Proof**
+#### Proof
 
 **TODO:** Property of round robin.
-
-**End of proof**
 
 ### Proposition 3: Deadlock Absence
 
 _A certain non-Byzantine node will sooner or later send some message relating to
 the consensus algorithm (propose, prevote, precommit)._
 
-**Proof**
+#### Proof
 
 Let us prove it by contradiction. Assume that each non-Byzantine node send no
 messages for an arbitrarily long period of time; then that node updates neither
@@ -267,9 +317,9 @@ message had been sent before this time). Consider the cases of PoL status:
   previous statement). In this case, the node will form a new proposal and send
   _propose_ and _prevote_ messages.
 
-**End of proof**
+#### Consequence
 
-**Consequence.** _If there exists an unlimited number of heights on which the
+_If there exists an unlimited number of heights on which the
 validator can become a leader (property of round robin), then any non-Byzantine
 node will send an arbitrarily large number of messages related to the consensus
 algorithm (propose, prevote, precommit)._
@@ -279,7 +329,7 @@ algorithm (propose, prevote, precommit)._
 _There necessarily will come a point in the system when the node adds the block
 to the blockchain._
 
-**Proof**
+#### Proof
 
 Suppose the network be at a certain height `H`; then the maximum height of a
 non-Byzantine nodes' blockchain is equal to `H`. In accordance with the
@@ -294,12 +344,12 @@ Similarly, `T(R)` is the time of coming of the `R` round by the clock of an
 outside observer for all non-Byzantine validators.
 
 Let the non-Byzantine node be the leader for the first time in the round with
-the number `R<R*` (where `R*` denote a uniform estimate **TODO** explain of `R`).
+the number `R < R*` (where `R*` denote a uniform estimate **TODO** explain of `R`).
 Then the coming time of the round `R*` for all non-Byzantine nodes on the
 outside observer's watch is `T(R*)`.
 
 Not later than at the moment `T(R*) + \delta T + propose_timeout` each
-non-Byzantine node will receive a correct proposal from the`R` round. Further,
+non-Byzantine node will receive a correct proposal from the `R` round. Further,
 not later than through `2 \delta T`, that node will know all the transactions
 from this proposal (request mechanism). Denote this time
 `T* = T(R*) + propose_timeout + 3 \delta T`.
@@ -338,15 +388,13 @@ Not later than time `T(R(T''')) + \delta T` at least one non-Byzantine validator
 will accept the new block and hence some node will correctly add the block to
 the blockchain.
 
-**End of proof**
-
 ### Proposition 5: Absence of Forks (Consensus Finality)
 
 _If some non-Byzantine node adds a block to the blockchain, then no other node
 can add another block, confirmed with +2/3 precommit messages, to the blockchain
 at the same height._
 
-**Proof**
+#### Proof
 
 Let some node added the `B` block to the blockchain. This could only happen if
 that node went into the **COMMIT** state. There exist three possibilities of the
@@ -378,24 +426,22 @@ nodes are -2/3, we have two consequences.
 Thus, messages of _precommit_ type can not be sent for any other block. This
 means that none of the non-Byzantine node can add another block to the blockchain.
 
-**End of proof**
+#### Corollary
 
-**Corollary.** _The property of fork absence will be preserved also in the case
+_The property of fork absence will be preserved also in the case
 of an asynchronous network ._
 
-**Proof**
+#### Proof
 
 The proof of _Proposition 5_ did not in any way use the assumption of partial
 synchronism. Therefore, it is also true in an asynchronous network.
-
-**End of proof**
 
 ### Proposition 6: Moving Nodes Up
 
 _Any non-Byzantine node can get all the blocks included in the blockchain by any
 other non-Byzantine node._
 
-**Proof**
+#### Proof
 
 Let the `A` node fall behind for some reason from the`B` node. And the `A` node
 is at the height `H`, while the `B` node is at the height `H + h`. We will show
@@ -410,18 +456,14 @@ is added, then the block will be correct due to absence of forks (proposition 5)
 In accordance with the corollary from proposition 3 (deadlock absence), the `B`
 node always sends some message of consensus algorithm .
 
-# **End of proof**
-
 ## Proposition 7: Censorship Resistance
 
 _Not less than once in `1/3` blocks the non-Byzantine node will be the leader of
 the accepted block._
 
-**Proof**
+#### Proof
 
 **TODO:** Property of a new algorithm for choosing a leader.
-
-**End of proof**
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
