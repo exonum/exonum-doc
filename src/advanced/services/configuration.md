@@ -118,7 +118,9 @@ config][config_propose] serialization. It has the following fields:
 
 ### Actual Configuration
 
-    GET {base_path}/configs/actual
+```none
+GET {base_path}/configs/actual
+```
 
 Looks up the actual global configuration.
 
@@ -137,7 +139,9 @@ JSON object with the following fields:
 
 ### Following Configuration
 
-    GET {base_path}/configs/following
+```none
+GET {base_path}/configs/following
+```
 
 Looks up the locked-in following configuration which hasn’t taken effect yet.
 Returns `null` if no configuration is locked in.
@@ -157,7 +161,9 @@ JSON object with the following fields:
 
 ### Configuration by Hash
 
-    GET {base_path}/configs/{config_hash}
+```none
+GET {base_path}/configs/{config_hash}
+```
 
 Looks up configuration (including proposals) by the hash.
 
@@ -180,7 +186,9 @@ JSON object with the following fields:
 
 ### Votes for Configuration
 
-    GET {base_path}/configs/{config_hash}/votes
+```none
+GET {base_path}/configs/{config_hash}/votes
+```
 
 Looks up votes for a configuration proposal by the configuration hash.
 
@@ -201,7 +209,9 @@ JSON object with the following fields:
 
 ### Committed Configurations
 
-    GET {base_path}/configs/committed
+```none
+GET {base_path}/configs/committed
+```
 
 Looks up all committed configurations, optionally filtered by
 the activation height and/or the previous configuration hash.
@@ -228,7 +238,9 @@ configuration proposals were committed as transactions to the Exonum blockchain.
 
 ### Proposed Configurations
 
-    GET {base_path}/configs/proposed?previous_cfg_hash
+```none
+GET {base_path}/configs/proposed
+```
 
 Looks up all proposed configurations, optionally filtered by
 the activation height and/or the previous configuration hash.
@@ -311,7 +323,9 @@ If all the checks pass, execution results in modifying some tables and
 
 ### Endpoint
 
-    POST {base_path}/configs/postpropose
+```none
+POST {base_path}/configs/postpropose
+```
 
 Posts proposed configuration body.
 
@@ -377,7 +391,9 @@ If all the checks pass, execution results in modifying some tables and
 
 ### Endpoint
 
-    POST {base_path}/configs/{config_hash_vote_for}/postvote
+```none
+POST {base_path}/configs/{config_hash_vote_for}/postvote
+```
 
 Votes for a configuration having specific hash.
 
