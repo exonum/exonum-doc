@@ -87,6 +87,13 @@ This ensures immutability of the transaction log; once a transaction is committe
 it cannot be retroactively modified or evicted from the log. Similarly,
 it’s impossible to insert a transaction in the middle of the log.
 
+**Notice.** The agreement on the hash of the data storage means that not only
+full nodes execute transactions in the same order; they also
+must execute all transactions in exactly the same way. This protects against
+a scenario where execution results differ for the nodes in the network
+(e.g., because of non-deterministic instructions in the transaction
+execution code), which may lead to all sorts of trouble.
+
 ## Network Structure
 
 **Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
