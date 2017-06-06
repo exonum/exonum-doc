@@ -39,8 +39,36 @@ Data fields can be one of following types:
 
 #### Primitive types
 
-Data of primitive types is fixed sized, and located fully in header. Primitive
-types are listed here(**TODO** link)
+Data of primitive types is fixed sized, and located fully in header.
+
+- `u8`  
+  Regular byte. Size: 1 byte.
+
+- `i8`  
+  Signed byte. Size: 1 byte.
+
+- `u16`  
+  Short unsigned number stored in little endian. Size: 2 bytes.
+
+- `i16`  
+  Short signed number stored in little endian. Size: 2 bytes.
+
+- `u32`  
+  32-bit unsigned number stored in little endian. Size: 4 bytes.
+
+- `i32`  
+  32-bit signed number stored in little endian. Size: 4 bytes.
+
+- `u64`  
+  Long unsigned number stored in little endian. Size: 8 bytes.
+
+- `i64`  
+  Long signed number stored in little endian. Size: 8 bytes.
+
+- `bool`  
+  `0x01` for true, `0x00` for false. Trying to represent other values as `bool`
+  leads to undefined behavior. Size: 1 byte.
+
 
 #### Segment fields
 
