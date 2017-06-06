@@ -303,9 +303,12 @@ The key points differentiating Exonum smart contracts from other models
 used in blockchains are as follows:
 
 - **Restricted environment.** Exonum executes only predefined request types,
-  not allowing to execute arbitrary code received from a client
+  not allowing to execute untrusted code received from a client. This
+  results in a more controlled environment, and makes it easier to argue
+  about smart contract safety
 - **No isolation.** Request processing is performed
-  in the same execution context as the core of the system
+  in the same execution context as the core of the system. This is beneficial
+  for performance, although has certain security risks
 - **Local state.** Exonum services may define a local state, which is
   specific to the node on which the service is running. The local state
   can be used to manage secret information (e.g., private keys). The local
@@ -320,6 +323,9 @@ used in blockchains are as follows:
   as well as other structural checks over the transaction contents.
   At the same time, transaction verification has no access to the current
   blockchain state
+
+**Notice.** Service execution isolation is a high-priority task
+on [the Exonum roadmap](../dev/roadmap.md).
 
 ### Existing Services
 
