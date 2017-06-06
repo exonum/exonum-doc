@@ -136,7 +136,9 @@ To generate a new block and vote upon it, a 3-phase approach is used.
 
 - The consensus algorithm is divided into rounds, the beginning of which is determined
   by each validator based on its local clock.
-  For every round, there is a predefined leader validator. The leader
+  For every round, there is a predefined leader validator, which is determined
+  based on the round number, blockchain height and other information
+  from the blockchain state. The leader
   creates a *block proposal* and sends it to other validators
 - Other validators check the proposal, and if it is correct, vote for
   it by broadcasting *prevote* messages to the validators
@@ -145,6 +147,10 @@ To generate a new block and vote upon it, a 3-phase approach is used.
   message with the resulting data storage state and broadcasts it to the validators
 - Finally, if there are precommits from a supermajority of validators for a common
   proposal, the proposal becomes a new block
+
+If a validator does not receive a correct block proposal in a particular round,
+it eventually moves to the next round by a timeout and is ready to
+review proposals from the leader in the new round.
 
 The consensus algorithm can withstand up to 1/3 of the validators acting maliciously,
 being switched off or isolated from the rest of the network.
