@@ -270,9 +270,9 @@ from different rounds.
 
 ### Proposition 1: Round Beginning
 
-_All non-Byzantine nodes being at a height of not less than `H`, will be in the
+All non-Byzantine nodes being at a height of not less than `H`, will be in the
 state `(H, R)`or higher (either bigger round or bigger height), where `R` is an
-arbitrary fixed constant._
+arbitrary fixed constant.
 
 #### Proof
 
@@ -288,8 +288,8 @@ Thus, all non-Byzantine validators will move to the state `(H, R)` or higher.
 
 ### Proposition 2: Non-Byzantine Leader
 
-_For each height `H` there exists a round in which the non-Byzantine node will
-become the leader._
+For each height `H` there exists a round in which the non-Byzantine node will
+become the leader.
 
 #### Proof
 
@@ -297,8 +297,8 @@ become the leader._
 
 ### Proposition 3: Deadlock Absence
 
-_A certain non-Byzantine node will sooner or later send some message relating to
-the consensus algorithm (propose, prevote, precommit)._
+A certain non-Byzantine node will sooner or later send some message relating to
+the consensus algorithm (propose, prevote, precommit).
 
 #### Proof
 
@@ -319,15 +319,15 @@ message had been sent before this time). Consider the cases of PoL status:
 
 #### Consequence
 
-_If there exists an unlimited number of heights on which the
+If there exists an unlimited number of heights on which the
 validator can become a leader (property of round robin), then any non-Byzantine
 node will send an arbitrarily large number of messages related to the consensus
-algorithm (propose, prevote, precommit)._
+algorithm (propose, prevote, precommit).
 
 ### Proposition 4: Obligatory Block Acceptance (Liveness)
 
-_There necessarily will come a point in the system when the node adds the block
-to the blockchain._
+There necessarily will come a point in the system when the node adds the block
+to the blockchain.
 
 #### Proof
 
@@ -390,9 +390,9 @@ the blockchain.
 
 ### Proposition 5: Absence of Forks (Consensus Finality)
 
-_If some non-Byzantine node adds a block to the blockchain, then no other node
+If some non-Byzantine node adds a block to the blockchain, then no other node
 can add another block, confirmed with +2/3 precommit messages, to the blockchain
-at the same height._
+at the same height.
 
 #### Proof
 
@@ -428,8 +428,8 @@ means that none of the non-Byzantine node can add another block to the blockchai
 
 #### Corollary
 
-_The property of fork absence will be preserved also in the case
-of an asynchronous network ._
+The property of fork absence will be preserved also in the case
+of an asynchronous network .
 
 #### Proof
 
@@ -438,8 +438,8 @@ synchronism. Therefore, it is also true in an asynchronous network.
 
 ### Proposition 6: Moving Nodes Up
 
-_Any non-Byzantine node can get all the blocks included in the blockchain by any
-other non-Byzantine node._
+Any non-Byzantine node can get all the blocks included in the blockchain by any
+other non-Byzantine node.
 
 #### Proof
 
@@ -456,10 +456,10 @@ is added, then the block will be correct due to absence of forks (proposition 5)
 In accordance with the corollary from proposition 3 (deadlock absence), the `B`
 node always sends some message of consensus algorithm .
 
-## Proposition 7: Censorship Resistance
+### Proposition 7: Censorship Resistance
 
-_Not less than once in `1/3` blocks the non-Byzantine node will be the leader of
-the accepted block._
+Not less than once in `1/3` blocks the non-Byzantine node will be the leader of
+the accepted block.
 
 #### Proof
 
