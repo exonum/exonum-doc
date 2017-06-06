@@ -21,9 +21,9 @@ Due to the fact that we do not need to serialize-deserialize the data, we can
 work with the signed messages, and later, if necessary, transfer them to other
 nodes. This is necessary for the consensus algorithm. Also, "deserialization" of
 unused fields does not occur without the need, which minimizes the overhead.
-Moreover, this format allows to achieve `zero-copy` because the data itself is a
-kind of non-mutable buffer that can be safely transmitted, and there will be no
-copying until there is no access to the fields.
+Moreover, this format allows to achieve [zero-copy][zero_copy] because the data
+itself is a kind of non-mutable buffer that can be safely transmitted, and there
+will be no copying until there is no access to the fields.
 
 ## Serialization Principles
 
@@ -54,3 +54,5 @@ This types could be implemented arbitrarily, but the creator should declare
 size of custom field's header.
 
 Examples of data serialization can be found here(**TODO** link)
+
+[zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
