@@ -43,7 +43,8 @@ transactions are listed in the table below:
 
 ### Network ID
 
-**TODO** What for?
+Useless right now. It would be used to send messages over networks in the
+future releases.
 
 **Binary presentation:** `u8` (unsigned 1 byte).
 **JSON presentation:** number
