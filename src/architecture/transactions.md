@@ -133,13 +133,11 @@ The `execute` method given the blockchain state and can modify it (but can
 choose not to if certain conditions are not met).
 
 !!! Note.
-    `Verify` and `execute` are triggered at different times:
-    - `verify` checks internal consistency of a transaction before the
-      transaction is included into the
-      [proposal block](../advanced/consensus/consensus.md)
-    - `execute` performs
-      [almost at the same time](../advanced/consensus/consensus.md) as the
-      block with the given transaction is committed into the blockchain.
+    `Verify` and `execute` are triggered at different times. `Verify` checks
+    internal consistency of a transaction before the transaction is included
+    into the [proposal block](../advanced/consensus/consensus.md). `Execute`
+    performs [almost at the same time](../advanced/consensus/consensus.md) as
+    the block with the given transaction is committed into the blockchain.
 
 ### Info
 
