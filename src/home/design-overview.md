@@ -145,8 +145,13 @@ To generate a new block and vote upon it, a 3-phase approach is used.
 - If a validator collects prevote messages for the same proposal from a supermajority
   of validators, it executes transactions in the proposal, creates a *precommit*
   message with the resulting data storage state and broadcasts it to the validators
-- Finally, if there are precommits from a supermajority of validators for a common
-  proposal, the proposal becomes a new block
+- Finally, if a validator receives precommits from a supermajority of validators
+  for the same proposal, the proposal becomes a new block and is committed to
+  the local storage of the validator
+
+**Notice.** A block can be committed at different times for different validators.
+The consensus algorithm guarantees that validators cannot commit different blocks
+at the same height (see [the safety property](#safety-and-liveness) below).
 
 If a validator does not receive a correct block proposal in a particular round,
 it eventually moves to the next round by a timeout and is ready to
@@ -164,6 +169,24 @@ Validators can be changed during the blockchain operation by [updating](#configu
 the global blockchain configuration. This mechanism can be used to rotate
 validators’ keys, and to add, replace or remove validator nodes without
 having to start a blockchain anew.
+
+### Safety and Liveness
+
+Technically speaking, the consensus algorithm used in Exonum guarantees
+2 basic properties:
+
+- **Safety** means that once a single correctly operating validator
+  commits a block, all other correctly operating validators will eventually commit
+  the same block at the same height; in other words, the blockchain cannot split
+- **Liveness** means that correctly operating validators continue committing blocks
+  from time to time
+
+These properties are formally proven to hold for the consensus algorithm
+in a partially synchronous network with up to 1/3 of validator nodes
+being compromised or non-responsive. If the network is asynchronous (i.e., there are
+arbitrary high connection latencies among validators), the algorithm
+guarantees safety, but may lose liveness. The same happens in most scenarios in which
+more than 1/3 (but less than 2/3) of the validators are compromised.
 
 ## Data Storage
 
