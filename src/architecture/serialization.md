@@ -81,6 +81,31 @@ other values.
 This types could be implemented arbitrarily, but the creator should declare
 size of custom field's header.
 
-Examples of data serialization can be found here(**TODO** link)
+### Example
+
+Consider the structure with two fields:
+
+- Name: `String`  
+  Andrew
+
+- Age: `u64`  
+  23
+
+Its serialized representation:
+
+#### Header
+
+| Position | Stored data  | Hexadecimal form | Comment |
+|:--------|:------:|:---------------------|:--------------------------------------------------|
+`0  => 4`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
+`4  => 8`  | 6     | `06 00 00 00`            | Little endian stored segment size |
+`8  => 16` | 23    | `10 00 00 00 00 00 00 00`| Number in little endian |
+
+#### Body
+
+| Position | Stored data  | Hexadecimal form | Comment |
+|:--------|:------:|:---------------------|:--------------------------------------------------|
+`16 => 24` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
+
 
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
