@@ -69,7 +69,6 @@ Data of primitive types is fixed sized, and located fully in header.
   `0x01` for true, `0x00` for false. Trying to represent other values as `bool`
   leads to undefined behavior. Size: 1 byte.
 
-
 #### Segment fields
 
 All segment types take 8 bytes in header: 4 for position in buffer, and 4 for
@@ -106,6 +105,5 @@ Its serialized representation:
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
 `16 => 24` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
-
 
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
