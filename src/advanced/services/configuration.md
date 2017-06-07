@@ -4,6 +4,13 @@
 by the means of *proposing* a new configuration and *voting* for proposed configurations
 among the validators.
 
+One may need to change the global configuration for the following reasons:
+
+- Keys rotation
+- Validators changes (their number, nodes)
+- Fine tuning of consensus algorithm
+- Changes in services public configuration (e.g. anchoring period)
+
 ## General Idea
 
 Any validator node can propose a new configuration, by broadcasting a corresponding
