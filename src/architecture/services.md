@@ -96,10 +96,11 @@ for more details. Proofs allow thin clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
-**Trivia.** In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
-to data in the blockchain, where the commitment is stored in a block header
-in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
-allows to make proofs compact enough to be processed by thin clients.
+!!! summary "Trivia"
+    In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
+    to data in the blockchain, where the commitment is stored in a block header
+    in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
+    allows to make proofs compact enough to be processed by thin clients.
 
 **Example.** Retrieving information on a particular wallet (e.g., the current
 wallet balance) is implemented as a read request in the cryptocurrency tutorial.
