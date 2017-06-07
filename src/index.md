@@ -48,9 +48,10 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 - [*Light clients*](architecture/clients.md)
   are the main way for third-party applications to interact with the services
 
-**Tip.** See [the anchoring][anchoring] and [configuration update][config] services
-for the examples of real-world Exonum services, and [the cryptocurency tutorial][tutorial]
-for an example how to use the light client library.
+!!! tip
+    See [the anchoring][anchoring] and [configuration update][config] services
+    for the examples of real-world Exonum services, and [the cryptocurency tutorial][tutorial]
+    for an example how to use the light client library.
 
 ### Specifications
 
