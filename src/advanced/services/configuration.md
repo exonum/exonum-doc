@@ -4,12 +4,12 @@
 by the means of *proposing* a new configuration and *voting* for proposed configurations
 among the validators.
 
-One may need to change the global configuration for the following reasons:
+The global configuration may need to be modified for various reasons:
 
-- Keys rotation
-- Validators changes (their number, nodes)
-- Fine tuning of consensus algorithm
-- Changes in services public configuration (e.g. anchoring period)
+- Changes in the validator set (validators being added, replaced, or removed)
+- Fine tuning of the consensus algorithm parameters
+- Changes in the global configuration of services (e.g., the anchoring interval
+  in [the anchoring service](anchoring.md))
 
 ## General Idea
 
@@ -41,8 +41,8 @@ execution rules guarantee that only one of them will get activated.
 !!! note
     The threshold of 2/3 of validators is chosen to reflect the security
     model used in [the consensus algorithm](../consensus/consensus.md). According
-    to this model, up to 1/3 of validators may be compromised or be non-responsive at
-    any time.
+    to this model, up to 1/3 of validators may be compromised or be non-responsive
+    at any time.
 
 ## REST API
 
