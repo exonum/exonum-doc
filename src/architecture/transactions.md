@@ -140,7 +140,8 @@ into the blockchain. Each transaction which reached any validator and passed
 
 !!! note "Example"
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
-    a `TransactionSend` also checks if the sender is not same as the receiver.
+    a `TransactionSend` also checks if the sender is not the same as the
+    receiver.
 
 ### Execute
 
@@ -154,6 +155,7 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     an `execute` method of `TransactionSend` executes the transaction which
     means: set the result of executing equal to `true` and change `from` and
     `to` wallets balances with `amount` if
+
     - `to` is not the same as `from`
     - `from` were presented in committed blocks (necessary condition of
       positive balance of `from` for a considered cryptocurrency
@@ -161,7 +163,7 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     - balance of `from` is greater or equal to `amount`,
     else the result of execution is `false` and it doesn't change any balances.
 
-!!! note.
+!!! note
     `Verify` and `execute` are triggered at different times. `Verify` checks
     internal consistency of a transaction before the transaction is included
     into the [proposal block](../advanced/consensus/consensus.md). `Execute`
@@ -210,7 +212,7 @@ that
   effect or output the `verify` method of transactions does not depend on.
 
 The purity for `verify` means that its result doesn't depend on the
-the blockchain's state and full node's hardware. So the `verify` could be
+blockchain's state and full node's hardware. So the `verify` could be
 parallelized over transactions and `verify` could be performed only once for
 any transaction.
 
