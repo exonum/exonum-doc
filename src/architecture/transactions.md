@@ -99,8 +99,9 @@ service with `service_id`.
     `seed` to distinct different transactions with the same previous three
     fields.
 
-The message body is serialized according to the binary serialization
-specification from its type specification in the service.
+The message body is serialized according to the
+[binary serialization](../advanced/serializtion.md) specification from its type
+specification in the service.
 
 **Binary presentation:** binary sequence with `payload_length` bytes.
 **JSON presentation:** JSON.
@@ -141,6 +142,11 @@ blockchain state.
 
 The `execute` method given the blockchain state and can modify it (but can
 choose not to if certain conditions are not met).
+
+!!! Example
+    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
+    an `execute` method of `TransactionSend` returns JSON with fields `from`, `to`,
+    `amount` and `seed`.
 
 !!! Note.
     `Verify` and `execute` are triggered at different times. `Verify` checks
