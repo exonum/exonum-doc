@@ -13,7 +13,7 @@ effect. And it is guaranteed by Exonum core. A transaction could be created by
 the allowed entities and sent for the distributed system of validators for the
 consideration.
 
-!!! Example
+!!! note "Example"
     A private key owner could initialize his coins transfer for
     [cryptocurrency](https://github.com/exonum/cryptocurrency).
 
@@ -70,7 +70,7 @@ a key to process transaction (to find such methods as `verify` and `execute`).
 
 The `message_id` defines the type of message in the service.
 
-!!! Example
+!!! note "Example"
     The service *cryptocurrency* could include different types of transactions:
     `AddFundsTransaction` for coins emission and `TransferTransaction` for
     money transfer et. al.
@@ -93,7 +93,7 @@ The body of the transaction, which includes specific for a given transaction
 (`service_id`, `message_id`) type data and a format of which is specified by
 service with `service_id`.
 
-!!! Example
+!!! note "Example"
     the body of `TransferTransaction` should include field `from` for coins
     sender, `to` for coins recipient, `amount` for the sending amount and
     `seed` to distinct different transactions with the same previous three
@@ -138,7 +138,7 @@ into the blockchain. Each transaction which reached any validator and passed
 `verify` have to be included into the blockchain in a finite time. See
 [consensus algorithm](../advanced/consensus/consensus.md) for more details.
 
-!!! Example
+!!! note "Example"
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
     a `TransactionSend` also checks if the sender is not same as the receiver.
 
@@ -149,7 +149,7 @@ choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
 storage ([under certain conditions](../advanced/consensus/consensus.md)).
 
-!!! Example
+!!! note "Example"
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
     an `execute` method of `TransactionSend` executes the transaction which
     means: set the result of executing equal to `true` and change `from` and
@@ -161,7 +161,7 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     - balance of `from` is greater or equal to `amount`,
     else the result of execution is `false` and it doesn't change any balances.
 
-!!! Note.
+!!! note.
     `Verify` and `execute` are triggered at different times. `Verify` checks
     internal consistency of a transaction before the transaction is included
     into the [proposal block](../advanced/consensus/consensus.md). `Execute`
@@ -174,7 +174,7 @@ The `info` method returns the useful information (from service developers point
 of view) about the transaction and has no access to the blockchain state as the
 `verify`.
 
-!!! Example
+!!! note "Example"
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
     an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
     `amount` and `seed`.
