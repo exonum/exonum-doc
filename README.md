@@ -18,7 +18,8 @@ them as a pull request. Simple!
 Notice that the repository uses a set of [linters][wiki:lint] to check possible
 problems with the contributed documents:
 
-- [markdownlint][mdl] is used to lint Markdown files
+- [markdownlint][mdl] is used to lint Markdown files. Please see
+  [the rules list][mdl-rules] to fix possible problems with this linter
 - [html5validator][html5validator] is used for checking problems with the
   generated HTML pages
 - [linkchecker][linkchecker] is used to find missing links
@@ -63,5 +64,6 @@ Exonum Documentation is licensed under the Apache License (Version 2.0). See
 
 [wiki:lint]: https://en.wikipedia.org/wiki/Lint_(software)
 [mdl]: https://github.com/mivok/markdownlint
+[mdl-rules]: https://github.com/mivok/markdownlint/blob/master/docs/RULES.md
 [html5validator]: https://github.com/svenkreiss/html5validator
 [linkchecker]: https://github.com/wummel/linkchecker
