@@ -32,7 +32,7 @@ any time.
 
 ## REST API
 
-Configuration service specifies a set of public and private endpoints.
+Configuration update service specifies a set of public and private endpoints.
 
 - Public read requests:
 
@@ -54,8 +54,9 @@ equal to `/api/services/configuration/v1`.
 **Tip.** See [*Services*](../../architecture/services.md) for a description of
 types of endpoints in services.
 
-**Tip.** See [the configuration service tutorial][http_api] for more details
-on the config update service API, and [here][response_samples] for API examples.
+**Tip.** See [the configuration update service tutorial][http_api] for more details
+on the configuration update service API, and [this][response_samples] for API
+examples.
 
 ### Types
 
