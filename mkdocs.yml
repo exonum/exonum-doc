@@ -20,6 +20,7 @@ google_analytics:
   - 'auto'
 markdown_extensions:
   - codehilite
+  - admonition
 copyright: © 2017 Bitfury Group Limited
 pages:
   # Short description of Exonum, documentation and how to use it
