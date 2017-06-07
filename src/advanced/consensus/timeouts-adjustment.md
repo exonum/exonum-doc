@@ -25,6 +25,9 @@ for the previous block, and information taken from the blockchain
 the algorithm calculates `next_timeout`, the round timeout value to be
 used for the next block.
 
+**Tip.** See [source code][src-timeout-adj] for more details on timeout adjustment
+implementation.
+
 ### Constants
 
 - `ADJUSTMENT_SPEED`: float in (0.0, 1.0)  
@@ -95,3 +98,4 @@ next_timeout = target_timeout * ADJUSTMENT_SPEED + previous_timeout *
 
 [exponential_smoothing]: https://en.wikipedia.org/wiki/Exponential_smoothing
 [line_segment]: https://en.wikipedia.org/wiki/Line_segment
+[src-timeout-adj]: https://github.com/exonum/exonum-core/blob/master/exonum/src/node/timeout_adjuster.rs
