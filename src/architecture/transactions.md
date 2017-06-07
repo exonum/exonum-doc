@@ -100,7 +100,7 @@ service with `service_id`.
     fields.
 
 The message body is serialized according to the
-[binary serialization](../advanced/serializtion.md) specification from its type
+[binary serialization](../advanced/serialization.md) specification from its type
 specification in the service.
 
 **Binary presentation:** binary sequence with `payload_length` bytes.
