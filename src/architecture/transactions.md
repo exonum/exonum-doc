@@ -36,10 +36,11 @@ transactions are listed in the table below:
 |-------|:--------------:|-------:|:-------:|
 | `network_id` | `u8` | 0 | number |
 | `protocol_version` | `u8` | 1 | number |
-| `service_id` | `u16` | 4 | number |
-| `message_id` | `u16` | 2 | number |
-| `body` | `&[u8]` | 10 | JSON |
-| `signature` | Ed25519 signature | -64 | hex string |
+| `service_id` | `u16` | 4..6 | number |
+| `message_id` | `u16` | 2..4 | number |
+| `payload_length`| `usize` | 6..10 | - |
+| `body` | `&[u8]` | 10..-64 | object |
+| `signature` | Ed25519 signature | -64.. | hex string |
 
 ### Network ID
 
@@ -74,6 +75,15 @@ The `message_id` defines the type of message in the service.
     `AddFundsTransaction` for coins emission and `TransferTransaction` for
     money transfer et. al.
 
+**Binary presentation:** `usize` (the same as `u32` in this case, unsigned 4
+bytes).
+**JSON presentation:** isn't present.
+
+### Payload length
+
+The length of the message after the header. It includes both body and signature
+lengths.
+
 **Binary presentation:** `u16` (unsigned 2 bytes).
 **JSON presentation:** number.
 
@@ -92,20 +102,20 @@ service with `service_id`.
 The message body is serialized according to the binary serialization
 specification from its type specification in the service.
 
-**Binary presentation:** binary sequence with the fixed length.
+**Binary presentation:** binary sequence with `payload_length - 64` bytes.
 **JSON presentation:** JSON.
 
 ### Signature
 
 [Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
-serialization of the transaction (excluding the signature bytes, i.e.,
-the last 64 bytes of the serialization). The cryptographic signature for the
-message with a transaction. Any author of the transaction (as any other
-message) should have the private and public keys which allow him to generate a
-correct transaction. He shouldn't provide any other person his private key but
-should use it to sign messages. The signature of a particular person could be
-verified by anyone using the public key and `Exonum.verifySignature` function.
-See [Exonum client](https://github.com/exonum/exonum-client) for details.
+serialization of the message with a transaction (excluding the signature bytes,
+i.e., the last 64 bytes of the serialization). Any author of the transaction
+(as any other message) should have the private and public keys which allow him
+to generate a correct transaction. He shouldn't provide any other person his
+private key but should use it to sign messages. The signature of a particular
+person could be verified by anyone using the public key and
+`Exonum.verifySignature` function. See
+[Exonum client](https://github.com/exonum/exonum-client) for details.
 
 **Binary presentation:** Ed25519 signature.
 **JSON presentation:** hex string.
@@ -145,6 +155,11 @@ The `info` method returns the useful information (from service developers point
 of view) about transaction and has no access to the blockchain state as the
 `verify`.
 
+!!! Example
+    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
+    an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
+    `amount` and `seed`.
+
 ## Transaction lifecycle
 
 1. A transaction is created by an external entity (e.g., a
@@ -167,14 +182,17 @@ of view) about transaction and has no access to the blockchain state as the
 
 ### Purity
 
-The purity of the function means that
+[The purity of the function](https://en.wikipedia.org/wiki/Pure_function) means
+that
 
 - the function always evaluates the same result value given the same argument
   value
 - evaluation of the result does not cause any semantically observable side
   effect or output the `verify` method of transactions does not depend on.
 
-And both properties should be true by design.
+The purity for `verify` means that its result doesn't depend on the
+calculator's configuration. So the `verify` could be parallelized over
+transactions `verify` could be performed only once for any transaction.
 
 ### Sequential consistency
 
