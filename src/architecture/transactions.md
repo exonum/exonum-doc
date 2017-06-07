@@ -44,8 +44,8 @@ transactions are listed in the table below.
 
 ### Network ID
 
-This field is useless right now. It would be used to send messages over
-networks in the future releases.
+This field would be used to send inter-blockchain messages in the future
+releases. `Network_id` is useless right now.
 
 **Binary presentation:** `u8` (unsigned 1 byte).
 **JSON presentation:** number
@@ -132,7 +132,11 @@ All transactions have at least three methods: `verify`, `execute` and `info`
 The `verify` method verifies the transaction, which includes the message
 signature verification and other specific for a given transaction type checks.
 `Verify` checks internal consistency of a transaction and has no access to the
-blockchain state.
+blockchain state. If a transaction fails `verify` it is incorrect and couldn't
+be included into any correct block proposal. So it couldn't ever be included
+into the blockchain. Each transaction which reached any validator and passed
+`verify` have to be included into the blockchain in a finite time. See
+[consensus algorithm](../advanced/consensus/consensus.md) for more details.
 
 !!! Example
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
@@ -141,12 +145,21 @@ blockchain state.
 ### Execute
 
 The `execute` method given the blockchain state and can modify it (but can
-choose not to if certain conditions are not met).
+choose not to if certain conditions are not met). Technically `execute`
+operates on a fork of the blockchain state, which is merged to the persistent
+storage ([under certain conditions](../advanced/consensus/consensus.md)).
 
 !!! Example
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
-    an `execute` method of `TransactionSend` returns JSON with fields `from`, `to`,
-    `amount` and `seed`.
+    an `execute` method of `TransactionSend` executes the transaction which
+    means: set the result of executing equal to `true` and change `from` and
+    `to` wallets balances with `amount` if
+    - `to` is not the same as `from`
+    - `from` were presented in committed blocks (necessary condition of
+      positive balance of `from` for a considered cryptocurrency
+      implementation)
+    - balance of `from` is greater or equal to `amount`,
+    else the result of execution is `false` and it doesn't change any balances.
 
 !!! Note.
     `Verify` and `execute` are triggered at different times. `Verify` checks
@@ -197,8 +210,9 @@ that
   effect or output the `verify` method of transactions does not depend on.
 
 The purity for `verify` means that its result doesn't depend on the
-calculator's configuration. So the `verify` could be parallelized over
-transactions and `verify` could be performed only once for any transaction.
+the blockchain's state and full node's hardware. So the `verify` could be
+parallelized over transactions and `verify` could be performed only once for
+any transaction.
 
 ### Sequential consistency
 
