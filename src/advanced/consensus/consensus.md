@@ -126,9 +126,10 @@ the it’s locked on a certain proposal. Other validators may request prevotes
 that led to the lock from a locked validator, if they do not have them locally
 (these proposals are known as *proof of lock*).
 
-**Example.** Validator A gets prevotes from validators B and C,
-and they do not get prevotes from each other because of the connection problems.
-Then validators B and C can request each other’s prevotes from validator A.
+!!! note "Example"
+    Validator A gets prevotes from validators B and C,
+    and they do not get prevotes from each other because of the connection problems.
+    Then validators B and C can request each other’s prevotes from validator A.
 
 Locks can be changed: if A locked on a propose and during next round all other
 validators locked on the next proposal, A would update its lock eventually.
@@ -141,10 +142,11 @@ A request is sent by a validator to its peer
 if the peer has information of interest, which is unknown to the validator,
 and which has been discovered during the previous communication with the peer.
 
-**Example.** A request is sent if the node receives a consensus message from
-a height greater than the local height. The peer is supposed to respond with
-a message that contains transactions in an accepted block, together with a proof
-that the block is indeed accepted (i.e., precommits of +2/3 validators).
+!!! note "Example"
+    A request is sent if the node receives a consensus message from
+    a height greater than the local height. The peer is supposed to respond with
+    a message that contains transactions in an accepted block, together with a proof
+    that the block is indeed accepted (i.e., precommits of +2/3 validators).
 
 There are requests for all consensus messages: proposals, prevotes, and precommits.
 As consensus messages are authenticated with digital signatures, they can be sent
@@ -232,10 +234,11 @@ set of `Precommit` messages that allowed that block to be accepted.
 There are request messages for transactions, `Propose` and `Prevote` messages, and
 blocks. The generation and processing rules for these messages are fairly obvious.
 
-**Example.** A `RequestPropose` message is generated if a validator receives a consensus
-message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
-is unknown to the validator. A receiver of a `RequestPropose` message sends a requested
-`Propose` in response.
+!!! note "Example"
+    A `RequestPropose` message is generated if a validator receives a consensus
+    message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
+    is unknown to the validator. A receiver of a `RequestPropose` message sends a requested
+    `Propose` in response.
 
 ## Distinguishing Features
 
