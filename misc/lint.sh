@@ -27,9 +27,8 @@ lint_md () {
 
 lint_html () {
   html5validator --root "$SITE_DIR" --show-warnings --ignore-re \
-  'for attribute "href" on element "link": Illegal character in query: "|" is not allowed' \
-  '"autocorrect" not allowed on element "input"' \
-  '"autocapitalize" not allowed on element "input"';
+    'Illegal character in query: "\|" is not allowed' \
+    '"(autocorrect|autocapitalize)" not allowed on element "input"';
 }
 
 lint_links () {
