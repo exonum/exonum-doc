@@ -29,11 +29,12 @@ blockchain network. The order of transaction processing and the resulting change
 to the service state are a part of [the consensus algorithm](../advanced/consensus/consensus.md).
 They are guaranteed to be the same for all nodes in the blockchain network.
 
-**Tip.** When developing a service, you should keep in mind that
-calls to service endpoints must produce an identical result
-on all nodes in the network given the same blockchain
-state. If the call results differ, the consensus algorithm may stall,
-or an audit of the blockchain by auditing nodes may fail.
+!!! tip
+    When developing a service, you should keep in mind that
+    calls to service endpoints must produce an identical result
+    on all nodes in the network given the same blockchain
+    state. If the call results differ, the consensus algorithm may stall,
+    or an audit of the blockchain by auditing nodes may fail.
 
 !!! note
     Unlike smart contract in certain blockchains, services in Exonum
@@ -230,9 +231,10 @@ Here’s a list of things to figure out when developing an Exonum service:
   by the blockchain maintainers? (The answer determines whether a parameter
   should be a part of the local configuration or stored in the blockchain.)
 
-**Tip.** [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
-provides a hands-on guide how to build an Exonum service that implements
-a minimalistic crypto-token.
+!!! tip
+    [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    provides a hands-on guide how to build an Exonum service that implements
+    a minimalistic crypto-token.
 
 ## Tips and Tricks
 

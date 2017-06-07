@@ -16,8 +16,9 @@ This page describes the core design decisions of the Exonum framework.
 
 ## Transaction Processing
 
-**Tip.** See the [*Transactions*](../architecture/transactions.md) article
-for more details.
+!!! tip
+    See the [*Transactions*](../architecture/transactions.md) article
+    for more details.
 
 For an outer application, an Exonum blockchain represents a key-value
 storage and an [online transaction processing][wiki:oltp] facility managing
@@ -97,8 +98,9 @@ it’s impossible to insert a transaction in the middle of the log.
 
 ## Network Structure
 
-**Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
-[*Clients*](../architecture/clients.md).
+!!! tip
+    See separate articles for more details: [*Network*](../advanced/network.md),
+    [*Clients*](../architecture/clients.md).
 
 The Exonum network consists of *full nodes* connected via peer-to-peer connections,
 and *light clients*.
@@ -130,8 +132,9 @@ has been really authorized by supermajority of validators.
 
 ## Consensus
 
-**Tip.** See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
-[*Leader Election*](../advanced/consensus/leader-election.md).
+!!! tip
+    See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
+    [*Leader Election*](../advanced/consensus/leader-election.md).
 
 Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
@@ -199,8 +202,9 @@ more than 1/3 (but less than 2/3) of the validators are compromised.
 
 ## Data Storage
 
-**Tip.** See the [*Data Storage*](../architecture/storage.md) article
-for more details.
+!!! tip
+    See the [*Data Storage*](../architecture/storage.md) article
+    for more details.
 
 ### LevelDB
 
@@ -250,8 +254,9 @@ with the requested data. This allows to prove data authenticity efficiently.
 
 ## Modularity and Services
 
-**Tip.** See the [*Services*](../architecture/services.md) article
-for more details.
+!!! tip
+    See the [*Services*](../architecture/services.md) article
+    for more details.
 
 Besides the core, Exonum includes the framework for building **services**.
 While the Core is responsible for the consensus, and provides middleware
@@ -335,8 +340,9 @@ used in blockchains are as follows:
 
 #### Configuration Update Service
 
-**Tip.** See the [*Configuration Update Service*](../advanced/services/configuration.md)
-article for more details.
+!!! tip
+    See the [*Configuration Update Service*](../advanced/services/configuration.md)
+    article for more details.
 
 Although every node has its own configuration file, some settings should
 be changed for all nodes simultaneously. This service allows updating
@@ -352,8 +358,9 @@ which the new configuration activates.
 
 #### Anchoring Service
 
-**Tip.** See the [*Anchoring Service*](../advanced/services/anchoring.md)
-article for more details.
+!!! tip
+    See the [*Anchoring Service*](../advanced/services/anchoring.md)
+    article for more details.
 
 The anchoring service writes the hash of the current Exonum blockchain state
 to the Bitcoin blockchain with a certain time interval. The anchored data is

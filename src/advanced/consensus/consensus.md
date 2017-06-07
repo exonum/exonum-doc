@@ -179,8 +179,9 @@ must be processed only during the round `R`).
 
 ## Network Communication
 
-**Tip.** See [source code][src-messages] for more technical details on
-consensus messages.
+!!! tip
+    See [source code][src-messages] for more technical details on
+    consensus messages.
 
 ### Messages
 
