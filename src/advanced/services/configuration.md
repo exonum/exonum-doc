@@ -313,7 +313,8 @@ with a state change if all of the following conditions take place:
 6. There isn't a previously submitted configuration proposal, which evaluates
   to the same configuration hash.
 
-If all the checks pass, the execution results in modifying some tables.
+If all the checks pass, the execution results in modifying `config_proposes`
+table. See [TxConfigPropose.execute][config_service_source] for details.
 
 ### Vote for Proposal
 
@@ -345,7 +346,8 @@ if all of the following conditions take place:
 6. No vote for the same proposal from the same `from` has been
   submitted previously.
 
-If all the checks pass, execution results in modifying some tables.
+If all the checks pass, execution results in modifying `votes_by_config_hash` table.
+See [TxConfigVote.execute][config_service_source] for details.
 
 ## Private APIs
 
@@ -403,3 +405,4 @@ JSON object with the following fields:
 [http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[config_service_source]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
