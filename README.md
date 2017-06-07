@@ -31,13 +31,26 @@ for more details) and run them using the `./misc/lint.sh` script with `md`, `htm
 ## Build Instructions
 
 It is a good idea to preview your changes locally before sending a pull request. 
+
+### Installation
+
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
-
-Then, install the theme together with its dependencies:
+Then, install the `mkdocs` theme together with its dependencies:
 
 ```
-pip install mkdocs pygments pygments-github-lexers mkdocs-material 
+pip install mkdocs pygments pygments-github-lexers mkdocs-material
 ```
+
+Alternatively, you may use
+
+```
+pip install -r requirements.txt
+```
+
+This will install the theme with all dependencies and the linters, except
+for `markdownlint` (which is written in Ruby and uses `gem` as the package manager).
+
+### Viewing Documents Locally
 
 In order to run a local web server serving docs, use:
 
