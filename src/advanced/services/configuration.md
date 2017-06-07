@@ -29,6 +29,11 @@ and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
 
+**Notice.** Nodes can have only single following configuration. After the
+configuration proposal got a supermajority of votes and became the following
+configuration, nodes can not vote for the new proposal until the following
+configuration is activated.
+
 There may be several proposals with the same `previous_cfg_hash`; the transaction
 execution rules guarantee that only one of them will get activated.
 
