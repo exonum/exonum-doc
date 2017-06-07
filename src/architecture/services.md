@@ -75,11 +75,12 @@ Indeed, this is impossible because of how consensus works in blockchains;
 a transaction is not included in the blockchain immediately, but rather bundled
 with other transactions in a block.
 
-**Example.** Currency transfer is a classic example of a blockchain transaction.
-The transaction contains the fields corresponding to the sender’s and recipient’s
-public keys, the amount of transferred funds and the digital signature
-created by the sender’s private key. See [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
-for more details.
+!!! note "Example"
+    Currency transfer is a classic example of a blockchain transaction.
+    The transaction contains the fields corresponding to the sender’s and recipient’s
+    public keys, the amount of transferred funds and the digital signature
+    created by the sender’s private key. See [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    for more details.
 
 ### Read Requests
 
@@ -102,8 +103,9 @@ is as secure as if the client queried a supermajority of blockchain validators.
     in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
     allows to make proofs compact enough to be processed by thin clients.
 
-**Example.** Retrieving information on a particular wallet (e.g., the current
-wallet balance) is implemented as a read request in the cryptocurrency tutorial.
+!!! note "Example"
+    Retrieving information on a particular wallet (e.g., the current
+    wallet balance) is implemented as a read request in the cryptocurrency tutorial.
 
 ### Private API
 
@@ -115,9 +117,10 @@ be accessible from the outside world.
 Similar to read requests, private APIs cannot change the blockchain state;
 however, they can create transactions and broadcast them to the network.
 
-**Example.** In [the configuration update service](../advanced/services/configuration.md),
-private API is used to obtain the information about the current configuration
-and update proposals.
+!!! note "Example"
+    In [the configuration update service](../advanced/services/configuration.md),
+    private API is used to obtain the information about the current configuration
+    and update proposals.
 
 ## Implementation Details
 
@@ -246,9 +249,10 @@ send/receive data on the network, and so on), but should do it only
 in the non-consensus code (i.e., code that is not executed during transaction execution).
 A good place for such code is event handlers.
 
-**Example.** [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
-uses the commit event handler extensively to communicate with the Bitcoin Blockchain
-network.
+!!! note "Example"
+    [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
+    uses the commit event handler extensively to communicate with the Bitcoin Blockchain
+    network.
 
 ### Services vs Smart Contracts
 
