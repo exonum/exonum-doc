@@ -237,8 +237,8 @@ blocks. The generation and processing rules for these messages are fairly obviou
 !!! note "Example"
     A `RequestPropose` message is generated if a validator receives a consensus
     message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
-    is unknown to the validator. A receiver of a `RequestPropose` message sends a requested
-    `Propose` in response.
+    is unknown to the validator. A receiver of a `RequestPropose` message sends
+    a requested `Propose` in response.
 
 ## Distinguishing Features
 
