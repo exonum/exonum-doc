@@ -1,91 +1,91 @@
 # Timeout Adjustment
 
-**Timeout adjustment algorithm** allows to optimize the frequency of creating
-blocks, in order to include the maximum number of transactions per block if  
-transactions are frequent, and at the same time, to avoid creating new blocks
+**The timeout adjustment algorithm** allows to optimize the frequency of creating
+blocks, in order to include the maximum number of transactions per block if
+transactions are frequent, and at the same time, avoid creating new blocks
 too often if transactions are rare.
 
-_Round timeout_ is the time that influences the frequency of acceptance of new
-blocks. The longer the round timeout, the bigger the expected acceptance time;
+The algorithm controls _the round timeout_ and adjusts it after each block acceptance.
+The longer the round timeout, the bigger the expected acceptance time;
 the shorter the round timeout, the smaller the expected acceptance time.
+
+## Motivation
 
 Creating blocks with too low timeout leads to increase in the consumption of
 resources for blocks storage and (more crucial) for processing cryptographic
-proofs when checking that blocks. Creating blocks with too high timeout leads to
-delay increase in the applying of new transactions. Moreover, the accumulation of
-unprocessed transactions can begin if their incoming traffic is too large.
-
-Timeout adjustment is executed after each block acceptance.
+proofs when verifying these blocks. Creating blocks with too high timeout leads to
+delays in applying incoming transactions. Moreover, unprocessed transactions
+can start accumulating if their incoming traffic is too large.
 
 ## Algorithm Statement
 
-`block_load` is the ratio of the transactions number in the block to the
-maximum number of transactions in the block.
-
 ### Constants
 
-- `ADJUSTMENT_SPEED`: floating-point value in (0.0, 1.0).
+- `ADJUSTMENT_SPEED`: float in (0.0, 1.0)  
   Determines how fast the timeout changes when the number of
   transactions per block changes.
-
-- `MAX_TIMEOUT`: non-negative integer value.
-  Is the upper bound of the possible timeout values in milliseconds.
-
-- `MIN_TIMEOUT`: non-negative integer value.
-  Is the lower bound of the possible timeout values in milliseconds.
-
-- `OPTIMAL_BLOCK_LOAD`: floating-point value in (0.0, 1.0).
-  Is the equilibrium point. If `block_load` is less than
+- `MAX_TIMEOUT`: non-negative integer  
+  Upper bound of the possible timeout values in milliseconds.
+- `MIN_TIMEOUT`: non-negative integer  
+  Lower bound of the possible timeout values in milliseconds.
+- `OPTIMAL_BLOCK_LOAD`: float in (0.0, 1.0)  
+  The equilibrium point. If `block_load` is less than
   the `OPTIMAL_BLOCK_LOAD`, then the timeout increases. And vice versa, if
   `block_load` is greater than `OPTIMAL_BLOCK_LOAD`, then the timeout decreases.
-  `OPTIMAL_BLOCK_LOAD` should be selected in accordance with the loads
-  specificity in the particular network. Small `OPTIMAL_BLOCK_LOAD` results
+  `OPTIMAL_BLOCK_LOAD` should be selected in accordance with the load
+  profile in a particular blockchain network. Small `OPTIMAL_BLOCK_LOAD` results
   in the generation of almost empty blocks and therefore allows to cope with a
   sharp increase in the transactions flow. Large `OPTIMAL_BLOCK_LOAD` allows to
   reduce the overhead associated with the number of blocks, but makes the system
   vulnerable to increase in the number of incoming transactions.
-
-- `TXS_BLOCK_LIMIT`: floating-point value.
-  Is the maximum number of transactions in a block. It is consensus algorithm
+- `TXS_BLOCK_LIMIT`: integer  
+  Maximum number of transactions in a block. It is consensus algorithm
   parameter defined in [system
   configuration](../../architecture/configuration.md#genesisconsensus).
-
-- `OPTIMAL_LOAD`: floating-point value.
-  Is the number of transactions in the optimally loaded block:
+- `OPTIMAL_LOAD`: float  
+  Number of transactions in the optimally loaded block:
   `OPTIMAL_LOAD = TXS_BLOCK_LIMIT * OPTIMAL_BLOCK_LOAD`.
 
-### Formula
+### Auxiliary Variables
 
-`current_load` is number of transactions in previous block;
+- `current_load`: integer  
+  Number of transactions in previous block.
+- `block_load`: float in (0.0, 1.0)  
+  Ratio of the transactions number in the block to the maximum number
+  of transactions in the block.
+- `previous_timeout`: float  
+  Previous timeout value.
 
-`previous_timeout` is previous timeout value;
+### Target Timeout
 
 `target_timeout` is the expected timeout that will be set in the system if the
 current value of `block_load` remains unchanged for a long time. Plot at the
 bottom of this page shows the dependency of `target_timeout` on `block_load`:
 
-```Text
+```none
 target_timeout = MAX_TIMEOUT - (MAX_TIMEOUT - previous_timeout) *
                  current_load / OPTIMAL_LOAD,
 if current_load < OPTIMAL_LOAD;
 ```
 
-```Text
+```none
 target_timeout = previous_timeout - (previous_timeout - MIN_TIMEOUT) *
                  (current_load / OPTIMAL_LOAD - 1) / (1 / OPTIMAL_BLOCK_LOAD - 1),
 if current_load >= OPTIMAL_LOAD.
 ```
 
+#### Dependency of `target_timeout` on `block_load`
+
+**TODO** add graph
+
+### Timeout Adjustment
+
 Next round timeout is calculated using [exponential smoothing][exponential_smoothing]:
 
-```Text
+```none
 next_timeout = target_timeout * ADJUSTMENT_SPEED + previous_timeout *
                (1 - ADJUSTMENT_SPEED),
 ```
-
-### Dependency of `target_timeout` from `block_load`
-
-**TODO** add graph
 
 [exponential_smoothing]: https://en.wikipedia.org/wiki/Exponential_smoothing
 [line_segment]: https://en.wikipedia.org/wiki/Line_segment
