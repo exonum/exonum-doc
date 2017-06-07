@@ -411,9 +411,10 @@ Services may utilize additional key pairs, including from other cryptosystems.
 For example, the anchoring service defines an additional secp256k1 key pair
 for signing anchoring transactions in Bitcoin.
 
-**Warning.** Presently, the local configuration of the node (which includes all
-its private keys, both used in consensus and by the services) is stored in plaintext.
-This is going to be fixed soon.
+!!! warning
+    Presently, the local configuration of the node (which includes all
+    its private keys, both used in consensus and by the services) is stored in plaintext.
+    This is going to be fixed soon.
 
 !!! note
     Presently, the administrative keys are hot (i.e., stored in the unencrypted
