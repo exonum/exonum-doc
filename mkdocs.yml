@@ -6,37 +6,20 @@ repo_name: 'exonum/exonum-core'
 repo_url: 'https://github.com/exonum/exonum-core'
 site_favicon: 'images/favicon.ico'
 extra:
-  logo: 'images/logo.svg'
+  logo: 'images/logo.svg" alt="Exonum Logo'
   palette:
     primary: 'blue grey'
     accent: 'lime'
   social:
     - type: 'github'
       link: 'https://github.com/exonum'
-#    - type: 'twitter'
-#      link: 'https://twitter.com/BitFuryGroup'
     - type: 'facebook'
       link: 'https://www.facebook.com/Exonum'
-#    - type: 'linkedin'
-#      link: 'https://www.linkedin.com/company-beta/5178019'
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'
 markdown_extensions:
   - codehilite
-  - pymdownx.arithmatex
-  - pymdownx.betterem(smart_enable=all)
-  - pymdownx.caret
-  - pymdownx.critic
-  - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
-  - pymdownx.inlinehilite
-  - pymdownx.magiclink
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences
-  - pymdownx.tasklist(custom_checkbox=true)
-  - pymdownx.tilde
 copyright: © 2017 Bitfury Group Limited
 pages:
   # Short description of Exonum, documentation and how to use it
