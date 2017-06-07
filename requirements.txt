@@ -1,7 +1,7 @@
 # Main dependencies
 mkdocs
 pygments
-pymdown-extensions
+pygments-github-lexers
 mkdocs-material
 # Linters
 linkchecker
