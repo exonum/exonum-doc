@@ -306,23 +306,24 @@ specified in `from`.
 A `TxConfigPropose` transaction is only successfully executed
 with a state change if all of the following conditions take place:
 
-1. `cfg` is a valid stringified JSON object corresponding to the `ConfigBody`
-  format.
-2. `cfg.previous_cfg_hash` equals to hash of the *actual* configuration.
-3. `cfg.actual_from` is greater than the *current height* of the blockchain,
-  determined as the height of the latest committed block + 1.
-4. A *following* configuration isn't present.
-5. The *actual* configuration contains the `from` public key in the array of
-  validator keys.
-6. There isn't a previously submitted configuration proposal, which evaluates
-  to the same configuration hash.
+- `cfg` is a valid stringified JSON object corresponding to the `ConfigBody`
+  format
+- `cfg.previous_cfg_hash` equals to hash of the actual configuration
+- `cfg.actual_from` is greater than the current height of the blockchain,
+  determined as the height of the latest committed block + 1
+- A following configuration isn't present
+- The actual configuration contains the `from` public key in the array of
+  validator keys
+- There isn't a previously submitted configuration proposal, which evaluates
+  to the same configuration hash
 
-If all the checks pass, the execution results in modifying `config_proposes`
+If all the checks pass, the execution results in modifying the `config_proposes`
 table. See [TxConfigPropose.execute][config_service_source] for details.
 
 ### Vote for Proposal
 
-`TxVote` implements voting for a previously proposed configuration.
+`TxConfigVote` is a transaction that implements voting for a previously
+proposed configuration.
 
 #### Data Layout
 
@@ -341,17 +342,17 @@ specified in `from`.
 Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
-1. `cfg_hash` references a known proposed configuration `cfg`.
-2. A *following* configuration isn't present.
-3. The *actual* configuration contains the `from` public key in the array of
-  validator keys.
-4. `cfg.previous_cfg_hash`, is equal to hash of the *actual* configuration.
-5. `cfg.actual_from` is greater than the *current height*.
-6. No vote for the same proposal from the same `from` has been
-  submitted previously.
+- `cfg_hash` references a known proposed configuration `cfg`
+- A following configuration isn't present
+- The actual configuration contains the `from` public key in the array of
+  validator keys
+- `cfg.previous_cfg_hash` is equal to hash of the actual configuration
+- `cfg.actual_from` is greater than the current height
+- No vote for the same proposal from the same `from` has been
+  submitted previously
 
-If all the checks pass, execution results in modifying `votes_by_config_hash` table.
-See [TxConfigVote.execute][config_service_source] for details.
+If all the checks pass, execution results in modifying the `votes_by_config_hash`
+table. See [TxConfigVote.execute][config_service_source] for details.
 
 ## Private APIs
 
@@ -388,7 +389,7 @@ JSON object with the following fields:
 POST {base_path}/configs/{config_hash_vote_for}/postvote
 ```
 
-Creates a [`TxVote` transaction](#configuration-proposal).
+Creates a [`TxConfigVote` transaction](#configuration-proposal).
 As with the previous endpoint, the `from` field of the transaction
 and its signature are computed automatically.
 
@@ -402,7 +403,7 @@ and its signature are computed automatically.
 JSON object with the following fields:
 
 - **tx_hash**: Hash  
-  Hash of the corresponding `TxVote` transaction.
+  Hash of the corresponding `TxConfigVote` transaction.
 
 [stored_configuration]: http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html
 [config_propose]: http://exonum.com/doc/crates/configuration_service/struct.StorageValueConfigProposeData.html
