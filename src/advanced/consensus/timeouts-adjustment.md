@@ -19,6 +19,12 @@ can start accumulating if their incoming traffic is too large.
 
 ## Algorithm Statement
 
+The algorithm takes `previous_timeout`, the round timeout value used
+for the previous block, and information taken from the blockchain
+(such as the number of transactions in the block). Based on this information,
+the algorithm calculates `next_timeout`, the round timeout value to be
+used for the next block.
+
 ### Constants
 
 - `ADJUSTMENT_SPEED`: float in (0.0, 1.0)  
@@ -78,13 +84,13 @@ if current_load >= OPTIMAL_LOAD.
 
 **TODO** add graph
 
-### Timeout Adjustment
+### Calculating Next Timeout
 
 Next round timeout is calculated using [exponential smoothing][exponential_smoothing]:
 
 ```none
 next_timeout = target_timeout * ADJUSTMENT_SPEED + previous_timeout *
-               (1 - ADJUSTMENT_SPEED),
+               (1 - ADJUSTMENT_SPEED)
 ```
 
 [exponential_smoothing]: https://en.wikipedia.org/wiki/Exponential_smoothing
