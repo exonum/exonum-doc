@@ -66,8 +66,8 @@ Data of primitive types is fixed sized, and located fully in header.
   Long signed number stored in little endian. Size: 8 bytes.
 
 - `bool`  
-  `0x01` for true, `0x00` for false. Trying to represent other values as `bool`
-  leads to undefined behavior. Size: 1 byte.
+  `0x01` for true, `0x00` for false. A message with other value stored in place
+  of `bool` will not pass validation. Size: 1 byte.
 
 #### Segment fields
 
@@ -98,7 +98,7 @@ Its serialized representation:
 |:--------|:------:|:---------------------|:--------------------------------------------------|
 `0  => 4`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
 `4  => 8`  | 6     | `06 00 00 00`            | Little endian stored segment size |
-`8  => 16` | 23    | `10 00 00 00 00 00 00 00`| Number in little endian |
+`8  => 16` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
 
 #### Body
 
