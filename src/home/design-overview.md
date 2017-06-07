@@ -16,8 +16,9 @@ This page describes the core design decisions of the Exonum framework.
 
 ## Transaction Processing
 
-**Tip.** See the [*Transactions*](../architecture/transactions.md) article
-for more details.
+!!! tip
+    See the [*Transactions*](../architecture/transactions.md) article
+    for more details.
 
 For an outer application, an Exonum blockchain represents a key-value
 storage and an [online transaction processing][wiki:oltp] facility managing
@@ -87,17 +88,19 @@ This ensures immutability of the transaction log; once a transaction is committe
 it cannot be retroactively modified or evicted from the log. Similarly,
 it’s impossible to insert a transaction in the middle of the log.
 
-**Notice.** The agreement on the hash of the data storage means that not only
-full nodes execute transactions in the same order; they also
-must execute all transactions in exactly the same way. This protects against
-a scenario where execution results differ for the nodes in the network
-(e.g., because of non-deterministic instructions in the transaction
-execution code), which may lead to all sorts of trouble.
+!!! note
+    The agreement on the hash of the data storage means that not only
+    full nodes execute transactions in the same order; they also
+    must execute all transactions in exactly the same way. This protects against
+    a scenario where execution results differ for the nodes in the network
+    (e.g., because of non-deterministic instructions in the transaction
+    execution code), which may lead to all sorts of trouble.
 
 ## Network Structure
 
-**Tip.** See separate articles for more details: [*Network*](../advanced/network.md),
-[*Clients*](../architecture/clients.md).
+!!! tip
+    See separate articles for more details: [*Network*](../advanced/network.md),
+    [*Clients*](../architecture/clients.md).
 
 The Exonum network consists of *full nodes* connected via peer-to-peer connections,
 and *light clients*.
@@ -129,8 +132,9 @@ has been really authorized by supermajority of validators.
 
 ## Consensus
 
-**Tip.** See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
-[*Leader Election*](../advanced/consensus/leader-election.md).
+!!! tip
+    See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
+    [*Leader Election*](../advanced/consensus/leader-election.md).
 
 Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
@@ -156,9 +160,10 @@ To generate a new block and vote upon it, a 3-phase approach is used.
   for the same proposal, the proposal becomes a new block and is committed to
   the local storage of the validator
 
-**Notice.** A block can be committed at different times for different validators.
-The consensus algorithm guarantees that validators cannot commit different blocks
-at the same height (see [the safety property](#safety-and-liveness) below).
+!!! note
+    A block can be committed at different times for different validators.
+    The consensus algorithm guarantees that validators cannot commit different blocks
+    at the same height (see [the safety property](#safety-and-liveness) below).
 
 If a validator does not receive a correct block proposal in a particular round,
 it eventually moves to the next round by a timeout and is ready to
@@ -197,8 +202,9 @@ more than 1/3 (but less than 2/3) of the validators are compromised.
 
 ## Data Storage
 
-**Tip.** See the [*Data Storage*](../architecture/storage.md) article
-for more details.
+!!! tip
+    See the [*Data Storage*](../architecture/storage.md) article
+    for more details.
 
 ### LevelDB
 
@@ -248,8 +254,9 @@ with the requested data. This allows to prove data authenticity efficiently.
 
 ## Modularity and Services
 
-**Tip.** See the [*Services*](../architecture/services.md) article
-for more details.
+!!! tip
+    See the [*Services*](../architecture/services.md) article
+    for more details.
 
 Besides the core, Exonum includes the framework for building **services**.
 While the Core is responsible for the consensus, and provides middleware
@@ -276,10 +283,11 @@ A service may define 3 types of endpoints:
   cannot modify the blockchain state directly (although they
   can generate transactions and push them to the network)
 
-**Notice.** Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
-Events will implement the [pub/sub architecure pattern][wiki:pubsub],
-allowing light clients and services to subscribe to events emitted
-by services.
+!!! note
+    Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
+    Events will implement the [pub/sub architecure pattern][wiki:pubsub],
+    allowing light clients and services to subscribe to events emitted
+    by services.
 
 External applications may communicate with service endpoints
 via HTTP REST API, using JSON as the serialization format.
@@ -324,15 +332,17 @@ used in blockchains are as follows:
   At the same time, transaction verification has no access to the current
   blockchain state
 
-**Notice.** Service execution isolation is a high-priority task
-on [the Exonum roadmap](../dev/roadmap.md).
+!!! note
+    Service execution isolation is a high-priority task
+    on [the Exonum roadmap](../dev/roadmap.md).
 
 ### Existing Services
 
 #### Configuration Update Service
 
-**Tip.** See the [*Configuration Update Service*](../advanced/services/configuration.md)
-article for more details.
+!!! tip
+    See the [*Configuration Update Service*](../advanced/services/configuration.md)
+    article for more details.
 
 Although every node has its own configuration file, some settings should
 be changed for all nodes simultaneously. This service allows updating
@@ -348,8 +358,9 @@ which the new configuration activates.
 
 #### Anchoring Service
 
-**Tip.** See the [*Anchoring Service*](../advanced/services/anchoring.md)
-article for more details.
+!!! tip
+    See the [*Anchoring Service*](../advanced/services/anchoring.md)
+    article for more details.
 
 The anchoring service writes the hash of the current Exonum blockchain state
 to the Bitcoin blockchain with a certain time interval. The anchored data is
@@ -400,16 +411,18 @@ Services may utilize additional key pairs, including from other cryptosystems.
 For example, the anchoring service defines an additional secp256k1 key pair
 for signing anchoring transactions in Bitcoin.
 
-**Warning.** Presently, the local configuration of the node (which includes all
-its private keys, both used in consensus and by the services) is stored in plaintext.
-This is going to be fixed soon.
+!!! warning
+    Presently, the local configuration of the node (which includes all
+    its private keys, both used in consensus and by the services) is stored in plaintext.
+    This is going to be fixed soon.
 
-**Notice.** Presently, the administrative keys are hot (i.e., stored in the unencrypted
-form during the node operation). In the future releases, they will be able to
-be managed as externally stored cold keys (i.e., the node would not have
-access to the administrative key at all). Additionally, the 1-to-1 correspondence
-between consensus and administrative keys will be generalized to support various
-administrative settings.
+!!! note
+    Presently, the administrative keys are hot (i.e., stored in the unencrypted
+    form during the node operation). In the future releases, they will be able to
+    be managed as externally stored cold keys (i.e., the node would not have
+    access to the administrative key at all). Additionally, the 1-to-1 correspondence
+    between consensus and administrative keys will be generalized to support various
+    administrative settings.
 
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
