@@ -29,18 +29,20 @@ and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
 
-**Notice.** Nodes can have only single following configuration. After the
-configuration proposal got a supermajority of votes and became the following
-configuration, nodes can not vote for the new proposal until the following
-configuration is activated.
+!!! note
+    Nodes can have only single following configuration. After the
+    configuration proposal got a supermajority of votes and became the following
+    configuration, nodes can not vote for the new proposal until the following
+    configuration is activated.
 
 There may be several proposals with the same `previous_cfg_hash`; the transaction
 execution rules guarantee that only one of them will get activated.
 
-**Notice.** The threshold of 2/3 of validators is chosen to reflect the security
-model used in [the consensus algorithm](../consensus/consensus.md). According
-to this model, up to 1/3 of validators may be compromised or be non-responsive at
-any time.
+!!! note
+    The threshold of 2/3 of validators is chosen to reflect the security
+    model used in [the consensus algorithm](../consensus/consensus.md). According
+    to this model, up to 1/3 of validators may be compromised or be non-responsive at
+    any time.
 
 ## REST API
 
@@ -63,12 +65,14 @@ Configuration update service specifies a set of public and private endpoints.
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
 
-**Tip.** See [*Services*](../../architecture/services.md) for a description of
-types of endpoints in services.
+!!! tip
+    See [*Services*](../../architecture/services.md) for a description of
+    types of endpoints in services.
 
-**Tip.** See [the configuration update service tutorial][http_api] for more details
-on the configuration update service API, and [this][response_samples] for API
-examples.
+!!! tip
+    See [the configuration update service tutorial][http_api] for more details
+    on the configuration update service API, and [this][response_samples] for API
+    examples.
 
 ### Types
 
