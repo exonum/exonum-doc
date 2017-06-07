@@ -31,21 +31,27 @@ for more details) and run them using the `./misc/lint.sh` script with `md`, `htm
 
 It is a good idea to preview your changes locally before sending a pull request. 
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
-Then, install `mkdocs` and the `bootswatch` theme:
+
+Then, install the theme together with its dependencies:
+
 ```
-pip install mkdocs mkdocs-bootswatch
+pip install mkdocs pygments pygments-github-lexers mkdocs-material 
 ```
 
 In order to run a local web server serving docs, use:
+
 ```
 mkdocs serve
 ```
+
 The web server will be available on [127.0.0.1:8000](http://127.0.0.1:8000/).
 
 To generate HTML files from the Markdown source files, use:
+
 ```
 mkdocs build
 ```
+
 The generated pages will be available in the **site/** directory.
 
 ## License
