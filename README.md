@@ -27,6 +27,23 @@ You can set up these tools locally (see the `install` step in [the Travis config
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
 `links`, or `all` arguments.
 
+## SEO optimization
+
+To make article more SEO-optimised and to make it possible to paste beautiful links into a Slack/Skype/Twitter/Facebook add `description` field into the beginning of the document:
+
+```markdown
+description: A brief description of my article
+
+# Some title
+
+Some content begins here...
+```
+
+Description should contain a one to two sentence description of the article.
+Place it at the very beginning of the document.
+
+Note, it should be blank line between description section and beginning of document.
+
 ## Build Instructions
 
 It is a good idea to preview your changes locally before sending a pull request. 
