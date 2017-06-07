@@ -30,17 +30,17 @@ serialization formats - binary and [JSON](https://en.wikipedia.org/wiki/JSON);
 the first one is used in communication among nodes and
 [storage](./storage.md), the second one is used to communicate with
 [light clients](./clients.md). All fields to serialize and deserialize
-transactions are listed in the table below:
+transactions are listed in the table below.
 
-| Field | Binary format | Binary offset | JSON |
-|-------|:--------------:|-------:|:-------:|
-| `network_id` | `u8` | 0 | number |
-| `protocol_version` | `u8` | 1 | number |
-| `service_id` | `u16` | 4..6 | number |
-| `message_id` | `u16` | 2..4 | number |
-| `payload_length`| `usize` | 6..10 | - |
-| `body` | `&[u8]` | 10..-64 | object |
-| `signature` | Ed25519 signature | -64.. | hex string |
+| Field              | Binary format     | Binary offset | JSON       |
+|--------------------|:-----------------:|--------------:|:----------:|
+| `network_id`       | `u8`              | 0             | number     |
+| `protocol_version` | `u8`              | 1             | number     |
+| `service_id`       | `u16`             | 4..6          | number     |
+| `message_id`       | `u16`             | 2..4          | number     |
+| `payload_length`   | `usize`           | 6..10         | -          |
+| `body`             | `&[u8]`           | 10..-64       | object     |
+| `signature`        | Ed25519 signature | -64..         | hex string |
 
 ### Network ID
 
@@ -81,8 +81,8 @@ bytes).
 
 ### Payload length
 
-The length of the message after the header. It includes both body and signature
-lengths.
+The length of the message body after the header. It does not include the
+signature length.
 
 **Binary presentation:** `u16` (unsigned 2 bytes).
 **JSON presentation:** number.
@@ -102,7 +102,7 @@ service with `service_id`.
 The message body is serialized according to the binary serialization
 specification from its type specification in the service.
 
-**Binary presentation:** binary sequence with `payload_length - 64` bytes.
+**Binary presentation:** binary sequence with `payload_length` bytes.
 **JSON presentation:** JSON.
 
 ### Signature
@@ -192,7 +192,7 @@ that
 
 The purity for `verify` means that its result doesn't depend on the
 calculator's configuration. So the `verify` could be parallelized over
-transactions `verify` could be performed only once for any transaction.
+transactions and `verify` could be performed only once for any transaction.
 
 ### Sequential consistency
 
