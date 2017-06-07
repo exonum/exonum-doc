@@ -89,8 +89,9 @@ To put it *very* simply, rounds proceed as follows:
 
 ### Non-Strawman Version
 
-**Note.** In the following description, +2/3 means more than two thirds of the validators,
-and -1/3 means less than one third.
+!!! note
+    In the following description, +2/3 means more than two thirds of the validators,
+    and -1/3 means less than one third.
 
 The algorithm above is overly simplified:
 

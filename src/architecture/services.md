@@ -35,11 +35,12 @@ on all nodes in the network given the same blockchain
 state. If the call results differ, the consensus algorithm may stall,
 or an audit of the blockchain by auditing nodes may fail.
 
-**Notice.** Unlike smart contract in certain blockchains, services in Exonum
-are not isolated in a virtual machine environment and are not containerized.
-This makes Exonum services more efficient and flexible in their capabilities,
-but at the same time requires more careful service programming. Service isolation
-is on [the Exonum roadmap](../dev/roadmap.md).
+!!! note
+    Unlike smart contract in certain blockchains, services in Exonum
+    are not isolated in a virtual machine environment and are not containerized.
+    This makes Exonum services more efficient and flexible in their capabilities,
+    but at the same time requires more careful service programming. Service isolation
+    is on [the Exonum roadmap](../dev/roadmap.md).
 
 ## Service Interface
 
@@ -52,9 +53,10 @@ In order to communicate with external entities, services employ three kinds of e
 Service endpoints are automatically aggregated and dispatched by the Exonum
 middleware layer.
 
-**Notice.** Exonum uses [the Iron framework][iron] to specify service endpoints,
-both public and private. Public and private API endpoints are served on different
-sockets, which allows to specify stricter firewall rules for private APIs.
+!!! note
+    Exonum uses [the Iron framework][iron] to specify service endpoints,
+    both public and private. Public and private API endpoints are served on different
+    sockets, which allows to specify stricter firewall rules for private APIs.
 
 ### Transactions
 
@@ -161,10 +163,11 @@ At the very beginning of the lifecycle, the service is registered
 with the blockchain. During deployment, the service creates an initial
 service configuration and initializes its persistent storage.
 
-**Notice.** As of Exonum 0.1, services may be deployed only during the blockchain
-initialization (i.e., before the blockchain network starts creating any blocks).
-In the future releases, services will be able to be deployed dynamically as
-shared libraries.
+!!! note
+    As of Exonum 0.1, services may be deployed only during the blockchain
+    initialization (i.e., before the blockchain network starts creating any blocks).
+    In the future releases, services will be able to be deployed dynamically as
+    shared libraries.
 
 ### Initialization
 
@@ -188,15 +191,18 @@ state, but can be used for various tasks such as logging, data migrations,
 updating local parameters, and/or generating and broadcasting transactions to the
 blockchain network
 
-**Notice.** As of Exonum 0.1, the only built-in event is block commit. More events
-will be added in the future, including possibility for services to define and emit
-events and for services and thin clients to subscribe to events emitted by the services.
+!!! note
+    As of Exonum 0.1, the only built-in event is block commit. More events
+    will be added in the future, including possibility for services to define
+    and emit events and for services and thin clients to subscribe to events
+    emitted by the services.
 
 ## Service Development
 
-**Notice.** As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
-Rust is probably the safest general-purpose programming language, but it’s
-not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
+!!! note
+    As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
+    Rust is probably the safest general-purpose programming language, but it’s
+    not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
 
 Here’s a list of things to figure out when developing an Exonum service:
 

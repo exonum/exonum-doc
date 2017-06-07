@@ -87,12 +87,13 @@ This ensures immutability of the transaction log; once a transaction is committe
 it cannot be retroactively modified or evicted from the log. Similarly,
 it’s impossible to insert a transaction in the middle of the log.
 
-**Notice.** The agreement on the hash of the data storage means that not only
-full nodes execute transactions in the same order; they also
-must execute all transactions in exactly the same way. This protects against
-a scenario where execution results differ for the nodes in the network
-(e.g., because of non-deterministic instructions in the transaction
-execution code), which may lead to all sorts of trouble.
+!!! note
+    The agreement on the hash of the data storage means that not only
+    full nodes execute transactions in the same order; they also
+    must execute all transactions in exactly the same way. This protects against
+    a scenario where execution results differ for the nodes in the network
+    (e.g., because of non-deterministic instructions in the transaction
+    execution code), which may lead to all sorts of trouble.
 
 ## Network Structure
 
@@ -156,9 +157,10 @@ To generate a new block and vote upon it, a 3-phase approach is used.
   for the same proposal, the proposal becomes a new block and is committed to
   the local storage of the validator
 
-**Notice.** A block can be committed at different times for different validators.
-The consensus algorithm guarantees that validators cannot commit different blocks
-at the same height (see [the safety property](#safety-and-liveness) below).
+!!! note
+    A block can be committed at different times for different validators.
+    The consensus algorithm guarantees that validators cannot commit different blocks
+    at the same height (see [the safety property](#safety-and-liveness) below).
 
 If a validator does not receive a correct block proposal in a particular round,
 it eventually moves to the next round by a timeout and is ready to
@@ -276,10 +278,11 @@ A service may define 3 types of endpoints:
   cannot modify the blockchain state directly (although they
   can generate transactions and push them to the network)
 
-**Notice.** Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
-Events will implement the [pub/sub architecure pattern][wiki:pubsub],
-allowing light clients and services to subscribe to events emitted
-by services.
+!!! note
+    Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
+    Events will implement the [pub/sub architecure pattern][wiki:pubsub],
+    allowing light clients and services to subscribe to events emitted
+    by services.
 
 External applications may communicate with service endpoints
 via HTTP REST API, using JSON as the serialization format.
@@ -324,8 +327,9 @@ used in blockchains are as follows:
   At the same time, transaction verification has no access to the current
   blockchain state
 
-**Notice.** Service execution isolation is a high-priority task
-on [the Exonum roadmap](../dev/roadmap.md).
+!!! note
+    Service execution isolation is a high-priority task
+    on [the Exonum roadmap](../dev/roadmap.md).
 
 ### Existing Services
 
@@ -404,12 +408,13 @@ for signing anchoring transactions in Bitcoin.
 its private keys, both used in consensus and by the services) is stored in plaintext.
 This is going to be fixed soon.
 
-**Notice.** Presently, the administrative keys are hot (i.e., stored in the unencrypted
-form during the node operation). In the future releases, they will be able to
-be managed as externally stored cold keys (i.e., the node would not have
-access to the administrative key at all). Additionally, the 1-to-1 correspondence
-between consensus and administrative keys will be generalized to support various
-administrative settings.
+!!! note
+    Presently, the administrative keys are hot (i.e., stored in the unencrypted
+    form during the node operation). In the future releases, they will be able to
+    be managed as externally stored cold keys (i.e., the node would not have
+    access to the administrative key at all). Additionally, the 1-to-1 correspondence
+    between consensus and administrative keys will be generalized to support various
+    administrative settings.
 
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
