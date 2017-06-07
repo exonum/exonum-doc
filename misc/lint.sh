@@ -14,7 +14,7 @@ SRC_DIR="$ROOT_DIR/src"
 SITE_DIR="$ROOT_DIR/site"
 # Directory with mdl linter binary
 BIN_DIR=~/.local/bin
-# Directory with configurations
+# Directory with linter configurations
 CFG_DIR="$ROOT_DIR/misc"
 
 kill_server () {
