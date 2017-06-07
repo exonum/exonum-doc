@@ -152,7 +152,7 @@ choose not to if certain conditions are not met).
 ### Info
 
 The `info` method returns the useful information (from service developers point
-of view) about transaction and has no access to the blockchain state as the
+of view) about the transaction and has no access to the blockchain state as the
 `verify`.
 
 !!! Example
@@ -209,9 +209,9 @@ Non-replayability means that an attacker cannot take an old legitimate
 transaction from the blockchain and apply it to the blockchain state again.
 Assume Alice pays Bob 10 coins using the Exonum
 [cryptocurrency service](https://github.com/exonum/cryptocurrency).
-Non-replayability prevents Bob from taking the Alice's transaction and
-submitting it to the network again to get extra coins. Naturally,
-non-replayability is also a measure against DoS attacks; it prevents an
-attacker from spamming the network with his own or others' transactions.
-The `seed` field inside the transaction and ignoring the transactions, already
-included into the blockchain, for the new blocks guarantees this property.
+Non-replayability prevents Bob from taking Alice's transaction and submitting
+it to the network again to get extra coins. Naturally, non-replayability is
+also a measure against DoS attacks; it prevents an attacker from spamming the
+network with his own or others' transactions. The `seed` field inside the
+transaction and ignoring the transactions, already included into the
+blockchain, for the new blocks guarantees this property.
