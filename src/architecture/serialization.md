@@ -27,15 +27,7 @@ will be no copying until there is no access to the fields.
 
 ## Serialization Principles
 
-Binary representation structure is splitted into two main parts:
-
-- **Header** is a fixed sized part.
-
-- **Body** is a dynamic sized part, it can be read only after parsing header.
-
-### Data types
-
-#### Primitive types
+### Primitive types
 
 - `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
   Correspond to the same [Rust language primitive types][rust_primitive_types].
@@ -46,18 +38,33 @@ Binary representation structure is splitted into two main parts:
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
 
-#### Segment fields
+### Arrays
 
-All segment types take 8 bytes in header: 4 for position in buffer, and 4 for
-segment field size. Segment field examples: string, array of bytes, array of
-other values.
+An array is a data structure consisting of a collection of same type elements.
+An array is stored so that the position of each element can be computed from its
+index. Array elements are located in memory without gaps in the order of
+increasing their indexes. String is array of bytes example.
 
-#### Custom fields
+### Sequences
 
-This types could be implemented arbitrarily, but the creator should declare
-size of custom field's header.
+A sequence is representation of `struct` in Rust. It is data structure with a
+fixed number of possibly heterogeneous fields.
 
-### Example
+In binary representation sequence is splitted into two main parts:
+
+- **Header** is a fixed sized part.
+
+- **Body** is a dynamic sized part, it can be read only after parsing header.
+
+Data of primitive types as well as arrays of fixed length (for example
+`PublicKey`) are stored completely in the header.
+
+Other types take 8 bytes in header of sequence: 4 for position in the body, and 4
+for data size. So the header points to the data in the body. Data segments are
+placed in the body without gaps or overlaps, and in the same order as the
+corresponding fields in the header.
+
+## Example
 
 Consider the structure with two fields:
 
@@ -69,7 +76,7 @@ Consider the structure with two fields:
 
 Its serialized representation:
 
-#### Header
+### Header
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
@@ -77,7 +84,7 @@ Its serialized representation:
 `4  => 8`  | 6     | `06 00 00 00`            | Little endian stored segment size |
 `8  => 16` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
 
-#### Body
+### Body
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
