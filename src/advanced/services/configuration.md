@@ -30,9 +30,9 @@ switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
 
 !!! note
-    Nodes can have only single following configuration. After the
+    Nodes can have only single following configuration. After a
     configuration proposal got a supermajority of votes and became the following
-    configuration, nodes can not vote for the new proposal until the following
+    configuration, nodes can not vote for a new proposal until the following
     configuration is activated.
 
 There may be several proposals with the same `previous_cfg_hash`; the transaction
@@ -98,7 +98,7 @@ config][stored_configuration] serialization. It has the following fields:
   Hash of the previous active configuration.
 - **actual_from**: integer  
   The height from which the configuration became actual.
-- **validators**: Array\<PublicKey\>  
+- **validators**: Array<PublicKey\>  
   List of validators' public keys.
 - **consensus**: Object  
   Consensus-specific configuration parameters.
@@ -218,7 +218,7 @@ Looks up votes for a configuration proposal by the configuration hash.
 
 JSON object with the following fields:
 
-- **Votes**: Array\<?Vote\>  
+- **Votes**: Array<?Vote\>  
   Votes for the configuration. Indexing of the `Votes` array corresponds
   to the indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
   If a vote from the validator is absent, then `null` is returned
