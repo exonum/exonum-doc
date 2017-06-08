@@ -1,4 +1,5 @@
 # Main dependencies
+jinja2 >= 2.8
 mkdocs
 pygments
 pygments-github-lexers
