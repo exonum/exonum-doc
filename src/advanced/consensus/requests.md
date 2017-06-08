@@ -141,10 +141,9 @@ The processing of responses to requests is trivial:
 
 - If `to` value (node which should receive request) does not correspond to our
   key, ignore the message.
-- If the message is too old (the value of the field `time` is less than **TODO**
-  specify constant), ignore the message.
-- If the message indicates the future time of delivery with an accuracy of
-  **TODO** specify constant, ignore the message.
+- If the message is too old (the value of the field `time` is earlier than in
+  the previous `Connect` message received from the same peer), ignore the message.
+- If the message indicates the future time of delivery, ignore the message.
 - Check the signature of the message.
 
 ### `RequestPropose`
