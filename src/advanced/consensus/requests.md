@@ -7,6 +7,10 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
 
 ## Assumptions and definitions
 
+!!! note
+    In the following description, +2/3 means more than two thirds of the
+    validators number.
+
 Receiving a message from the node gives us the opportunity to learn certain
 information about the state of the node, if the node is not Byzantine:
 
@@ -40,7 +44,7 @@ consensus algorithm if the node needs to request information from other nodes.
 
 ### Getting any consensus message from a bigger height
 
-- Update the height for the corresponding node.
+- Update info about the height of blockchain in the corresponding node.
 - Initiate sending `RequestBlock` for the current height, if such a request was
   not sent earlier.
 
@@ -50,7 +54,7 @@ validator height.
 ### Receiving a transaction
 
 - If this is the last transaction required to generate some `propose`, node
-  deletes the data in the corresponding request and its timeouts.
+  deletes the data about the corresponding request and its timeouts.
 - _According to the main consensus logic_ a commit occurs, if all the necessary
   conditions are met.
 
