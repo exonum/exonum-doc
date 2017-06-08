@@ -6,7 +6,10 @@ correctness](proof-of-algorithm-correctness)
 
 ## Algorithm Specification
 
-### variables
+`propose_timeout` is the proposal timeout after the new height beginning. It's a
+constant defined in configuration.
+
+### Node State Variables
 
 - `current_height`
   Current blockchain height.
@@ -14,26 +17,29 @@ correctness](proof-of-algorithm-correctness)
 - `queued`
   Queue for messages from next height or round.
 
-- `validator_id`
-  Index of specific validator in `validators` list of configuration.
-
 - `proposes`
   HashMap with known block proposals.
 
 - `locked_round`
   Round in which **LOCK** was executed.
 
-- `propose.round`
-  Round in which `propose` was created.
-
 - `current_round`
   Number of current round.
+
+- `locked_propose`
+  `propose` on which node is locked.
 
 - `state_hash`
   Hash of blockchain state.
 
-- `propose_hash`
-  Hash of `propose`.
+### Fields of consensus messages
+
+- `validator_id`
+  Index of specific validator in `validators` list of configuration. This field
+  is common to all types of messages.
+
+- `propose.round`
+  Round in which `propose` was created.
 
 - `prevote.propose_hash`
   Hash of the `propose` to which `prevote` belongs.
@@ -43,12 +49,6 @@ correctness](proof-of-algorithm-correctness)
 
 - `prevote.hash`
   Hash of `prevote`.
-
-- `locked_propose`
-  `propose` on which node is locked.
-
-- `propose_timeout`
-  Proposal timeout after the new height beginning.
 
 - `block.prev_hash`
   Hash of the previous block.
@@ -131,7 +131,7 @@ processing** or **Transaction processing**.
 #### Availability of +2/3 `prevote`
 
 - Delete **Prevotes** request, if available for `prevote.round` and
-  `propose_hash`
+  `prevote.propose_hash`.
 - If our `locked_round` is less than `prevote.round` and the hash of the stored
   `propose` is the same as `prevote.propose_hash`, then proceed to **LOCK** for
   this very proposal.
