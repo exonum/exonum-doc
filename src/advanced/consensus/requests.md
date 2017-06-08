@@ -55,8 +55,6 @@ validator height.
 
 - If this is the last transaction required to generate some `propose`, node
   deletes the data about the corresponding request and its timeouts.
-- _According to the main consensus logic_ a commit occurs, if all the necessary
-  conditions are met.
 
 For any message from the current height:
 
@@ -66,11 +64,8 @@ For any message from the current height:
   and the timeout.
 - If the node does not have certain transactions from this `propose`, it
   initiates sending `RequestTransactions`.
-- If there are committed transactions in `propose`, then discard them.
 - A list of nodes that have all transactions should be copied from the remote
   `RequestState` for `RequestPropose`, if it existed. (**TODO** clarify)
-- _According to the main consensus logic_, a commit occurs, if all the necessary
-  conditions are met.
 
 ### `prevote` receiving
 
@@ -96,18 +91,9 @@ For any message from the current height:
 - If the node has formed +2/3 `precommit`, it deletes the data for the
   corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
-- _According to the main consensus logic_, a commit occurs, if all the necessary
-  conditions are met.
 
 ### `block` receiving
 
-- The node checks the correctness of all `precommit`s so that they are correctly
-  signed, belong to the same propose and to the same round.
-- The node checks the correctness of the transactions so that they are correctly
-  signed.
-- The node executes transactions and makes sure that `block_hash` matches what
-  is specified in the block.
-- The node commits the block if all conditions are met.
 - The node requests the next block if there are validators at a height higher
   than current.
 
