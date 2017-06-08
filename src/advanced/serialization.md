@@ -47,8 +47,8 @@ increasing their indexes. String is array of bytes example.
 
 ### Sequences
 
-A sequence is representation of `struct` in Rust. It is data structure with a
-fixed number of possibly heterogeneous fields.
+A sequence is representation of [`struct` in Rust][rust_structs]. It is data
+structure with a fixed number of possibly heterogeneous fields.
 
 In binary representation sequence is splitted into two main parts:
 
@@ -92,3 +92,4 @@ Its serialized representation:
 
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
+[rust_structs]: https://doc.rust-lang.org/book/structs.html
