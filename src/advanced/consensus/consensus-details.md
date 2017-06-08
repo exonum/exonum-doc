@@ -50,14 +50,8 @@ correctness](proof-of-algorithm-correctness)
 - `propose_timeout`
   Proposal timeout after the new height beginning.
 
-- `BLOCK_ALIVE`
-  _Block_ message lifetime.
-
 - `block.prev_hash`
   Hash of the previous block.
-
-- `block.time`
-  Block formation time.
 
 **TODO:** insert picture
 
@@ -96,7 +90,6 @@ processing** or **Transaction processing**.
 
 - If we already know this proposal, ignore the message.
 - Check `block.prev_hash` correctness.
-- Check `block.time` correctness.
 - Make sure that the specified validator is the leader for the given round.
 - Make sure that the proposal does not contain any previously committed
   transaction.
@@ -218,8 +211,6 @@ Only for the case if a validator is behind the majority of the network:
 - Check the block message
 
   - The key in the `to` field must match the key of the validator.
-  - The time of the block creating must fit within the interval
-    `0 <= (current_time - block.time) <= BLOCK_ALIVE`
   - `block.prev_hash` matches the hash of the last committed block.
 
 - If the message is compiled correctly, proceed to check the block contents.
