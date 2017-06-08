@@ -86,7 +86,7 @@ processing** or **Transaction processing**.
 
 - If everything is OK, proceed to the message processing according to its type.
 
-#### _Propose_ message processing
+#### `propose` message processing
 
 - If we already know this proposal, ignore the message.
 - Check `block.prev_hash` correctness.
@@ -110,17 +110,17 @@ processing** or **Transaction processing**.
 
 #### Full proposal
 
-- If we do not have a saved PoL, send _prevote_ in the round to which the
+- If we do not have a saved PoL, send `prevote` in the round to which the
   proposal belongs.
 - For all rounds in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-  - If we have +2/3 _prevote_ for this proposal in this round, then proceed to
-  **Availability of +2/3** **_Prevote_** for this proposal in this round.
+  - If we have +2/3 `prevote` for this proposal in this round, then proceed to
+  **Availability of +2/3 `Prevote`** for this proposal in this round.
 
 - For all rounds in the interval `[propose.round, current_round]`:
 
-  - If +2/3 _precommit_ аrе available for this proposal in this round and with
+  - If +2/3 `precommit` аrе available for this proposal in this round and with
     the same `state_hash`, then:
 
     - Execute the block, if it has not yet been executed.
@@ -128,7 +128,7 @@ processing** or **Transaction processing**.
       majority.
     - Proceed to **COMMIT** for this block.
 
-#### Availability of +2/3 _Prevote_
+#### Availability of +2/3 `prevote`
 
 - Delete **Prevotes** request, if available for `prevote.round` and
   `propose_hash`
@@ -136,28 +136,28 @@ processing** or **Transaction processing**.
   `propose` is the same as `prevote.propose_hash`, then proceed to **LOCK** for
   this very proposal.
 
-#### _Prevote_ message processing
+#### `prevote` message processing
 
-- Add the message to the list of known _prevote_ for this proposal in this round.
+- Add the message to the list of known `prevote` for this proposal in this round.
 - If:
 
-  - we have formed +2/3 _prevote_
+  - we have formed +2/3 `prevote`
   - `locked_round < prevote.round`
   - we know this proposal
   - we know all of its transactions
 
-- Then proceed to **Availability of + 2/3** **_Prevote_** for this proposal in
+- Then proceed to **Availability of + 2/3 `Prevote`** for this proposal in
   the round `prevote.round`
 
 - If we do not know `Propose` or any transactions, request them.
 
-#### _Precommit_ message processing
+#### `precommit` message processing
 
-- Add the message to the list of known _precommit_ for this proposal in this
+- Add the message to the list of known `precommit` for this proposal in this
   round with the given `state_hash`.
 - If:
 
-  - we have formed +2/3 _precommit_
+  - we have formed +2/3 `precommit`
   - we know this proposal
   - we know all of its transactions
 
@@ -170,41 +170,41 @@ processing** or **Transaction processing**.
 
 - Else:
 
-  - Request _propose_, if it is not known.
-  - If the message round is bigger than `locked_round`, request _prevotes_ from
+  - Request `propose`, if it is not known.
+  - If the message round is bigger than `locked_round`, request `prevotes` from
     the message round.
 
-#### _LOCK_
+#### LOCK
 
 - For all rounds in the interval `[locked_round, current_round]`:
 
-  - If we have not sent _prevote_ in this round, send it for `locked_propose`.
-  - If we have formed +2/3 _prevote_ in this round, then execute **LOCK** for
+  - If we have not sent `prevote` in this round, send it for `locked_propose`.
+  - If we have formed +2/3 `prevote` in this round, then execute **LOCK** for
     this round and `locked_propose`, assign `locked_round` to `current_round`.
-  - If we did not send _prevote_ messages such that
+  - If we did not send `prevote` messages such that
     `prevote.hash != locked_propose`, in rounds>`locked_round` (that is, if we
-    did not vote _prevote_ for other proposals in subsequent rounds after
+    did not vote `prevote` for other proposals in subsequent rounds after
     `locked_round`), then:
 
     - Execute the block, if it has not yet been executed.
-    - Send _precommit_ for `locked_propose` in this round.
-    - If we have 2/3 _precommit_, then proceed to **COMMIT**.
+    - Send `precommit` for `locked_propose` in this round.
+    - If we have 2/3 `precommit`, then proceed to **COMMIT**.
 
-#### _COMMIT_
+#### COMMIT
 
-- Remove _RequestPrecommits_, if there was one.
+- Remove `RequestPrecommits`, if there was one.
 - Push all the changes to the storage.
 - Update current height.
 - Set the value of the variable `locked_round` to `0` at the new height.
 - Delete all transactions of the committed block from the pool of unconfirmed
   transactions.
-- If we are the leader, form and send _propose_ and _prevote_ after
+- If we are the leader, form and send `propose` and `prevote` after
   `propose_timeout` expiration.
 - Process all messages from the queue (**TODO** specify message queue), if they
   become relevant.
 - Add a timeout for the next round of new height.
 
-#### _Block_ message processing
+#### `Block` message processing
 
 Only for the case if a validator is behind the majority of the network:
 
@@ -218,8 +218,8 @@ Only for the case if a validator is behind the majority of the network:
   - The block height should be equal to the current height of the node.
   - The time for the block creation must fit into the intervals of the
     corresponding round.
-  - The number of _precommit_ messages should be sufficient to reach consensus.
-  - All _precommit_ messages must be correct.
+  - The number of `precommit` messages should be sufficient to reach consensus.
+  - All `precommit` messages must be correct.
 
 - If the check is successful, then check all transactions for correctness and if
   they are all correct, then proceed to their execution, which results in
@@ -239,18 +239,17 @@ Only for the case if a validator is behind the majority of the network:
 - If the timeout does not match the current height and round, ignore it
   (**TODO** specify exit() after a point or proceed to the next point).
 - Add a timeout for the next round.
-- If we have a saved PoL, send _prevote_ for `locked_propose` in a new round,
-  checking if we have reached the status of **Availability of + 2/3**
-  **_Prevote_** .
-- Else, if we are the leader, form and send _propose_ and _prevote_ after the
+- If we have a saved PoL, send `prevote` for `locked_propose` in a new round,
+  checking if we have reached the status of **Availability of + 2/3 `Prevote`**.
+- Else, if we are the leader, form and send `propose` and `prevote` after the
   expiration of `propose_timeout`.
 - Process all messages from the queue, if they become relevant.
 
 #### Status timeout processing
 
-- If the node has at least one received block, then send out a status message to
+- If the node has at least one received block, then send out a `status` message to
   all validators.
-- Add a timeout for the next status send.
+- Add a timeout for the next `status` send.
 
 ## Proof of Algorithm Correctness
 
@@ -289,31 +288,31 @@ become the leader.
 ### Proposition 3: Deadlock Absence
 
 A certain non-Byzantine node will sooner or later send some message relating to
-the consensus algorithm (propose, prevote, precommit).
+the consensus algorithm (`propose`, `prevote`, `precommit`).
 
 #### Proof
 
 Let us prove it by contradiction. Assume that each non-Byzantine node send no
 messages for an arbitrarily long period of time; then that node updates neither
-the current height nor the PoL state (_prevote_ message would be sent for the
+the current height nor the PoL state (`prevote` message would be sent for the
 new PoL upon the coming of a new round in the case of a PoL update, if no other
 message had been sent before this time). Consider the cases of PoL status:
 
 1. **Some non-Byzantine node has a saved PoL**. Then this node will send a
-  _prevote_ message for the proposal saved in the PoL when the next round
+  `prevote` message for the proposal saved in the PoL when the next round
   timeout occurs (unless it sends any other message earlier).
 
 2. **No one non-Byzantine node has a saved PoL**. Then there will always come
   another round in which some non-Byzantine node will be the leader (see the
   previous statement). In this case, the node will form a new proposal and send
-  _propose_ and _prevote_ messages.
+  `propose` and `prevote` messages.
 
 #### Consequence
 
 If there exists an unlimited number of heights on which the
 validator can become a leader (property of round robin), then any non-Byzantine
 node will send an arbitrarily large number of messages related to the consensus
-algorithm (propose, prevote, precommit).
+algorithm (`propose`, `prevote`, `precommit`).
 
 ### Proposition 4: Obligatory Block Acceptance (Liveness)
 
@@ -347,32 +346,32 @@ from this proposal (request mechanism). Denote this time
 
 If no non-Byzantine node has PoL to the `R(T*)` round, then in this round the
 node will receive PoL (for the proposal from the `R` round). Indeed, if no one
-has PoL, then the nodes could not send the _prevote_ message in the `R(T*)`
+has PoL, then the nodes could not send the `prevote` message in the `R(T*)`
 round. In accordance with the algorithm for processing complete proposals, the
-confirming _prevote_ message will be sent.
+confirming `prevote` message will be sent.
 
 Thus, **by the time `T'= T(R(T*)) + \delta T` at least one non-Byzantine node
 will have PoL**.
 
 **Not later than `T'' = T(R(T')) + 2 \delta T` each non-Byzantine node will have
 some PoL**. Indeed, starting with the `R(T')` round, the non-Byzantine node will
-send _prevote_ messages for the proposal from its PoL. Non-Byzantine nodes that
+send `prevote` messages for the proposal from its PoL. Non-Byzantine nodes that
 do not have PoL will be able to get this PoL through the request mechanism by
 the time `T''`.
 
-None of the non-Byzantine nodes will send _prevote_ for new proposals since the
+None of the non-Byzantine nodes will send `prevote` for new proposals since the
 moment `T''`. Hence, new PoL will not appear in the network.
 
 During one iteration `T(R(...)) + 2 \delta T` at least one non-Byzantine
 validator will increase its PoL. Indeed, all the non-Byzantine nodes already
-have some PoLs. In this case, they will always send _prevote_ messages for the
+have some PoLs. In this case, they will always send `prevote` messages for the
 corresponding proposals. And according to the logic of their processing, if the
-non-Byzantine node receives _prevote_ pointing to a larger PoL, a request for
-missing _prevote_ for this (bigger) PoL occurs.
+non-Byzantine node receives `prevote` pointing to a larger PoL, a request for
+missing `prevote` for this (bigger) PoL occurs.
 
 Since there exists finite number of the validators and possible proposals, it
 follows that in some finite time `T '''` + 2/3 of all validators will receive
-PoL for the same proposal. After that they will be able to send _precommit_
+PoL for the same proposal. After that they will be able to send `precommit`
 messages.
 
 Not later than time `T(R(T''')) + \delta T` at least one non-Byzantine validator
@@ -389,32 +388,32 @@ at the same height.
 
 Let some node added the `B` block to the blockchain. This could only happen if
 that node went into the **COMMIT** state. There exist three possibilities of the
-transition to the **COMMIT** state: from **LOCK**, **_Prevote_** **processing**,
+transition to the **COMMIT** state: from **LOCK**, **`Prevote` processing**,
 and **Availability of the full proposal**. In all these cases, the condition of
-the transition is the presence of +2/3 _precommit_ messages for some proposal `P`
+the transition is the presence of +2/3 `precommit` messages for some proposal `P`
 from the `R` round and the result of applying the corresponding block leads to
 the same `state_hash`. Since the number of Byzantine nodes is -1/3, +1/3 of the
-non-Byzantine nodes sent _precomit_ messages in the corresponding round. Such a
+non-Byzantine nodes sent `precomit` messages in the corresponding round. Such a
 message could only be sent within the **LOCK** state in which the PoL was stored
 for the `P` proposal in the `R` round. This could happen only if these nodes did
-not send _prevote_ messages in rounds `R '> R` for `P'! = P` (special condition
-for sending the _precommit_ message). Also, these nodes sent _prevote_ messages
+not send `prevote` messages in rounds `R '> R` for `P'! = P` (special condition
+for sending the `precommit` message). Also, these nodes sent `prevote` messages
 in all rounds after `R` until their current rounds. Thus, since the remaining
 nodes are -2/3, we have two consequences.
 
 1. In no rounds after `R` we can get PoL (in other words go to the **LOCK**
-  state) for the `P '! = P` proposal, because this requires +2/3 _prevote_
+  state) for the `P '! = P` proposal, because this requires +2/3 `prevote`
   messages.
 
 2. In all rounds of `R '> R`, new PoLs cannot emerge in the network, except for
   PoLs related to the `P` proposal (and, accordingly, to the `B` block). Indeed,
   at the beginning of the round following the current round, the specified +1/3
   of the non-Byzantine nodes will be in the state with the saved PoL
-  corresponding to the `P` proposal. And consequently they will send _prevote_
+  corresponding to the `P` proposal. And consequently they will send `prevote`
   messages only for the saved `P` proposal according to the **Processing of the
   timeout of the round** state.
 
-Thus, messages of _precommit_ type can not be sent for any other block. This
+Thus, messages of `precommit` type can not be sent for any other block. This
 means that none of the non-Byzantine node can add another block to the blockchain.
 
 #### Corollary
@@ -424,7 +423,7 @@ of an asynchronous network .
 
 #### Proof
 
-The proof of _Proposition 5_ did not in any way use the assumption of partial
+The proof of **Proposition 5** did not in any way use the assumption of partial
 synchronism. Therefore, it is also true in an asynchronous network.
 
 ### Proposition 6: Moving Nodes Up
@@ -439,7 +438,7 @@ is at the height `H`, while the `B` node is at the height `H + h`. We will show
 that in a finite time the `A` node can be pulled to the height `H + 1`.
 
 All messages described in the algorithm and related to the consensus algorithm
-(_propose_, _prevote_, _precommit_, _status_) contain the current height. Thus,
+(`propose`, `prevote`, `precommit`, `status`) contain the current height. Thus,
 as soon as the `B` node sends any of these messages and the message is delivered
 to `A`, the `A` node will understand that it is behind and will request the next
 block (it can do this not at the `B` node, but at any other node; if the block
