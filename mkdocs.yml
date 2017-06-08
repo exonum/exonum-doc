@@ -22,6 +22,8 @@ extra:
       link: 'https://github.com/exonum'
     - type: 'facebook'
       link: 'https://www.facebook.com/Exonum'
+    - type: 'twitter'
+      link: 'https://twitter.com/BitFuryGroup'
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'
