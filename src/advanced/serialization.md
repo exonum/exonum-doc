@@ -35,35 +35,12 @@ Binary representation structure is splitted into two main parts:
 
 ### Data types
 
-Data fields can be one of following types:
-
 #### Primitive types
 
-Data of primitive types is fixed sized, and located fully in header.
-
-- `u8`  
-  Regular byte. Size: 1 byte.
-
-- `i8`  
-  Signed byte. Size: 1 byte.
-
-- `u16`  
-  Short unsigned number stored in little endian. Size: 2 bytes.
-
-- `i16`  
-  Short signed number stored in little endian. Size: 2 bytes.
-
-- `u32`  
-  32-bit unsigned number stored in little endian. Size: 4 bytes.
-
-- `i32`  
-  32-bit signed number stored in little endian. Size: 4 bytes.
-
-- `u64`  
-  Long unsigned number stored in little endian. Size: 8 bytes.
-
-- `i64`  
-  Long signed number stored in little endian. Size: 8 bytes.
+- `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
+  Correspond to the same [Rust language primitive types][rust_primitive_types].
+  Their size is the same as for correspond Rust types and they are stored in
+  little endian.
 
 - `bool`  
   `0x01` for true, `0x00` for false. A message with other value stored in place
@@ -107,3 +84,4 @@ Its serialized representation:
 `16 => 24` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
 
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
+[rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
