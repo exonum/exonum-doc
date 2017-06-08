@@ -10,25 +10,25 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
 Receiving a message from the node gives us the opportunity to learn certain
 information about the state of the node, if the node is not Byzantine:
 
-**Any consensus message**
+### Any consensus message
 
 - The node is at the appropriate height, it has all the previous blocks, +2/3
-  _precommit_ for each of them.
+  `precommit` for each of them.
 
-**_Prevote_**
+### `prevote`
 
 - The node has a corresponding proposal.
-- The node has _all_ transactions of this proposal.
-- If the node indicated `lock_round` in the message, it has a +2/3 _prevote_ for
+- The node has `all` transactions of this proposal.
+- If the node indicated `lock_round` in the message, it has a +2/3 `prevote` for
   this proposal in the specified round.
 
-**_Precommit_**
+### `precommit`
 
 - The node has a corresponding proposal.
-- The node has _all_ transactions of this proposal.
-- The node has +2/3 _prevote_ for this proposal in the corresponding round.
+- The node has `all` transactions of this proposal.
+- The node has +2/3 `prevote` for this proposal in the corresponding round.
 
-**_Connect_**
+### `connect`
 
 - On specified `addr` it is possible to address to a node with specified
   `pub_key`.
@@ -38,70 +38,67 @@ information about the state of the node, if the node is not Byzantine:
 This algorithm determines the node's behavior at different stages of the
 consensus algorithm if the node needs to request information from other nodes.
 
-**Getting any consensus message from a bigger height**
+### Getting any consensus message from a bigger height
 
 - Update the height for the corresponding node.
-- Initiate sending _RequestBlock_ for the current height, if such a request was
+- Initiate sending `RequestBlock` for the current height, if such a request was
   not sent earlier.
 
 Everything below is applicable only if the height of the message is the same as
 validator height.
 
-**Receiving a transaction**
+### Receiving a transaction
 
-- If this is the last transaction required to generate some _propose_, node
+- If this is the last transaction required to generate some `propose`, node
   deletes the data in the corresponding request and its timeouts.
 - _According to the main consensus logic_ a commit occurs, if all the necessary
   conditions are met.
 
 For any message from the current height:
 
-**_propose_** **receiving**
+### `propose` receiving
 
-- If the node requested this _propose_, it deletes the data about the request
+- If the node requested this `propose`, it deletes the data about the request
   and the timeout.
-- If the node does not have certain transactions from this _propose_, it
-  initiates sending _RequestTransactions_.
-- If there are committed transactions in _propose_, then discard them.(**TODO**
-  indicate critical error?)
+- If the node does not have certain transactions from this `propose`, it
+  initiates sending `RequestTransactions`.
+- If there are committed transactions in `propose`, then discard them.
 - A list of nodes that have all transactions should be copied from the remote
-  **RequestState** for _RequestPropose_, if it existed. (**TODO** clarify)
+  `RequestState` for `RequestPropose`, if it existed. (**TODO** clarify)
 - _According to the main consensus logic_, a commit occurs, if all the necessary
   conditions are met.
 
-**_prevote_** **receiving**
+### `prevote` receiving
 
-- If the node does not have a corresponding _propose_, it initiates sending
-  _RequestPropose_.
-- If the node has _propose_ but not all transactions, it initiates sending
-  _RequestTransaction_. (**TODO** Need to say something about the repeat of
-  requests. At this specific point we probably already have sent some requests
-  about the unknown transactions. It's not necessary to repeat these requests.)
+- If the node does not have a corresponding `propose`, it initiates sending
+  `RequestPropose`.
+- If the node has `propose` but not all transactions, it initiates sending
+  `RequestTransaction` (only for those unknown transactions for which the request
+  has not yet been sent ).
 - If the sender specified `lock_round`, which is greater than the stored PoL,
-  node initiates sending _RequestPrevotes_.
-- If the node have formed +2/3 _prevote_, it deletes the data for the
-  corresponding request _RequestPrevotes_ and timeouts, if the node requested
+  node initiates sending `RequestPrevotes`.
+- If the node have formed +2/3 `prevote`, it deletes the data for the
+  corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
 
-**_precommit_** **receiving**
+### `precommit` receiving
 
-- If the node does not have a corresponding _propose_, it initiates sending
-  _RequestPropose_.
-- If the node have _propose_ but not all transactions, it initiates sending
-  _RequestTransaction_.
+- If the node does not have a corresponding `propose`, it initiates sending
+  `RequestPropose`.
+- If the node have `propose` but not all transactions, it initiates sending
+  `RequestTransaction`.
 - If the message corresponds to a larger round than the saved PoL, the node
-  initiates sending _RequestPrevotes_ for this round.
-- If the node has formed +2/3 _precommit_, it deletes the data for the
-  corresponding request _RequestPrecommit_ and timeouts, if the node requested
+  initiates sending `RequestPrevotes` for this round.
+- If the node has formed +2/3 `precommit`, it deletes the data for the
+  corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
 - _According to the main consensus logic_, a commit occurs, if all the necessary
   conditions are met.
 
-**_block_** **receiving**
+### `block` receiving
 
-- The node checks the correctness of all precommits so that they are correctly
-  signed, belong to the same propose and to the same round (**TODO** double check
-  whether we have a round in a precommit or not).
+- The node checks the correctness of all `precommit`s so that they are correctly
+  signed, belong to the same propose and to the same round.
 - The node checks the correctness of the transactions so that they are correctly
   signed.
 - The node executes transactions and makes sure that `block_hash` matches what
@@ -110,25 +107,25 @@ For any message from the current height:
 - The node requests the next block if there are validators at a height higher
   than current.
 
-**Adding new validators**
+### Adding new validators
 
-- Send the _RequestPeers_ request to the known network validator.
+- Send the `RequestPeers` request to the known network validator.
 
-**Transition to a new height**
+### Transition to a new height
 
 - Delete all information about requests and their timeouts.
 
-**Request sending initiation**
+### Request sending initiation
 
-- If there is no corresponding **RequestState** for the requested data, create
+- If there is no corresponding `RequestState` for the requested data, create
   it and set the timer to wait for the data (`RequesTimeout`).
 - Add the node to the list of nodes that have this data.
 
-**Triggering request timeout**
+### Triggering request timeout
 
 - Delete the validator from the list of nodes that have the requested data.
 - If the list of validators for which the requested data should be empty, delete
-  **RequestState**.
+  `RequestState`.
 - Otherwise, execute the request and start a new timer.
 
 ## Algorithm for requests processing
@@ -138,47 +135,48 @@ by the node.
 
 The processing of responses to requests is trivial:
 
-- If _to_ value does not correspond to our key, ignore the message.
+- If `to` value (node which should receive request) does not correspond to our
+  key, ignore the message.
 - If the message is too old (the value of the field `time` is less than **TODO**
   specify constant), ignore the message.
 - If the message indicates the future time of delivery with an accuracy of
   **TODO** specify constant, ignore the message.
 - Check the signature of the message.
 
-_RequestPropose_
+### `RequestPropose`
 
 - If the message corresponds to a height higher than the one on which the node
   is, ignore the message.
-- If the node has _propose_ c with the corresponding hash at the given height,
+- If the node has `propose` c with the corresponding hash at the given height,
   send it.
 
-_RequestTransactions_
+### `RequestTransactions`
 
 The node sends all transactions that we have from those that were requested, as
 separate messages. Transactions can either be already committed or be in the
 pool. If we do not have any of the requested transactions, don't send anything.
 
-_RequestPrevotes_
+### `RequestPrevotes`
 
 - If the message does not match the height at which the node is, ignore the
   message.
-- Send as individual messages all the corresponding _prevote_ messages except
+- Send as individual messages all the corresponding `prevote` messages except
   those that the requestor has.
 
-_RequestPrecommits_
+### `RequestPrecommits`
 
 - If the message corresponds to a height higher than the one on which the node
   is, ignore the message.
-- Send as individual messages all the corresponding _precommit_ messages except
+- Send as individual messages all the corresponding `precommit` messages except
   those that the requestor has.
 
-_RequestBlock_
+### `RequestBlock`
 
 - If the message corresponds to a height not less than the one on which we are,
   ignore the message.
 - Form the message `Block` from the data of the blockchain and send it to the
   requestor.
 
-_RequestPeers_
+### `RequestPeers`
 
-- Send all the saved messages _Connect_ from **peers** to the author.
+- Send all the saved messages `Connect` from `peers` to the author.
