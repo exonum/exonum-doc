@@ -25,12 +25,13 @@ the blockchain.
 
 ## Serialization
 
-All transaction messages are serialized in a uniform format. There are 2
-serialization formats - binary and [JSON](https://en.wikipedia.org/wiki/JSON);
-the first one is used in communication among nodes and
-[storage](./storage.md), the second one is used to communicate with
-[light clients](./clients.md). All fields to serialize and deserialize
-transactions are listed in the table below.
+Transactions in Exonum are subtypes of messages and share serialization logic
+with consensus messages. All transaction messages are serialized in a uniform
+format. There are 2 serialization formats - binary and
+[JSON](https://en.wikipedia.org/wiki/JSON); the first one is used in
+communication among nodes and [storage](./storage.md), the second one is used
+to communicate with [light clients](./clients.md). All fields to serialize and
+deserialize transactions are listed in the table below.
 
 | Field              | Binary format     | Binary offset | JSON       |
 |--------------------|:-----------------:|--------------:|:----------:|
@@ -75,8 +76,7 @@ The `message_id` defines the type of message in the service.
     `AddFundsTransaction` for coins emission and `TransferTransaction` for
     money transfer et. al.
 
-**Binary presentation:** `usize` (the same as `u32` in this case, unsigned 4
-bytes).
+**Binary presentation:** `u32` (unsigned 4 bytes).
 **JSON presentation:** isn't present.
 
 ### Payload length
@@ -153,15 +153,17 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
 !!! note "Example"
     In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
     an `execute` method of `TransactionSend` executes the transaction which
-    means: set the result of executing equal to `true` and change `from` and
-    `to` wallets balances with `amount` if
+    means: add this transaction to the data storage with a Boolean `status`
+    metadata for changing any wallets founds. The `status` is `true`, the
+    balance of the `from` wallet is decreased by `amount` and the balance of
+    the `to` wallet is increased by `amount` if
 
-    - `to` is not the same as `from`
     - `from` were presented in committed blocks (necessary condition of
       positive balance of `from` for a considered cryptocurrency
       implementation)
     - balance of `from` is greater or equal to `amount`,
-    else the result of execution is `false` and it doesn't change any balances.
+    else the tag in the data storage is `false` and it doesn't change any
+    balances.
 
 !!! note
     `Verify` and `execute` are triggered at different times. `Verify` checks
