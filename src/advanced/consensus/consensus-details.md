@@ -70,7 +70,7 @@ processing** or **Transaction processing**.
 
 #### Consensus messages processing
 
-- We do not process the message if it belongs to a future round or height. In
+- Do not process the message if it belongs to a future round or height. In
   this case, if the message refers to the height `current_height + 1`, the
   message is added to the `queued` queue. If the message is
   related to the future height and includes updated information about the
@@ -146,7 +146,7 @@ processing** or **Transaction processing**.
   - we know this proposal
   - we know all of its transactions
 
-- Then proceed to **Availability of + 2/3 `Prevote`** for this proposal in
+- Then proceed to **Availability of +2/3 `Prevote`** for this proposal in
   the round `prevote.round`
 
 - If we do not know `Propose` or any transactions, request them.
@@ -240,7 +240,7 @@ Only for the case if a validator is behind the majority of the network:
   (**TODO** specify exit() after a point or proceed to the next point).
 - Add a timeout for the next round.
 - If we have a saved PoL, send `prevote` for `locked_propose` in a new round,
-  checking if we have reached the status of **Availability of + 2/3 `Prevote`**.
+  check if we have reached the status of **Availability of +2/3 `Prevote`**.
 - Else, if we are the leader, form and send `propose` and `prevote` after the
   expiration of `propose_timeout`.
 - Process all messages from the queue, if they become relevant.
@@ -370,7 +370,7 @@ non-Byzantine node receives `prevote` pointing to a larger PoL, a request for
 missing `prevote` for this (bigger) PoL occurs.
 
 Since there exists finite number of the validators and possible proposals, it
-follows that in some finite time `T '''` + 2/3 of all validators will receive
+follows that in some finite time `T '''` +2/3 of all validators will receive
 PoL for the same proposal. After that they will be able to send `precommit`
 messages.
 
