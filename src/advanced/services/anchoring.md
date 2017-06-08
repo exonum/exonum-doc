@@ -401,9 +401,10 @@ An anchoring transaction proposal is constructed as follows:
 - It MUST conform to the Bitcoin transaction specification with SegWit activated
   (except having no signature witnesses for the transaction inputs)
 - The inputs are:
-  - The change output of the previous anchoring tx. TODO: very first anchoring tx
-  - Funding UTXOs agreed upon as configuration changes and not included in a previous
-    anchoring transaction
+    - The change output of the previous anchoring tx.
+      TODO: very first anchoring tx
+    - Funding UTXOs agreed upon as configuration changes and not included in
+      a previous anchoring transaction
   The inputs are ordered using BIP 69 [BIP69]
 - The outputs are MUST contain a data output and the change output, and no other
   outputs. The data output MUST be first, and the change output MUST be second

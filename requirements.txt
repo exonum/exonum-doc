@@ -1,6 +1,8 @@
 # Main dependencies
 mkdocs
-mkdocs-bootswatch
+pygments
+pygments-github-lexers
+mkdocs-material
 # Linters
 linkchecker
 html5validator
