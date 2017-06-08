@@ -26,22 +26,22 @@ points.
 
 Multiple table types may be used in the Exonum applications.
 
-### Used parameter types
 
-In the table descriptions the following parameters types are used:
+!!! note "Used parameter types"
+    In the table descriptions the following parameters types are used:
 
-- `K`: key type at the map definitions. Exonum uses byte sequences for
-  the keys.
-- `V`: value type at the map definitions. Map stores the objects of
-  particular class defined by user in the table initialization. At the
-  bottom level objects are serialized and are stored as byte sequences.
-- `u64`: unsigned 64-bit int type.
-- `I`: an Iterator object.
-- `Hash`: `sha-256` hash object
-- `Proofnode`: a custom class representing nodes from `MerkleTable`
-  proof trees.
-- `RootProofNode`: a custom class representing nodes from
-  `MerklePatriciaTable` proof trees.
+    - `K`: key type at the map definitions. Exonum uses byte sequences for
+      the keys.
+    - `V`: value type at the map definitions. Map stores the objects of
+      particular class defined by user in the table initialization. At the
+      bottom level objects are serialized and are stored as byte sequences.
+    - `u64`: unsigned 64-bit int type.
+    - `I`: an Iterator object.
+    - `Hash`: `sha-256` hash object
+    - `Proofnode`: a custom class representing nodes from `MerkleTable`
+      proof trees.
+    - `RootProofNode`: a custom class representing nodes from
+      `MerklePatriciaTable` proof trees.
 
 ### MapTable
 
@@ -194,10 +194,11 @@ with the following key in the LevelDB map:
 
 Here, `|` stands for bytes sequences concatenation.
 
-It is strongly advised not to admit situation when one table name inside
-the service is a prefix for the other table in the same service. Such
-cases may cause the ineligible coincidences between the different keys
-and elements.
+!!! warning ""
+    It is strongly advised not to admit situation when one table name inside
+    the service is a prefix for the other table in the same service. Such
+    cases may cause the ineligible coincidences between the different keys
+    and elements.
 
 ## List of system tables
 
@@ -240,8 +241,9 @@ At the very start of the blockchain, services should initialize its
 tables. It should be done during Genesis block creation. To set up its
 data tables, service should handle `genesis_block` event:
 [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92).
-**Notice.** Genesis Block creation procedure is called every time Exonum
-node starts.
+!!! note Notice
+    Genesis Block creation procedure is called every time Exonum
+    node starts.
 
 You may find implementation examples in the our tutorial:
 [cryptocurrency-service-genesis-block]() **TODO: fill the link**
