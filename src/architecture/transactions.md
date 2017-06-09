@@ -1,33 +1,38 @@
 # Transactions
 
-A transaction in a blockchain
+A transaction in Exonum
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
-is a group of sequential operations with the database and is a logical unit of
-work with data. So any business logic of the project with Exomum should be
-formulated using different types of transactions in different types of
-services. A transaction must be executed entirely, respecting the integrity of
-the data (the correct transaction execution workflow should be implemented by
-this transaction type developer). If the transaction execution is unsuccessful,
-then the transaction must be not performed at all, so that it shall not have any
-effect. And it is guaranteed by Exonum core. A transaction could be created by
+is a group of sequential operations with the data (i.e., the Exonum [key-value storage](storage.md)).
+Transactions are defined in [services](services.md) and determine all business logic
+of any Exonum-powered blockchain.
+
+Transactions are executed [atomically, consistently, in isolation and durably][wiki:acid]. 
+If the transaction execution violates data invariants,
+the transaction is completely rolled back, so that it does not have any
+effect on the persistent storage.
+
+All transactions are authorized with the help of public-key digital signatures.
+A transaction could be created by
 the allowed entities and sent for the distributed system of validators for the
 consideration.
 
 !!! note "Example"
-    A private key owner could initialize his coins transfer for
-    [cryptocurrency](https://github.com/exonum/cryptocurrency).
+    In a sample [cryptocurrency service][cryptocurrency],
+    an owner of cryptocurrency may authorize transferring his coins by signing
+    a transfer transaction with a key associated with coins.
 
-If the transaction is correct, it would be included in a block of the
-blockchain through the validators voting process via the
-[consensus algorithm](../advanced/consensus/consensus.md) work. All
-transactions are executed one by one in the order in which they are placed into
+If the transaction is correct, it can be included into a block
+via the [consensus algorithm](../advanced/consensus/consensus.md)
+among the blockchain validators.
+All transactions are executed sequentially in the order in which they are placed into
 the blockchain.
 
 ## Serialization
 
-Transactions in Exonum are subtypes of messages and share serialization logic
-with consensus messages. All transaction messages are serialized in a uniform
-format. There are 2 serialization formats - binary and
+Transactions in Exonum are subtypes of messages and share the serialization logic
+with [consensus messages](../advanced/consensus/consensus.md#messages).
+All transaction messages are serialized in a uniform
+fashion. There are 2 serialization formats - binary and
 [JSON](https://en.wikipedia.org/wiki/JSON); the first one is used in
 communication among nodes and [storage](./storage.md), the second one is used
 to communicate with [light clients](./clients.md). All fields to serialize and
@@ -45,26 +50,27 @@ deserialize transactions are listed in the table below.
 
 ### Network ID
 
-This field would be used to send inter-blockchain messages in the future
-releases. `Network_id` is useless right now.
+This field will be used to send inter-blockchain messages in the future
+releases. For now, it is not used.
 
-**Binary presentation:** `u8` (unsigned 1 byte).
+**Binary presentation:** `u8` (unsigned 1-byte integer).
 **JSON presentation:** number
 
 ### Protocol Version
 
 The major version of the Exonum serialization protocol. Currently, `0`.
 
-**Binary presentation:** `u8` (unsigned 1 byte).
+**Binary presentation:** `u8` (unsigned 1-byte integer).
 **JSON presentation:** number.
 
 ### Service ID
 
 Sets the [service](services.md) to make a deal with (for example,
 *configuration* or *cryptocurrency*). The pair (`service_id`, `message_id`) is
-a key to process transaction (to find such methods as `verify` and `execute`).
+a key used to lookup implementation of [the transaction interface](#interface)
+(e.g., `verify` and `execute` methods).
 
-**Binary presentation:** `u16` (unsigned 2 bytes).
+**Binary presentation:** `u16` (unsigned 2-byte integer).
 **JSON presentation:** number.
 
 ### Message ID
@@ -72,30 +78,31 @@ a key to process transaction (to find such methods as `verify` and `execute`).
 The `message_id` defines the type of message in the service.
 
 !!! note "Example"
-    The service *cryptocurrency* could include different types of transactions:
-    `AddFundsTransaction` for coins emission and `TransferTransaction` for
-    money transfer et. al.
+    [The sample cryptocurrency service][cryptocurrency] includes 2 main 
+    types of transactions: `AddFundsTransaction` for coins emission
+    and `TransferTransaction` for money transfer .
 
-**Binary presentation:** `u32` (unsigned 4 bytes).
+**Binary presentation:** `u32` (unsigned 4-byte integer).
 **JSON presentation:** isn't present.
 
 ### Payload length
 
-The length of the message body after the header. It does not include the
+The length of the message body after the header. Does not include the
 signature length.
 
-**Binary presentation:** `u16` (unsigned 2 bytes).
-**JSON presentation:** number.
+**Binary presentation:** `u16` (unsigned 2-byte integer).
+**JSON presentation:** (not serialized).
 
 ### Body
 
-The body of the transaction, which includes specific for a given transaction
-(`service_id`, `message_id`) type data and a format of which is specified by
+The body of the transaction, which includes data specific for a given
+transaction type. Format of the body is specified by the
 service with `service_id`.
 
 !!! note "Example"
-    the body of `TransferTransaction` should include field `from` for coins
-    sender, `to` for coins recipient, `amount` for the sending amount and
+    The body of `TransferTransaction` in the sample cryptocurrency service
+    includes field `from` for coins
+    sender, `to` for coins recipient, `amount` for the amount being transferred and
     `seed` to distinct different transactions with the same previous three
     fields.
 
@@ -123,35 +130,39 @@ person could be verified by anyone using the public key and
 
 ## Interface
 
-All transactions have at least three methods: `verify`, `execute` and `info`
+Transaction interface defines 3 methods: `verify`, `execute` and `info`
 (see `src/blockchain/service.rs` from
 [Exonum core](https://github.com/exonum/exonum-core)).
 
 ### Verify
 
 The `verify` method verifies the transaction, which includes the message
-signature verification and other specific for a given transaction type checks.
-`Verify` checks internal consistency of a transaction and has no access to the
-blockchain state. If a transaction fails `verify` it is incorrect and couldn't
-be included into any correct block proposal. So it couldn't ever be included
-into the blockchain. Each transaction which reached any validator and passed
+signature verification and other specific internal constraints.
+`verify` is intended to check the internal consistency of a transaction;
+it has no access to the blockchain state.
+
+If a transaction fails `verify`, it is considered incorrect and cannot
+be included into any correct block proposal. Incorrect transactions are never
+included into the blockchain.
+
+Each transaction which reached any validator and passed
 `verify` have to be included into the blockchain in a finite time. See
 [consensus algorithm](../advanced/consensus/consensus.md) for more details.
 
 !!! note "Example"
-    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
-    a `TransactionSend` also checks if the sender is not the same as the
-    receiver.
+    In [the cryptocurrency service][cryptocurrency]
+    a `TransactionSend` verifies the digital signature and checks that
+    the sender of coins is not the same as the receiver.
 
 ### Execute
 
-The `execute` method given the blockchain state and can modify it (but can
+The `execute` method takes the current blockchain state and can modify it (but can
 choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
 storage ([under certain conditions](../advanced/consensus/consensus.md)).
 
 !!! note "Example"
-    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
+    In [the cryptocurrency service][cryptocurrency]
     an `execute` method of `TransactionSend` executes the transaction which
     means: add this transaction to the data storage with a Boolean `status`
     metadata for changing any wallets founds. The `status` is `true`, the
@@ -162,8 +173,8 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
       positive balance of `from` for a considered cryptocurrency
       implementation)
     - balance of `from` is greater or equal to `amount`,
-    else the tag in the data storage is `false` and it doesn't change any
-    balances.
+      else the tag in the data storage is `false` and it doesn't change any
+      balances.
 
 !!! note
     `Verify` and `execute` are triggered at different times. `Verify` checks
@@ -175,33 +186,36 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
 ### Info
 
 The `info` method returns the useful information (from service developers point
-of view) about the transaction and has no access to the blockchain state as the
-`verify`.
+of view) about the transaction. The method has no access to the blockchain state,
+same as `verify`.
 
 !!! note "Example"
-    In the [cryptocurrency](https://github.com/exonum/cryptocurrency)) service
+    In [the cryptocurrency service][cryptocurrency]
     an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
     `amount` and `seed`.
 
-## Transaction lifecycle
+## Transaction Lifecycle
 
 1. A transaction is created by an external entity (e.g., a
   [thin client](clients.md)) and is signed with a private key
 2. The transaction is broadcast to the network
 3. The transaction is verified on each full node including validator nodes
-  which it reaches (by transaction's method `verify` which includes at least
-  signature verification) and is added to the pool of unconfirmed transactions
+  which it reaches using the `verify` method.
+  If the verification is successful, the transaction is added to the pool
+  of unconfirmed transactions; otherwise, it is discarded, and the following
+  steps are skipped
 4. The transaction is included into a block proposal (or multiple proposals)
 5. The transaction is executed (by transaction's method `execute`) during the
   lock step of the consensus algorithm, when a validator node has collected all
   transactions for a block proposal and under certain conditions which imply
-  that the considered proposal is going to be accepted in nearly future
-6. Finally, when a certain *precommit* gathers necessary approval among
-  validators, the block is committed to the blockchain. This means that
-  transactions from the committed block change the blockchain state, are
-  executed sequentially and in the same exact order on every node
+  that the considered proposal is going to be accepted in the near future
+6. When a certain *precommit* gathers necessary approval among
+  validators, a block with the transaction is committed to the blockchain.
+  All transactions from the committed block are sequentially applied
+  to the persistent blockchain state in the order they appear in the block
+  (i.e., the order of application is the same for every node in the network)
 
-## Blockchain transaction properties
+## Blockchain Transaction Properties
 
 ### Purity
 
@@ -218,7 +232,7 @@ blockchain's state and full node's hardware. So the `verify` could be
 parallelized over transactions and `verify` could be performed only once for
 any transaction.
 
-### Sequential consistency
+### Sequential Consistency
 
 [Sequential consistency](https://en.wikipedia.org/wiki/Sequential_consistency)
 essentially means that the blockchain looks like a centralized system for an
@@ -231,11 +245,18 @@ specified by their ordering in blocks. Such a property is guaranteed by the
 
 Non-replayability means that an attacker cannot take an old legitimate
 transaction from the blockchain and apply it to the blockchain state again.
-Assume Alice pays Bob 10 coins using the Exonum
-[cryptocurrency service](https://github.com/exonum/cryptocurrency).
-Non-replayability prevents Bob from taking Alice's transaction and submitting
-it to the network again to get extra coins. Naturally, non-replayability is
+
+!!! note "Example"
+    Assume Alice pays Bob 10 coins using
+    [the sample cryptocurrency service][cryptocurrency].
+    Non-replayability prevents Bob from taking Alice's transaction and submitting
+    it to the network again to get extra coins.
+
+Naturally, non-replayability is
 also a measure against DoS attacks; it prevents an attacker from spamming the
 network with his own or others' transactions. The `seed` field inside the
 transaction and ignoring the transactions, already included into the
 blockchain, for the new blocks guarantees this property.
+
+[wiki:acid]: https://en.wikipedia.org/wiki/ACID
+[cryptocurrency]: https://github.com/exonum/cryptocurrency
