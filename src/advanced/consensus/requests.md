@@ -42,6 +42,11 @@ information about the state of the node, if the node is not Byzantine:
 This algorithm determines the node's behavior at different stages of the
 consensus algorithm if the node needs to request information from other nodes.
 
+For each sent request, the node stores `RequestState` which includes number of
+request attempts made and list of nodes that have the required information. When
+the requested info is obtained, node deletes `RequestState` for the corresponding
+request.
+
 ### Getting any consensus message from a bigger height
 
 - Update info about the height of blockchain in the corresponding node.
@@ -64,8 +69,8 @@ For any message from the current height:
   and the timeout.
 - If the node does not have certain transactions from this `propose`, it
   initiates sending `RequestTransactions`.
-- A list of nodes that have all transactions should be copied from the remote
-  `RequestState` for `RequestPropose`, if it existed. (**TODO** clarify)
+- A list of nodes that have all transactions should be copied from the deleted
+  `RequestState` for `RequestPropose`, if it existed.
 
 ### `prevote` receiving
 
