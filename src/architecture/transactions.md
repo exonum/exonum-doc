@@ -119,17 +119,28 @@ signature length.
 The body of the transaction, which includes data specific for a given
 transaction type. Format of the body is specified by the
 service identified by `service_id`.
+Binary serialization of the body is performed using
+[the Exonum serialization format](../advanced/serialization.md)
+according to the transaction specification in the service.
 
 !!! note "Example"
     The body of `TransferTransaction` in the sample cryptocurrency service
-    includes field `from` for coins
-    sender, `to` for coins recipient, `amount` for the amount being transferred and
-    `seed` to distinct different transactions with the same previous three
-    fields.
+    is structured as follows:
 
-The message body is serialized according to the
-[binary serialization](../advanced/serialization.md) specification from its type
-specification in the service.
+    | Field      | Binary format | Binary offset | JSON       |
+    |------------|:-------------:|--------------:|:----------:|
+    | `from`     | `PublicKey`   | 0..32         | hex string |
+    | `to`       | `PublicKey`   | 32..64        | hex string |
+    | `amount`   | `u64`         | 64..72        | number string |
+    | `seed`     | `u64`         | 72..80        | number string |
+    
+    `from` is the coins sender, `to` is the coins recipient,
+    `amount` is the amount being transferred, and
+    `seed` is a randomly generated field to distinct among transactions
+    with the same previous three fields.
+    
+    (`u64` values are serialized as strings in JSON, as they may be
+    [unsafe][mdn:safe-int].)
 
 **Binary presentation:** binary sequence with `payload_length` bytes.  
 **JSON presentation:** JSON.
@@ -286,3 +297,4 @@ blockchain, for the new blocks guarantees this property.
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [rust]: http://rust-lang.org/
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
+[mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
