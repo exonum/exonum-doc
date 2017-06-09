@@ -32,11 +32,14 @@ the blockchain.
 Transactions in Exonum are subtypes of messages and share the serialization logic
 with [consensus messages](../advanced/consensus/consensus.md#messages).
 All transaction messages are serialized in a uniform
-fashion. There are 2 serialization formats - binary and
-[JSON](https://en.wikipedia.org/wiki/JSON); the first one is used in
-communication among nodes and [storage](./storage.md), the second one is used
-to communicate with [light clients](./clients.md). All fields to serialize and
-deserialize transactions are listed in the table below.
+fashion. There are 2 serialization formats:
+
+- **Binary serialization** is used in communication among nodes and
+  to persist transactions in the [storage](./storage.md)
+- **JSON** is used to receive and send transactions when communicating
+  with [light clients](./clients.md)
+
+Fields used in transaction serialization are listed below.
 
 | Field              | Binary format     | Binary offset | JSON       |
 |--------------------|:-----------------:|--------------:|:----------:|
@@ -44,23 +47,29 @@ deserialize transactions are listed in the table below.
 | `protocol_version` | `u8`              | 1             | number     |
 | `service_id`       | `u16`             | 4..6          | number     |
 | `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `usize`           | 6..10         | -          |
+| `payload_length`   | `u32  `           | 6..10         | -          |
 | `body`             | `&[u8]`           | 10..-64       | object     |
 | `signature`        | Ed25519 signature | -64..         | hex string |
+
+!!! tip
+    For the binary format, the table uses the type notation taken
+    from [Rust][rust]. Offsets also correspond to [the slicing syntax][rust-slice],
+    with the exception that Rust does not support negative offsets,
+    which denote an offset relative to the end of the byte buffer.
 
 ### Network ID
 
 This field will be used to send inter-blockchain messages in the future
 releases. For now, it is not used.
 
-**Binary presentation:** `u8` (unsigned 1-byte integer).
+**Binary presentation:** `u8` (unsigned 1-byte integer).  
 **JSON presentation:** number
 
 ### Protocol Version
 
 The major version of the Exonum serialization protocol. Currently, `0`.
 
-**Binary presentation:** `u8` (unsigned 1-byte integer).
+**Binary presentation:** `u8` (unsigned 1-byte integer).  
 **JSON presentation:** number.
 
 ### Service ID
@@ -70,7 +79,7 @@ Sets the [service](services.md) to make a deal with (for example,
 a key used to lookup implementation of [the transaction interface](#interface)
 (e.g., `verify` and `execute` methods).
 
-**Binary presentation:** `u16` (unsigned 2-byte integer).
+**Binary presentation:** `u16` (unsigned 2-byte integer).  
 **JSON presentation:** number.
 
 ### Message ID
@@ -82,7 +91,7 @@ The `message_id` defines the type of message in the service.
     types of transactions: `AddFundsTransaction` for coins emission
     and `TransferTransaction` for money transfer .
 
-**Binary presentation:** `u32` (unsigned 4-byte integer).
+**Binary presentation:** `u32` (unsigned 4-byte integer).  
 **JSON presentation:** isn't present.
 
 ### Payload length
@@ -90,7 +99,7 @@ The `message_id` defines the type of message in the service.
 The length of the message body after the header. Does not include the
 signature length.
 
-**Binary presentation:** `u16` (unsigned 2-byte integer).
+**Binary presentation:** `u16` (unsigned 2-byte integer).  
 **JSON presentation:** (not serialized).
 
 ### Body
@@ -110,7 +119,7 @@ The message body is serialized according to the
 [binary serialization](../advanced/serialization.md) specification from its type
 specification in the service.
 
-**Binary presentation:** binary sequence with `payload_length` bytes.
+**Binary presentation:** binary sequence with `payload_length` bytes.  
 **JSON presentation:** JSON.
 
 ### Signature
@@ -125,7 +134,7 @@ person could be verified by anyone using the public key and
 `Exonum.verifySignature` function. See
 [Exonum client](https://github.com/exonum/exonum-client) for details.
 
-**Binary presentation:** Ed25519 signature.
+**Binary presentation:** Ed25519 signature (64 bytes).  
 **JSON presentation:** hex string.
 
 ## Interface
@@ -260,3 +269,5 @@ blockchain, for the new blocks guarantees this property.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
+[rust]: http://rust-lang.org/
+[rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
