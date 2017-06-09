@@ -12,7 +12,7 @@ site_description: Exonum is a blockchain framework that allows to build secure p
 site_favicon: 'images/favicon.ico'
 
 extra:
-  og_image: 'images/wallpaper.png'
+  og_image: 'images/logo-square.jpg'
   logo: 'images/logo.svg" alt="Exonum Logo'
   palette:
     primary: 'blue grey'
