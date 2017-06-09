@@ -14,7 +14,7 @@ effect on the persistent storage.
 If the transaction is correct, it can be committed, i.e., included into a block
 via the [consensus algorithm](../advanced/consensus/consensus.md)
 among the blockchain validators. Consensus provides [total ordering][wiki:order]
-among all transactions; between any two transactions in the blockchain, 
+among all transactions; between any two transactions in the blockchain,
 it is possible to determine which one comes first.
 Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
@@ -59,7 +59,7 @@ Fields used in transaction serialization are listed below.
 | `protocol_version` | `u8`              | 1             | number     |
 | `service_id`       | `u16`             | 4..6          | number     |
 | `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `u32  `           | 6..10         | -          |
+| `payload_length`   | `u32`             | 6..10         | -          |
 | `body`             | `&[u8]`           | 10..-64       | object     |
 | `signature`        | Ed25519 signature | -64..         | hex string |
 
@@ -99,12 +99,12 @@ a key used to lookup implementation of [the transaction interface](#interface)
 `message_id` defines the type of message within the service.
 
 !!! note "Example"
-    [The sample cryptocurrency service][cryptocurrency] includes 2 main 
+    [The sample cryptocurrency service][cryptocurrency] includes 2 main
     types of transactions: `AddFundsTransaction` for coins emission
     and `TransferTransaction` for coin transfer.
 
 **Binary presentation:** `u32` (unsigned 4-byte integer).  
-**JSON presentation:** isn't present.
+**JSON presentation:** isn’t present.
 
 ### Payload length
 
@@ -133,12 +133,12 @@ according to the transaction specification in the service.
     | `to`       | `PublicKey`   | 32..64        | hex string |
     | `amount`   | `u64`         | 64..72        | number string |
     | `seed`     | `u64`         | 72..80        | number string |
-    
+
     `from` is the coins sender, `to` is the coins recipient,
     `amount` is the amount being transferred, and
     `seed` is a randomly generated field to distinct among transactions
     with the same previous three fields.
-    
+
     (`u64` values are serialized as strings in JSON, as they may be
     [unsafe][mdn:safe-int].)
 
@@ -217,7 +217,7 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
       positive balance of `from` for a considered cryptocurrency
       implementation)
     - balance of `from` is greater or equal to `amount`,
-      else the tag in the data storage is `false` and it doesn't change any
+      else the tag in the data storage is `false` and it doesn’t change any
       balances.
 
 !!! note
@@ -252,8 +252,9 @@ the transaction.
 
 ### 2. Submission to Network
 
-After creation, the transaction is submitted to the blockchain network. Usually, this is performed
-by a thin client connecting to a full node via [an appropriate transaction endpoint](services.md#transactions).
+After creation, the transaction is submitted to the blockchain network.
+Usually, this is performed by a thin client connecting to a full node
+via [an appropriate transaction endpoint](services.md#transactions).
 
 !!! note
     As transactions use universally verified cryptography (digital signatures)
@@ -284,7 +285,7 @@ into a block proposal (or multiple proposals).
 !!! summary "Trivia"
     Presently, the order of inclusion of transactions into a proposal is
     determined by the transaction hash. An honest validator takes transactions
-    with the smallest hashes when building a proposal. This behavior shouldn't
+    with the smallest hashes when building a proposal. This behavior shouldn’t
     be relied upon; it is likely to change in the future.
 
 The transaction is executed with `execute` during the
@@ -309,11 +310,11 @@ to the persistent blockchain state in the order they appear in the block
 ### Purity
 
 `verify` in transactions is [pure](https://en.wikipedia.org/wiki/Pure_function),
-which means that the verification result doesn't depend on the
+which means that the verification result doesn’t depend on the
 blockchain state and the local environment of the verifier. Thus, transaction
 verification could easily be
-parallelized over transactions. Moreover, it's sufficient to verify any transaction
-only once – when it's submitted to the pool of unconfirmed transactions.
+parallelized over transactions. Moreover, it’s sufficient to verify any transaction
+only once – when it’s submitted to the pool of unconfirmed transactions.
 
 !!! note
     As a downside, `verify` cannot perform any checks that depend on the blockchain
@@ -337,12 +338,12 @@ transaction from the blockchain and apply it to the blockchain state again.
 !!! note "Example"
     Assume Alice pays Bob 10 coins using
     [the sample cryptocurrency service][cryptocurrency].
-    Non-replayability prevents Bob from taking Alice's transaction and submitting
+    Non-replayability prevents Bob from taking Alice’s transaction and submitting
     it to the network again to get extra coins.
 
 Non-replayability is
 also a measure against DoS attacks; it prevents an attacker from spamming the
-network with his own or others' transactions.
+network with his own or others’ transactions.
 
 Non-replayability in Exonum is guaranteed by discarding transactions already
 included into the blockchain (which is determined by the transaction hash),
