@@ -55,10 +55,13 @@ constant defined in configuration.
 
 ### Definitions
 
+The definitions from the [general description of consensus algorithm](consensus.md)
+are used.
+
 Each node has a set of transactions that have not yet been added to the
 blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
-necessary, the nodes can request unknown transactions from other nodes. 
+necessary, the nodes can request unknown transactions from other nodes.
 
 **TODO:** insert picture
 
