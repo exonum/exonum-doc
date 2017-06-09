@@ -23,11 +23,12 @@ The helper functions are divided into the following submodules:
   validity of a block (its compliance with [consensus
   algorithm](../advanced/consensus/consensus))
 
-**Notice.** A hash of the entire blockchain state is a part of each block
-(see [data storage](storage.md)). This hash is formed using Merkle
-and Merkle Patricia indexes. Thus, using functions for proof verification, one can
-verify the commitment of any blockchain data in a block. The block itself
-can be verified using blockchain integrity verification.
+!!! note
+    A hash of the entire blockchain state is a part of each block
+    (see [data storage](storage.md)). This hash is formed using Merkle
+    and Merkle Patricia indexes. Thus, using functions for proof verification,
+    one can verify the commitment of any blockchain data in a block. The block itself
+    can be verified using blockchain integrity verification.
 
 There are two typical use cases for the light client:
 
@@ -47,15 +48,17 @@ implemented in Exonum light client.
 3. The generated transaction (JSON data + digital signature) is sent to the
   a full node via an HTTP POST request
 
-**Notice.** Serialization during signing is a necessary step, since all
-data (including transactions) is stored in Exonum in a [custom binary
-format](../advanced/serialization.md). This is done for several reasons:
+!!! note
+    Serialization during signing is a necessary step, since all
+    data (including transactions) is stored in Exonum in a [custom binary
+    format](../advanced/serialization.md). This is done for several reasons:
 
-- The binary format is unambiguous, while the same data can have multiple JSON
-  representations (which would lead to different hashes of logically the same data)
-- The data stored in the binary format consumes less disk space
-- Access to a field in a binary format can be implemented using fast pointer
-  arithmetic; the same operation for JSON data would require multiple reads
+    - The binary format is unambiguous, while the same data can have multiple JSON
+      representations (which would lead to different hashes of logically
+      the same data)
+    - The data stored in the binary format consumes less disk space
+    - Access to a field in a binary format can be implemented using fast pointer
+      arithmetic; the same operation for JSON data would require multiple reads
 
 ## Sending Requests
 
@@ -67,8 +70,9 @@ format](../advanced/serialization.md). This is done for several reasons:
   and *validates cryptographic proofs* for the response
 4. The result of checks is shown in the user interface
 
-**Notice.**  In the case user authentication in needed (for example, for data
-access management), requests can be *digitally signed*.
+!!! note
+    In the case user authentication in needed (for example, for data
+    access management), requests can be *digitally signed*.
 
 ## Motivation
 
@@ -118,10 +122,11 @@ Advantages of this approach are:
 - To start or resume the audit of the system, no synchronization period is
   required
 
-**Notice.** The user still needs to trust the light client developers if the client
-has closed source. Alternatively, the user should perform an
-audit of light client code to remove the necessity of trust to
-third parties completely.
+!!! note
+    The user still needs to trust the light client developers if the client
+    has closed source. Alternatively, the user should perform an
+    audit of light client code to remove the necessity of trust to
+    third parties completely.
 
 The presence of light clients does not mean the absence of auditor nodes, since
 their tasks are different. Light clients verify particular user's data, while
@@ -146,9 +151,10 @@ difficulties during development:
   with cryptography, it may be necessary to create multiple light clients and
   continuously support their codebase
 
-**Notice.** The first two problems above can be overcome with the aid of data
-schema, stated in a language independent format (see [Exonum
-roadmap](../dev/roadmap.md))
+!!! note
+    The first two problems above can be overcome with the aid of data
+    schema, stated in a language independent format (see [the Exonum
+    roadmap](../dev/roadmap.md)).
 
 Despite the complexity of the development, **the presence of
 light clients in a blockchain-based system is the only practical way to

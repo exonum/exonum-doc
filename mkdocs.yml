@@ -1,9 +1,26 @@
 site_name: Exonum Documentation
 docs_dir: src
-theme: flatly
+theme: material
 theme_dir: theme
-extra_css:
-  - css/extra.css
+repo_name: 'exonum/exonum-core'
+repo_url: 'https://github.com/exonum/exonum-core'
+site_favicon: 'images/favicon.ico'
+extra:
+  logo: 'images/logo.svg" alt="Exonum Logo'
+  palette:
+    primary: 'blue grey'
+    accent: 'lime'
+  social:
+    - type: 'github'
+      link: 'https://github.com/exonum'
+    - type: 'facebook'
+      link: 'https://www.facebook.com/Exonum'
+google_analytics:
+  - 'UA-85962154-1'
+  - 'auto'
+markdown_extensions:
+  - codehilite
+  - admonition
 copyright: © 2017 Bitfury Group Limited
 pages:
   # Short description of Exonum, documentation and how to use it

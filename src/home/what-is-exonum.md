@@ -74,10 +74,11 @@ all the network maintainers together cannot bend. Indeed, Exonum allows to
 easily convey the compliance to transaction processing rules for external parties
 (be it the regulator, auditors, or users of a platform).
 
-**Example.** In most reasonable blockchain setups, there is a requirement
-for all transactions to be digitally signed. If the blockchain maintainers
-do not have control over private keys in the system,
-they cannot forge transactions in the name of the key owners.
+!!! note "Example"
+    In most reasonable blockchain setups, there is a requirement
+    for all transactions to be digitally signed. If the blockchain maintainers
+    do not have control over private keys in the system,
+    they cannot forge transactions in the name of the key owners.
 
 ### Transparency
 
@@ -86,19 +87,21 @@ modern world. Exonum provides a rich toolset to define the correct system operat
 and allows external parties (e.g., regulators, auditors and end clients of the system)
 to continuously verify the system operation against these definitions.
 
-**Example.** In a [sample cryptocurrency implementation](cryptocurrency/intro.md),
-users can monitor the state of their wallet in real time.
-The state returned to a user by network nodes is supplied with an unforgeable
-cryptographic proof.
+!!! note "Example"
+    In a [sample cryptocurrency implementation](cryptocurrency/intro.md),
+    users can monitor the state of their wallet in real time.
+    The state returned to a user by network nodes is supplied with an unforgeable
+    cryptographic proof.
 
 ### Flexibility
 
 One of the reasons for permissioned blockchain setup is a greater degree of flexibility.
 Exonum ensures flexibility by providing a rich environment for transaction execution.
 
-**Example.** Document timestamping, cryptocurrency and property rights registries
-are three vastly different domains in which the Exonum framework can be used
-effectively.
+!!! note "Example"
+    Document timestamping, cryptocurrency and property rights registries
+    are three vastly different domains in which the Exonum framework can be used
+    effectively.
 
 ### Safety
 
@@ -107,11 +110,12 @@ on blockchains may be vulnerable to logic bombs and difficult-to-detect marginal
 cases. Exonum uses [the Rust programming language](https://www.rust-lang.org/),
 which guarantees the highest degree of memory safety.
 
-**Example.** [Mutability][rust-mut], [references and borrowing][rust-ref] in Rust
-help enforce access restrictions. For example, if a variable is passed
-to an external component in a non-mutable reference, it **cannot** be changed
-no matter what the component does. Strict static typing and absence of null pointers
-in Rust helps preventing undefined behavior and memory access violations.
+!!! note "Example"
+    [Mutability][rust-mut], [references and borrowing][rust-ref] in Rust
+    help enforce access restrictions. For example, if a variable is passed
+    to an external component in a non-mutable reference, it **cannot** be changed
+    no matter what the component does. Strict static typing and absence of null pointers
+    in Rust helps preventing undefined behavior and memory access violations.
 
 ### Performance
 
@@ -175,9 +179,10 @@ which the client is interested in. Thin clients allow to provide access to block
 through web or mobile apps. A thin client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
-**Example.** [In the cryptocurrency tutorial](cryptocurrency/intro.md),
-a client corresponds to an owner of currency; it is only interested in transactions
-that involve the owner.
+!!! note "Example"
+    [In the cryptocurrency tutorial](cryptocurrency/intro.md),
+    a client corresponds to an owner of currency; it is only interested in transactions
+    that involve the owner.
 
 Exonum pays much attention to the security of thin clients. Thin clients do not
 unconditionally trust the responses from full nodes, but rather verify them
