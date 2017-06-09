@@ -256,8 +256,8 @@ Only for the case if a validator is behind the majority of the network:
 
 #### Round timeout processing
 
-- If the timeout does not match the current height and round, ignore it
-  (**TODO** specify exit() after a point or proceed to the next point).
+- If the timeout does not match the current height and round, ignore it (next
+  points should not be performed).
 - Add a timeout for the next round.
 - If we have a saved PoL, send `prevote` for `locked_propose` in a new round,
   check if we have reached the status of **Availability of +2/3 `Prevote`**.
