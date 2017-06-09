@@ -46,6 +46,11 @@ fashion. There are 2 serialization formats:
 - **JSON** is used to receive and send transactions when communicating
   with [light clients](./clients.md)
 
+!!! note
+    Although light clients communicate with full nodes using the JSON format,
+    they implement serialization internally in order to sign transactions
+    and calculate their hashes.
+
 Fields used in transaction serialization are listed below.
 
 | Field              | Binary format     | Binary offset | JSON       |
@@ -81,8 +86,8 @@ The major version of the Exonum serialization protocol. Currently, `0`.
 
 ### Service ID
 
-Sets the [service](services.md) to make a deal with (for example,
-*configuration* or *cryptocurrency*). The pair (`service_id`, `message_id`) is
+Sets the [service](services.md) that a transaction belongs to.
+The pair (`service_id`, `message_id`) is
 a key used to lookup implementation of [the transaction interface](#interface)
 (e.g., `verify` and `execute` methods).
 
@@ -91,12 +96,12 @@ a key used to lookup implementation of [the transaction interface](#interface)
 
 ### Message ID
 
-The `message_id` defines the type of message in the service.
+`message_id` defines the type of message within the service.
 
 !!! note "Example"
     [The sample cryptocurrency service][cryptocurrency] includes 2 main 
     types of transactions: `AddFundsTransaction` for coins emission
-    and `TransferTransaction` for money transfer .
+    and `TransferTransaction` for coin transfer.
 
 **Binary presentation:** `u32` (unsigned 4-byte integer).  
 **JSON presentation:** isn't present.
@@ -113,7 +118,7 @@ signature length.
 
 The body of the transaction, which includes data specific for a given
 transaction type. Format of the body is specified by the
-service with `service_id`.
+service identified by `service_id`.
 
 !!! note "Example"
     The body of `TransferTransaction` in the sample cryptocurrency service
@@ -132,14 +137,15 @@ specification in the service.
 ### Signature
 
 [Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
-serialization of the message with a transaction (excluding the signature bytes,
-i.e., the last 64 bytes of the serialization). Any author of the transaction
-(as any other message) should have the private and public keys which allow him
-to generate a correct transaction. He shouldn't provide any other person his
-private key but should use it to sign messages. The signature of a particular
-person could be verified by anyone using the public key and
-`Exonum.verifySignature` function. See
-[Exonum client](https://github.com/exonum/exonum-client) for details.
+serialization of the message (excluding the signature bytes,
+i.e., the last 64 bytes of the serialization).
+
+!!! tip
+    It is recommended for transaction signing to be decentralized in order
+    to minimize security risks. Roughly speaking, there should not be a single
+    server signing all transactions in the system; this could create a security
+    chokepoint. One of options to decentralize signing is to use
+    the [light client library](https://github.com/exonum/exonum-client).
 
 **Binary presentation:** Ed25519 signature (64 bytes).  
 **JSON presentation:** hex string.
