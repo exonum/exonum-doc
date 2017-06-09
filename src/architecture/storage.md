@@ -26,7 +26,6 @@ points.
 
 Multiple table types may be used in the Exonum applications.
 
-
 !!! note "Used parameter types"
     In the table descriptions the following parameters types are used:
 
