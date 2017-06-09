@@ -164,10 +164,16 @@ i.e., the last 64 bytes of the serialization).
 ## Interface
 
 Transaction interface defines 3 methods: `verify`, `execute` and `info`
-(see `src/blockchain/service.rs` from
-[Exonum core](https://github.com/exonum/exonum-core)).
+
+!!! tip
+    From the Rust perspective, `Transaction` is a [trait][rust-trait].
+    See [Exonum Core][core-tx] for more details.
 
 ### Verify
+
+```rust
+fn verify(&self) -> bool
+```
 
 The `verify` method verifies the transaction, which includes the message
 signature verification and other specific internal constraints.
@@ -188,6 +194,11 @@ Each transaction which reached any validator and passed
     the sender of coins is not the same as the receiver.
 
 ### Execute
+
+```rust
+fn execute(&self, view: &View)
+           -> Result<(), ::exonum::storage::StorageError>
+```
 
 The `execute` method takes the current blockchain state and can modify it (but can
 choose not to if certain conditions are not met). Technically `execute`
@@ -210,43 +221,82 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
       balances.
 
 !!! note
-    `Verify` and `execute` are triggered at different times. `Verify` checks
+    `verify` and `execute` are triggered at different times. `verify` checks
     internal consistency of a transaction before the transaction is included
-    into the [proposal block](../advanced/consensus/consensus.md). `Execute`
+    into the [proposal block](../advanced/consensus/consensus.md). `execute`
     performs [almost at the same time](../advanced/consensus/consensus.md) as
     the block with the given transaction is committed into the blockchain.
 
 ### Info
 
+```rust
+fn info(&self) -> ::serde_json::Value
+```
+
 The `info` method returns the useful information (from service developers point
-of view) about the transaction. The method has no access to the blockchain state,
-same as `verify`.
+of view) about the transaction in the JSON format.
+The method has no access to the blockchain state, same as `verify`.
 
 !!! note "Example"
     In [the cryptocurrency service][cryptocurrency]
     an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
     `amount` and `seed`.
 
-## Transaction Lifecycle
+## Lifecycle
 
-1. A transaction is created by an external entity (e.g., a
-  [thin client](clients.md)) and is signed with a private key
-2. The transaction is broadcast to the network
-3. The transaction is verified on each full node including validator nodes
-  which it reaches using the `verify` method.
-  If the verification is successful, the transaction is added to the pool
-  of unconfirmed transactions; otherwise, it is discarded, and the following
-  steps are skipped
-4. The transaction is included into a block proposal (or multiple proposals)
-5. The transaction is executed (by transaction's method `execute`) during the
-  lock step of the consensus algorithm, when a validator node has collected all
-  transactions for a block proposal and under certain conditions which imply
-  that the considered proposal is going to be accepted in the near future
-6. When a certain *precommit* gathers necessary approval among
-  validators, a block with the transaction is committed to the blockchain.
-  All transactions from the committed block are sequentially applied
-  to the persistent blockchain state in the order they appear in the block
-  (i.e., the order of application is the same for every node in the network)
+### 1. Creation
+
+A transaction is created by an external entity (e.g., a
+[thin client](clients.md)) and is signed with a private key necessary to authorize
+the transaction.
+
+### 2. Submission to Network
+
+After creation, the transaction is submitted to the blockchain network. Usually, this is performed
+by a thin client connecting to a full node via [an appropriate transaction endpoint](services.md#transactions).
+
+!!! note
+    As transactions use universally verified cryptography (digital signatures)
+    for authentication, a transaction theoretically can be submitted to the network
+    by anyone aware of the transaction. There is no intrinsic upper bound on
+    the transaction lifetime, either.
+
+### 3. Verification
+
+After a transaction is received by a full node, it is looked up
+using the `(service_id, message_id)` type identifier and verified for
+internal consistency using the `verify` method.
+If the verification is successful, the transaction is added to the pool
+of unconfirmed transactions; otherwise, it is discarded, and the following
+steps are skipped.
+
+### 4. Consensus
+
+After a transaction reaches the pool of a validator, it can be included
+into a block proposal (or multiple proposals).
+
+!!! summary "Trivia"
+    Presently, the order of inclusion of transactions into a proposal is
+    determined by the transaction hash. An honest validator takes transactions
+    with the smallest hashes when building a proposal. This behavior shouldn't
+    be relied upon; it is likely to change in the future.
+
+The transaction is executed with `execute` during the
+lock step of the consensus algorithm. This happens when a validator
+has collected all
+transactions for a block proposal and certain conditions are met, which imply
+that the proposal is going to be accepted in the near future.
+The results of execution are reflected in `Precommit` consensus messages and
+are agreed upon within the consensus algorithm. This allows to ensure that transactions
+are executed in the same way on all nodes.
+
+### 5. Commitment
+
+When a certain block proposal and the result of its execution gather
+sufficient approval among validators, a block with the transaction is committed
+to the blockchain. All transactions from the committed block are sequentially applied
+to the persistent blockchain state in the order they appear in the block
+(i.e., the order of application is the same for every node in the network).
 
 ## Blockchain Transaction Properties
 
@@ -295,6 +345,8 @@ blockchain, for the new blocks guarantees this property.
 [wiki:order]: https://en.wikipedia.org/wiki/Total_order
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
+[core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
 [rust]: http://rust-lang.org/
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
+[rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
