@@ -6,26 +6,33 @@ is a group of sequential operations with the data (i.e., the Exonum [key-value s
 Transactions are defined in [services](services.md) and determine all business logic
 of any Exonum-powered blockchain.
 
-Transactions are executed [atomically, consistently, in isolation and durably][wiki:acid]. 
-If the transaction execution violates data invariants,
+Transactions are executed [atomically, consistently, in isolation and durably][wiki:acid].
+If the transaction execution violates certain data invariants,
 the transaction is completely rolled back, so that it does not have any
 effect on the persistent storage.
 
-All transactions are authorized with the help of public-key digital signatures.
-A transaction could be created by
-the allowed entities and sent for the distributed system of validators for the
-consideration.
+If the transaction is correct, it can be committed, i.e., included into a block
+via the [consensus algorithm](../advanced/consensus/consensus.md)
+among the blockchain validators. Consensus provides [total ordering][wiki:order]
+among all transactions; between any two transactions in the blockchain, 
+it is possible to determine which one comes first.
+Transactions are applied to the Exonum key-value storage sequentially
+in the same order transactions are placed into the blockchain.
+
+All transactions are authenticated with the help of public-key digital signatures.
+Generally, a transaction contains the signature verification key (aka public key)
+among its parameters. Thus, authorization (verifying whether the transaction author
+actually has the right to perform the transaction) can be accomplished
+with the help of building a [public key infrastructure][wiki:pki] and/or
+various constraints based on this key.
 
 !!! note "Example"
     In a sample [cryptocurrency service][cryptocurrency],
     an owner of cryptocurrency may authorize transferring his coins by signing
-    a transfer transaction with a key associated with coins.
-
-If the transaction is correct, it can be included into a block
-via the [consensus algorithm](../advanced/consensus/consensus.md)
-among the blockchain validators.
-All transactions are executed sequentially in the order in which they are placed into
-the blockchain.
+    a transfer transaction with a key associated with coins. Authentication
+    in this case means verifying that a transaction is digitally signed with
+    a specific key, and authorization means that this key is associated with
+    a sufficient amount of coins to make the transaction.
 
 ## Serialization
 
@@ -268,6 +275,8 @@ transaction and ignoring the transactions, already included into the
 blockchain, for the new blocks guarantees this property.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
+[wiki:order]: https://en.wikipedia.org/wiki/Total_order
+[wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [rust]: http://rust-lang.org/
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
