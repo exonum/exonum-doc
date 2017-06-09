@@ -15,7 +15,7 @@ constant defined in configuration.
   Current blockchain height.
 
 - `queued`  
-  Queue for messages from next height or round.
+  Queue for messages from the future height or round.
 
 - `proposes`  
   HashMap with known block proposals.
@@ -221,8 +221,7 @@ processing** or **Transaction processing**.
   transactions.
 - If we are the leader, form and send `propose` and `prevote` after
   `propose_timeout` expiration.
-- Process all messages from the queue (**TODO** specify message queue), if they
-  become relevant.
+- Process all messages from the `queued`, if they become relevant.
 - Add a timeout for the next round of new height.
 
 #### `Block` message processing
