@@ -104,7 +104,9 @@ For any message from the current height:
 
 ### Adding new validators
 
-- Send the `RequestPeers` request to the known network validator.
+- Send the `RequestPeers` request to the known network validator. `RequestPeers`
+  message is sent regularly with the timeout `peers_timeout` defined in [the global
+  configuration](../../architecture/configuration.md#global-parameters).
 
 ### Transition to a new height
 
