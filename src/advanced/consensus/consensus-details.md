@@ -11,46 +11,46 @@ constant defined in configuration.
 
 ### Node State Variables
 
-- `current_height`
+- `current_height`  
   Current blockchain height.
 
-- `queued`
+- `queued`  
   Queue for messages from next height or round.
 
-- `proposes`
+- `proposes`  
   HashMap with known block proposals.
 
-- `locked_round`
+- `locked_round`  
   Round in which **LOCK** was executed.
 
-- `current_round`
+- `current_round`  
   Number of current round.
 
-- `locked_propose`
+- `locked_propose`  
   `propose` on which node is locked.
 
-- `state_hash`
+- `state_hash`  
   Hash of blockchain state.
 
 ### Fields of consensus messages
 
-- `validator_id`
+- `validator_id`  
   Index of specific validator in `validators` list of configuration. This field
   is common to all types of messages.
 
-- `propose.round`
+- `propose.round`  
   Round in which `propose` was created.
 
-- `prevote.propose_hash`
+- `prevote.propose_hash`  
   Hash of the `propose` to which `prevote` belongs.
 
-- `prevote.round`
+- `prevote.round`  
   Round when `prevote` was created.
 
-- `prevote.hash`
+- `prevote.hash`  
   Hash of `prevote`.
 
-- `block.prev_hash`
+- `block.prev_hash`  
   Hash of the previous block.
 
 **TODO:** insert picture
