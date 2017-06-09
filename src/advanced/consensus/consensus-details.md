@@ -473,9 +473,3 @@ the accepted block.
 **TODO:** Property of a new algorithm for choosing a leader.
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
-[partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
-[pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
-[public_and_private_blockchains]: https://blog.ethereum.org/2015/08/07/on-public-and-private-blockchains/
-[tendermint_consensus]: https://github.com/tendermint/tendermint/wiki/Byzantine-Consensus-Algorithm
-[wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
-[wiki:consensus]: https://en.wikipedia.org/wiki/Consensus_(computer_science)
