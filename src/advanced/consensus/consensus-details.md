@@ -70,6 +70,10 @@ a higher priority), in cases when 1) there is no PoL recorded 2) the recorded
 PoL corresponds to a proposal with a smaller round number. So PoLs are [partially
 ordered][partial_ordering].
 
+As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
+node deletes stored data (`RequestState`) about sent request when the the
+requested info is obtained.
+
 **TODO:** insert picture
 
 ### Algorithm Itself
@@ -147,8 +151,8 @@ processing** or **Transaction processing**.
 
 #### Availability of +2/3 `prevote`
 
-- Delete **Prevotes** request, if available for `prevote.round` and
-  `prevote.propose_hash`.
+- Delete `RequestState` for `RequestPrevotes`, if available for `prevote.round`
+  and `prevote.propose_hash`.
 - If our `locked_round` is less than `prevote.round` and the hash of the stored
   `propose` is the same as `prevote.propose_hash`, then proceed to **LOCK** for
   this very proposal.
@@ -209,7 +213,7 @@ processing** or **Transaction processing**.
 
 #### COMMIT
 
-- Remove `RequestPrecommits`, if there was one.
+- Delete `RequestState` for  `RequestPrecommits`, if there was one.
 - Push all the changes to the storage.
 - Update current height.
 - Set the value of the variable `locked_round` to `0` at the new height.
