@@ -264,8 +264,14 @@ by a thin client connecting to a full node via [an appropriate transaction endpo
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
-using the `(service_id, message_id)` type identifier and verified for
-internal consistency using the `verify` method.
+among committed transactions, using the transaction hash as the unique
+identifier. If a transaction has been committed previosuly, it is
+discarded, and the following steps are skipped.
+
+The transaction implementation is then looked up
+using the `(service_id, message_id)` type identifier.
+The `verify` method of the implementation is invoked to check the internal
+consistency of the transaction.
 If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
@@ -298,22 +304,21 @@ to the blockchain. All transactions from the committed block are sequentially ap
 to the persistent blockchain state in the order they appear in the block
 (i.e., the order of application is the same for every node in the network).
 
-## Blockchain Transaction Properties
+## Transaction Properties
 
 ### Purity
 
-[The purity of the function](https://en.wikipedia.org/wiki/Pure_function) means
-that
+`verify` in transactions is [pure](https://en.wikipedia.org/wiki/Pure_function),
+which means that the verification result doesn't depend on the
+blockchain state and the local environment of the verifier. Thus, transaction
+verification could easily be
+parallelized over transactions. Moreover, it's sufficient to verify any transaction
+only once – when it's submitted to the pool of unconfirmed transactions.
 
-- the function always evaluates the same result value given the same argument
-  value
-- evaluation of the result does not cause any semantically observable side
-  effect or output the `verify` method of transactions does not depend on.
-
-The purity for `verify` means that its result doesn't depend on the
-blockchain's state and full node's hardware. So the `verify` could be
-parallelized over transactions and `verify` could be performed only once for
-any transaction.
+!!! note
+    As a downside, `verify` cannot perform any checks that depend on the blockchain
+    state. For example, in the cryptocurrency service, `TransactionSend.verify`
+    cannot check whether the sender has sufficient amount of coins to transfer.
 
 ### Sequential Consistency
 
@@ -321,8 +326,8 @@ any transaction.
 essentially means that the blockchain looks like a centralized system for an
 external observer (e.g., a thin client). All transactions in the blockchain
 affect the blockchain state as if they were executed one by one in the order
-specified by their ordering in blocks. Such a property is guaranteed by the
-[consensus algorithm](../advanced/consensus/consensus.md).
+specified by their ordering in blocks. Sequential consistency is guaranteed
+by the [consensus algorithm](../advanced/consensus/consensus.md).
 
 ### Non-replayability
 
@@ -335,15 +340,26 @@ transaction from the blockchain and apply it to the blockchain state again.
     Non-replayability prevents Bob from taking Alice's transaction and submitting
     it to the network again to get extra coins.
 
-Naturally, non-replayability is
+Non-replayability is
 also a measure against DoS attacks; it prevents an attacker from spamming the
-network with his own or others' transactions. The `seed` field inside the
-transaction and ignoring the transactions, already included into the
-blockchain, for the new blocks guarantees this property.
+network with his own or others' transactions.
+
+Non-replayability in Exonum is guaranteed by discarding transactions already
+included into the blockchain (which is determined by the transaction hash),
+on the verify step.
+
+!!! tip
+    If a transaction is not [idempotent][wiki:idempotent], it needs to have
+    an additional field to distinguish among transactions with the same
+    set of parameters. This field needs to have a sufficient length (e.g., 8 bytes)
+    and can be generated deterministically (e.g., via a counter) or
+    (pseudo-)randomly. See `TransactionSend.seed` in the cryptocurrency service
+    as an example.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [wiki:order]: https://en.wikipedia.org/wiki/Total_order
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
+[wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
 [rust]: http://rust-lang.org/
