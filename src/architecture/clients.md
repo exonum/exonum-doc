@@ -71,7 +71,7 @@ implemented in Exonum light client.
 4. The result of checks is shown in the user interface
 
 !!! note
-    In the case user authentication in needed (for example, for data
+    In the case user authentication is needed (for example, for data
     access management), requests can be *digitally signed*.
 
 ## Motivation
