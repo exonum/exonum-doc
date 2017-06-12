@@ -71,6 +71,18 @@ Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by [PBFT][pbf
 It is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
 which is the best possible number under the security model that Exonum uses.
 
+## Configuration
+
+Set of configurable parameters that determine the behavior of a [full node](#full-node).
+Configuration consists of 2 parts: [global configuration](#global-configuration)
+and [local configuration](#local-configuration). Certain configuration parameters
+are defined by [the core](#core), e.g., the maximum number of transactions
+in a [block](#block). [Services](#services) can define and manage additional
+configuration parameters, too.
+
+!!! tip
+    See [*Configuration*](../architecture/configuration.md) for more details.
+
 ## Consensus
 
 **Aka** consensus algorithm
@@ -123,6 +135,14 @@ and thus has a local copy of the entire [blockchain state](#blockchain-state).
 There are 2 categories of full nodes in Exonum: [validators](#validator)
 and [auditors](#auditor).
 
+## Global Configuration
+
+Part of [configuration](#configuration) common for all [full nodes](#full-node).
+The global configuration is a part of [the blockchain state](#blockchain-state).
+[The core](#core) defines several global configuration parameters,
+which are mostly related to [consensus](#consensus) and networking
+(e.g., a set of [validators'](#validator) public keys).
+
 ## Light Client
 
 **Aka** lightweight client, thin client
@@ -134,6 +154,15 @@ to [retrieve information from the blockchain](#read-request)
 and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
 allows to minimize the trust during this communication and protect against
 a range of attacks.
+
+## Local Configuration
+
+Part of [configuration](#configuration) local for each [full node](#full-node).
+The local configuration is not a part of [the blockchain state](#blockchain-state);
+instead, it's maintained as a local TOML file, which is read during the node startup.
+[The core](#core) defines several local configuration parameters,
+such as the private key used to sign consensus and network messages
+created by the node.
 
 ## Maintainer
 
