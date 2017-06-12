@@ -158,11 +158,38 @@ anonymous or pseudonymous.
 ## Merkle Proof
 
 Cryptographic proof that certain data is a part of [the cryptographic commitment][wiki:commitment]
-based on [Merkle trees][wiki:mt] or their variants. A Merkle proof allows to
+based on [Merkle trees](#merkle-tree) or their variants. A Merkle proof allows to
 compactly prove that a certain data is stored at the specified key
 in [the blockchain state](#blockchain-state), at the same time not revealing
 other information about the state or requiring to replicate all [transactions](#transaction)
 in the blockchain network.
+
+Merkle proofs are used in Exonum in responses to [read requests](#read-request)
+by [light clients](#light-client). Using them, a client can verify the authenticity
+of the response without needing to communicate with multiple full nodes or
+replicating all transactions in the blockchain.
+
+## Merkle Tree
+
+**Aka** hash tree
+
+Data structure based on a binary tree that allows to calculate a single hash
+from a list of elements in such a way that any particular element of the list
+is tied to the overall hash via a short link.
+(This link is called a *Merkle path* or [*Merkle proof*](#merkle-proof).)
+
+Exonum uses Merkle trees and a similar data structure for maps (Merkle [Patricia tree][wiki:p-tree])
+to collect the entire [blockchain state](#blockchain-state) into a single hash
+in a [block](#block), and to provide [proofs](#merkle-proof) to [light clients](#light-client).
+
+!!! note
+    In cryptographic terms, a Merkle tree implements a [commitment scheme][wiki:commitment]
+    to the list of elements in such a way that the size of any opening of the commitment
+    is logarithmic with respect to the number of elements in the list.
+
+!!! tip
+    See [*Merkle index*](../advanced/merkle-index.md) and
+    [*Merkle Patricia index*](../advanced/merkle-patricia-index.md) for more details.
 
 ## Permissioned Blockchain
 
@@ -261,5 +288,6 @@ is reasonably small, consisting of 4-15 nodes.
 [leveldb]: http://leveldb.org/
 [exonum-core]: https://github.com/exonum/exonum-core/
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
+[wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
