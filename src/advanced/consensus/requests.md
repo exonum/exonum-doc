@@ -24,14 +24,14 @@ information about the state of the node, if the node is not Byzantine:
 
 - The node has a corresponding proposal.
 - The node has all transactions of this proposal.
-- If the node indicated `lock_round` in the message, it has a +2/3 `Prevote` for
-  this proposal in the specified round.
+- If the node indicated `lock_round` in the message, it has a +2/3 `Prevote`
+  messages for this proposal in the specified round.
 
 ### `Precommit`
 
 - The node has a corresponding proposal.
 - The node has all transactions of this proposal.
-- The node has +2/3 `Prevote` for this proposal in the corresponding round.
+- The node has +2/3 `Prevote` messages for this proposal in the corresponding round.
 
 ### `Connect`
 
@@ -82,7 +82,7 @@ For any message from the current height:
   has not yet been sent ).
 - If the sender specified `lock_round`, which is greater than the stored PoL,
   node initiates sending `RequestPrevotes`.
-- If the node have formed +2/3 `Prevote`, it deletes the data for the
+- If the node have formed +2/3 `Prevote` messages, it deletes the data for the
   corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
 
@@ -94,7 +94,7 @@ For any message from the current height:
   `RequestTransaction`.
 - If the message corresponds to a larger round than the saved PoL, the node
   initiates sending `RequestPrevotes` for this round.
-- If the node has formed +2/3 `Precommit`, it deletes the data for the
+- If the node has formed +2/3 `Precommit` messages, it deletes the data for the
   corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
 
