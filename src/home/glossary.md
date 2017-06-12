@@ -5,7 +5,7 @@ Here, these terms are condensed to a single page.
 
 ## Auditor
 
-**Aka** auditing nodes
+**Aka** auditing node
 
 A [full node](#full-node) in the blockchain network that does not participate
 in creating new [blocks](#block), but rather performs continuous audit of all transactions
@@ -33,7 +33,7 @@ authentication by at least 2/3 of the [validator set](#validator), and some addi
 information (such as the hash of the previous block and the hash
 of [the blockchain state](#blockchain-state) after applying transactions
 in the block). The compact block form, in which transactions replaced by the root
-of their [Merkle tree](#merkle-tree) is used for communication with [light clients](#light-client).
+of their [Merkle tree](#merkle-tree), is used for communication with [light clients](#light-client).
 
 ## Blockchain
 
@@ -178,7 +178,8 @@ from a list of elements in such a way that any particular element of the list
 is tied to the overall hash via a short link.
 (This link is called a *Merkle path* or [*Merkle proof*](#merkle-proof).)
 
-Exonum uses Merkle trees and a similar data structure for maps (Merkle [Patricia tree][wiki:p-tree])
+Exonum uses Merkle trees and a similar data structure for maps
+(Merkle [Patricia tree][wiki:p-tree])
 to collect the entire [blockchain state](#blockchain-state) into a single hash
 in a [block](#block), and to provide [proofs](#merkle-proof) to [light clients](#light-client).
 
