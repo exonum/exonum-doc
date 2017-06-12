@@ -89,6 +89,9 @@ As specified in [requests algorithm](requests.md#algorithm-for-sending-requests)
 node deletes stored data (`RequestState`) about sent request when the the
 requested info is obtained.
 
+The timeout is implemented as a message to this node itself. This message is
+queued and processed when it reaches its queue.
+
 **TODO:** insert picture
 
 ### Algorithm Description
@@ -131,7 +134,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Check `Block.prev_hash` correctness.
 - Check that the specified validator is the leader for the given round.
 - Check that the proposal does not contain any previously committed transaction
-  (`Propose` contain only hashes of transactions, so check uses these hashes).
+  (`Propose` contain only hashes of transactions, so the absence of hashes in the
+  database of committed transactions is checked).
 - Add the proposal to the `proposes` HashMap.
 - Form a list of transactions we do not know from this proposal. Request
   transactions from this list.
