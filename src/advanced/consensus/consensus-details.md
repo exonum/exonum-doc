@@ -70,12 +70,12 @@ blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
 necessary, the nodes can request unknown transactions from other nodes.
 
-A set of +2/3 `Prevote` votes from the nodes at current round and blockchain
-height is called _Proof-of-Lock (PoL)_. Nodes should store PoL. The node can
-have no more than one stored PoL. We say that PoL is more than recorded one (has
-a higher priority), in cases when 1) there is no PoL recorded 2) the recorded
-PoL corresponds to a proposal with a smaller round number. So PoLs are [partially
-ordered][partial_ordering].
+A set of +2/3 `Prevote` votes for the same proposal from the nodes at current
+round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
+part of node state. The node can have no more than one stored PoL. We say that
+PoL is more than recorded one (has a higher priority), in cases when 1) there is
+no PoL recorded 2) the recorded PoL corresponds to a proposal with a smaller
+round number. So PoLs are [partially ordered][partial_ordering].
 
 As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
 node deletes stored data (`RequestState`) about sent request when the the
