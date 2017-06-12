@@ -116,7 +116,7 @@ validator height.
 ### Triggering request timeout
 
 - Delete the validator from the list of nodes that have the requested data.
-- If the list of validators for which the requested data should be empty, delete
+- If the list of validators having the data to be requested is empty, delete
   `RequestState`.
 - Otherwise, execute the request and start a new timer.
 
