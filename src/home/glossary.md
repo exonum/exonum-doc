@@ -1,1 +1,265 @@
 # Glossary of Terms
+
+The Exonum documentation uses some specific terms to describe key Exonum concepts.
+Here, these terms are condensed to a single page.
+
+## Auditor
+
+**Aka** auditing nodes
+
+A [full node](#full-node) in the blockchain network that does not participate
+in creating new [blocks](#block), but rather performs continuous audit of all transactions
+in the network. Auditors are identified by a public key. Unlike [validators](#validator),
+adding auditors does not create an overhead in transaction latency and throughput,
+so there can be hundreds of auditors in a blockchain network.
+
+!!! note "Example"
+    Consider an Exonum blockchain that implements public registry in a particular
+    country. In this case, auditing nodes may belong to non-government agencies
+    who are interested in monitoring the operation of the registry.
+
+## Authenticated Consensus
+
+Type of [consensus](#consensus), in which the participants are known in advance
+and are authenticated, usually with the help of public-key cryptography.
+Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
+in order to keep the system [decentralized](#decentralized)
+and be able withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
+
+## Block
+
+Ordered list of [transactions](#transaction) in the blockchain, together with the
+authentication by at least 2/3 of the [validator set](#validator), and some additional
+information (such as the hash of the previous block and the hash
+of [the blockchain state](#blockchain-state) after applying transactions
+in the block). The compact block form, in which transactions replaced by the root
+of their [Merkle tree](#merkle-tree) is used for communication with [light clients](#light-client).
+
+## Blockchain
+
+A [distributed ledger](#distributed-ledger), which uses [hash linking][wiki:linked-ts]
+to achieve the immutability of the transaction log, as well as other cryptographic
+tools to improve accountability. Transactions in a blockchain are grouped in [blocks](#block)
+to improve auditing by [light clients](#light-client).
+
+Whereas the design goal
+of a distributed ledger is [decentralized](#decentralization) data management,
+one of the design goals of a blockchain is achieving accountability of the
+[blockchain maintainers](#maintainer) and auditablity of the system by third parties
+(e.g., internal and external auditors, regulators and end users of the system).
+
+## Blockchain State
+
+The persistent state maintained by each [full node](#full-node) in the blockchain
+network, which [transactions](#transaction) are applied to.
+[The consensus algorithm](#consensus) ensures that the blockchain state (not only
+the transaction log) is identical for all full nodes.
+
+In Exonum, the blockchain state is implemented as a key-value storage. It is
+persisted using [LevelDB][leveldb]. The parts of the storage correspond to
+[tables](#table) used by [the core](#core) and [services](#service).
+
+## Byzantine Node
+
+Node in a distributed network that acts outside of the behavior prescribed
+by [the consensus algorithm](#consensus) in the network. Byzantine behavior
+may be caused by a malicious intent, malfunctioning software/hardware, or
+network connectivity problems.
+
+Consensus algorithms that are able to withstand Byzantine behavior are called
+Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by [PBFT][pbft].
+It is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
+which is the best possible number under the security model that Exonum uses.
+
+## Consensus
+
+**Aka** consensus algorithm
+
+Mechanism of reaching agreement among nodes in a network. In the [blockchain](#blockchain)
+context, consensus is required to withstand faults: nodes being non-responsive
+and/or outright trying to compromise the operation of the blockchain.
+
+There are 2 main types of consensus:
+
+- [Authenticated consensus](#authenticated-consensus), in which the participating
+  nodes are known in advance. This is the type of consensus implemented in Exonum
+- Anonymous consensus, in which the consensus participants are not known in advance.
+  This type of consensus is commonly used in cryptocurrencies (e.g., Bitcoin)
+
+## Core
+
+In Exonum: the functionality present in any Exonum blockchain regardless of
+the deployed [services](#service). Encapsulated in the [exonum-core][exonum-core]
+repository.
+
+For example, the core includes a collection of system [tables](#table) (such as
+a set of all transactions ever committed to the blockchain).
+
+## Decentralization
+
+Absence of single point of failure in the system. For example, absence of a single
+administrator having privileges to perform arbitrary actions.
+
+## Distributed Ledger
+
+A distributed system that maintains a full [transaction](#transaction) log
+for all operations
+in the system, so that any piece of data in the system has a verifiable audit trail.
+All transactions are authenticated, usually via [public key cryptography][wiki:pkc]
+used together with some form of timestamping to provide [non-repudiation][wiki:non-rep].
+
+!!! note
+    In a generic distributed ledgers, the audit trail may be dispersed across
+    the system participants. Thus, it may be difficult to argue about consistency
+    of the whole system.
+
+[Blockchains](#blockchain) are a particular kind of distributed ledgers with focus
+on auditability and accountability of the system maintainers.
+
+## Full Node
+
+Node in the blockchain network that replicates all transactions in the blockchain
+and thus has a local copy of the entire [blockchain state](#blockchain-state).
+There are 2 categories of full nodes in Exonum: [validators](#validator)
+and [auditors](#auditor).
+
+## Light Client
+
+**Aka** lightweight client, thin client
+
+Node in the blockchain network that does not replicate all transactions in the
+blockchain, but rather only a small subset that the client is interested in
+and/or has access to. Light clients can communicate with [full nodes](#full-node)
+to [retrieve information from the blockchain](#read-request)
+and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
+allows to minimize the trust during this communication and protect against
+a range of attacks.
+
+## Maintainer
+
+An entity participating in creating [blocks](#block) and setting the rules
+on a blockchain.
+
+In [permissioned blockchains](#permissioned-blockchain), maintainers
+have known real-world identities, which is reflected in the blockchain protocol.
+The maintainers set up and administer
+[validator nodes](#validator) in the network, and agree on the changes in
+the transaction processing rules.
+
+!!! note "Example"
+    Consider an Exonum blockchain that implements public registry in a particular
+    country. In this case, the maintainers of the blockchain are government agency
+    or agencies, which are tasked with maintaining public registries by law.
+
+In contrast, in permissionless blockchains (e.g., Bitcoin), maintainers are not
+reflected within the blockchain protocol. Validators in such networks are usually
+anonymous or pseudonymous.
+
+## Merkle Proof
+
+Cryptographic proof that certain data is a part of [the cryptographic commitment][wiki:commitment]
+based on [Merkle trees][wiki:mt] or their variants. A Merkle proof allows to
+compactly prove that a certain data is stored at the specified key
+in [the blockchain state](#blockchain-state), at the same time not revealing
+other information about the state or requiring to replicate all [transactions](#transaction)
+in the blockchain network.
+
+## Permissioned Blockchain
+
+Blockchain, the [maintainers](#maintainer) of which are a limited set of entities
+with established real-world identities. Accordingly, [validator nodes](#validator)
+in a permissioned blockchain
+are few in numbers and are authenticated with the help of public-key cryptography.
+
+Permissioned blockchains usually use variations of [authenticated consensus](#authenticated-consensus).
+
+## Private API
+
+[Service endpoint](#service-endpoint) that can be used to administer the local
+instance of the service. As an example, private API can be used to change the
+local configuration of the service.
+
+## Read Request
+
+[Service endpoint](#service-endpoint) that can be used to retrieve data from
+[the blockchain state](#blockchain-state). The data is usually returned with
+a [proof](#merkle-proof) that the data is indeed a part of the blockchain state
+and has been authorized by a supermajority of [validators](#validator).
+
+## Service
+
+The main extension point of the Exonum framework, similar in their design
+to web services. Services define all [transaction](#transaction) processing logic
+in any Exonum blockchain.
+
+Externally, a service is essentially a collection of [endpoints](#service-endpoint)
+that allow to manipulate data in [the blockchain state](#blockchain-state)
+and retrieve it, possibly with [proofs](#merkle-proof). Internally, a service
+may define a bunch of stuff, including [table](#table) schema,
+[configurable parameters](#configuration), etc.
+
+!!! tip
+    See [*Services*](../architecture/services.md) for more details.
+
+## Service Endpoint
+
+A point of communication with [a service](#service). There are three kinds of
+endpoints:
+
+- [Transactions](#transaction) allow to atomically change the blockchain state
+- [Read requests](#read-request) allow to read data from the blockchain state,
+  usually together with [a proof](#merkle-proof)
+- [Private APIs](#private-api) allow to configure the service locally.
+
+External entities such as [light clients](#light-client) can access endpoints
+via REST API. The configuration for REST API is specified in the service.
+
+## Table
+
+A structured collection of data (e.g., a map or a list) that provides a high-level
+abstraction on top of [the blockchain state](#blockchain-state). Tables are used
+by [services](#service) to simplify data management. Additionally, some types
+of tables provide a way to efficiently compute [Merkle proofs](#merkle-proof) for
+items stored in the table.
+
+## Transaction
+
+An atomic patch to [the blockchain state](#blockchain-state)
+satisfying [ACID][wiki:acid] criteria. Transactions are
+authenticated with the help of public-key digital signatures; i.e., the authorship
+of each transaction is known and cannot be easily repudiated. Transactions may be
+generated by various entities in the blockchain network, such as [light clients](#light-client).
+
+Transactions are ordered and grouped into [blocks](#block) in the course of
+[the consensus algorithm](#consensus). Thus, transactions are applied in the same
+order on all [full nodes](#full-node) in the blockchain network.
+
+In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
+Thus, all transactions are templated and defined within [services](#service),
+acting similarly to stored procedures in RDBMSs.
+Transaction endpoints of a service usually specify verification rules, such
+as the validity of a digital signature in the transaction. If the rules don't hold,
+the transaction does not change the blockchain state, but is still recorded in
+the transaction log.
+
+!!! tip
+    See [*Transactions*](../architecture/transactions.md) for more details.
+
+## Validator
+
+A [full node](#full-node) in the blockchain network with the right to participate
+in [the consensus algorithm](#consensus) to create [blocks](#block). In Exonum,
+validators are identified with the help of [the global configuration](#global-configuration),
+which contains public keys of all validators in the network. The set of validators
+can be changed by changing the global configuration. Usually, the set of validators
+is reasonably small, consisting of 4-15 nodes.
+
+[wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
+[wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
+[wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
+[wiki:acid]: https://en.wikipedia.org/wiki/ACID
+[leveldb]: http://leveldb.org/
+[exonum-core]: https://github.com/exonum/exonum-core/
+[wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
+[wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
+[pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
