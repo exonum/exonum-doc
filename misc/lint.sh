@@ -14,7 +14,7 @@ SRC_DIR="$ROOT_DIR/src"
 SITE_DIR="$ROOT_DIR/site"
 # Directory with mdl linter binary
 BIN_DIR=~/.local/bin
-# Directory with configurations
+# Directory with linter configurations
 CFG_DIR="$ROOT_DIR/misc"
 
 kill_server () {
@@ -26,7 +26,9 @@ lint_md () {
 }
 
 lint_html () {
-  html5validator --root "$SITE_DIR" --show-warnings;
+  html5validator --root "$SITE_DIR" --show-warnings --ignore-re \
+    'Illegal character in query: "\|" is not allowed' \
+    '"(autocorrect|autocapitalize)" not allowed on element "input"';
 }
 
 lint_links () {
