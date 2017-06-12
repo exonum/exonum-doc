@@ -62,7 +62,7 @@ validator height.
 - If this is the last transaction required to generate some `Propose`, node
   deletes the data about the corresponding request and its timeouts.
 
-### `Propose` receiving
+### Receiving `Propose`
 
 - If the node requested this `Propose`, it deletes the data about the request
   and the timeout.
@@ -71,7 +71,7 @@ validator height.
 - A list of nodes that have all transactions should be copied from the deleted
   `RequestState` for `RequestPropose`, if it existed.
 
-### `Prevote` receiving
+### Receiving `Prevote`
 
 - If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose`.
@@ -84,7 +84,7 @@ validator height.
   corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
 
-### `Precommit` receiving
+### Receiving `Precommit`
 
 - If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose`.
@@ -96,7 +96,7 @@ validator height.
   corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
 
-### `Block` receiving
+### Receiving `Block`
 
 - The node requests the next block if there are validators at a height higher
   than current.
