@@ -78,8 +78,9 @@ validator height.
 - If the node has `Propose` but not all transactions, it initiates sending
   `RequestTransaction` (only for those unknown transactions for which the request
   has not yet been sent ).
-- If the sender specified `lock_round`, which is greater than the stored PoL,
-  node initiates sending `RequestPrevotes`.
+- If the sender specified `lock_round`, which is greater than the stored  
+  [Proof-of-Lock (PoL)](consensus-details.md#definitions), node initiates sending
+  `RequestPrevotes`.
 - If the node have formed +2/3 `Prevote` messages, it deletes the data for the
   corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
