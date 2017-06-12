@@ -69,6 +69,12 @@ Fields used in transaction serialization are listed below.
     with the exception that Rust does not support negative offsets,
     which denote an offset relative to the end of the byte buffer.
 
+!!! note
+    Exonum's blockchain doesn't contain the transactions themselves but
+    [SHA-256 hashes](https://en.wikipedia.org/wiki/SHA-2) of their messages
+    (including all the fields `network_id`, `protocol_version`, `service_id`,
+    `message_id`, `payload_length`, `body` and `signature`).
+
 ### Network ID
 
 This field will be used to send inter-blockchain messages in the future
