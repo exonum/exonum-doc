@@ -37,6 +37,7 @@ information about the state of the node, if the node is not Byzantine:
 
 - On specified `addr` (IP address + port) it is possible to address to a node
   with specified public key.
+- Time on that node is specified by `time` field.
 
 ## Algorithm for sending requests
 
