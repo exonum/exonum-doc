@@ -22,36 +22,42 @@ constant defined in configuration.
   HashMap with known block proposals.
 
 - `locked_round`  
-  Round in which **LOCK** was executed.
+  Round in which the node has [locked](consensus.md#locks) on a proposal.
 
 - `current_round`  
   Number of current round.
 
 - `locked_propose`  
-  `propose` on which node is locked.
+  `Propose` on which node is locked.
 
 - `state_hash`  
   Hash of blockchain state.
 
 ### Fields of consensus messages
 
+The consensus algorithm uses following types of messages:
+[`Propose`](consensus.md#propose), [`Prevote`](consensus.md#prevote),
+[`Precommit`](consensus.md#precommit), [`Status`](consensus.md#status),
+[`Block`](consensus.md#block). Only part of their fields is described here. See
+[source code][message_source] for more details.
+
 - `validator_id`  
   Index of specific validator in `validators` list of configuration. This field
   is common to all types of messages.
 
-- `propose.round`  
-  Round in which `propose` was created.
+- `Propose.round`  
+  Round in which `Propose` was created.
 
-- `prevote.propose_hash`  
-  Hash of the `propose` to which `prevote` belongs.
+- `Prevote.propose_hash`  
+  Hash of the `Propose` to which `Prevote` belongs.
 
-- `prevote.round`  
-  Round when `prevote` was created.
+- `Prevote.round`  
+  Round when `Prevote` was created.
 
-- `prevote.hash`  
-  Hash of `prevote`.
+- `Prevote.hash`  
+  Hash of `Prevote`.
 
-- `block.prev_hash`  
+- `Block.prev_hash`  
   Hash of the previous block.
 
 ### Definitions
@@ -477,3 +483,4 @@ the accepted block.
 **TODO:** Property of a new algorithm for choosing a leader.
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
+[message_source]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
