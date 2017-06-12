@@ -233,6 +233,13 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     performs [almost at the same time](../advanced/consensus/consensus.md) as
     the block with the given transaction is committed into the blockchain.
 
+!!! note
+    The `execute` method couldn't include an arbitrary manipulation over the
+    blockchain but only the primitives whose are allowed by the
+    [Exonum core](https://github.com/exonum/exonum-core) and templated in the
+    service definition. The transactions with a given (`service_id`,
+    message_id`) differs only with a set of their parameters.
+
 ### Info
 
 ```rust
