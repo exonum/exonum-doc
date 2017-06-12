@@ -15,7 +15,8 @@ constant defined in configuration.
   Current blockchain height.
 
 - `queued`  
-  Queue for messages from the future height or round.
+  Queue for consensus messages (`Propose`, `Prevote`, `Precommit`) from the
+  future height or round.
 
 - `proposes`  
   HashMap with known block proposals.
