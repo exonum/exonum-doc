@@ -113,12 +113,6 @@ validator height.
 
 - Delete all information about requests and their timeouts.
 
-### Request sending initiation
-
-- If there is no corresponding `RequestState` for the requested data, create
-  it and set the timer to wait for the data (`RequesTimeout`).
-- Add the node to the list of nodes that have this data.
-
 ### Triggering request timeout
 
 - Delete the validator from the list of nodes that have the requested data.
