@@ -4,5 +4,5 @@ pygments
 pygments-github-lexers
 mkdocs-material
 # Linters
-linkchecker
+linkchecker >= 9.0
 html5validator
