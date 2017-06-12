@@ -50,7 +50,7 @@ request.
 
 ### Getting any consensus message from a bigger height
 
-- Update info about the height of blockchain in the corresponding node.
+- Update info about the height of blockchain on the corresponding node.
 - Initiate sending `RequestBlock` for the current height, if such a request was
   not sent earlier.
 
@@ -61,8 +61,6 @@ validator height.
 
 - If this is the last transaction required to generate some `Propose`, node
   deletes the data about the corresponding request and its timeouts.
-
-For any message from the current height:
 
 ### `Propose` receiving
 
