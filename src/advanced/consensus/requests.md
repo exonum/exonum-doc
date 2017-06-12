@@ -22,14 +22,14 @@ information about the state of the node, if the node is not Byzantine:
 ### `prevote`
 
 - The node has a corresponding proposal.
-- The node has `all` transactions of this proposal.
+- The node has all transactions of this proposal.
 - If the node indicated `lock_round` in the message, it has a +2/3 `prevote` for
   this proposal in the specified round.
 
 ### `precommit`
 
 - The node has a corresponding proposal.
-- The node has `all` transactions of this proposal.
+- The node has all transactions of this proposal.
 - The node has +2/3 `prevote` for this proposal in the corresponding round.
 
 ### `connect`
