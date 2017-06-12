@@ -16,8 +16,9 @@ information about the state of the node, if the node is not Byzantine:
 
 ### Any consensus message
 
-- The node is at the appropriate height, it has all the previous blocks, +2/3
-  `Precommit` for each of them.
+- The node is at the appropriate height.
+- The node has all the previous blocks.
+- The node has +2/3 `Precommit` messages for each of previous blocks.
 
 ### `Prevote`
 
