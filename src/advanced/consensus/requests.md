@@ -17,22 +17,22 @@ information about the state of the node, if the node is not Byzantine:
 ### Any consensus message
 
 - The node is at the appropriate height, it has all the previous blocks, +2/3
-  `precommit` for each of them.
+  `Precommit` for each of them.
 
-### `prevote`
+### `Prevote`
 
 - The node has a corresponding proposal.
 - The node has all transactions of this proposal.
-- If the node indicated `lock_round` in the message, it has a +2/3 `prevote` for
+- If the node indicated `lock_round` in the message, it has a +2/3 `Prevote` for
   this proposal in the specified round.
 
-### `precommit`
+### `Precommit`
 
 - The node has a corresponding proposal.
 - The node has all transactions of this proposal.
-- The node has +2/3 `prevote` for this proposal in the corresponding round.
+- The node has +2/3 `Prevote` for this proposal in the corresponding round.
 
-### `connect`
+### `Connect`
 
 - On specified `addr` it is possible to address to a node with specified
   `pub_key`.
@@ -58,46 +58,46 @@ validator height.
 
 ### Receiving a transaction
 
-- If this is the last transaction required to generate some `propose`, node
+- If this is the last transaction required to generate some `Propose`, node
   deletes the data about the corresponding request and its timeouts.
 
 For any message from the current height:
 
-### `propose` receiving
+### `Propose` receiving
 
-- If the node requested this `propose`, it deletes the data about the request
+- If the node requested this `Propose`, it deletes the data about the request
   and the timeout.
-- If the node does not have certain transactions from this `propose`, it
+- If the node does not have certain transactions from this `Propose`, it
   initiates sending `RequestTransactions`.
 - A list of nodes that have all transactions should be copied from the deleted
   `RequestState` for `RequestPropose`, if it existed.
 
-### `prevote` receiving
+### `Prevote` receiving
 
-- If the node does not have a corresponding `propose`, it initiates sending
+- If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose`.
-- If the node has `propose` but not all transactions, it initiates sending
+- If the node has `Propose` but not all transactions, it initiates sending
   `RequestTransaction` (only for those unknown transactions for which the request
   has not yet been sent ).
 - If the sender specified `lock_round`, which is greater than the stored PoL,
   node initiates sending `RequestPrevotes`.
-- If the node have formed +2/3 `prevote`, it deletes the data for the
+- If the node have formed +2/3 `Prevote`, it deletes the data for the
   corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
 
-### `precommit` receiving
+### `Precommit` receiving
 
-- If the node does not have a corresponding `propose`, it initiates sending
+- If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose`.
-- If the node have `propose` but not all transactions, it initiates sending
+- If the node have `Propose` but not all transactions, it initiates sending
   `RequestTransaction`.
 - If the message corresponds to a larger round than the saved PoL, the node
   initiates sending `RequestPrevotes` for this round.
-- If the node has formed +2/3 `precommit`, it deletes the data for the
+- If the node has formed +2/3 `Precommit`, it deletes the data for the
   corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
 
-### `block` receiving
+### `Block` receiving
 
 - The node requests the next block if there are validators at a height higher
   than current.
@@ -143,7 +143,7 @@ The processing of responses to requests is trivial:
 
 - If the message corresponds to a height higher than the one on which the node
   is, ignore the message.
-- If the node has `propose` c with the corresponding hash at the given height,
+- If the node has `Propose` c with the corresponding hash at the given height,
   send it.
 
 ### `RequestTransactions`
@@ -156,14 +156,14 @@ pool. If we do not have any of the requested transactions, don't send anything.
 
 - If the message does not match the height at which the node is, ignore the
   message.
-- Send as individual messages all the corresponding `prevote` messages except
+- Send as individual messages all the corresponding `Prevote` messages except
   those that the requestor has.
 
 ### `RequestPrecommits`
 
 - If the message corresponds to a height higher than the one on which the node
   is, ignore the message.
-- Send as individual messages all the corresponding `precommit` messages except
+- Send as individual messages all the corresponding `Precommit` messages except
   those that the requestor has.
 
 ### `RequestBlock`
