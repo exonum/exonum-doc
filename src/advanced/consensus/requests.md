@@ -101,6 +101,7 @@ validator height.
 
 - The node requests the next block if there are validators at a height higher
   than current.
+- The node updates its height after committing the block locally.
 
 ### Adding new validators
 
