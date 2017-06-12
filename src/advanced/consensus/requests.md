@@ -35,8 +35,8 @@ information about the state of the node, if the node is not Byzantine:
 
 ### `Connect`
 
-- On specified `addr` it is possible to address to a node with specified
-  `pub_key`.
+- On specified `addr` (IP address + port) it is possible to address to a node
+  with specified public key.
 
 ## Algorithm for sending requests
 
