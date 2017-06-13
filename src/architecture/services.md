@@ -131,9 +131,9 @@ cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented
-using [LevelDB][leveldb]. Each service needs to define a set of data collections,
-in which the service persists the service-specific data;
-these collections abstract away the need for the service to deal with the blockchain
+using [LevelDB][leveldb]. Each service needs to define a set of data collections
+(*tables*), in which the service persists the service-specific data;
+these tables abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
 maps and append-only lists (`MapTable` and `ListTable`, respectively).
 
