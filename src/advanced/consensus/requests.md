@@ -51,6 +51,11 @@ request attempts made and list of nodes that have the required information. When
 the requested info is obtained, node deletes `RequestState` for the corresponding
 request.
 
+Also for each sent request the node sets timeout. The timeout is
+implemented as a message to this node itself. This message is queued and
+processed when it reaches its queue. Timeout deletion means deletion from the
+message queue.
+
 ### Getting any consensus message from a bigger height
 
 - Update info about the height of blockchain on the corresponding node.
