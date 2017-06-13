@@ -58,8 +58,8 @@ message queue.
 ### Getting any consensus message from a bigger height
 
 - Update info about the height of blockchain on the corresponding node.
-- Initiate sending `RequestBlock` for the current height, if such a request was
-  not sent earlier.
+- Initiate sending `RequestBlock` for the current height (height of the latest
+  committed block + 1), if such a request was not sent earlier.
 
 Everything below is applicable only if the height of the message is the same as
 validator height.
@@ -75,18 +75,19 @@ validator height.
   and the timeout. A list of nodes that have all transactions (if it exists)
   should be copied from the `RequestState` before deletion.
 - If the node does not have certain transactions from this `Propose`, it
-  initiates sending `RequestTransactions`.
+  initiates sending `RequestTransactions` to the author of `Propose`.
 
 ### Receiving `Prevote`
 
 - If the node does not have a corresponding `Propose`, it initiates sending
-  `RequestPropose`.
+  `RequestPropose` to the author of `Prevote`.
 - If the node has `Propose` but not all transactions, it initiates sending
-  `RequestTransactions` (only for those unknown transactions for which the request
-  has not yet been sent ).
+  `RequestTransactions` to the author of `Prevote` (only for those unknown
+  transactions for which the request has not yet been sent ).
 - If the sender specified `lock_round`, which is greater than the stored  
   [Proof-of-Lock (PoL)](consensus-details.md#definitions), node initiates sending
-  `RequestPrevotes` for the proposal, mentioned at the received locked `Prevote`.
+  `RequestPrevotes` for the proposal to the author of `Prevote`, mentioned at the
+  received locked `Prevote`.
 - If the node have formed +2/3 `Prevote` messages, it deletes the data for the
   corresponding request `RequestPrevotes` and timeouts, if the node requested
   them earlier.
@@ -94,11 +95,11 @@ validator height.
 ### Receiving `Precommit`
 
 - If the node does not have a corresponding `Propose`, it initiates sending
-  `RequestPropose`.
+  `RequestPropose` to the author of `Precommit`.
 - If the node have `Propose` but not all transactions, it initiates sending
-  `RequestTransactions`.
+  `RequestTransactions` to the author of `Precommit`.
 - If the message corresponds to a larger round than the saved PoL, the node
-  initiates sending `RequestPrevotes` for this round.
+  initiates sending `RequestPrevotes` for this round to the author of `Precommit`.
 - If the node has formed +2/3 `Precommit` messages, it deletes the data for the
   corresponding request `RequestPrecommit` and timeouts, if the node requested
   them earlier.
@@ -121,7 +122,8 @@ validator height.
 
 ### Triggering request timeout
 
-- Delete the validator from the list of nodes that have the requested data.
+- Delete the validator to which the request was sent from the list of nodes that
+  have the requested data.
 - If the list of validators having the data to be requested is empty, delete
   `RequestState`.
 - Otherwise, make one more request attempt and start a new timer.
