@@ -81,9 +81,6 @@ validator height.
 
 - If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose` to the author of `Prevote`.
-- If the node has `Propose` but not all transactions, it initiates sending
-  `RequestTransactions` to the author of `Prevote` (only for those unknown
-  transactions for which the request has not yet been sent ).
 - If the sender specified `lock_round`, which is greater than the stored  
   [Proof-of-Lock (PoL)](consensus-details.md#definitions), node initiates sending
   `RequestPrevotes` for the proposal to the author of `Prevote`, mentioned at the
@@ -96,8 +93,6 @@ validator height.
 
 - If the node does not have a corresponding `Propose`, it initiates sending
   `RequestPropose` to the author of `Precommit`.
-- If the node have `Propose` but not all transactions, it initiates sending
-  `RequestTransactions` to the author of `Precommit`.
 - If the message corresponds to a larger round than the saved PoL, the node
   initiates sending `RequestPrevotes` for this round to the author of `Precommit`.
 - If the node has formed +2/3 `Precommit` messages, it deletes the data for the
