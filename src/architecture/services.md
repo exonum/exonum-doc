@@ -243,7 +243,7 @@ Here’s a list of things to figure out when developing an Exonum service:
 ## Interface with Exonum Framework
 
 Internally, services communicate with the Exonum framework via an interface
-established in [the `Service` trait][service.rs].
+established in the [`Service`][service.rs] trait.
 This trait defines the following methods that need to be implemented by
 a service developer.
 
@@ -283,7 +283,7 @@ fn state_hash(&self, view: &View)
 
 The `state_hash` method needs to return a list of hashes for all
 Merklized tables defined by the service, which are calculated based on the
-current blockchain state `view`. 
+current blockchain state `view`.
 The core uses this list to aggregate
 hashes of tables defined by all services, into a single Merklized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
@@ -331,7 +331,7 @@ fn handle_genesis_block(&self, view: &View)
 of the service in the JSON format.
 This method is invoked for all deployed services during
 the blockchain initialization. A result of the method call for each service
-is recorded under [the stringified `service_id` key](#service-identifiers)
+is recorded under [the stringified service identifier](#service-identifiers)
 in the configuration. The resulting initial configuration is augmented
 by non-service parameters (such as public keys of the validators) and recorded in
 the genesis block, hence the method name.
@@ -427,3 +427,4 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
+[service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
