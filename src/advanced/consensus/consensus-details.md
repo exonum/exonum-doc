@@ -134,9 +134,11 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - If verification is successful, proceed to the message processing according to
   its type.
 
-#### `Propose` message processing
+#### `Propose` Message Processing
 
-- If the node already knows this proposal (its hash already is in the `proposes`
+**Arguments:** `propose`.
+
+- If `propose` is known (its hash already is in the `proposes`
   HashMap), ignore the message.
 - Check `propose.prev_hash` correctness.
 - Check that the specified validator is the leader for the given round.
@@ -161,6 +163,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 #### Full proposal
 
+**Arguments:** `propose`.
+
 - If the node does not have a saved PoL, send `Prevote` message in the round to
   which the proposal belongs.
 - For all rounds in the interval
@@ -181,15 +185,19 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 #### Availability of +2/3 `Prevote`
 
+**Arguments:** `prevote`.
+
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
 - If the node's `locked_round` is less than `prevote.round` and the hash of the stored
   `Propose` message corresponding to this `prevote` is the same as `prevote.propose_hash`,
   then proceed to **LOCK** for this very proposal.
 
-#### `Prevote` message processing
+#### `Prevote` Message Processing
 
-- Add the message to the list of known `Prevote` messages for its proposal in
+**Arguments:** `prevote`.
+
+- Add `prevote` to the list of known `Prevote` messages for its proposal in
   `prevote.round` round.
 - If:
 
@@ -203,7 +211,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 - If the node does not know `propose` or any transactions, request them.
 
-#### `Precommit` message processing
+#### `Precommit` Message Processing
 
 - Add the message to the list of known `Precommit` for this proposal in this
   round with the given `state_hash`.
@@ -253,7 +261,9 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Process all messages from the `queued`, if they become relevant.
 - Add a timeout for the next round of new height.
 
-#### `Block` message processing
+#### `Block` Message Processing
+
+**Arguments:** `propose`.
 
 Only for the case if a validator is behind the majority of the network:
 
