@@ -301,6 +301,22 @@ the case when a service doesn't have any Merklized tables.
     a more even key distribution (which results in a more balanced
     Merkle Patricia tree).
 
+### Parse Raw Transaction
+
+```rust
+fn tx_from_raw(&self, raw: RawTransaction)
+               -> Result<Box<Transaction>, MessageError>;
+```
+
+The `tx_from_raw` method is used to parse raw transactions received from the network
+into specific transaction types defined by the service. The core uses this method
+to dispatch incoming transactions to services that host transaction implementations.
+The `service_id` field in the transaction serialization is used to determine
+the service, whose `tx_from_raw` method is called by the core.
+
+A parsed transaction returned by the method is then used in further
+transaction processing.
+
 ## Tips and Tricks
 
 ### Communication with External World
