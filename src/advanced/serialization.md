@@ -17,8 +17,9 @@ In Exonum, the binary format is used for two purposes:
 
 ## Motivation of Own Serialization Format
 
-Due to the fact that we do not need to serialize-deserialize the data, we can
-work with the signed messages, and later, if necessary, transfer them to other
+Due to the fact that the messages do not need to be serialized/deserialized
+between the wire format and the in-memory representation, it is possible to work
+with the signed messages, and later, if necessary, transfer them to other
 nodes. This is necessary for the consensus algorithm. Also, "deserialization" of
 unused fields does not occur without the need, which minimizes the overhead.
 Moreover, this format allows to achieve [zero-copy][zero_copy] because the data
