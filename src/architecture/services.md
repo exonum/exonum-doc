@@ -240,6 +240,13 @@ Here’s a list of things to figure out when developing an Exonum service:
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
 
+## Interface with Exonum Framework
+
+Internally, services communicate with the Exonum framework via an interface
+established in [the `Service` trait][service.rs].
+This trait defines the following methods that need to be implemented by
+a service developer.
+
 ## Tips and Tricks
 
 ### Communication with External World
