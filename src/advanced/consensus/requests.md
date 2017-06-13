@@ -37,7 +37,6 @@ information about the state of the node, if the node is not Byzantine:
 
 - On specified `addr` (IP address + port) it is possible to address to a node
   with specified public key.
-- Time on that node is specified by `time` field.
 
 ## Algorithm for sending requests
 
@@ -136,9 +135,6 @@ The processing of responses to requests is trivial:
 
 - If `to` value (node which should receive request) does not correspond to our
   key, ignore the message.
-- If the message is too old (the value of the field `time` is earlier than in
-  the previous `Connect` message received from the same peer), ignore the message.
-- If the message indicates the future time of delivery, ignore the message.
 - Check the signature of the message.
 
 ### `RequestPropose`
