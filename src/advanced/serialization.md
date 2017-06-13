@@ -75,6 +75,23 @@ Consider the structure with two fields:
 - Age: `u64`  
   23
 
+To serialize the structure, one may use macros like this:
+
+```Rust
+storage_value! {
+    struct MyAwesomeStructure {
+        const SIZE = 16;
+
+        field name: &str [0 => 8]
+        field age:  u64  [8 => 16]
+    }
+}
+
+// create serialized structure in memory
+
+    let student = MyAwesomeStructure::new("Andrew", 23);
+```
+
 Its serialized representation:
 
 ### Header
