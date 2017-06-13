@@ -248,6 +248,31 @@ established in [the `Service` trait][service.rs].
 This trait defines the following methods that need to be implemented by
 a service developer.
 
+### Service Identifiers
+
+```rust
+fn service_id(&self) -> u16;
+fn service_name(&self) -> &'static str;
+```
+
+`service_id` returns a 2-byte service identifier, which needs to be unique
+within a specific Exonum blockchain. `service_name` is similarly a unique identifier,
+only it is a string instead of an integer.
+
+`service_id` is used:
+
+- To identify [transactions](transactions.md) hosted by the service.
+- Within the blockchain state. See [`state_hash`](#state-hash) below and
+  [*Storage*](storage.md)
+- In [the configuration](configuration.md). Service configuration
+  is stored in the overall configuration under the key obtained
+  by converting `service_id` to a string via `format("{}", service_id)`
+
+`service_name` is used:
+
+- To compute API endpoints for the service. All service endpoints
+  are mounted on `/api/services/{service_name}`.
+
 ## Tips and Tricks
 
 ### Communication with External World
