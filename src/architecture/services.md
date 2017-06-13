@@ -357,6 +357,28 @@ and push them in the queue for broadcasting, etc.
     Keep in mind that `handle_commit` is sequentially invoked for each block
     in the blockchain during an initial full node synchronization.
 
+### REST API Initialization
+
+```rust
+use iron::Handler;
+
+fn public_api_handler(&self, context: &ApiContext)
+                      -> Option<Box<Handler>> {
+    None
+}
+fn private_api_handler(&self, context: &ApiContext)
+                       -> Option<Box<Handler>> {
+    None
+}
+```
+
+`public_api_handler` and `private_api_handler` provide hooks for defining
+public and private API endpoints respectively, using [Iron framework][iron] API.
+These methods are given an API context, which allows to read information from
+the blockchain, and to translate POST requests into Exonum transactions.
+
+The default trait implementation does not define any public or private endpoints.
+
 ## Tips and Tricks
 
 ### Communication with External World
