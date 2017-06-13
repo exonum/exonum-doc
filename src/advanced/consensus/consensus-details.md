@@ -83,7 +83,8 @@ round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
 part of node state. The node can have no more than one stored PoL. We say that
 PoL is greater than recorded one (has a higher priority), in cases when 1) there
 is no PoL recorded 2) the recorded PoL corresponds to a proposal with a smaller
-round number. So PoLs are [partially ordered][partial_ordering].
+round number. So PoLs are [partially ordered][partial_ordering]. A node must
+replace stored PoL with a greater one.
 
 As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
 node deletes stored data (`RequestState`) about sent request when the the
@@ -169,7 +170,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
     - Execute the proposal, if it has not yet been executed.
     - Check that our `state_hash` coincides with the `state_hash` of the
-      majority.
+      majority (if not, the node must stop working and signalize error).
     - Proceed to **COMMIT** for this block.
 
 #### Availability of +2/3 `Prevote`
@@ -177,8 +178,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
 - If our `locked_round` is less than `Prevote.round` and the hash of the stored
-  `Propose` is the same as `Prevote.propose_hash`, then proceed to **LOCK** for
-  this very proposal.
+  `Propose` corresponding to this `Prevote` is the same as `Prevote.propose_hash`,
+  then proceed to **LOCK** for this very proposal.
 
 #### `Prevote` message processing
 
@@ -262,10 +263,11 @@ Only for the case if a validator is behind the majority of the network:
 
 - If the check is successful, then check all transactions for correctness and if
   they are all correct, then proceed to their execution, which results in
-  `Block`. Its hash must coincide with the hash of the block from the message,
-  if this did not happen, then this is an indication of a critical failure:
-  either the majority of the network is byzantine or the nodes' software is
-  corrupted.
+  `Block` (if not all transactions are correct, the node must stop working and
+  signalize error). Its hash must coincide with the hash of the block from the
+  message, if this did not happen, then this is an indication of a critical
+  failure: either the majority of the network is byzantine or the nodes' software
+  is corrupted.
 
 - Add the block to the blockchain and move to a new height. Set to`0` the value
   of the variable `locked_round` at the new height.
@@ -280,8 +282,8 @@ Only for the case if a validator is behind the majority of the network:
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
 - If we have a saved PoL, send `Prevote` for `locked_propose` in a new round,
   check if we have reached the status of **Availability of +2/3 `Prevote`**.
-- Else, if we are the leader, form and send `Propose` and `Prevote` after the
-  expiration of `propose_timeout`.
+- Else, if we are the leader, form and send `Propose` and `Prevote` (after the
+  expiration of `propose_timeout`, if the node has just moved to a new height).
 - Process all messages from the queue, if they become relevant.
 
 #### Status timeout processing
