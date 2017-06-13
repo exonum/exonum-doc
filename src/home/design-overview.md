@@ -119,7 +119,7 @@ Full nodes are further subdivided into 2 categories:
   new blocks by using a [Byzantine fault tolerant consensus algorithm](#consensus).
   Validators receive transactions, verify them, and include into a new block.
   The list of the validators is restricted by network maintainers, and normally
-  should consist of 4-15 nodes
+  should consist of 4–15 nodes
 
 ### Light Clients
 

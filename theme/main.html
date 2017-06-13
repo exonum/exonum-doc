@@ -4,3 +4,38 @@
   <a class="edit-on-github" href="{{ config.extra.github_edit_url }}{{ page.input_path | replace('\\', '/') }}" title="Edit page source on GitHub"><span class="md-icon">edit</span>Edit on GitHub</a>
   {{- super() }}
 {% endblock %}
+
+{%- block site_meta %}
+  {#- Remove description meta tag if it's present; it's reinserted later in the "extrahead" block #}
+  {%- set super_meta = super() %}
+  {%- set description_start = super_meta.find('<meta name="description"') %}
+  {%- if description_start >= 0 %}
+    {%- set description_end = super_meta.find('>', description_start) %}
+    {{- super_meta[:description_start] + super_meta[description_end + 1:] }}
+  {%- else %}
+    {{- super_meta }}
+  {%- endif %}
+{%- endblock %}
+
+{% block extrahead %}
+  {% set description = page.meta.description | join(' ')
+    | default(page.content.partition('</h1>')[2].partition('</p>')[0] | striptags, True)
+    | default(config.site_description, True)
+    | escape %}
+  <meta name="description" content="{{ description }}">
+
+  {% if page and page.canonical_url %}
+  <meta name="og:title" content="{{ page.meta.title | default(page.title) }}">
+  <meta name="og:url" content="{{ page.canonical_url }}">
+  <meta name="og:description" content="{{ description }}">
+  <meta name="og:type" content="article">
+  <meta name="og:image" content="{{ config.site_url }}{{ config.extra.og_image }}">
+  <meta name="twitter:card" content="summary">
+  {% set twitter_site = config.extra.social
+    | selectattr('type', 'equalto', 'twitter')
+    | first %}
+  {% if twitter_site %}<meta name="twitter:site" content="@{{ twitter_site.link | replace('https://twitter.com/', '') }}">{% endif %}
+  <meta name="twitter:title" content="{{ page.meta.title | default(page.title) }}">
+  <meta name="twitter:description" content="{{ description }}">
+  {% endif %}
+{% endblock %}

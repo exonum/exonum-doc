@@ -28,6 +28,22 @@ You can set up these tools locally (see the `install` step in [the Travis config
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
 `links`, or `all` arguments.
 
+### Page Meta
+
+During the build process, `mkdocs` gathers meta information for each page, which
+is then used to provide page summary on social media, for search engines, etc.
+The main meta information of interest is the page description. By default,
+it is equal to the first paragraph of the page. You can override this default
+by providing an explicit description on the very top of the page:
+
+```markdown
+description: 1-3 sentence description of the page
+
+# Page Title
+
+Page contents...
+```
+
 ## Build Instructions
 
 It is a good idea to preview your changes locally before sending a pull request. 
