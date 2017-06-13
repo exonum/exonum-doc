@@ -60,7 +60,8 @@ In binary representation sequence is splitted into two main parts:
 Data of primitive types as well as arrays of fixed length (for example
 `PublicKey`) are stored completely in the header.
 
-Other types take 8 bytes in header of sequence: 4 for position in the body, and 4
+Other types take 8 bytes in header of sequence: 4 for position in the body
+(counted from the beginning of the whole serialization buffer), and 4
 for data size. So the header points to the data in the body. Data segments are
 placed in the body without gaps or overlaps, and in the same order as the
 corresponding fields in the header.
