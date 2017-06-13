@@ -135,8 +135,8 @@ by the node.
 
 The processing of responses to requests is trivial:
 
-- If `to` value (node which should receive request) does not correspond to our
-  key, ignore the message.
+- If `to` value (node which should receive request) does not correspond to the
+  node's key, ignore the message.
 - Check the signature of the message.
 
 ### `RequestPropose`
