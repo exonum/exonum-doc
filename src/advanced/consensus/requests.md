@@ -105,11 +105,14 @@ validator height.
   than current.
 - The node updates its height after committing the block locally.
 
-### Adding new validators
+### Adding new peers
 
-- Send the `RequestPeers` request to the known network validator. `RequestPeers`
-  message is sent regularly with the timeout `peers_timeout` defined in [the global
-  configuration](../../architecture/configuration.md#global-parameters).
+- Send the `RequestPeers` request to a random peer (auditor or validator) from
+  `peers` (list of known peers specified in [local
+  configuration](../../architecture/configuration.md#local-parameters)).
+  `RequestPeers` message is sent regularly with the timeout `peers_timeout`
+  defined in [the global configuration](../../architecture/configuration.md#global-parameters).
+  `RequestPeers` is used to obtain `Connect` messages from peers.
 
 ### Transition to a new height
 
