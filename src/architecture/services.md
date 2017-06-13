@@ -241,24 +241,12 @@ Here’s a list of things to figure out when developing an Exonum service:
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
 
-### Limitations
+## Interface with Exonum Framework
 
-As of Exonum 0.1, there are some temporary limitations on what you can do
-with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
-on when and how these limitations are going to be lifted.
-
-#### Interaction Among Services
-
-In Exonum 0.1, there is no unified API for services to
-access other services’ endpoints. As an example, a service cannot call a transaction
-defined in another service, and cannot read data from another service
-via its read endpoint.
-
-#### Authentication Middleware
-
-Unlike common web frameworks, Exonum 0.1 does not provide authentication middleware
-for service endpoints. Implementing authentication and authorization is thus
-the responsibility of a service developer.
+Internally, services communicate with the Exonum framework via an interface
+established in [the `Service` trait][service.rs].
+This trait defines the following methods that need to be implemented by
+a service developer.
 
 ## Tips and Tricks
 
