@@ -317,6 +317,28 @@ the service, whose `tx_from_raw` method is called by the core.
 A parsed transaction returned by the method is then used in further
 transaction processing.
 
+### Genesis Block Handler
+
+```rust
+use serde_json::Value;
+
+fn handle_genesis_block(&self, view: &View)
+                        -> Result<Value, StorageError> {
+    Ok(Value::Null)
+}
+```
+
+`handle_genesis_block` returns an initial [global configuration](configuration.md)
+of the service in the JSON format.
+This method is invoked for all deployed services during
+the blockchain initialization. A result of the method call for each service
+is recorded under [the stringified `service_id` key](#service-identifiers)
+in the configuration. The resulting initial configuration is augmented
+by non-service parameters (such as public keys of the validators) and recorded in
+the genesis block, hence the method name.
+
+The default trait implementation returns `null` (i.e., no configuration).
+
 ## Tips and Tricks
 
 ### Communication with External World
