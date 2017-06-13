@@ -11,33 +11,33 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
     In the following description, +2/3 means more than two thirds of the
     validators number.
 
-Receiving a consensus message from a node gives us an opportunity
-to learn certain
-information about the state of the node, if the node is not Byzantine:
+Receiving a consensus message from a node gives the message recepient
+an opportunity to learn certain
+information about the state of the message author, if the author is not Byzantine.
 
 ### Any Consensus Message
 
-- The node is at the height implied by the message
-- The node has all previous blocks
-- The node has +2/3 `Precommit` messages for each of previous blocks
+- The message author is at the height implied by the message
+- The author has all previous blocks
+- The author has +2/3 `Precommit` messages for each of previous blocks
 
 ### `Prevote`
 
-- The node has a proposal (`Propose` message) referenced by the `Prevote` message
-- The node has all transactions mentioned in this proposal
-- If the node indicated `lock_round` in the message, it has a +2/3 `Prevote`
+- The author has a proposal (`Propose` message) referenced by the `Prevote` message
+- The author has all transactions mentioned in this proposal
+- If the author indicated `lock_round` in the message, it has a +2/3 `Prevote`
   messages for this proposal in the specified round
 
 ### `Precommit`
 
-- The node has a proposal referenced by the `Precommit` message
-- The node has all transactions mentioned in this proposal
-- The node has +2/3 `Prevote` messages for this proposal in the corresponding round
+- The author has a proposal referenced by the `Precommit` message
+- The author has all transactions mentioned in this proposal
+- The author has +2/3 `Prevote` messages for this proposal in the corresponding round
 
 ### `Connect`
 
-- It is possible to access a node with a public key specified
-  in the `Connect` message, by the IP adress + port mentioned in the message
+- It is possible to access the author by using the IP adress + port
+  mentioned in the message
 
 ## Algorithm for Sending Requests
 
@@ -59,7 +59,7 @@ message queue.
 ### Consensus Message from Bigger Height
 
 - Update info about the height of blockchain on the corresponding node
-- Initiate sending `RequestBlock` for the current height (height of the latest
+- Send `RequestBlock` for the current height (height of the latest
   committed block + 1), if such a request was not sent earlier
 
 All events below are applicable only if the height of the message is the same as
@@ -67,57 +67,57 @@ validator height.
 
 ### Receiving Transaction
 
-- If this is the last transaction required to collect a known `Propose`, the node
-  deletes the data about the corresponding `RequestTransactions` and its timeouts
+If this is the last transaction required to collect a known `Propose`,
+delete the data about the corresponding `RequestTransactions` and its timeouts.
 
 ### Receiving `Propose`
 
-- If the node requested this `Propose`, it deletes the data about the request
+- If this `Propose` was requested, delete the data about the request
   and the timeout. A list of nodes that have all transactions (if it exists)
   should be copied from the `RequestState` before deletion
-- If the node does not have certain transactions from this `Propose`, it
-  initiates sending `RequestTransactions` to the author of `Propose`
+- If certain transactions from the `Propose` are not known,
+  send `RequestTransactions` to the author of `Propose`
 
 ### Receiving `Prevote`
 
-- If the node does not have a corresponding `Propose`, it initiates sending
+- If the node does not have the corresponding `Propose`, send
   `RequestPropose` to the author of `Prevote`
 - If the sender specified `lock_round`, which is greater than the stored  
-  [Proof-of-Lock (PoL)](consensus-details.md#definitions), the node initiates sending
+  [Proof-of-Lock (PoL)](consensus-details.md#definitions), send
   `RequestPrevotes` for the proposal to the author of `Prevote`, mentioned at the
   received locked `Prevote`
-- If the node have formed +2/3 `Prevote` messages, it deletes the data for the
-  corresponding `RequestPrevotes` and timeouts, if the node requested
-  them earlier
+- If the node have formed +2/3 `Prevote` messages, delete the data for the
+  corresponding `RequestPrevotes` and timeouts (if they were requested
+  earlier)
 
 ### Receiving `Precommit`
 
-- If the node does not have a corresponding `Propose`, it initiates sending
+- If the node does not have a corresponding `Propose`, send
   `RequestPropose` to the author of `Precommit`
-- If the message corresponds to a larger round than the saved PoL, the node
-  initiates sending `RequestPrevotes` for this round to the author of `Precommit`
-- If the node has formed +2/3 `Precommit` messages, it deletes the data for the
-  corresponding `RequestPrecommit` and timeouts, if the node requested
-  them earlier
+- If the message corresponds to a larger round than the saved PoL,
+  send `RequestPrevotes` for this round to the author of `Precommit`
+- If the node has formed +2/3 `Precommit` messages, delete the data for the
+  corresponding `RequestPrecommit` and timeouts (if they were requested
+  earlier)
 
 ### Receiving `Block`
 
-- The node requests the next block if there are validators at a height higher
+- Request the next block if there are validators at a height higher
   than current
-- The node updates its height after committing the block locally
+- Update local height after committing the block locally
 
 ### Peers Timeout
 
-- Send a `RequestPeers` request to a random peer (auditor or validator) from
-  `peers` (list of known peers specified in [local
-  configuration](../../architecture/configuration.md#local-parameters)).
-  `RequestPeers` message is sent regularly with the timeout `peers_timeout`
-  defined in [the global configuration](../../architecture/configuration.md#global-parameters).
-  `RequestPeers` is used to obtain `Connect` messages from peers
+Send a `RequestPeers` request to a random peer (auditor or validator) from
+`peers` (list of known peers specified in [local
+configuration](../../architecture/configuration.md#local-parameters)).
+`RequestPeers` message is sent regularly with the timeout `peers_timeout`
+defined in [the global configuration](../../architecture/configuration.md#global-parameters).
+`RequestPeers` is used to obtain `Connect` messages from peers.
 
 ### Transition to New Height
 
-- Delete all information about requests and their timeouts
+Delete all information about requests and their timeouts.
 
 ### Request Timeout
 
@@ -135,19 +135,19 @@ by the node.
 The processing of responses to requests is trivial:
 
 - If `to` value (node which should receive request) does not correspond to the
-  node's key, ignore the message.
-- Check the signature of the message.
+  node's key, ignore the message
+- Check the signature of the message
 
 ### `RequestPropose`
 
 - If the message corresponds to a height higher than the one on which the node
-  is, ignore the message.
+  is, ignore the message
 - If the node has `Propose` with the corresponding hash at the given height,
-  send it.
+  send it
 
 ### `RequestTransactions`
 
-The node sends all transactions it has from those that were requested, as
+Send all transactions the node has from those that were requested, as
 separate messages. Transactions can either be already committed or be in the
 pool of unconfirmed transactions.
 If the node does not have any of the requested transactions, don't send
@@ -163,18 +163,18 @@ anything.
 ### `RequestPrecommits`
 
 - If the message corresponds to a height greater than that of the node,
-  ignore the message.
+  ignore the message
 - Send as individual messages all the corresponding `Precommit` messages except
   those that the requestor has (the list of validators whose `Precommit` messages
-  requestor already has is part of `RequestPrecommits`).
+  requestor already has is part of `RequestPrecommits`)
 
 ### `RequestBlock`
 
 - If the message corresponds to a height not less than that of the node,
-  ignore the message.
-- Form the message `Block` from the data of the blockchain and send it to the
-  requestor.
+  ignore the message
+- Form the message `Block` from the blockchain data and send it to the
+  requestor
 
 ### `RequestPeers`
 
-- Send all the saved `Connect` messages from peers to the sender.
+Send all the saved `Connect` messages from peers to the requestor.
