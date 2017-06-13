@@ -272,6 +272,34 @@ only it is a string instead of an integer.
 - To compute API endpoints for the service. All service endpoints
   are mounted on `/api/services/{service_name}`.
 
+### State Hash
+
+```rust
+fn state_hash(&self, view: &View)
+              -> Result<Vec<Hash>, StorageError> {
+    Ok(Vec::new())
+}
+```
+
+The `state_hash` method needs to return a list of hashes for all
+Merklized tables defined by the service, which are calculated based on the
+current blockchain state `view`. 
+The core uses this list to aggregate
+hashes of tables defined by all services, into a single Merklized meta-map.
+The hash of this meta-map is considered the hash of the entire blockchain state
+and is recorded as such in blocks and [`Precommit` messages](../advanced/consensus/consensus.md).
+
+The default trait implementation returns an empty list. This corresponds to
+the case when a service doesn't have any Merklized tables.
+
+!!! note
+    The keys of the meta-map are defined as pairs `(service_id, table_id)`,
+    where `service_id` is a 2-byte [service identifier](#service-identifiers)
+    and `table_id` is a 2-byte identifier of a table within the service.
+    Keys are then stretched to 32 bytes using SHA-256 in order to provide
+    a more even key distribution (which results in a more balanced
+    Merkle Patricia tree).
+
 ## Tips and Tricks
 
 ### Communication with External World
