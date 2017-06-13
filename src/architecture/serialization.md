@@ -8,12 +8,12 @@ created already "serialized" and Exonum works directly with the serialized data
 In Exonum, the binary format is used for two purposes:
 
 - **Message serialization**: everything that passes in the network between nodes
-  turns into messages (the `message!` macro). Data received as a message is
-  validated.
+  turns into messages (the [`message!` macro][message_macro]). Data received as
+  a message is validated.
 
-- **Serialization of data stored in the blockchain** (the `storage_value!`
-  macro). Data obtained from the blockchain is not validated, since it is assumed
-  to be validated earlier.
+- **Serialization of data stored in the blockchain** (the [`storage_value!`
+  macro][storage_value_macro]). Data obtained from the blockchain is not
+  validated, since it is assumed to be validated earlier.
 
 ## Motivation of Own Serialization Format
 
@@ -90,6 +90,8 @@ Its serialized representation:
 |:--------|:------:|:---------------------|:--------------------------------------------------|
 `16 => 24` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
 
+[message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
+[storage_value_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/spec.rs
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
 [rust_structs]: https://doc.rust-lang.org/book/structs.html
