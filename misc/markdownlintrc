@@ -1,3 +1,6 @@
 all
-rule 'MD013', :tables => false
-rule 'MD029', :style => 'ordered'
+exclude_rule 'no-duplicate-header'
+rule 'line-length', :tables => false
+rule 'ol-prefix', :style => 'ordered'
+rule 'no-trailing-spaces', :br_spaces => 2
+rule 'ul-indent', :indent => 4

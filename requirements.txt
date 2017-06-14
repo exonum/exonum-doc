@@ -1,6 +1,9 @@
 # Main dependencies
+jinja2 >= 2.8
 mkdocs
-mkdocs-bootswatch
+pygments
+pygments-github-lexers
+mkdocs-material
 # Linters
 linkchecker
 html5validator
