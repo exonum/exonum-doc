@@ -18,6 +18,10 @@ among all transactions; between any two transactions in the blockchain,
 it is possible to determine which one comes first.
 Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
+An arbitrary transaction can be viewed as a function `tx: State -> State`,
+where `State` denotes the blockchain state datatype. In this case, the template
+`tx_template: Params -> (State -> State)`, i.e., the transaction can be applied
+to the blockchain state by `tx_template(params)(state)`.
 
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
@@ -70,10 +74,12 @@ Fields used in transaction serialization are listed below.
     which denote an offset relative to the end of the byte buffer.
 
 !!! note
-    Exonum's blockchain doesn't contain the transactions themselves but
-    [SHA-256 hashes](https://en.wikipedia.org/wiki/SHA-2) of their messages
+    Each unique transaction message serialization is hashed with
     (including all the fields `network_id`, `protocol_version`, `service_id`,
-    `message_id`, `payload_length`, `body` and `signature`).
+    `message_id`, `payload_length`, `body` and `signature`). Hashes are used as
+    unique identifiers for transactions where such an identifier is needed
+    (e.g., when determining whether a specific transaction has been committed
+    previously).
 
 ### Network ID
 
@@ -232,13 +238,6 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     into the [proposal block](../advanced/consensus/consensus.md). `execute`
     performs [almost at the same time](../advanced/consensus/consensus.md) as
     the block with the given transaction is committed into the blockchain.
-
-!!! note
-    The `execute` method couldn't include an arbitrary manipulation over the
-    blockchain but only the primitives whose are allowed by the
-    [Exonum core](https://github.com/exonum/exonum-core) and templated in the
-    service definition. The transactions with a given (`service_id`,
-    message_id`) differs only with a set of their parameters.
 
 ### Info
 
