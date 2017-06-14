@@ -18,10 +18,6 @@ among all transactions; between any two transactions in the blockchain,
 it is possible to determine which one comes first.
 Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
-An arbitrary transaction can be viewed as a function `tx: State -> State`,
-where `State` denotes the blockchain state datatype. In this case, the template
-`tx_template: Params -> (State -> State)`, i.e., the transaction can be applied
-to the blockchain state by `tx_template(params)(state)`.
 
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
@@ -217,21 +213,6 @@ The `execute` method takes the current blockchain state and can modify it (but c
 choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
 storage ([under certain conditions](../advanced/consensus/consensus.md)).
-
-!!! note "Example"
-    In [the cryptocurrency service][cryptocurrency]
-    an `execute` method of `TransactionSend` executes the transaction which
-    means: add this transaction to the data storage with a Boolean `status`
-    metadata for changing any wallets founds. The `status` is `true`, the
-    balance of the `from` wallet is decreased by `amount` and the balance of
-    the `to` wallet is increased by `amount` if
-
-    - `from` were presented in committed blocks (necessary condition of
-      positive balance of `from` for a considered cryptocurrency
-      implementation)
-    - balance of `from` is greater or equal to `amount`,
-      else the tag in the data storage is `false` and it doesn’t change any
-      balances.
 
 !!! note
     `verify` and `execute` are triggered at different times. `verify` checks
