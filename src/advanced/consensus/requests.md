@@ -32,7 +32,8 @@ information about the state of the message author, if the author is not Byzantin
 
 - The author has a proposal referenced by the `Precommit` message
 - The author has all transactions mentioned in this proposal
-- The author has +2/3 `Prevote` messages for this proposal in the corresponding round
+- The author has +2/3 `Prevote` messages for this proposal in the corresponding
+  round
 
 ### `Connect`
 
@@ -49,18 +50,20 @@ For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made
 and a list of nodes that have the required information. When
 the requested info is obtained, the node deletes `RequestState`
-for the corresponding request.
+for the corresponding request (cancels request).
 
 The node sets a timeout for each sent request. The timeout is
 implemented as a message to this node itself. This message is queued and
-processed when it reaches its queue. Timeout deletion means its deletion from the
-message queue.
+processed when it reaches its queue. Timeout deletion (cancelling timeout) means
+its deletion from the message queue.
+
+Cancelling a request means cancelling a corresponding timeout as well.
 
 ### Consensus Message from Bigger Height
 
 - Update info about the height of blockchain on the corresponding node
 - Send `RequestBlock` for the current height (height of the latest
-  committed block + 1), if such a request was not sent earlier
+  committed block + 1) to the message author, if such a request was not sent earlier
 
 All events below are applicable only if the height of the message is the same as
 validator height.
@@ -68,13 +71,13 @@ validator height.
 ### Receiving Transaction
 
 If this is the last transaction required to collect a known `Propose`,
-delete the data about the corresponding `RequestTransactions` and its timeouts.
+cancel the corresponding `RequestTransactions`.
 
 ### Receiving `Propose`
 
-- If this `Propose` was requested, delete the data about the request
-  and the timeout. A list of nodes that have all transactions (if it exists)
-  should be copied from the `RequestState` before deletion
+- If this `Propose` was requested, cancel the request. A list
+  of nodes that may have all transactions mentioned in the `Propose` message
+  should be copied from the `RequestState` before its deletion
 - If certain transactions from the `Propose` are not known,
   send `RequestTransactions` to the author of `Propose`
 
@@ -83,12 +86,11 @@ delete the data about the corresponding `RequestTransactions` and its timeouts.
 - If the node does not have the corresponding `Propose`, send
   `RequestPropose` to the author of `Prevote`
 - If the sender specified `lock_round`, which is greater than the stored  
-  [Proof-of-Lock (PoL)](consensus-details.md#definitions), send
-  `RequestPrevotes` for the proposal to the author of `Prevote`, mentioned at the
-  received locked `Prevote`
-- If the node have formed +2/3 `Prevote` messages, delete the data for the
-  corresponding `RequestPrevotes` and timeouts (if they were requested
-  earlier)
+  [Proof-of-Lock (PoL)](consensus.md#locks), send
+  `RequestPrevotes` for the locked proposal to the author of `Prevote`
+- If the node have formed +2/3 `Prevote` messages for the same proposal, cancel
+  the request `RequestPrevotes` for `Prevote` messages corresponding to this
+  proposal (if they were requested earlier)
 
 ### Receiving `Precommit`
 
@@ -96,8 +98,8 @@ delete the data about the corresponding `RequestTransactions` and its timeouts.
   `RequestPropose` to the author of `Precommit`
 - If the message corresponds to a larger round than the saved PoL,
   send `RequestPrevotes` for this round to the author of `Precommit`
-- If the node has formed +2/3 `Precommit` messages, delete the data for the
-  corresponding `RequestPrecommit` and timeouts (if they were requested
+- If the node has formed +2/3 `Precommit` messages for the same proposal, cancel the
+  corresponding `RequestPrecommit` (if they were requested
   earlier)
 
 ### Receiving `Block`
@@ -117,14 +119,14 @@ defined in [the global configuration](../../architecture/configuration.md#global
 
 ### Transition to New Height
 
-Delete all information about requests and their timeouts.
+Cancel all requests.
 
 ### Request Timeout
 
 - Delete the validator, to which the request was sent, from the list of nodes that
   may have the requested data
-- If the list of validators having the data to be requested is empty, delete
-  `RequestState`
+- If the list of validators having the data to be requested is empty, cancel
+  request
 - Otherwise, make one more request attempt and start a new timer
 
 ## Algorithm for requests processing
@@ -150,8 +152,6 @@ The processing of responses to requests is trivial:
 Send all transactions the node has from those that were requested, as
 separate messages. Transactions can either be already committed or be in the
 pool of unconfirmed transactions.
-If the node does not have any of the requested transactions, don't send
-anything.
 
 ### `RequestPrevotes`
 
