@@ -75,6 +75,7 @@ Fields used in transaction serialization are listed below.
 
 !!! note
     Each unique transaction message serialization is hashed with
+    [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2)
     (including all the fields `network_id`, `protocol_version`, `service_id`,
     `message_id`, `payload_length`, `body` and `signature`). Hashes are used as
     unique identifiers for transactions where such an identifier is needed
