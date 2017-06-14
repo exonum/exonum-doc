@@ -2,7 +2,8 @@ site_name: Exonum Documentation
 docs_dir: src
 theme: material
 theme_dir: theme
-
+extra_css:
+  - assets/stylesheets/extra.css
 repo_name: 'exonum/exonum-core'
 repo_url: 'https://github.com/exonum/exonum-core'
 
@@ -14,6 +15,7 @@ site_favicon: 'images/favicon.ico'
 extra:
   og_image: 'images/logo-square.jpg'
   logo: 'images/logo.svg" alt="Exonum Logo'
+  github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
   palette:
     primary: 'blue grey'
     accent: 'lime'
