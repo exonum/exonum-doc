@@ -40,6 +40,71 @@ information about the state of the message author, if the author is not Byzantin
 - It is possible to access the author by using the IP adress + port
   mentioned in the message
 
+## Request Messages
+
+### Field Types
+
+`Hash` and `PublicKey` types are hexadecimal strings of the appropriate length
+(64 hex digits, i.e., 32 bytes).
+
+`u32` and `u64` are nonnegative integers of appropriate size (32 and 64 bits).
+
+### `RequestPropose`
+
+- **from**: PublicKey  
+  Requestor's public key.
+- **to**: PublicKey  
+  Public key of the node to which the request was sent.
+- **height**: u64  
+  Height of the blochchain for which information is requested.
+- **propose_hash**: Hash  
+  Hash of the proposal for which information is requested.
+
+### `RequestTransactions`
+
+- **from**: PublicKey  
+  Requestor's public key.
+- **to**: PublicKey  
+  Public key of the node to which the request was sent.
+- **txs**: Array<Hash>  
+  List of requested transactions' hashes.
+
+### `RequestPrevotes`
+
+- **from**: PublicKey  
+  Requestor's public key.
+- **to**: PublicKey  
+  Public key of the node to which the request was sent.
+- **height**: u64  
+  Blochchain height for which information is requested.
+- **round**: u32  
+  Round number (at the blockchain height specified in `height` field) for which
+  information is requested.
+- **propose_hash**: Hash  
+  Hash of the proposal for which information is requested.
+- **validators**: BitVec
+
+### `RequestBlock`
+
+- **from**: PublicKey  
+  Requestor's public key.
+- **to**: PublicKey  
+  Public key of the node to which the request was sent.
+- **height**: u64  
+  Height of the blochchain for which information is requested.
+
+### `RequestPeers`
+
+`RequestPeers` is used to obtain `Connect` messages from peers.
+`RequestPeers` message is sent regularly with the timeout `peers_timeout`
+defined in [the global configuration](../../architecture/configuration.md#global-parameters).
+It has the following fields:
+
+- **from**: PublicKey  
+  Requestor's public key.
+- **to**: PublicKey  
+  Public key of the node to which the request was sent.
+
 ## Algorithm for Sending Requests
 
 This algorithm determines the node's behavior at different stages of the
@@ -112,9 +177,6 @@ cancel the corresponding `RequestTransactions`.
 Send a `RequestPeers` request to a random peer (auditor or validator) from
 `peers` (list of known peers specified in [local
 configuration](../../architecture/configuration.md#local-parameters)).
-`RequestPeers` message is sent regularly with the timeout `peers_timeout`
-defined in [the global configuration](../../architecture/configuration.md#global-parameters).
-`RequestPeers` is used to obtain `Connect` messages from peers.
 
 ### Transition to New Height
 
@@ -152,14 +214,6 @@ pool of unconfirmed transactions.
   message
 - Send as individual messages all the corresponding `Prevote` messages except
   those that the requestor has
-
-### `RequestPrecommits`
-
-- If the message corresponds to a height greater than that of the node,
-  ignore the message
-- Send as individual messages all the corresponding `Precommit` messages except
-  those that the requestor has (the list of validators whose `Precommit` messages
-  requestor already has is part of `RequestPrecommits`)
 
 ### `RequestBlock`
 
