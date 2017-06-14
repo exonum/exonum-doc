@@ -98,9 +98,8 @@ cancel the corresponding `RequestTransactions`.
   `RequestPropose` to the author of `Precommit`
 - If the message corresponds to a larger round than the saved PoL,
   send `RequestPrevotes` for this round to the author of `Precommit`
-- If the node has formed +2/3 `Precommit` messages for the same proposal, cancel the
-  corresponding `RequestPrecommit` (if they were requested
-  earlier)
+- If the node has formed +2/3 `Precommit` messages for the same proposal, cancel
+  the corresponding `RequestPrecommit` (if they were requested earlier)
 
 ### Receiving `Block`
 
@@ -133,12 +132,6 @@ Cancel all requests.
 
 This algorithm determines the processing of different types of request messages
 by the node.
-
-The processing of responses to requests is trivial:
-
-- If `to` value (node which should receive request) does not correspond to the
-  node's key, ignore the message
-- Check the signature of the message
 
 ### `RequestPropose`
 
@@ -178,3 +171,10 @@ pool of unconfirmed transactions.
 ### `RequestPeers`
 
 Send all the saved `Connect` messages from peers to the requestor.
+
+## Processing of responses to requests
+
+- If `to` value (node which should receive request) does not correspond to the
+  node's key, ignore the message
+- Check the signature of the message
+- Save requested info from the response to request
