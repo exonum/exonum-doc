@@ -316,8 +316,8 @@ consensus messages belonging to a future height.
 
 #### Status timeout processing
 
-- If the node has at least one accepted block, then send out a `Status` message
-  to all validators.
+- If the node's height has not changed since the timeout was set, then send out
+  a `Status` message to all validators.
 - Add a timeout for the next `Status` send.
 
 ## Proof of Algorithm Correctness
