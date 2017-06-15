@@ -53,11 +53,19 @@ The consensus algorithm uses following types of messages:
   Index of specific validator in `validators` list of configuration. This field
   is common to all types of messages.
 
+- `height`  
+  Height to which the message is related. This field is common to all types of
+  messages.
+
+- `round`  
+  Round number to which the message is related. This field is common to all
+  types of messages.
+
+- `hash`  
+  Hash of the message. This method is common to all types of messages.
+
 - `propose`  
   The `Propose` message being processed.
-
-- `propose.round`  
-  Round in which `propose` was created.
 
 - `propose.prev_hash`
   Hash of the previous block.
@@ -67,12 +75,6 @@ The consensus algorithm uses following types of messages:
 
 - `prevote.propose_hash`  
   Hash of the `Propose` message to which `prevote` belongs.
-
-- `prevote.round`  
-  Round when `prevote` was created.
-
-- `prevote.hash`  
-  Hash of `prevote`.
 
 ### Definitions
 
