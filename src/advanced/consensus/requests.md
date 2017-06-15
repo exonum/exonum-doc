@@ -14,6 +14,7 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
 Receiving a consensus message from a node gives the message recepient
 an opportunity to learn certain
 information about the state of the message author, if the author is not Byzantine.
+The node saves this information in [the RequestState structure](#algorithm-for-sending-requests).
 
 ### Any Consensus Message
 
@@ -136,7 +137,7 @@ The following subsections describe events that cause a specific response.
 
 For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made
-and a list of nodes that have the required information. When
+and a list of nodes that should have the required information.  When
 the requested info is obtained, the node deletes `RequestState`
 for the corresponding request (cancels request).
 
@@ -164,7 +165,7 @@ cancel the corresponding `RequestTransactions`.
 ### Receiving `Propose`
 
 - If this `Propose` was requested, cancel the request. A list
-  of nodes that may have all transactions mentioned in the `Propose` message
+  of nodes that should have all transactions mentioned in the `Propose` message
   should be copied from the `RequestState` before its deletion
 - If certain transactions from the `Propose` are not known,
   send `RequestTransactions` to the author of `Propose`
@@ -208,7 +209,8 @@ Cancel all requests.
 ### Request Timeout
 
 - Delete the node, to which the request was sent, from the list of nodes that
-  may have the requested data
+  should have the requested data (that list is a part of the `RequestState`
+  structure)
 - If the list of nodes having the data to be requested is empty, cancel
   request
 - Otherwise, make one more request attempt and start a new timer
@@ -223,7 +225,7 @@ by the node.
 - If the message corresponds to a height higher than the one on which the node
   is, ignore the message
 - If the node has `Propose` with the corresponding hash at the given height,
-  send it
+  send it (nodes store consensus messages for current height only)
 
 ### `RequestTransactions`
 
