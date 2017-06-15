@@ -9,9 +9,10 @@ Here, these terms are condensed to a single page.
 
 A [full node](#full-node) in the blockchain network that does not participate
 in creating new [blocks](#block), but rather performs continuous audit of all transactions
-in the network. Auditors are identified by a public key. Unlike [validators](#validator),
+in the network. Auditors are identified by a public key within the blockchain network.
+Unlike [validators](#validator),
 adding auditors does not create an overhead in transaction latency and throughput,
-so there can be hundreds of auditors in a blockchain network.
+so there can be hundreds of auditors in the same blockchain network.
 
 !!! note "Example"
     Consider an Exonum blockchain that implements public registry in a particular
@@ -24,7 +25,7 @@ Type of [consensus](#consensus), in which the participants are known in advance
 and are authenticated, usually with the help of public-key cryptography.
 Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
 in order to keep the system [decentralized](#decentralization)
-and be able withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
+and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
 ## Binary Serialization
 
@@ -54,7 +55,7 @@ is used for communication with [light clients](#light-client).
 ## Blockchain
 
 A [distributed ledger](#distributed-ledger), which uses [hash linking][wiki:linked-ts]
-to achieve the immutability of the transaction log, as well as other cryptographic
+to achieve the immutability of the transaction log, and other cryptographic
 tools to improve accountability. Transactions in a blockchain are grouped in [blocks](#block)
 to improve auditing by [light clients](#light-client).
 
@@ -84,7 +85,7 @@ network connectivity problems.
 
 Consensus algorithms that are able to withstand Byzantine behavior are called
 Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by [PBFT][pbft].
-It is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
+Exonum is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
 which is the best possible number under the security model that Exonum uses.
 
 ## Configuration
@@ -145,7 +146,7 @@ a set of all transactions ever committed to the blockchain).
 
 ## Decentralization
 
-Absence of single point of failure in the system. For example, absence of a single
+Absence of a single point of failure in the system. For example, absence of a single
 administrator having privileges to perform arbitrary actions.
 
 ## Distributed Ledger
@@ -157,12 +158,12 @@ All transactions are authenticated, usually via [public key cryptography][wiki:p
 used together with some form of timestamping to provide [non-repudiation][wiki:non-rep].
 
 !!! note
-    In a generic distributed ledgers, the audit trail may be dispersed across
+    In a generic distributed ledger, the audit trail may be dispersed across
     the system participants. Thus, it may be difficult to argue about consistency
     of the whole system.
 
 [Blockchains](#blockchain) are a particular kind of distributed ledgers with focus
-on auditability and accountability of the system maintainers.
+on auditability and accountability of the [system maintainers](#maintainer).
 
 ## Full Node
 
@@ -184,7 +185,7 @@ Part of [configuration](#configuration) common for all [full nodes](#full-node).
 The global configuration is a part of [the blockchain state](#blockchain-state).
 [The core](#core) defines several global configuration parameters,
 which are mostly related to [consensus](#consensus) and networking
-(e.g., a set of [validators'](#validator) public keys).
+(e.g., a set of [validators’](#validator) public keys).
 
 ## JSON Serialization
 
@@ -203,16 +204,16 @@ blockchain, but rather only a small subset that the client is interested in
 and/or has access to. Light clients can communicate with [full nodes](#full-node)
 to [retrieve information from the blockchain](#read-request)
 and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
-allows to minimize the trust during this communication and protect against
+allows to minimize the trust during this communication and protect the client against
 a range of attacks.
 
 ## Local Configuration
 
-Part of [configuration](#configuration) local for each [full node](#full-node).
+Part of [configuration](#configuration) local to every [full node](#full-node).
 The local configuration is not a part of [the blockchain state](#blockchain-state);
-instead, it's maintained as a local TOML file, which is read during the node startup.
+instead, it’s maintained as a local TOML file, which is read during the node startup.
 [The core](#core) defines several local configuration parameters,
-such as the private key used to sign consensus and network messages
+such as the private key used to sign [consensus and network messages](#consensus-message)
 created by the node.
 
 ## Maintainer
@@ -233,19 +234,20 @@ the transaction processing rules.
 
 In contrast, in permissionless blockchains (e.g., Bitcoin), maintainers are not
 reflected within the blockchain protocol. Validators in such networks are usually
-anonymous or pseudonymous.
+pseudonymous.
 
 ## Merkle Proof
 
 Cryptographic proof that certain data is a part of [the cryptographic commitment][wiki:commitment]
 based on [Merkle trees](#merkle-tree) or their variants. A Merkle proof allows to
 compactly prove that a certain data is stored at the specified key
-in [the blockchain state](#blockchain-state), at the same time not revealing
-other information about the state or requiring to replicate all [transactions](#transaction)
+in [the blockchain state](#blockchain-state).
+At the same time the proof does not reveal
+other information about the state and does not require to replicate all [transactions](#transaction)
 in the blockchain network.
 
-Merkle proofs are used in Exonum in responses to [read requests](#read-request)
-by [light clients](#light-client). Using them, a client can verify the authenticity
+Merkle proofs are used in Exonum in the responses to [read requests](#read-request)
+by [light clients](#light-client). Using proofs, a client can verify the authenticity
 of the response without needing to communicate with multiple full nodes or
 replicating all transactions in the blockchain.
 
@@ -253,15 +255,16 @@ replicating all transactions in the blockchain.
 
 **Aka** hash tree
 
-Data structure based on a binary tree that allows to calculate a single hash
+Data structure based on a binary tree that allows to calculate an aggregate hash
 from a list of elements in such a way that any particular element of the list
 is tied to the overall hash via a short link.
 (This link is called a *Merkle path* or [*Merkle proof*](#merkle-proof).)
 
 Exonum uses Merkle trees and a similar data structure for maps
 (Merkle [Patricia tree][wiki:p-tree])
-to collect the entire [blockchain state](#blockchain-state) into a single hash
-in a [block](#block), and to provide [proofs](#merkle-proof) to [light clients](#light-client).
+to collect the entire [blockchain state](#blockchain-state) into a single
+*state hash* recorded in [blocks](#block),
+and to provide [proofs](#merkle-proof) to [light clients](#light-client).
 
 !!! note
     In cryptographic terms, a Merkle tree implements a [commitment scheme][wiki:commitment]
@@ -293,7 +296,7 @@ Permissioned blockchains usually use variations of [authenticated consensus](#au
 
 ## Private API
 
-[Service endpoint](#service-endpoint) that can be used to administer the local
+[Service endpoint](#service-endpoint) that can be used to administer a local
 instance of the service. As an example, private API can be used to change the
 local configuration of the service.
 
@@ -313,8 +316,8 @@ and [messages](#message). Each of these can be converted from/to 2 representatio
 
 ## Service
 
-The main extension point of the Exonum framework, similar in their design
-to web services. Services define all [transaction](#transaction) processing logic
+The main extension point of the Exonum framework, similar in its design
+to a web service. Services define all [transaction](#transaction) processing logic
 in any Exonum blockchain.
 
 Externally, a service is essentially a collection of [endpoints](#service-endpoint)
@@ -353,8 +356,8 @@ logic to convert data to a platform-independent representation.
 A structured collection of data (e.g., a map or a list) that provides a high-level
 abstraction on top of [the blockchain state](#blockchain-state). Tables are used
 by [services](#service) to simplify data management. Additionally, some types
-of tables provide a way to efficiently compute [Merkle proofs](#merkle-proof) for
-items stored in the table.
+of tables allow to efficiently compute [Merkle proofs](#merkle-proof) for
+table items.
 
 ## Transaction
 
@@ -369,11 +372,12 @@ Transactions are ordered and grouped into [blocks](#block) in the course of
 order on all [full nodes](#full-node) in the blockchain network.
 
 In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
-Thus, all transactions are templated and defined within [services](#service),
+All transactions are templated and defined within [services](#service),
 acting similarly to [stored procedures][mysql-stored] in database management systems.
-Transaction endpoints of a service usually specify verification rules, such
-as the validity of a digital signature in the transaction. If the rules don't hold,
-the transaction does not change the blockchain state, but is still recorded in
+Transaction endpoints of a service usually specify certain verification rules, such
+as the validity of a digital signature in the transaction. If the rules don’t hold
+for a particular transaction,
+it does not change the blockchain state, but may still be recorded in
 the transaction log.
 
 !!! tip
@@ -386,7 +390,7 @@ in [the consensus algorithm](#consensus) to create [blocks](#block). In Exonum,
 validators are identified with the help of [the global configuration](#global-configuration),
 which contains public keys of all validators in the network. The set of validators
 can be changed by changing the global configuration. Usually, the set of validators
-is reasonably small, consisting of 4-15 nodes.
+is reasonably small, consisting of 4–15 nodes.
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
 [wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
