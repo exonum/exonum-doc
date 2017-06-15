@@ -192,7 +192,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
-- If the node's `locked_round` is less than `prevote.round` and the hash of the stored
+- If the node's `locked_round` is less than `prevote.round` and the hash of the locked
   `Propose` message corresponding to this `prevote` is the same as `prevote.propose_hash`,
   then proceed to **LOCK** for this very proposal.
 
@@ -258,7 +258,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 #### COMMIT
 
 - Delete `RequestState` for  `RequestPrecommits`, if there was one.
-- Push all the transactions from the block to the storage.
+- Add block to the blockchain.
+- Push all the transactions from the block to the table of committed transactions.
 - Update current height.
 - Set the value of the variable `locked_round` to `0` at the new height.
 - Delete all transactions of the committed block from the pool of unconfirmed
