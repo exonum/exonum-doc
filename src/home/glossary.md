@@ -3,6 +3,12 @@
 The Exonum documentation uses some specific terms to describe key Exonum concepts.
 Here, these terms are condensed to a single page.
 
+!!! note
+    All terms here are defined with Exonum in mind. For
+    example, [*Transaction*](#transaction) describes how transactions work
+    in Exonum; generally speaking, *transaction* may have a lot of other meanings
+    (but they are not covered in this document).
+
 ## Auditor
 
 **Aka** auditing node
