@@ -171,6 +171,13 @@ and thus has a local copy of the entire [blockchain state](#blockchain-state).
 There are 2 categories of full nodes in Exonum: [validators](#validator)
 and [auditors](#auditor).
 
+## Genesis Block
+
+The very first [block](#block) in the blockchain. The genesis block does not
+link to the hash of the previous block in the blockchain; instead, this link
+is filled with a placeholder (32 bytes of zeros). The genesis block contains
+an initial [global configuration](#global-configuration) and no other transactions.
+
 ## Global Configuration
 
 Part of [configuration](#configuration) common for all [full nodes](#full-node).
