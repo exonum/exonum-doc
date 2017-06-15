@@ -1,6 +1,6 @@
 # Transactions
 
-A transaction in Exonum
+A **transaction** in Exonum
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
 is a group of sequential operations with the data (i.e., the Exonum [key-value storage](storage.md)).
 Transactions are defined in [services](services.md) and determine all business logic
@@ -112,8 +112,8 @@ a key used to lookup implementation of [the transaction interface](#interface)
     types of transactions: `AddFundsTransaction` for coins emission
     and `TransferTransaction` for coin transfer.
 
-**Binary presentation:** `u16` (unsigned 2-byte integer).
-**JSON presentation:** isn’t present.
+**Binary presentation:** `u16` (unsigned 2-byte integer).  
+**JSON presentation:** number.
 
 ### Payload length
 
@@ -172,7 +172,8 @@ i.e., the last 64 bytes of the serialization).
 
 ## Interface
 
-Transaction interface defines 3 methods: `verify`, `execute` and `info`
+Transaction interface defines 3 methods: [`verify`](#verify),
+[`execute`](#execute) and [`info`](#info).
 
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
