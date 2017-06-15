@@ -23,7 +23,7 @@ so there can be hundreds of auditors in a blockchain network.
 Type of [consensus](#consensus), in which the participants are known in advance
 and are authenticated, usually with the help of public-key cryptography.
 Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
-in order to keep the system [decentralized](#decentralized)
+in order to keep the system [decentralized](#decentralization)
 and be able withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
 ## Binary Serialization
@@ -47,8 +47,9 @@ Ordered list of [transactions](#transaction) in the blockchain, together with th
 authentication by at least 2/3 of the [validator set](#validator), and some additional
 information (such as the hash of the previous block and the hash
 of [the blockchain state](#blockchain-state) after applying transactions
-in the block). The compact block form, in which transactions replaced by the root
-of their [Merkle tree](#merkle-tree), is used for communication with [light clients](#light-client).
+in the block). The compact block form, in which transactions are replaced
+by the root of their [Merkle tree](#merkle-tree),
+is used for communication with [light clients](#light-client).
 
 ## Blockchain
 
@@ -92,7 +93,7 @@ Set of configurable parameters that determine the behavior of a [full node](#ful
 Configuration consists of 2 parts: [global configuration](#global-configuration)
 and [local configuration](#local-configuration). Certain configuration parameters
 are defined by [the core](#core), e.g., the maximum number of transactions
-in a [block](#block). [Services](#services) can define and manage additional
+in a [block](#block). [Services](#service) can define and manage additional
 configuration parameters, too.
 
 !!! tip
@@ -362,7 +363,7 @@ order on all [full nodes](#full-node) in the blockchain network.
 
 In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
 Thus, all transactions are templated and defined within [services](#service),
-acting similarly to stored procedures in RDBMSs.
+acting similarly to [stored procedures][mysql-stored] in database management systems.
 Transaction endpoints of a service usually specify verification rules, such
 as the validity of a digital signature in the transaction. If the rules don't hold,
 the transaction does not change the blockchain state, but is still recorded in
@@ -390,3 +391,4 @@ is reasonably small, consisting of 4-15 nodes.
 [wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
+[mysql-stored]: https://dev.mysql.com/doc/refman/5.6/en/stored-routines.html
