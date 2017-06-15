@@ -193,10 +193,6 @@ If a transaction fails `verify`, it is considered incorrect and cannot
 be included into any correct block proposal. Incorrect transactions are never
 included into the blockchain.
 
-Each transaction which reached any validator and passed
-`verify` have to be included into the blockchain in a finite time. See
-[consensus algorithm](../advanced/consensus/consensus.md) for more details.
-
 !!! note "Example"
     In [the cryptocurrency service][cryptocurrency]
     a `TransactionSend` verifies the digital signature and checks that
