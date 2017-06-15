@@ -26,6 +26,21 @@ Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
 in order to keep the system [decentralized](#decentralized)
 and be able withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
+## Binary Serialization
+
+Serialization of [data stored in the blockchain](#stored-datatype) and
+[messages](#message) into a platform-independent sequence of bytes
+according to the set of rules defined by the Exonum framework.
+Binary serialization is used in Exonum for cryptographic operations, such as computing
+hashes and digital signing. It is implemented both in [the core](#core)
+and in [the light client library](#light-client).
+
+The Exonum serialization format is optimized to provide almost zero-cost
+derserialization in low-level programming environments (such as Rust).
+
+!!! tip
+    See [*Serialization*](../advanced/serialization.md) for more details.
+
 ## Block
 
 Ordered list of [transactions](#transaction) in the blockchain, together with the
@@ -143,6 +158,14 @@ The global configuration is a part of [the blockchain state](#blockchain-state).
 which are mostly related to [consensus](#consensus) and networking
 (e.g., a set of [validators'](#validator) public keys).
 
+## JSON Serialization
+
+Serialization of [data stored in the blockchain](#stored-datatype) and
+[messages](#message) into JSON.
+JSON serialization is used in Exonum for [service endpoints](#service-endpoint).
+It is implemented both in [the core](#core)
+and in [the light client library](#light-client).
+
 ## Light Client
 
 **Aka** lightweight client, thin client
@@ -242,6 +265,13 @@ local configuration of the service.
 [the blockchain state](#blockchain-state). The data is usually returned with
 a [proof](#merkle-proof) that the data is indeed a part of the blockchain state
 and has been authorized by a supermajority of [validators](#validator).
+
+## Serialization
+
+Process of converting Exonum data structures to a language-independent representation.
+Exonum defines (de)serialization rules for [stored datatypes](#stored-datatype)
+and [messages](#message). Each of these can be converted from/to 2 representations:
+[binary](#binary-serialization) and [JSON](#json-serialization).
 
 ## Service
 
