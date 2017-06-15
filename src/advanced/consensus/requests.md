@@ -49,7 +49,14 @@ information about the state of the message author, if the author is not Byzantin
 
 `u32` and `u64` are nonnegative integers of appropriate size (32 and 64 bits).
 
+`BitVec` is a bit vector containing as many elements as there are validators in
+the system.
+
 ### `RequestPropose`
+
+Used to obtain missing `Propose` messages from the node having them (node
+that sent `Prevote` or `Precommit` message for some proposal is assumed to have
+that proposal). It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -62,14 +69,23 @@ information about the state of the message author, if the author is not Byzantin
 
 ### `RequestTransactions`
 
+Used to obtain missing transactions from the node having them (node that sent
+`Propose` message with some transactions is assumed to have that transactions).
+It has the following fields:
+
 - **from**: PublicKey  
   Requestor's public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
-- **txs**: Array<Hash>  
+- **txs**: Array<Hash\>  
   List of requested transactions' hashes.
 
 ### `RequestPrevotes`
+
+Used to obtain missing `Prevote` messages from the node having them (node that
+sent `Precommit` message for some proposal or  signalized lock on that proposal
+is assumed to have +2/3 `Prevote` messages for the corresponding proposal). It
+has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -82,9 +98,16 @@ information about the state of the message author, if the author is not Byzantin
   information is requested.
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
-- **validators**: BitVec
+- **validators**: BitVec  
+  Each element of this field indicates the need to send `Prevote` message from
+  the corresponding validator (if bit value is 1, `Prevote` is requested; else
+  `Prevote` is not needed). Indexing of the `validators` bits corresponds to the
+  indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
 
 ### `RequestBlock`
+
+Used to obtain missing committed blocks from the node having them (node at a
+higher height is assumed to have such block). It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -95,7 +118,7 @@ information about the state of the message author, if the author is not Byzantin
 
 ### `RequestPeers`
 
-`RequestPeers` is used to obtain `Connect` messages from peers.
+Used to obtain missing `Connect` messages from peers.
 `RequestPeers` message is sent regularly with the timeout `peers_timeout`
 defined in [the global configuration](../../architecture/configuration.md#global-parameters).
 It has the following fields:
@@ -168,7 +191,7 @@ cancel the corresponding `RequestTransactions`.
 
 ### Receiving `Block`
 
-- Request the next block if there are validators at a height higher
+- Request the next block if there are nodes at a height higher
   than current
 - Update local height after committing the block locally
 
@@ -184,9 +207,9 @@ Cancel all requests.
 
 ### Request Timeout
 
-- Delete the validator, to which the request was sent, from the list of nodes that
+- Delete the node, to which the request was sent, from the list of nodes that
   may have the requested data
-- If the list of validators having the data to be requested is empty, cancel
+- If the list of nodes having the data to be requested is empty, cancel
   request
 - Otherwise, make one more request attempt and start a new timer
 
