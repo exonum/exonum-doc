@@ -331,6 +331,15 @@ endpoints:
 External entities such as [light clients](#light-client) can access endpoints
 via REST API. The configuration for REST API is specified in the service.
 
+## Stored Datatype
+
+Datatype capable to be stored as a value in [the Exonum key-value storage](#blockchain-state).
+Stored datatypes use [binary serialization](#binary-serialization)
+logic to convert data to a platform-independent representation.
+
+!!! tip
+    See [*Storage*](../architecture/storage.md) for more details.
+
 ## Table
 
 A structured collection of data (e.g., a map or a list) that provides a high-level
