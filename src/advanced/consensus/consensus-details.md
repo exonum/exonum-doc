@@ -92,7 +92,8 @@ part of node state. The node can have no more than one stored PoL. We say that
 PoL is greater than recorded one (has a higher priority), in cases when 1) there
 is no PoL recorded 2) the recorded PoL corresponds to a proposal with a smaller
 round number. So PoLs are [partially ordered][partial_ordering]. A node must
-replace stored PoL with a greater one.
+replace the stored PoL with a greater PoL if it is collected by the node during
+message processing.
 
 As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
 node deletes stored data (`RequestState`) about sent request when the the
@@ -100,6 +101,8 @@ requested info is obtained.
 
 The timeout is implemented as a message to this node itself. This message is
 queued and processed when it reaches its queue.
+
+current_round
 
 **TODO:** insert picture
 
@@ -124,7 +127,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   height and updates the knowledge of the node about the current blockchain
   height of the message author, this information is saved according to
   [requests algorithm](requests.md).
-- If the message refers to a lesser height, it should be ignored.
+- If the message refers to a past height, it should be ignored.
 - If the message refers to the current height and any round not higher than the
   current one, then:
 
@@ -146,9 +149,9 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Check that the specified validator is the leader for the given round.
 - Check that the proposal does not contain any previously committed transaction
   (`Propose` message contain only hashes of transactions, so the absence of hashes in the
-  database of committed transactions is checked).
+  table of committed transactions is checked).
 - Add the proposal to the `proposes` HashMap.
-- Form a list of transactions the node does not know from this proposal. Request
+- Form a list of transactions the node does not know from `propose`. Request
   transactions from this list.
 - If all transactions are known, go to **Full proposal**.
 
@@ -172,12 +175,12 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - For all rounds in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-  - If the node has +2/3 `Prevote` for this proposal in this round, then proceed to
-  **Availability of +2/3 `Prevote`** for this proposal in this round.
+  - If the node has +2/3 `Prevote` for `propose` in `current_round`, then proceed to
+  **Availability of +2/3 `Prevote`** for `propose` in `current_round`.
 
 - For all rounds in the interval `[propose.round, current_round]`:
 
-  - If +2/3 `Precommit` аrе available for this proposal in this round and with
+  - If +2/3 `Precommit` аrе available for `propose` in `current_round` and with
     the same `state_hash`, then:
 
     - Execute the proposal, if it has not yet been executed.
@@ -186,8 +189,6 @@ proceed to **Consensus messages processing** or **Transaction processing**.
     - Proceed to **COMMIT** for this block.
 
 #### Availability of +2/3 `Prevote`
-
-**Arguments:** `prevote`.
 
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
@@ -205,22 +206,22 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
   - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`.
   - `locked_round < prevote.round`
-  - the node knows this proposal
+  - the node knows `propose` corresponding to this `prevote`
   - the node knows all of its transactions
 
-- Then proceed to **Availability of +2/3 `Prevote`** for this proposal in
+- Then proceed to **Availability of +2/3 `Prevote`** for `propose` in
   the round `prevote.round`
 
 - If the node does not know `propose` or any transactions, request them.
 
 #### `Precommit` Message Processing
 
-- Add the message to the list of known `Precommit` for this proposal in this
+- Add the message to the list of known `Precommit` for `propose` in this
   round with the given `state_hash`.
 - If:
 
   - the node has formed +2/3 `Precommit` for the same round and `propose_hash`.
-  - the node knows this proposal
+  - the node knows `propose`
   - the node knows all of its transactions
 
 - Then:
@@ -238,17 +239,21 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 #### LOCK
 
+**Arguments:** `locked_round`, `locked_propose`.
+
 - For all rounds in the interval `[locked_round, current_round]`:
 
-  - If the node has not sent `Prevote` in this round, send it for `locked_propose`.
-  - If the node has formed +2/3 `Prevote` in this round, then execute **LOCK** for
-    this round and `locked_propose`, assign `locked_round` to `current_round`.
-  - If the node did not send `Prevote` for other proposals in subsequent rounds
-    after `locked_round`, then:
+  - If the node has not sent `Prevote` in `current_round`, send it for
+    `locked_propose`.
+  - If the node has formed +2/3 `Prevote` in `current_round`, then execute
+    **LOCK** for `locked_propose`, assign `locked_round` to `current_round`.
 
-    - Execute the propoasl, if it has not yet been executed.
-    - Send `Precommit` for `locked_propose` in this round.
-    - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
+- If the node did not send `Prevote` for other proposals in subsequent rounds
+  after `locked_round`, then:
+
+  - Execute the proposal, if it has not yet been executed.
+  - Send `Precommit` for `locked_propose` in `current_round`.
+  - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
 
 #### COMMIT
 
@@ -260,18 +265,20 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   transactions.
 - If the node is the leader, form and send `Propose` and `Prevote` messages after
   `propose_timeout` expiration.
-- Process all messages from the `queued`, if they become relevant.
+- Process all messages from the `queued`, if they become relevant (their round
+  and height coincide with the current ones).
 - Add a timeout for the next round of new height.
 
 #### `Block` Message Processing
 
 **Arguments:** `propose`.
 
-Only for the case if a validator is behind the majority of the network:
+`Block` messages are usually requested by validators if they see that some
+consensus messages belonging to a future height.
 
 - Check the block message
 
-  - The key in the `to` field must match the key of the validator.
+  - The key in the `to` field must match the key of the node.
   - `propose.prev_hash` of the correspondent `propose` matches the hash of the
     last committed block.
 
@@ -289,7 +296,7 @@ Only for the case if a validator is behind the majority of the network:
   failure: either the majority of the network is byzantine or the nodes' software
   is corrupted.
 
-- Add the block to the blockchain and move to a new height. Set to`0` the value
+- Add the block to the blockchain and move to a new height. Set to `0` the value
   of the variable `locked_round` at the new height.
 
 - If there are validators who claim that they are at a bigger height, then turn
@@ -300,12 +307,12 @@ Only for the case if a validator is behind the majority of the network:
 - If the timeout does not match the current height and round, skip further
   timeout processing.
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
+- Process all messages from the queue, if they become relevant.
 - If the node has a saved PoL, send `Prevote` for `locked_propose` in a new round,
-  check if the node has reached the status of **Availability of +2/3 `Prevote`**.
+  proceed to **Availability of +2/3 `Prevote`**.
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
   (after the expiration of `propose_timeout`, if the node has just moved to a new
   height).
-- Process all messages from the queue, if they become relevant.
 
 #### Status timeout processing
 
