@@ -29,17 +29,19 @@ blockchain network. The order of transaction processing and the resulting change
 to the service state are a part of [the consensus algorithm](../advanced/consensus/consensus.md).
 They are guaranteed to be the same for all nodes in the blockchain network.
 
-**Tip.** When developing a service, you should keep in mind that
-calls to service endpoints must produce an identical result
-on all nodes in the network given the same blockchain
-state. If the call results differ, the consensus algorithm may stall,
-or an audit of the blockchain by auditing nodes may fail.
+!!! tip
+    When developing a service, you should keep in mind that
+    calls to service endpoints must produce an identical result
+    on all nodes in the network given the same blockchain
+    state. If the call results differ, the consensus algorithm may stall,
+    or an audit of the blockchain by auditing nodes may fail.
 
-**Notice.** Unlike smart contract in certain blockchains, services in Exonum
-are not isolated in a virtual machine environment and are not containerized.
-This makes Exonum services more efficient and flexible in their capabilities,
-but at the same time requires more careful service programming. Service isolation
-is on [the Exonum roadmap](../dev/roadmap.md).
+!!! note
+    Unlike smart contract in certain blockchains, services in Exonum
+    are not isolated in a virtual machine environment and are not containerized.
+    This makes Exonum services more efficient and flexible in their capabilities,
+    but at the same time requires more careful service programming. Service isolation
+    is on [the Exonum roadmap](../dev/roadmap.md).
 
 ## Service Interface
 
@@ -52,9 +54,10 @@ In order to communicate with external entities, services employ three kinds of e
 Service endpoints are automatically aggregated and dispatched by the Exonum
 middleware layer.
 
-**Notice.** Exonum uses [the Iron framework][iron] to specify service endpoints,
-both public and private. Public and private API endpoints are served on different
-sockets, which allows to specify stricter firewall rules for private APIs.
+!!! note
+    Exonum uses [the Iron framework][iron] to specify service endpoints,
+    both public and private. Public and private API endpoints are served on different
+    sockets, which allows to specify stricter firewall rules for private APIs.
 
 ### Transactions
 
@@ -72,11 +75,12 @@ Indeed, this is impossible because of how consensus works in blockchains;
 a transaction is not included in the blockchain immediately, but rather bundled
 with other transactions in a block.
 
-**Example.** Currency transfer is a classic example of a blockchain transaction.
-The transaction contains the fields corresponding to the sender’s and recipient’s
-public keys, the amount of transferred funds and the digital signature
-created by the sender’s private key. See [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
-for more details.
+!!! note "Example"
+    Currency transfer is a classic example of a blockchain transaction.
+    The transaction contains the fields corresponding to the sender’s and recipient’s
+    public keys, the amount of transferred funds and the digital signature
+    created by the sender’s private key. See [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    for more details.
 
 ### Read Requests
 
@@ -93,13 +97,15 @@ for more details. Proofs allow thin clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
-**Trivia.** In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
-to data in the blockchain, where the commitment is stored in a block header
-in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
-allows to make proofs compact enough to be processed by thin clients.
+!!! summary "Trivia"
+    In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
+    to data in the blockchain, where the commitment is stored in a block header
+    in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
+    allows to make proofs compact enough to be processed by thin clients.
 
-**Example.** Retrieving information on a particular wallet (e.g., the current
-wallet balance) is implemented as a read request in the cryptocurrency tutorial.
+!!! note "Example"
+    Retrieving information on a particular wallet (e.g., the current
+    wallet balance) is implemented as a read request in the cryptocurrency tutorial.
 
 ### Private API
 
@@ -111,9 +117,10 @@ be accessible from the outside world.
 Similar to read requests, private APIs cannot change the blockchain state;
 however, they can create transactions and broadcast them to the network.
 
-**Example.** In [the configuration update service](../advanced/services/configuration.md),
-private API is used to obtain the information about the current configuration
-and update proposals.
+!!! note "Example"
+    In [the configuration update service](../advanced/services/configuration.md),
+    private API is used to obtain the information about the current configuration
+    and update proposals.
 
 ## Implementation Details
 
@@ -161,10 +168,11 @@ At the very beginning of the lifecycle, the service is registered
 with the blockchain. During deployment, the service creates an initial
 service configuration and initializes its persistent storage.
 
-**Notice.** As of Exonum 0.1, services may be deployed only during the blockchain
-initialization (i.e., before the blockchain network starts creating any blocks).
-In the future releases, services will be able to be deployed dynamically as
-shared libraries.
+!!! note
+    As of Exonum 0.1, services may be deployed only during the blockchain
+    initialization (i.e., before the blockchain network starts creating any blocks).
+    In the future releases, services will be able to be deployed dynamically as
+    shared libraries.
 
 ### Initialization
 
@@ -188,15 +196,18 @@ state, but can be used for various tasks such as logging, data migrations,
 updating local parameters, and/or generating and broadcasting transactions to the
 blockchain network
 
-**Notice.** As of Exonum 0.1, the only built-in event is block commit. More events
-will be added in the future, including possibility for services to define and emit
-events and for services and thin clients to subscribe to events emitted by the services.
+!!! note
+    As of Exonum 0.1, the only built-in event is block commit. More events
+    will be added in the future, including possibility for services to define
+    and emit events and for services and thin clients to subscribe to events
+    emitted by the services.
 
 ## Service Development
 
-**Notice.** As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
-Rust is probably the safest general-purpose programming language, but it’s
-not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
+!!! note
+    As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
+    Rust is probably the safest general-purpose programming language, but it’s
+    not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
 
 Here’s a list of things to figure out when developing an Exonum service:
 
@@ -224,9 +235,10 @@ Here’s a list of things to figure out when developing an Exonum service:
   by the blockchain maintainers? (The answer determines whether a parameter
   should be a part of the local configuration or stored in the blockchain.)
 
-**Tip.** [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
-provides a hands-on guide how to build an Exonum service that implements
-a minimalistic crypto-token.
+!!! tip
+    [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    provides a hands-on guide how to build an Exonum service that implements
+    a minimalistic crypto-token.
 
 ## Tips and Tricks
 
@@ -237,9 +249,10 @@ send/receive data on the network, and so on), but should do it only
 in the non-consensus code (i.e., code that is not executed during transaction execution).
 A good place for such code is event handlers.
 
-**Example.** [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
-uses the commit event handler extensively to communicate with the Bitcoin Blockchain
-network.
+!!! note "Example"
+    [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
+    uses the commit event handler extensively to communicate with the Bitcoin Blockchain
+    network.
 
 ### Services vs Smart Contracts
 
