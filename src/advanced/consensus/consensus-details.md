@@ -200,15 +200,15 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 - If the node does not have a saved PoL, send `Prevote` message in the round to
   which the proposal belongs.
-- For all rounds in the interval
+- For each round `r` in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-  - If the node has +2/3 `Prevote` for `propose` in `current_round`, then
-  proceed to **Availability of +2/3 `Prevote`** for `propose` in `current_round`.
+  - If the node has +2/3 `Prevote` for `propose` in `r`, then
+  proceed to **Availability of +2/3 `Prevote`** for `propose` in `r`.
 
-- For all rounds in the interval `[propose.round, current_round]`:
+- For each round `r` in the interval `[propose.round, current_round]`:
 
-  - If +2/3 `Precommit` аrе available for `propose` in `current_round` and with
+  - If +2/3 `Precommit` аrе available for `propose` in `r` and with
     the same `state_hash`, then:
 
     - Execute the proposal, if it has not yet been executed.
@@ -269,11 +269,11 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 **Arguments:** `locked_round`, `locked_propose`.
 
-- For all rounds in the interval `[locked_round, current_round]`:
+- For each round `r` in the interval `[locked_round, current_round]`:
 
-  - If the node has not sent `Prevote` in `current_round`, send it for
+  - If the node has not sent `Prevote` in `r`, send it for
     `locked_propose`.
-  - If the node has formed +2/3 `Prevote` in `current_round`, then execute
+  - If the node has formed +2/3 `Prevote` in `r`, then execute
     **LOCK** for `locked_propose`, assign `locked_round` to `current_round`.
 
 - If the node did not send `Prevote` for other proposals in subsequent rounds
