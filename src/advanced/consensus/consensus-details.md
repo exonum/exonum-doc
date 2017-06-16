@@ -125,7 +125,7 @@ Messages from future height or round are placed in the separate queue (`queued`)
 - [Full proposal](#full-proposal) (availability of full proposal)  
   Occurs when the node gets complete info about some proposal and all the
   transactions from that proposal.
-- [Availability of +2/3 `Prevote`](#availability-of-23-prevote)  
+- [Availability of +2/3 Prevote](#availability-of-23-prevote)  
   Occurs when node collects +2/3 `Prevote` messages from the same round for the
   same known proposal.
 - [LOCK](#lock)  
@@ -133,7 +133,7 @@ Messages from future height or round are placed in the separate queue (`queued`)
   its first PoL).
 - [COMMIT](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
-  the same known proposal. Corresponds to [the **Commit** node state](consensus.md#node-states-overview).
+  the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
 
 Let us explain in more detail rules for the transitions between stages and
 consensus message processing.
@@ -159,10 +159,10 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - If the message refers to the current height and any round not higher than the
   current one, then:
 
-  - Check that the `validator_id` specified in the message is less than the total
-  number of validators.
-  - Check the message signature against the public key of the validator with
-  index `validator_id`.
+    - Check that the `validator_id` specified in the message is less than the total
+    number of validators.
+    - Check the message signature against the public key of the validator with
+    index `validator_id`.
 
 - If verification is successful, proceed to the message processing according to
   its type.
@@ -203,18 +203,18 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - For each round `r` in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-  - If the node has +2/3 `Prevote` for `propose` in `r`, then
-  proceed to **Availability of +2/3 `Prevote`** for `propose` in `r`.
+    - If the node has +2/3 `Prevote` for `propose` in `r`, then
+    proceed to **Availability of +2/3 `Prevote`** for `propose` in `r`.
 
 - For each round `r` in the interval `[propose.round, current_round]`:
 
-  - If +2/3 `Precommit` аrе available for `propose` in `r` and with
-    the same `state_hash`, then:
+    - If +2/3 `Precommit` аrе available for `propose` in `r` and with
+      the same `state_hash`, then:
 
-    - Execute the proposal, if it has not yet been executed.
-    - Check that the node's `state_hash` coincides with the `state_hash` of the
-      majority (if not, the node must stop working and signalize error).
-    - Proceed to **COMMIT** for this block.
+        - Execute the proposal, if it has not yet been executed.
+        - Check that the node's `state_hash` coincides with the `state_hash` of the
+          majority (if not, the node must stop working and signalize error).
+        - Proceed to **COMMIT** for this block.
 
 #### Availability of +2/3 `Prevote`
 
@@ -232,10 +232,10 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   `prevote.round` round.
 - If:
 
-  - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`.
-  - `locked_round < prevote.round`
-  - the node knows `propose` corresponding to this `prevote`
-  - the node knows all of its transactions
+    - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`.
+    - `locked_round < prevote.round`
+    - the node knows `propose` corresponding to this `prevote`
+    - the node knows all of its transactions
 
 - Then proceed to **Availability of +2/3 `Prevote`** for `propose` in
   the round `prevote.round`
@@ -248,22 +248,22 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   round with the given `state_hash`.
 - If:
 
-  - the node has formed +2/3 `Precommit` for the same round and `propose_hash`.
-  - the node knows `propose`
-  - the node knows all of its transactions
+    - the node has formed +2/3 `Precommit` for the same round and `propose_hash`.
+    - the node knows `propose`
+    - the node knows all of its transactions
 
 - Then:
 
-  - Execute the proposal, if it has not yet been executed.
-  - Check that the node's `state_hash` coincides with the `state_hash` of the
-    majority.
-  - Proceed to **COMMIT** for this block.
+    - Execute the proposal, if it has not yet been executed.
+    - Check that the node's `state_hash` coincides with the `state_hash` of the
+      majority.
+    - Proceed to **COMMIT** for this block.
 
 - Else:
 
-  - Request `propose`, if it is not known.
-  - If the message round is bigger than `locked_round`, request `Prevote`s from
-    the message round.
+    - Request `propose`, if it is not known.
+    - If the message round is bigger than `locked_round`, request `Prevote`s from
+      the message round.
 
 #### LOCK
 
@@ -271,17 +271,17 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
 - For each round `r` in the interval `[locked_round, current_round]`:
 
-  - If the node has not sent `Prevote` in `r`, send it for
-    `locked_propose`.
-  - If the node has formed +2/3 `Prevote` in `r`, then execute
-    **LOCK** for `locked_propose`, assign `locked_round` to `current_round`.
+    - If the node has not sent `Prevote` in `r`, send it for
+      `locked_propose`.
+    - If the node has formed +2/3 `Prevote` in `r`, then execute
+      **LOCK** for `locked_propose`, assign `locked_round` to `current_round`.
 
 - If the node did not send `Prevote` for other proposals in subsequent rounds
   after `locked_round`, then:
 
-  - Execute the proposal, if it has not yet been executed.
-  - Send `Precommit` for `locked_propose` in `current_round`.
-  - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
+    - Execute the proposal, if it has not yet been executed.
+    - Send `Precommit` for `locked_propose` in `current_round`.
+    - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
 
 #### COMMIT
 
@@ -307,15 +307,15 @@ consensus messages belonging to a future height.
 
 - Check the block message
 
-  - The key in the `to` field must match the key of the node.
-  - `propose.prev_hash` of the correspondent `propose` matches the hash of the
-    last committed block.
+    - The key in the `to` field must match the key of the node.
+    - `propose.prev_hash` of the correspondent `propose` matches the hash of the
+      last committed block.
 
 - If the message structure is correct, proceed to check the block contents.
 
-  - The block height should be equal to the current height of the node.
-  - The number of `Precommit` messages should be sufficient to reach consensus.
-  - All `Precommit` messages must be correct.
+    - The block height should be equal to the current height of the node.
+    - The number of `Precommit` messages should be sufficient to reach consensus.
+    - All `Precommit` messages must be correct.
 
 - If the check is successful, then check all transactions for correctness and if
   they are all correct, then proceed to their execution, which results in
