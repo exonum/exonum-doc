@@ -273,15 +273,15 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
     - If the node has not sent `Prevote` in `r`, send it for
       `locked_propose`.
-    - If the node has formed +2/3 `Prevote` in `r`, then execute
-      **LOCK** for `locked_propose`, assign `locked_round` to `current_round`.
+    - If the node has formed +2/3 `Prevote` in `r`, then change `locked_round`
+      to `current_round`, `locked_propose` to `propose.hash` (`propose`
+      corresponds to +2/3 `Prevote` in `r`).
+    - If the node did not send `Prevote` for other proposals in subsequent rounds
+      after `locked_round`, then:
 
-- If the node did not send `Prevote` for other proposals in subsequent rounds
-  after `locked_round`, then:
-
-    - Execute the proposal, if it has not yet been executed.
-    - Send `Precommit` for `locked_propose` in `current_round`.
-    - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
+        - Execute the proposal, if it has not yet been executed.
+        - Send `Precommit` for `locked_propose` in `current_round`.
+        - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
 
 #### COMMIT
 
