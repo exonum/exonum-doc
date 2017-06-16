@@ -120,7 +120,23 @@ Messages from future height or round are placed in the separate queue (`queued`)
 
 ### Algorithm Description
 
-Let us explain in more detail the transitions between states.
+#### Consensus Algorithm Stages
+
+- [Full proposal](#full-proposal) (availability of full proposal)  
+  Occurs when the node gets complete info about some proposal and all the
+  transactions from that proposal.
+- [Availability of +2/3 `Prevote`](#availability-of-23-prevote)  
+  Occurs when node collects +2/3 `Prevote` messages from the same round for the
+  same known proposal.
+- [LOCK](#lock)  
+  Occurs when the node replaces [the stored PoL](#proof-of-lock) (or collects
+  its first PoL).
+- [COMMIT](#commit)  
+  Occurs when the node collects +2/3 `Precommit` messages for the same round for
+  the same known proposal. Corresponds to [the **Commit** node state](consensus.md#node-states-overview).
+
+Let us explain in more detail rules for the transitions between stages and
+consensus message processing.
 
 #### Receiving an incoming message
 
@@ -469,14 +485,14 @@ at the same height.
 #### Proof
 
 Let some node added the `B` block to the blockchain. This could only happen if
-that node went into the **COMMIT** state. There exist three possibilities of the
-transition to the **COMMIT** state: from **LOCK**, **`Prevote` processing**,
+that node went into the **COMMIT** stage. There exist three possibilities of the
+transition to the **COMMIT** : from **LOCK**, **`Prevote` processing**,
 and **Full Proposal**. In all these cases, the condition of
 the transition is the presence of +2/3 `Precommit` messages for some proposal `P`
 from the `R` round and the result of applying the corresponding block leads to
 the same `state_hash`. Since the number of Byzantine nodes is -1/3, +1/3 of the
 non-Byzantine nodes sent `Precomit` messages in the corresponding round. Such a
-message could only be sent within the **LOCK** state in which the PoL was stored
+message could only be sent within the **LOCK** stage in which the PoL was stored
 for the `P` proposal in the `R` round. This could happen only if these nodes did
 not send `Prevote` messages in rounds `R '> R` for `P'! = P` (special condition
 for sending the `Precommit` message). Also, these nodes sent `Prevote` messages
@@ -484,7 +500,7 @@ in all rounds after `R` until their current rounds. Thus, since the remaining
 nodes are -2/3, we have two consequences.
 
 1. In no rounds after `R` we can get PoL (in other words go to the **LOCK**
-  state) for the `P '! = P` proposal, because this requires +2/3 `Prevote`
+  stage) for the `P '! = P` proposal, because this requires +2/3 `Prevote`
   messages.
 
 2. In all rounds of `R '> R`, new PoLs cannot emerge in the network, except for
@@ -493,7 +509,7 @@ nodes are -2/3, we have two consequences.
   of the non-Byzantine nodes will be in the state with the saved PoL
   corresponding to the `P` proposal. And consequently they will send `Prevote`
   messages only for the saved `P` proposal according to the **Processing of the
-  timeout of the round** state.
+  timeout of the round** stage.
 
 Thus, messages of `Precommit` type can not be sent for any other block. This
 means that none of the non-Byzantine node can add another block to the blockchain.
