@@ -33,8 +33,8 @@ The node saves this information in [the RequestState structure](#algorithm-for-s
 
 - The author has a proposal referenced by the `Precommit` message
 - The author has all transactions mentioned in this proposal
-- The author has +2/3 `Prevote` messages for this proposal in the corresponding
-  round
+- The author has +2/3 `Prevote` messages for this proposal in some round with
+  lower or equal number.
 
 ### `Connect`
 
@@ -45,12 +45,12 @@ The node saves this information in [the RequestState structure](#algorithm-for-s
 
 ### Field Types
 
-`Hash` and `PublicKey` types are hexadecimal strings of the appropriate length
-(64 hex digits, i.e., 32 bytes).
+`Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
+and take 32 bytes.
 
 `u32` and `u64` are nonnegative integers of appropriate size (32 and 64 bits).
 
-`BitVec` is a bit vector containing as many elements as there are validators in
+`BitVec` is a bit vector containing as many bits as there are validators in
 the system.
 
 ### `RequestPropose`
@@ -100,7 +100,7 @@ has the following fields:
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
 - **validators**: BitVec  
-  Each element of this field indicates the need to send `Prevote` message from
+  Each bit of this field indicates the need to send `Prevote` message from
   the corresponding validator (if bit value is 1, `Prevote` is requested; else
   `Prevote` is not needed). Indexing of the `validators` bits corresponds to the
   indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
@@ -119,7 +119,7 @@ higher height is assumed to have such block). It has the following fields:
 
 ### `RequestPeers`
 
-Used to obtain missing `Connect` messages from peers.
+Used to obtain `Connect` messages from peers.
 `RequestPeers` message is sent regularly with the timeout `peers_timeout`
 defined in [the global configuration](../../architecture/configuration.md#global-parameters).
 It has the following fields:
@@ -202,7 +202,7 @@ Send a `RequestPeers` request to a random peer (auditor or validator) from
 `peers` (list of known peers specified in [local
 configuration](../../architecture/configuration.md#local-parameters)).
 
-### Transition to New Height
+### Move to New Height
 
 Cancel all requests.
 
@@ -250,10 +250,3 @@ pool of unconfirmed transactions.
 ### `RequestPeers`
 
 Send all the saved `Connect` messages from peers to the requestor.
-
-## Processing of responses to requests
-
-- If `to` value (node which should receive request) does not correspond to the
-  node's key, ignore the message
-- Check the signature of the message
-- Save requested info from the response to request
