@@ -81,10 +81,21 @@ The consensus algorithm uses following types of messages:
 The definitions from the [general description of consensus algorithm](consensus.md)
 are used.
 
+As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
+node deletes stored data (`RequestState`) about sent request when the
+requested info is obtained.
+
+The timeout is implemented as a message to this node itself. This message is
+queued and processed when it reaches its queue.
+
+#### Pool of Unconfirmed Transactions
+
 Each node has a set of transactions that have not yet been added to the
 blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
 necessary, the nodes can request unknown transactions from other nodes.
+
+#### Proof-of-Lock
 
 A set of +2/3 `Prevote` votes for the same proposal from the nodes at current
 round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
@@ -95,14 +106,15 @@ round number. So PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
 message processing.
 
-As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
-node deletes stored data (`RequestState`) about sent request when the the
-requested info is obtained.
+#### Message Processing
 
-The timeout is implemented as a message to this node itself. This message is
-queued and processed when it reaches its queue.
+Node uses queue based on [the Mio library][mio_lib] for message processing.
+Incoming request and consensus messages are placed in this queue when they are
+received. The same queue is used for timeouts processing.
 
-current_round
+Message is processed when it reaches its queue.
+
+Messages from future height or round are placed in the separate queue (`queued`).
 
 **TODO:** insert picture
 
@@ -148,8 +160,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Check `propose.prev_hash` correctness.
 - Check that the specified validator is the leader for the given round.
 - Check that the proposal does not contain any previously committed transaction
-  (`Propose` message contain only hashes of transactions, so the absence of hashes in the
-  table of committed transactions is checked).
+  (`Propose` message contain only hashes of transactions, so the absence of
+  hashes in the table of committed transactions is checked).
 - Add the proposal to the `proposes` HashMap.
 - Form a list of transactions the node does not know from `propose`. Request
   transactions from this list.
@@ -175,8 +187,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - For all rounds in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-  - If the node has +2/3 `Prevote` for `propose` in `current_round`, then proceed to
-  **Availability of +2/3 `Prevote`** for `propose` in `current_round`.
+  - If the node has +2/3 `Prevote` for `propose` in `current_round`, then
+  proceed to **Availability of +2/3 `Prevote`** for `propose` in `current_round`.
 
 - For all rounds in the interval `[propose.round, current_round]`:
 
@@ -527,3 +539,4 @@ the accepted block.
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [message_source]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
+[mio_lib]: https://github.com/carllerche/mio
