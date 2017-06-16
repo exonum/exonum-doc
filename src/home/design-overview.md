@@ -1,18 +1,12 @@
 # Design Overview
 
-This page describes the core design decisions of the Exonum framework.
-
-- [Transaction processing](#transaction-processing) describes the lifecycle of
-  transactions and blocks in Exonum
-- [Network structure](#network-structure) describes how Exonum network operates
-- [Consensus](#consensus) explains how nodes agree on the blockchain
-  state
-- [Data storage](#data-storage) describes how data is saved locally and
-  introduces the proofs mechanism
-- [Modularity and services](#modularity-and-services) introduces services
-  and explains what they are used for
-- [Cryptography](#cryptography) briefly describes main crypto-primitives used
-  in Exonum
+This page describes the core design decisions of the Exonum framework:
+[transaction processing](#transaction-processing),
+[network structure](#network-structure),
+[consensus algorithm](#consensus),
+[data storage organization](#data-storage),
+[services](#modularity-and-services),
+and [cryptography used in Exonum](#cryptography).
 
 ## Transaction Processing
 
