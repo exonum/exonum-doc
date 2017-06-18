@@ -1,7 +1,7 @@
 # Transactions
 
-A **transaction** in Exonum
-([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
+A **transaction** in Exonum,
+[as in usual databases](https://en.wikipedia.org/wiki/Database_transaction),
 is a group of sequential operations with the data (i.e., the Exonum [key-value storage](storage.md)).
 Transaction processing rules are defined in [services](services.md);
 these rules determine business logic of any Exonum-powered blockchain.
@@ -106,10 +106,10 @@ Fields used in transaction serialization are listed below.
 ### Network ID
 
 This field will be used to send inter-blockchain messages in the future
-releases. For now, it is not used.
+releases. Not used currently.
 
 **Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number
+**JSON presentation:** number.
 
 ### Protocol Version
 
@@ -121,8 +121,8 @@ The major version of the Exonum serialization protocol. Currently, `0`.
 ### Service ID
 
 Sets the [service](services.md) that a transaction belongs to.
-The pair (`service_id`, `message_id`) is
-a key used to lookup implementation of [the transaction interface](#interface)
+The pair `(service_id, message_id)` is
+used to look up the implementation of [the transaction interface](#interface)
 (e.g., `verify` and `execute` methods).
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
@@ -220,8 +220,8 @@ be included into any correct block proposal. Incorrect transactions are never
 included into the blockchain.
 
 !!! note "Example"
-    In [the cryptocurrency service][cryptocurrency]
-    a `TransactionSend` verifies the digital signature and checks that
+    In [the cryptocurrency service][cryptocurrency],
+    `TransactionSend.verify` checks the digital signature and ensures that
     the sender of coins is not the same as the receiver.
 
 ### Execute
@@ -239,8 +239,8 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
 !!! note
     `verify` and `execute` are triggered at different times. `verify` checks
     internal consistency of a transaction before the transaction is included
-    into the [proposal block](../advanced/consensus/consensus.md). `execute`
-    performs [almost at the same time](../advanced/consensus/consensus.md) as
+    into a [pool of unconfirmed transactions](../advanced/consensus/consensus.md).
+    `execute` is performed during the `Precommit` stage of consensus and when
     the block with the given transaction is committed into the blockchain.
 
 !!! note "Example"
@@ -274,13 +274,13 @@ The method has no access to the blockchain state, same as `verify`.
 ### 1. Creation
 
 A transaction is created by an external entity (e.g., a
-[thin client](clients.md)) and is signed with a private key necessary to authorize
+[light client](clients.md)) and is signed with a private key necessary to authorize
 the transaction.
 
 ### 2. Submission to Network
 
 After creation, the transaction is submitted to the blockchain network.
-Usually, this is performed by a thin client connecting to a full node
+Usually, this is performed by a light client connecting to a full node
 via [an appropriate transaction endpoint](services.md#transactions).
 
 !!! note
@@ -302,7 +302,7 @@ via [an appropriate transaction endpoint](services.md#transactions).
 
 After a transaction is received by a full node, it is looked up
 among committed transactions, using the transaction hash as the unique
-identifier. If a transaction has been committed previosuly, it is
+identifier. If a transaction has been committed previously, it is
 discarded, and the following steps are skipped.
 
 The transaction implementation is then looked up
@@ -316,7 +316,7 @@ steps are skipped.
 ### 4. Broadcasting
 
 If a transaction included to the pool of unconfirmed transactions
-is received by a node not from another full node, 
+is received by a node not from another full node,
 then the transaction is broadcast to all full nodes that the node is connected to.
 In particular, a node broadcasts transactions received from light clients
 or generated internally by services, but does not rebroadcast
@@ -334,7 +334,7 @@ into a block proposal (or multiple proposals).
     with the smallest hashes when building a proposal. This behavior shouldn’t
     be relied upon; it is likely to change in the future.
 
-The transaction is executed with `execute` during the
+The transaction `execute`s during the
 lock step of the consensus algorithm. This happens when a validator
 has collected all
 transactions for a block proposal and certain conditions are met, which imply
@@ -371,7 +371,7 @@ only once – when it’s submitted to the pool of unconfirmed transactions.
 
 [Sequential consistency](https://en.wikipedia.org/wiki/Sequential_consistency)
 essentially means that the blockchain looks like a centralized system for an
-external observer (e.g., a thin client). All transactions in the blockchain
+external observer (e.g., a light client). All transactions in the blockchain
 affect the blockchain state as if they were executed one by one in the order
 specified by their ordering in blocks. Sequential consistency is guaranteed
 by the [consensus algorithm](../advanced/consensus/consensus.md).
