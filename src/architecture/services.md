@@ -269,8 +269,15 @@ only it is a string instead of an integer.
 
 - In [the configuration](configuration.md). Service configuration
   is stored in the overall configuration under the key `service_name`
+  in the `services` variable
 - To compute API endpoints for the service. All service endpoints
   are mounted on `/api/services/{service_name}`
+
+!!! note "Example"
+    [The Bitcoin anchoring service](../advanced/services/anchoring.md)
+    defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the service
+    are available on `/api/services/btc_anchoring/`, and its configuration is
+    stored in the `services.btc_anchoring` section of the overall configuration.
 
 ### State Hash
 

@@ -12,13 +12,16 @@ or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. Initialization on the node
 start up passes the configuration to all services deployed on the blockchain.
-The configuration for a service is stored in the overall configuration
+The configuration for a service is stored in the `services` subtree
+of the overall configuration
 under a separate key equal to [the name of the service](services.md#service-identifiers).
 
 !!! note "Example"
     [The anchoring service](../advanced/bitcoin-anchoring.md)
     stores in the configuration parameters of the RPC connection to
     a Bitcoin Core node, as well as the Bitcoin address used for anchoring.
+    These parameters are stored in the `services.btc_anchoring`
+    section of the overall configuration.
 
 ## Configuration Parameters
 
