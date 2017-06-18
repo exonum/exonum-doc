@@ -260,7 +260,7 @@ only it is a string instead of an integer.
 
 `service_id` is used:
 
-- To identify [transactions](transactions.md) hosted by the service
+- To identify [transactions](transactions.md) handled by the service
 - Within the blockchain state. See [`state_hash`](#state-hash) below and
   [*Storage*](storage.md)
 
@@ -281,23 +281,23 @@ fn state_hash(&self, view: &View)
 ```
 
 The `state_hash` method needs to return a list of hashes for all
-Merklized tables defined by the service, which are calculated based on the
+Merklized tables defined by the service. Hashes are calculated based on the
 current blockchain state `view`.
 The core uses this list to aggregate
-hashes of tables defined by all services, into a single Merklized meta-map.
+hashes of tables defined by all services into a single Merklized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
 and is recorded as such in blocks and [`Precommit` messages](../advanced/consensus/consensus.md).
 
 The default trait implementation returns an empty list. This corresponds to
-the case when a service doesn't have any Merklized tables.
+the case when a service doesn’t have any Merklized tables.
 
 !!! note
     The keys of the meta-map are defined as pairs `(service_id, table_id)`,
     where `service_id` is a 2-byte [service identifier](#service-identifiers)
     and `table_id` is a 2-byte identifier of a table within the service.
-    Keys are then stretched to 32 bytes using SHA-256 in order to provide
-    a more even key distribution (which results in a more balanced
-    Merkle Patricia tree).
+    Keys are then hashed in order to provide
+    a more even key distribution, which results in a more balanced
+    Merkle Patricia tree.
 
 ### Parse Raw Transaction
 
@@ -307,7 +307,7 @@ fn tx_from_raw(&self, raw: RawTransaction)
 ```
 
 The `tx_from_raw` method is used to parse raw transactions received from the network
-into specific transaction types defined by the service. The core uses this method
+into specific transaction types handled by the service. The core uses this method
 to dispatch incoming transactions to services that host transaction implementations.
 The `service_id` field in the transaction serialization is used to determine
 the service, whose `tx_from_raw` method is called by the core.
@@ -330,7 +330,7 @@ fn handle_genesis_block(&self, view: &View)
 of the service in the JSON format.
 This method is invoked for all deployed services during
 the blockchain initialization. A result of the method call for each service
-is recorded under [the stringified service identifier](#service-identifiers)
+is recorded under [the string service identifier](#service-identifiers)
 in the configuration. The resulting initial configuration is augmented
 by non-service parameters (such as public keys of the validators) and recorded in
 the genesis block, hence the method name.
@@ -348,7 +348,7 @@ fn handle_commit(&self, context: &mut NodeState)
 
 `handle_commit` is invoked for every deployed service each time a block
 is committed in the blockchain locally. This method is so far the only example
-of [event-based processing](#event-handling). The method is passed the blockchain
+of [event-based processing](#event-handling). The method is called with the blockchain
 context, which can be used to inspect the blockchain state, create transactions
 and push them in the queue for broadcasting, etc.
 
@@ -372,7 +372,7 @@ fn private_api_handler(&self, context: &ApiContext)
 ```
 
 `public_api_handler` and `private_api_handler` provide hooks for defining
-public and private API endpoints respectively, using [Iron framework][iron] API.
+public and private API endpoints respectively using [Iron framework][iron].
 These methods are given an API context, which allows to read information from
 the blockchain, and to translate POST requests into Exonum transactions.
 
