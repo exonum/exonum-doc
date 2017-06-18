@@ -3,8 +3,8 @@
 A **transaction** in Exonum
 ([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
 is a group of sequential operations with the data (i.e., the Exonum [key-value storage](storage.md)).
-Transactions are defined in [services](services.md) and determine all business logic
-of any Exonum-powered blockchain.
+Transaction processing rules are defined in [services](services.md);
+these rules determine business logic of any Exonum-powered blockchain.
 
 Transactions are executed [atomically, consistently, in isolation and durably][wiki:acid].
 If the transaction execution violates certain data invariants,
@@ -33,6 +33,31 @@ various constraints based on this key.
     in this case means verifying that a transaction is digitally signed with
     a specific key, and authorization means that this key is associated with
     a sufficient amount of coins to make the transaction.
+
+## Transaction Templates
+
+All transactions in Exonum are *templated*. Every Exonum transaction
+is defined by its template and a set of parameters, rather than by an overt
+sequence of operations on the key-value storage. The sequence of operations
+can be unambiguously restored given a template identifier and template parameters.
+This design leads to a more safe and controlled environment for transactional
+processing.
+
+Transaction templates are defined in services and could be viewed as an analogue
+to stored procedures in database management systems, or to POST/PUT endpoints
+in web services. Similar to these cases, the goal of templating is to restrict
+eligible transaction patterns (e.g., to preserve certain invariants) and to
+separate implementation details from transaction invocation.
+
+!!! summary "Trivia"
+    From the computer science perspective, an arbitrary Exonum transaction
+    can be defined as `Tx: S -> S`, where `S` denotes the key-value storage type.
+    Templating corresponds to eliciting parameterized families of transactions
+    `TTx(i: I): P(i) -> S -> S`,
+    where `I` is the set of defined transaction families and `P(i)`
+    is the parameter space for the `i`th family. Correspondingly, any transaction
+    in Exonum is [a partially applied function][wiki:currying]
+    with the transaction family and parameters fixed.
 
 ## Serialization
 
@@ -358,3 +383,4 @@ on the verify step.
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
+[wiki:currying]: https://en.wikipedia.org/wiki/Currying
