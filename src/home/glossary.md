@@ -214,6 +214,19 @@ The global configuration is a part of [the blockchain state](#blockchain-state).
 which are mostly related to [consensus](#consensus) and networking
 (e.g., a set of [validators’](#validator) public keys).
 
+## Hash
+
+**Aka** cryptographic hash
+
+[SHA-256][sha-256] [cryptographic hash][wiki:hash] digest of certain data.
+Exonum uses hashes as unique identifiers for [transactions](#transaction).
+Hashes are also used to create [Merkle trees](#merkle-tree) and their variants.
+
+!!! summary "Implementation details"
+    SHA-256 hashes occupy 32 bytes in the binary form. Exonum uses [`sodiumoxide`][sodiumoxide]
+    to calculate hashes on [full nodes](#full-node) and [sha.js][sha.js] to do
+    the same on [light clients](#light-client).
+
 ## JSON Serialization
 
 Serialization of [data stored in the blockchain](#stored-datatype) and
@@ -460,3 +473,6 @@ is reasonably small, consisting of 4–15 nodes.
 [libsodium]: https://download.libsodium.org/doc/
 [tweetnacl]: https://github.com/dchest/tweetnacl-js
 [ed25519]: https://ed25519.cr.yp.to/
+[wiki:hash]: https://en.wikipedia.org/wiki/Cryptographic_hash_function
+[sha-256]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+[sha.js]: https://www.npmjs.com/package/sha.js
