@@ -293,7 +293,17 @@ If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
 
-### 4. Consensus
+### 4. Broadcasting
+
+If a transaction included to the pool of unconfirmed transactions
+is received by a node not from another full node, 
+then the transaction is broadcast to all full nodes that the node is connected to.
+In particular, a node broadcasts transactions received from light clients
+or generated internally by services, but does not rebroadcast
+transactions that are broadcast by peer nodes or are received with the help
+of [requests](../advanced/consensus/requests.md) during consensus.
+
+### 5. Consensus
 
 After a transaction reaches the pool of a validator, it can be included
 into a block proposal (or multiple proposals).
@@ -313,7 +323,7 @@ The results of execution are reflected in `Precommit` consensus messages and
 are agreed upon within the consensus algorithm. This allows to ensure that transactions
 are executed in the same way on all nodes.
 
-### 5. Commitment
+### 6. Commitment
 
 When a certain block proposal and the result of its execution gather
 sufficient approval among validators, a block with the transaction is committed
