@@ -289,6 +289,15 @@ via [an appropriate transaction endpoint](services.md#transactions).
     by anyone aware of the transaction. There is no intrinsic upper bound on
     the transaction lifetime, either.
 
+!!! tip
+    From the point of view of a light client, transaction execution is
+    asynchronous; full nodes do not return an execution status synchronously
+    in a response to a client’s request. To determine transaction status,
+    you may poll the transaction status using [read requests](services.md#read-requests)
+    defined in the corresponding service or the blockchain explorer.
+    If a transaction is valid (i.e., its `verify` returns `true`), it’s expected
+    to be committed in a matter of seconds.
+
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
