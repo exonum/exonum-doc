@@ -155,6 +155,27 @@ a set of all transactions ever committed to the blockchain).
 Absence of a single point of failure in the system. For example, absence of a single
 administrator having privileges to perform arbitrary actions.
 
+## Digital Signature
+
+**Aka** signature
+
+Public-key digital signature in the [Ed25519][Ed25519] elliptic curve cryptosystem.
+A signature over a message proves that the signer has the knowledge
+of a specific [private key](#private-key) corresponding to a publicly known
+[public key](#public-key). A signature can be verified
+against this public key and the signed message, thus providing message *authenticity*
+(i.e., the message comes from a specific source) and *integrity*
+(the message is not modified after being signed). Ed5519 signatures are universally
+verifiable, meaning that the verifier doesn’t need to know any additional information
+to verify a signature.
+
+!!! summary "Implementation details"
+    Ed25519 digital signatures occupy 64 bytes in the binary form. Exonum
+    uses the [`sodiumoxide`][sodiumoxide] Rust crate (a [`libsodium`][libsodium]
+    binding for Rust) to create and verify digital signatures
+    on [full nodes](#full-node), and [TweetNaCl.js][tweetnacl] to do
+    the same operations on [light clients](#light-client).
+
 ## Distributed Ledger
 
 A distributed system that maintains a full [transaction](#transaction) log
@@ -306,6 +327,32 @@ Permissioned blockchains usually use variations of [authenticated consensus](#au
 instance of the service. As an example, private API can be used to change the
 local configuration of the service.
 
+## Private Key
+
+Private key as per the [Ed25519][ed25519] specification. Each private key corresponds
+to a specific [public key](#public-key). The knowledge of a private key
+is necessary to create [digital signatures](#digital-signature) over [messages](#message),
+which could be later verified against the message and the corresponding public key.
+
+!!! summary "Implementation details"
+    As per [`libsodium`][libsodium], private keys occupy 64 bytes in the binary
+    form: 32 bytes for the cryptographic seed used to generate the key,
+    and 32 bytes for the pre-calculated corresponding public key. The latter
+    32 bytes are redundant, but help speed up computations.
+
+## Public Key
+
+Public key as per the [Ed25519][ed25519] specification. Public keys are used
+to verify [digital signatures](#digital-signature) over [messages](#message).
+A public key can be linked with a real-world identity. For example,
+public keys used in [consensus](#consensus) are tied to specific [validators](#validator),
+as only a specific validator is assumed to know
+the corresponding [private key](#private-key).
+
+!!! summary "Implementation details"
+    As per [`libsodium`][libsodium], public keys occupy 32 bytes in the binary
+    form.
+
 ## Read Request
 
 [Service endpoint](#service-endpoint) that can be used to retrieve data from
@@ -409,3 +456,7 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [mysql-stored]: https://dev.mysql.com/doc/refman/5.6/en/stored-routines.html
+[sodiumoxide]: https://dnaq.github.io/sodiumoxide/sodiumoxide/index.html
+[libsodium]: https://download.libsodium.org/doc/
+[tweetnacl]: https://github.com/dchest/tweetnacl-js
+[ed25519]: https://ed25519.cr.yp.to/
