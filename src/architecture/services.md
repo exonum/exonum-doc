@@ -260,17 +260,16 @@ only it is a string instead of an integer.
 
 `service_id` is used:
 
-- To identify [transactions](transactions.md) hosted by the service.
+- To identify [transactions](transactions.md) hosted by the service
 - Within the blockchain state. See [`state_hash`](#state-hash) below and
   [*Storage*](storage.md)
-- In [the configuration](configuration.md). Service configuration
-  is stored in the overall configuration under the key obtained
-  by converting `service_id` to a string via `format("{}", service_id)`
 
 `service_name` is used:
 
+- In [the configuration](configuration.md). Service configuration
+  is stored in the overall configuration under the key `service_name`
 - To compute API endpoints for the service. All service endpoints
-  are mounted on `/api/services/{service_name}`.
+  are mounted on `/api/services/{service_name}`
 
 ### State Hash
 
