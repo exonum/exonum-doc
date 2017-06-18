@@ -243,6 +243,17 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     performs [almost at the same time](../advanced/consensus/consensus.md) as
     the block with the given transaction is committed into the blockchain.
 
+!!! note "Example"
+    In the sample cryptocurrency service, `TransferTransaction.execute` verifies
+    that the sender’s and recipient’s accounts exist and the sender has enough
+    coins to complete the transfer. If these conditions hold, the sender’s
+    balance of coins is decreased and the recipient’s one is increased by the amount
+    specified in the transaction. Additionally, the transaction is logged in the
+    sender’s and recipient’s history of transactions; the logging is performed even
+    if the transaction execution is unsuccessful (e.g., the sender has insufficient
+    number of coins). Logging helps to ensure that
+    the account state is verifiable by light clients.
+
 ### Info
 
 ```rust
