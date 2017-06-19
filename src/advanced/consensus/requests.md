@@ -12,14 +12,15 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
     validators number.
 
 Receiving a consensus message from a node gives the message recepient
-an opportunity to learn certain
-information about the state of the message author, if the author is not Byzantine.
-The node saves this information in [the RequestState structure](#algorithm-for-sending-requests).
+an opportunity to learn certain information about the state of the message
+author (a node that has signed the message; the message author may differ from
+the peer that the message recipient got the message from), if the author is not
+Byzantine. The node saves this information in [the RequestState structure](#algorithm-for-sending-requests).
 
 ### Any Consensus Message
 
 - The message author is at the height implied by the message
-- The author has all previous blocks
+- The author has blocks corresponding to all lesser heights
 - The author has +2/3 `Precommit` messages for each of previous blocks
 
 ### `Prevote`
@@ -27,14 +28,14 @@ The node saves this information in [the RequestState structure](#algorithm-for-s
 - The author has a proposal (`Propose` message) referenced by the `Prevote` message
 - The author has all transactions mentioned in this proposal
 - If the author indicated `lock_round` in the message, it has a +2/3 `Prevote`
-  messages for this proposal in the specified round
+  messages for this proposal in the `locked_round` or round with lower number.
 
 ### `Precommit`
 
 - The author has a proposal referenced by the `Precommit` message
 - The author has all transactions mentioned in this proposal
 - The author has +2/3 `Prevote` messages for this proposal in some round with
-  lower or equal number.
+  number equal to or lower than the round number mentioned in the `Precommit`.
 
 ### `Connect`
 
@@ -48,7 +49,7 @@ The node saves this information in [the RequestState structure](#algorithm-for-s
 `Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
 and take 32 bytes.
 
-`u32` and `u64` are nonnegative integers of appropriate size (32 and 64 bits).
+`u32` and `u64` are nonnegative integers of appropriate size (4 and 8 bytes).
 
 `BitVec` is a bit vector containing as many bits as there are validators in
 the system.
@@ -107,7 +108,7 @@ has the following fields:
 
 ### `RequestBlock`
 
-Used to obtain missing committed blocks from the node having them (node at a
+Used to obtain a committed block from the node having it (node at a
 higher height is assumed to have such block). It has the following fields:
 
 - **from**: PublicKey  
@@ -148,6 +149,11 @@ its deletion from the message queue.
 
 Cancelling a request means cancelling a corresponding timeout as well.
 
+### Receiving Transaction
+
+If this is the last transaction required to collect a known `Propose`,
+cancel the corresponding `RequestTransactions`.
+
 ### Consensus Message from Bigger Height
 
 - Update info about the height of blockchain on the corresponding node
@@ -157,16 +163,13 @@ Cancelling a request means cancelling a corresponding timeout as well.
 All events below are applicable only if the height of the message is the same as
 validator height.
 
-### Receiving Transaction
-
-If this is the last transaction required to collect a known `Propose`,
-cancel the corresponding `RequestTransactions`.
-
 ### Receiving `Propose`
 
 - If this `Propose` was requested, cancel the request. A list
   of nodes that should have all transactions mentioned in the `Propose` message
-  should be copied from the `RequestState` before its deletion
+  should be copied from the `RequestState` before its deletion to request
+  missing transactions if necessary (copy is placed into `RequestState` for
+  `RequestTransactions`)
 - If certain transactions from the `Propose` are not known,
   send `RequestTransactions` to the author of `Propose`
 
@@ -192,9 +195,10 @@ cancel the corresponding `RequestTransactions`.
 
 ### Receiving `Block`
 
-- Request the next block if there are nodes at a height higher
-  than current
+- Request the next block from the node (if one exists) that sent any message
+  from the height higher than current height + 1
 - Update local height after committing the block locally
+- Cancel `RequestBlock` for the current height
 
 ### Peers Timeout
 
@@ -213,7 +217,8 @@ Cancel all requests.
   structure)
 - If the list of nodes having the data to be requested is empty, cancel
   request
-- Otherwise, make one more request attempt and start a new timer
+- Otherwise, make one more request attempt to another node from the list of
+  nodes that should have the requested data and start a new timer
 
 ## Algorithm for requests processing
 
