@@ -254,6 +254,30 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     number of coins). Logging helps to ensure that
     the account state is verifiable by light clients.
 
+If the `execute` method of a transaction raises an unhandled exception (panics
+in the Rust terms), the changes made by the transactions are discarded,
+but the transaction itself is still considered committed. Such erroneous transactions
+can be included into the blockchain provided they panic for at least 2/3
+of the validators.
+
+!!! note
+    Rust commonly uses [`Result`s][rust-result] to handle errors,
+    so using `panic` just to roll back
+    transaction execution (e.g., if blockchain state-specific checks fail)
+    may be considered poor coding style.
+
+!!! warning
+    As of Exonum 0.1, it is the sole responsibility of a service developer to
+    ensure that transactions logically failing during the `execute` stage
+    do not change the blockchain state
+    (e.g., if a `TransferTransaction` in the cryptocurrency service attempts to
+    transfer more coins than the sender has). There is no way to signal
+    to the core that a transaction has failed and should be rolled back (however,
+    it’s on [the roadmap](../dev/roadmap.md), so this inconvenience won’t last
+    for long).
+    Correspondingly, when programming `execute`, you should perform state-related
+    checks *before* any changes to the state and return early if these checks fail.
+
 ### Info
 
 ```rust
@@ -415,3 +439,4 @@ on the verify step.
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying
+[rust-result]: https://doc.rust-lang.org/book/first-edition/error-handling.html
