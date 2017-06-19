@@ -166,8 +166,8 @@ of a specific [private key](#private-key) corresponding to a publicly known
 [public key](#public-key). A signature can be verified
 against this public key and the signed message, thus providing message *authenticity*
 (i.e., the message comes from a specific source) and *integrity*
-(the message is not modified after being signed). Ed5519 signatures are universally
-verifiable, meaning that the verifier doesn’t need to know any additional information
+(the message is not modified after being signed). Ed25519 signatures are universally
+verifiable, meaning that a verifier doesn’t need to know any additional information
 to verify a signature.
 
 !!! summary "Implementation details"
