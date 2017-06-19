@@ -287,7 +287,7 @@ fn state_hash(&self, view: &View)
 }
 ```
 
-The `state_hash` method needs to return a list of hashes for all
+The `state_hash` method returns a list of hashes for all
 Merklized tables defined by the service. Hashes are calculated based on the
 current blockchain state `view`.
 The core uses this list to aggregate
@@ -314,13 +314,11 @@ fn tx_from_raw(&self, raw: RawTransaction)
 ```
 
 The `tx_from_raw` method is used to parse raw transactions received from the network
-into specific transaction types handled by the service. The core uses this method
-to dispatch incoming transactions to services that host transaction implementations.
-The `service_id` field in the transaction serialization is used to determine
-the service, whose `tx_from_raw` method is called by the core.
-
-A parsed transaction returned by the method is then used in further
-transaction processing.
+into specific transaction types handled by the service. The core calls this method
+for all incoming transactions at the beginning of transaction processing.
+The service, which `tx_from_raw` method
+will be called for a particular transaction, is chosen
+based on the `service_id` field in the transaction serialization.
 
 ### Genesis Block Handler
 
@@ -355,7 +353,7 @@ fn handle_commit(&self, context: &mut NodeState)
 
 `handle_commit` is invoked for every deployed service each time a block
 is committed in the blockchain locally. This method is so far the only example
-of [event-based processing](#event-handling). The method is called with the blockchain
+of [event-based processing](#event-handling). The method receives the blockchain
 context, which can be used to inspect the blockchain state, create transactions
 and push them in the queue for broadcasting, etc.
 
@@ -380,7 +378,7 @@ fn private_api_handler(&self, context: &ApiContext)
 
 `public_api_handler` and `private_api_handler` provide hooks for defining
 public and private API endpoints respectively using [Iron framework][iron].
-These methods are given an API context, which allows to read information from
+These methods receive an API context, which allows to read information from
 the blockchain, and to translate POST requests into Exonum transactions.
 
 The default trait implementation does not define any public or private endpoints.
