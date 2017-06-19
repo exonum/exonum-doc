@@ -12,6 +12,8 @@ site_author: 'BitFury Group'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 site_favicon: 'images/favicon.ico'
 
+copyright: © 2017 Bitfury Group Limited. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+
 extra:
   og_image: 'images/logo-square.jpg'
   logo: 'images/logo.svg" alt="Exonum Logo'
@@ -33,7 +35,6 @@ markdown_extensions:
   - codehilite
   - admonition
   - meta
-copyright: © 2017 Bitfury Group Limited
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
