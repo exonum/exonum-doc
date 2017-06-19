@@ -5,15 +5,28 @@ there is no process of transforming the structure into binary data. The data is
 created already "serialized" and Exonum works directly with the serialized data
 "deserializing" the fields to which it refers, if necessary.
 
-In Exonum, the binary format is used for two purposes:
+In Exonum, the binary format is used for three purposes:
 
-- **Message serialization**: everything that passes in the network between nodes
-  turns into messages (the [`message!` macro][message_macro]). Data received as
-  a message is validated.
+- **Communication of full nodes using consensus messages**  
+  Full nodes can both serialize messages for sending and deserialize messages
+  when they are received. All the information that passes in the network between
+  nodes turns into messages (the [`message!` macro][message_macro]). Data
+  received as a message is validated.
 
-- **Serialization of data stored in the blockchain** (the [`storage_value!`
-  macro][storage_value_macro]). Data obtained from the blockchain is not
-  validated, since it is assumed to be validated earlier.
+- **Communication with light clients**  
+  Light clients can only serialize messages due to the complexity of the checks
+  necessary for the deserialization process. Transactions are created on the
+  client side and sent to the validators in order to be committed into the
+  blockchain. The client serializes the transaction and sends it in JSON format
+  along with a signature to the data in a binary format. Similarly, when the
+  client receives data from a full node, the client serializes the data received
+  in the JSON format to verify the signature.
+
+- **Storage of data**  
+  The storage is used to place blocks, configurations, data specific for services
+  (for example, wallet). Serialization is implemented by [`storage_value!`
+  macro][storage_value_macro]). Data obtained from the storage is not validated,
+  since it is assumed to be validated earlier.
 
 ## Motivation of Own Serialization Format
 
