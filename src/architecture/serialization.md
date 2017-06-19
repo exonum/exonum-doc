@@ -30,14 +30,46 @@ In Exonum, the binary format is used for three purposes:
 
 ## Motivation of Own Serialization Format
 
-Due to the fact that the messages do not need to be serialized/deserialized
-between the wire format and the in-memory representation, it is possible to work
-with the signed messages, and later, if necessary, transfer them to other
-nodes. This is necessary for the consensus algorithm. Also, "deserialization" of
-unused fields does not occur without the need, which minimizes the overhead.
-Moreover, this format allows to achieve [zero-copy][zero_copy] because the data
-itself is a kind of non-mutable buffer that can be safely transmitted, and there
-will be no copying until there is no access to the fields.
+### Data Representation Requirements in Exonum
+
+- **Unambiguity** (one can uniquely restore the original data based on serialized
+  data)  
+  It is required that the verification of the transaction structure on all nodes
+  is identical, hence the format should be binary.
+
+- **Canonicity**  
+  The data set must be presented in only one way. Required for uniqueness of the
+  hash of data.
+
+- Serialized data can not be partially correct  
+  Reading the fields does not happen until the validation is complete.
+
+- **Byzantine fault tolerance (BFT)**  
+  The node must be ready to receive the Byzantine message.
+
+- Storage of the data in the same form as it is sent  
+  Nodes forward almost all received messages unchanged. Storage of data in the
+  same form allows node not to waste time on the  message re-creating. In this
+  case, deserialization consists in verifying the correctness of all fields.
+  This requirement allows to achieve [zero-copy][zero_copy].
+
+- Conversion to JSON and back (used to communicate with light clients) must be
+  unambiguous. The binary format and JSON must have the same data schema.
+
+- It should be possible to set the data scheme and check the message for
+  compliance with the scheme. The scheme should not allow the presence of
+  optional fields.
+
+- Validation on message reading can not be lazy: first check the entire message
+  to the end, then read completely without checking.
+
+- The format should be effective in terms of data compression. The Exonum
+  serialization format contains a trade-off with the speed of work: pointers for
+  quick access to fields are not necessary.
+
+- Serialization should work on all architectures / platforms identically. The
+  little-endian is always used in the Exonum so that reading and writing on
+  modern platforms are direct.
 
 ## Serialization Principles
 
