@@ -71,6 +71,24 @@ In Exonum, the binary format is used for three purposes:
   little-endian is always used in the Exonum so that reading and writing on
   modern platforms are direct.
 
+### Alternative Serialization Formats
+
+- [ASN.1 DER][asn_der]  
+  Provides canonicity but poorly extensible.
+
+- [Protocol Buffers][wiki_protobuf]  
+  Does not provide canonicity, has problems with BFT.
+
+- [Cap'n Proto][cap_n_proto]  
+  Meets all requirements since version 0.5 ([canonicalization][cap_n_proto_canonicalization]
+  was introduced)
+
+- [Simple Binary Encoding (SBE)][sbe]  
+  BFT problem.
+
+- [FlatBuffers][wiki_flatbuf]  
+  Poor documentation, BFT problem.
+
 ## Serialization Principles
 
 ### Primitive types
@@ -157,5 +175,11 @@ Its serialized representation:
 [message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
 [storage_value_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/spec.rs
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
+[asn_der]: https://en.wikipedia.org/wiki/X.690#DER_encoding
+[wiki_protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
+[cap_n_proto]: https://capnproto.org/
+[cap_n_proto_canonicalization]: https://capnproto.org/encoding.html#canonicalization
+[sbe]: https://github.com/real-logic/simple-binary-encoding
+[wiki_flatbuf]: https://en.wikipedia.org/wiki/FlatBuffers
 [rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
 [rust_structs]: https://doc.rust-lang.org/book/structs.html
