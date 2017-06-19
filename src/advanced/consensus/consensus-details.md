@@ -81,12 +81,8 @@ The consensus algorithm uses following types of messages:
 The definitions from the [general description of consensus algorithm](consensus.md)
 are used.
 
-As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
-node deletes stored data (`RequestState`) about sent request when the
-requested info is obtained.
-
-The timeout is implemented as a message to this node itself. This message is
-queued and processed when it reaches its queue.
+In the following description, +2/3 means more than two thirds of the validators,
+and -1/3 means less than one third.
 
 #### Pool of Unconfirmed Transactions
 
@@ -106,15 +102,21 @@ round number. So PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
 message processing.
 
-#### Message Processing
+### Message Processing
 
 Node uses queue based on [the Mio library][mio_lib] for message processing.
 Incoming request and consensus messages are placed in this queue when they are
 received. The same queue is used for timeouts processing.
 
-Message is processed when it reaches its queue.
+Messages from the next height (i.e., `current_height` + 1) or future round are
+placed in the separate queue (`queued`).
 
-Messages from future height or round are placed in the separate queue (`queued`).
+As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
+node deletes stored data (`RequestState`) about sent request when the
+requested info is obtained.
+
+The timeout is implemented as a message to this node itself. This message is
+queued and processed when it reaches its queue.
 
 **TODO:** insert picture
 
@@ -338,7 +340,8 @@ consensus messages belonging to a future height.
 - If the timeout does not match the current height and round, skip further
   timeout processing.
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
-- Process all messages from the queue, if they become relevant.
+- Process all messages from the `queued`, if they become relevant (their round
+  and height coincide with the current ones).
 - If the node has a saved PoL, send `Prevote` for `locked_propose` in a new round,
   proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote).
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
@@ -355,10 +358,17 @@ consensus messages belonging to a future height.
 
 In this version, we assume that messages are processed instantly. To get rid of
 this assumption, it is enough to guarantee the finality of the processed messages
+(**TODO** clarify message finality)
 pertaining to each round, and the correct organization of the queue for messages
 from different rounds.
 
+The network is assumed to be [partially synchronous][partial_synchrony], so each
+message is delivered in time not more than the unknown `δt`.
+
 ### Statement 1: Round Beginning
+
+Denote `(H, R)` the **consensus state** of a node at a certain moment, where `H`
+is the blockchain height of the node and `R` is the round number at this moment.
 
 All non-Byzantine nodes being at a height of not less than `H`, will be in the
 state `(H, R)`or higher (either bigger round or bigger height), where `R` is an
@@ -407,7 +417,9 @@ message had been sent before this time). Consider the cases of PoL status:
   [statement 2](#statement-2-non-byzantine-leader)). In this case, the node will
   form a new proposal and send `Propose` and `Prevote` messages.
 
-#### Consequence
+#### Corollary
+
+**TODO** decide if is necessary
 
 If there exists an unlimited number of heights on which the
 validator can become a leader (property of round robin), then any non-Byzantine
@@ -439,11 +451,11 @@ the number `R < R*` (where `R*` denote a uniform estimate **TODO** explain of `R
 Then the coming time of the round `R*` for all non-Byzantine nodes on the
 outside observer's watch is `T(R*)`.
 
-Not later than at the moment `T(R*) + \delta T + propose_timeout` each
+Not later than at the moment `T(R*) + δt + propose_timeout` each
 non-Byzantine node will receive a correct proposal from the `R` round. Further,
-not later than through `2 \delta T`, that node will know all the transactions
+not later than through `2 δt`, that node will know all the transactions
 from this proposal (request mechanism). Denote this time
-`T* = T(R*) + propose_timeout + 3 \delta T`.
+`T* = T(R*) + propose_timeout + 3 δt`.
 
 If no non-Byzantine node has PoL to the `R(T*)` round, then in this round the
 node will receive PoL (for the proposal from the `R` round). Indeed, if no one
@@ -451,31 +463,32 @@ has PoL, then the nodes could not send the `Prevote` message in the `R(T*)`
 round. In accordance with the algorithm for processing complete proposals, the
 confirming `Prevote` message will be sent.
 
-Thus, **by the time `T'= T(R(T*)) + \delta T` at least one non-Byzantine node
+Thus, **by the time `T′= T(R(T*)) + δt` at least one non-Byzantine node
 will have PoL**.
 
-**Not later than `T'' = T(R(T')) + 2 \delta T` each non-Byzantine node will have
-some PoL**. Indeed, starting with the `R(T')` round, the non-Byzantine node will
+**Not later than `T″ = T(R(T′)) + 2 δt` each non-Byzantine node will have
+some PoL**. Indeed, starting with the `R(T′)` round, the non-Byzantine node will
 send `Prevote` messages for the proposal from its PoL. Non-Byzantine nodes that
 do not have PoL will be able to get this PoL through the request mechanism by
-the time `T''`.
+the time `T″`.
 
 None of the non-Byzantine nodes will send `Prevote` for new proposals since the
-moment `T''`. Hence, new PoL will not appear in the network.
+moment `T″`. Hence, new PoL will not appear in the network.
 
-During one iteration `T(R(...)) + 2 \delta T` at least one non-Byzantine
+During one iteration `T(R(...)) + 2 δt` at least one non-Byzantine
 validator will increase its PoL. Indeed, all the non-Byzantine nodes already
 have some PoLs. In this case, they will always send `Prevote` messages for the
 corresponding proposals. And according to the logic of their processing, if the
 non-Byzantine node receives `Prevote` pointing to a larger PoL, a request for
 missing `Prevote` for this (bigger) PoL occurs.
 
-Since there exists finite number of the validators and possible proposals, it
-follows that in some finite time `T '''` +2/3 of all validators will receive
+Since there exists finite number of the validators and possible proposals
+(**TODO** clarify),
+it follows that in some finite time `T‴` +2/3 of all validators will receive
 PoL for the same proposal. After that they will be able to send `Precommit`
 messages.
 
-Not later than time `T(R(T''')) + \delta T` at least one non-Byzantine validator
+Not later than time `T(R(T‴)) + δt` at least one non-Byzantine validator
 will accept the new block and hence some node will correctly add the block to
 the blockchain.
 
@@ -498,16 +511,16 @@ the same `state_hash`. Since the number of Byzantine nodes is -1/3, +1/3 of the
 non-Byzantine nodes sent `Precomit` messages in the corresponding round. Such a
 message could only be sent within the [LOCK](#lock) stage in which the PoL was stored
 for the `P` proposal in the `R` round. This could happen only if these nodes did
-not send `Prevote` messages in rounds `R '> R` for `P'! = P` (special condition
+not send `Prevote` messages in rounds `R′ > R` for `P′ ≠ P` (special condition
 for sending the `Precommit` message). Also, these nodes sent `Prevote` messages
 in all rounds after `R` until their current rounds. Thus, since the remaining
 nodes are -2/3, we have two consequences.
 
 1. In no rounds after `R` we can get PoL (in other words go to the [LOCK](#lock)
-  stage) for the `P '! = P` proposal, because this requires +2/3 `Prevote`
+  stage) for the `P′ ≠ P` proposal, because this requires +2/3 `Prevote`
   messages.
 
-2. In all rounds of `R '> R`, new PoLs cannot emerge in the network, except for
+2. In all rounds of `R′ > R`, new PoLs cannot emerge in the network, except for
   PoLs related to the `P` proposal (and, accordingly, to the `B` block). Indeed,
   at the beginning of the round following the current round, the specified +1/3
   of the non-Byzantine nodes will be in the state with the saved PoL
@@ -518,10 +531,10 @@ nodes are -2/3, we have two consequences.
 Thus, messages of `Precommit` type can not be sent for any other block. This
 means that none of the non-Byzantine node can add another block to the blockchain.
 
-#### Corollary
+#### Corollary: deadlock absence for asynchronous network
 
 The property of fork absence will be preserved also in the case
-of an asynchronous network .
+of an asynchronous network.
 
 #### Proof
 
@@ -536,29 +549,23 @@ other non-Byzantine node.
 
 #### Proof
 
-Let the `A` node fall behind for some reason from the `B` node. And the `A` node
-is at the height `H`, while the `B` node is at the height `H + h`. We will show
-that in a finite time the `A` node can be pulled to the height `H + 1`.
+Let the node `A` fall behind for some reason from the node `B`. And the node `A`
+is at the height `H`, while the node `B` is at the height `H + h`, where `h > 0`.
+We will show that in a finite time the node `A` can be pulled to the height
+`H + 1`.
 
 All messages described in the algorithm and related to the consensus algorithm
 (`Propose`, `Prevote`, `Precommit`, `Status`) contain the current height. Thus,
-as soon as the `B` node sends any of these messages and the message is delivered
-to `A`, the `A` node will understand that it is behind and will request the next
-block (it can do this not at the `B` node, but at any other node; if the block
+as soon as the node `B` sends any of these messages and the message is delivered
+to `A`, the node `A` will understand that it is behind and will request the next
+block (it can do this not at the node `B`, but at any other node; if the block
 is added, then the block will be correct due to [absence of
 forks](#statement-5-absence-of-forks-consensus-finality)).
-In accordance with the [corollary from Statement 3 (deadlock absence)](#corollary),
-the `B` node always sends some message of consensus algorithm.
-
-### Statement 7: Censorship Resistance
-
-Not less than once in `1/3` blocks the non-Byzantine node will be the leader of
-the accepted block.
-
-#### Proof
-
-**TODO:** Property of a new algorithm for choosing a leader.
+In accordance with the [corollary from Statement 3 (deadlock
+absence)](#corollary-deadlock-absence-for-asynchronous-network),
+the node `B` always sends some message of consensus algorithm.
 
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [message_source]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
 [mio_lib]: https://github.com/carllerche/mio
+[partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
