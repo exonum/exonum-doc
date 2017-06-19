@@ -52,7 +52,7 @@ separate implementation details from transaction invocation.
 !!! summary "Trivia"
     From the computer science perspective, an arbitrary Exonum transaction
     can be defined as `Tx: S -> S`, where `S` denotes the key-value storage type.
-    Templating corresponds to eliciting parameterized families of transactions
+    Templating corresponds to defining parameterized families of transactions
     `TTx(i: I): P(i) -> S -> S`,
     where `I` is the set of defined transaction families and `P(i)`
     is the parameter space for the `i`th family. Correspondingly, any transaction
@@ -348,8 +348,9 @@ are executed in the same way on all nodes.
 When a certain block proposal and the result of its execution gather
 sufficient approval among validators, a block with the transaction is committed
 to the blockchain. All transactions from the committed block are sequentially applied
-to the persistent blockchain state in the order they appear in the block
-(i.e., the order of application is the same for every node in the network).
+to the persistent blockchain state by invoking their `execute` method
+in the same order the transactions appear in the block.
+Hence, the order of application is the same for every node in the network.
 
 ## Transaction Properties
 
