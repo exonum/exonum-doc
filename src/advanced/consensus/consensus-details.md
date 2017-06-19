@@ -145,7 +145,8 @@ format](../serialization.md).
 
 If any problems during deserialization are detected, such a message is ignored
 as something that we can not correctly interpret. If verification is successful,
-proceed to **Consensus messages processing** or **Transaction processing**.
+proceed to [Consensus messages processing](#consensus-messages-processing) or
+[Transaction processing](#transaction-processing).
 
 #### Consensus messages processing
 
@@ -181,7 +182,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Add the proposal to the `proposes` HashMap.
 - Form a list of transactions the node does not know from `propose`. Request
   transactions from this list.
-- If all transactions are known, go to **Full proposal**.
+- If all transactions are known, go to [Full proposal](#full-proposal).
 
 #### Transaction processing
 
@@ -191,8 +192,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 - Add the transaction to the unconfirmed transaction pool.
 - For all known proposals in which this transaction is included, exclude the
   hash of this transaction from the list of unknown transactions. If the number
-  of unknown transactions becomes zero, proceed to **Full Proposal** for current
-  proposal.
+  of unknown transactions becomes zero, proceed to [Full proposal](#full-proposal)
+  for current proposal.
 
 #### Full proposal
 
@@ -204,7 +205,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   `[max(locked_round + 1, propose.round), current_round]`:
 
     - If the node has +2/3 `Prevote` for `propose` in `r`, then
-    proceed to **Availability of +2/3 `Prevote`** for `propose` in `r`.
+    proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote) for
+    `propose` in `r`.
 
 - For each round `r` in the interval `[propose.round, current_round]`:
 
@@ -214,7 +216,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
         - Execute the proposal, if it has not yet been executed.
         - Check that the node's `state_hash` coincides with the `state_hash` of the
           majority (if not, the node must stop working and signalize error).
-        - Proceed to **COMMIT** for this block.
+        - Proceed to [COMMIT](#commit) for this block.
 
 #### Availability of +2/3 `Prevote`
 
@@ -222,7 +224,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
   with the collected `Prevote`s.
 - If the node's `locked_round` is less than `prevote.round` and the hash of the locked
   `Propose` message corresponding to this `prevote` is the same as `prevote.propose_hash`,
-  then proceed to **LOCK** for this very proposal.
+  then proceed to [LOCK](#lock) for this very proposal.
 
 #### `Prevote` Message Processing
 
@@ -237,8 +239,8 @@ proceed to **Consensus messages processing** or **Transaction processing**.
     - the node knows `propose` corresponding to this `prevote`
     - the node knows all of its transactions
 
-- Then proceed to **Availability of +2/3 `Prevote`** for `propose` in
-  the round `prevote.round`
+- Then proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote) for
+  `propose` in the round `prevote.round`
 
 - If the node does not know `propose` or any transactions, request them.
 
@@ -257,7 +259,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
     - Execute the proposal, if it has not yet been executed.
     - Check that the node's `state_hash` coincides with the `state_hash` of the
       majority.
-    - Proceed to **COMMIT** for this block.
+    - Proceed to [COMMIT](#commit) for this block.
 
 - Else:
 
@@ -281,7 +283,7 @@ proceed to **Consensus messages processing** or **Transaction processing**.
 
         - Execute the proposal, if it has not yet been executed.
         - Send `Precommit` for `locked_propose` in `current_round`.
-        - If the node has 2/3 `Precommit`, then proceed to **COMMIT**.
+        - If the node has 2/3 `Precommit`, then proceed to [COMMIT](#commit).
 
 #### COMMIT
 
@@ -338,7 +340,7 @@ consensus messages belonging to a future height.
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
 - Process all messages from the queue, if they become relevant.
 - If the node has a saved PoL, send `Prevote` for `locked_propose` in a new round,
-  proceed to **Availability of +2/3 `Prevote`**.
+  proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote).
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
   (after the expiration of `propose_timeout`, if the node has just moved to a new
   height).
@@ -356,7 +358,7 @@ this assumption, it is enough to guarantee the finality of the processed message
 pertaining to each round, and the correct organization of the queue for messages
 from different rounds.
 
-### Proposition 1: Round Beginning
+### Statement 1: Round Beginning
 
 All non-Byzantine nodes being at a height of not less than `H`, will be in the
 state `(H, R)`or higher (either bigger round or bigger height), where `R` is an
@@ -364,7 +366,7 @@ arbitrary fixed constant.
 
 #### Proof
 
-We will prove the statement above for every single non-Byzantine node. That node
+We will prove the statement for every single non-Byzantine node. That node
 shall move to a new height in a finite time (and in this case the condition will
 be satisfied) or remain at the height `H`. In the second case, the node
 increments the round counter at fixed intervals (by stopwatch). From the fact
@@ -374,7 +376,7 @@ to the value `R` no more than in finite time `R * T`.
 
 Thus, all non-Byzantine validators will move to the state `(H, R)` or higher.
 
-### Proposition 2: Non-Byzantine Leader
+### Statement 2: Non-Byzantine Leader
 
 For each height `H` there exists a round in which the non-Byzantine node will
 become the leader.
@@ -383,7 +385,7 @@ become the leader.
 
 **TODO:** Property of round robin.
 
-### Proposition 3: Deadlock Absence
+### Statement 3: Deadlock Absence
 
 A certain non-Byzantine node will sooner or later send some message relating to
 the consensus algorithm (`Propose`, `Prevote`, `Precommit`).
@@ -401,9 +403,9 @@ message had been sent before this time). Consider the cases of PoL status:
   timeout occurs (unless it sends any other message earlier).
 
 2. **No one non-Byzantine node has a saved PoL**. Then there will always come
-  another round in which some non-Byzantine node will be the leader (see the
-  previous statement). In this case, the node will form a new proposal and send
-  `Propose` and `Prevote` messages.
+  another round in which some non-Byzantine node will be the leader (see
+  [statement 2](#statement-2-non-byzantine-leader)). In this case, the node will
+  form a new proposal and send `Propose` and `Prevote` messages.
 
 #### Consequence
 
@@ -412,7 +414,7 @@ validator can become a leader (property of round robin), then any non-Byzantine
 node will send an arbitrarily large number of messages related to the consensus
 algorithm (`Propose`, `Prevote`, `Precommit`).
 
-### Proposition 4: Obligatory Block Acceptance (Liveness)
+### Statement 4: Obligatory Block Acceptance (Liveness)
 
 There necessarily will come a point in the system when the node adds the block
 to the blockchain.
@@ -420,9 +422,10 @@ to the blockchain.
 #### Proof
 
 Suppose the network be at a certain height `H`; then the maximum height of a
-non-Byzantine nodes' blockchain is equal to `H`. In accordance with the
-proposition 3, all non-Byzantine nodes will be able to move up to the height `H`
-(**TODO** state a separate consequence after proposition 3). Next, the state is
+non-Byzantine nodes' blockchain is equal to `H`. In accordance with [the
+statement 3](#statement-3-deadlock-absence), all non-Byzantine nodes will be
+able to move up to the height `H`
+(**TODO** state a separate consequence after Statement 3). Next, the state is
 considered when all the non-Byzantine nodes are at the height `H`.
 
 Let `R(T)` denote the round following the maximum round with non-Byzantine
@@ -476,7 +479,7 @@ Not later than time `T(R(T''')) + \delta T` at least one non-Byzantine validator
 will accept the new block and hence some node will correctly add the block to
 the blockchain.
 
-### Proposition 5: Absence of Forks (Consensus Finality)
+### Statement 5: Absence of Forks (Consensus Finality)
 
 If some non-Byzantine node adds a block to the blockchain, then no other node
 can add another block, confirmed with +2/3 precommit messages, to the blockchain
@@ -485,21 +488,22 @@ at the same height.
 #### Proof
 
 Let some node added the `B` block to the blockchain. This could only happen if
-that node went into the **COMMIT** stage. There exist three possibilities of the
-transition to the **COMMIT** : from **LOCK**, **`Prevote` processing**,
-and **Full Proposal**. In all these cases, the condition of
+that node went into the [COMMIT](#commit) stage. There exist three possibilities
+of the transition to the [COMMIT](#commit) : from [LOCK](#lock), [Prevote Message
+Processing](#prevote-message-processing),
+and [Full proposal](#full-proposal). In all these cases, the condition of
 the transition is the presence of +2/3 `Precommit` messages for some proposal `P`
 from the `R` round and the result of applying the corresponding block leads to
 the same `state_hash`. Since the number of Byzantine nodes is -1/3, +1/3 of the
 non-Byzantine nodes sent `Precomit` messages in the corresponding round. Such a
-message could only be sent within the **LOCK** stage in which the PoL was stored
+message could only be sent within the [LOCK](#lock) stage in which the PoL was stored
 for the `P` proposal in the `R` round. This could happen only if these nodes did
 not send `Prevote` messages in rounds `R '> R` for `P'! = P` (special condition
 for sending the `Precommit` message). Also, these nodes sent `Prevote` messages
 in all rounds after `R` until their current rounds. Thus, since the remaining
 nodes are -2/3, we have two consequences.
 
-1. In no rounds after `R` we can get PoL (in other words go to the **LOCK**
+1. In no rounds after `R` we can get PoL (in other words go to the [LOCK](#lock)
   stage) for the `P '! = P` proposal, because this requires +2/3 `Prevote`
   messages.
 
@@ -508,8 +512,8 @@ nodes are -2/3, we have two consequences.
   at the beginning of the round following the current round, the specified +1/3
   of the non-Byzantine nodes will be in the state with the saved PoL
   corresponding to the `P` proposal. And consequently they will send `Prevote`
-  messages only for the saved `P` proposal according to the **Processing of the
-  timeout of the round** stage.
+  messages only for the saved `P` proposal according to the [Round timeout
+  processing](#round-timeout-processing) stage.
 
 Thus, messages of `Precommit` type can not be sent for any other block. This
 means that none of the non-Byzantine node can add another block to the blockchain.
@@ -521,17 +525,18 @@ of an asynchronous network .
 
 #### Proof
 
-The proof of **Proposition 5** did not in any way use the assumption of partial
+The proof of [statement 5](#statement-5-absence-of-forks-consensus-finality) did
+not in any way use the assumption of partial
 synchronism. Therefore, it is also true in an asynchronous network.
 
-### Proposition 6: Moving Nodes Up
+### Statement 6: Moving Nodes Up
 
 Any non-Byzantine node can get all the blocks included in the blockchain by any
 other non-Byzantine node.
 
 #### Proof
 
-Let the `A` node fall behind for some reason from the`B` node. And the `A` node
+Let the `A` node fall behind for some reason from the `B` node. And the `A` node
 is at the height `H`, while the `B` node is at the height `H + h`. We will show
 that in a finite time the `A` node can be pulled to the height `H + 1`.
 
@@ -540,11 +545,12 @@ All messages described in the algorithm and related to the consensus algorithm
 as soon as the `B` node sends any of these messages and the message is delivered
 to `A`, the `A` node will understand that it is behind and will request the next
 block (it can do this not at the `B` node, but at any other node; if the block
-is added, then the block will be correct due to absence of forks (proposition 5)).
-In accordance with the corollary from proposition 3 (deadlock absence), the `B`
-node always sends some message of consensus algorithm .
+is added, then the block will be correct due to [absence of
+forks](#statement-5-absence-of-forks-consensus-finality)).
+In accordance with the [corollary from Statement 3 (deadlock absence)](#corollary),
+the `B` node always sends some message of consensus algorithm.
 
-### Proposition 7: Censorship Resistance
+### Statement 7: Censorship Resistance
 
 Not less than once in `1/3` blocks the non-Byzantine node will be the leader of
 the accepted block.
