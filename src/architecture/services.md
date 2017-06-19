@@ -149,14 +149,39 @@ Exonum datatypes to JSON for communication with thin clients.
 
 ### Configuration
 
-Besides blockchain, a service may read or write data in [the local configuration](configuration.md).
-Logically, the local configuration represents parameters local to a specific
-node instance. A good example is a private anchoring key used in
-[the anchoring service](../advanced/services/anchoring.md);
+Services may use [configuration](configuration.md)
+to store parameters that will be received by the service constructor during
+[node initialization](#initialization). Configuration consists of two parts:
+*global configuration*, which is stored on the blockchain, and *local configuration*,
+which is specific to each node instance.
+
+#### Global Configuration
+
+Global configuration is common for all nodes in the blockchain network.
+An example of a global configuration parameter is the anchoring address
+in [the anchoring service](../advanced/services/anchoring.md). The anchoring address
+is common for all nodes in the blockchain network, its changes should be auditable
+and authorized by specific nodes, etc.
+
+Global configuration is managed by the system maintainers via
+[the configuration update service](../advanced/services/configuration.md).
+From the point of view of a service, global configuration is *volatile*;
+it can be changed without touching service endpoints.
+A service may view the current global configuration via [dedicated methods][core-schema.rs]
+of the core API.
+
+#### Local Configuration
+
+Local configuration is specific to each node instance.
+An example of a local configuration parameter is a private anchoring key
+used in [the anchoring service](../advanced/services/anchoring.md);
 naturally, nodes have different private keys and they cannot be put on the blockchain
 for security reasons.
 
-Local configuration can be changed via private API.
+Local configuration can be changed via editing the local configuration file
+of the node instance. As of Exonum 0.1, the only
+way for a service to read its local configuration is to retain it after it’s passed
+to the service constructor during [service initialization](#initialization).
 
 ## Lifecycle
 
@@ -177,7 +202,7 @@ service configuration and initializes its persistent storage.
 ### Initialization
 
 Each time a validating or auditing node is started, it initializes all
-deployed services. Initialization passes local and public blockchain configuration
+deployed services. Initialization passes local and global blockchain configuration
 to the service, so it can properly initialize its state.
 If the configuration is updated, the services are automatically restarted.
 
@@ -331,7 +356,7 @@ fn handle_genesis_block(&self, view: &View)
 }
 ```
 
-`handle_genesis_block` returns an initial [global configuration](configuration.md)
+`handle_genesis_block` returns an initial [global configuration](#global-configuration)
 of the service in the JSON format.
 This method is invoked for all deployed services during
 the blockchain initialization. A result of the method call for each service
@@ -341,6 +366,7 @@ by non-service parameters (such as public keys of the validators) and recorded i
 the genesis block, hence the method name.
 
 The default trait implementation returns `null` (i.e., no configuration).
+It must be redefined for services that have global configuration parameters.
 
 ### Commit Handler
 
@@ -432,3 +458,4 @@ running the service might not know this information.
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
+[core-schema.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs
