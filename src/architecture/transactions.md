@@ -134,8 +134,8 @@ used to look up the implementation of [the transaction interface](#interface)
 
 !!! note "Example"
     [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `AddFundsTransaction` for coins emission
-    and `TransferTransaction` for coin transfer.
+    types of transactions: `TxIssue` for coins issuance
+    and `TxTransfer` for coin transfer.
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
 **JSON presentation:** number.
@@ -158,7 +158,7 @@ Binary serialization of the body is performed using
 according to the transaction specification in the service.
 
 !!! note "Example"
-    The body of `TransferTransaction` in the sample cryptocurrency service
+    The body of `TxTransfer` in the sample cryptocurrency service
     is structured as follows:
 
     | Field      | Binary format | Binary offset | JSON       |
@@ -221,7 +221,7 @@ included into the blockchain.
 
 !!! note "Example"
     In [the cryptocurrency service][cryptocurrency],
-    `TransactionSend.verify` checks the digital signature and ensures that
+    `TxTransfer.verify` checks the digital signature and ensures that
     the sender of coins is not the same as the receiver.
 
 ### Execute
@@ -244,7 +244,7 @@ storage ([under certain conditions](../advanced/consensus/consensus.md)).
     the block with the given transaction is committed into the blockchain.
 
 !!! note "Example"
-    In the sample cryptocurrency service, `TransferTransaction.execute` verifies
+    In the sample cryptocurrency service, `TxTransfer.execute` verifies
     that the sender’s and recipient’s accounts exist and the sender has enough
     coins to complete the transfer. If these conditions hold, the sender’s
     balance of coins is decreased and the recipient’s one is increased by the amount
@@ -270,7 +270,7 @@ of the validators.
     As of Exonum 0.1, it is the sole responsibility of a service developer to
     ensure that transactions logically failing during the `execute` stage
     do not change the blockchain state
-    (e.g., if a `TransferTransaction` in the cryptocurrency service attempts to
+    (e.g., if a `TxTransfer` in the cryptocurrency service attempts to
     transfer more coins than the sender has). There is no way to signal
     to the core that a transaction has failed and should be rolled back (however,
     it’s on [the roadmap](../dev/roadmap.md), so this inconvenience won’t last
@@ -290,7 +290,7 @@ The method has no access to the blockchain state, same as `verify`.
 
 !!! note "Example"
     In [the cryptocurrency service][cryptocurrency]
-    an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
+    an `info` method of `TxTransfer` returns JSON with fields `from`, `to`,
     `amount` and `seed`.
 
 ## Lifecycle
@@ -389,7 +389,7 @@ only once – when it’s submitted to the pool of unconfirmed transactions.
 
 !!! note
     As a downside, `verify` cannot perform any checks that depend on the blockchain
-    state. For example, in the cryptocurrency service, `TransactionSend.verify`
+    state. For example, in the cryptocurrency service, `TxTransfer.verify`
     cannot check whether the sender has sufficient amount of coins to transfer.
 
 ### Sequential Consistency
@@ -425,7 +425,7 @@ on the verify step.
     an additional field to distinguish among transactions with the same
     set of parameters. This field needs to have a sufficient length (e.g., 8 bytes)
     and can be generated deterministically (e.g., via a counter) or
-    (pseudo-)randomly. See `TransactionSend.seed` in the cryptocurrency service
+    (pseudo-)randomly. See `TxTransfer.seed` in the cryptocurrency service
     as an example.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
