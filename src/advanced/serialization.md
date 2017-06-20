@@ -108,17 +108,21 @@ In Exonum, the binary format is used for three purposes:
 `Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
 and take 32 bytes.
 
+### Strings
+
+Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
+with 1 to 6 bytes.
+
 ### Slices
 
 A slice is a data structure consisting of a collection of same type elements.
 A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
-increasing their indexes.
+increasing their indexes. Slices can contain elements with variable length.
 
-### Strings
-
-Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
-with 1 to 6 bytes.
+!!! note
+    In the current implementation, a slice of strings can not be serialized (it
+    should be fixed later).
 
 ### Sequences
 
@@ -133,6 +137,11 @@ In binary representation sequence is splitted into two main parts:
 
 Data of primitive types as well as other types that have fixed-length
 serialization are stored completely in the header.
+
+!!! note "Example"
+    Consider a sequence containing `PublicKey`, `u64` and `bool` fields. In the
+    binary format all fields of such sequence are placed in the header, its body
+    is empty.
 
 Other types take 8 bytes in header of sequence: 4 for position in the body
 (counted from the beginning of the whole serialization buffer), and 4
