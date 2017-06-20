@@ -81,7 +81,7 @@ In Exonum, the binary format is used for three purposes:
 
 - [Cap'n Proto][cap_n_proto]  
   Meets all requirements since version 0.5 ([canonicalization][cap_n_proto_canonicalization]
-  was introduced)
+  was introduced).
 
 - [Simple Binary Encoding (SBE)][sbe]  
   BFT problem.
@@ -102,6 +102,11 @@ In Exonum, the binary format is used for three purposes:
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
 
+### Other types that have fixed-length serialization
+
+`Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
+and take 32 bytes.
+
 ### Arrays
 
 An array is a data structure consisting of a collection of same type elements.
@@ -120,8 +125,8 @@ In binary representation sequence is splitted into two main parts:
 
 - **Body** is a dynamic sized part, it can be read only after parsing header.
 
-Data of primitive types as well as arrays of fixed length (for example
-`PublicKey`) are stored completely in the header.
+Data of primitive types as well as other types that have fixed-length
+serialization are stored completely in the header.
 
 Other types take 8 bytes in header of sequence: 4 for position in the body
 (counted from the beginning of the whole serialization buffer), and 4
