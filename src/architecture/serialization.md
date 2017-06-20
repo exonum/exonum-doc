@@ -107,12 +107,12 @@ In Exonum, the binary format is used for three purposes:
 `Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
 and take 32 bytes.
 
-### Arrays
+### Slices
 
-An array is a data structure consisting of a collection of same type elements.
-An array is stored so that the position of each element can be computed from its
-index. Array elements are located in memory without gaps in the order of
-increasing their indexes. String is array of bytes example.
+A slice is a data structure consisting of a collection of same type elements.
+A slice is stored so that the position of each element can be computed from its
+index. Slice elements are located in memory without gaps in the order of
+increasing their indexes.
 
 ### Sequences
 
