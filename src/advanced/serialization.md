@@ -115,6 +115,11 @@ A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
 increasing their indexes.
 
+### Strings
+
+Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
+with 1 to 6 bytes.
+
 ### Sequences
 
 A sequence is representation of [`struct` in Rust][rust_structs]. It is data
@@ -188,4 +193,5 @@ Its serialized representation:
 [sbe]: https://github.com/real-logic/simple-binary-encoding
 [wiki_flatbuf]: https://en.wikipedia.org/wiki/FlatBuffers
 [rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
+[utf8]: https://en.wikipedia.org/wiki/UTF-8
 [rust_structs]: https://doc.rust-lang.org/book/structs.html
