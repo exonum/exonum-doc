@@ -277,9 +277,10 @@ of the validators.
 
     Preliminary checks may seem unusual compared to other blockchains,
     but they fit well with the computational model of Exonum 0.1, in which
-    services cannot directly access each other’s endpoints. In this model, preliminary
+    [services cannot directly access each other’s endpoints](services.md#limitations).
+    In this model, preliminary
     checks are the most robust way to organize transaction execution.
-    
+
 ### Info
 
 ```rust
