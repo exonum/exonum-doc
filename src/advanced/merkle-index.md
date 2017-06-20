@@ -32,8 +32,8 @@ as [Tor][tor], [Bitcoin][bitcoin], and [Git][wiki:git]. The usage of Merkle
 index for blockchains (including Bitcoin and Exonum) is twofold
 
 1. minimization of the data transfer during the
-  [consensus algorithm](../consensus/consensus.md)
-2. the possibility of [lightweight clients](.../architecture/clients.md)
+  [consensus algorithm](./consensus/consensus.md)
+2. the possibility of [lightweight clients](../architecture/clients.md)
   implementation.
 
 ## *MerkleTable* database storage structure
@@ -81,7 +81,7 @@ Key (db\_key) | Value
 
 Below is an illustration of logical representation of a Merkle tree, containing
 6 values `v0...v5`.
-**TODO** ![Tree Structure](table.png)
+**TODO** Tree Structure table.png
 
 ### Hashing rules
 
@@ -161,7 +161,7 @@ Below is depicted a Merkle tree with 5 elements (*not full binary*) with
 elements, that are a saved inside a proof for range `[3, 5)` in
 **[bold_and_underscored]**.
 
-**TODO**![Proof_Structure](proof.png)
+**TODO** Proof_Structure proof.png
 
 Which corresponds to the following json representation of `Proofnode`.
 
