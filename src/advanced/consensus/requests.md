@@ -9,9 +9,12 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
 
 !!! note
     In the following description, +2/3 means more than two thirds of the
-    validators number.
+    validators number. For example, +2/3 `Precommit`s means a set of valid
+    `Precommit` messages, each of which is digitally signed by a different
+    validator, and the size of the set is more than 2/3 of the validator number.
 
-Receiving a consensus message from a node gives the message recepient
+Receiving [a consensus message](consensus.md#messages) from a node gives the
+message recepient
 an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
@@ -56,9 +59,7 @@ the system.
 
 ### `RequestPropose`
 
-Used to obtain missing `Propose` messages from the node having them (node
-that sent `Prevote` or `Precommit` message for some proposal is assumed to have
-that proposal). It has the following fields:
+Requests a `Propose` message from a node. It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -71,9 +72,7 @@ that proposal). It has the following fields:
 
 ### `RequestTransactions`
 
-Used to obtain missing transactions from the node having them (node that sent
-`Propose` message with some transactions is assumed to have that transactions).
-It has the following fields:
+Requests missing transactions from a node. It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -84,9 +83,7 @@ It has the following fields:
 
 ### `RequestPrevotes`
 
-Used to obtain missing `Prevote` messages from the node having them (node that
-sent `Precommit` message for some proposal or  signalized lock on that proposal
-is assumed to have +2/3 `Prevote` messages for the corresponding proposal). It
+Requests a `Prevote` message from a node. It
 has the following fields:
 
 - **from**: PublicKey  
@@ -108,8 +105,7 @@ has the following fields:
 
 ### `RequestBlock`
 
-Used to obtain a committed block from the node having it (node at a
-higher height is assumed to have such block). It has the following fields:
+Requests a committed block from a node. It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -120,7 +116,7 @@ higher height is assumed to have such block). It has the following fields:
 
 ### `RequestPeers`
 
-Used to obtain `Connect` messages from peers.
+Requests `Connect` messages from a node.
 `RequestPeers` message is sent regularly with the timeout `peers_timeout`
 defined in [the global configuration](../../architecture/configuration.md#global-parameters).
 It has the following fields:
@@ -167,9 +163,9 @@ validator height.
 
 - If this `Propose` was requested, cancel the request. A list
   of nodes that should have all transactions mentioned in the `Propose` message
-  should be copied from the `RequestState` before its deletion to request
+  is copied from the `RequestState` before its deletion to request
   missing transactions if necessary (copy is placed into `RequestState` for
-  `RequestTransactions`)
+  `RequestTransactions` to be sent on the next step)
 - If certain transactions from the `Propose` are not known,
   send `RequestTransactions` to the author of `Propose`
 
@@ -197,14 +193,14 @@ validator height.
 
 - Request the next block from the node (if one exists) that sent any message
   from the height higher than current height + 1
-- Update local height after committing the block locally
-- Cancel `RequestBlock` for the current height
+- Update current height after committing the block locally
+- Cancel `RequestBlock` for the height at which the block was just committed
 
 ### Peers Timeout
 
-Send a `RequestPeers` request to a random peer (auditor or validator) from
-`peers` (list of known peers specified in [local
-configuration](../../architecture/configuration.md#local-parameters)).
+Send a `RequestPeers` request to a random peer (auditor or validator) from a
+list of known peers specified in [local
+configuration](../../architecture/configuration.md#local-parameters).
 
 ### Move to New Height
 
@@ -227,10 +223,10 @@ by the node.
 
 ### `RequestPropose`
 
-- If the message corresponds to a height higher than the one on which the node
-  is, ignore the message
+- If the message corresponds to a height that isn't equal to the current height
+  of the node, ignore the message
 - If the node has `Propose` with the corresponding hash at the given height,
-  send it (nodes store consensus messages for current height only)
+  send it
 
 ### `RequestTransactions`
 
