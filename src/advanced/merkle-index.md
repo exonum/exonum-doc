@@ -46,10 +46,9 @@ stands for [SHA-256][sha-256] hash of byte array **arg**.
 The internal representation of tree is organized by utilizing 2 integer
 parameters for each element: **height** and **index**.
 
-- Each Merkle tree element is addressed by `db_key = height ||
-  index`.
-  * `db_key` is a byte array
-  * `height` and `index` are written to byte array as
+- Each Merkle tree element is addressed by `db_key = height || index`
+  - `db_key` is a byte array
+  - `height` and `index` are written to byte array as
     [BigEndian][wiki:big-endian].
 - The actual values are stored in `(height = 0, index)` cells,
   where `index` is in interval `[0, len(merkle_table))`.
