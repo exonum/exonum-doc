@@ -44,8 +44,9 @@ In Exonum, the binary format is used for three purposes:
 - Serialized data can not be partially correct  
   Reading the fields does not happen until the validation is complete.
 
-- **Byzantine fault tolerance (BFT)**  
-  The node must be ready to receive the Byzantine message.
+- **Tolerance to malicious messages**  
+  The node must not fail on receiving a message violating the serialization
+  rules.
 
 - Storage of the data in the same form as it is sent  
   Nodes forward almost all received messages unchanged. Storage of data in the
@@ -77,17 +78,17 @@ In Exonum, the binary format is used for three purposes:
   Provides canonicity but poorly extensible.
 
 - [Protocol Buffers][wiki_protobuf]  
-  Does not provide canonicity, has problems with BFT.
+  Does not provide canonicity, has problems with tolerance to malicious messages.
 
 - [Cap'n Proto][cap_n_proto]  
   Meets all requirements since version 0.5 ([canonicalization][cap_n_proto_canonicalization]
   was introduced).
 
 - [Simple Binary Encoding (SBE)][sbe]  
-  BFT problem.
+  Problems with tolerance to malicious messages.
 
 - [FlatBuffers][wiki_flatbuf]  
-  Poor documentation, BFT problem.
+  Poor documentation, problems with tolerance to malicious messages .
 
 ## Serialization Principles
 
