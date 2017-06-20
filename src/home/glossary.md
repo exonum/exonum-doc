@@ -15,7 +15,8 @@ Here, these terms are condensed to a single page.
 
 A [full node](#full-node) in the blockchain network that does not participate
 in creating new [blocks](#block), but rather performs continuous audit of all transactions
-in the network. Auditors are identified by a public key within the blockchain network.
+in the network. Auditors are identified by a [public key](#public-key)
+within the blockchain network.
 Unlike [validators](#validator),
 adding auditors does not create an overhead in transaction latency and throughput,
 so there can be hundreds of auditors in the same blockchain network.
@@ -28,7 +29,8 @@ so there can be hundreds of auditors in the same blockchain network.
 ## Authenticated Consensus
 
 Type of [consensus](#consensus), in which the participants are known in advance
-and are authenticated, usually with the help of public-key cryptography.
+and are authenticated, usually with the help of public-key cryptography
+(such as [digital signatures](#digital-signature)).
 Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
 in order to keep the system [decentralized](#decentralization)
 and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
@@ -161,8 +163,8 @@ administrator having privileges to perform arbitrary actions.
 **Aka** signature
 
 Public-key digital signature in the [Ed25519][Ed25519] elliptic curve cryptosystem.
-A signature over a message proves that the signer has the knowledge
-of a specific [private key](#private-key) corresponding to a publicly known
+A signature over a message proves that the signer knows
+a specific [private key](#private-key) corresponding to a publicly known
 [public key](#public-key). A signature can be verified
 against this public key and the signed message, thus providing message *authenticity*
 (i.e., the message comes from a specific source) and *integrity*
@@ -254,8 +256,8 @@ Part of [configuration](#configuration) local to every [full node](#full-node).
 The local configuration is not a part of [the blockchain state](#blockchain-state);
 instead, it’s maintained as a local TOML file, which is read during the node startup.
 [The core](#core) defines several local configuration parameters,
-such as the private key used to sign [consensus and network messages](#consensus-message)
-created by the node.
+such as [the private key](#private-key) used to sign
+[consensus and network messages](#consensus-message) created by the node.
 
 ## Maintainer
 
