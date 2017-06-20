@@ -22,7 +22,7 @@ location, it's important that the same data changes are processed everywhere.
 
 However, it is time consuming and computationally expensive to check the
 entirety of each part whenever a system wants to verify data. So, this why
-Merkle trees (Merkle indexes or hash trees or ) are used.
+Merkle trees (Merkle indexes or hash trees or Tiger tree hash) are used.
 Basically, we want to limit the amount of data being sent over a network (like
 the Internet) as much as possible. So, instead of sending an entire file over
 the network, we just send a hash of the file to see if it matches.
@@ -36,29 +36,30 @@ index for blockchains (including Bitcoin and Exonum) is twofold
 2. the possibility of [lightweight clients](.../architecture/clients.md)
   implementation.
 
-## Merkle Tree db storage structure: *MerkleTable*
+## *MerkleTable* database storage structure
 
 Operator __||__ below stands for concatenation. Function _hash(**arg**)_ below
-stands for SHA-256 hash of byte array **arg**.
+stands for [SHA-256][sha-256] hash of byte array **arg**.
 
 ### Representation in persistent storage
 
 The internal representation of tree is organized by utilizing 2 integer
 parameters for each element: **height** and **index**.
 
-- Each merkle tree element is addressed by **db\_key**= **height** ||
+- Each Merkle tree element is addressed by **db\_key**= **height** ||
   **index**.
-  - **db\_key** is a byte array; **height** and **index** are written to byte
-    array as [BigEndian][wiki:big-endian].
-- The actual values are stored in ( **height** = **0**, **index** ) cells,
-  where **index** is in interval [ **0**, __len(**merkle\_table**)__ ).
+  - **db\_key** is a byte array
+  - **height** and **index** are written to byte array as
+    [BigEndian][wiki:big-endian].
+- The actual values are stored in (**height** = **0**, **index**) cells,
+  where **index** is in interval [**0**, __len(**merkle\_table**)__).
 - Hash of an individual value is stored in (**height** = **1**, **index**).
   It corresponds to the value, stored in (**height** = **0**, **index**) cell.
 - Some of the rightmost values on different heights may be absent, it's not
   required that the obtained tree is full binary. New values on **height** =
-  **0** are always appended to the right end - new value is written to
+  **0** are always appended to the right end and new value is written to
   **index** = __len(**merkle\_table**)__
-- On all of (**height** > **1**, **index**) hashes of 2 or 1 child hashes are
+- On all of (**height** > **1**, **index**) hashes of 2 or 1 child are
   stored.
   - If both (**height** - **1**, **index** \* **2**) and (**height** -
     **1**, **index** \* **2** + **1**) nodes are present, the node
@@ -71,7 +72,7 @@ parameters for each element: **height** and **index**.
     __len(**merkle\_table**)__
   - (**max\_height**, **0**) is the root hash of the Merkle tree.
 
-An example of key -> value mappings in db.
+An example of key -> value mappings in database.
 
 Key (db\_key) | Value
 ------------ | -------------
@@ -82,7 +83,7 @@ Key (db\_key) | Value
 ### Logical representation
 
 Below is an illustration of logical representation of a Merkle tree, containing
-5 values **v0**...**v5**.
+6 values **v0**...**v5**.
 **TODO** ![Tree Structure](table.png)
 
 ### Hashing rules
@@ -98,7 +99,8 @@ Below is an illustration of logical representation of a Merkle tree, containing
 4. Hash of single value, contained in (**height** - **1**, **index** \* **2**),
   when ( **height** - **1**, **index** \* **2** + **1** ) is absent in the
   table, is defined as:
-  - (**height** > **1**, **index**) = _hash((**height** - **1**, **index** \* **2**))_
+  - (**height** > **1**, **index**) = _hash((**height** - **1**, **index** \*
+    **2**))_
 
 **TODO**: change empty tree hash to the documented.
 
@@ -107,12 +109,12 @@ Below is an illustration of logical representation of a Merkle tree, containing
 ### General description
 
 *Proofnode* is a recursively defined structure that's designed to provide
-evidence to client that a certain set of values is contained in a contiguos
+evidence to client that a certain set of values is contained in a contiguous
 range of indices.
 
 For a given range of indices [**start\_index**, **end\_index**) the proof
 contains binary-tree-like structure, containing **values** of elements from
-the leaves with requested indices and **hashes** of all neighbour leaves/nodes
+the leaves with requested indices and **hashes** of all neighbor leaves/nodes
 on the way up to the root of tree (excluding the root itself). It doesn't
 contain the **indices** themselves, as they can be deduced from the structure's
 form.
@@ -144,14 +146,14 @@ Variant | Child *Proofnode* (s) indices | Hashing rule
 
 While validating the proof a client has to verify following conditions:
 
-1. All of the { "val": ... } variants are located at the same depth in the
+1. All of the {"val": ...} variants are located at the same depth in the
   retrieved json.
-2. If either of 2 variants { "left": *BalancedProofnode*, "right": ... } is
+2. If either of 2 variants {"left": *BalancedProofnode*, "right": ...} is
   met, neither *BalancedProofnode* nor its children at arbitrary depth can be a
-  { "left": ... } variant. It means that the subtree represented by
+  {"left": ...} variant. It means that the subtree represented by
   *BalancedProofnode* must be full binary.
 3. Collected indices of *ValueJson* (s) in proof correspond to the requested
-  range of indices [ **start\_index**, **end\_index** ).
+  range of indices [**start\_index**, **end\_index**).
 4. The root hash of the proof evaluates to the root hash of the *MerkleTable*
   in question.
 
@@ -206,9 +208,6 @@ Which corresponds to the following json representation of *Proofnode*.
   Computer Science, Vol. 3027, pp. 541-554, 2004.
 3. [Merkle tree on Brilliant](https://brilliant.org/wiki/merkle-tree/).
 
-
-
-
 [wiki-merkle-index]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki-tree]: https://en.wikipedia.org/wiki/Tree_(data_structure)
 [wiki:p2p]: https://en.wikipedia.org/wiki/Peer-to-peer
@@ -216,3 +215,4 @@ Which corresponds to the following json representation of *Proofnode*.
 [tor]: https://www.torproject.org/
 [wiki:git]: https://en.wikipedia.org/wiki/Git
 [wiki:big-endian]: https://en.wikipedia.org/wiki/Endianness
+[sha-256]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
