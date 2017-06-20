@@ -269,15 +269,17 @@ of the validators.
 !!! warning
     As of Exonum 0.1, it is the sole responsibility of a service developer to
     ensure that transactions logically failing during the `execute` stage
-    do not change the blockchain state
-    (e.g., if a `TxTransfer` in the cryptocurrency service attempts to
-    transfer more coins than the sender has). There is no way to signal
-    to the core that a transaction has failed and should be rolled back (however,
-    it’s on [the roadmap](../dev/roadmap.md), so this inconvenience won’t last
-    for long).
+    do not change the blockchain state.
+    (An example of such a transaction is a `TxTransfer` in the cryptocurrency service
+    that attempts to transfer more coins than the sender has.)
     Correspondingly, when programming `execute`, you should perform state-related
     checks *before* any changes to the state and return early if these checks fail.
 
+    Preliminary checks may seem unusual compared to other blockchains,
+    but they fit well with the computational model of Exonum 0.1, in which
+    services cannot directly access each other’s endpoints. In this model, preliminary
+    checks are the most robust way to organize transaction execution.
+    
 ### Info
 
 ```rust
