@@ -249,7 +249,7 @@ on when and how these limitations are going to be lifted.
 
 #### Interaction Among Services
 
-As of Exonum 0.1, there does not exist a unified API for services to
+In Exonum 0.1, there is no unified API for services to
 access other services’ endpoints. As an example, a service cannot call a transaction
 defined in another service, and cannot read data from another service
 via its read endpoint.
