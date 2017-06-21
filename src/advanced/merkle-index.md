@@ -46,27 +46,27 @@ stands for [SHA-256][sha-256] hash of byte array `arg`.
 The internal representation of tree is organized by utilizing 2 integer
 parameters for each element: `height` and `index`.
 
-- Each Merkle tree element is addressed by `db_key = height || index`, where
+1. Each Merkle tree element is addressed by `db_key = height || index`, where
   - `db_key` is an `8` byte array
   - `height` and `index` are written to byte array as
     [BigEndian][wiki:big-endian]
   - `height < 58` consists of `6` bits
   - `index` consists of `58` bits.
-- The actual values are stored in `(height = 0, index)` cells,
+2. The actual values are stored in `(height = 0, index)` cells,
   where `index` is in interval `[0, len(merkle_table))`.
-- Hash of an individual value is stored in `(height = 1, index)`.
+3. Hash of an individual value is stored in `(height = 1, index)`.
   It corresponds to the value, stored in `(height = 0, index)` cell.
-- Some of the rightmost values on different heights may be absent, it's not
+4. Some of the rightmost values on different heights may be absent, it's not
   required that the obtained tree is full binary. New values on `height =
   0` are always appended to the right end and new value is written to
   `index = len(merkle_table)`
-- On all of `(height > 1, index)` hashes of 2 or 1 child are
+5. On all of `(height > 1, index)` hashes of 2 or 1 child are
   stored.
   - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
     nodes are present, the node `(height, index)` has 2 children hashes.
   - If only `(height - 1, index * 2)` node is present, the
     node at `(height, index)` has single child hash.
-- `max_height` is the height where only a single hash is stored at `index = 0`.
+6. `max_height` is the height where only a single hash is stored at `index = 0`.
   - `max_height = pow + 1`, where `pow` is the smallest integer such that
     `2^pow >= len(merkle_table)`
   - `(max_height, 0)` is the root hash of the Merkle tree.
