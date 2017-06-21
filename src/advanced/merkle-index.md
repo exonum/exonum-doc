@@ -38,21 +38,23 @@ index for blockchains (including Bitcoin and Exonum) is twofold
 
 ## *MerkleTable* database storage structure
 
-Operator __||__ below stands for concatenation. Function _hash(**arg**)_ below
-stands for [SHA-256][sha-256] hash of byte array **arg**.
+Operator __||__ below stands for concatenation. Function `hash(arg)` below
+stands for [SHA-256][sha-256] hash of byte array `arg`.
 
 ### Representation in persistent storage
 
 The internal representation of tree is organized by utilizing 2 integer
-parameters for each element: **height** and **index**.
+parameters for each element: `height` and `index`.
 
-- Each Merkle tree element is addressed by `db_key = height || index`
-  - `db_key` is a byte array
+- Each Merkle tree element is addressed by `db_key = height || index`, where
+  - `db_key` is an `8` byte array
   - `height` and `index` are written to byte array as
-    [BigEndian][wiki:big-endian].
+    [BigEndian][wiki:big-endian]
+  - `height < 58` consists of `6` bits
+  - `index` consists of `58` bits.
 - The actual values are stored in `(height = 0, index)` cells,
   where `index` is in interval `[0, len(merkle_table))`.
-- Hash of an individual value is stored in `(height = 1, index).
+- Hash of an individual value is stored in `(height = 1, index)`.
   It corresponds to the value, stored in `(height = 0, index)` cell.
 - Some of the rightmost values on different heights may be absent, it's not
   required that the obtained tree is full binary. New values on `height =
@@ -62,15 +64,16 @@ parameters for each element: **height** and **index**.
   stored.
   - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
     nodes are present, the node `(height, index)` has 2 children hashes.
-  - If only `(height - 1, index * 2)`` node is present, the
+  - If only `(height - 1, index * 2)` node is present, the
     node at `(height, index)` has single child hash.
 - `max_height` is the height where only a single hash is stored at `index = 0`.
-  - `max_height = pow + 1`, where `2^pow >= len(merkle_table)`
+  - `max_height = pow + 1`, where `pow` is the smallest integer such that
+    `2^pow >= len(merkle_table)`
   - `(max_height, 0)` is the root hash of the Merkle tree.
 
-An example of key -> value mappings in database.
+An example of `key -> value` mappings in database.
 
-Key (db\_key) | Value
+Key (`db_key`) | Value
 ------------ | -------------
 [_0000_**00FF**]  **height** = **0**, **index** = **255**   | serialized value [..]
 [_0001_**0005**]  **height** = **1**, **index** = **5**   | hash [..]
@@ -78,26 +81,24 @@ Key (db\_key) | Value
 
 ### Logical representation
 
-Below is an illustration of logical representation of a Merkle tree, containing
-6 values `v0...v5`.
-**TODO** Tree Structure table.png
+Below is an illustration of the logical representation of a Merkle tree,
+containing `6` values `v0...v5`.
+![Tree Structure](pictures/merkle-tree-example.png)
 
 ### Hashing rules
 
-1. Hash of empty tree is defined as `[0*HASH_SIZE]``.
+1. Hash of empty tree is defined as `[0*HASH_SIZE]`.
 2. Hash of a value, contained in `(height = 0, index)`, is defined
   as:
   - `(height = 1, index) = hash((height = 0, index))`.
-3. Hash of 2 values, contained in (**height** - **1**, **index** \* **2**) and
+3. Hash of `2` values, contained in `(height - 1, index * 2)` and
   `(height - 1, index * 2 + 1)`, is defined as:
   - `(height > 1, index) = hash((height - 1, index *
-    2) || (height - 1, index * 2 + 1))``
+    2) || (height - 1, index * 2 + 1))`
 4. Hash of single value, contained in `(height - 1, index * 2)`,
   when `(height - 1, index * 2 + 1)` is absent in the
   table, is defined as:
   - `(height > 1, index) = hash((height - 1, index * 2))`
-
-**TODO**: change empty tree hash to the documented.
 
 ## Merkle Tree range proofs structure: `Proofnode`
 
@@ -118,23 +119,24 @@ form.
 
 A `Proofnode<Value>` is defined to be one of the following (in terms of JSON values):
 
-Variant | Child `Proofnode` (s) indices | Hashing rule
+Variant | Child `Proofnode`(s) indices | Hashing rule
 ------------ | ------------- | -------------
 { "left": `Proofnode`, "right": `Proofnode` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
 { "left": `Proofnode`, "right": "`Hash`" } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
 { "left": `Proofnode` } | `left_i = 2*i` | [4](#hashing-rules)
 { "left": "`Hash`", "right": `Proofnode` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
-{ "val": *ValueJson* } | `val_i = i` | [2](#hashing-rules)
+{ "val": `ValueJson` } | `val_i = i` | [2](#hashing-rules)
 
-1. `Hash` is a hex encoded string, representing the array of bytes of a hash.
+1. `Hash` is a hexadecimal encoded string, representing the array of bytes of a
+  hash.
 2. An option without the right hash \{"left": `Proofnode`\} is present due to how
   trees, which are not full binary, are handled in this implementation.
-3. `i` is the index of a `Proofnode` itself. `left_i`, `right_i`,
-  `val_i` are the indices of the nested (child) `Proofnode` (s).
+3. `i` is the index of a `Proofnode` itself. `left_i`, `right_i` and
+  `val_i` are the indices of the nested (child) `Proofnode`(s).
 4. `i` for the outmost proofnode is `0`.
 5. Custom functions to compute "val" hash for each individual entity type are
   required on client. Each function should construct a byte array from
-  `ValueJson` fields (same as that used in *serialized value [..]* on backend)
+  `ValueJson` fields (same as that used in `serialized value [..]` on backend)
   and compute "val" hash according to [2](#hashing-rules).
 
 ### Proof verification
@@ -154,13 +156,13 @@ While validating the proof a client has to verify following conditions:
 
 If either of these verifications fails, the proof is deemed invalid.
 
-### Example
+#### Example
 
 Below is depicted a Merkle tree with 5 elements (*not full binary*) with
 elements, that are a saved inside a proof for range `[3, 5)` in
-**[bold_and_underscored]**.
+__**bold and underscored**__ on the bottom.
 
-**TODO** Proof_Structure proof.png
+![Proof_Structure](pictures/merkle-tree-example-2.png)
 
 Which corresponds to the following json representation of `Proofnode`.
 
