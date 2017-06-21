@@ -1,32 +1,33 @@
 # Exonum Serialization Format
 
-Serialization in Exonum differs from serialization in the usual sense, since
-there is no process of transforming the structure into binary data. The data is
-created already "serialized" and Exonum works directly with the serialized data
-"deserializing" the fields to which it refers, if necessary.
-
 In Exonum, the binary format is used for three purposes:
 
 - **Communication of full nodes using consensus messages**  
   Full nodes can both serialize messages for sending and deserialize messages
   when they are received. All the information that passes in the network between
   nodes turns into messages (the [`message!` macro][message_macro]). Data
-  received as a message is validated.
+  received as a message is validated against [serialization rules](#serialization-principles).
 
 - **Communication with light clients**  
   Light clients can only serialize messages due to the complexity of the checks
   necessary for the deserialization process. Transactions are created on the
   client side and sent to the validators in order to be committed into the
-  blockchain. The client serializes the transaction and sends it in JSON format
-  along with a signature to the data in a binary format. Similarly, when the
+  blockchain. The client sends the transaction in the JSON format along with a
+  signature over the binary serialization of the transaction. Similarly, when the
   client receives data from a full node, the client serializes the data received
-  in the JSON format to verify the signature.
+  in the JSON format and verifies the signature against the binary serialization
+  of the data.
 
 - **Storage of data**  
-  The storage is used to place blocks, configurations, data specific for services
-  (for example, wallet). Serialization is implemented by [`storage_value!`
-  macro][storage_value_macro]). Data obtained from the storage is not validated,
-  since it is assumed to be validated earlier.
+  [The storage](../architecture/storage.md) is used to place blocks,
+  configurations, data specific for services. Serialization is implemented by
+  [`encoding_struct!` macro][encoding_struct_macro]). Data obtained from the storage
+  is not validated, since it is assumed to be validated earlier.
+
+Serialization in Exonum differs from serialization in the usual sense, since
+there is no process of transforming the structure into binary data. The data is
+created already "serialized" and Exonum works directly with the serialized data
+"deserializing" the fields to which it refers, if necessary.
 
 ## Motivation of Own Serialization Format
 
@@ -41,35 +42,37 @@ In Exonum, the binary format is used for three purposes:
   The data set must be presented in only one way. Required for uniqueness of the
   hash of data.
 
-- Serialized data can not be partially correct  
+- **Serialized data can not be partially correct**  
   Reading the fields does not happen until the validation is complete.
+  Validation on message reading can not be lazy: first check the entire message
+  to the end, then read completely without checking.
 
 - **Tolerance to malicious messages**  
   The node must not fail on receiving a message violating the serialization
   rules.
 
-- Storage of the data in the same form as it is sent  
+- **Storage format is wire format**  
   Nodes forward almost all received messages unchanged. Storage of data in the
   same form allows node not to waste time on the  message re-creating. In this
   case, deserialization consists in verifying the correctness of all fields.
   This requirement allows to achieve [zero-copy][zero_copy].
 
-- Conversion to JSON and back (used to communicate with light clients) must be
-  unambiguous. The binary format and JSON must have the same data schema.
+- **Unambiguity of conversion to JSON and back**  
+  The binary format and JSON (used to communicate with light clients) must have
+  the same data schema. This requirement provides the ability of light clients
+  to verify cryptographically signed messages.
 
-- It should be possible to set the data scheme and check the message for
-  compliance with the scheme. The scheme should not allow the presence of
-  optional fields.
+- **Possibility to set the data scheme and check the message for
+  compliance with the scheme**  
+  The scheme should not allow the presence of optional fields.
 
-- Validation on message reading can not be lazy: first check the entire message
-  to the end, then read completely without checking.
+- **Effectiveness in terms of data compression**  
+  The Exonum serialization format contains a trade-off with the speed of work:
+  [segment pointers](#sequences) are not necessary but used for quick access to
+  fields.
 
-- The format should be effective in terms of data compression. The Exonum
-  serialization format contains a trade-off with the speed of work: pointers for
-  quick access to fields are not necessary.
-
-- Serialization should work on all architectures / platforms identically. The
-  little-endian is always used in the Exonum so that reading and writing on
+- **Identity of serialization on all architectures / platforms**  
+  The little-endian is always used in the Exonum so that reading and writing on
   modern platforms are direct.
 
 ### Alternative Serialization Formats
@@ -88,7 +91,7 @@ In Exonum, the binary format is used for three purposes:
   Problems with tolerance to malicious messages.
 
 - [FlatBuffers][wiki_flatbuf]  
-  Poor documentation, problems with tolerance to malicious messages .
+  Problems with tolerance to malicious messages.
 
 ## Serialization Principles
 
@@ -103,97 +106,117 @@ In Exonum, the binary format is used for three purposes:
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
 
-### Other types that have fixed-length serialization
+### Plain-old-data types
 
-`Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
-and take 32 bytes.
+Data of this types is stored in big endian.
+
+- `Hash`  
+  SHA-256 hash. Size: 32 bytes.
+
+- `PublicKey`  
+  Ed25519 public key. Size: 32 bytes.
+
+- `Signature`  
+  Ed25519 signature. Size: 64 bytes.
 
 ### Strings
 
 Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
-with 1 to 6 bytes.
-
-### Slices
-
-A slice is a data structure consisting of a collection of same type elements.
-A slice is stored so that the position of each element can be computed from its
-index. Slice elements are located in memory without gaps in the order of
-increasing their indexes. Slices can contain elements with variable length.
-
-!!! note
-    In the current implementation, a slice of strings can not be serialized (it
-    should be fixed later).
+with 1 to 4 bytes.
 
 ### Sequences
 
 A sequence is representation of [`struct` in Rust][rust_structs]. It is data
 structure with a fixed number of possibly heterogeneous fields.
 
-In binary representation sequence is splitted into two main parts:
+In binary representation sequence is split into two main parts (which are
+adjacent to each other for each serialized sequence):
 
 - **Header** is a fixed sized part.
 
 - **Body** is a dynamic sized part, it can be read only after parsing header.
 
-Data of primitive types as well as other types that have fixed-length
-serialization are stored completely in the header.
+Data of primitive types as well as plain-old-data types are stored completely in
+the header.
 
 !!! note "Example"
     Consider a sequence containing `PublicKey`, `u64` and `bool` fields. In the
     binary format all fields of such sequence are placed in the header, its body
     is empty.
 
-Other types take 8 bytes in header of sequence: 4 for position in the body
-(counted from the beginning of the whole serialization buffer), and 4
+Variable-length types take 8 bytes in header of sequence: 4 for position in the
+body (counted from the beginning of the whole serialization buffer), and 4
 for data size. So the header points to the data in the body. Data segments are
 placed in the body without gaps or overlaps, and in the same order as the
 corresponding fields in the header.
 
+### Slices
+
+A slice is a data structure consisting of a collection of same type elements.
+A slice is stored so that the position of each element can be computed from its
+index. Slice elements are located in memory without gaps in the order of
+increasing their indexes. Slices can contain elements with variable length (in
+fact, the body of such a slice contains pointers to the elements of the slice,
+and elements themselves are located further in memory).
+
+!!! note
+    In the current implementation, a slice of strings can not be serialized
+    (This is due to the use of borrowed type `&str` in the definition of message
+    structures and should be fixed later).
+
 ## Example
 
-Consider the structure with two fields:
+Consider the structure with three fields:
 
-- Name: `String`  
+- pub_key: `PublicKey`
+  99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1
+
+- Owner: `String`  
   Andrew
 
-- Age: `u64`  
-  23
+- Balance: `u64`  
+  1234
 
 To serialize the structure, one may use macros like this:
 
 ```Rust
-storage_value! {
+encoding_struct! {
     struct MyAwesomeStructure {
-        const SIZE = 16;
+        const SIZE = 48;
 
-        field name: &str [0 => 8]
-        field age:  u64  [8 => 16]
+        field pub_key:            &PublicKey  [00 => 32]
+        field owner:              &str        [32 => 40]
+        field balance:            u64         [40 => 48]
     }
 }
 
 // create serialized structure in memory
 
-    let student = MyAwesomeStructure::new("Andrew", 23);
+let wallet = MyAwesomeStructure::new("""99ace6c721db293b0ed5b487e6d6111f\
+                                        22a8c55d2a1b7606b6fa6e6c29671aa1""",
+                                     "Andrew",
+                                     1234);
+
+// check structure content
+
+assert_eq!(wallet.pub_key(), """99ace6c721db293b0ed5b487e6d6111f\
+                                22a8c55d2a1b7606b6fa6e6c29671aa1""");
+assert_eq!(wallet.owner(), "Andrew");
+assert_eq!(wallet.balance(), 1234);
 ```
 
 Its serialized representation:
 
-### Header
-
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
-`0  => 4`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
-`4  => 8`  | 6     | `06 00 00 00`            | Little endian stored segment size |
-`8  => 16` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
-
-### Body
-
-| Position | Stored data  | Hexadecimal form | Comment |
-|:--------|:------:|:---------------------|:--------------------------------------------------|
-`16 => 24` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
+`0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key in big endian |
+`32  => 36`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
+`36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
+`40  => 48` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
+`48 => 54` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
 
 [message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
-[storage_value_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/spec.rs
+[encoding_struct_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/encoding/spec.rs
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [asn_der]: https://en.wikipedia.org/wiki/X.690#DER_encoding
 [wiki_protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
