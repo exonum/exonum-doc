@@ -83,7 +83,7 @@ Key (`db_key`) | Value
 
 Below is an illustration of the logical representation of a Merkle tree,
 containing `6` values `v0...v5`.
-![Tree Structure](pictures/merkle-tree-example.png)
+![Tree Structure](../images/merkle-tree-example.png)
 
 ### Hashing rules
 
@@ -162,7 +162,7 @@ Below is depicted a Merkle tree with 5 elements (*not full binary*) with
 elements, that are a saved inside a proof for range `[3, 5)` in
 __**bold and underscored**__ on the bottom.
 
-![Proof_Structure](pictures/merkle-tree-example-2.png)
+![Proof_Structure](../images/merkle-tree-example-2.png)
 
 Which corresponds to the following json representation of `Proofnode`.
 
