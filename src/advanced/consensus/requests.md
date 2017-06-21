@@ -72,7 +72,7 @@ Requests a `Propose` message from a node. It has the following fields:
 
 ### `RequestTransactions`
 
-Requests missing transactions from a node. It has the following fields:
+Requests transactions from a node. It has the following fields:
 
 - **from**: PublicKey  
   Requestor's public key.
@@ -83,7 +83,7 @@ Requests missing transactions from a node. It has the following fields:
 
 ### `RequestPrevotes`
 
-Requests a `Prevote` message from a node. It
+Requests `Prevote` messages from a node. It
 has the following fields:
 
 - **from**: PublicKey  
@@ -164,10 +164,10 @@ validator height.
 - If this `Propose` was requested, cancel the request. A list
   of nodes that should have all transactions mentioned in the `Propose` message
   is copied from the `RequestState` before its deletion to request
-  missing transactions if necessary (copy is placed into `RequestState` for
-  `RequestTransactions` to be sent on the next step)
+  missing transactions if necessary
 - If certain transactions from the `Propose` are not known,
-  send `RequestTransactions` to the author of `Propose`
+  send `RequestTransactions` to the author of `Propose`. Set the nodes in
+  `RequestState` for this request as calculated on the previous step.
 
 ### Receiving `Prevote`
 
@@ -187,12 +187,14 @@ validator height.
 - If the message corresponds to a larger round than the saved PoL,
   send `RequestPrevotes` for this round to the author of `Precommit`
 - If the node has formed +2/3 `Precommit` messages for the same proposal, cancel
-  the corresponding `RequestPrecommit` (if they were requested earlier)
+  the corresponding `RequestPrecommit`s (if they were requested earlier)
 
 ### Receiving `Block`
 
 - Request the next block from the node (if one exists) that sent any message
-  from the height higher than current height + 1
+  from the height higher than current height + 1. If there are several such
+  nodes, request is sent to the one from which the message from the height
+  higher than current height + 1 was received earlier
 - Update current height after committing the block locally
 - Cancel `RequestBlock` for the height at which the block was just committed
 
