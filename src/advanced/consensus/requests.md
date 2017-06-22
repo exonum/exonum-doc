@@ -14,6 +14,9 @@ algorithm for generating and handling requests is an integral part of
     `Precommit` messages, each of which is digitally signed by a different
     validator, and the size of the set is more than 2/3 of the validator number.
 
+!!! note
+    Auditors along with validators request information and respond to requests.
+
 ### Which node should have the necessary information
 
 Receiving [a consensus message](consensus.md#messages) from a node gives the
@@ -138,8 +141,10 @@ The following subsections describe events that cause a specific response.
 For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made and a list of
 [nodes that should have the required information](#which-node-should-have-the-necessary-information).
-When the requested info is obtained, the node deletes `RequestState`
-for the corresponding request (cancels request).
+`RequestState` for each request is placed into hash map where key is identifier
+of requested data (hash for `Propose` and `Transactions`, round and hash for
+`Prevotes`, height for `Block`). When the requested info is obtained, the node
+deletes `RequestState` for the corresponding request (cancels request).
 
 The node sets a timeout for each sent request. The timeout is
 implemented as a message to this node itself. This message is queued and
