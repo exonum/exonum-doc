@@ -99,7 +99,7 @@ created already "serialized" and Exonum works directly with the serialized data
 
 The way a particular data type is serialized within a complex type (i.e.,
 sequence) depends on whether this type has a fixed or variable byte length of
-the serialization. These kinds of types are referred to as _fixed-lengh_ and
+the serialization. These kinds of types are referred to as _fixed-length_ and
 _var-length_, respectively.
 
 - All primitive types are fixed-length. For example, all `u32` instances take 4
@@ -108,8 +108,10 @@ _var-length_, respectively.
   takes 4 bytes.
 - The rules determining whether a complex type is fixed-length are described in
   the corresponding sections below.
+- Custom type can be fixed-length if its data size is known in advance (can be
+  computed at the compilation stage), or var-length otherwise.
 
-### Primitive types
+### Fixed-length types
 
 - `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
   Correspond to the same [Rust language primitive types][rust_primitive_types].
@@ -120,10 +122,8 @@ _var-length_, respectively.
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
 
-### Plain-old-data types
-
-The data is stored in the same way as defined by the underlying byte buffer,
-without any modifications.
+The data of the following fixed-length types is stored in the same way as
+defined by the underlying byte buffer, without any modifications.
 
 - `Hash`  
   SHA-256 hash. Size: 32 bytes.
@@ -134,12 +134,14 @@ without any modifications.
 - `Signature`  
   Ed25519 signature. Size: 64 bytes.
 
-### Strings
+### Var-length types
+
+#### Strings
 
 Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
 with 1 to 4 bytes.
 
-### Sequences
+#### Sequences
 
 A sequence is representation of [`struct` in Rust][rust_structs]. It is data
 structure with a fixed number of possibly heterogeneous fields.
@@ -151,8 +153,8 @@ adjacent to each other for each serialized sequence):
 
 - **Body** is a dynamic sized part, it can be read only after parsing header.
 
-Data of primitive types as well as plain-old-data types are stored completely in
-the header.
+Data of [fixed-length types](#fixed-length-types) is stored completely in the
+header.
 
 !!! note "Example"
     Consider a sequence containing `PublicKey`, `u64` and `bool` fields. In the
@@ -165,7 +167,7 @@ for data size. So the header points to the data in the body. Data segments are
 placed in the body without gaps or overlaps, and in the same order as the
 corresponding fields in the header.
 
-### Slices
+#### Slices
 
 A slice is a data structure consisting of a collection of same type elements.
 A slice is stored so that the position of each element can be computed from its
