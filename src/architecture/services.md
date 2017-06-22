@@ -306,15 +306,14 @@ only it is a string instead of an integer.
 ### State Hash
 
 ```rust
-fn state_hash(&self, view: &View)
-              -> Result<Vec<Hash>, StorageError> {
-    Ok(Vec::new())
+fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash> {
+    Vec::new()
 }
 ```
 
 The `state_hash` method returns a list of hashes for all
 Merklized tables defined by the service. Hashes are calculated based on the
-current blockchain state `view`.
+current blockchain state `snapshot`.
 The core uses this list to aggregate
 hashes of tables defined by all services into a single Merklized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
@@ -350,9 +349,9 @@ based on the `service_id` field in the transaction serialization.
 ```rust
 use serde_json::Value;
 
-fn handle_genesis_block(&self, view: &View)
-                        -> Result<Value, StorageError> {
-    Ok(Value::Null)
+fn handle_genesis_block(&self, fork: &mut Fork)
+                        -> Value {
+    Value::Null
 }
 ```
 
@@ -371,15 +370,12 @@ It must be redefined for services that have global configuration parameters.
 ### Commit Handler
 
 ```rust
-fn handle_commit(&self, context: &mut NodeState)
-                 -> Result<(), StorageError> {
-    Ok(())
-}
+fn handle_commit(&self, context: &mut ServiceContext) { }
 ```
 
 `handle_commit` is invoked for every deployed service each time a block
 is committed in the blockchain locally. This method is so far the only example
-of [event-based processing](#event-handling). The method receives the blockchain
+of [event-based processing](#event-handling). The method receives the service
 context, which can be used to inspect the blockchain state, create transactions
 and push them in the queue for broadcasting, etc.
 
