@@ -137,7 +137,7 @@ The following subsections describe events that cause a specific response.
 
 For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made and a list of
-[nodes that should have the required information](#which-node-should-have-the-necessary-information).  
+[nodes that should have the required information](#which-node-should-have-the-necessary-information).
 When the requested info is obtained, the node deletes `RequestState`
 for the corresponding request (cancels request).
 
@@ -194,10 +194,10 @@ validator height.
 
 ### Receiving `Block`
 
-- Request the next block from the node (if one exists) that sent any message
-  from the height higher than current height + 1. If there are several such
-  nodes, request is sent to the one from which the message from the height
-  higher than current height + 1 was received earlier
+- Request the following block in the blockchain from the node (if one exists)
+  that sent any message from the height greater than current height + 1. If there
+  are several such nodes, request is sent to the one from which the message from
+  the height greater than current height + 1 was received earlier
 - Update current height after committing the block locally
 - Cancel `RequestBlock` for the height at which the block was just committed
 
@@ -243,7 +243,7 @@ pool of unconfirmed transactions.
 
 - If the message does not match the height at which the node is, ignore the
   message
-- Send as individual messages all the corresponding `Prevote` messages except
+- Send as individual messages all the corresponding `Prevote`s except
   those that the requestor has
 
 ### `RequestBlock`
