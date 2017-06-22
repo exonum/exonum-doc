@@ -42,7 +42,7 @@ created already "serialized" and Exonum works directly with the serialized data
   The data set must be presented in only one way. Required for uniqueness of the
   hash of data.
 
-- **Serialized data can not be partially correct**  
+- **All-or-nothing approach to correctness**  
   Reading the fields does not happen until the validation is complete.
   Validation on message reading can not be lazy: first check the entire message
   to the end, then read completely without checking.
@@ -51,7 +51,7 @@ created already "serialized" and Exonum works directly with the serialized data
   The node must not fail on receiving a message violating the serialization
   rules.
 
-- **Storage format is wire format**  
+- **Single format for storage and wire transfer**  
   Nodes forward almost all received messages unchanged. Storage of data in the
   same form allows node not to waste time on the  message re-creating. In this
   case, deserialization consists in verifying the correctness of all fields.
@@ -62,11 +62,11 @@ created already "serialized" and Exonum works directly with the serialized data
   the same data schema. This requirement provides the ability of light clients
   to verify cryptographically signed messages.
 
-- **Possibility to set the data scheme and check the message for
-  compliance with the scheme**  
+- **Schema-based verification**  
+  **TODO** add motivation
   The scheme should not allow the presence of optional fields.
 
-- **Effectiveness in terms of data compression**  
+- **Balance between access speed and data compactness**  
   The Exonum serialization format contains a trade-off with the speed of work:
   [segment pointers](#sequences) are not necessary but used for quick access to
   fields.
@@ -95,6 +95,20 @@ created already "serialized" and Exonum works directly with the serialized data
 
 ## Serialization Principles
 
+### Fixed-length and var-length types
+
+The way a particular data type is serialized within a complex type (i.e.,
+sequence) depends on whether this type has a fixed or variable byte length of
+the serialization. These kinds of types are referred to as _fixed-lengh_ and
+_var-length_, respectively.
+
+- All primitive types are fixed-length. For example, all `u32` instances take 4
+  bytes to serialize.
+- Strings are var-length. `"Hello world!"` takes 12 bytes to serialize, and `"👍"`
+  takes 4 bytes.
+- The rules determining whether a complex type is fixed-length are described in
+  the corresponding sections below.
+
 ### Primitive types
 
 - `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
@@ -108,7 +122,8 @@ created already "serialized" and Exonum works directly with the serialized data
 
 ### Plain-old-data types
 
-Data of this types is stored in big endian.
+The data is stored in the same way as defined by the underlying byte buffer,
+without any modifications.
 
 - `Hash`  
   SHA-256 hash. Size: 32 bytes.
@@ -190,26 +205,28 @@ encoding_struct! {
     }
 }
 
-// create serialized structure in memory
+// `encoding_struct` macro defines a constructor (`new`) and field access methods
+// (`pub_key`, `owner`, `balance`) automatically.
 
-let wallet = MyAwesomeStructure::new("""99ace6c721db293b0ed5b487e6d6111f\
-                                        22a8c55d2a1b7606b6fa6e6c29671aa1""",
-                                     "Andrew",
-                                     1234);
+let pub_key_str = """99ace6c721db293b0ed5b487e6d6111f\
+                     22a8c55d2a1b7606b6fa6e6c29671aa1""";
+
+let pub_key_hex = HexValue::from_hex(pub_key_str);
+let myWallet = Wallet::new(pub_key_hex, "Andrew", 1234);
 
 // check structure content
 
-assert_eq!(wallet.pub_key(), """99ace6c721db293b0ed5b487e6d6111f\
-                                22a8c55d2a1b7606b6fa6e6c29671aa1""");
-assert_eq!(wallet.owner(), "Andrew");
-assert_eq!(wallet.balance(), 1234);
+assert_eq!(myWallet.pub_key().to_hex(), """99ace6c721db293b0ed5b487e6d6111f\
+                                           22a8c55d2a1b7606b6fa6e6c29671aa1""");
+assert_eq!(myWallet.owner(), "Andrew");
+assert_eq!(myWallet.balance(), 1234);
 ```
 
 Its serialized representation:
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
-`0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key in big endian |
+`0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
 `32  => 36`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
 `36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
 `40  => 48` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
