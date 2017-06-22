@@ -1,10 +1,11 @@
 # Services
 
-Services are the main extension point for the Exonum framework.
+**Services** are the main extension point for the Exonum framework.
 By itself, Exonum provides building blocks for creating blockchains;
-it does not come with any concrete transaction processing rules on its own.
+it does not come with any concrete transaction processing rules.
 This is where services come into play.
-If you want to create an instance of the Exonum, services are *the* way to go.
+If you want to create an instance of the Exonum blockchain,
+services are *the* way to go.
 
 ## Overview
 

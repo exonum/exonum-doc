@@ -28,6 +28,22 @@ You can set up these tools locally (see the `install` step in [the Travis config
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
 `links`, or `all` arguments.
 
+### Page Meta
+
+During the build process, `mkdocs` gathers meta information for each page, which
+is then used to provide page summary on social media, for search engines, etc.
+The main meta information of interest is the page description. By default,
+it is equal to the first paragraph of the page. You can override this default
+by providing an explicit description on the very top of the page:
+
+```markdown
+description: 1-3 sentence description of the page
+
+# Page Title
+
+Page contents...
+```
+
 ## Build Instructions
 
 It is a good idea to preview your changes locally before sending a pull request. 
@@ -70,10 +86,12 @@ The generated pages will be available in the **site/** directory.
 
 ## License
 
-Copyright 2016, Bitfury Group
+Copyright 2017, Bitfury Group
 
-Exonum Documentation is licensed under the Apache License (Version 2.0). See
-[LICENSE](LICENSE) for details.
+The Exonum documentation is licensed under the Creative Commons Non-Commercial
+Share-Alike International License (version 4.0). Code samples are licensed
+under the Apache License (version 2.0).
+See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 
 [wiki:lint]: https://en.wikipedia.org/wiki/Lint_(software)
 [mdl]: https://github.com/mivok/markdownlint
