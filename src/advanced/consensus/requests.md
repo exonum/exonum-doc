@@ -1,9 +1,10 @@
 # Requests in Consensus Algorithm
 
-The requests algorithm is used to obtain unknown information from nodes that
-signal the presence of such information (for example, by messages sent from
-heights greater than the current node height in the case of a lagging node). The
-requests algorithm is an integral part of the [consensus algorithm](consensus.md).
+**Requests** are used to obtain unknown information from nodes that signal the
+presence of such information via consensus messages (for example, via a message
+indicating a blockchain height greater than the local blockchain height). The
+algorithm for generating and handling requests is an integral part of
+[the Exonum consensus algorithm](consensus.md).
 
 ## Assumptions and Definitions
 
@@ -13,6 +14,8 @@ requests algorithm is an integral part of the [consensus algorithm](consensus.md
     `Precommit` messages, each of which is digitally signed by a different
     validator, and the size of the set is more than 2/3 of the validator number.
 
+### Which node should have the necessary information
+
 Receiving [a consensus message](consensus.md#messages) from a node gives the
 message recepient
 an opportunity to learn certain information about the state of the message
@@ -20,27 +23,27 @@ author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
 Byzantine. The node saves this information in [the RequestState structure](#algorithm-for-sending-requests).
 
-### Any Consensus Message
+#### Any Consensus Message
 
 - The message author is at the height implied by the message
 - The author has blocks corresponding to all lesser heights
 - The author has +2/3 `Precommit` messages for each of previous blocks
 
-### `Prevote`
+#### `Prevote`
 
 - The author has a proposal (`Propose` message) referenced by the `Prevote` message
 - The author has all transactions mentioned in this proposal
 - If the author indicated `lock_round` in the message, it has a +2/3 `Prevote`
   messages for this proposal in the `locked_round` or round with lower number.
 
-### `Precommit`
+#### `Precommit`
 
 - The author has a proposal referenced by the `Precommit` message
 - The author has all transactions mentioned in this proposal
 - The author has +2/3 `Prevote` messages for this proposal in some round with
   number equal to or lower than the round number mentioned in the `Precommit`.
 
-### `Connect`
+#### `Connect`
 
 - It is possible to access the author by using the IP adress + port
   mentioned in the message
@@ -133,9 +136,9 @@ consensus algorithm if the node needs to request information from other nodes.
 The following subsections describe events that cause a specific response.
 
 For each sent request, the node stores a `RequestState` structure,
-which includes the number of request attempts made
-and a list of nodes that should have the required information.  When
-the requested info is obtained, the node deletes `RequestState`
+which includes the number of request attempts made and a list of
+[nodes that should have the required information](#which-node-should-have-the-necessary-information).  
+When the requested info is obtained, the node deletes `RequestState`
 for the corresponding request (cancels request).
 
 The node sets a timeout for each sent request. The timeout is
@@ -161,10 +164,10 @@ validator height.
 
 ### Receiving `Propose`
 
-- If this `Propose` was requested, cancel the request. A list
-  of nodes that should have all transactions mentioned in the `Propose` message
-  is copied from the `RequestState` before its deletion to request
-  missing transactions if necessary
+- If this `Propose` was requested, cancel the request. A list of
+  [nodes that should have all transactions](#which-node-should-have-the-necessary-information)
+  mentioned in the `Propose` message is copied from the `RequestState` before
+  its deletion to request missing transactions if necessary
 - If certain transactions from the `Propose` are not known,
   send `RequestTransactions` to the author of `Propose`. Set the nodes in
   `RequestState` for this request as calculated on the previous step.
@@ -210,9 +213,9 @@ Cancel all requests.
 
 ### Request Timeout
 
-- Delete the node, to which the request was sent, from the list of nodes that
-  should have the requested data (that list is a part of the `RequestState`
-  structure)
+- Delete the node, to which the request was sent, from the list of
+  [nodes that should have the requested data](#which-node-should-have-the-necessary-information)
+  (that list is a part of the `RequestState` structure)
 - If the list of nodes having the data to be requested is empty, cancel
   request
 - Otherwise, make one more request attempt to another node from the list of
