@@ -198,6 +198,15 @@ further in memory.
     (This is due to the use of borrowed type `&str` in the definition of message
     structures and should be fixed later).
 
+### Types to be supported in future
+
+The current version does not support the serialization of the following types,
+but it is planned to be implemented in future:
+
+- Floating point types: `f32`, `f64`
+
+- [Enums][rust_enums]
+
 ## Example
 
 Consider the structure with three fields:
@@ -260,6 +269,7 @@ Its serialized representation:
 [cap_n_proto_canonicalization]: https://capnproto.org/encoding.html#canonicalization
 [sbe]: https://github.com/real-logic/simple-binary-encoding
 [wiki_flatbuf]: https://en.wikipedia.org/wiki/FlatBuffers
-[rust_primitive_types]: https://doc.rust-lang.org/book/primitive-types.html
+[rust_primitive_types]: https://doc.rust-lang.org/book/first-edition/primitive-types.html
 [utf8]: https://en.wikipedia.org/wiki/UTF-8
-[rust_structs]: https://doc.rust-lang.org/book/structs.html
+[rust_structs]: https://doc.rust-lang.org/book/first-edition/structs.html
+[rust_enums]: https://doc.rust-lang.org/book/first-edition/enums.html
