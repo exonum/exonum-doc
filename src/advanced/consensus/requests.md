@@ -6,47 +6,46 @@ indicating a blockchain height greater than the local blockchain height). The
 algorithm for generating and handling requests is an integral part of
 [the Exonum consensus algorithm](consensus.md).
 
-## Assumptions and Definitions
-
 !!! note
     In the following description, +2/3 means more than two thirds of the
     validators number. For example, +2/3 `Precommit`s means a set of valid
     `Precommit` messages, each of which is digitally signed by a different
-    validator, and the size of the set is more than 2/3 of the validator number.
+    validator, and the size of the set is more than 2/3 of the validators number.
 
 !!! note
     Auditors along with validators request information and respond to requests.
 
-### Which node should have the necessary information
+## Which node should have the necessary information
 
 Receiving [a consensus message](consensus.md#messages) from a node gives the
 message recepient
 an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
-Byzantine. The node saves this information in [the RequestState structure](#algorithm-for-sending-requests).
+Byzantine. The receiving node saves this information in
+[the RequestState structure](#algorithm-for-sending-requests).
 
-#### Any Consensus Message
+### Any Consensus Message
 
 - The message author is at the height implied by the message
 - The author has blocks corresponding to all lesser heights
 - The author has +2/3 `Precommit` messages for each of previous blocks
 
-#### `Prevote`
+### `Prevote`
 
 - The author has a proposal (`Propose` message) referenced by the `Prevote` message
 - The author has all transactions mentioned in this proposal
 - If the author indicated `lock_round` in the message, it has a +2/3 `Prevote`
   messages for this proposal in the `locked_round` or round with lower number.
 
-#### `Precommit`
+### `Precommit`
 
 - The author has a proposal referenced by the `Precommit` message
 - The author has all transactions mentioned in this proposal
 - The author has +2/3 `Prevote` messages for this proposal in some round with
   number equal to or lower than the round number mentioned in the `Precommit`.
 
-#### `Connect`
+### `Connect`
 
 - It is possible to access the author by using the IP adress + port
   mentioned in the message
@@ -132,7 +131,7 @@ It has the following fields:
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 
-## Algorithm for Sending Requests
+## Sending Requests
 
 This algorithm determines the node's behavior at different stages of the
 consensus algorithm if the node needs to request information from other nodes.
@@ -226,7 +225,7 @@ Cancel all requests.
 - Otherwise, make one more request attempt to another node from the list of
   nodes that should have the requested data and start a new timer
 
-## Algorithm for requests processing
+## Requests Processing
 
 This algorithm determines the processing of different types of request messages
 by the node.
