@@ -194,9 +194,11 @@ pointers to the elements of the slice, and elements themselves are located
 further in memory.
 
 !!! note
-    In the current implementation, a slice of strings can not be serialized
-    (This is due to the use of borrowed type `&str` in the definition of message
-    structures and should be fixed later).
+    In the current implementation, a slice of borrowed type elements can not be
+    used for serialization/deserialization because of missing deserialize
+    implementation for borrowed types.
+    For example slice of `&str` can not be serialized/deserialized.
+    This is planned to be fixed in future.
 
 ### Types to be supported in future
 
