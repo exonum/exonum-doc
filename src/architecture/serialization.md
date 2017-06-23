@@ -53,8 +53,8 @@ is not validated, since it is assumed to be validated earlier.
 
 - **All-or-nothing approach to correctness**  
   Reading the fields does not happen until the validation is complete.
-  Validation on message reading can not be lazy: first check the entire message
-  to the end, then read completely without checking.
+  Validation on message reading can not be lazy: first [check](validation-rules)
+  the entire message to the end, then read completely without checking.
 
 - **Tolerance to malicious messages**  
   The node must not fail on receiving a message violating the serialization
@@ -107,6 +107,19 @@ that's why Exonum uses a custom format.
   Problems with tolerance to malicious messages.
 
 ## Serialization Principles
+
+### Validation Rules
+
+- Sizes of the segments must correspond to the data schema
+
+- Segments must not overlap
+
+- There must be no gaps between the segments
+
+- Segment pointers must not refer to the memory before themselves (this
+  guarantees the absence of loops)
+
+- The segment pointers must not point outside the buffer
 
 ### Fixed-length and var-length types
 
@@ -178,8 +191,7 @@ Data of fixed-length types is stored completely in the header.
 Var-length types take 8 bytes in header of sequence: 4 for
 position in the body (counted from the beginning of the whole serialization
 buffer), and 4 for data size. So the header points to the data in the body. Data
-segments are placed in the body without gaps or overlaps, and in the same order
-as the corresponding fields in the header.
+segments are placed in the correspondence with [the validation rules](validation-rules).
 
 #### Slices
 
