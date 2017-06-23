@@ -119,12 +119,12 @@ _fixed-length_ and _var-length_, respectively.
   take 4 bytes to serialize.
 - Strings are var-length. `"Hello world!"` takes 12 bytes to serialize, and `"👍"`
   takes 4 bytes.
-- The rules determining whether a complex type is fixed-length are described in
+- The rules determining whether an aggregate type is fixed-length are described in
   the corresponding sections below.
 - Custom type can be fixed-length if its data size is known in advance (can be
   computed at the compilation stage), or var-length otherwise.
 
-### Fixed-length types
+### Primitive types
 
 - `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
   Correspond to the same [Rust language primitive types][rust_primitive_types].
@@ -134,6 +134,10 @@ _fixed-length_ and _var-length_, respectively.
 - `bool`  
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
+
+### Aggregate types
+
+#### Byte buffers
 
 The data of the following fixed-length types is stored in the same way as
 defined by the underlying byte buffer, without any modifications.
@@ -146,8 +150,6 @@ defined by the underlying byte buffer, without any modifications.
 
 - `Signature`  
   Ed25519 signature. Size: 64 bytes.
-
-### Var-length types
 
 #### Strings
 
@@ -166,15 +168,14 @@ adjacent to each other for each serialized sequence):
 
 - **Body** is a dynamic sized part, it can be read only after parsing header.
 
-Data of [fixed-length types](#fixed-length-types) is stored completely in the
-header.
+Data of fixed-length types is stored completely in the header.
 
 !!! note "Example"
     Consider a sequence containing `PublicKey`, `u64` and `bool` fields. In the
     binary format all fields of such sequence are placed in the header, its body
-    is empty.
+    is empty. So such a sequence is fixed-length.
 
-[Var-length types](#var-length-types) take 8 bytes in header of sequence: 4 for
+Var-length types take 8 bytes in header of sequence: 4 for
 position in the body (counted from the beginning of the whole serialization
 buffer), and 4 for data size. So the header points to the data in the body. Data
 segments are placed in the body without gaps or overlaps, and in the same order
@@ -187,9 +188,9 @@ A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
 increasing their indexes.
 
-Slices like structures have header and body. If slice consists of [fixed-length](#fixed-length-types)
+Slices like structures have header and body. If slice consists of fixed-length
 elements, then its body contain elements themselves. If slice consists of
-[var-length](#var-length-types) elements, the body of such a slice contains
+var-length elements, the body of such a slice contains
 pointers to the elements of the slice, and elements themselves are located
 further in memory.
 
