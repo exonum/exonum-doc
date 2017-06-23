@@ -23,7 +23,7 @@ an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
 Byzantine. The receiving node saves this information in
-[the RequestState structure](#algorithm-for-sending-requests).
+[the RequestState structure](#sending-requests).
 
 ### Any Consensus Message
 
@@ -139,7 +139,7 @@ The following subsections describe events that cause a specific response.
 
 For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made and a list of
-[nodes that should have the required information](#which-node-should-have-the-necessary-information).
+[nodes that should have the required information](#learning-from-consensus-messages).
 `RequestState` for each request is placed into hash map where key is identifier
 of requested data (hash for `Propose` and `Transactions`, round and hash for
 `Prevotes`, height for `Block`). When the requested info is obtained, the node
@@ -169,7 +169,7 @@ validator height.
 ### Receiving `Propose`
 
 - If this `Propose` was requested, cancel the request. A list of
-  [nodes that should have all transactions](#which-node-should-have-the-necessary-information)
+  [nodes that should have all transactions](#learning-from-consensus-messages)
   mentioned in the `Propose` message is copied from the `RequestState` before
   its deletion to request missing transactions if necessary
 - If certain transactions from the `Propose` are not known,
@@ -218,7 +218,7 @@ Cancel all requests.
 ### Request Timeout
 
 - Delete the node, to which the request was sent, from the list of
-  [nodes that should have the requested data](#which-node-should-have-the-necessary-information)
+  [nodes that should have the requested data](#learning-from-consensus-messages)
   (that list is a part of the `RequestState` structure)
 - If the list of nodes having the data to be requested is empty, cancel
   request
