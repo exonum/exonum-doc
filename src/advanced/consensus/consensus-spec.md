@@ -1,12 +1,9 @@
-# Details of Consensus Algorithm
+# Consensus Algorithm Specification
 
-This article contains [formal specification](#algorithm-specification) of
-[consensus algorithm](consensus.md) in Exonum and [proofs of consensus algorithm
-correctness](proof-of-algorithm-correctness)
+This article contains formal specification of [consensus algorithm](consensus.md)
+in Exonum.
 
-## Algorithm Specification
-
-### Global Configuration Parameters
+## Global Configuration Parameters
 
 - `propose_timeout`  
   Proposal timeout after the new height beginning.
@@ -17,7 +14,7 @@ correctness](proof-of-algorithm-correctness)
 - `status_timeout`  
   Period of sending a `Status` message.
 
-### Node State Variables
+## Node State Variables
 
 - `current_height`  
   Current blockchain height.
@@ -41,7 +38,7 @@ correctness](proof-of-algorithm-correctness)
 - `state_hash`  
   Hash of blockchain state.
 
-### Consensus messages and their fields
+## Consensus messages and their fields
 
 The consensus algorithm uses following types of messages:
 [`Propose`](consensus.md#propose), [`Prevote`](consensus.md#prevote),
@@ -76,7 +73,7 @@ The consensus algorithm uses following types of messages:
 - `prevote.propose_hash`  
   Hash of the `Propose` message to which `prevote` belongs.
 
-### Definitions
+## Definitions
 
 The definitions from the [general description of consensus algorithm](consensus.md)
 are used.
@@ -84,14 +81,14 @@ are used.
 In the following description, +2/3 means more than two thirds of the validators,
 and -1/3 means less than one third.
 
-#### Pool of Unconfirmed Transactions
+### Pool of Unconfirmed Transactions
 
 Each node has a set of transactions that have not yet been added to the
 blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
 necessary, the nodes can request unknown transactions from other nodes.
 
-#### Proof-of-Lock
+### Proof-of-Lock
 
 A set of +2/3 `Prevote` votes for the same proposal from the nodes at current
 round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
@@ -102,7 +99,7 @@ round number. So PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
 message processing.
 
-### Message Processing
+## Message Processing
 
 Node uses queue based on [the Mio library][mio_lib] for message processing.
 Incoming request and consensus messages are placed in this queue when they are
@@ -120,9 +117,9 @@ queued and processed when it reaches its queue.
 
 **TODO:** insert picture
 
-### Algorithm Description
+## Algorithm Description
 
-#### Consensus Algorithm Stages
+### Consensus Algorithm Stages
 
 - [Full proposal](#full-proposal) (availability of full proposal)  
   Occurs when the node gets complete info about some proposal and all the
@@ -140,7 +137,7 @@ queued and processed when it reaches its queue.
 Let us explain in more detail rules for the transitions between stages and
 consensus message processing.
 
-#### Receiving an incoming message
+### Receiving an incoming message
 
 At the very beginning, the message is checked against the [serialization
 format](../serialization.md).
@@ -150,7 +147,7 @@ as something that we can not correctly interpret. If verification is successful,
 proceed to [Consensus messages processing](#consensus-messages-processing) or
 [Transaction processing](#transaction-processing).
 
-#### Consensus messages processing
+### Consensus messages processing
 
 - Do not process the message if it belongs to a future round or height. In
   this case, if the message refers to the height `current_height + 1`, the
@@ -170,7 +167,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 - If verification is successful, proceed to the message processing according to
   its type.
 
-#### `Propose` Message Processing
+### `Propose` Message Processing
 
 **Arguments:** `propose`.
 
@@ -186,7 +183,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   transactions from this list.
 - If all transactions are known, go to [Full proposal](#full-proposal).
 
-#### Transaction processing
+### Transaction processing
 
 - If the transaction is already committed, ignore the message.
 - If such a transaction is already in the pool of unconfirmed transactions,
@@ -197,7 +194,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   of unknown transactions becomes zero, proceed to [Full proposal](#full-proposal)
   for current proposal.
 
-#### Full proposal
+### Full proposal
 
 **Arguments:** `propose`.
 
@@ -220,7 +217,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
           majority (if not, the node must stop working and signalize error).
         - Proceed to [COMMIT](#commit) for this block.
 
-#### Availability of +2/3 `Prevote`
+### Availability of +2/3 `Prevote`
 
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
@@ -228,7 +225,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   `Propose` message corresponding to this `prevote` is the same as `prevote.propose_hash`,
   then proceed to [LOCK](#lock) for this very proposal.
 
-#### `Prevote` Message Processing
+### `Prevote` Message Processing
 
 **Arguments:** `prevote`.
 
@@ -246,7 +243,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
 - If the node does not know `propose` or any transactions, request them.
 
-#### `Precommit` Message Processing
+### `Precommit` Message Processing
 
 - Add the message to the list of known `Precommit` for `propose` in this
   round with the given `state_hash`.
@@ -269,7 +266,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
     - If the message round is bigger than `locked_round`, request `Prevote`s from
       the message round.
 
-#### LOCK
+### LOCK
 
 **Arguments:** `locked_round`, `locked_propose`.
 
@@ -287,7 +284,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
         - Send `Precommit` for `locked_propose` in `current_round`.
         - If the node has 2/3 `Precommit`, then proceed to [COMMIT](#commit).
 
-#### COMMIT
+### COMMIT
 
 - Delete `RequestState` for  `RequestPrecommits`, if there was one.
 - Add block to the blockchain.
@@ -302,7 +299,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   and height coincide with the current ones).
 - Add a timeout for the next round of new height.
 
-#### `Block` Message Processing
+### `Block` Message Processing
 
 **Arguments:** `propose`.
 
@@ -335,7 +332,7 @@ consensus messages belonging to a future height.
 - If there are validators who claim that they are at a bigger height, then turn
   to the request of the block from the higher height.
 
-#### Round timeout processing
+### Round timeout processing
 
 - If the timeout does not match the current height and round, skip further
   timeout processing.
@@ -348,7 +345,7 @@ consensus messages belonging to a future height.
   (after the expiration of `propose_timeout`, if the node has just moved to a new
   height).
 
-#### Status timeout processing
+### Status timeout processing
 
 - If the node's height has not changed since the timeout was set, then send out
   a `Status` message to all validators.
