@@ -134,16 +134,13 @@ queued and processed when it reaches its queue.
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
   the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
 
-Let us explain in more detail rules for the transitions between stages and
-consensus message processing.
-
 ### Receiving an incoming message
 
 At the very beginning, the message is checked against the [serialization
 format](../serialization.md).
 
 If any problems during deserialization are detected, such a message is ignored
-as something that we can not correctly interpret. If verification is successful,
+as something that a node can not correctly interpret. If verification is successful,
 proceed to [Consensus messages processing](#consensus-messages-processing) or
 [Transaction processing](#transaction-processing).
 
@@ -179,8 +176,8 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   (`Propose` message contain only hashes of transactions, so the absence of
   hashes in the table of committed transactions is checked).
 - Add the proposal to the `proposes` HashMap.
-- Form a list of transactions the node does not know from `propose`. Request
-  transactions from this list.
+- Form a list of transactions the node does not know from `propose`. [Request
+  transactions](requests.md#requesttransactions) from this list.
 - If all transactions are known, go to [Full proposal](#full-proposal).
 
 ### Transaction processing
@@ -217,7 +214,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
           majority (if not, the node must stop working and signalize error).
         - Proceed to [COMMIT](#commit) for this block.
 
-### Availability of +2/3 `Prevote`
+### Availability of +2/3 `Prevote`s
 
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
@@ -268,8 +265,6 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
 ### LOCK
 
-**Arguments:** `locked_round`, `locked_propose`.
-
 - For each round `r` in the interval `[locked_round, current_round]`:
 
     - If the node has not sent `Prevote` in `r`, send it for
@@ -277,8 +272,8 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
     - If the node has formed +2/3 `Prevote` in `r`, then change `locked_round`
       to `current_round`, `locked_propose` to `propose.hash` (`propose`
       corresponds to +2/3 `Prevote` in `r`).
-    - If the node did not send `Prevote` for other proposals in subsequent rounds
-      after `locked_round`, then:
+    - If the node did not send `Prevote` for any other proposal except
+      `locked_propose` in subsequent rounds after `locked_round`, then:
 
         - Execute the proposal, if it has not yet been executed.
         - Send `Precommit` for `locked_propose` in `current_round`.
@@ -286,7 +281,6 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
 ### COMMIT
 
-- Delete `RequestState` for  `RequestPrecommits`, if there was one.
 - Add block to the blockchain.
 - Push all the transactions from the block to the table of committed transactions.
 - Update current height.
@@ -330,7 +324,7 @@ consensus messages belonging to a future height.
   of the variable `locked_round` at the new height.
 
 - If there are validators who claim that they are at a bigger height, then turn
-  to the request of the block from the higher height.
+  to the [request of the block from the higher height](requests.md#receiving-block).
 
 ### Round timeout processing
 
