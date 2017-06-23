@@ -161,20 +161,24 @@ header.
     binary format all fields of such sequence are placed in the header, its body
     is empty.
 
-Variable-length types take 8 bytes in header of sequence: 4 for position in the
-body (counted from the beginning of the whole serialization buffer), and 4
-for data size. So the header points to the data in the body. Data segments are
-placed in the body without gaps or overlaps, and in the same order as the
-corresponding fields in the header.
+[Var-length types](#var-length-types) take 8 bytes in header of sequence: 4 for
+position in the body (counted from the beginning of the whole serialization
+buffer), and 4 for data size. So the header points to the data in the body. Data
+segments are placed in the body without gaps or overlaps, and in the same order
+as the corresponding fields in the header.
 
 #### Slices
 
 A slice is a data structure consisting of a collection of same type elements.
 A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
-increasing their indexes. Slices can contain elements with variable length (in
-fact, the body of such a slice contains pointers to the elements of the slice,
-and elements themselves are located further in memory).
+increasing their indexes.
+
+Slices like sequences have header and body. If slice consists of [fixed-length](#fixed-length-types)
+elements, then its body contain elements themselves. If slice consists of
+[var-length](#var-length-types) elements, the body of such a slice contains
+pointers to the elements of the slice, and elements themselves are located
+further in memory.
 
 !!! note
     In the current implementation, a slice of strings can not be serialized
@@ -198,7 +202,7 @@ To serialize the structure, one may use macros like this:
 
 ```Rust
 encoding_struct! {
-    struct MyAwesomeStructure {
+    struct Wallet {
         const SIZE = 48;
 
         field pub_key:            &PublicKey  [00 => 32]
