@@ -1,35 +1,44 @@
 # Exonum Serialization Format
 
-In Exonum, the binary format is used for three purposes:
-
-- **Communication of full nodes using consensus messages**  
-  Full nodes can both serialize messages for sending and deserialize messages
-  when they are received. All the information that passes in the network between
-  nodes turns into messages (the [`message!` macro][message_macro]). Data
-  received as a message is validated against [serialization rules](#serialization-principles).
-
-- **Communication with light clients**  
-  Light clients can only serialize messages due to the complexity of the checks
-  necessary for the deserialization process. Transactions are created on the
-  client side and sent to the validators in order to be committed into the
-  blockchain. The client sends the transaction in the JSON format along with a
-  signature over the binary serialization of the transaction. Similarly, when the
-  client receives data from a full node, the client serializes the data received
-  in the JSON format and verifies the signature against the binary serialization
-  of the data.
-
-- **Storage of data**  
-  [The storage](../architecture/storage.md) is used to place blocks,
-  configurations, data specific for services. Serialization is implemented by
-  [`encoding_struct!` macro][encoding_struct_macro]). Data obtained from the storage
-  is not validated, since it is assumed to be validated earlier.
+**Binary serialization format** is used in Exonum for communication
+among full nodes, cryptographic operations on light clients and storage of data.
+The format design provides several important properties,
+including resilience to maliciously crafted messages, [zero-copy][zero_copy]
+deserialization and canonicity.
 
 Serialization in Exonum differs from serialization in the usual sense, since
 there is no process of transforming the structure into binary data. The data is
 created already "serialized" and Exonum works directly with the serialized data
 "deserializing" the fields to which it refers, if necessary.
 
-## Motivation of Own Serialization Format
+## Usage
+
+### Communication Among Full Nodes
+
+Full nodes can both serialize messages for sending and deserialize messages
+when they are received. All the information that passes in the network between
+nodes turns into messages (the [`message!` macro][message_macro]). Data
+received as a message is validated against [serialization rules](#serialization-principles).
+
+### Communication with light clients
+
+Light clients can only serialize messages due to the complexity of the checks
+necessary for the deserialization process. Transactions are created on the
+client side and sent to the validators in order to be committed into the
+blockchain. The client sends the transaction in the JSON format along with a
+signature over the binary serialization of the transaction. Similarly, when the
+client receives data from a full node, the client serializes the data received
+in the JSON format and verifies the signature against the binary serialization
+of the data.
+
+### Storage of data
+
+[The storage](../architecture/storage.md) is used to place blocks,
+configurations, data specific for services. Serialization is implemented by
+[`encoding_struct!` macro][encoding_struct_macro]). Data obtained from the storage
+is not validated, since it is assumed to be validated earlier.
+
+## Motivation
 
 ### Data Representation Requirements in Exonum
 
@@ -54,7 +63,8 @@ created already "serialized" and Exonum works directly with the serialized data
 - **Single format for storage and wire transfer**  
   Nodes forward almost all received messages unchanged. Storage of data in the
   same form allows node not to waste time on the  message re-creating. In this
-  case, deserialization consists in verifying the correctness of all fields.
+  case, deserialization from the wire format after receiving a message consists
+  in verifying the correctness of all fields.
   This requirement allows to achieve [zero-copy][zero_copy].
 
 - **Unambiguity of conversion to JSON and back**  
@@ -68,7 +78,7 @@ created already "serialized" and Exonum works directly with the serialized data
 
 - **Balance between access speed and data compactness**  
   The Exonum serialization format contains a trade-off with the speed of work:
-  [segment pointers](#sequences) are not necessary but used for quick access to
+  [segment pointers](#structures) are not necessary but used for quick access to
   fields.
 
 - **Identity of serialization on all architectures / platforms**  
@@ -76,6 +86,9 @@ created already "serialized" and Exonum works directly with the serialized data
   modern platforms are direct.
 
 ### Alternative Serialization Formats
+
+The existing serialization formats do not satisfy requirements on serialization,
+that's why Exonum uses a custom format.
 
 - [ASN.1 DER][asn_der]  
   Provides canonicity but poorly extensible.
@@ -98,12 +111,12 @@ created already "serialized" and Exonum works directly with the serialized data
 ### Fixed-length and var-length types
 
 The way a particular data type is serialized within a complex type (i.e.,
-sequence) depends on whether this type has a fixed or variable byte length of
-the serialization. These kinds of types are referred to as _fixed-length_ and
-_var-length_, respectively.
+sequence) depends on whether the instances of this type may exhibit variable
+byte length of their serialization. These kinds of types are referred to as
+_fixed-length_ and _var-length_, respectively.
 
-- All primitive types are fixed-length. For example, all `u32` instances take 4
-  bytes to serialize.
+- Integer types and booleans are fixed-length. For example, all `u32` instances
+  take 4 bytes to serialize.
 - Strings are var-length. `"Hello world!"` takes 12 bytes to serialize, and `"👍"`
   takes 4 bytes.
 - The rules determining whether a complex type is fixed-length are described in
@@ -141,7 +154,7 @@ defined by the underlying byte buffer, without any modifications.
 Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
 with 1 to 4 bytes.
 
-#### Sequences
+#### Structures
 
 A sequence is representation of [`struct` in Rust][rust_structs]. It is data
 structure with a fixed number of possibly heterogeneous fields.
@@ -169,12 +182,12 @@ as the corresponding fields in the header.
 
 #### Slices
 
-A slice is a data structure consisting of a collection of same type elements.
+A slice is a data structure consisting of an arbitrary number of same type elements.
 A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
 increasing their indexes.
 
-Slices like sequences have header and body. If slice consists of [fixed-length](#fixed-length-types)
+Slices like structures have header and body. If slice consists of [fixed-length](#fixed-length-types)
 elements, then its body contain elements themselves. If slice consists of
 [var-length](#var-length-types) elements, the body of such a slice contains
 pointers to the elements of the slice, and elements themselves are located
