@@ -23,7 +23,7 @@ an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
 Byzantine. The receiving node saves this information in
-[the RequestState structure](#algorithm-for-sending-requests).
+[the RequestState structure](#sending-requests).
 
 ### Any Consensus Message
 
