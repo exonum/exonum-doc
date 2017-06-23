@@ -51,6 +51,13 @@ is not validated, since it is assumed to be validated earlier.
   The data set must be presented in only one way. Required for uniqueness of the
   hash of data.
 
+- **Schema-based verification**  
+  It should be possible to set the data scheme and check the message for
+  compliance with the scheme (this allows to [check](validation-rules) the
+  received message before reading its content). The scheme should not allow the
+  presence of optional fields. In the Exonum serialization format the scheme is
+  stored separately from the serializable data.
+
 - **All-or-nothing approach to correctness**  
   Reading the fields does not happen until the validation is complete.
   Validation on message reading can not be lazy: first [check](validation-rules)
@@ -71,10 +78,6 @@ is not validated, since it is assumed to be validated earlier.
   The binary format and JSON (used to communicate with light clients) must have
   the same data schema. This requirement provides the ability of light clients
   to verify cryptographically signed messages.
-
-- **Schema-based verification**  
-  **TODO** add motivation
-  The scheme should not allow the presence of optional fields.
 
 - **Balance between access speed and data compactness**  
   The Exonum serialization format contains a trade-off with the speed of work:
