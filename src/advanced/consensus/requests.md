@@ -15,7 +15,7 @@ algorithm for generating and handling requests is an integral part of
 !!! note
     Auditors along with validators request information and respond to requests.
 
-## Which node should have the necessary information
+## Learning from Consensus Messages
 
 Receiving [a consensus message](consensus.md#messages) from a node gives the
 message recepient
