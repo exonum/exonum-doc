@@ -268,8 +268,8 @@ encoding_struct! {
 let pub_key_str = "99ace6c721db293b0ed5b487e6d6111f\
                    22a8c55d2a1b7606b6fa6e6c29671aa1";
 
-let pub_key_hex = HexValue::from_hex(pub_key_str.as_bytes());
-let my_wallet = Wallet::new(pub_key_hex, "Andrew", 1234);
+let pub_key_hex = HexValue::from_hex(pub_key_str).unwrap();
+let my_wallet = Wallet::new(&pub_key_hex, "Andrew", 1234);
 
 // check structure content
 
@@ -277,14 +277,15 @@ assert_eq!(my_wallet.pub_key().to_hex(), pub_key_str);
 assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
-let expected_buffer = HexValue::from_hex((pub_key_str + // Public key
-                                          "10000000" +  // Segment pointer position
-                                          "06000000" +  // Segment size
-                                          "d204000000000000" + // Balance
-                                          "416e64726577"       // Name
-                                         ).as_bytes()
-                                        );
+let expected_buffer:Vec<u8> = HexValue::from_hex(&(pub_key_str.to_owned() +
+                                                       // Public key
+                                         "30000000" +  // Segment pointer position
+                                         "06000000" +  // Segment size
+                                         "d204000000000000" + // Balance
+                                         "416e64726577"       // Name
+                                         )).unwrap();
 assert_eq!(my_wallet.serialize(), expected_buffer);
+}
 ```
 
 Serialized representation of `my_wallet`:
@@ -292,7 +293,7 @@ Serialized representation of `my_wallet`:
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
 `0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
-`32  => 36`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
+`32  => 36`  | 48    | `30 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
 `36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
 `40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
 `48 => 54` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
