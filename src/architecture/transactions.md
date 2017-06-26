@@ -207,7 +207,7 @@ Transaction interface defines 3 methods: [`verify`](#verify),
 ### Verify
 
 ```rust
-fn verify(&self) -> bool
+fn verify(&self) -> bool;
 ```
 
 The `verify` method verifies the transaction, which includes the message
@@ -227,14 +227,13 @@ included into the blockchain.
 ### Execute
 
 ```rust
-fn execute(&self, view: &View)
-           -> Result<(), ::exonum::storage::StorageError>
+fn execute(&self, view: &mut Fork);
 ```
 
 The `execute` method takes the current blockchain state and can modify it (but can
 choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
-storage ([under certain conditions](../advanced/consensus/consensus.md)).
+storage [under certain conditions](../advanced/consensus/consensus.md).
 
 !!! note
     `verify` and `execute` are triggered at different times. `verify` checks
