@@ -53,7 +53,7 @@ separate implementation details from transaction invocation.
     From the computer science perspective, an arbitrary Exonum transaction
     can be defined as `Tx: S -> S`, where `S` denotes the key-value storage type.
     Templating corresponds to defining parameterized families of transactions
-    `TTx(i: I): P(i) -> S -> S`,
+    `TxTemplate(i: I): P(i) -> S -> S`,
     where `I` is the set of defined transaction families and `P(i)`
     is the parameter space for the `i`th family. Correspondingly, any transaction
     in Exonum is [a partially applied function][wiki:currying]
