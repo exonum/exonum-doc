@@ -126,12 +126,9 @@ The segment pointer mechanism is slightly similar to the concept of heap in
 ### Validation Rules
 
 - Segments must not overlap
-
 - There must be no gaps between the segments
-
 - Segment pointers must not refer to the memory before themselves (this
   guarantees the absence of loops)
-
 - The segment pointers must not point outside the buffer
 
 ### Fixed-length and var-length types
@@ -236,7 +233,6 @@ The current version does not support the serialization of the following types,
 but it is planned to be implemented in future:
 
 - Floating point types: `f32`, `f64`
-
 - [Enums][rust_enums]
 
 ## Example
@@ -281,16 +277,15 @@ assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
 let expected_buffer_str = pub_key_str.to_owned() + // Public key
-                          "30000000" +             // Segment pointer position
+                          "30000000" +             // Segment start
                           "06000000" +             // Segment size
                           "d204000000000000" +     // Balance
                           "416e64726577";          // Name
 
-let expected_buffer:Vec<u8> = HexValue::from_hex(&expected_buffer_str)
+let expected_buffer: Vec<u8> = HexValue::from_hex(&expected_buffer_str)
                                        .unwrap();
 
 assert_eq!(my_wallet.serialize(), expected_buffer);
-}
 ```
 
 Serialized representation of `my_wallet`:
@@ -301,7 +296,7 @@ Serialized representation of `my_wallet`:
 `32  => 36`  | 48    | `30 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
 `36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
 `40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
-`48 => 54` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
+`48 => 54` | Andrew| `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
 
 [message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
 [encoding_struct_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/encoding/spec.rs
