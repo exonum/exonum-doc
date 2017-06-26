@@ -119,14 +119,21 @@ aforementioned `encoding_struct!` macro).
 
 The serialization format uses _segments_ and _segment pointers_ to serialize
 data which size is unknown in compile time (i.e., doesn't follow from the type
-specification).
+specification):
+
+- **Segment** is a continuous subarray of the serialization buffer, which
+  stores serialization of a certain serializable type instance
+- **Segment pointer** is a pair of two unsigned integers: a 0-based
+  starting position of a segment relative to the beginning of the entire
+  serialization buffer, and the byte size of the segment
+
 The segment pointer mechanism is slightly similar to the concept of heap in
 [memory management](https://en.wikipedia.org/wiki/Memory_management).
 
 ### Validation Rules
 
 - Segments must not overlap
-- There must be no gaps between the segments
+- There must be no gaps between the segments allocated within the same datatype
 - Segment pointers must not refer to the memory before themselves (this
   guarantees the absence of loops)
 - The segment pointers must not point outside the buffer
@@ -134,7 +141,8 @@ The segment pointer mechanism is slightly similar to the concept of heap in
 ### Fixed-length and var-length types
 
 The way a particular data type is serialized within a complex type (e.g.,
-structure) depends on whether the instances of this type may exhibit variable
+a [structure](#structures)) depends on whether the instances of this type
+may exhibit variable
 byte length of their serialization. These kinds of types are referred to as
 _fixed-length_ and _var-length_, respectively.
 
@@ -181,31 +189,46 @@ defined by the underlying byte buffer, without any modifications.
 ### Strings
 
 Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
-with 1 to 4 bytes.
+with 1 to 4 bytes. String is a var-length type.
+
+### Segment Pointers
+
+Segment pointers take 8 bytes:
+
+- 4 bytes for the position of the corresponding segment
+  (counted from the beginning of the entire serialization buffer)
+- 4 bytes for the byte size of the segment.
+
+Both the position and byte size are serialized as little-endian unsigned integers
+(i.e., in the same way as `u32`). Hence, segment pointer can be viewed
+as a [structure](#structures) with two `u32` fields.
 
 ### Structures
 
 A structure is representation of [`struct` in Rust][rust_structs]. It is data
-structure with a fixed number of possibly heterogeneous, named fields.
+structure with a fixed number of possibly heterogeneous, ordered, named fields.
 
 In binary representation structure is split into two main parts (which are
 adjacent to each other for each serialized structure):
 
 - **Header** is a fixed sized part.
+- **Body** is a dynamic sized part; it can be read only after parsing the header.
 
-- **Body** is a dynamic sized part, it can be read only after parsing header.
+Fixed-length fields are stored completely in the header.
+Var-length fields are allocated as segments in the body,
+plus take 8 bytes in the header for a corresponding segment pointer.
+Thus, a segment pointer in the header (the position of which is known in compile time)
+points to the segment in the body,
+which contains the actual serialization of the field. Segments are placed
+in the correspondence with [the validation rules](#validation-rules).
 
-Data of fixed-length types is stored completely in the header.
+A structure type is fixed-length if and only if all its fields are fixed-length
+(i.e., the body of the binary representation is always empty).
 
 !!! note "Example"
     Consider a structure containing `PublicKey`, `u64` and `bool` fields. In the
     binary format all fields of such structure are placed in the header, its body
     is empty. So such a structure is fixed-length.
-
-Var-length types take 8 bytes in header of structure: 4 for
-position in the body (counted from the beginning of the whole serialization
-buffer), and 4 for data size. So the header points to the data in the body. Data
-segments are placed in the correspondence with [the validation rules](#validation-rules).
 
 ### Slices
 
@@ -219,6 +242,8 @@ elements, then its body contain elements themselves. If slice consists of
 var-length elements, the body of such a slice contains
 pointers to the elements of the slice, and elements themselves are located
 further in memory.
+
+All slices are var-length datatypes.
 
 !!! note
     In the current implementation, a slice of borrowed type elements can not be
