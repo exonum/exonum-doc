@@ -1,7 +1,20 @@
 # Consensus Algorithm Specification
 
-This article contains formal specification of [consensus algorithm](consensus.md)
+This article contains formal specification of [consensus algorithm](../../home/glossary.md#consensus)
 in Exonum.
+
+Consensus algorithm in Exonum is a process of reaching an agreement about order
+of [transactions](../../home/glossary.md#transaction) and the result of their
+execution in the presence of [Byzantine faults][wiki_bft] and [partially
+synchronous](partial_synchrony) network. According to the consensus algorithm
+nodes exchange [consensus messages](../../home/glossary.md#consensus-message)
+authenticated with public-key crypto; these messages are processed via [a
+message queue](#message-processing) and determine [transitions among
+states](consensus.md#node-states-overview).
+
+!!! tip
+    See [algorithm overview](consensus.md#algorithm-overview) and [list of
+    assumptions](consensus.md#assumptions) for more details.
 
 ## Global Configuration Parameters
 
@@ -345,6 +358,7 @@ consensus messages belonging to a future height.
   a `Status` message to all validators.
 - Add a timeout for the next `Status` send.
 
+[wiki_bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [message_source]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
 [mio_lib]: https://github.com/carllerche/mio
