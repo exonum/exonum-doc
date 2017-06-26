@@ -1,8 +1,8 @@
 # Exonum Serialization Format
 
 **Binary serialization format** is used in Exonum for communication
-among full nodes, cryptographic operations on light clients and storage of data.
-The format design provides several important properties,
+among full nodes, cryptographic operations on [light clients](../architecture/clients.md)
+and storage of data. The format design provides several important properties,
 including resilience to maliciously crafted messages, [zero-copy][zero_copy]
 deserialization and canonicity.
 
@@ -52,10 +52,10 @@ is not validated, since it is assumed to be validated earlier.
   hash of data.
 
 - **Schema-based verification**  
-  It should be possible to set the data scheme and check the message for
-  compliance with the scheme (this allows to [check](#validation-rules) the
-  received message before reading its content). The scheme should not allow the
-  presence of optional fields. In the Exonum serialization format the scheme is
+  It should be possible to set the data schema and check the message for
+  compliance with the schema (this allows to [check](#validation-rules) the
+  received message before reading its content). The schema should not allow the
+  presence of optional fields. In the Exonum serialization format the schema is
   stored separately from the serializable data.
 
 - **All-or-nothing approach to correctness**  
@@ -117,14 +117,13 @@ instances of this type are (de)serialized from/to a binary buffer. In most cases
 these rules are implicitly inferred from the datatype declaration (e.g., via the
 aforementioned `encoding_struct!` macro).
 
-The serialization format uses *segment pointers* to serialize data which size is
-unknown in compile time (i.e., doesn't follow from the type specification).
+The serialization format uses _segments_ and _segment pointers_ to serialize
+data which size is unknown in compile time (i.e., doesn't follow from the type
+specification).
 The segment pointer mechanism is slightly similar to the concept of heap in
 [memory management](https://en.wikipedia.org/wiki/Memory_management).
 
 ### Validation Rules
-
-- Sizes of the segments must correspond to the data schema
 
 - Segments must not overlap
 
@@ -138,7 +137,7 @@ The segment pointer mechanism is slightly similar to the concept of heap in
 ### Fixed-length and var-length types
 
 The way a particular data type is serialized within a complex type (e.g.,
-sequence) depends on whether the instances of this type may exhibit variable
+structure) depends on whether the instances of this type may exhibit variable
 byte length of their serialization. These kinds of types are referred to as
 _fixed-length_ and _var-length_, respectively.
 
@@ -153,14 +152,18 @@ _fixed-length_ and _var-length_, respectively.
 
 ## Primitive types
 
-- `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
-  Correspond to the same [Rust language primitive types][rust_primitive_types].
-  Their size is the same as for correspond Rust types and they are stored in
-  little endian.
+### Integer types
 
-- `bool`  
-  `0x01` for true, `0x00` for false. A message with other value stored in place
-  of `bool` will not pass validation. Size: 1 byte.
+`u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
+Correspond to the same [Rust language primitive types][rust_primitive_types].
+Their size is the same as for correspond Rust types and they are stored in
+little endian.
+
+### Boolean
+
+`bool`  
+`0x01` for true, `0x00` for false. A message with other value stored in place
+of `bool` will not pass validation. Size: 1 byte.
 
 ## Aggregate types
 
@@ -185,11 +188,11 @@ with 1 to 4 bytes.
 
 ### Structures
 
-A sequence is representation of [`struct` in Rust][rust_structs]. It is data
-structure with a fixed number of possibly heterogeneous fields.
+A structure is representation of [`struct` in Rust][rust_structs]. It is data
+structure with a fixed number of possibly heterogeneous, named fields.
 
-In binary representation sequence is split into two main parts (which are
-adjacent to each other for each serialized sequence):
+In binary representation structure is split into two main parts (which are
+adjacent to each other for each serialized structure):
 
 - **Header** is a fixed sized part.
 
@@ -198,11 +201,11 @@ adjacent to each other for each serialized sequence):
 Data of fixed-length types is stored completely in the header.
 
 !!! note "Example"
-    Consider a sequence containing `PublicKey`, `u64` and `bool` fields. In the
-    binary format all fields of such sequence are placed in the header, its body
-    is empty. So such a sequence is fixed-length.
+    Consider a structure containing `PublicKey`, `u64` and `bool` fields. In the
+    binary format all fields of such structure are placed in the header, its body
+    is empty. So such a structure is fixed-length.
 
-Var-length types take 8 bytes in header of sequence: 4 for
+Var-length types take 8 bytes in header of structure: 4 for
 position in the body (counted from the beginning of the whole serialization
 buffer), and 4 for data size. So the header points to the data in the body. Data
 segments are placed in the correspondence with [the validation rules](#validation-rules).
@@ -240,7 +243,7 @@ but it is planned to be implemented in future:
 
 Consider the structure with three fields:
 
-- pub_key: `PublicKey`
+- pub_key: `PublicKey`  
   99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1
 
 - Owner: `String`  
@@ -277,13 +280,15 @@ assert_eq!(my_wallet.pub_key().to_hex(), pub_key_str);
 assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
-let expected_buffer:Vec<u8> = HexValue::from_hex(&(pub_key_str.to_owned() +
-                                                       // Public key
-                                         "30000000" +  // Segment pointer position
-                                         "06000000" +  // Segment size
-                                         "d204000000000000" + // Balance
-                                         "416e64726577"       // Name
-                                         )).unwrap();
+let expected_buffer_str = pub_key_str.to_owned() + // Public key
+                          "30000000" +             // Segment pointer position
+                          "06000000" +             // Segment size
+                          "d204000000000000" +     // Balance
+                          "416e64726577";          // Name
+
+let expected_buffer:Vec<u8> = HexValue::from_hex(&expected_buffer_str)
+                                       .unwrap();
+
 assert_eq!(my_wallet.serialize(), expected_buffer);
 }
 ```
