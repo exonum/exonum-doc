@@ -6,7 +6,7 @@ in Exonum.
 Consensus algorithm in Exonum is a process of reaching an agreement about order
 of [transactions](../../home/glossary.md#transaction) and the result of their
 execution in the presence of [Byzantine faults][wiki_bft] and [partially
-synchronous](partial_synchrony) network. According to the consensus algorithm
+synchronous][partial_synchrony] network. According to the consensus algorithm
 nodes exchange [consensus messages](../../home/glossary.md#consensus-message)
 authenticated with public-key crypto; these messages are processed via [a
 message queue](#message-processing) and determine [transitions among
@@ -357,6 +357,24 @@ consensus messages belonging to a future height.
 - If the node's height has not changed since the timeout was set, then send out
   a `Status` message to all validators.
 - Add a timeout for the next `Status` send.
+
+## Properties of the Consensus Algorithm
+
+!!! note
+    Formal proof of the following properties is coming in a separate white paper.
+
+- **Safety**  
+  If some non-Byzantine node adds a block to the blockchain, then no other node
+  can add another block, confirmed with +2/3 `Precommit` messages, to the
+  blockchain at the same height.
+
+- **Liveness**  
+  There necessarily will come a point in the system when the node adds the block
+  to the blockchain.
+
+- **Weak form of chain quality**  
+  1 block out of F+1 (where F is one third of the validators) committed blocks is
+  guaranteed to be proposed by non-Byzantine validators.
 
 [wiki_bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
