@@ -53,14 +53,14 @@ is not validated, since it is assumed to be validated earlier.
 
 - **Schema-based verification**  
   It should be possible to set the data scheme and check the message for
-  compliance with the scheme (this allows to [check](validation-rules) the
+  compliance with the scheme (this allows to [check](#validation-rules) the
   received message before reading its content). The scheme should not allow the
   presence of optional fields. In the Exonum serialization format the scheme is
   stored separately from the serializable data.
 
 - **All-or-nothing approach to correctness**  
   Reading the fields does not happen until the validation is complete.
-  Validation on message reading can not be lazy: first [check](validation-rules)
+  Validation on message reading can not be lazy: first [check](#validation-rules)
   the entire message to the end, then read completely without checking.
 
 - **Tolerance to malicious messages**  
@@ -111,6 +111,17 @@ that's why Exonum uses a custom format.
 
 ## Serialization Principles
 
+Serialization in Exonum is based on the datatype specifications. Each
+serializable datatype has its (de)serialization rules, which govern how the
+instances of this type are (de)serialized from/to a binary buffer. In most cases,
+these rules are implicitly inferred from the datatype declaration (e.g., via the
+aforementioned `encoding_struct!` macro).
+
+The serialization format uses *segment pointers* to serialize data which size is
+unknown in compile time (i.e., doesn't follow from the type specification).
+The segment pointer mechanism is slightly similar to the concept of heap in
+[memory management](https://en.wikipedia.org/wiki/Memory_management).
+
 ### Validation Rules
 
 - Sizes of the segments must correspond to the data schema
@@ -126,7 +137,7 @@ that's why Exonum uses a custom format.
 
 ### Fixed-length and var-length types
 
-The way a particular data type is serialized within a complex type (i.e.,
+The way a particular data type is serialized within a complex type (e.g.,
 sequence) depends on whether the instances of this type may exhibit variable
 byte length of their serialization. These kinds of types are referred to as
 _fixed-length_ and _var-length_, respectively.
@@ -140,7 +151,7 @@ _fixed-length_ and _var-length_, respectively.
 - Custom type can be fixed-length if its data size is known in advance (can be
   computed at the compilation stage), or var-length otherwise.
 
-### Primitive types
+## Primitive types
 
 - `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
   Correspond to the same [Rust language primitive types][rust_primitive_types].
@@ -151,9 +162,9 @@ _fixed-length_ and _var-length_, respectively.
   `0x01` for true, `0x00` for false. A message with other value stored in place
   of `bool` will not pass validation. Size: 1 byte.
 
-### Aggregate types
+## Aggregate types
 
-#### Byte buffers
+### Byte buffers
 
 The data of the following fixed-length types is stored in the same way as
 defined by the underlying byte buffer, without any modifications.
@@ -167,12 +178,12 @@ defined by the underlying byte buffer, without any modifications.
 - `Signature`  
   Ed25519 signature. Size: 64 bytes.
 
-#### Strings
+### Strings
 
 Strings are stored in [UTF-8 encoding][utf8], which may represent a single char
 with 1 to 4 bytes.
 
-#### Structures
+### Structures
 
 A sequence is representation of [`struct` in Rust][rust_structs]. It is data
 structure with a fixed number of possibly heterogeneous fields.
@@ -194,9 +205,9 @@ Data of fixed-length types is stored completely in the header.
 Var-length types take 8 bytes in header of sequence: 4 for
 position in the body (counted from the beginning of the whole serialization
 buffer), and 4 for data size. So the header points to the data in the body. Data
-segments are placed in the correspondence with [the validation rules](validation-rules).
+segments are placed in the correspondence with [the validation rules](#validation-rules).
 
-#### Slices
+### Slices
 
 A slice is a data structure consisting of an arbitrary number of same type elements.
 A slice is stored so that the position of each element can be computed from its
@@ -216,7 +227,7 @@ further in memory.
     For example slice of `&str` can not be serialized/deserialized.
     This is planned to be fixed in future.
 
-### Types to be supported in future
+## Types to be supported in future
 
 The current version does not support the serialization of the following types,
 but it is planned to be implemented in future:
@@ -254,28 +265,36 @@ encoding_struct! {
 // `encoding_struct` macro defines a constructor (`new`) and field access methods
 // (`pub_key`, `owner`, `balance`) automatically.
 
-let pub_key_str = """99ace6c721db293b0ed5b487e6d6111f\
-                     22a8c55d2a1b7606b6fa6e6c29671aa1""";
+let pub_key_str = "99ace6c721db293b0ed5b487e6d6111f\
+                   22a8c55d2a1b7606b6fa6e6c29671aa1";
 
-let pub_key_hex = HexValue::from_hex(pub_key_str);
-let myWallet = Wallet::new(pub_key_hex, "Andrew", 1234);
+let pub_key_hex = HexValue::from_hex(pub_key_str.as_bytes());
+let my_wallet = Wallet::new(pub_key_hex, "Andrew", 1234);
 
 // check structure content
 
-assert_eq!(myWallet.pub_key().to_hex(), """99ace6c721db293b0ed5b487e6d6111f\
-                                           22a8c55d2a1b7606b6fa6e6c29671aa1""");
-assert_eq!(myWallet.owner(), "Andrew");
-assert_eq!(myWallet.balance(), 1234);
+assert_eq!(my_wallet.pub_key().to_hex(), pub_key_str);
+assert_eq!(my_wallet.owner(), "Andrew");
+assert_eq!(my_wallet.balance(), 1234);
+
+let expected_buffer = HexValue::from_hex((pub_key_str + // Public key
+                                          "10000000" +  // Segment pointer position
+                                          "06000000" +  // Segment size
+                                          "d204000000000000" + // Balance
+                                          "416e64726577"       // Name
+                                         ).as_bytes()
+                                        );
+assert_eq!(my_wallet.serialize(), expected_buffer);
 ```
 
-Its serialized representation:
+Serialized representation of `my_wallet`:
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
 `0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
 `32  => 36`  | 16    | `10 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
 `36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
-`40  => 48` | 23    | `17 00 00 00 00 00 00 00`| Number in little endian |
+`40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
 `48 => 54` | Andrew| `41 6e 64 72 65 77`       | Real text bytes|
 
 [message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
