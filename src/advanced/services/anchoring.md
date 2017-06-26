@@ -1,10 +1,9 @@
 # Anchoring using Bitcoin multisignatures
 
-**NB.** This document does not describe how anchoring (which tries to conform to this specification) is implemented in Exonum. We have [a separate document](../architecture/anchoring.md) for that.
+**NB.** This document does not describe how anchoring (which tries to conform to this specification) is implemented in Exonum. We have [a separate document](anchoring-impl.md) for that.
 
 ```none
 Type: Process specification
-Status: Initial draft
 Authors: Alex Ostrovski, Bitfury Group
 Viacheslav Kukushkin, Bitfury Group
 ```
@@ -68,6 +67,7 @@ Both proposal submission and voting MAY be implemented as specific transaction t
 The anchoring SHOULD prevent equivocation and history revisions by a colluding majority of blockchain validators [BFAudit]. The anchoring also provides long-term non-repudiation, even in the case that the majority of information about the anchored blockchain is lost or is unreliable. For this second use case, anchoring MUST be used together with blockchain receipts.
 
 The idea of the anchoring approach described in this spec is simple: As soon as there appears an invalid anchor, the system is **broken**. We don't really care _why_ the system is broken (this MUST be determined by the out-of-band means); the key point that there is **never** a situation when there is an invalid anchor, but the blockchain itself is fine. This hypothetical situation would be detrimental for long-term non-repudiation, and may be confusing for real-time anchor verification as well (Huh? There are two contradicting anchors? Who's in the right here? Who was in the right when it all happened 20 years ago?).
+
 #### 2.1.2\. Feedback from Bitcoin
 
 Due to real life restrictions, Bitcoin blockchain could be forked and some of already sent anchoring transactions could be not written to the main chain of Bitcoin blockchain. Also, on malicious behavior of some validators, new bitcoin block could contain anchoring transaction that is not expected by legitimate nodes. In total, anchoring process SHOULD be flexible enough to depend on certain situation in the bitcoin blockchain and thus is not really deterministic.
@@ -78,7 +78,7 @@ In order to get the view of the Bitcoin Blockchain, the validators SHOULD mainta
 
 Let `pk_1`, `pk_2`, `pk_n` and `sk_1`, `sk_2`, `sk_n` denote the anchoring public and private keys of validators (`n <= 15` is the total number of validators). The public keys `pk_i` MUST be ordered alphabetically when using the encoding of a compressed key used in Bitcoin Script (i.e., each public key in this form is encoded as 33 bytes - 0x02 or 0x03 depending on the parity of the y coordinate, plus 32 bytes for the x coordinate, the most significant byte first).
 
-Let m denote the minimal number of validators required for anchoring. For Byzantine fault tolerance, `m = floor(2*n/3)`. For stop fault tolerance, `m = floor(n/2)`. For no fault tolerance, `m = 1`. `m` value SHOULD correspond to the fault tolerance assumptions of the anchored blockchain.
+Let `m` denote the minimal number of validators required for anchoring. For Byzantine fault tolerance, `m = floor(2*n/3)`. For stop fault tolerance, `m = floor(n/2)`. For no fault tolerance, `m = 1`. `m` value SHOULD correspond to the fault tolerance assumptions of the anchored blockchain.
 
 The **locking script** for the multisignature is
 
@@ -119,84 +119,52 @@ Sometimes anchoring process timetable could differ from ideal. Such variations c
 - It MUST contain at least two outputs
 - The first output, called the **data output**, MUST be the OP_RETURN output structured as described in _Section 4.1_
 - The second output, called the **change output**, MUST specify the anchoring address for the next anchor (i.e., it MUST be equivalent to the multisig locking script described above)
-- The optional third output, called the **recovery output**. It MAY appear in the very first transaction of anchoring chain if the previous anchoring chain was broken. If exists, then it MUST be the OP_RETURN output structured as described in _Section 4.2_
 - The first transaction input MUST contain a multisig witness described above, with signatures covering at least the data output and the change output. If a BFT blockchain is anchored, at most `-1/2` of sigs in the first input MAY NOT cover the data and change outputs. This is because Byzantine validators may mutate these signatures after the anchoring tx is assembled. Signatures not covering the data output and the change output SHOULD be investigated out of band.
 
 ### 4.1\. Data output
 
-The data output MUST consist of an OP_RETURN instruction (0x6a) followed by a blockchain-state data chunk encoded as per Bitcoin Script spec (1-byte chunk length + byte sequence).
+The data output MUST consist of the following parts:
+
+- an OP_RETURN instruction (`0x6a`)
+- `EXONUM` at the ASCII-code (`0x45 0x58 0x4f 0x4e 0x55 0x4d`)
+- a version of the current data output, 1 byte
+- blockchain-state data chunk, encoded as described further
+- (optional) a recovering data chunk, encoded as described further
+
+Every data chunk MUST be encoded as per Bitcoin Script spec (1-byte chunk length + byte sequence). All integer chunk parts MUST be little-endian, as per the general guidelines of Bitcoin Script. 
+
+- **TODO: is there any separator byte between two chunks?**
+- **TODO: shouldn't all this detailed information be located at the implementation page?**
+- **TODO: does every chunk includes its own length or there is a one data-output length value right after `OP_RETURN`?**
+
+#### 4.2.1. Blockchain-state data chunk
+
+The chunk MUST be present in every anchoring transaction. 
 
 - 8-byte zero-based unsigned height of the anchored block (i.e., the height of the genesis block is `0`)
 - Block hash (variable length)
 
-All integer chunk parts MUST be little-endian, as per the general guidelines of Bitcoin Script.
-
 Block height allows for efficient lookups.
 
-The hash function for the block hash MUST be the function used internally in the blockchain. If SHA-256 is used, the data chunk size is `8 + 32 = 40` bytes. If SHA-512 is used, the data chunk size is `8 + 64 = 72` bytes, which is less than the current maximum size of a data chunk for a standard bitcoin transaction (80 bytes).
+The hash function for the block hash MUST be the function used internally in the blockchain. With SHA-256 is used, the data chunk size is `8 + 32 = 40` bytes. 
 
-### 4.2\. Optional outputs
+#### 4.2.1\. Recovery data chunk
 
-In addition to the necessary Data output and change output, other outputs MAY present. Such outputs are structured as follows:
-
-- OP_RETURN instruction (0x6a)
-- Output version as (one byte). Each type of output should have its own version number.
-- Some data chunk. The structure of that chunk depends on a type of the output.
-
-#### 4.2.1\. Recovery output
-
-Output version for recovery output is `01`. Recovery chunk MUST be encoded as per Bitcoin Script spec (1-byte chunk length + byte sequence).
+Recovery chunk MUST be encoded as per Bitcoin Script spec (1-byte chunk length + byte sequence).
 
 The data of the recovery chunk is structured as follows:
 
 - 32-byte bitcoin transaction hash. This hash shows that the current anchoring chain is the prolongation of previously stopped anchoring chain. The possible reasons of such stops are described further.
 
-The recovery output is optional and MAY appear in the very first bitcoin anchoring transaction only if the previous anchoring chain was failed.
+The recovery output is optional and MAY appear in the very first bitcoin anchoring transaction only if the previous anchoring chain was failed (as described in the **TODO: failure section**).
+
+**TODO: what length does recovery chunk have?**
 
 ### 4.3\. Anchoring transaction malleability
 
 As it was told, each anchoring bitcoin transaction should spend UTXO from the previous anchoring transaction. That builds an anchoring chain.
 
-In order to spend bitcoins from previous change-output, we need M signatures out of N validators. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). If all validators are legitimate, certain signature is built deterministically. But any Byzantine node could step out from deterministic algorithm and change signature of anchoring transaction. Thus it creates transaction with the same anchor hash (the same data-output) but another tx-id and spread it to the bitcoin network. Such byzantine transactions make a problem: we want to build new anchoring transaction even if previous is still not included in any bitcoin block. But previous transaction could be substituted by byzantine one with another tx-id. That makes all later (already created) anchoring transactions useless. Solution of this problem lies at the _Sections 5.1, 5.2_
-
-## 5\. Last Expected Correct Transaction (LECT)
-
-Each validator MUST keep a chain of the last K anchoring bitcoin transactions. Each transaction spends change-UTXO from the previous tx; the change-UTXO from the last transaction is not spent. K SHOULD be big enough to be sure that all validators agree with the started tx. For example if we try to anchor each 10 minutes K could be equal to 144 as we believe the bitcoin blockchain as irreversible and unchangeable on that scale. Such chains MAY differ for different validators. Each validator appoints the last transaction of that chain to be a Last Expected Correct Transaction (LECT). In the every assets-block each validator's LECT is publicized so everybody know what LECT transactions do validators appoint.
-
-Validators MUST check if their current LECT matches with their LECT published in assets-blockchain with a certain interval (for example, such check MAY be held on each assets-block). If by some reasons its current LECT differs from the one stated in the assets blockchain, the validator MUST re-broadcast message (or a service transaction) to update its LECT value in assets-blockchain.
-
-### 5.1\. Update of Last Expected Correct Transaction by validator
-
-All validators SHOULD sometimes update its LECT according to the new bitcoin blockchain state. Every validator set its own interval between updates according to its network connection and hardware characteristics. Such interval SHOULD be small enough for validator to be up-to-date. At the necessary time validator SHOULD update its anchoring chain. Last transaction of that new chain is defined as new LECT and MUST be propagated to the next block of the assets-blockchain. For example, algorithm of updating could be such:
-
-1. Each validator keeps the current anchoring multisig-address and track for its transactions.
-2. Each validator keeps (and respectively updates) the list of the already known anchoring transactions.
-3. Validator checks list of unspent UTXOs for the current anchoring multisig-address. Node should check not only confirmed UTXOs but also transactions that are in mempool yet.
-4. Each UTXO SHOULD have one of the following types:
-
-  1. Unspent transaction MAY already be known to validator as anchoring one; if so, then it is our LECT.
-  2. Unspent transaction MAY look like funding one; if so, we SHOULD check it over the initial funding transaction. That case is the only one when LECT is not anchoring transaction.
-  3. Unspent transaction MAY look like anchoring one, but is unknown to validator yet; if so, then we MUST check if it have anchoring transaction as one of its inputs. We check its inputs in the same way as we checked transaction itself.
-
-5. Unspent transaction is neither anchoring one nor funding one; if so, it can not be the LECT.
-
-  Such approach could be implemented using BitcoinCore `listunspent` RPC method. However, there is a weakness for spam: every time we update our LECT we should check every unspent UTXO from the anchoring multisig-address. Malefactor can send a lot of dummy txs that would slow process. Normally there should be strictly one anchoring transaction with unspent change-output. But if we are moving to the new anchoring multisig-address we MAY find no appropriate UTXOs. See _Section 9.3.1_ for details.
-
-### 5.2\. Different interactions between _old LECT_ and _new LECT_
-
-Let us call the last anchoring transaction already known to us as _old LECT_; respectively, we will call result of the previously described procedure as _new LECT_. Please, note that _old | new_ are not about transaction timestamp: _old_ means "we knew that LECT before updating", while _new_ means "the LECT after updating".
-
-1. _old LECT_ is the same as _new LECT_. LECT is still the last tx of anchoring bitcoin. Nothing changed.
-2. _new LECT_ is located after _old LECT_ in the anchoring chain. That means other validators anchored new block but the current node for some reason did not participated in it. Validator MUST publish new LECT into assets blockchain (see _Section 5_)
-3. _new LECT_ is already included in the list of anchored transactions, but it differs from _old LECT_. For some reasons Bitcoin node left all the following transactions (for example, bitcoin node was rebooted and cleared its mempool). The current node SHOULD re-broadcast these following already created anchoring transactions to the bitcoin node.
-4. _new LECT_ is unknown to the current node but it have common root with _old LECT_ (different than _old LECT_ itself). Graphically:
-
-  ```
-  tx1 --> tx2 --> ... --> old LECT
-  ^^^^^-> new LECT
-  ```
-
-  Such situation MAY appear because of _transaction malleability_ (see _Section 4.3_). All previously generated anchoring transactions following `tx2` are useless now and could not be included to the Bitcoin blockchain anymore. Validator MUST publish new LECT into assets blockchain (see _Section 5_)
+In order to spend bitcoins from previous change-output, we need `M` signatures out of `N` validators. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). If all validators are legitimate, certain signature is built deterministically. However, any Byzantine node could step out from deterministic algorithm and change signature of anchoring transaction. Thus it creates transaction with the same anchor hash (the same data-output) but another tx-id and spread it to the bitcoin network. Such byzantine transactions make a problem: we want to build new anchoring transaction even if previous is still not included in any bitcoin block. But previous transaction could be substituted by byzantine one with another tx-id. That makes all later (already created) anchoring transactions useless. Solution of this problem lies at the **TODO: update, set a link** _Sections 5.1, 5.2_
 
 ## 6\. Anchoring Verification
 
@@ -207,6 +175,9 @@ Anchors can be verified both in real time and retrospectively. The real-time ver
 Anchors SHOULD be verified in real time by all parties replicating the blockchain in whole or in parts; in particular, all full nodes and lightweight nodes. Naturally, the validators MUST verify anchors.
 
 The rules for verification is as follows:
+
+
+**TODO: rewrite rules**
 
 1. The verifier MUST monitor all spending transactions from the current anchoring address. Let `tx` denote a new spending transaction from such an address.
 2. If `tx` is a valid anchoring transaction as per _Section 4_, then the verifier checks if the chain block at height specified by the anchor has the same hash as specified by the anchor. If not, the verifier MUST fail verification.
@@ -229,6 +200,8 @@ In the case anchoring txs are absent for a prolonged period of time (e.g., 6 hou
 One of the goals of anchoring is to provide long-term non-repudiation, including the cases when the blockchain ceases functioning and there is no authoritative source as to the blockchain transactions or blockchain state. This problem is solved with the help of blockchain receipts.
 
 **Blockchain receipt** for a blockchain transaction `tx` is:
+
+**TODO: is it really built?**
 
 - `tx` encoded as per the blockchain spec
 - The path in the Merkle tree from `tx` to the transaction root of the block `b`, in which `tx` resides
@@ -283,30 +256,55 @@ XXX: anchoring some shit is a more viable case, yet we don't consider it. A thir
 
 A variant of real-time verification could be adopted for "near" real-time verification, e.g., by syncing full or lightweight nodes. In this case, the latest blockchain state known by the node should not be that far behind the current state, so the verification procedure is simpler than retrospective verification described above.
 
+## 5\. Last Expected Correct Transaction
+
+Before diving into the details of how anchoring transaction is built, the Last Expected Correct Transaction (LECT) should be introduced.
+
+Every anchoring transaction spends change-output from the previous tx. Thus, the validators should make a consensus over which transaction is previous one ans thereby should be spent. The difference between the validators' opinions is caused by the matter and uncertainty of the bitcoin blockchain state.
+
+Every node from time to time MUST check the bitcoin blockchain state and define which bitcoin transaction is the last one in the current anchoring chain. Such transaction is called a LECT for the specified validator. The following properties should be persisted for the LECT:
+
+- It is valid anchoring transaction for the curren Exonum blockchain
+- It may have any amount of confirmations, in particular, 0
+- Its change output should be not spent. That means that the specified validator believes there was no following anchoring transactions after this one
+- Among all bitcoin transactions satisfying the previous properties, LECT should have the greatest anchored Exonum block height
+- If multiple transactions respond to previous conditions, any of them may be choosed as a LECT.
+
+The identification process is out of scope for this specification and depends on the way validators communicate with the bitcoin network.
+
+!!! note "Exonum implementation"
+	See [Anchoring Implementation](anchoring-impl.md) to know how the anchoring service is implemented in the Exonum.
+
+The LECTs' registry is maintained in the Exonum blockchain. Every validator should publicate its new LECT every time it is changed; therefore, all the validators' LECTs are publicly known to everybody.
+
 ## 7\. Creating Anchoring Transactions
 
 This section describes generation of anchoring transactions in Exonum-BFT.
 
 - Say `H` is the block height of the block that MUST be anchored (recall that determining the nearest `H` is fully deterministic given the blockchain data). Block `#H` is accepted using generic blockchain rules.
 - Starting from this block `#H`, every validator monitors list of current LECTs. As soon as there is a common LECT (that is defined by `+2/3` validators), **anchoring transaction proposal** (the anchoring transaction without validators' sigs) is completely defined and is agreed upon by `+2/3` validators.
-- Any proposal of block `#(H+1)` MUST include special type transactions from `+2/3` of validators (the exact number: e.g., 7 in a 10-party consensus), each of which contains signatures on the all inputs of the anchoring transaction proposal of a specific validator. Any block proposal with the incorrect amount of these signatures is invalid and MUST NOT be processed.
+- Any proposal of block `#(H+1)` MUST include special type transactions from `+2/3` of validators (the exact number: e.g., 7 in a 10-party consensus), each of which contains signatures on the all inputs of the anchoring transaction proposal of a specific validator.
 - Each signature MUST have `SIGHASH_ALL` sighash type.
 - _All_ signatures from a specific validator MUST be valid for the corresponding transaction to be valid
 - Based on the signatures, _any_ party with sufficient access to the blockchain can create anchoring transaction and broadcast it to the Bitcoin network. Because of deterministic algorithm of selecting necessary signatures for new anchoring transaction every legitimate node MUST get the same anchoring tx (with the same tx-id).
-- Every legitimate validator agreed with the selected LECT (and accordingly signed anchoring transaction proposal) SHOULD update its LECT with the hash of new complete anchoring transaction. Also every such validator MAY send complete anchoring transaction to the Bitcoin network.
-- If at the block `#H` there is no common LECT (that is agreed upon `+2/3` validators) than no anchoring happened. Assets-blockchain continue to create new blocks. All validators wait until some of them would update its anchoring chain and common LECT would be found. By the reason of uncertainty in the bitcoin blockchain common LECT could be found even after new time for anchoring comes. New state for anchoring is the last assets-blockchain state we need to anchor. For example now we are at the height `#11000` and anchoring should be held every `1000` blocks. But common LECT appeared only at the height `#12345`. In that case we anchor block `#12000` but there would be no anchor for block `#11000`
+- Every legitimate validator agreed with the selected LECT (and accordingly signed anchoring transaction proposal) SHOULD update its LECT with the hash of new complete anchoring transaction. However, until such update is publicized and is written to the Exonum blockchain, validator MAY NOT count new LECT as active one.
+- Also every legitimate validator agreed with the selected LECT MAY send complete anchoring transaction to the Bitcoin network.
+- If at the block `#H` there is no common LECT (that is agreed upon `+2/3` validators) than no anchoring happened. Assets-blockchain continue to create new blocks. All validators wait until some of them would update its anchoring chain and common LECT would be found. By the reason of uncertainty in the bitcoin blockchain common LECT could be found even after new time for anchoring comes. New state for anchoring is the last assets-blockchain state we need to anchor. 
+
+!!! note "Example"
+	The Exonum network is at the height `#11000` and anchoring should be held every `1000` blocks. But common LECT appeared only at the height `#12345`. In that case block `#12000` would be anchored, however there would be no anchor for block `#11000`
 
 ### 7.1\. Anchoring Transaction Proposal
 
 An anchoring transaction proposal is constructed as follows:
 
-- It MUST conform to the Bitcoin transaction specification with SegWit activated (except having no signature witnesses for the transaction inputs)
+- It MUST conform to the Bitcoin transaction specification.
 - The inputs are:
 
-  - The change output of the selected common LECT. This input MUST present in every anchoring transaction except the first one.
-  - Funding UTXOs agreed upon as configuration changes and not included in a previous anchoring transaction The inputs are ordered using BIP 69 [BIP69]
+  - The change output of the selected common LECT. This input MUST present in every anchoring transaction except the first one. This input MUST have `#0` position.
+  - Funding UTXOs agreed upon as configuration changes and not included in a previous anchoring transaction.
 
-- The outputs MUST contain a data output and the change output, and the optional allowed outputs only. The data output MUST be first, and the change output MUST be second
+- The outputs MUST contain a data output and the change output only. The data output MUST be first, and the change output MUST be second
 
 - The data output MUST anchor correct information as per _Section 4.1_
 
@@ -320,7 +318,7 @@ The whole procedure MAY be automated as a smart contract, which outputs the anch
 
 Due to uncertainty in the status of the last anchoring transactions, blocks of the assets blockchain could be divided into zones according to their anchoring status confidence.
 
-- Green zone: blocks whose first anchoring transactions have enough confirmations in the bitcoin blockchain and thus could be not deleted (for example, >= 144 confirmations)
+- Green zone: blocks whose first anchoring transactions have enough confirmations in the bitcoin blockchain and thus could be not deleted (for example, `>= 144` confirmations)
 - Yellow zone: blocks whose anchoring transactions are already written to the blockchain but have small number of confirmations. They are very unlikely to be deleted.
 - Orange zone: blocks whose anchoring transactions is already generated and sent to the Bitcoin blockchain but still have 0 confirmations. In some cases such anchors could be removed.
 - Red zone: blocks that appeared after last anchoring transaction was generated. They are still not anchored at all.
@@ -329,7 +327,9 @@ Due to uncertainty in the status of the last anchoring transactions, blocks of t
 
 ### 9.1\. Fee value
 
-There is no constraints as to the fee value, other than being non-negative. Sound values SHOULD be determined based on the sufficiently confirmed part of the Bitcoin Blockchain (so that it is shared among all validators).
+There is no constraints as to the fee value, other than being non-negative. The mentioned value is stored at the global Exonum configuration as a constant as therefore is shared amon all validators.
+
+The update is done through the common Global Configuration Update process and is out of scope of this specification.
 
 The fee value is applied to all following anchoring transactions after it is accepted.
 
@@ -339,8 +339,8 @@ A funding UTXO is referred to as a pair `(txid, outnum)`. It MUST be locked with
 
 1. It MUST be added by administrators through configuration changing manually.
 2. Each validator monitors configuration changes.
-3. After new configuration is accepted by every node (it takes place on the height `H` specified by administrator; accepting new configuration is out of the scope for this document) we believe new funding transaction can be used. It should have enough confirmations to this moment. However, administrator is responsible for this and nodes do not check number of confirmations for UTXOs.
-4. Each validator checks last funding-txs defined in configuration and filters only such UTXOs that have not being spent yet.
+3. After new configuration is accepted by every node (it takes place on the height `H` specified by administrator; accepting new configuration is out of the scope for this document) new funding transaction can be used. It should have enough confirmations to this moment. However, administrator is responsible for this and nodes do not check number of confirmations for UTXOs.
+4. Each validator checks funding tx defined in configuration if it has not being spent yet.
 5. The whole system add funding UTXO as a second input for the next anchoring transaction.
 
 Such approach solves following questions:
@@ -363,11 +363,10 @@ Anchoring pubkeys MAY be changed in the course of periodic key rotation. Alterna
 
 Anchoring pubkeys define new Anchoring BTC-address. In order to prolong anchoring chain, new anchoring transaction should spend previous anchoring address UTXO and send it to the new anchoring address. We MUST be confident such transaction would be written to the blockchain **before** we really change the list of validators. Thus we need suspend anchoring process.
 
-- We SHOULD wait until last already existed anchoring BTC transaction is written to the Bitcoin blockchain. We do not need all really generated txs to be written; it's sufficient that common LECT would be written.
+- We SHOULD wait until common LECT is written to the Bitcoin blockchain. We do not need all really generated txs to be written
 - After common LECT appears and is written to the Bitcoin blockchain, we MUST wait until it will gather sufficient number of confirmations (ex., `24`).
 - Further we SHOULD generate Anchoring transaction proposal that would move money to the new anchoring address. Lets call such anchoring transaction as transitional.
-- As anchoring chain is already moved to the new anchoring address we MUST wait until new validator set is applied.
-- Anchoring process SHOULD be resumed. We do not wait until transitional transaction get enough confirmations.
+- As anchoring chain is already moved to the new anchoring address we MUST wait until new validator set is applied. The anchoring process SHOULD be resumed after it.
 
 Such process could suspend anchoring transaction on fairly a big time. For example, if we would wait until 24 confirmations, total pause could last for 4-6 hours.
 
@@ -381,13 +380,12 @@ After anchoring chain was broken (_Section 9.3_) administrators MUST generate ne
 
 A completed anchoring transaction is a (transitional) anchoring tx proposal supplied with at least `m` anchoring signatures for each input.
 
-- A completed anchoring transaction SHOULD be pushed to the Bitcoin network by the proposer of the block at height `H+1`.
+- A completed anchoring transaction SHOULD be pushed to the Bitcoin network by the every validator agreeing upon it after a validator receives data necessary for its creation.
 - If a validator has more sigs for a completed anchoring tx than necessary, the validator SHOULD use sigs belonging to the anchoring pubkeys with the least indices as specified by the ordering in _Section 3_. Note that as a result, the validator MAY omit his own signatures from the transaction.
-- If a completed tx is not pushed to the network for 1 minute (**TODO: parameter?**) after a validator receives data necessary for its creation, the validator SHOULD push the completed tx on his own.
 
 Note that a completed anchoring transaction MAY reference UTXOs created by previous anchoring transactions, which are not yet confirmed. This situation is normally processed by the Bitcoin nodes; a chain of unconfirmed transactions is stored in the mempool and is gradually confirmed. There are limits on the length of unconfirmed transaction chains dictated by the node policies (i.e., these rules are local and configurable, and not a part of consensus). By default, the maximum number of unconfirmed transaction ancestors/descendants is 25 [BtcMainH]. This SHOULD be enough for the anchoring intervals mentioned in _Section 3.1_.
 
-As alias for the new Anchoring transaction could be created by byzantine node (i.e. transaction with the same outputs, but different list (or order) of signatures, thus having new tx-id) there is no guarantee that transaction would be written to the Bitcoin blockchain sometime.
+As alias for the new Anchoring transaction could be created by byzantine node (i.e. transaction with the same outputs, but different list of signatures, thus having new tx-id) there is no guarantee that transaction would be written to the Bitcoin blockchain sometime.
 
 Moreover, as new Anchoring transaction is based on the selected LECT that could be still in the mempool and could be substituted by another byzantine transaction, there is no guarantee that this anchored block would be really anchored sometime.
 
@@ -400,13 +398,6 @@ Sometimes bitcoin transactions do not want to confirm; that's a harsh reality of
 
 If no anchoring transactions are confirmed for a prolonged period of time (**TODO: 3-6 hours?**), the situation MUST be investigated out of band. With overwhelming probability this situation would be caused not by insufficient fee, but rather by transaction censorship.
 
-## 11\. Anchoring states.
-
-In total, Anchoring service may appear in one of the following states.
-
-1. _Anchoring_. When everything is going as usual, we are not moving to new validators set, create anchors at the necessary Exonum blockchain heights, update our LECTs, etc.
-2. _Transition_. If new validator set should be applied then we wait until last common LECT receives efficient amount of confirmations. During this waiting (and until we are really moved to new validator set) Anchoring service is in the _Transition_ state.
-3. _Broken_. If new validator set is applied before last common LECT get efficient number of confirmations then we fall into the _Broken_ state. We have this state until new funding transaction appears.
 
 ## 12\. Example
 
@@ -416,43 +407,37 @@ In total, Anchoring service may appear in one of the following states.
 
 This specification is not ideal and introduces some weak points.
 
-1. Transaction malleability.<br>
-  Let us have an anchoring chain.
+### 13.1. Transaction malleability
 
-  ```
-  tx1 --> tx2 --> tx3 --> tx4
-  ```
+Let us have an anchoring chain.
 
-  `tx2..tx4` have 0 confirmations that is they where not added to any bitcoin block. If so, Byzantine node can create and broadcast over the bitcoin network `tx2_new` transaction using `transaction malleability`. If this transaction is written to the bitcoin blockchain then anchoring txs `tx3..tx4` disappear, because they would never be accepted. So, anchoring chain will look like this:
+```
+tx1 --> tx2 --> tx3 --> tx4
+```
 
-  ```
-  tx1 --> tx2 --> tx3 --> tx4
-  ^^^^^-> tx2_new --------------> tx_5
-  ```
+`tx2..tx4` have 0 confirmations that is they where not added to any bitcoin block. If so, Byzantine node can create and broadcast over the bitcoin network `tx2_new` transaction using `transaction malleability`. If this transaction is written to the bitcoin blockchain then anchoring txs `tx3..tx4` disappear, because they would never be accepted. So, anchoring chain will look like this:
 
-  And there is a big gap inside this chain. Assets-blockchain blocks anchored in `tx3`, `tx4` temporarily loose its anchors. Eventually we can assume blocks really anchored only if according anchoring transaction receives sufficient amount of confirmations.
+```
+tx1 --> tx2 --> tx3 --> tx4
+^^^^^-> tx2_new --------------> tx_5
+```
 
-2. Service should be paused during list of validators pubkeys changing<br>
-  We change anchoring multisig-address when the list of validators pubkeys changing. The network should wait until common LECT receives sufficient amount of confirmations before moving to the new multisig-address. The certain time depends on the necessary amount of confirmations and may be placed in the range of 1-24 hours. New blocks will be not anchored in this time. See details at _Section 9.3_.
+And there is a big gap inside this chain. Assets-blockchain blocks anchored in `tx3`, `tx4` temporarily loose its anchors. Eventually we can assume blocks really anchored only if according anchoring transaction receives sufficient amount of confirmations.
 
-3. Broken anchoring chain<br>
-  This is an enhancement of the previous point. If the common LECT would fail in receiving confirmations and the network moves to the new pubkeys list earlier, then the old anchoring chain would be broken and we would not prolong it. The service should start new anchoring chain not connected with the previous one; it looks like service is totally turned off and then turned on.
+### 13.2. Service should be paused during list of validators pubkeys changing.
 
-4. UTXOs spam<br>
-  LECT updating now is implemented using BitcoinCore `listunspent` RPC method. Malefactor can spam our anchoring address using thousands of small txs. We will repeat checking all this transactions at every round.
+We change anchoring multisig-address when the list of validators pubkeys changing. The network should wait until common LECT receives sufficient amount of confirmations before moving to the new multisig-address. The certain time depends on the necessary amount of confirmations and may be placed in the range of 1-24 hours. New blocks will be not anchored in this time. See details at _Section 9.3_.
 
-5. Administrators responsibility
+### 13.3. Broken anchoring chain
 
-  1. Funding txs confirmations<br>
-    Funding txs should take sufficient amount of confirmations before it could be safely used in the anchoring chain. But this is not checked by the validators and is up to administrators.
-  2. Fees Just now amount of fees is fixed at the network config.
+This is an enhancement of the previous point. If the common LECT would fail in receiving confirmations and the network moves to the new pubkeys list earlier, then the old anchoring chain would be broken and we would not prolong it. The service should start new anchoring chain not connected with the previous one; it looks like service is totally turned off and then turned on.
 
-  But it is better to use adaptive techniques when the fee size is calculated according to the current bitcoin blockchain situation. If blockchain is flooded with transactions we may want to increase fee accordingly to guarantee our anchoring transactions are accepted quickly.
 
-6. Common LECT may not be found<br>
-  Every validator tracks for the LECT independently from each other. We need `+2/3` validators agree upon common LECT in order to build the next anchoring transaction. But because of bitcoin forks and `transaction malleability` sometimes nodes can not choose the common LECT. The problem will be solved only after bitcoin network set one of the forked chains as `orphaned` one.
+### 13.6. Common LECT may not be found
 
-7. Signatures checking Validator believes to Bitcoin node. It does not check any signatures for the bitcoin transactions received through RPC.
+Every validator tracks for the LECT independently from each other. We need `+2/3` validators agree upon common LECT in order to build the next anchoring transaction. But because of bitcoin forks and `transaction malleability` sometimes nodes can not choose the common LECT. The problem will be solved only after bitcoin network set one of the forked chains as `orphaned` one.
+
+
 
 ## References
 
