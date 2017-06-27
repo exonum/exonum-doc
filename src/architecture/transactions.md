@@ -1,10 +1,10 @@
 # Transactions
 
-A **transaction** in Exonum
-([as in usual databases](https://en.wikipedia.org/wiki/Database_transaction))
+A **transaction** in Exonum,
+[as in usual databases](https://en.wikipedia.org/wiki/Database_transaction),
 is a group of sequential operations with the data (i.e., the Exonum [key-value storage](storage.md)).
-Transactions are defined in [services](services.md) and determine all business logic
-of any Exonum-powered blockchain.
+Transaction processing rules are defined in [services](services.md);
+these rules determine business logic of any Exonum-powered blockchain.
 
 Transactions are executed [atomically, consistently, in isolation and durably][wiki:acid].
 If the transaction execution violates certain data invariants,
@@ -33,6 +33,31 @@ various constraints based on this key.
     in this case means verifying that a transaction is digitally signed with
     a specific key, and authorization means that this key is associated with
     a sufficient amount of coins to make the transaction.
+
+## Transaction Templates
+
+All transactions in Exonum are *templated*. Every Exonum transaction
+is defined by its template and a set of parameters, rather than by an overt
+sequence of operations on the key-value storage. The sequence of operations
+can be unambiguously restored given a template identifier and template parameters.
+This design leads to a more safe and controlled environment for transactional
+processing.
+
+Transaction templates are defined in services and could be viewed as an analogue
+to stored procedures in database management systems, or to POST/PUT endpoints
+in web services. Similar to these cases, the goal of templating is to restrict
+eligible transaction patterns (e.g., to preserve certain invariants) and to
+separate implementation details from transaction invocation.
+
+!!! summary "Trivia"
+    From the computer science perspective, an arbitrary Exonum transaction
+    can be defined as `Tx: S -> S`, where `S` denotes the key-value storage type.
+    Templating corresponds to defining parameterized families of transactions
+    `TxTemplate(i: I): P(i) -> S -> S`,
+    where `I` is the set of defined transaction families and `P(i)`
+    is the parameter space for the `i`th family. Correspondingly, any transaction
+    in Exonum is [a partially applied function][wiki:currying]
+    with the transaction family and parameters fixed.
 
 ## Serialization
 
@@ -81,10 +106,10 @@ Fields used in transaction serialization are listed below.
 ### Network ID
 
 This field will be used to send inter-blockchain messages in the future
-releases. For now, it is not used.
+releases. Not used currently.
 
 **Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number
+**JSON presentation:** number.
 
 ### Protocol Version
 
@@ -96,8 +121,8 @@ The major version of the Exonum serialization protocol. Currently, `0`.
 ### Service ID
 
 Sets the [service](services.md) that a transaction belongs to.
-The pair (`service_id`, `message_id`) is
-a key used to lookup implementation of [the transaction interface](#interface)
+The pair `(service_id, message_id)` is
+used to look up the implementation of [the transaction interface](#interface)
 (e.g., `verify` and `execute` methods).
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
@@ -109,8 +134,8 @@ a key used to lookup implementation of [the transaction interface](#interface)
 
 !!! note "Example"
     [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `AddFundsTransaction` for coins emission
-    and `TransferTransaction` for coin transfer.
+    types of transactions: `TxIssue` for coins issuance
+    and `TxTransfer` for coin transfer.
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
 **JSON presentation:** number.
@@ -133,7 +158,7 @@ Binary serialization of the body is performed using
 according to the transaction specification in the service.
 
 !!! note "Example"
-    The body of `TransferTransaction` in the sample cryptocurrency service
+    The body of `TxTransfer` in the sample cryptocurrency service
     is structured as follows:
 
     | Field      | Binary format | Binary offset | JSON       |
@@ -182,7 +207,7 @@ Transaction interface defines 3 methods: [`verify`](#verify),
 ### Verify
 
 ```rust
-fn verify(&self) -> bool
+fn verify(&self) -> bool;
 ```
 
 The `verify` method verifies the transaction, which includes the message
@@ -195,28 +220,65 @@ be included into any correct block proposal. Incorrect transactions are never
 included into the blockchain.
 
 !!! note "Example"
-    In [the cryptocurrency service][cryptocurrency]
-    a `TransactionSend` verifies the digital signature and checks that
+    In [the cryptocurrency service][cryptocurrency],
+    `TxTransfer.verify` checks the digital signature and ensures that
     the sender of coins is not the same as the receiver.
 
 ### Execute
 
 ```rust
-fn execute(&self, view: &View)
-           -> Result<(), ::exonum::storage::StorageError>
+fn execute(&self, view: &mut Fork);
 ```
 
 The `execute` method takes the current blockchain state and can modify it (but can
 choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
-storage ([under certain conditions](../advanced/consensus/consensus.md)).
+storage [under certain conditions](../advanced/consensus/consensus.md).
 
 !!! note
     `verify` and `execute` are triggered at different times. `verify` checks
     internal consistency of a transaction before the transaction is included
-    into the [proposal block](../advanced/consensus/consensus.md). `execute`
-    performs [almost at the same time](../advanced/consensus/consensus.md) as
+    into a [pool of unconfirmed transactions](../advanced/consensus/consensus.md).
+    `execute` is performed during the `Precommit` stage of consensus and when
     the block with the given transaction is committed into the blockchain.
+
+!!! note "Example"
+    In the sample cryptocurrency service, `TxTransfer.execute` verifies
+    that the sender’s and recipient’s accounts exist and the sender has enough
+    coins to complete the transfer. If these conditions hold, the sender’s
+    balance of coins is decreased and the recipient’s one is increased by the amount
+    specified in the transaction. Additionally, the transaction is logged in the
+    sender’s and recipient’s history of transactions; the logging is performed even
+    if the transaction execution is unsuccessful (e.g., the sender has insufficient
+    number of coins). Logging helps to ensure that
+    the account state is verifiable by light clients.
+
+If the `execute` method of a transaction raises an unhandled exception (panics
+in the Rust terms), the changes made by the transactions are discarded,
+but the transaction itself is still considered committed. Such erroneous transactions
+can be included into the blockchain provided they panic for at least 2/3
+of the validators.
+
+!!! note
+    Rust commonly uses [`Result`s][rust-result] to handle errors,
+    so using `panic` just to roll back
+    transaction execution (e.g., if blockchain state-specific checks fail)
+    may be considered poor coding style.
+
+!!! warning
+    As of Exonum 0.1, it is the sole responsibility of a service developer to
+    ensure that transactions logically failing during the `execute` stage
+    do not change the blockchain state.
+    (An example of such a transaction is a `TxTransfer` in the cryptocurrency service
+    that attempts to transfer more coins than the sender has.)
+    Correspondingly, when programming `execute`, you should perform state-related
+    checks *before* any changes to the state and return early if these checks fail.
+
+    Preliminary checks may seem unusual compared to other blockchains,
+    but they fit well with the computational model of Exonum 0.1, in which
+    [services cannot directly access each other’s endpoints](services.md#limitations).
+    In this model, preliminary
+    checks are the most robust way to organize transaction execution.
 
 ### Info
 
@@ -230,7 +292,7 @@ The method has no access to the blockchain state, same as `verify`.
 
 !!! note "Example"
     In [the cryptocurrency service][cryptocurrency]
-    an `info` method of `TransactionSend` returns JSON with fields `from`, `to`,
+    an `info` method of `TxTransfer` returns JSON with fields `from`, `to`,
     `amount` and `seed`.
 
 ## Lifecycle
@@ -238,13 +300,13 @@ The method has no access to the blockchain state, same as `verify`.
 ### 1. Creation
 
 A transaction is created by an external entity (e.g., a
-[thin client](clients.md)) and is signed with a private key necessary to authorize
+[light client](clients.md)) and is signed with a private key necessary to authorize
 the transaction.
 
 ### 2. Submission to Network
 
 After creation, the transaction is submitted to the blockchain network.
-Usually, this is performed by a thin client connecting to a full node
+Usually, this is performed by a light client connecting to a full node
 via [an appropriate transaction endpoint](services.md#transactions).
 
 !!! note
@@ -253,11 +315,20 @@ via [an appropriate transaction endpoint](services.md#transactions).
     by anyone aware of the transaction. There is no intrinsic upper bound on
     the transaction lifetime, either.
 
+!!! tip
+    From the point of view of a light client, transaction execution is
+    asynchronous; full nodes do not return an execution status synchronously
+    in a response to a client’s request. To determine transaction status,
+    you may poll the transaction status using [read requests](services.md#read-requests)
+    defined in the corresponding service or the blockchain explorer.
+    If a transaction is valid (i.e., its `verify` returns `true`), it’s expected
+    to be committed in a matter of seconds.
+
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
 among committed transactions, using the transaction hash as the unique
-identifier. If a transaction has been committed previosuly, it is
+identifier. If a transaction has been committed previously, it is
 discarded, and the following steps are skipped.
 
 The transaction implementation is then looked up
@@ -268,7 +339,17 @@ If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
 
-### 4. Consensus
+### 4. Broadcasting
+
+If a transaction included to the pool of unconfirmed transactions
+is received by a node not from another full node,
+then the transaction is broadcast to all full nodes that the node is connected to.
+In particular, a node broadcasts transactions received from light clients
+or generated internally by services, but does not rebroadcast
+transactions that are broadcast by peer nodes or are received with the help
+of [requests](../advanced/consensus/requests.md) during consensus.
+
+### 5. Consensus
 
 After a transaction reaches the pool of a validator, it can be included
 into a block proposal (or multiple proposals).
@@ -279,7 +360,7 @@ into a block proposal (or multiple proposals).
     with the smallest hashes when building a proposal. This behavior shouldn’t
     be relied upon; it is likely to change in the future.
 
-The transaction is executed with `execute` during the
+The transaction `execute`s during the
 lock step of the consensus algorithm. This happens when a validator
 has collected all
 transactions for a block proposal and certain conditions are met, which imply
@@ -288,13 +369,14 @@ The results of execution are reflected in `Precommit` consensus messages and
 are agreed upon within the consensus algorithm. This allows to ensure that transactions
 are executed in the same way on all nodes.
 
-### 5. Commitment
+### 6. Commitment
 
 When a certain block proposal and the result of its execution gather
 sufficient approval among validators, a block with the transaction is committed
 to the blockchain. All transactions from the committed block are sequentially applied
-to the persistent blockchain state in the order they appear in the block
-(i.e., the order of application is the same for every node in the network).
+to the persistent blockchain state by invoking their `execute` method
+in the same order the transactions appear in the block.
+Hence, the order of application is the same for every node in the network.
 
 ## Transaction Properties
 
@@ -309,14 +391,14 @@ only once – when it’s submitted to the pool of unconfirmed transactions.
 
 !!! note
     As a downside, `verify` cannot perform any checks that depend on the blockchain
-    state. For example, in the cryptocurrency service, `TransactionSend.verify`
+    state. For example, in the cryptocurrency service, `TxTransfer.verify`
     cannot check whether the sender has sufficient amount of coins to transfer.
 
 ### Sequential Consistency
 
 [Sequential consistency](https://en.wikipedia.org/wiki/Sequential_consistency)
 essentially means that the blockchain looks like a centralized system for an
-external observer (e.g., a thin client). All transactions in the blockchain
+external observer (e.g., a light client). All transactions in the blockchain
 affect the blockchain state as if they were executed one by one in the order
 specified by their ordering in blocks. Sequential consistency is guaranteed
 by the [consensus algorithm](../advanced/consensus/consensus.md).
@@ -345,7 +427,7 @@ on the verify step.
     an additional field to distinguish among transactions with the same
     set of parameters. This field needs to have a sufficient length (e.g., 8 bytes)
     and can be generated deterministically (e.g., via a counter) or
-    (pseudo-)randomly. See `TransactionSend.seed` in the cryptocurrency service
+    (pseudo-)randomly. See `TxTransfer.seed` in the cryptocurrency service
     as an example.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
@@ -358,3 +440,5 @@ on the verify step.
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
+[wiki:currying]: https://en.wikipedia.org/wiki/Currying
+[rust-result]: https://doc.rust-lang.org/book/first-edition/error-handling.html
