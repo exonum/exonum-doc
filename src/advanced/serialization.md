@@ -221,7 +221,15 @@ adjacent to each other for each serialized structure):
 
 Fixed-length fields are stored completely in the header.
 Var-length fields are allocated as segments in the body,
-plus take 8 bytes in the header for a corresponding segment pointer.
+plus take 8 bytes in the header: 4 bytes for a corresponding segment pointer and
+4 bytes for segment field size.
+
+!!! note
+    If field is slice, corresponding 8 bytes in the header of structure mean a
+    corresponding segment pointer (4 bytes) and number of slice elements (4
+    bytes). Slice size in bytes is calculated based on number of elements and
+    size of one element.
+
 Thus, a segment pointer in the header (the position of which is known in compile
 time) points to the segment in the body,
 which contains the actual serialization of the field. Segments are placed
@@ -248,6 +256,9 @@ elements, then its body contain elements themselves. If slice consists of
 var-length elements, the body of such a slice contains
 pointers to the elements of the slice, and elements themselves are located
 further in memory.
+
+Number of the slice elements is specified in the header of structure containing
+the slice.
 
 All slices are var-length datatypes.
 
