@@ -1,26 +1,8 @@
-# Anchoring using Bitcoin multisignatures
+# Anchoring service
 
-**NB.** This document does not describe how anchoring (which tries to conform to this specification) is implemented in Exonum. We have [a separate document](../architecture/anchoring.md) for that.
+The anchoring service is developed to increase product security and provide non-repudiation for Exonum applications. Service publishes assets-blockchain state hash to the bitcoin blockchain. ....
 
-```none
-Type: Process specification
-Status: Initial draft
-Authors: Alex Ostrovski, Bitfury Group
-Viacheslav Kukushkin, Bitfury Group
-```
-
-## Abstract
-
-This document describes the use of native Bitcoin multisignatures to anchor a private/permissioned blockchain with BFT consensus (i.e., known blockchain maintainers) onto the Bitcoin Blockchain. The anchoring achieves full accountability of private blockchain maintainers/validators (cf. accountability of the linked timestamping service as per [LinkedTS]), long-term non-repudiation, and resistance of the system to DoS, including (but not limited to) a complete shutdown of the private blockchain infrastructure. **TODO: does new anchoring really supports all these advantages?**
-
-## 1\. Introduction
-
-Private blockchain infrastructure necessitates additional measures for accountability of the blockchain validators. In public PoW blockchains (e.g., Bitcoin), accountability is purely economic and is based on game theory and equivocation or retroactive modifications being economically costly. Not so in private blockchains, where these two behaviors are a real threat per any realistic threat model that assumes that the blockchain is of use not only to the system validators, but also to third parties (e.g., regulators, auditors, and/or end clients in the case of a financial service blockchain). See [BFAudit] for a more detailed research on the topic.
-
-This documents proposes a protocol for blockchain anchoring onto the Bitcoin Blockchain that utilizes the native Bitcoin capabilities of creating multisig transactions (i.e., transactions authorized by multiple entities). This is in contrast with other two approaches described in [BFAudit]:
-
-- Anchors produced by a single blockchain maintainer (used, e.g., in Factom)
-- Anchors produced using threshold ECDSA signatures. To create a threshold signature, the validators initiate a Byzantine fault-tolerant computation which results in a single ECDSA signature over the predetermined message keyed by a public key which may be deterministically computed in advance based on public keys of the validators.
+ achieves full accountability of private blockchain maintainers/validators, long-term non-repudiation, and resistance of the system to DoS, including (but not limited to) a complete shutdown of the Exonum blockchain infrastructure.
 
 ### 1.1\. Glossary of Terms
 
@@ -34,16 +16,6 @@ This documents proposes a protocol for blockchain anchoring onto the Bitcoin Blo
 - Lightweight node
 - Funding UTXO
 
-### 1.2\. Requirements Language
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 [RFC2119].
-
-## 2\. Assumptions and Limitations
-
-It is assumed that one can readily create multisig transactions in Bitcoin. The exact nature of these transactions (e.g., whether they utilize SegWit or P2SH) is outside the scope of this specification. Thus, the **locking script** and **unlocking script** will refer to their meaning as if multisig transactions were created without SegWit or P2SH.
-
-We assume that SegWit is not deployed in Bitcoin. Non-implementing SegWit makes anchoring process more difficult and non-deterministic. If you are interested in SegWit version (or SegWit is implemented in certain blockchain), please, refer to [Anchoring specification: SegWit]()
-
 The approach is currently applicable for no more than 15 validators as per the restrictions on standard transactions in Bitcoin.
 
 It is assumed that each validator possesses a key pair for anchoring in a cryptosystem recognized by Bitcoin (currently, only secp256k1 EC cryptosystem). The anchoring pubkeys MUST be known to all blockchain clients. The anchoring pubkeys MAY be certified, e.g., within a X.509 PKI. The anchoring private keys MAY be secured with an HSM.
@@ -54,18 +26,10 @@ It is assumed that there exists a blockchain mechanism for agreeing on the chang
 - **Anchoring transaction fee** to be used in all following anchoring transactions until amended by a new configuration change
 - **List of funding UTXOs** to be spent in the nearest anchoring transaction
 
-Configuration change is outside the scope of this specification. Generally, configuration changes MAY be organized as follows:
-
-1. **Proposal:** A validator submitting a proposal containing one or more configuration parameters to be changed and their values after the change. The proposal SHOULD also contain its validity conditions. For example, a majority of proposals MUST become invalid after the validator set is changed; proposals MAY have a limited timespan defined in terms of block height and/or block timestamp
-2. **Voting:** Voting among validators for submitted block proposals. Once the required (super)majority of validators have voted in favor of the proposal, it is _locked-in_ and activated with the specified delay (e.g., in the next block).
-
-Both proposal submission and voting MAY be implemented as specific transaction types/calls to the smart contract(s).
-
 ### 2.1\. Design Rationale
 
 #### 2.1.1\. Authorized anchoring
 
-The anchoring SHOULD prevent equivocation and history revisions by a colluding majority of blockchain validators [BFAudit]. The anchoring also provides long-term non-repudiation, even in the case that the majority of information about the anchored blockchain is lost or is unreliable. For this second use case, anchoring MUST be used together with blockchain receipts.
 
 The idea of the anchoring approach described in this spec is simple: As soon as there appears an invalid anchor, the system is **broken**. We don't really care _why_ the system is broken (this MUST be determined by the out-of-band means); the key point that there is **never** a situation when there is an invalid anchor, but the blockchain itself is fine. This hypothetical situation would be detrimental for long-term non-repudiation, and may be confusing for real-time anchor verification as well (Huh? There are two contradicting anchors? Who's in the right here? Who was in the right when it all happened 20 years ago?).
 #### 2.1.2\. Feedback from Bitcoin
