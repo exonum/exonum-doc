@@ -4,6 +4,47 @@ The anchoring service is developed to increase product security and provide non-
 
  achieves full accountability of private blockchain maintainers/validators, long-term non-repudiation, and resistance of the system to DoS, including (but not limited to) a complete shutdown of the Exonum blockchain infrastructure.
 
+## anchoring chain. Rough description
+
+To write a data state hash, the service builds a _anchoring chain_ over bitcoin blockchain. Such chain consists of multiple _bitcoin anchoring transactions_. Each anchoring transaction 
+have at least 1 input and only 2 outputs: data output and change output. Data output contains written data storage hash, while change output transfers money to the next anchoring transaction.
+
+```
+       tx1        tx2        tx3        tx4
+.. --> change --> change --> change --> change --> ..
+   \-> data   \-> data   \-> data   \-> data
+```
+
+Sometimes additional inputs called funding UTXO are used. Such input is necessary to refill balance of anchoring chain, that is spending to transaction fees.
+
+## setups
+
+local config
+	bitcoind
+	bitcoin private keys
+global config
+	Fees
+	bitcoin public keys
+	funding utxos
+
+## anchoring transactions
+
+lect
+anchoring transaction detailed
+
+## creating anchoring transaction (consensus)
+
+## verification (blockchain receipts)
+
+## transitional transaction
+
+## recovering
+
+## available API
+
+## service transactions for assets-blockchain
+
+ 
 ### 1.1\. Glossary of Terms
 
 **TODO:**
