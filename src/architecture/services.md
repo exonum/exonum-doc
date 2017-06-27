@@ -1,10 +1,11 @@
 # Services
 
-Services are the main extension point for the Exonum framework.
+**Services** are the main extension point for the Exonum framework.
 By itself, Exonum provides building blocks for creating blockchains;
-it does not come with any concrete transaction processing rules on its own.
+it does not come with any concrete transaction processing rules.
 This is where services come into play.
-If you want to create an instance of the Exonum, services are *the* way to go.
+If you want to create an instance of the Exonum blockchain,
+services are *the* way to go.
 
 ## Overview
 
@@ -264,6 +265,25 @@ Here’s a list of things to figure out when developing an Exonum service:
     [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
+
+### Limitations
+
+As of Exonum 0.1, there are some temporary limitations on what you can do
+with Exonum services. Please consult [the Exonum roadmap](../dev/roadmap.md)
+on when and how these limitations are going to be lifted.
+
+#### Interaction Among Services
+
+In Exonum 0.1, there is no unified API for services to
+access other services’ endpoints. As an example, a service cannot call a transaction
+defined in another service, and cannot read data from another service
+via its read endpoint.
+
+#### Authentication Middleware
+
+Unlike common web frameworks, Exonum 0.1 does not provide authentication middleware
+for service endpoints. Implementing authentication and authorization is thus
+the responsibility of a service developer.
 
 ## Interface with Exonum Framework
 

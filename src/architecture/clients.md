@@ -4,11 +4,9 @@ To improve system auditability, Exonum includes a [**light
 client**](https://github.com/exonum/exonum-client). Light client is a
 JavaScript library with a number of helper functions available for use by
 frontend developers. These helper functions are used to
-verify blockchain responses on the client side. That's why it is a good practice
-to include specific cryptographic proofs into the blockchain backend responses
-along with validating these proofs on the client side.
+verify blockchain responses on the client side using cryptographic proofs.
 
-The helper functions are divided into the following submodules:
+The client functions are divided into the following submodules:
 
 - **Data**. Functions for [serialization and deserialization of
   data](../advanced/serialization) from the JSON format to
@@ -71,7 +69,7 @@ implemented in Exonum light client.
 4. The result of checks is shown in the user interface
 
 !!! note
-    In the case user authentication in needed (for example, for data
+    In the case user authentication is needed (for example, for data
     access management), requests can be *digitally signed*.
 
 ## Motivation
