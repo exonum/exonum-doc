@@ -128,15 +128,20 @@ specification):
   serialization buffer, and the byte size of the segment
 
 The segment pointer mechanism is slightly similar to the concept of heap in
-[memory management](https://en.wikipedia.org/wiki/Memory_management).
+[memory management](https://en.wikipedia.org/wiki/Memory_management). Similarly
+to dynamically allocated memory, datatype serialization procedures may use
+segments to allocate space for variable-length data, and point to these segments
+using segment pointers.
 
-### Validation Rules
+### Segment Validation Rules
 
 - Segments must not overlap
 - There must be no gaps between the segments allocated within the same datatype
 - Segment pointers must not refer to the memory before themselves (this
   guarantees the absence of loops)
 - The segment pointers must not point outside the buffer
+- Segments must be placed in a specific order determined by the datatype
+  performing segment allocation
 
 ### Fixed-length and var-length types
 
@@ -217,8 +222,8 @@ adjacent to each other for each serialized structure):
 Fixed-length fields are stored completely in the header.
 Var-length fields are allocated as segments in the body,
 plus take 8 bytes in the header for a corresponding segment pointer.
-Thus, a segment pointer in the header (the position of which is known in compile time)
-points to the segment in the body,
+Thus, a segment pointer in the header (the position of which is known in compile
+time) points to the segment in the body,
 which contains the actual serialization of the field. Segments are placed
 in the correspondence with [the validation rules](#validation-rules).
 
@@ -237,7 +242,8 @@ A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
 increasing their indexes.
 
-Slices like structures have header and body. If slice consists of fixed-length
+Slices like structures have header and body. Each element takes 8 bytes in the
+header for a corresponding segment pointer. If slice consists of fixed-length
 elements, then its body contain elements themselves. If slice consists of
 var-length elements, the body of such a slice contains
 pointers to the elements of the slice, and elements themselves are located
