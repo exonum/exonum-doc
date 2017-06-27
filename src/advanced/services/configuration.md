@@ -216,13 +216,14 @@ Looks up votes for a configuration proposal by the configuration hash.
 
 #### Response
 
-JSON object with the following fields:
-
-- **Votes**: Array<?Vote\>  
-  Votes for the configuration. Indexing of the `Votes` array corresponds
-  to the indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
-  If a vote from the validator is absent, then `null` is returned
-  at the corresponding index.
+A nullable JSON array `?Array<?Vote>` containing
+votes for the configuration, where each vote is [the JSON serialization](../../architecture/transactions.md#serialization)
+of [the corresponding vote transaction](#vote-for-proposal).
+Indexing of the votes in the array corresponds
+to the indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
+If a vote from the validator is absent, then `null` is returned
+at the corresponding index. If the configuration with `config_hash` is absent,
+`null` is returned instead of the whole array.
 
 ### Committed Configurations
 
