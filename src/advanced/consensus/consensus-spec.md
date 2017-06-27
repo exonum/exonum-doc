@@ -103,7 +103,7 @@ necessary, the nodes can request unknown transactions from other nodes.
 
 ### Proof-of-Lock
 
-A set of +2/3 `Prevote` votes for the same proposal from the nodes at current
+A set of +2/3 `Prevote` messages for the same proposal from the nodes at current
 round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
 part of node state. The node can have no more than one stored PoL. We say that
 PoL is greater than recorded one (has a higher priority), in cases when 1) there
@@ -116,7 +116,8 @@ message processing.
 
 Node uses queue based on [the Mio library][mio_lib] for message processing.
 Incoming request and consensus messages are placed in this queue when they are
-received. The same queue is used for timeouts processing.
+received. The same queue is used for timeouts processing. Timeouts are
+implemented as messages to this node itself.
 
 Messages from the next height (i.e., `current_height` + 1) or future round are
 placed in the separate queue (`queued`).
@@ -125,11 +126,6 @@ As specified in [requests algorithm](requests.md#algorithm-for-sending-requests)
 node deletes stored data (`RequestState`) about sent request when the
 requested info is obtained.
 
-The timeout is implemented as a message to this node itself. This message is
-queued and processed when it reaches its queue.
-
-**TODO:** insert picture
-
 ## Algorithm Description
 
 ### Consensus Algorithm Stages
@@ -137,7 +133,7 @@ queued and processed when it reaches its queue.
 - [Full proposal](#full-proposal) (availability of full proposal)  
   Occurs when the node gets complete info about some proposal and all the
   transactions from that proposal.
-- [Availability of +2/3 Prevote](#availability-of-23-prevote)  
+- [Availability of +2/3 Prevotes](#availability-of-23-prevotes)  
   Occurs when node collects +2/3 `Prevote` messages from the same round for the
   same known proposal.
 - [LOCK](#lock)  
@@ -213,13 +209,13 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 - For each round `r` in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-    - If the node has +2/3 `Prevote` for `propose` in `r`, then
-    proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote) for
+    - If the node has +2/3 `Prevote`s for `propose` in `r`, then
+    proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes) for
     `propose` in `r`.
 
 - For each round `r` in the interval `[propose.round, current_round]`:
 
-    - If +2/3 `Precommit` аrе available for `propose` in `r` and with
+    - If +2/3 `Precommit`s аrе available for `propose` in `r` and with
       the same `state_hash`, then:
 
         - Execute the proposal, if it has not yet been executed.
@@ -248,7 +244,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
     - the node knows `propose` corresponding to this `prevote`
     - the node knows all of its transactions
 
-- Then proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote) for
+- Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes) for
   `propose` in the round `prevote.round`
 
 - If the node does not know `propose` or any transactions, request them.
@@ -259,7 +255,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
   round with the given `state_hash`.
 - If:
 
-    - the node has formed +2/3 `Precommit` for the same round and `propose_hash`.
+    - the node has formed +2/3 `Precommit`s for the same round and `propose_hash`
     - the node knows `propose`
     - the node knows all of its transactions
 
@@ -267,7 +263,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
     - Execute the proposal, if it has not yet been executed.
     - Check that the node's `state_hash` coincides with the `state_hash` of the
-      majority.
+      majority (if not, the node must stop working and signalize error).
     - Proceed to [COMMIT](#commit) for this block.
 
 - Else:
@@ -282,15 +278,16 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
     - If the node has not sent `Prevote` in `r`, send it for
       `locked_propose`.
-    - If the node has formed +2/3 `Prevote` in `r`, then change `locked_round`
+    - If the node has formed +2/3 `Prevote`s in `r`, then change `locked_round`
       to `current_round`, `locked_propose` to `propose.hash` (`propose`
-      corresponds to +2/3 `Prevote` in `r`).
+      corresponds to +2/3 `Prevote`s in `r`).
     - If the node did not send `Prevote` for any other proposal except
       `locked_propose` in subsequent rounds after `locked_round`, then:
 
         - Execute the proposal, if it has not yet been executed.
         - Send `Precommit` for `locked_propose` in `current_round`.
-        - If the node has 2/3 `Precommit`, then proceed to [COMMIT](#commit).
+        - If the node has +2/3 `Precommit`s for the same round with the same
+          `block_hash`, then proceed to [COMMIT](#commit).
 
 ### COMMIT
 
@@ -347,7 +344,7 @@ consensus messages belonging to a future height.
 - Process all messages from the `queued`, if they become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send `Prevote` for `locked_propose` in a new round,
-  proceed to [Availability of +2/3 Prevote](#availability-of-23-prevote).
+  proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
   (after the expiration of `propose_timeout`, if the node has just moved to a new
   height).
@@ -355,10 +352,10 @@ consensus messages belonging to a future height.
 ### Status timeout processing
 
 - If the node's height has not changed since the timeout was set, then send out
-  a `Status` message to all validators.
-- Add a timeout for the next `Status` send.
+  a `Status` message to all peers.
+- Add a timeout for the next `Status` broadcast.
 
-## Properties of the Consensus Algorithm
+## Properties
 
 !!! note
     Formal proof of the following properties is coming in a separate white paper.
@@ -374,7 +371,9 @@ consensus messages belonging to a future height.
 
 - **Weak form of chain quality**  
   1 block out of F+1 (where F is one third of the validators) committed blocks is
-  guaranteed to be proposed by non-Byzantine validators.
+  guaranteed to be proposed by non-Byzantine validators. This can provide a
+  certain degree of _censorship resistance_ (any correct transaction broadcasted
+  to every validator would be included into the new block somewhen).
 
 [wiki_bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
