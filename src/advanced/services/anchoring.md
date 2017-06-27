@@ -3,8 +3,11 @@
 The anchoring service is developed to increase product security and provide non-repudiation for Exonum applications. Service publishes assets-blockchain state hash to the bitcoin blockchain. ....
 
  achieves full accountability of private blockchain maintainers/validators, long-term non-repudiation, and resistance of the system to DoS, including (but not limited to) a complete shutdown of the Exonum blockchain infrastructure.
+ 
+!!! note "Another pages about anchoring service"
+	This page describe mostly how the service do work; however, there is a separate page, describing how the service should be [configured and deployed][anchoring-deploy].
 
-## anchoring chain. Rough description
+## Anchoring chain. Rough description
 
 To write a data state hash, the service builds a _anchoring chain_ over bitcoin blockchain. Such chain consists of multiple _bitcoin anchoring transactions_. Each anchoring transaction 
 have at least 1 input and only 2 outputs: data output and change output. Data output contains written data storage hash, while change output transfers money to the next anchoring transaction.
@@ -17,15 +20,54 @@ have at least 1 input and only 2 outputs: data output and change output. Data ou
 
 Sometimes additional inputs called funding UTXO are used. Such input is necessary to refill balance of anchoring chain, that is spending to transaction fees.
 
-## setups
+## Setups
 
-local config
-	bitcoind
-	bitcoin private keys
-global config
-	Fees
-	bitcoin public keys
-	funding utxos
+Anchoring requires additional settings to be set. There are both local and global configuration settings. Local are accepted just to the current node, while global are shared between all the validators.
+
+The settings can be updated in the same way as other conriguration parameters do; for example, the global configuration should be updated through the [Configuration Update service](configuration.md)
+
+### Bitcoind node
+
+The service uses third-party bitcoin node to communicate with the bitcoin blockchain network. As for Exonum v 0.1, [Bitcoin Core][bitcoind] is supported only.
+
+You need to specify the following settings to access the bitcoind node:
+
+- bitcoind host
+- bitcoind rpc username
+- bitcoind rpc password
+
+It is strongly advised to have a separate bitcoind node for every validator; otherwise the single bitcoind node represents a centralisation point and brings a weakness into the anchoring process.
+
+### Anchoring private keys
+
+Every validator should posess its own secp256k1 EC keypair in order to participate in anchoring process. This is the standard (and currently the only suported) key format for bitcoin transactions. While the private keys should be secured by every validator, the public keys are shared among them and are written into Exonum blockchain.
+
+To create an anchoring transactions `+2/3` of validators' signatures are needed.
+
+### Transaction fees
+
+A transaction fee represent a value in satoshis that is set as a fee for every anchoring transaction. It is advised to be a 2x-3x times bigger then average market fee, in order to be sure that anchoring transaction does not hang if the bitcoin network is spammed.
+
+This value is written to the global configuration and is applied by all the validators.
+
+### Anchoring schedule
+
+This parameter defines how often does anchoring should be executed. It defines the difference between block heights for anchored data states.
+
+!!! note Example
+	It is recommended to anchor with fixed interval between block heights (e.g., blocks `#1000`, `#2000`, `#3000`, ...). The interval may be chosen in a way that under normal conditions the interval between anchored blocks is between 10 minutes and 1 hour.
+	
+	Consider the following example: there is an Exonum blockchain with the normal interval between blocks equal to 3 seconds. If the blockchain is anchored each 1000 blocks, the interval between anchoring transactions is approximately 3000 seconds, or 50 minutes, i.e., within acceptable limits. The same blockchain could be anchored each 500 blocks (=25 minutes), or 200 blocks (=10 minutes).
+
+Sometimes anchoring process timetable could differ from ideal. Such variations could be triggered by byzantine behavior of nodes, forking of bitcoin blockchain, or changing list of validators (anchoring PubKeys, see _Section 9.3_). For example, at the necessary height (`#1000` because of bitcoin blockchain fork nodes could not agree upon which anchoring transaction is the last one (and should be spent in the next anchoring tx). If so, nodes will wait until bitcoin network do not resolve its fork. Such situation is described in more details in the _Section 7_.	
+
+### Bitcoin public keys
+
+As it was written earlier, every validator should store its own private key. According public keys are stored in the global configuration.
+
+### Funding UTXOs
+
+To refill anchoring address balance, system maintainers should generate bitcoin funding transaction that sends money to the current anchoring address.
 
 ## anchoring transactions
 
@@ -110,11 +152,7 @@ The **anchoring balance** `bal` is the set of sufficiently confirmed bitcoin UTX
 
 The anchoring basic schedule MUST be agreed upon among the validators (e.g., as a part of consensus rules). Changes to the schedule MUST be announced on the blockchain as configuration changes as specified in _Section 2_.
 
-It is RECOMMENDED to anchor with fixed interval between block heights (e.g., blocks `#1000`, `#2000`, `#3000`, ...). The interval SHOULD be chosen in a way that under normal conditions the interval between anchored blocks is between 10 minutes and 1 hour.
 
-Consider the following example: there is a BFT blockchain with the normal interval between blocks equal to 3 seconds. If the blockchain is anchored each 1000 blocks, the interval between anchoring transactions is approximately 3000 seconds, or 50 minutes, i.e., within acceptable limits. The same blockchain could be anchored each 500 blocks (=25 minutes), or 200 blocks (=10 minutes).
-
-Sometimes anchoring process timetable could differ from ideal. Such variations could be triggered by byzantine behavior of nodes, forking of bitcoin blockchain, or changing list of validators (anchoring PubKeys, see _Section 9.3_). For example, at the necessary height (`#1000` because of bitcoin blockchain fork nodes could not agree upon which anchoring transaction is the last one (and should be spent in the next anchoring tx). If so, nodes will wait until bitcoin network do not resolve its fork. Such situation is described in more details in the _Section 7_.
 
 ## 4\. Anchoring Structure
 
