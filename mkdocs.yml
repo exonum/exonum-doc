@@ -44,6 +44,7 @@ pages:
     # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
     # links to necessary documentation parts
     - 'Design overview': 'home/design-overview.md'
+    - 'Installing': 'home/installing.md'
     - 'Glossary of terms': 'home/glossary.md'
     - 'Cryptocurrency tutorial':
       - 'Introduction': 'home/cryptocurrency/intro.md'
