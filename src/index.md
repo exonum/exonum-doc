@@ -18,8 +18,8 @@ and client security.
 
 [Exonum Core][core] is a open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
-You may refer to [the installation guide][install] in order to install the library
-together with its prerequisites.
+You may refer to [the installation guide](home/install.md) in order to install
+the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
