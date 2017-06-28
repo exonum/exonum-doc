@@ -3,7 +3,7 @@
 [Exonum Core][exonum-core] and most of [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing
-to these projects.
+to these projects, testing them, and developing using Exonum.
 
 ## Dependencies
 
@@ -18,7 +18,7 @@ below.
 
 ### MacOS
 
-Install the necessary libraries using `homebrew`:
+Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
 brew install libsodium leveldb openssl
@@ -40,8 +40,8 @@ libsodium is contained in a third-party PPA, so you may need to add it with
 add-apt-repository ppa:chris-lea/libsodium
 ```
 
-Package names may differ in other Linux distributives; use package manager tools
-to find them if necessary.
+Package names and installation methods may differ in other Linux distributives;
+use package manager tools to locate and install dependencies.
 
 ### Windows
 
@@ -114,6 +114,7 @@ guide on how to develop applications on top of the Exonum framework.
 [leveldb]: http://leveldb.org/
 [libsodium]: https://download.libsodium.org/doc/
 [openssl]: http://openssl.org/
+[homebrew]: https://brew.sh/
 [clippy]: https://github.com/Manishearth/rust-clippy
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
