@@ -6,7 +6,7 @@ towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
 
 !!! note
-    This contribution guide is partially derived from [Bitcoin Contribution Guide](https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md).
+    This contribution guide is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
 ## Contributor Hierarchy
 
@@ -46,25 +46,26 @@ Commit messages should be helpful to people reading your code in the future,
 so explain the reasoning for your decisions.
 
 !!! tip
-    Further explanation about commit message conventions is available [here](http://chris.beams.io/posts/git-commit/).
+    Further explanation about commit message conventions is available [here][git:messages].
 
-If a particular commit references another issue, please add the reference,
+If a particular commit references another issue or PR, please add the reference,
 for example `refs #1234`, or `fixes #4321`.
 Using the `fixes` or `closes` keywords will cause the corresponding issue
 to be closed when the pull request is merged.
 
-Please refer to the [Git manual](https://git-scm.com/doc) for more information
-about Git.
+!!! tip
+    Please refer to the [Git manual](https://git-scm.com/doc) for more information
+    about Git.
 
 ### Pull Request Naming and Descriptions
 
 If a pull request is specifically not to be considered for merging (yet),
-please prefix the title with `WIP:`
-and/or use [task lists][gh:task-lists]
-in the body of the pull request to indicate tasks are pending.
+please prefix its title with `WIP:`.
+You may use [task lists][gh:task-lists]
+in the body of the pull request to indicate pending tasks.
 
 The body of the pull request should contain enough description about what
-the patch does together with any justification/reasoning.
+the patch does together with any justification or reasoning.
 You should include references to any discussions.
 
 ### Peer Reviews and PR Amendments
@@ -103,7 +104,8 @@ git push --force
 
 ## Pull Request Philosophy
 
-Patchsets should always be focused. For example, a pull request could add a feature,
+Pull requests should always be focused. For example,
+a pull request could add a feature,
 fix a bug, or refactor code; but not a mixture. Please also avoid super pull requests
 which attempt to do too much, are overly large, or overly complex
 as this makes review difficult.
@@ -122,8 +124,13 @@ they may be removed by the Repository Maintainer.
 Refactoring is a necessary part of any software project's evolution.
 The following guidelines cover refactoring pull requests for the project.
 
-There are three categories of refactoring, code only moves, code style fixes,
-code refactoring. In general refactoring pull requests should not mix
+There are three categories of refactoring:
+
+- code only moves
+- code style fixes
+- code refactoring
+
+In general, refactoring pull requests should not mix
 these three kinds of activity in order to make refactoring pull requests
 easy to review and uncontroversial. In all cases, refactoring PRs must not change
 the behavior of code within the pull request (bugs must be preserved as is).
@@ -133,7 +140,7 @@ so where possible keep them short, uncomplex and easy to verify.
 
 ## Decision Making Process
 
-Whether a pull request is merged into the Exonum repository
+Whether a pull request is merged into the targeted Exonum repository
 rests with the project merge maintainers and ultimately the project lead.
 
 Maintainers will take into consideration if a patch is in line
@@ -189,6 +196,9 @@ unless specified otherwise at the top of the file itself.
 Any work contributed where you are not the original author
 must contain its license header with the original author(s) and source.
 
+[btc-contrib]: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
 [exonum-core]: http://github.com/exonum/exonum-core/
 [exonum-org]: http://github.com/exonum/
+[gh:pr]: https://help.github.com/articles/about-pull-requests/
 [gh:task-lists]: https://help.github.com/articles/basic-writing-and-formatting-syntax/#task-lists
+[git:messages]: http://chris.beams.io/posts/git-commit/
