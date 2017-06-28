@@ -38,13 +38,13 @@ purpose of the specific project.
 Lifecycle for a service in Exonum would look like as the following:
 
 - The service is uploaded as a shared library within a specific transaction in
-Exonum blockchain
+  Exonum blockchain
 - [Validators](../advanced/consensus/consensus/#assumptions) make a decision on
-inclusion of a service into active
-[configuration](../architecture/configuration)
+  inclusion of a service into active
+  [configuration](../architecture/configuration)
 - A service becomes active, that is available for users of the system
 - If necessary services can be removed by the
-[consensus](../advanced/consensus/consensus.md) of validators
+  [consensus](../advanced/consensus/consensus.md) of validators
 
 ## Interoperability
 
