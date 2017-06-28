@@ -8,6 +8,10 @@ This document explains the practical process and guidelines for contributing.
 !!! note
     This contribution guide is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
+!!! summary "TL;DR"
+    Use pull requests, use [git commit message conventions][git:messages],
+    listen to peer reviews, and you should be fine.
+
 ## Contributor Hierarchy
 
 In terms of structure, there is no particular concept of “Exonum core developers”
