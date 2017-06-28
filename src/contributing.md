@@ -84,7 +84,7 @@ It’s generally a good idea to test your PR locally;
 in particular, it helps get a successful CI build faster and with less hassle.
 Follow installation instructions from the repository and recreate test steps
 from `.travis.yml`; usually, they perform code linting (e.g., via [`clippy`][clippy])
-and unit testing (e.g., `cargo test`), although some repositories may have
+and unit testing (e.g., `cargo test`), although some repositories may use
 more complicated tests.
 
 Patches that introduce new functionality should cover it with tests to
@@ -105,7 +105,8 @@ You should include references to any discussions.
 
 ### Peer Reviews and PR Amendments
 
-At this stage one should expect comments and review from other contributors.
+After submitting a PR to the relevant repository,
+one should expect comments and review from other contributors.
 You can add more commits to your pull request by committing them locally
 and pushing to your fork until you have satisfied all feedback.
 
@@ -152,18 +153,18 @@ and maintenance that feature may require after inclusion.
 Before proposing a new feature that will require maintenance,
 please consider if you are willing to maintain it (including bug fixing).
 If features get orphaned with no maintainer in the future,
-they may be removed by the Repository Maintainer.
+they may be removed by the repository maintainer.
 
 ### Refactoring
 
-Refactoring is a necessary part of any software project's evolution.
+Refactoring is a necessary part of any software project’s evolution.
 The following guidelines cover refactoring pull requests for the project.
 
 There are three categories of refactoring:
 
-- code only moves
-- code style fixes
-- code refactoring
+- Code only moves
+- Code style fixes
+- Code refactoring
 
 In general, refactoring pull requests should not mix
 these three kinds of activity in order to make refactoring pull requests
@@ -184,14 +185,14 @@ and will judge the general consensus of contributors.
 
 In general, all pull requests must:
 
-- have a clear use case, fix a demonstrable bug or serve the greater good
-  of the project (for example refactoring for modularization);
-- be well peer reviewed;
-- have unit tests and sandbox tests where appropriate;
-- follow code style guidelines;
-- not break the existing test suite;
-- where bugs are fixed, where possible, there should be unit tests demonstrating
-  the bug and also proving the fix. This helps prevent regression.
+- Have a clear use case, fix a demonstrable bug or serve the greater good
+  of the project (for example refactoring for modularization)
+- Be well peer reviewed
+- Have unit tests and sandbox tests where appropriate
+- Follow code style guidelines
+- Not break the existing test suite
+- Where bugs are fixed, where possible, there should be unit tests demonstrating
+  the bug and also proving the fix. This helps prevent regression
 
 ### Peer Review
 
