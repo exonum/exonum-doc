@@ -36,6 +36,18 @@ To contribute a patch, the workflow is as follows:
 - Push commits to the branch
 - Create a pull request for merging the topic branch
 
+### Doing Research
+
+Before starting to code, it makes sense to check if the analogous PR hasn’t
+been submitted (or even accepted) before. Accordingly, you may want to search
+pull requests and issues of the targeted repository by keywords, tags, etc.
+
+If you want to start contributing and not sure where to start,
+a good frame of reference are open GitHub issues in repositories.
+Issues are commonly tagged by their relevance,
+topic and milestone, which should provide some insight into most topical
+issues relevant to your expertise.
+
 ### Adding Commits
 
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
