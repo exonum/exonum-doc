@@ -8,7 +8,9 @@ This document explains the practical process and guidelines for contributing.
 !!! note
     This contribution guide is partially derived from [Bitcoin Contribution Guide](https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md).
 
-In terms of structure, there is no particular concept of "Core developers"
+## Contributor Hierarchy
+
+In terms of structure, there is no particular concept of “Exonum core developers”
 in the sense of privileged people. Open source often naturally revolves
 around meritocracy where longer term contributors gain more trust
 from the developer community. However, some hierarchy is necessary
@@ -25,9 +27,12 @@ This facilitates social contribution, easy testing and peer review.
 
 To contribute a patch, the workflow is as follows:
 
-- Fork repository
-- Create topic branch
-- Commit patches
+- Fork the relevant repository
+- Create a topic branch
+- Push commits to the branch
+- Create a pull request for merging the topic branch
+
+### Adding Commits
 
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
 and diffs should be easy to read. For this reason do not mix any formatting fixes
@@ -51,8 +56,7 @@ to be closed when the pull request is merged.
 Please refer to the [Git manual](https://git-scm.com/doc) for more information
 about Git.
 
-- Push changes to your fork
-- Create pull request
+### Pull Request Naming and Descriptions
 
 If a pull request is specifically not to be considered for merging (yet),
 please prefix the title with `WIP:`
@@ -63,11 +67,22 @@ The body of the pull request should contain enough description about what
 the patch does together with any justification/reasoning.
 You should include references to any discussions.
 
+### Peer Reviews and PR Amendments
+
 At this stage one should expect comments and review from other contributors.
 You can add more commits to your pull request by committing them locally
 and pushing to your fork until you have satisfied all feedback.
 
-## Squashing Commits
+The length of time required for peer review is unpredictable and will vary
+from pull request to pull request.
+
+!!! tip
+    Please refrain from creating several pull requests for the same change.
+    Use the pull request that is already open (or was created earlier)
+    to amend changes. This preserves the discussion and review that happened earlier
+    for the respective change set.
+
+### Preparations for Merge
 
 If your pull request is accepted for merging, you may be asked by a maintainer
 to squash and/or [rebase](https://git-scm.com/docs/git-rebase) your commits
@@ -85,14 +100,6 @@ git rebase --interactive HEAD~n
 # Force-push to GitHub
 git push --force
 ```
-
-Please refrain from creating several pull requests for the same change.
-Use the pull request that is already open (or was created earlier)
-to amend changes. This preserves the discussion and review that happened earlier
-for the respective change set.
-
-The length of time required for peer review is unpredictable and will vary
-from pull request to pull request.
 
 ## Pull Request Philosophy
 
