@@ -189,6 +189,22 @@ as well as test out the patch set and opine on the technical merits of the patch
 Project maintainers take into account the peer review when determining
 if there is consensus to merge a pull request.
 
+!!! tip
+    It’s possible to check out a pull request locally, for example, to test it manually
+    or to suggest code improvements. This can be accomplished via
+
+    ```shell
+    git fetch exonum pull/<pr-number>/head:<pr-local-branch>
+    git checkout <pr-local-branch>
+    # Emulate merging the PR
+    git merge master
+    ```
+
+    Here, `exonum` is a git remote pointing to the original Exonum repository
+    (not its fork used by the topic branch).
+
+    See [this GitHub guide][gh:local-pr] for more details.
+
 The following language is used within pull-request comments:
 
 - LGTM means “Looks Good To Me”
@@ -224,6 +240,7 @@ must contain its license header with the original author(s) and source.
 [exonum-org]: http://github.com/exonum/
 [gh:pr]: https://help.github.com/articles/about-pull-requests/
 [gh:task-lists]: https://help.github.com/articles/basic-writing-and-formatting-syntax/#task-lists
+[gh:local-pr]: https://help.github.com/articles/checking-out-pull-requests-locally/
 [git:messages]: http://chris.beams.io/posts/git-commit/
 [travis]: https://docs.travis-ci.com/
 [clippy]: https://github.com/Manishearth/rust-clippy
