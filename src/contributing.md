@@ -61,6 +61,25 @@ to be closed when the pull request is merged.
     Please refer to the [Git manual](https://git-scm.com/doc) for more information
     about Git.
 
+### Testing PRs Locally
+
+Every Exonum repository features test suite(s) and continuous integration (CI)
+via [Travis][travis], so any proposed changes are tested automatically.
+A successful CI build is a necessary (but not sufficient) condition
+for a PR to be accepted.
+
+It’s generally a good idea to test your PR locally;
+in particular, it helps get a successful CI build faster and with less hassle.
+Follow installation instructions from the repository and recreate test steps
+from `.travis.yml`; usually, they perform code linting (e.g., via [`clippy`][clippy])
+and unit testing (e.g., `cargo test`), although some repositories may have
+more complicated tests.
+
+Patches that introduce new functionality should cover it with tests to
+assure code quality and prevent regression in the future. Bug fixes should
+also include tests to prove that the bug had existed and was fixed. Generally, more
+tests are always welcome.
+
 ### Pull Request Naming and Descriptions
 
 If a pull request is specifically not to be considered for merging (yet),
@@ -206,3 +225,5 @@ must contain its license header with the original author(s) and source.
 [gh:pr]: https://help.github.com/articles/about-pull-requests/
 [gh:task-lists]: https://help.github.com/articles/basic-writing-and-formatting-syntax/#task-lists
 [git:messages]: http://chris.beams.io/posts/git-commit/
+[travis]: https://docs.travis-ci.com/
+[clippy]: https://github.com/Manishearth/rust-clippy
