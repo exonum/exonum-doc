@@ -12,15 +12,15 @@ In terms of structure, there is no particular concept of "Core developers"
 in the sense of privileged people. Open source often naturally revolves
 around meritocracy where longer term contributors gain more trust
 from the developer community. However, some hierarchy is necessary
-for practical purposes. As such there are repository "maintainers"
-who are responsible for merging pull requests as well as a "lead maintainer"
+for practical purposes. As such there are **repository maintainers**
+who are responsible for merging pull requests as well as a **lead maintainer**
 who is responsible for the release cycle, overall merging, moderation
 and appointment of maintainers.
 
 ## Contributor Workflow
 
-The codebase is maintained using the "contributor workflow" where everyone
-without exception contributes patch proposals using "pull requests".
+The codebase is maintained using the contributor workflow where everyone
+without exception contributes patch proposals using [*pull requests*][gh:pr] (PRs).
 This facilitates social contribution, easy testing and peer review.
 
 To contribute a patch, the workflow is as follows:
@@ -35,7 +35,7 @@ or code moves with actual code changes.
 
 Commit messages should be verbose by default consisting of a short subject line
 (50 chars max), a blank line and detailed explanatory text as separate paragraph(s);
-unless the title alone is self-explanatory (like "Corrected typo in init.rs")
+unless the title alone is self-explanatory (like “Correct typo in init.rs”)
 then a single title line is sufficient.
 Commit messages should be helpful to people reading your code in the future,
 so explain the reasoning for your decisions.
@@ -124,7 +124,7 @@ the behavior of code within the pull request (bugs must be preserved as is).
 Project maintainers aim for a quick turnaround on refactoring pull requests,
 so where possible keep them short, uncomplex and easy to verify.
 
-## "Decision Making" Process
+## Decision Making Process
 
 Whether a pull request is merged into the Exonum repository
 rests with the project merge maintainers and ultimately the project lead.
@@ -154,8 +154,8 @@ if there is consensus to merge a pull request.
 
 The following language is used within pull-request comments:
 
-- LGTM means "Looks Good To Me"
-- Concept LGTM means "I agree in the general principle of this pull request"
+- LGTM means “Looks Good To Me”
+- Concept LGTM means “I agree in the general principle of this pull request”
 
 Reviewers should include the commit hash which they reviewed in their comments.
 
