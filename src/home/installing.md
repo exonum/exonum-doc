@@ -105,7 +105,7 @@ development toolchain:
 
 ## Developing with Exonum
 
-[The cryptocurrency tutorial](crypto1currency/intro.md) provides a step-by-step
+[The cryptocurrency tutorial](cryptocurrency/intro.md) provides a step-by-step
 guide on how to develop applications on top of the Exonum framework.
 
 [exonum-core]: https://github.com/exonum/exonum-core/
