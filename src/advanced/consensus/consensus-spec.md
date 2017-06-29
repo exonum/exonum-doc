@@ -125,7 +125,10 @@ message processing.
 
 ## Algorithm Stages
 
-- [Full proposal](#full-proposal) (availability of full proposal)  
+The algorithm proceeds in stages, transitions among which are triggered
+by [incoming messages](#message-processing) and [timeouts](#timeout-processing).
+
+- [Full proposal](#full-proposal)  
   Occurs when the node gets complete info about some proposal and all the
   transactions from the proposal.
 - [Availability of +2/3 Prevotes](#availability-of-23-prevotes)  
@@ -137,6 +140,8 @@ message processing.
 - [Commit](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
   the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
+
+The steps performed at each stage are described [below](#stage-processing).
 
 ## Message Processing
 
