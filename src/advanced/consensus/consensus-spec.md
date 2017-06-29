@@ -159,13 +159,12 @@ requested information is obtained.
 
 ### Deserialization
 
-At the very beginning, the message is checked against the [serialization
-format](../serialization.md).
-
-If any problems during deserialization are detected, a message is ignored
-as something that a node can not correctly interpret. If verification is successful,
-proceed to [Consensus messages processing](#consensus-messages-processing) or
-[Transaction processing](#transaction-processing).
+- Check the message against the [serialization format](../serialization.md).
+- If any problems during deserialization are detected, ignore
+  the message as something that a node can not correctly interpret.
+- If verification is successful, proceed to [Consensus messages processing](#consensus-messages-processing)
+  or [Transaction processing](#transaction-processing), depending
+  on whether the message is a transaction.
 
 ### Transaction Processing
 
