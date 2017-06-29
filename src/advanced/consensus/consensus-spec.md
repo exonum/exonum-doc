@@ -266,8 +266,11 @@ requested information is obtained.
 
 **Arguments:** `block`.
 
-`Block` messages are usually requested by validators if they see that some
-consensus messages belonging to a future height.
+!!! note
+    `Block` messages are requested by validators if they see a
+    consensus message belonging to a future height. `Block` messages are not a part
+    of an ordinary consensus message workflow for nodes at the latest
+    blockchain height.
 
 - Check the block message
 
