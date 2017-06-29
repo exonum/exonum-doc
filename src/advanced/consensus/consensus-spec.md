@@ -172,20 +172,25 @@ requested information is obtained.
 - If the transaction is already in the pool of unconfirmed transactions,
   ignore it.
 - Add the transaction to the pool of unconfirmed transactions.
-- For all known proposals in which this transaction is included, exclude the
-  hash of this transaction from the list of unknown transactions. If the number
-  of unknown transactions for the proposal becomes zero, proceed to [Full proposal](#full-proposal)
-  state for the current proposal.
+- For every known proposal `propose` in which this transaction is included:
+
+    - Exclude the hash of this transaction from the list of unknown transactions
+      for the `propose`.
+    - If the number of unknown transactions for the proposal becomes zero,
+      proceed to [Full proposal](#full-proposal) state for `propose`.
 
 ### Consensus Messages Processing
 
 - Do not process the message if it belongs to a future round or height. In
-  this case, if the message refers to the height `current_height + 1`, the
-  message is added to the `queued` queue. If the message is related to the future
-  height and updates the knowledge of the node about the current blockchain
-  height of the message author, this information is saved according to
-  [requests algorithm](requests.md).
-- If the message refers to a past height, it should be ignored.
+  this case:
+  
+    - If the message refers to the height `current_height + 1`, add the
+      message to the `queued` queue.
+    - If the message is related to a future height and updates the knowledge
+      of the node about the current blockchain height of the message author,
+      save this information according to [the requests algorithm](requests.md).
+
+- If the message refers to a past height, ignore it.
 - If the message refers to the current height and any round not higher than the
   current one, then:
 
@@ -221,7 +226,7 @@ requested information is obtained.
   `prevote.round` round.
 - If:
 
-    - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`.
+    - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`
     - `locked_round < prevote.round`
     - the node knows a `Propose` message referenced by this `prevote`
     - the node knows all the transactions from the `Propose`
