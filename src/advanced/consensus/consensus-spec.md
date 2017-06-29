@@ -239,6 +239,8 @@ requested information is obtained.
 
 ### Precommit
 
+**Arguments:** `precommit`.
+
 - Add the message to the list of known `Precommit`s for `propose_hash` in this
   round with the given `state_hash`.
 - If:
@@ -347,6 +349,8 @@ requested information is obtained.
 
 ### Availability of +2/3 Prevotes
 
+**Arguments:** shared `propose_hash` and `round` of the collected +2/3 `Prevote`s.
+
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
 - If the node's `locked_round` is less than `prevote.round` and the hash of the locked
@@ -371,6 +375,10 @@ requested information is obtained.
           `propose_hash` and `state_hash`, then proceed to [Commit](#commit).
 
 ### Commit
+
+**Arguments:** block (i.e., a proposal with all known transactions,
+and the `state_hash` resulting from the execution of all transactions in the
+proposal).
 
 - Add a block to the blockchain.
 - Push all the transactions from the block to the table of committed transactions.
