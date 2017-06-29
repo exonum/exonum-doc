@@ -20,7 +20,6 @@ Exonum Core depends on the following third-party system libraries:
 
 - [LevelDB][leveldb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
-- [OpenSSL][openssl]
 
 You can find instructions how to install them on the various environments
 below.
@@ -30,7 +29,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb openssl
+brew install libsodium leveldb
 ```
 
 ### Linux
@@ -40,7 +39,7 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev \
-    libleveldb-dev libssl-dev pkg-config
+    libleveldb-dev pkg-config
 ```
 
 libsodium is contained in a third-party PPA, so you may need to add it with
