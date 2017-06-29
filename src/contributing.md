@@ -18,8 +18,8 @@ In terms of structure, there is no particular concept of “Exonum core develope
 in the sense of privileged people. Open source often naturally revolves
 around meritocracy where longer term contributors gain more trust
 from the developer community. However, some hierarchy is necessary
-for practical purposes. As such there are **repository maintainers**
-who are responsible for merging pull requests as well as a **lead maintainer**
+for practical purposes. As such, each Exonum repository has **maintainers**
+who are responsible for merging pull requests, and a **lead maintainer**
 who is responsible for the release cycle, overall merging, moderation
 and appointment of maintainers.
 
@@ -177,7 +177,7 @@ so where possible keep them short, uncomplex and easy to verify.
 ## Decision Making Process
 
 Whether a pull request is merged into the targeted Exonum repository
-rests with the project merge maintainers and ultimately the project lead.
+rests with the project merge maintainers and ultimately the lead maintainer.
 
 Maintainers will take into consideration if a patch is in line
 with the general principles of the project; meets the minimum standards for inclusion;
@@ -238,7 +238,11 @@ of consensus critical code.
 
 ## Release Policy
 
-The project leader is the release manager for each Exonum Core release.
+The lead maintainer of the Exonum Core repository is the release manager
+for each Exonum Core release. Likewise, releases of other projects are managed
+by the respective lead maintainers.
+The Core releases are synchronized with releases of other Exonum projects
+through informal communication among repository maintainers.
 
 ## Copyright
 
