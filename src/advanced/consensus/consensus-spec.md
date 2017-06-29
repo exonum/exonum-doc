@@ -221,8 +221,9 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
       the same `state_hash`, then:
 
         - Execute the proposal, if it has not yet been executed.
-        - Check that the node's `state_hash` coincides with the `state_hash` of the
-          majority (if not, the node must stop working and signalize error).
+        - Check that the node's `state_hash` after applying transactions in `propose`
+          coincides with the `state_hash` in the aforementioned +2/3 `Precommit`s.
+          If not, stop working and signal about an unrecoverable error.
         - Proceed to [COMMIT](#commit) for this block.
 
 ### Availability of +2/3 `Prevote`s
@@ -267,7 +268,8 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
 
     - Execute the proposal, if it has not yet been executed.
     - Check that the node's `state_hash` coincides with the `state_hash` of the
-      majority (if not, the node must stop working and signalize error).
+      in the `Precommit`s. If not, stop working and signal about
+      an unrecoverable error.
     - Proceed to [COMMIT](#commit) for this block.
 
 - Else:
@@ -327,13 +329,12 @@ consensus messages belonging to a future height.
       should be sufficient to reach consensus.
     - All `Precommit` messages must be correct.
 
-- If the check is successful, then check all transactions for correctness and if
-  they are all correct, then proceed to their execution, which results in
-  `Block` (if not all transactions are correct, the node must stop working and
-  signalize error). Its hash must coincide with the hash of the block from the
-  message, if this did not happen, then this is an indication of a critical
-  failure: either the majority of the network is byzantine or the nodes' software
-  is corrupted.
+- If the check is successful, then check all transactions in the block for correctness.
+  If some transactions are incorrect, stop working and signal about
+  an unrecoverable error.
+- Execute all transactions. If the hash of the blockchain state after the execution
+  diverges from that in the `Block` message, stop working and signal about
+  an unrecoverable error.
 
 - Add the block to the blockchain and move to a new height. Set to `0` the value
   of the variable `locked_round` at the new height.
