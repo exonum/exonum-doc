@@ -1,9 +1,12 @@
 # Cryptocurrency Tutorial: Intro
 
-This section explains how to create a secure transactional system to transfer
-money. It works like core database of a bank. We called it "cryptocurrency"
-to show that blockchain-driven transaction system has similar security model
-like bitcoin, but it could be used for any real material stuff like money.
+This section explains how to create a safe transactional system to transfer
+money. It implements a minimal cryptocurrency.
+
+In this demo we create and run single-node blockchain network. That network
+will accept three types of transactions: create a wallet, issue money for
+a wallet, transfer money between the wallets. Also we define a persistent
+storage to keep the balance of wallets.
 
 ## Create the single node
 
@@ -14,14 +17,14 @@ compiler to build this demo. If you haven't one, install it from
 Let's create minimal crate with `exonum-core` dependency.
 
 ```sh
-cargo create --bin minibank
+cargo new --bin cryptocurrency
 ```
 
 Add to your `Cargo.toml` `exonum-core` dependency.
 
 ```toml
 [package]
-name = "minibank"
+name = "cryptocurrency"
 version = "0.1.0"
 authors = ["Your Name <your@email.com>"]
 
@@ -48,6 +51,7 @@ empty.
 
 We use `MemoryDB` to store our data in this demo, because `MemoryDB` is an
 in-memory database implementation useful for development and testing purposes.
+But there is `LevelDB` support as well as we recommend to use it in production.
 
 ```rust
 let db = MemoryDB::new();
@@ -58,8 +62,8 @@ let blockchain = Blockchain::new(db, services);
 Minimal blockchain is ready. To work with our blocks we have to create a node
 which maintains a database, writes new blocks and provides REST API to interact
 with the blockchain. Every node needs public and private keys. We'll create
-a temporary pair, but for ordinary use you should use the same keys and it's
-better to keep them in files.
+a temporary pair, but for ordinary use you should use the keys from node
+configuration file.
 
 If you want to generate new keypair, you can call `exonum::crypto::gen_keypair()`
 method to take random pair of keys.
@@ -79,21 +83,21 @@ Every node has own unique pair of keys.
 
 ```rust
 let (public_key, secret_key) = exonum::crypto::gen_keypair();
-
 ```
 
-Genesis configuration is a basic declaration of blockchain safety. It contains
-a list of public keys of validators: nodes which can vote for block acceptance.
+Genesis configuration contains a list of public keys of validators: nodes which
+can vote for block acceptance. Fill it with your public key value:
 
 ```rust
 let genesis = GenesisConfig::new(vec![public_key].into_iter());
 ```
 
+Let's configure REST API to open the node for external web requests.
 For the REST API we should set an address of public API (there is a private API,
-but it is used for administration purposes and we won't call it now). Also we
-recommend you to activate blockchain explorer. It's a tool to get and explore
-blocks of a blockchain. Our node will expose API on **8000** port of every
-network interface.
+but it is used for administration purposes and we won't call it now). Also you
+can activate blockchain explorer. It's a tool to get and explore all blocks of
+the blockchain. Our node will expose API on **8000** port of every network
+interface.
 
 ```rust
 let api_address = "0.0.0.0:8000".parse().unwrap();
@@ -124,6 +128,8 @@ let node_cfg = NodeConfig {
 let mut node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
+
+> TODO Add curl to check the explorer
 
 ## Declare persistent data
 
@@ -171,136 +177,6 @@ We've added two methods: to increase the wallet's balance and other to decrease
 it. We used `Field::write` method there, because the data stored as binary blob
 and we have to overwrite data directly in the blob.
 
-## Add transactions
-
-Transaction is a kind of message which performs actions with a blockchain.
-
-For our cryptocurrency demonstration we need three transaction types:
-
-1. Create a new wallet
-2. Add some money to the wallet
-3. Transfer money between two different wallets
-
-Declaration of any transaction have to contain:
-
-1. Type of transaction (it referring to unique service's identifier)
-2. Unique identifier of message
-2. Total size of data in the message
-
-You have to add these identifiers, because Exonum doesn't differentiate messages
-by name for perfomance reasons. Also it helps to maintain future versioning if
-messages are changed.
-
-Transaction to create a new wallet have to contain public key of a wallet and
-name of user who created this wallet:
-
-```rust
-pub const TX_WALLET_ID: u16 = 1;
-
-message! {
-    struct TxCreateWallet {
-        const TYPE = SERVICE_ID;
-        const ID = TX_WALLET_ID;
-        const SIZE = 40;
-
-        field pub_key:     &PublicKey  [00 => 32]
-        field name:        &str        [32 => 40]
-    }
-}
-
-```
-
-Message is used for insreasing the balance of the wallet has to contain public
-key of the wallet and amount of money to add:
-
-> You can add money to the wallet, because we made this type of message for
-bank's staff members. User won't be able to add it himself.
-
-The field `seed` contains random number to make every transaction unique.
-That's important, because every transaction can't be duplicated and stores
-to blockchain forever. If transaction can be repeated then an attacker can
-intercept the signed transaction and repeat it multiple times.
-
-```rust
-pub const TX_ISSUE_ID: u16 = 2;
-
-message! {
-    struct TxIssue {
-        const TYPE = SERVICE_ID;
-        const ID = TX_ISSUE_ID;
-        const SIZE = 48;
-
-        field pub_key:     &PublicKey  [00 => 32]
-        field amount:      u64         [32 => 40]
-        field seed:        u64         [40 => 48]
-    }
-}
-```
-
-Transaction to transfer money between different wallets:
-
-```rust
-pub const TX_TRANSFER_ID: u16 = 3;
-
-message! {
-    struct TxTransfer {
-        const TYPE = SERVICE_ID;
-        const ID = TX_TRANSFER_ID;
-        const SIZE = 72;
-
-        field from:        &PublicKey  [00 => 32]
-        field to:          &PublicKey  [32 => 64]
-        field amount:      u64         [64 => 72]
-    }
-}
-```
-
-The last consists of two public keys: for wallet of sender and the second key
-of wallet of receiver. And of course it contains amount of money to move
-between them.
-
-## Make data layout
-
-Blockchain can store and sign any data, but for business reasons that's better
-to have strictly defined types which produce predictable pieces of data.
-
-We need a wallet to keep the balance of the user. Our struct should consist of:
-public key, user's name and the actual balance. To declare the data type
-`Exonum` has `encoding_struct!` macro which works like `message!` macro.
-
-```rust
-encoding_struct! {
-    struct Wallet {
-        const SIZE = 48;
-
-        field pub_key:            &PublicKey  [00 => 32]
-        field name:               &str        [32 => 40]
-        field balance:            u64         [40 => 48]
-    }
-}
-```
-
-To change the balance we will add two methods: to increase and to decrease it.
-
-```rust
-impl Wallet {
-    pub fn increase(&mut self, amount: u64) {
-        let balance = self.balance() + amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
-    }
-
-    pub fn decrease(&mut self, amount: u64) {
-        let balance = self.balance() - amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
-    }
-}
-```
-
-Data struct in Exonum it is an array of bytes with special access manner to
-fields through `Field` trait and `Field::write` method. To replace the value
-we have to pass it to the method `write` with a mutable reference to a raw
-data of the struct and field's offsets.
-
 ## Create the schema
 
 Schema of data is a capability to access to the data in the persistent storage.
@@ -328,7 +204,8 @@ in the first argument to `MapIndex::new` call:
 ```rust
 impl<'a> CurrencySchema<'a> {
     pub fn wallets(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
-        MapIndex::new(vec![20], self.view)
+        let prefix = gen_prefix(SERVICE_ID, 1, &());
+        MapIndex::new(prefix, self.view)
     }
 
     pub fn wallet(&mut self, pub_key: &PublicKey) -> Option<Wallet> {
@@ -340,6 +217,175 @@ impl<'a> CurrencySchema<'a> {
 Exonum indices are handy data mapping which you can use like collections from
 standard library of Rust. If we found and get the value we also can replace it
 with a new one.
+
+## Transactions
+
+Transaction is a kind of message which performs actions with a blockchain.
+
+For our cryptocurrency demonstration we need three transaction types:
+
+1. Create a new wallet
+2. Add some money to the wallet
+3. Transfer money between two different wallets
+
+Declaration of any transaction have to contain:
+
+1. Type of transaction (a service identifier)
+2. Unique identifier of message
+2. Size of fixed size of the message
+
+You have to add service and message identifiers, because Exonum will use it
+for deserialization purposes. Also it helps to maintain future versioning if
+messages are changed.
+
+Transaction to create a new wallet have to contain public key of a wallet and
+name of user who created this wallet:
+
+```rust
+pub const TX_WALLET_ID: u16 = 1;
+
+message! {
+    struct TxCreateWallet {
+        const TYPE = SERVICE_ID;
+        const ID = TX_WALLET_ID;
+        const SIZE = 40;
+
+        field pub_key:     &PublicKey  [00 => 32]
+        field name:        &str        [32 => 40]
+    }
+}
+
+```
+
+Message is used for insreasing the balance of the wallet has to contain public
+key of the wallet and amount of money to add:
+
+> You can add money to the wallet, because we made this to simplify the example.
+In real-world app you shouldn't do that.
+
+The field `seed` contains random number to make every transaction unique.
+You can read more in the [Transaction artice](../../architecture/transactions.md).
+
+```rust
+pub const TX_ISSUE_ID: u16 = 2;
+
+message! {
+    struct TxIssue {
+        const TYPE = SERVICE_ID;
+        const ID = TX_ISSUE_ID;
+        const SIZE = 48;
+
+        field pub_key:     &PublicKey  [00 => 32]
+        field amount:      u64         [32 => 40]
+        field seed:        u64         [40 => 48]
+    }
+}
+```
+
+Transaction to transfer money between different wallets:
+
+```rust
+pub const TX_TRANSFER_ID: u16 = 3;
+
+message! {
+    struct TxTransfer {
+        const TYPE = SERVICE_ID;
+        const ID = TX_TRANSFER_ID;
+        const SIZE = 80;
+
+        field from:        &PublicKey  [00 => 32]
+        field to:          &PublicKey  [32 => 64]
+        field amount:      u64         [64 => 72]
+        field seed:        u64         [72 => 80]
+    }
+}
+```
+
+The last consists of two public keys: for wallet of sender and the second key
+of wallet of receiver. And of course it contains amount of money to move
+between them.
+
+## Contracts
+
+Every transaction in Exonum has an attached contract. The contract is a
+busiless-logic of the blockchain. Actually we declared structs and we also have
+to implement `Trasaction` trait which includes `verify` method to verify every
+incoming transaction and `execute` method which contains contract logic which
+applied to the storage when a transaction is executed.
+
+For every transaction we will check the signature. For money transfer
+transaction we also will check that sender is not the receiver to prevent
+useless transactions flood.
+
+`execute` method gets the reference to a `Fork` of a storage. We can wrap it
+with our schema to turn it into structured storage with our data layout inside.
+
+`TxCreateWallet` checks the wallet is not exists and add a new one if so:
+
+```rust
+impl Transaction for TxCreateWallet {
+    fn verify(&self) -> bool {
+        self.verify_signature(self.pub_key())
+    }
+
+    fn execute(&self, view: &mut Fork) {
+        let mut schema = CurrencySchema { view };
+        if let None = schema.wallet(self.pub_key()) {
+            let wallet = Wallet::new(self.pub_key(), self.name(), 0);
+            schema.wallets().put(self.pub_key(), wallet)
+        }
+    }
+}
+```
+
+`TxIssue` transaction finds the wallet, adds `amount` of money and puts the
+changed wallet back into the storage. Storage will be updated when block
+applied:
+
+```rust
+impl Transaction for TxIssue {
+    fn verify(&self) -> bool {
+        self.verify_signature(self.pub_key())
+    }
+
+    fn execute(&self, view: &mut Fork) {
+        let mut schema = CurrencySchema { view };
+        if let Some(mut wallet) = schema.wallet(self.pub_key()) {
+            wallet.increase(self.amount());
+            schema.wallets().put(self.pub_key(), wallet)
+        }
+    }
+}
+```
+
+`TxTransfer` transaction finds two wallets for both sides of a transfer
+transaction. If they have been found it checks the balance of the sender and if
+it has enough money then decreases the sender balance and increases the balance
+of receiver.
+
+```rust
+impl Transaction for TxTransfer {
+    fn verify(&self) -> bool {
+         (*self.from() != *self.to()) && self.verify_signature(self.from())
+    }
+
+    fn execute(&self, view: &mut Fork) {
+        let mut schema = CurrencySchema { view };
+        let sender = schema.wallet(self.from());
+        let receiver = schema.wallet(self.to());
+        if let (Some(mut sender), Some(mut receiver)) = (sender, receiver) {
+            let amount = self.amount();
+            if sender.balance() >= amount {
+                sender.decrease(amount);
+                receiver.increase(amount);
+                let mut wallets = schema.wallets();
+                wallets.put(self.from(), sender);
+                wallets.put(self.to(), receiver);
+            }
+        }
+    }
+}
+```
 
 ## Define minimal service
 
@@ -478,88 +524,6 @@ impl<T: TransactionSend + Clone + 'static> Api for CryptocurrencyApi<T> {
         };
         let route_post = "/v1/wallets/transaction";
         router.post(&route_post, transaction, "transaction");
-    }
-}
-```
-
-## Contracts
-
-Every transaction in Exonum has an attached contract. The contract is a
-busiless-logic of the blockchain. Actually we declared structs and we also have
-to implement `Trasaction` trait which includes `verify` method to verify every
-incoming transaction and `execute` method which contains contract logic which
-applied to the storage when a transaction is executed.
-
-For every transaction we will check the signature. For money transfer
-transaction we also will check that sender is not the receiver to prevent
-useless transactions flood.
-
-`execute` method gets the reference to a `Fork` of a storage. We can wrap it
-with our schema to turn it into structured storage with our data layout inside.
-
-`TxCreateWallet` checks the wallet is not exists and add a new one if so:
-
-```rust
-impl Transaction for TxCreateWallet {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.pub_key())
-    }
-
-    fn execute(&self, view: &mut Fork) {
-        let schema = CurrencySchema { view };
-        if let None = schema.wallet(self.pub_key()) {
-            let wallet = Wallet::new(self.pub_key(), self.name(), 0);
-            schema.wallets().put(self.pub_key(), wallet)
-        }
-    }
-}
-```
-
-`TxIssue` transaction finds the wallet, adds `amount` of money and puts the
-changed wallet back into the storage. Storage will be updated when block
-applied:
-
-```rust
-impl Transaction for TxIssue {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.pub_key())
-    }
-
-    fn execute(&self, view: &mut Fork) {
-        let schema = CurrencySchema { view };
-        if let Some(mut wallet) = schema.wallet(self.pub_key()) {
-            wallet.increase(self.amount());
-            schema.wallets().put(self.pub_key(), wallet)
-        }
-    }
-}
-```
-
-`TxTransfer` transaction finds two wallets for both sides of a transfer
-transaction. If they have been found it checks the balance of the sender and if
-it has enough money then decreases the sender balance and increases the balance
-of receiver.
-
-```rust
-impl Transaction for TxTransfer {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.from()) && (*self.from() != *self.to())
-    }
-
-    fn execute(&self, view: &mut Fork) {
-        let schema = CurrencySchema { view };
-        let sender = schema.wallet(self.from());
-        let receiver = schema.wallet(self.to());
-        if let (Some(mut sender), Some(mut receiver)) = (sender, receiver) {
-            let amount = self.amount();
-            if sender.balance() >= amount {
-                sender.decrease(amount);
-                receiver.increase(amount);
-                let mut wallets = schema.wallets();
-                wallets.put(self.from(), sender);
-                wallets.put(self.to(), receiver);
-            }
-        }
     }
 }
 ```
