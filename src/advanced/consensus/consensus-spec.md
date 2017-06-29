@@ -18,7 +18,7 @@ for all honest nodes in the network.
     See [algorithm overview](consensus.md#algorithm-overview) and [list of
     assumptions](consensus.md#assumptions) for more details.
 
-## Global Configuration Parameters
+## Configuration Parameters
 
 - `propose_timeout`  
   Proposal timeout after a new block is committed to the blockchain locally.
@@ -28,6 +28,10 @@ for all honest nodes in the network.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
+
+!!! tip
+    These parameters are a part of [the global configuration](../../architecture/configuration.md).
+    They can be adjusted with the help of [the configuration update service](../services/configuration.md).
 
 ## Node State Variables
 
