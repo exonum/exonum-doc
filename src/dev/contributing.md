@@ -48,6 +48,10 @@ Issues are commonly tagged by their relevance,
 topic and milestone, which should provide some insight into most topical
 issues relevant to your expertise.
 
+!!! tip
+    Besides GitHub, Exonum issues and solutions are discussed on [gitter][gitter]
+    and [Reddit][reddit].
+
 ### Adding Commits
 
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
@@ -261,3 +265,5 @@ must contain its license header with the original author(s) and source.
 [git:messages]: http://chris.beams.io/posts/git-commit/
 [travis]: https://docs.travis-ci.com/
 [clippy]: https://github.com/Manishearth/rust-clippy
+[gitter]: https://gitter.im/exonum
+[reddit]: https://www.reddit.com/r/Exonum/
