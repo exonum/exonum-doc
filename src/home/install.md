@@ -1,6 +1,6 @@
 # Installation Guide
 
-[Exonum Core][exonum-core] and most of [other Exonum repositories][exonum-org] use
+[Exonum Core][exonum-core] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
@@ -65,7 +65,7 @@ curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 ```
 
 The toolchain includes the Rust compiler (`rustc`) and several utilities,
-of which the most important one is [`cargo`][cargo], the Rust package manager.
+of which the most important one is [Cargo][cargo], the Rust package manager.
 
 A nightly (`2017-05-10`) Rust toolchain is used for the [clippy][clippy] linter.
 Install it with the following command:
@@ -101,7 +101,7 @@ cargo test --manifest-path sandbox/Cargo.toml
 
 ### Light Client Library
 
-[The light client library][exonum-client] uses an ordinary JavaScript
+[The light client library][exonum-client] uses a standard JavaScript
 development toolchain:
 [Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for testing
 (+ [Karma][karma] for browser testing),
