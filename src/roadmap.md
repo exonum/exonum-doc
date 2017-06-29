@@ -50,4 +50,24 @@ Lifecycle for a service in Exonum would look like as the following:
 
 ## Java Binding
 
+[Rust](https://www.rust-lang.org/en-US/) is a systems programming language,
+which is focused on memory safety. It seems to be a good fit for a security
+critical applications. However, the community of Rust developers is small. This
+fact can become a problem on the way of adoption of Exonum. It would be logical
+to extend its functionality to other programming languages by implementing
+[bindings](https://en.wikipedia.org/wiki/Language_binding). Java was chosen for
+the first binding since it has a wast developer community. We already started
+the implementation of Java binding.
+
+!!! note
+    Java binding consist of two substantially different parts:
+
+    - **High level binding**, or a binding for Exonum's public API. This part
+      allows the developer to connect blockchain to Java applications
+      directly. Technically, within this part Java calls Rust.
+    - **Service binding**. This part allows to implement services (and
+      potentially other Exonum modules) in Java. Thus, Exonum Core (Rust
+      programming language) should be able to run JVM and launch services
+      whitten in Java.
+
 ## Object Related Mapping
