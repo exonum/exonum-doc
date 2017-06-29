@@ -275,14 +275,14 @@ requested information is obtained.
 - Check the block message
 
     - The key in the `to` field must match the key of the node.
-    - `propose.prev_hash` of the correspondent `propose` matches the hash of the
-      last committed block.
+    - `propose.prev_hash` of the correspondent `propose` must match the hash
+      of the latest committed block.
 
 - If the message structure is correct, proceed to check the block contents.
 
-    - The block height should be equal to the current height of the node.
+    - The block height must be equal to the current height of the node.
     - The number of `Precommit` messages from different validators
-      should be sufficient to reach consensus.
+      must be sufficient to reach consensus.
     - All `Precommit` messages must be correct.
 
 - If the check is successful, then check all transactions in the block for correctness.
@@ -295,8 +295,8 @@ requested information is obtained.
 - Add the block to the blockchain and move to a new height. Set to `0` the value
   of the variable `locked_round` at the new height.
 
-- If there are validators who claim that they are at a bigger height, then turn
-  to the [request of the block from the higher height](requests.md#receiving-block).
+- If there are validators who claim that they are at a bigger height, then proceed
+  [requesting a block at the next height](requests.md#receiving-block).
 
 ## Timeout Processing
 
@@ -305,7 +305,7 @@ requested information is obtained.
 - If the timeout does not match the current height and round, skip further
   timeout processing.
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
-- Process all messages from `queued`, if they become relevant (their round
+- Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in a new round,
   and proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
@@ -317,7 +317,7 @@ requested information is obtained.
 
 - If the node's height has not increased since the timeout was set, then broadcast
   a `Status` message to all peers.
-- Add a timeout for the next `Status` broadcast.
+- Add a timeout for the next `Status` broadcast (its length is specified by `status_timeout`).
 
 ## Stage Processing
 
@@ -380,7 +380,7 @@ requested information is obtained.
   transactions.
 - If the node is the leader, form and send `Propose` and `Prevote` messages after
   `propose_timeout` expiration.
-- Process all messages from the `queued`, if they become relevant (their round
+- Process all messages from the `queued` that have become relevant (their round
   and height coincide with the current ones).
 - Add a timeout for the next round.
 
