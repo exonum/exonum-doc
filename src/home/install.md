@@ -5,6 +5,15 @@
 This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
 
+!!! note
+    As of version 0.1, you need to compile the core locally for every application
+    that depends on it. [Cargo][cargo] (the Rust package manager) takes care
+    of most things, but you still need to have dependencies
+    installed locally as described below for the core to compile.
+
+    In future releases, Exonum will become more modular and will work as
+    a standalone application. See [the roadmap](../dev/roadmap.md) for more details.
+
 ## Dependencies
 
 Exonum Core depends on the following third-party system libraries:
