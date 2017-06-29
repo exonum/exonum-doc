@@ -70,4 +70,49 @@ the implementation of Java binding.
       programming language) should be able to run JVM and launch services
       whitten in Java.
 
-## Object Related Mapping
+## Object Relational Mapping
+
+Exonums' current implementation implies that a service developer should
+manually specify the set of tables ([Merkle](../advanced/merkle-index) and
+[Merkle-Patricia](../advanced/merkle-patricia-index) indexes) in blockchain
+database (see [storage](../architecture/storage)). This specification is
+unclear, leads to a big number of potential problems. As a solution of this
+issue a declarative format is considered for service specification. Such
+technique is similar to [object relational
+mapping](https://en.wikipedia.org/wiki/Object-relational_mapping), which is
+common in ordinary databases.
+
+Declarative service description can be added in a blockchain using specific
+transaction. It should include:
+
+- [Data schema](../architecture/services/#data-schema) (a set of indexes,
+  related to a service)
+- A list of [transactions](../architecture/services/#transactions)
+- API description (both [public](../architecture/services/#read-requests) and
+  [private](../architecture/services/#private-api))
+
+!!! note
+    The main part of the service, which cannot be stated (at least in a
+    simple way) within the declarative description, is transactions application
+    to a database (see [`execute`
+    method](../architecture/transactions/#execute)).
+
+Declarative description is useless by itself. However it is an enabler for
+several important features. Here are two of them.
+
+- **Server-side code generation**. Having service description, one can generate
+  the major part of the 'formal' server code. This refers to the definition of
+  all necessary service functions, indexes hierarchy, usage of the relevant
+  function arguments and so on. Code generation will substantially ease
+  developers' work, leaving him only the implementation of service business
+  logic.
+- **Unified light client**. In the current version of the [light
+  client](../architecture/clients), one need to specify it for each
+  Exonum-based project. This is a consequence of unknown index hierarchy, which
+  leads to inability to check entire cryptographic proofs (see [Merkle
+  index](../advanced/merkle-index), for example), which are returned from the
+  backend. Instead light client is able to check the proof within a single
+  Merkle proof. Having declarative description in the blockchain (and thus
+  clients' ability to get it), will allow the light client to determine proof
+  structure automatically and there will be no need for customization of a
+  light client for different Exonum-based systems.
