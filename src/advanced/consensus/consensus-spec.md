@@ -183,7 +183,7 @@ requested information is obtained.
 
 - Do not process the message if it belongs to a future round or height. In
   this case:
-  
+
     - If the message refers to the height `current_height + 1`, add the
       message to the `queued` queue.
     - If the message is related to a future height and updates the knowledge
@@ -253,7 +253,7 @@ requested information is obtained.
 - Then:
 
     - Execute the proposal, if it has not yet been executed.
-    - Check that the node's `state_hash` coincides with the `state_hash` of the
+    - Check that the node’s `state_hash` coincides with the `state_hash` of the
       in the `Precommit`s. If not, stop working and signal about
       an unrecoverable error.
     - Proceed to [Commit](#commit) for this block.
@@ -317,7 +317,7 @@ requested information is obtained.
 
 ### Status Timeout
 
-- If the node's height has not increased since the timeout was set, then broadcast
+- If the node’s height has not increased since the timeout was set, then broadcast
   a `Status` message to all peers.
 - Add a timeout for the next `Status` broadcast (its length is specified by `status_timeout`).
 
@@ -342,7 +342,7 @@ requested information is obtained.
       the same `state_hash`, then:
 
         - Execute the proposal, if it has not yet been executed.
-        - Check that the node's `state_hash` after applying transactions in `propose`
+        - Check that the node’s `state_hash` after applying transactions in `propose`
           coincides with the `state_hash` in the aforementioned +2/3 `Precommit`s.
           If not, stop working and signal about an unrecoverable error.
         - Proceed to [Commit](#commit) for this block.
@@ -353,7 +353,7 @@ requested information is obtained.
 
 - Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
   with the collected `Prevote`s.
-- If the node's `locked_round` is less than `prevote.round` and the hash of the locked
+- If the node’s `locked_round` is less than `prevote.round` and the hash of the locked
   `Propose` message is the same as `propose_hash` in the collected `Prevote`s,
   then proceed to [Lock](#lock) for this `Propose` message.
 
@@ -406,7 +406,7 @@ If:
 - Less than 1/3 of validators act Byzantine (i.e., in an arbitrary way, including
   being offline, having arbitrary hardware and/or software issues or being
   compromised, possibly in a coordinated effort to break the system)
-  
+
 Then the algorithm described above has the following properties:
 
 - **Safety**  
