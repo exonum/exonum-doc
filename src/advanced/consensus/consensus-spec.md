@@ -397,21 +397,33 @@ proposal).
 !!! note
     Formal proof of the following properties is coming in a separate white paper.
 
+If:
+
+- Digital signature scheme used in the algorithm is secure (i.e., signatures
+  cannot be forged)
+- Network is partially synchronous (i.e., all messages are delivered in finite,
+  but *a priori* unknown time)
+- Less than 1/3 of validators act Byzantine (i.e., in an arbitrary way, including
+  being offline, having arbitrary hardware and/or software issues or being
+  compromised, possibly in a coordinated effort to break the system)
+  
+Then the algorithm described above has the following properties:
+
 - **Safety**  
-  If a non-Byzantine node adds a block to the blockchain, then no other node
-  can add another block, confirmed with +2/3 `Precommit` messages, to the
+  If an honest node adds a block to the blockchain, then no other honest node
+  can add a different block, confirmed with +2/3 `Precommit` messages, to the
   blockchain at the same height.
 
 - **Liveness**  
-  There necessarily will come a point in the system when the node adds the block
-  to the blockchain.
+  At any point in time, a block will be committed eventually by an honest node
+  in the future. In other words, the transaction processing won’t stall.
 
 - **Weak form of chain quality**  
   1 block out of any `F + 1` (where `F` is one third of the validators)
   sequentially committed blocks is
   guaranteed to be proposed by non-Byzantine validators. This can provide a
   certain degree of _censorship resistance_ (any correct transaction broadcasted
-  to every validator would be committed eventually).
+  to every validator will be committed eventually).
 
 [wiki_bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
