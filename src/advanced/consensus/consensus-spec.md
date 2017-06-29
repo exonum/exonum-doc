@@ -53,7 +53,7 @@ for all honest nodes in the network.
 - `state_hash`  
   Hash of the blockchain state.
 
-## Consensus messages and their fields
+## Consensus Messages
 
 The consensus algorithm uses the following types of messages:
 [`Propose`](consensus.md#propose), [`Prevote`](consensus.md#prevote),
@@ -65,7 +65,7 @@ The following fields are present for all messages:
 
 - `validator_id`  
   Index of a validator in the `validators` list in the global configuration.
-  
+
 - `height`  
   Blockchain height to which the message is related.
 
@@ -127,10 +127,10 @@ message processing.
 - [Availability of +2/3 Prevotes](#availability-of-23-prevotes)  
   Occurs when the node collects +2/3 `Prevote` messages from the same round
   for the same known proposal.
-- [LOCK](#lock)  
+- [Lock](#lock)  
   Occurs when the node replaces [the stored PoL](#proof-of-lock) (or collects
   its first PoL for the `current_height`).
-- [COMMIT](#commit)  
+- [Commit](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
   the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
 
@@ -241,7 +241,7 @@ proceed to [Consensus messages processing](#consensus-messages-processing) or
     - Check that the node's `state_hash` coincides with the `state_hash` of the
       in the `Precommit`s. If not, stop working and signal about
       an unrecoverable error.
-    - Proceed to [COMMIT](#commit) for this block.
+    - Proceed to [Commit](#commit) for this block.
 
 - Else:
 
