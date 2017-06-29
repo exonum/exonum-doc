@@ -94,9 +94,7 @@ The following fields are present for all messages:
 ## Definitions
 
 The definitions from the [general description of consensus algorithm](consensus.md)
-are used.
-
-In the following description, +2/3 means more than two thirds of the validators,
+are used. In particular, +2/3 means more than two thirds of the validators,
 and -1/3 means less than one third.
 
 ### Pool of Unconfirmed Transactions
@@ -104,16 +102,20 @@ and -1/3 means less than one third.
 Each node has a set of transactions that have not yet been added to the
 blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
-necessary, the nodes can request unknown transactions from other nodes.
+necessary, the nodes [can request unknown transactions from other nodes](requests.md).
 
 ### Proof-of-Lock
 
 A set of +2/3 `Prevote` messages for the same proposal from the nodes at current
-round and blockchain height is called _Proof-of-Lock (PoL)_.  Nodes store PoL as
-part of node state. The node can have no more than one stored PoL. We say that
-PoL is greater than recorded one (has a higher priority), in cases when 1) there
-is no PoL recorded 2) the recorded PoL corresponds to a proposal with a smaller
-round number. So PoLs are [partially ordered][partial_ordering]. A node must
+round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes store PoL as
+a part of the node state. The node can have no more than one stored PoL.
+
+A PoL is greater than recorded one (has a higher priority), in cases:
+
+- There is no PoL recorded
+- The recorded PoL corresponds to a proposal with a smaller round number
+
+Thus, PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
 message processing.
 
