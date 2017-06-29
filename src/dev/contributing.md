@@ -10,7 +10,7 @@ This document explains the practical process and guidelines for contributing.
 
 !!! summary "TL;DR"
     Use pull requests, use [git commit message conventions][git:messages],
-    listen to peer reviews, and you should be fine.
+    test your contributions, listen to peer reviews, and you should be fine.
 
 ## Contributor Hierarchy
 
