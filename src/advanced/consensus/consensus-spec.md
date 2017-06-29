@@ -61,32 +61,35 @@ The consensus algorithm uses the following types of messages:
 [`Block`](consensus.md#block). Only a part of their fields is described here. See
 [source code][message_source] for more details.
 
-- `validator_id`  
-  Index of specific validator in `validators` list of configuration. This field
-  is common to all types of messages.
+The following fields are present for all messages:
 
+- `validator_id`  
+  Index of a validator in the `validators` list in the global configuration.
+  
 - `height`  
-  Height to which the message is related. This field is common to all types of
-  messages.
+  Blockchain height to which the message is related.
 
 - `round`  
-  Round number to which the message is related. This field is common to all
-  types of messages.
+  Round number to which the message is related.
 
 - `hash`  
-  Hash of the message. This method is common to all types of messages.
+  Hash of the message.
 
-- `propose`  
-  The `Propose` message being processed.
+`Propose` messages have the following additional fields:
 
-- `propose.prev_hash`
-  Hash of the previous block.
+- `prev_hash`  
+  Hash of the previous block in the blockchain.
 
-- `prevote`  
-  The `Prevote` message being processed.
+`Prevote` and `Precommit` messages have the following additional fields:
 
-- `prevote.propose_hash`  
-  Hash of the `Propose` message to which `prevote` belongs.
+- `propose_hash`  
+  Hash of the `Propose` message corresponding to this message.
+
+`Precommit` messages have the following additional fields:
+
+- `state_hash`  
+  Hash of the blockchain state after the execution of all transactions in the
+  `Propose` referenced by the precommit.
 
 ## Definitions
 
