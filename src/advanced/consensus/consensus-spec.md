@@ -119,23 +119,7 @@ Thus, PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
 message processing.
 
-## Message Processing
-
-Node uses queue based on [the Mio library][mio_lib] for message processing.
-Incoming request and consensus messages are placed in this queue when they are
-received. The same queue is used for timeouts processing. Timeouts are
-implemented as messages to this node itself.
-
-Messages from the next height (i.e., `current_height` + 1) or future round are
-placed in the separate queue (`queued`).
-
-As specified in [requests algorithm](requests.md#algorithm-for-sending-requests),
-node deletes stored data (`RequestState`) about sent request when the
-requested info is obtained.
-
-## Algorithm Description
-
-### Consensus Algorithm Stages
+## Algorithm Stages
 
 - [Full proposal](#full-proposal) (availability of full proposal)  
   Occurs when the node gets complete info about some proposal and all the
@@ -150,7 +134,21 @@ requested info is obtained.
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
   the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
 
-### Receiving an incoming message
+## Message Processing
+
+Nodes use a message queue based on [the Mio library][mio_lib] for message processing.
+Incoming request and consensus messages are placed in the queue when they are
+received. The same queue is used for processing timeouts. Timeouts are
+implemented as messages looped to the node itself.
+
+Messages from the next height (i.e., `current_height` + 1) or from a future round
+are placed in a separate queue (`queued`).
+
+As specified in [the requests algorithm](requests.md#algorithm-for-sending-requests),
+a node deletes the data (`RequestState`) about a sent request when the
+requested information is obtained.
+
+### Deserialization
 
 At the very beginning, the message is checked against the [serialization
 format](../serialization.md).
