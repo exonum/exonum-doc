@@ -74,7 +74,7 @@ pages:
       # Consensus overview
       - 'Overview': 'advanced/consensus/consensus.md'
       # Consensus specification
-      - 'Specification': 'advanced/consensus/consensus-spec.md'
+      - 'Consensus specification': 'advanced/consensus/consensus-spec.md'
       # Leader election algorithm specification
       - 'Leader election': 'advanced/consensus/leader-election.md'
       # Requests specification
