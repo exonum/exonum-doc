@@ -127,7 +127,7 @@ has been really authorized by supermajority of validators.
 ## Consensus
 
 !!! tip
-    See separate articles for more details: [*Consensus*](../advanced/consensus/consensus.md),
+    See separate articles for more details: [*Consensus*](../architecture/consensus.md),
     [*Leader Election*](../advanced/consensus/leader-election.md).
 
 Exonum uses a custom modification of Byzantine fault tolerant
@@ -278,7 +278,7 @@ A service may define 3 types of endpoints:
   can generate transactions and push them to the network)
 
 !!! note
-    Another type of endpoints, *events*, [is coming soon](../dev/roadmap.md).
+    Another type of endpoints, *events*, [is coming soon](../roadmap.md).
     Events will implement the [pub/sub architecure pattern][wiki:pubsub],
     allowing light clients and services to subscribe to events emitted
     by services.
@@ -328,14 +328,14 @@ used in blockchains are as follows:
 
 !!! note
     Service execution isolation is a high-priority task
-    on [the Exonum roadmap](../dev/roadmap.md).
+    on [the Exonum roadmap](../roadmap.md).
 
 ### Existing Services
 
 #### Configuration Update Service
 
 !!! tip
-    See the [*Configuration Update Service*](../advanced/services/configuration.md)
+    See the [*Configuration Update Service*](../advanced/configuration-updater.md)
     article for more details.
 
 Although every node has its own configuration file, some settings should
@@ -353,7 +353,7 @@ which the new configuration activates.
 #### Anchoring Service
 
 !!! tip
-    See the [*Anchoring Service*](../advanced/services/anchoring.md)
+    See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
     article for more details.
 
 The anchoring service writes the hash of the current Exonum blockchain state
