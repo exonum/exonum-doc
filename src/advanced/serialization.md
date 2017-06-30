@@ -20,7 +20,7 @@ when they are received. All the information that passes in the network between
 nodes turns into messages (the [`message!` macro][message_macro]). Data
 received as a message is validated against [serialization rules](#serialization-principles).
 
-### Communication with light clients
+### Communication with Light Clients
 
 Light clients can only serialize messages due to the complexity of the checks
 necessary for the deserialization process. Transactions are created on the
@@ -31,7 +31,7 @@ client receives data from a full node, the client serializes the data received
 in the JSON format and verifies the signature against the binary serialization
 of the data.
 
-### Storage of data
+### Storage of Data
 
 [The storage](../architecture/storage.md) is used to place blocks,
 configurations, data specific for services. Serialization is implemented by
@@ -144,7 +144,7 @@ using segment pointers.
 - Segments must be placed in a specific order determined by the datatype
   performing segment allocation
 
-### Fixed-length and var-length types
+### Fixed-length and Var-length Types
 
 The way a particular data type is serialized within a complex type (e.g.,
 a [structure](#structures)) depends on whether the instances of this type
@@ -161,9 +161,9 @@ _fixed-length_ and _var-length_, respectively.
 - Custom type can be fixed-length if its data size is known in advance (can be
   computed at the compilation stage), or var-length otherwise.
 
-## Primitive types
+## Primitive Types
 
-### Integer types
+### Integer Types
 
 `u8`, `i8`, `u16`, `i16`, `u32`, `i32`, `u64`, `i64`  
 Correspond to the same [Rust language primitive types][rust_primitive_types].
@@ -176,9 +176,9 @@ little endian.
 `0x01` for true, `0x00` for false. A message with other value stored in place
 of `bool` will not pass validation. Size: 1 byte.
 
-## Aggregate types
+## Aggregate Types
 
-### Byte buffers
+### Byte Buffers
 
 The data of the following fixed-length types is stored in the same way as
 defined by the underlying byte buffer, without any modifications.
@@ -270,7 +270,7 @@ All slices are var-length datatypes.
     For example slice of `&str` can not be serialized/deserialized.
     This is planned to be fixed in future.
 
-## Types to be supported in future
+## Types to Be Supported in Future
 
 The current version does not support the serialization of the following types,
 but it is planned to be implemented in future:
