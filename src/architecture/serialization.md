@@ -81,8 +81,8 @@ is not validated, since it is assumed to be validated earlier.
 
 - **Balance between access speed and data compactness**  
   The Exonum serialization format contains a trade-off with the speed of work:
-  [segment pointers](#structures) are not necessary but used for quick access to
-  fields.
+  [segment pointers](#segment-pointers) are not necessary but used for quick
+  access to fields.
 
 - **Identity of serialization on all architectures / platforms**  
   The little-endian is always used in the Exonum so that reading and writing on
@@ -125,7 +125,8 @@ specification):
   stores serialization of a certain serializable type instance
 - **Segment pointer** is a pair of two unsigned integers: a 0-based
   starting position of a segment relative to the beginning of the entire
-  serialization buffer, and the byte size of the segment
+  serialization buffer, and the byte size of the segment (or number of elements
+  for slice)
 
 The segment pointer mechanism is slightly similar to the concept of heap in
 [memory management](https://en.wikipedia.org/wiki/Memory_management). Similarly
@@ -137,7 +138,9 @@ using segment pointers.
 
 - Segments must not overlap
 - There must be no gaps between the segments allocated within the same datatype
-- There must be no space in the structure body not covered by a segment
+- There must be no space in the serialization buffer that does not correspond to
+  any data of the serialized object. In particular, there must be no gaps before
+  or after segments allocated for a certain datatype
 - Segment pointers must not refer to the memory before themselves (this
   guarantees the absence of loops)
 - The segment pointers must not point outside the buffer
@@ -203,7 +206,8 @@ Segment pointers take 8 bytes:
 
 - 4 bytes for the position of the corresponding segment
   (counted from the beginning of the entire serialization buffer)
-- 4 bytes for the byte size of the segment.
+- 4 bytes for the byte size of the segment (for number of elements in case of
+  slice)
 
 Both the position and byte size are serialized as little-endian unsigned integers
 (i.e., in the same way as `u32`). Hence, segment pointer can be viewed
@@ -222,8 +226,7 @@ adjacent to each other for each serialized structure):
 
 Fixed-length fields are stored completely in the header.
 Var-length fields are allocated as segments in the body,
-plus take 8 bytes in the header: 4 bytes for a corresponding segment pointer and
-4 bytes for segment field size.
+plus take 8 bytes for the serialized segment pointer, as described [above](#segment-pointers).
 
 !!! note
     If field is slice, corresponding 8 bytes in the header of structure mean a
@@ -254,9 +257,9 @@ increasing their indexes.
 Slices like structures have header and body. Each element takes 8 bytes in the
 header for a corresponding segment pointer. If slice consists of fixed-length
 elements, then its body contain elements themselves. If slice consists of
-var-length elements, the body of such a slice contains
+var-length elements, the body of such a slice contains segment
 pointers to the elements of the slice, and elements themselves are located
-further in memory.
+further in memory as segments as per the validation rules.
 
 Number of the slice elements is specified in the header of structure containing
 the slice.
