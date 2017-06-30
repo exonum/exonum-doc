@@ -85,7 +85,13 @@ if current_load >= OPTIMAL_LOAD.
 
 #### Dependency of `target_timeout` on `block_load`
 
-**TODO** add graph
+![fig1](../../images/timeout-adjustment-01.png)
+
+Here
+
+- **L** is `block_load`, **Lₒₚₜᵢₘₐₗ** is `OPTIMAL_BLOCK_LOAD`;
+- **tₘᵢₙ** is `MIN_TIMEOUT`, **tₘₐₓ** is `MAX_TIMEOUT`;
+- **t₁** is `previous_timeout`.
 
 ### Calculating Next Timeout
 
@@ -95,6 +101,21 @@ Next round timeout is calculated using [exponential smoothing][exponential_smoot
 next_timeout = target_timeout * ADJUSTMENT_SPEED + previous_timeout *
                (1 - ADJUSTMENT_SPEED)
 ```
+
+#### Example
+
+The following figure shows an example of timeout adjustment.
+If the transaction flow is constant, then the system eventually move from the
+starting point (**L₁**, **t₁**) to the point (**Lₒₚₜᵢₘₐₗ**, **᷉t<sup>\*</sup>**)
+corresponding to the optimal timeout for this transaction flow.
+
+![fig1](../../images/timeout-adjustment-02.png)
+
+After determining `target_timeout` (**᷉t₁**), the next timeout **t₂** is
+calculated based on `ADJUSTMENT_SPEED` (**q**). Under the constant transaction
+flow conditions the ratio of timeout to block load remains constant:
+
+t₁ / L₁ = t₂ / L₂ = t<sup>\*</sup> / Lₒₚₜᵢₘₐₗ
 
 [exponential_smoothing]: https://en.wikipedia.org/wiki/Exponential_smoothing
 [line_segment]: https://en.wikipedia.org/wiki/Line_segment
