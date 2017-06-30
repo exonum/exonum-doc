@@ -179,9 +179,9 @@ The recovery output is optional and may appear in the very first bitcoin anchori
 
 **TODO: what length does recovery chunk have?**
 
-## Verification (blockchain receipts)
+## Verification
 
-**TODO: is verification implemented somewhere?**
+**TODO: is verification implemented anywhere?**
 
 Anchors can be verified both in real time and retrospectively. The real-time verification is simpler, but it is insufficient for long-term non-repudiation.
 
@@ -245,9 +245,37 @@ Verifying authorization of `tx_anc`:
 
 This procedure assumes that the validators had not gone rogue before `tx_anc`. If they had, this is probably public knowledge, so `tx_anc` is not considered valid in any case. 
 
-## transitional transaction
+## Changing validators list
 
-## recovering
+The list of validators' anchoring keys may be changed by a multiple reasons:
+
+- periodic key rotation
+- changing the validators'list: add/replace/remove some validators
+
+Both ways require disabling old anchoring keys and add new ones. As well as the anchoring bitcoin address is a derivative from the list of anchoring public keys, it should be changed accordingly. Pub-keys list is stored in the global configuration; it can be updated by out-of-band means, for example, using [Configuration Update service](configuration.md). We may note only the following properties:
+
+1. New configuration is spread over nodes. It is still not active.
+2. New configuration have additional parameter `height when this configuration should be applied`. It is chosen by administrator. The good sense is to choose height so config would be applied in ~3-6 hours after it was sent into Exonum blockchain.
+3. After mentioned height takes place, new configuration is applied by every validator simultaneously. The list of validators finally is changed.
+
+**It is important that pause between configuration appearing and configuration applying is big enough. It should be defined in accordance with necessary number of confirmations for the last LECT.**
+
+### Transitional transaction
+
+Anchoring pubkeys define new Anchoring BTC-address. In order to prolong anchoring chain, new anchoring transaction should spend previous anchoring address UTXO and send it to the new anchoring address. We must be confident such transaction would be written to the blockchain **before** we really change the list of validators. Thus we need suspend anchoring process.
+
+- The anchoring service wait until common LECT is written to the Bitcoin blockchain.
+- After common LECT appears and is written to the Bitcoin blockchain, the service waits until it will gather sufficient number of confirmations (ex., `24`).
+- Further transitional Anchoring transaction proposal is generated. That transaction moves money to the new anchoring address. 
+- As anchoring chain is already moved to the new anchoring address, Exonum nodes wait until new validator set is applied. The anchoring process is resumed after.
+
+Such process could suspend anchoring transaction on fairly a big time. For example, if the service waits until 24 confirmations, total pause could last for 4-6 hours.
+
+If last LECT does not get enough confirmations before the Exonum blockchain moves to the new validators list then anchoring chain is **BROKEN** and could not be prolonged. Anchoring service would log a lot of warnings.
+
+## Recovering broken anchoring
+
+After anchoring chain was broken administrators must generate new funding transaction to the new anchoring address and add it to the global configuration as fundingUTXO. New anchoring chain will produced, starting with this funding tx. The very first anchoring transaction from this chain would include optional [anchoring-recovering data chunk](#recovery-data-chunk) in the data output.
 
 ## available API
 
