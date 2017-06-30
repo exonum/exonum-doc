@@ -156,7 +156,7 @@ Every data chunk is encoded as per Bitcoin Script spec (1-byte chunk length + by
 - **TODO: is there any separator byte between two chunks?**
 - **TODO: does every chunk includes its own length or there is a one data-output length value right after `OP_RETURN`?**
 
-### Blockchain-state data chunk
+#### Blockchain-state data chunk
 
 The chunk must be present in every anchoring transaction. 
 
@@ -167,7 +167,7 @@ Block height allows for efficient lookups.
 
 The hash function for the block hash is the function used internally in the blockchain. With SHA-256 is used, the data chunk size is `8 + 32 = 40` bytes. 
 
-### Recovery data chunk
+#### Recovery data chunk
 
 Recovery chunk is be encoded as per Bitcoin Script spec (1-byte chunk length + byte sequence).
 
@@ -277,6 +277,77 @@ If last LECT does not get enough confirmations before the Exonum blockchain move
 
 After anchoring chain was broken administrators must generate new funding transaction to the new anchoring address and add it to the global configuration as fundingUTXO. New anchoring chain will produced, starting with this funding tx. The very first anchoring transaction from this chain would include optional [anchoring-recovering data chunk](#recovery-data-chunk) in the data output.
 
-## available API
+## Available API
 
-## service transactions for assets-blockchain
+The service provides the following public API endpoints:
+
+ - [Get actual anchoring address](#actual-address)
+ - [Get next anchoring address](#following-address)
+ - [Get actual lect for this validator](#actual-lect-for-this-validator)
+ - [Get actual lect for another validator](#actual-lect-for-another-validator)
+ 
+All REST endpoints share the same base path, denoted **{base_path}**,
+equal to `/api/services/btc_anchoring/v1`.
+
+!!! tip
+    See [*Services*](../../architecture/services.md) for a description of
+    types of endpoints in services.
+
+ 
+### Actual address
+
+` GET {base_path}/address/actual`
+
+Returns the current anchoring btc-address
+
+#### Parameters
+
+None.
+
+#### Response
+
+JSON object with the following fields:
+
+**TODO: ???**
+
+### Following address
+
+```GET {base_path}/address/following```
+ 
+#### Parameters
+
+None.
+
+#### Response
+
+JSON object with the following fields:
+
+**TODO: ???**
+ 
+### Actual LECT for this validator
+
+`GET {base_path}/actual_lect`
+
+#### Parameters
+
+None.
+
+#### Response
+
+JSON object with the following fields:
+
+**TODO: ???**
+
+### Actual LECT for this validator
+
+`GET {base_path}/actual_lect/:id`
+
+#### Parameters
+
+id: unsigned 32-bit integer
+
+#### Response
+
+JSON object with the following fields:
+
+**TODO: ???**
