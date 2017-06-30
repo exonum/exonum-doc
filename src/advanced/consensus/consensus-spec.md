@@ -93,7 +93,7 @@ message processing.
   Number of current round.
 
 - `locked_propose`  
-  `Propose` on which node is locked (may be undefined).
+  `Propose` on which node is locked. May be undefined.
 
 - `state_hash`  
   Hash of the blockchain state.
@@ -133,8 +133,8 @@ The following fields are present for all messages:
   If the author is not locked on a propose, the `locked_round` field is 0.
 
 !!! note
-    A node that is locked on a proposal must send `Prevote`s only
-    for the proposal it’s locked on. Thus, `locked_round` in `Prevote`s sent
+    A node that is locked on a proposal must send prevotes only
+    for the proposal it’s locked on. Thus, `locked_round` in prevotes sent
     by a node is always equal to `locked_round` from its state.
 
 `Prevote` and `Precommit` messages have the following additional fields:
@@ -256,10 +256,10 @@ requested information is obtained.
     - the node knows a `Propose` message referenced by this `prevote`
     - the node knows all the transactions from the `Propose`
 
-- Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes) for
-  `propose` in the round `prevote.round`
+- Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes)
+  for the referenced `Propose` message in the round `prevote.round`
 
-- If the node does not know the referenced `Propose` or any of its transactions,
+- If the node does not know the referenced `Propose` message or any of its transactions,
   request them.
 
 ### Precommit
