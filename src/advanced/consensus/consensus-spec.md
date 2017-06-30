@@ -84,6 +84,18 @@ The following fields are present for all messages:
 - `prev_hash`  
   Hash of the previous block in the blockchain.
 
+`Prevote` messages have the following additional fields:
+
+- `locked_round`  
+  Round in which the author of the message [has locked](consensus.md#locks)
+  on the proposal which is referenced by the message.
+  If the author is not locked on a propose, the `locked_round` field is 0.
+
+!!! note
+    A node that is locked on a proposal must send `Prevote`s only
+    for the proposal it’s locked on. Thus, `locked_round` in `Prevote`s sent
+    by a node is always equal to `locked_round` from its state.
+
 `Prevote` and `Precommit` messages have the following additional fields:
 
 - `propose_hash`  
@@ -362,7 +374,8 @@ requested information is obtained.
 - For each round `r` in the interval `[locked_round, current_round]`:
 
     - If the node has not sent `Prevote` in `r`, send it for
-      `locked_propose`.
+      `locked_propose` with the `locked_round` specified as the `locked_round`
+      in the node state.
     - If the node has formed +2/3 `Prevote`s in `r`, then change `locked_round`
       to `current_round`, `locked_propose` to `propose.hash` (`propose`
       corresponds to +2/3 `Prevote`s in `r`).
