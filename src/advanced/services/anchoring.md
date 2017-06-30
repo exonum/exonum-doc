@@ -179,7 +179,71 @@ The recovery output is optional and may appear in the very first bitcoin anchori
 
 **TODO: what length does recovery chunk have?**
 
-## verification (blockchain receipts)
+## Verification (blockchain receipts)
+
+**TODO: is verification implemented somewhere?**
+
+Anchors can be verified both in real time and retrospectively. The real-time verification is simpler, but it is insufficient for long-term non-repudiation.
+
+### Real-Time Verification
+
+Real-time verification should be held to ensure that anchoring process is going normally. All the parties replicating blockchain may do such verification; naturally, the validators must verify anchors.
+
+1. The verifier monitors all spending transactions from the current anchoring address. Let `tx` denote a new such spending transaction.
+2. If `tx` is a valid anchoring transaction, then the verifier checks if the chain block at height specified by the anchor has the same hash as specified by the anchor.
+4. If the change output is directed to a new anchoring address, the verifier switches to monitoring the new address and stops monitoring the old anchoring address. The verifier checks that the new anchoring address is that inferred by a successful [change proposal](#transitional-transaction).
+5. Otherwise, the verification succeeds.
+
+If verification fails, any further updates to the blockchain are considered to be invalid. 
+
+### Retrospective Verification and Blockchain Receipts
+
+One of the goals of anchoring is to provide long-term non-repudiation, including the cases when the blockchain ceases functioning and there is no authoritative source as to the blockchain transactions or blockchain state. This problem is solved with the help of blockchain receipts.
+
+**Blockchain receipt** for a blockchain transaction `tx` is:
+
+- `tx` encoded as per the blockchain spec
+- The path in the Merkle tree from `tx` to the transaction root of the block `b`, in which `tx` resides
+- Header of `b` (including block header and validators' authorization)
+- Header of `b_anc` - the first anchored block after `b`
+- Hash of the `tx_anc` - the anchoring transaction for `b_anc`
+- Hash link from `b_anc` to `b`
+
+A blockchain receipt for the part of blockchain state is constructed in the same way, but with the state instead of `tx`, and the path in the state tree.
+
+**Blockchain receipts** are retrospectively verified based on the following data:
+
+- Generic blockchain spec (includes transaction and block formats)
+- List of initial anchoring pubkeys
+- Initial value of `m`
+
+Note that initial anchoring pubkeys and initial `m` SHOULD be committed to the genesis block header in some way, so essentially only the genesis block hash is required.
+
+**TODO: should be update with the respect to broken anchoring chains**
+
+#### Inner blockchain checks
+
+1. Verify that the receipt has all necessary data fields
+2. Verify that fields have the correct form, e.g., `tx` is a valid transaction and `b` and `b_anc` are valid block headers
+3. Verify that the `b`'s header commits to `tx`
+4. Verify that the link from `b_anc` to `b` is valid
+
+#### Anchoring checks
+
+1. Verify that `tx_anc` is a bitcoin transaction
+2. Verify that `tx_anc` is an anchoring transaction, without verifying authorization by proper validators yet
+3. Verify that `b_anc` is anchored by `tx_anc`
+4. Verify that `tx_anc` has proper authorization per the procedure below
+
+Verifying authorization of `tx_anc`:
+
+1. Calculate the initial anchoring address `addr`.
+2. Load spending transactions from `addr` ordered as in the Bitcoin Blockchain, until the first transitional anchoring transaction. XXX: Is there an efficient way to query spending txs and/or transitional anchoring txs? is encountered, or spending txs are depleted. Let `txs` be the list of loaded transactions ordered as in the Bitcoin Blockchain.
+3. If `tx_anc` is in `txs`, the check succeeds. XXX: If any transaction in `txs` is not an anchoring transaction, fail.
+4. Else, if the last transaction in `txs` is a transitional anchoring transaction, assign `addr` to the new address specified by this transaction, and go to step 2.
+5. If the last transaction in `txs` is not a transitional anchoring transaction, fail.
+
+This procedure assumes that the validators had not gone rogue before `tx_anc`. If they had, this is probably public knowledge, so `tx_anc` is not considered valid in any case. 
 
 ## transitional transaction
 
