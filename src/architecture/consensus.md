@@ -72,14 +72,14 @@ To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
   for the next block and broadcasts it accross the network. The logic of selecting
-  the leader node is described [in a separate algorithm](leader-election.md)
+  the leader node is described [in a separate algorithm](../advanced/consensus/leader-election.md)
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
   A prevote means that the validator has been able to parse the proposal
   and has all transactions specified in it
 3. After a validator has collected enough prevotes from a supermajority
   of other validators, it applies transactions specified in the prevoted proposal,
   and broadcasts a *precommit* message. This message contains the result of
-  the proposal execution in the form of [a new state hash](../../architecture/storage.md).
+  the proposal execution in the form of [a new state hash](storage.md).
   The precommit expresses that the sender is ready to commit the corresponding
   proposed block to the blockchain, but needs to see what the other validators
   have to say on the matter just to be sure
@@ -221,7 +221,7 @@ as the next block into blockchain. `Precommit` is broadcast to all validators.
 
 `Status` is an information message about the current height. It is sent with a
 periodicity written in the `status_timeout`
-[global configuration parameter](../../architecture/configuration.md).
+[global configuration parameter](configuration.md).
 
 #### Block
 

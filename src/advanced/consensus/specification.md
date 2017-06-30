@@ -1,20 +1,21 @@
 # Consensus Algorithm Specification
 
-This article contains formal specification of [consensus algorithm](../../home/glossary.md#consensus)
+This article contains formal specification of [consensus algorithm](../../glossary.md#consensus)
 in Exonum.
 
 Consensus algorithm in Exonum is a process of reaching an agreement about order
-of [transactions](../../home/glossary.md#transaction) and the result of their
+of [transactions](../../glossary.md#transaction) and the result of their
 execution in the presence of [Byzantine faults][wiki_bft] and [partially
 synchronous][partial_synchrony] network. According to the consensus algorithm
-nodes exchange [consensus messages](../../home/glossary.md#consensus-message)
+nodes exchange [consensus messages](../../glossary.md#consensus-message)
 authenticated with public-key crypto; these messages are processed via [a
 message queue](#message-processing) and determine [transitions among
-states](consensus.md#node-states-overview).
+states](../../architecture/consensus.md#node-states-overview).
 
 !!! tip
-    See [algorithm overview](consensus.md#algorithm-overview) and [list of
-    assumptions](consensus.md#assumptions) for more details.
+    See [algorithm overview](../../architecture/consensus.md#algorithm-overview)
+    and [list of assumptions](../../architecture/consensus.md#assumptions)
+    for more details.
 
 ## Global Configuration Parameters
 
@@ -40,7 +41,8 @@ states](consensus.md#node-states-overview).
   HashMap with known block proposals.
 
 - `locked_round`  
-  Round in which the node has [locked](consensus.md#locks) on a proposal.
+  Round in which the node has [locked](../../architecture/consensus.md#locks)
+  on a proposal.
 
 - `current_round`  
   Number of current round.
@@ -54,9 +56,12 @@ states](consensus.md#node-states-overview).
 ## Consensus messages and their fields
 
 The consensus algorithm uses following types of messages:
-[`Propose`](consensus.md#propose), [`Prevote`](consensus.md#prevote),
-[`Precommit`](consensus.md#precommit), [`Status`](consensus.md#status),
-[`Block`](consensus.md#block). Only part of their fields is described here. See
+[`Propose`](../../architecture/consensus.md#propose),
+[`Prevote`](../../architecture/consensus.md#prevote),
+[`Precommit`](../../architecture/consensus.md#precommit),
+[`Status`](../../architecture/consensus.md#status),
+[`Block`](../../architecture/consensus.md#block).
+Only part of their fields is described here. See
 [source code][message_source] for more details.
 
 - `validator_id`  
@@ -88,7 +93,7 @@ The consensus algorithm uses following types of messages:
 
 ## Definitions
 
-The definitions from the [general description of consensus algorithm](consensus.md)
+The definitions from the [general description of consensus algorithm](../../architecture/consensus.md)
 are used.
 
 In the following description, +2/3 means more than two thirds of the validators,
@@ -141,12 +146,12 @@ requested info is obtained.
   its first PoL).
 - [COMMIT](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
-  the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
+  the same known proposal. Corresponds to [the Commit node state](../../architecture/consensus.md#node-states-overview).
 
 ### Receiving an incoming message
 
 At the very beginning, the message is checked against the [serialization
-format](../serialization.md).
+format](../../architecture/serialization.md).
 
 If any problems during deserialization are detected, such a message is ignored
 as something that a node can not correctly interpret. If verification is successful,

@@ -49,7 +49,7 @@ The Exonum serialization format is optimized to provide almost zero-cost
 derserialization in low-level programming environments (such as Rust).
 
 !!! tip
-    See [*Serialization*](../advanced/serialization.md) for more details.
+    See [*Serialization*](architecture/serialization.md) for more details.
 
 ## Block
 
@@ -107,7 +107,7 @@ in a [block](#block). [Services](#service) can define and manage additional
 configuration parameters, too.
 
 !!! tip
-    See [*Configuration*](../architecture/configuration.md) for more details.
+    See [*Configuration*](architecture/configuration.md) for more details.
 
 ## Consensus
 
@@ -141,8 +141,8 @@ Consensus messages include:
 - Auxiliary messages, such as `Status` and `Connect`
 
 !!! tip
-    See [*Consensus*](../advanced/consensus/consensus.md) and
-    [*Requests*](../advanced/consensus/requests.md) for more details.
+    See [*Consensus*](architecture/consensus.md) and
+    [*Requests*](advanced/consensus/requests.md) for more details.
 
 ## Core
 
@@ -315,8 +315,8 @@ and to provide [proofs](#merkle-proof) to [light clients](#light-client).
     is logarithmic with respect to the number of elements in the list.
 
 !!! tip
-    See [*Merkle index*](../advanced/merkle-index.md) and
-    [*Merkle Patricia index*](../advanced/merkle-patricia-index.md) for more details.
+    See [*Merkle index*](advanced/merkle-index.md) and
+    [*Merkle Patricia index*](advanced/merkle-patricia-index.md) for more details.
 
 ## Message
 
@@ -396,7 +396,7 @@ may define a bunch of stuff, including [table](#table) schema,
 [configurable parameters](#configuration), etc.
 
 !!! tip
-    See [*Services*](../architecture/services.md) for more details.
+    See [*Services*](architecture/services.md) for more details.
 
 ## Service Endpoint
 
@@ -418,7 +418,7 @@ Stored datatypes use [binary serialization](#binary-serialization)
 logic to convert data to a platform-independent representation.
 
 !!! tip
-    See [*Storage*](../architecture/storage.md) for more details.
+    See [*Storage*](architecture/storage.md) for more details.
 
 ## Table
 
@@ -451,7 +451,7 @@ it does not change the blockchain state, but may still be recorded in
 the transaction log.
 
 !!! tip
-    See [*Transactions*](../architecture/transactions.md) for more details.
+    See [*Transactions*](architecture/transactions.md) for more details.
 
 ## Validator
 
