@@ -18,6 +18,47 @@ for all honest nodes in the network.
     See [algorithm overview](consensus.md#algorithm-overview) and [list of
     assumptions](consensus.md#assumptions) for more details.
 
+## Definitions
+
+The definitions from the [general description of consensus algorithm](consensus.md)
+are used. In particular, +2/3 means more than two thirds of the validators,
+and -1/3 means less than one third.
+
+### Rounds
+
+The consensus algorithm proceeds in rounds for each blockchain height
+(i.e., the number of blocks in the blockchain).
+Rounds are numbered from 1\. The onsets of rounds are determined
+by a fixed timetable:
+
+- The first round starts after committing a block at the previous height
+  to the blockchain
+- Rounds 2, 3, … start after regular intervals
+
+Rounds are not synchronized among nodes.
+
+### Pool of Unconfirmed Transactions
+
+Each node has a set of transactions that have not yet been added to the
+blockchain. This set is called _pool of unconfirmed transactions_. In general,
+the pools of unconfirmed transactions are different for different nodes. If
+necessary, the nodes [can request unknown transactions from other nodes](requests.md).
+
+### Proof-of-Lock
+
+A set of +2/3 `Prevote` messages for the same proposal from the nodes at current
+round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes store PoL as
+a part of the node state. The node can have no more than one stored PoL.
+
+A PoL is greater than recorded one (has a higher priority), in cases:
+
+- There is no PoL recorded
+- The recorded PoL corresponds to a proposal with a smaller round number
+
+Thus, PoLs are [partially ordered][partial_ordering]. A node must
+replace the stored PoL with a greater PoL if it is collected by the node during
+message processing.
+
 ## Configuration Parameters
 
 - `propose_timeout`  
@@ -106,34 +147,6 @@ The following fields are present for all messages:
 - `state_hash`  
   Hash of the blockchain state after the execution of all transactions in the
   `Propose` referenced by the precommit.
-
-## Definitions
-
-The definitions from the [general description of consensus algorithm](consensus.md)
-are used. In particular, +2/3 means more than two thirds of the validators,
-and -1/3 means less than one third.
-
-### Pool of Unconfirmed Transactions
-
-Each node has a set of transactions that have not yet been added to the
-blockchain. This set is called _pool of unconfirmed transactions_. In general,
-the pools of unconfirmed transactions are different for different nodes. If
-necessary, the nodes [can request unknown transactions from other nodes](requests.md).
-
-### Proof-of-Lock
-
-A set of +2/3 `Prevote` messages for the same proposal from the nodes at current
-round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes store PoL as
-a part of the node state. The node can have no more than one stored PoL.
-
-A PoL is greater than recorded one (has a higher priority), in cases:
-
-- There is no PoL recorded
-- The recorded PoL corresponds to a proposal with a smaller round number
-
-Thus, PoLs are [partially ordered][partial_ordering]. A node must
-replace the stored PoL with a greater PoL if it is collected by the node during
-message processing.
 
 ## Algorithm Stages
 
