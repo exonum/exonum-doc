@@ -137,6 +137,7 @@ using segment pointers.
 
 - Segments must not overlap
 - There must be no gaps between the segments allocated within the same datatype
+- There must be no space in the structure body not covered by a segment
 - Segment pointers must not refer to the memory before themselves (this
   guarantees the absence of loops)
 - The segment pointers must not point outside the buffer
