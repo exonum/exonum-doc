@@ -53,7 +53,7 @@ a part of the node state. The node can have no more than one stored PoL.
 A PoL is greater than recorded one (has a higher priority), in cases:
 
 - There is no PoL recorded
-- The recorded PoL corresponds to a proposal with a smaller round number
+- The recorded PoL corresponds to a proposal with a smaller round
 
 Thus, PoLs are [partially ordered][partial_ordering]. A node must
 replace the stored PoL with a greater PoL if it is collected by the node during
@@ -91,7 +91,7 @@ message processing.
   0 if the node is not locked.
 
 - `current_round`  
-  Number of current round.
+  Current round (1-based).
 
 - `locked_propose`  
   `Propose` on which node is locked. May be undefined.
@@ -116,7 +116,7 @@ The following fields are present for all messages:
   Blockchain height to which the message is related.
 
 - `round`  
-  Round number to which the message is related.
+  Round to which the message is related.
 
 - `hash`  
   Hash of the message.
@@ -250,7 +250,7 @@ are placed in a separate queue (`queued`).
 **Arguments:** `prevote`.
 
 - Add `prevote` to the list of known `Prevote` messages for its proposal in
-  `prevote.round` round.
+  `prevote.round`.
 - If:
 
     - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`
@@ -259,7 +259,7 @@ are placed in a separate queue (`queued`).
     - the node knows all the transactions from the `Propose`
 
 - Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes)
-  for the referenced `Propose` message in the round `prevote.round`
+  for the referenced `Propose` message in `prevote.round`.
 
 - [Request missing information based on the message](requests.md#receiving-prevote).
 
