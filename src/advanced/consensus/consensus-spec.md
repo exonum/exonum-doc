@@ -120,7 +120,7 @@ The following fields are present for all messages:
 - `hash`  
   Hash of the message.
 
-`Propose` messages have the following additional fields:
+`Propose` and `Block` messages have the following additional fields:
 
 - `prev_hash`  
   Hash of the previous block in the blockchain.
@@ -299,20 +299,16 @@ requested information is obtained.
     of an ordinary consensus message workflow for nodes at the latest
     blockchain height.
 
-- Check the block message
+- Check the block message:
 
     - The key in the `to` field must match the key of the node.
-    - `propose.prev_hash` of the correspondent `propose` must match the hash
-      of the latest committed block.
-
-- If the message structure is correct, proceed to check the block contents.
-
+    - `block.prev_hash` must match the hash of the latest committed block.
     - The block height must be equal to the current height of the node.
     - The number of `Precommit` messages from different validators
       must be sufficient to reach consensus.
     - All `Precommit` messages must be correct.
 
-- If the check is successful, then check all transactions in the block for correctness.
+- If the checks are successful, then check all transactions in the block for correctness.
   If some transactions are incorrect, stop working and signal about
   an unrecoverable error.
 - Execute all transactions. If the hash of the blockchain state after the execution
