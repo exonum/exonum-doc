@@ -88,6 +88,7 @@ message processing.
 
 - `locked_round`  
   Round in which the node has [locked](consensus.md#locks) on a proposal.
+  0 if the node is not locked.
 
 - `current_round`  
   Number of current round.
