@@ -172,16 +172,12 @@ The steps performed at each stage are described [below](#stage-processing).
 ## Message Processing
 
 Nodes use a message queue based on [the Mio library][mio_lib] for message processing.
-Incoming request and consensus messages are placed in the queue when they are
+Incoming requests and consensus messages are placed in the queue when they are
 received. The same queue is used for processing timeouts. Timeouts are
 implemented as messages looped to the node itself.
 
 Messages from the next height (i.e., `current_height` + 1) or from a future round
 are placed in a separate queue (`queued`).
-
-As specified in [the requests algorithm](requests.md#algorithm-for-sending-requests),
-a node deletes the data (`RequestState`) about a sent request when the
-requested information is obtained.
 
 ### Deserialization
 
@@ -228,6 +224,12 @@ requested information is obtained.
 - If verification is successful, proceed to the message processing according to
   its type.
 
+!!! note
+    Consensus messages can lead to sending *request(s)* based on information
+    in the message. Requests are used to obtain information unknown to the node,
+    but known to its peers. This part of message processing is described in the
+    [*Requests*](requests.md) article and is only marginally touched upon here.
+
 ### Propose
 
 **Arguments:** `propose`.
@@ -240,9 +242,8 @@ requested information is obtained.
   (`Propose` messages contain only hashes of transactions, so the absence of
   hashes in the table of committed transactions is checked).
 - Add the proposal to the `proposes` hash map.
-- Form a list of transactions the node does not know from `propose`. [Request
-  transactions](requests.md#requesttransactions) from this list.
-- If all transactions are known, go to [Full proposal](#full-proposal).
+- [Request missing information based on the message](requests.md#receiving-propose).
+- If all transactions in the proposal are known, go to [Full proposal](#full-proposal).
 
 ### Prevote
 
@@ -260,8 +261,7 @@ requested information is obtained.
 - Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes)
   for the referenced `Propose` message in the round `prevote.round`
 
-- If the node does not know the referenced `Propose` message or any of its transactions,
-  request them.
+- [Request missing information based on the message](requests.md#receiving-prevote).
 
 ### Precommit
 
@@ -286,9 +286,7 @@ requested information is obtained.
 
 - Else:
 
-    - Request `propose`, if it is not known.
-    - If the message round is bigger than `locked_round`, request `Prevote`s from
-      the message round.
+    - [Request missing information based on the message](requests.md#receiving-precommit).
 
 ### Block
 
@@ -319,8 +317,7 @@ requested information is obtained.
 - Add the block to the blockchain and move to a new height. Set to `0` the value
   of the variable `locked_round` at the new height.
 
-- If there are validators who claim that they are at a bigger height, then proceed
-  [requesting a block at the next height](requests.md#receiving-block).
+- [Request missing information based on the message](requests.md#receiving-block).
 
 ## Timeout Processing
 
@@ -373,8 +370,6 @@ requested information is obtained.
 
 **Arguments:** shared `propose_hash` and `round` of the collected +2/3 `Prevote`s.
 
-- Cancel all requests for `Prevote`s that share `round` and `propose_hash` fields
-  with the collected `Prevote`s.
 - If the node’s `locked_round` is less than `prevote.round` and the hash of the locked
   `Propose` message is the same as `propose_hash` in the collected `Prevote`s,
   then proceed to [Lock](#lock) for this `Propose` message.
