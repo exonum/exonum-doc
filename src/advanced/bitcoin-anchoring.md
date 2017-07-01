@@ -24,7 +24,7 @@ Sometimes additional inputs called [funding UTXO](#funding-utxo) are used. Such 
 
 Anchoring requires additional settings to be set. There are both local and global configuration settings. Local are accepted just to the current node, while global are shared between all the validators.
 
-The settings can be updated in the same way as other configuration parameters do; for example, the global configuration should be updated through the [Configuration Update service](configuration.md)
+The settings can be updated in the same way as other configuration parameters do; for example, the global configuration should be updated through the [Configuration Update service](configuration-updater.md)
 
 ### Bitcoind node
 
@@ -77,7 +77,7 @@ The funding UTXO should get enough confirmations before being used. However, the
 
 Decentralization during anchoring process is built over internal bitcoin multisignature addresses architecture.
 
-When Exonum network should be anchored, every validator builds an anchoring transaction using [deterministic and unequivocal algorithm] (#build-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such an anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are published into Exonum blockchain.
+When Exonum network should be anchored, every validator builds an anchoring transaction using [deterministic and unequivocal algorithm] (#creating-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such an anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are published into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M` is the necessary amount of signatures. In Exonum PBFT consensus, `M = 2/3*N + 1` is used as supermajority.
 
@@ -101,7 +101,7 @@ Every anchoring transaction should spent a previous anchoring tx. By a multiple 
 Every validator defines which transaction should be spend in its opinion. Such transaction is called Last Expected Correct Transaction (LECT). LECT of all validators are published in the Exonum blockchain. While creating a new anchoring transaction, the network chooses common LECT (which is selected by validators' supermajority) and spend its change output.
 
 Every validator should refresh its LECT with a custom schedule.
-To get new LECT, the validator uses [bitcoin node's](#bitcoin-node) API. New LECT must have the following properties:
+To get new LECT, the validator uses [bitcoin node's](#bitcoind-node) API. New LECT must have the following properties:
 
 - It is valid anchoring transaction for the current Exonum blockchain
 - It may have any amount of confirmations, in particular, 0
@@ -173,7 +173,7 @@ The data of the recovery chunk is structured as follows:
 
 - 32-byte bitcoin transaction hash. This hash shows that the current anchoring chain is the prolongation of previously stopped anchoring chain. The possible reasons of such stops are described further.
 
-The recovery output is optional and may appear in the very first bitcoin anchoring transaction only if the previous anchoring chain was failed (as described in the [Recovering the previous chain](#recovering-the-previous-chain)). 
+The recovery output is optional and may appear in the very first bitcoin anchoring transaction only if the previous anchoring chain was failed (as described in the [Recovering the previous chain](#recovering-broken-anchoring)). 
 
 **TODO: what length does recovery chunk have?**
 
@@ -250,7 +250,7 @@ The list of validators' anchoring keys may be changed by a multiple reasons:
 - periodic key rotation
 - changing the validators’ list: add/replace/remove some validators
 
-Both ways require disabling old anchoring keys and add new ones. As well as the anchoring bitcoin address is a derivative from the list of anchoring public keys, it should be changed accordingly. Pub-keys list is stored in the global configuration; it can be updated by out-of-band means, for example, using [Configuration Update service](configuration.md). We may notice only the following properties:
+Both ways require disabling old anchoring keys and add new ones. As well as the anchoring bitcoin address is a derivative from the list of anchoring public keys, it should be changed accordingly. Pub-keys list is stored in the global configuration; it can be updated by out-of-band means, for example, using [Configuration Update service](configuration-updater.md). We may notice only the following properties:
 
 1. New configuration is spread over nodes. It is still not active.
 2. New configuration have additional parameter `height when this configuration should be applied`. It is chosen by administrator. The good sense is to choose height so config would be applied in ~3-6 hours after it was sent into Exonum blockchain.
@@ -288,7 +288,7 @@ All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/btc_anchoring/v1`.
 
 !!! tip
-    See [*Services*](../../architecture/services.md) for a description of
+    See [*Services*](../architecture/services.md) for a description of
     types of endpoints in services.
 
  
@@ -353,7 +353,7 @@ JSON object of such format:
 - **payload/prev_tx_chain**: the tx-id for the anchoring transaction which is spent by the specified LECT. **TODO: yes?**
 - **txid**: the hash for the anchoring bitcoin transaction, which is considered to be a LECT.
 
-### Actual LECT for this validator
+### Actual LECT for another validator
 
 `GET {base_path}/actual_lect/:id`
 
@@ -384,3 +384,7 @@ JSON object with the following fields:
 - **content/payload/block_height**: the height of the anchored Exonum block
 - **content/payload/prev_tx_chain**: the tx-id for the anchoring transaction which is spent by the specified LECT. **TODO: yes?**
 - **content/txid**: the hash for the anchoring bitcoin transaction, which is considered to be a LECT.
+
+[anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
+[github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
+[bitcoind]: https://bitcoin.org/en/bitcoin-core/
