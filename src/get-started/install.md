@@ -12,7 +12,7 @@ to these projects, testing them, and developing using Exonum.
     installed locally as described below for the core to compile.
 
     In future releases, Exonum will become more modular and will work as
-    a standalone application. See [the roadmap](../dev/roadmap.md) for more details.
+    a standalone application. See [the roadmap](../roadmap.md) for more details.
 
 ## Dependencies
 
@@ -113,7 +113,7 @@ development toolchain:
 
 ## Developing with Exonum
 
-[The cryptocurrency tutorial](cryptocurrency/intro.md) provides a step-by-step
+[The cryptocurrency tutorial](create-service.md) provides a step-by-step
 guide on how to develop applications on top of the Exonum framework.
 
 [exonum-core]: https://github.com/exonum/exonum-core/

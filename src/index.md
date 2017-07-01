@@ -18,12 +18,12 @@ and client security.
 
 [Exonum Core][core] is a open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
-You may refer to [the installation guide](home/install.md) in order to install
+You may refer to [the installation guide](get-started/install.md) in order to install
 the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
-[Cryptocurrency tutorial](home/cryptocurrency/intro.md) showcases how Exonum Core
+[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum Core
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum Core, the tutorial also makes use of [the light client][client] –
 a JavaScript library intented for client-side verification of blockchain information
@@ -35,8 +35,9 @@ The source code of the tutorial [is available on GitHub][tutorial].
 
 ### Framework Design & Motivations
 
-Refer to [*What is Exonum*](home/what-is-exonum.md) for the motivations behind building
-yet another permissioned blockchain framework. [*Design Overview*](home/design-overview.md)
+Refer to [*What is Exonum*](get-started/what-is-exonum.md)
+for the motivations behind building
+yet another permissioned blockchain framework. [*Design Overview*](get-started/design-overview.md)
 takes a more technical approach and gives in-depth description of the Exonum design.
 
 ### Services & Clients
@@ -56,15 +57,15 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 ### Specifications
 
 Exonum documentation contains in-depth discussions for numerous other aspects
-of the framework, such as [binary serialization](advanced/serialization.md),
+of the framework, such as [binary serialization](architecture/serialization.md),
 [storage](architecture/storage.md), [networking](advanced/network.md), and
 [Merkle](advanced/merkle-index.md) and [Merkle Patricia](advanced/merkle-patricia-index.md)
 indexes.
 
 ## Contributing
 
-See the [contributing guide](dev/contributing.md) to get information on how
-to contribute to Exonum development, and the [roadmap](dev/roadmap.md) to find out
+See the [contributing guide](contributing.md) to get information on how
+to contribute to Exonum development, and the [roadmap](roadmap.md) to find out
 what features are coming soon.
 
 [rust]: http://rust-lang.org/
