@@ -245,9 +245,9 @@ An anchoring transaction proposal is constructed as follows:
 - It conform to the Bitcoin transaction specification.
 - The inputs are:
 
-  - The change output of the selected common LECT. This input present in
+    - The change output of the selected common LECT. This input present in
     every anchoring transaction except the first one.
-  - Funding UTXO written in the global configuration and not included in
+    - Funding UTXO written in the global configuration and not included in
     a previous anchoring transaction.
 
 - The outputs contain a data output and the change output only. The
@@ -307,11 +307,11 @@ anchoring transaction only if the previous anchoring chain was failed
 (as described in the [Recovering the previous
 chain](#recovering-broken-anchoring)).
 
-**TODO: what length does recovery chunk have?**
+Todos. **TODO: what length does recovery chunk have?**
 
 ## Verification
 
-**TODO: is verification implemented anywhere?**
+Todos. **TODO: is verification implemented anywhere?**
 
 Anchors can be verified both in real time and retrospectively. The
 real-time verification is simpler, but it is insufficient for long-term
@@ -335,7 +335,8 @@ verification; naturally, the validators must verify anchors.
   proposal](#transitional-transaction).
 4. Otherwise, the verification succeeds.
 
-If verification fails, any further updates to the blockchain are considered to be invalid.
+If verification fails, any further updates to the blockchain are
+considered to be invalid.
 
 ### Retrospective Verification and Blockchain Receipts
 
@@ -365,7 +366,7 @@ following data:
 - List of initial anchoring pubkeys
 - Initial value of `m`
 
-**TODO: should be update with the respect to broken anchoring chains**
+Todos. **TODO: should be update with the respect to broken anchoring chains**
 
 #### Inner blockchain checks
 
@@ -376,6 +377,7 @@ following data:
 4. Verify that the link from `b_anc` to `b` is valid
 
 #### Anchoring checks
+
 
 1. Verify that `tx_anc` is a bitcoin transaction
 2. Verify that `tx_anc` is an anchoring transaction, without verifying
@@ -474,10 +476,10 @@ chunk](#recovery-data-chunk) in the data output.
 
 The service provides the following public API endpoints:
 
- - [Get actual anchoring address](#actual-address)
- - [Get next anchoring address](#following-address)
- - [Get actual lect for this validator](#actual-lect-for-this-validator)
- - [Get actual lect for another validator](#actual-lect-for-another-validator)
+- [Get actual anchoring address](#actual-address)
+- [Get next anchoring address](#following-address)
+- [Get actual lect for this validator](#actual-lect-for-this-validator)
+- [Get actual lect for another validator](#actual-lect-for-another-validator)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/btc_anchoring/v1`.
@@ -519,7 +521,8 @@ None.
 
 #### Response
 
-The same format as for the actual anchoring address, the string with a value of anchoring address:
+The same format as for the actual anchoring address, the string with a
+value of anchoring address:
 
 `2NFGToas8B6sXqsmtGwL1H4kC5fGWSpTcYA`
 
@@ -537,14 +540,14 @@ None.
 
 JSON object of such format:
 
-    {
-      "payload": {
-        "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-        "block_height": 0,
-        "prev_tx_chain": null
-      },
-      "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-    }
+        {
+          "payload": {
+            "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+            "block_height": 0,
+            "prev_tx_chain": null
+          },
+          "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+        }
 
 - **payload/blockhash**: the hash of the anchored Exonum block
 - **payload/block_height**: the height of the anchored Exonum block
@@ -568,17 +571,17 @@ hash of Exonum transaction published this LECT.
 
 JSON object with the following fields:
 
-    {
-      "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
-      "content": {
-        "payload": {
-          "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-          "block_height": 0,
-          "prev_tx_chain": null
-        },
-        "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-      }
-    }
+        {
+          "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
+          "content": {
+            "payload": {
+              "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+              "block_height": 0,
+              "prev_tx_chain": null
+            },
+            "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+          }
+        }
 
 - **hash**: the hash of Exonum transaction, where the specified
   validator published this LECT
