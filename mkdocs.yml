@@ -38,54 +38,51 @@ markdown_extensions:
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
-  - 'Getting started':
+  - 'Get started':
     # What is Exonum 'as a box', from point of view of external developer
-    - 'What is Exonum': 'home/what-is-exonum.md'
+    - 'What is Exonum': 'get-started/what-is-exonum.md'
     # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
     # links to necessary documentation parts
-    - 'Design overview': 'home/design-overview.md'
-    - 'Glossary of terms': 'home/glossary.md'
-    - 'Cryptocurrency tutorial':
-      - 'Introduction': 'home/cryptocurrency/intro.md'
+    - 'Design overview': 'get-started/design-overview.md'
+    # Installation guide
+    - 'Install': 'get-started/install.md'
+    # Writing one's first Exonum service
+    - 'Create service': 'get-started/create-service.md'
   - 'Architecture':
+    # Includes guidelines for services
+    - 'Services': 'architecture/services.md'
+    # What is transaction? (purity, sequential consistency, non-replayability, signatures)
+    - 'Transactions': 'architecture/transactions.md'
+    # How to make Public API communication (both server and client side)
+    - 'Clients': 'architecture/clients.md'
     # Local configuration - how to roughly configure a node (make it ready to run)
     - 'Configuration': 'architecture/configuration.md'
     # Includes blockchain, genesis block, indexes, proofs, etc.
     - 'Storage': 'architecture/storage.md'
-    # What is transaction? (purity, sequential consistency, non-replayability, signatures)
-    - 'Transactions': 'architecture/transactions.md'
-    # Includes guidelines for services
-    - 'Services': 'architecture/services.md'
-    # How to make Public API communication (both server and client side)
-    - 'Clients': 'architecture/clients.md'
-  - 'Advanced topics':
-    # How the network module works: peer discovery, p2p connections
-    - 'Internode communication': 'advanced/network.md'
     # How the data is serialised and deserialised to be transfered through the network
-    - 'Serialization': 'advanced/serialization.md'
+    - 'Serialization': 'architecture/serialization.md'
+    # Consensus overview
+    - 'Consensus': 'architecture/consensus.md'
+  - 'Advanced':
+    # How the network module works: peer discovery, p2p connections
+    - 'Network': 'advanced/network.md'
+    # What is sandbox testing and simple example of one of sandbox tests
+    - 'Service testing': 'advanced/service-testing.md'
+    # Configuration change service documentation
+    - 'Configuration updater': 'advanced/configuration-updater.md'
+    # Anchoring service documentation
+    - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
     - 'Merkle index': 'advanced/merkle-index.md'
     - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
-    - 'Services':
-      # Configuration change service documentation
-      - 'Configuration': 'advanced/services/configuration.md'
-      # Anchoring service documentation
-      - 'Bitcoin anchoring': 'advanced/services/anchoring.md'
-    - 'Consensus specification':
-      # Consensus specification, including proofs
-      - 'Consensus': 'advanced/consensus/consensus.md'
+    - 'Consensus':
+      # Consensus specification
+      - 'Specification': 'advanced/consensus/specification.md'
       # Leader election algorithm specification
       - 'Leader election': 'advanced/consensus/leader-election.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
-      # Timeout adjustment module specification
-      - 'Timeouts adjustment': 'advanced/consensus/timeouts-adjustment.md'
-    # DoS attacks description. How we (are going to) protect the system from it
-    - 'DoS attacks': 'advanced/dos-attacks.md'
-    # What is sandbox testing and simple example of one of sandbox tests
-    - 'Sandbox testing': 'advanced/sandbox.md'
-  - 'Development':
-    # Includes roadmap and features list
-    - 'Roadmap': 'dev/roadmap.md'
-    # How to contribute to Exonum repositories
-    - 'Contributing': 'dev/contributing.md'
-    - 'License': 'dev/license.md'
+  # Includes roadmap and features list
+  - 'Roadmap': 'roadmap.md'
+  # How to contribute to Exonum repositories
+  - 'Contributing': 'contributing.md'
+  - 'Glossary': 'glossary.md'
