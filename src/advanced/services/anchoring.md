@@ -79,18 +79,18 @@ The funding UTXO should get enough confirmations before being used. However, the
 
 Decentralization during anchoring process is built over internal bitcoin multisignature addresses architecture.
 
-When Exonum network should be anchored, every validator builds an anchoring transaction using [deterministic and unequivocal algorithm] (#build-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such an anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are publicized into Exonum blockchain.
+When Exonum network should be anchored, every validator builds an anchoring transaction using [deterministic and unequivocal algorithm] (#build-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such an anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are published into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M` is the necessary amount of signatures. In Exonum PBFT consensus, `M = 2/3*N + 1` is used as supermajority.
 
 !!! note Example
 	If there are `N=10` validators, then `M=7` represents a supermajority. That means, 7 signatures are required to build an anchoring transaction. If `N=4`, then `M=3` signatures are required.
 
-After the necessary amount of signatures is publicized, any participant node can create correct and signed anchoring transaction and broadcast it to the bitcoin blockchain.
+After the necessary amount of signatures is published, any participant node can create correct and signed anchoring transaction and broadcast it to the bitcoin blockchain.
 
 ### Transaction malleability
 
-As it was told, we need `M` signatures out of `N` validators to spend bitcoins from previous change-output. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). More than `M` signatures can be publicized (and it is common situation); thus there is a special algorithm allowing to select `M` signatures deterministically. If all validators are legitimate, certain transaction is built unequivocally.
+As it was told, we need `M` signatures out of `N` validators to spend bitcoins from previous change-output. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). More than `M` signatures can be published (and it is common situation); thus there is a special algorithm allowing to select `M` signatures deterministically. If all validators are legitimate, certain transaction is built unequivocally.
 
 But any Byzantine node could step out from deterministic algorithm and change signature of anchoring transaction. Thus it creates transaction with the same anchor hash (the same data-output) but another tx-id and spread it to the bitcoin network. Such byzantine transactions make a problem: we want to build new anchoring transaction even if previous is still not included in any bitcoin block. But previous transaction could be substituted by byzantine one with another tx-id. That makes all later (already created) anchoring transactions useless.
 
@@ -100,7 +100,7 @@ To handle this problem, the process of selecting appropriate previous transactio
 
 Every anchoring transaction should spent a previous anchoring tx. By a multiple reasons such a transaction cannot be defined deterministically; thus, it is an object for validators' consensus.
 
-Every validator defines which transaction should be spend in its opinion. Such transaction is called Last Expected Correct Transaction (LECT). LECT of all validators are publicized in the Exonum blockchain. While creating a new anchoring transaction, the network chooses common LECT (which is selected by validators' supermajority) and spend its change output.
+Every validator defines which transaction should be spend in its opinion. Such transaction is called Last Expected Correct Transaction (LECT). LECT of all validators are published in the Exonum blockchain. While creating a new anchoring transaction, the network chooses common LECT (which is selected by validators' supermajority) and spend its change output.
 
 Every validator should refresh its LECT with a custom schedule.
 To get new LECT, the validator uses [bitcoin node's](#bitcoin-node) API. New LECT must have the following properties:
@@ -359,7 +359,7 @@ JSON object of such format:
 
 `GET {base_path}/actual_lect/:id`
 
-The actual LECT for the specified validator is returned, along with the hash of Exonum transaction publicized this LECT.
+The actual LECT for the specified validator is returned, along with the hash of Exonum transaction published this LECT.
 #### Parameters
 
 id: unsigned 32-bit integer
@@ -380,7 +380,7 @@ JSON object with the following fields:
 	  }
 	}
 
-- **hash**: the hash of Exonum transaction, where the specified validator publicized this LECT
+- **hash**: the hash of Exonum transaction, where the specified validator published this LECT
 - **content**: the LECT in the same format as in `actual_lect` API
 - **content/payload/blockhash**: the hash of the anchored Exonum block
 - **content/payload/block_height**: the height of the anchored Exonum block
