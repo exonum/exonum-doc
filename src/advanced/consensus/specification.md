@@ -1,26 +1,29 @@
 # Consensus Algorithm Specification
 
-This article contains the specification of [the consensus algorithm](../../home/glossary.md#consensus)
+
+This article contains the specification of [the consensus algorithm](../../glossary.md#consensus)
 in Exonum.
 
 Consensus algorithm in Exonum is a process of reaching an agreement about order
-of [transactions](../../home/glossary.md#transaction) and the result of their
+of [transactions](../../glossary.md#transaction) and the result of their
 execution in the presence of [Byzantine faults][wiki_bft] and [partially
 synchronous][partial_synchrony] network. During the consensus algorithm
-nodes exchange [consensus messages](../../home/glossary.md#consensus-message)
+nodes exchange [consensus messages](../../glossary.md#consensus-message)
 authenticated with public-key crypto. These messages are processed via [a
 message queue](#message-processing) and determine [transitions among
-states](consensus.md#node-states-overview). The output of the consensus algorithm
+states](../../architecture/consensus.md#node-states-overview).
+The output of the consensus algorithm
 is a sequence of blocks of transactions, which is guaranteed to be identical
 for all honest nodes in the network.
 
 !!! tip
-    See [algorithm overview](consensus.md#algorithm-overview) and [list of
-    assumptions](consensus.md#assumptions) for more details.
+    See [algorithm overview](../../architecture/consensus.md#algorithm-overview)
+    and [list of assumptions](../../architecture/consensus.md#assumptions)
+    for more details.
 
 ## Definitions
 
-The definitions from the [general description of consensus algorithm](consensus.md)
+The definitions from the [general description of consensus algorithm](../../architecture/consensus.md)
 are used. In particular, +2/3 means more than two thirds of the validators,
 and -1/3 means less than one third.
 
@@ -72,7 +75,7 @@ message processing.
 
 !!! tip
     These parameters are a part of [the global configuration](../../architecture/configuration.md).
-    They can be adjusted with the help of [the configuration update service](../services/configuration.md).
+    They can be adjusted with the help of [the configuration update service](../configuration-updater.md).
 
 ## Node State Variables
 
@@ -87,9 +90,8 @@ message processing.
   Hash map with known block proposals.
 
 - `locked_round`  
-  Round in which the node has [locked](consensus.md#locks) on a proposal.
+  Round in which the node has [locked](../../architecture/consensus.md#locks) on a proposal.
   0 if the node is not locked.
-
 - `current_round`  
   Current round (1-based).
 
@@ -102,9 +104,12 @@ message processing.
 ## Consensus Messages
 
 The consensus algorithm uses the following types of messages:
-[`Propose`](consensus.md#propose), [`Prevote`](consensus.md#prevote),
-[`Precommit`](consensus.md#precommit), [`Status`](consensus.md#status),
-[`Block`](consensus.md#block). Only a part of their fields is described here. See
+[`Propose`](../../architecture/consensus.md#propose),
+[`Prevote`](../../architecture/consensus.md#prevote),
+[`Precommit`](../../architecture/consensus.md#precommit),
+[`Status`](../../architecture/consensus.md#status),
+[`Block`](../../architecture/consensus.md#block).
+Only a part of their fields is described here. See
 [source code][message_source] for more details.
 
 The following fields are present for all messages:
@@ -129,7 +134,7 @@ The following fields are present for all messages:
 `Prevote` messages have the following additional fields:
 
 - `locked_round`  
-  Round in which the author of the message [has locked](consensus.md#locks)
+  Round in which the author of the message [has locked](../../architecture/consensus.md#locks)
   on the proposal which is referenced by the message.
   If the author is not locked on a propose, the `locked_round` field is 0.
 
@@ -165,7 +170,7 @@ by [incoming messages](#message-processing) and [timeouts](#timeout-processing).
   its first PoL for the `current_height`).
 - [Commit](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
-  the same known proposal. Corresponds to [the Commit node state](consensus.md#node-states-overview).
+  the same known proposal. Corresponds to [the Commit node state](../../architecture/consensus.md#node-states-overview).
 
 The steps performed at each stage are described [below](#stage-processing).
 
@@ -181,7 +186,7 @@ are placed in a separate queue (`queued`).
 
 ### Deserialization
 
-- Check the message against the [serialization format](../serialization.md).
+- Check the message against the [serialization format](../../architecture/serialization.md).
 - If any problems during deserialization are detected, ignore
   the message as something that a node can not correctly interpret.
 - If verification is successful, proceed to [Consensus messages processing](#consensus-messages-processing)
