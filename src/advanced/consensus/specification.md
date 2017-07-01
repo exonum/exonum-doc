@@ -1,6 +1,5 @@
 # Consensus Algorithm Specification
 
-
 This article contains the specification of [the consensus algorithm](../../glossary.md#consensus)
 in Exonum.
 
@@ -90,8 +89,8 @@ message processing.
   Hash map with known block proposals.
 
 - `locked_round`  
-  Round in which the node has [locked](../../architecture/consensus.md#locks) on a proposal.
-  0 if the node is not locked.
+  Round in which the node has [locked](../../architecture/consensus.md#locks)
+  on a proposal. 0 if the node is not locked.
 - `current_round`  
   Current round (1-based).
 
