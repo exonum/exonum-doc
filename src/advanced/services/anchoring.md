@@ -5,7 +5,7 @@ The anchoring service is developed to increase product security and provide non-
  achieves full accountability of private blockchain maintainers/validators, long-term non-repudiation, and resistance of the system to DoS, including (but not limited to) a complete shutdown of the Exonum blockchain infrastructure.
  
 !!! note "Another pages about anchoring service"
-	This page describe mostly how the service do work; however, there is a separate page, describing how the service should be [configured and deployed][anchoring-deploy].
+	This page describe mostly how the service do work; however, there is a separate page, describing how the service should be [configured and deployed][anchoring-deploy]. The sources are located [at the github][github-anchoring].
 
 ## Anchoring chain, anchoring transaction. Rough description
 
@@ -22,7 +22,7 @@ To write a data state hash, the service builds a _anchoring chain_ on the top of
 
 Sometimes additional inputs called [funding UTXO](#funding-utxo) are used. Such input is necessary to refill balance of anchoring chain, that is spending to transaction fees.
 
-## Setups
+## Setups and configuration
 
 Anchoring requires additional settings to be set. There are both local and global configuration settings. Local are accepted just to the current node, while global are shared between all the validators.
 
