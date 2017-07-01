@@ -23,7 +23,7 @@ input and only 2 outputs: data output and change output. Data output
 contains written data storage hash, while change output transfers money
 to the next anchoring transaction.
 
-```
+```None
              funding tx
                        \
       tx1        tx2    \   tx3        tx4
@@ -394,10 +394,9 @@ defines the distance between anchored block heights on the Exonum blockchain.
     The interval may be chosen in a way that under normal conditions the
     interval between anchored blocks is between 10 minutes and 1 hour.
 
-
 1. Verify that `tx_anc` is a bitcoin transaction
 2. Verify that `tx_anc` is an anchoring transaction, without verifying
-authorization by proper validators yet
+  authorization by proper validators yet
 3. Verify that `b_anc` is anchored by `tx_anc`
 4. Verify that `tx_anc` has proper authorization per the procedure below
 
