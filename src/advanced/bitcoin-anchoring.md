@@ -93,7 +93,7 @@ defines the difference between block heights for anchored data states.
     (e.g., blocks `#1000`, `#2000`, `#3000`, ...). The interval may be
     chosen in a way that under normal conditions the interval between
     anchored blocks is between 10 minutes and 1 hour.
-	
+
     Consider the following example: there is an Exonum blockchain with the
     normal interval between blocks equal to 3 seconds. If the blockchain is
     anchored each 1000 blocks, the interval between anchoring transactions
@@ -537,14 +537,14 @@ None.
 
 JSON object of such format:
 
-	{
-	  "payload": {
-		"block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-		"block_height": 0,
-		"prev_tx_chain": null
-	  },
-	  "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-	}
+    {
+      "payload": {
+        "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+        "block_height": 0,
+        "prev_tx_chain": null
+      },
+      "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+    }
 
 - **payload/blockhash**: the hash of the anchored Exonum block
 - **payload/block_height**: the height of the anchored Exonum block
@@ -568,17 +568,17 @@ hash of Exonum transaction published this LECT.
 
 JSON object with the following fields:
 
-	{
-	  "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
-	  "content": {
-		"payload": {
-		  "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-		  "block_height": 0,
-		  "prev_tx_chain": null
-		},
-		"txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-	  }
-	}
+    {
+      "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
+      "content": {
+        "payload": {
+          "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+          "block_height": 0,
+          "prev_tx_chain": null
+        },
+        "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+      }
+    }
 
 - **hash**: the hash of Exonum transaction, where the specified
   validator published this LECT
