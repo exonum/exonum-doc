@@ -306,13 +306,17 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+The string with a value of anchoring address:
 
-**TODO: ???**
+`2NFGToas8B6sXqsmtGwL1H4kC5fGWSpTcYA`
+
+If the anchoring is executing over the bitcoin mainnet, then anchoring P2SH address starts with `3`.
 
 ### Following address
 
-```GET {base_path}/address/following```
+`GET {base_path}/address/following`
+
+If the network plans to [change the validators list in future](#transitional-transaction), then the next anchoring address is returned. Otherwise, `null` is returned. **TODO: yes, null?**
  
 #### Parameters
 
@@ -320,28 +324,42 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+The same format as for the actual anchoring address, the string with a value of anchoring address:
 
-**TODO: ???**
+`2NFGToas8B6sXqsmtGwL1H4kC5fGWSpTcYA`
  
 ### Actual LECT for this validator
 
 `GET {base_path}/actual_lect`
 
+The current LECT for this validator is returned.
 #### Parameters
 
 None.
 
 #### Response
 
-JSON object with the following fields:
+JSON object of such format:
 
-**TODO: ???**
+	{
+	  "payload": {
+		"block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+		"block_height": 0,
+		"prev_tx_chain": null
+	  },
+	  "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+	}
+
+- **payload/blockhash**: the hash of the anchored Exonum block
+- **payload/block_height**: the height of the anchored Exonum block
+- **payload/prev_tx_chain**: the tx-id for the anchoring transaction which is spent by the specified LECT. **TODO: yes?**
+- **txid**: the hash for the anchoring bitcoin transaction, which is considered to be a LECT.
 
 ### Actual LECT for this validator
 
 `GET {base_path}/actual_lect/:id`
 
+The actual LECT for the specified validator is returned, along with the hash of Exonum transaction publicized this LECT.
 #### Parameters
 
 id: unsigned 32-bit integer
@@ -350,4 +368,21 @@ id: unsigned 32-bit integer
 
 JSON object with the following fields:
 
-**TODO: ???**
+	{
+	  "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
+	  "content": {
+		"payload": {
+		  "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+		  "block_height": 0,
+		  "prev_tx_chain": null
+		},
+		"txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+	  }
+	}
+
+- **hash**: the hash of Exonum transaction, where the specified validator publicized this LECT
+- **content**: the LECT in the same format as in `actual_lect` API
+- **content/payload/blockhash**: the hash of the anchored Exonum block
+- **content/payload/block_height**: the height of the anchored Exonum block
+- **content/payload/prev_tx_chain**: the tx-id for the anchoring transaction which is spent by the specified LECT. **TODO: yes?**
+- **content/txid**: the hash for the anchoring bitcoin transaction, which is considered to be a LECT.
