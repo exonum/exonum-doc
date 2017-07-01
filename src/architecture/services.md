@@ -27,7 +27,7 @@ in order to simplify data management) and can also access the local node configu
 
 Services are executed on each validator and each auditing node of the
 blockchain network. The order of transaction processing and the resulting changes
-to the service state are a part of [the consensus algorithm](../advanced/consensus/consensus.md).
+to the service state are a part of [the consensus algorithm](consensus.md).
 They are guaranteed to be the same for all nodes in the blockchain network.
 
 !!! tip
@@ -42,7 +42,7 @@ They are guaranteed to be the same for all nodes in the blockchain network.
     are not isolated in a virtual machine environment and are not containerized.
     This makes Exonum services more efficient and flexible in their capabilities,
     but at the same time requires more careful service programming. Service isolation
-    is on [the Exonum roadmap](../dev/roadmap.md).
+    is on [the Exonum roadmap](../roadmap.md).
 
 ## Service Interface
 
@@ -80,7 +80,7 @@ with other transactions in a block.
     Currency transfer is a classic example of a blockchain transaction.
     The transaction contains the fields corresponding to the sender’s and recipient’s
     public keys, the amount of transferred funds and the digital signature
-    created by the sender’s private key. See [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    created by the sender’s private key. See [the cryptocurrency tutorial](../get-started/create-service.md)
     for more details.
 
 ### Read Requests
@@ -119,7 +119,7 @@ Similar to read requests, private APIs cannot change the blockchain state;
 however, they can create transactions and broadcast them to the network.
 
 !!! note "Example"
-    In [the configuration update service](../advanced/services/configuration.md),
+    In [the configuration update service](../advanced/configuration-updater.md),
     private API is used to obtain the information about the current configuration
     and update proposals.
 
@@ -144,7 +144,7 @@ the items of the collection. Merklized versions of maps and lists are
 `MerklePatriciaTable` and `MerkleTable`, respectively.
 
 Naturally, the items of collections (and keys in the case of maps) need to be
-serializable. Exonum provides a simple and robust [binary serialization format](../advanced/serialization.md),
+serializable. Exonum provides a simple and robust [binary serialization format](serialization.md),
 and the corresponding set of tools for (de)serialization and conversion of
 Exonum datatypes to JSON for communication with thin clients.
 
@@ -153,7 +153,7 @@ Exonum datatypes to JSON for communication with thin clients.
 Besides blockchain, a service may read or write data in [the local configuration](configuration.md).
 Logically, the local configuration represents parameters local to a specific
 node instance. A good example is a private anchoring key used in
-[the anchoring service](../advanced/services/anchoring.md);
+[the anchoring service](../advanced/bitcoin-anchoring.md);
 naturally, nodes have different private keys and they cannot be put on the blockchain
 for security reasons.
 
@@ -186,7 +186,7 @@ If the configuration is updated, the services are automatically restarted.
 
 A service is responsible for verifying the structural integrity of incoming transactions
 and executing transactions (i.e., applying them to the blockchain state).
-Transactions are executed during [the precommit stage](../advanced/consensus/consensus.md)
+Transactions are executed during [the precommit stage](consensus.md)
 of the consensus (this concerns validators only) or when a node receives a block.
 
 ### Event handling
@@ -208,7 +208,7 @@ blockchain network
 !!! note
     As of Exonum 0.1, you can only code services in [Rust](http://rust-lang.org/).
     Rust is probably the safest general-purpose programming language, but it’s
-    not very easy to master. Java binding [is a high-priority task](../dev/roadmap.md).
+    not very easy to master. Java binding [is a high-priority task](../roadmap.md).
 
 Here’s a list of things to figure out when developing an Exonum service:
 
@@ -222,7 +222,7 @@ Here’s a list of things to figure out when developing an Exonum service:
   and append-only lists)?
 - Are there any foreign key relationships among stored entities? (Exonum data model
   supports relationships among entities via hash links;
-  see organization of wallet history in [the cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+  see organization of wallet history in [the cryptocurrency tutorial](../get-started/create-service.md)
   for more details.)
 - What persistent data will be returned to external clients? (You might want
   to use merklized data collections for this data and create corresponding
@@ -237,9 +237,28 @@ Here’s a list of things to figure out when developing an Exonum service:
   should be a part of the local configuration or stored in the blockchain.)
 
 !!! tip
-    [The cryptocurrency tutorial](../home/cryptocurrency/intro.md)
+    [The cryptocurrency tutorial](../get-started/create-service.md)
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
+
+### Limitations
+
+As of Exonum 0.1, there are some temporary limitations on what you can do
+with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
+on when and how these limitations are going to be lifted.
+
+#### Interaction Among Services
+
+In Exonum 0.1, there is no unified API for services to
+access other services’ endpoints. As an example, a service cannot call a transaction
+defined in another service, and cannot read data from another service
+via its read endpoint.
+
+#### Authentication Middleware
+
+Unlike common web frameworks, Exonum 0.1 does not provide authentication middleware
+for service endpoints. Implementing authentication and authorization is thus
+the responsibility of a service developer.
 
 ## Tips and Tricks
 
