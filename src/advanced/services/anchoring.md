@@ -26,7 +26,7 @@ Sometimes additional inputs called [funding UTXO](#funding-utxo) are used. Such 
 
 Anchoring requires additional settings to be set. There are both local and global configuration settings. Local are accepted just to the current node, while global are shared between all the validators.
 
-The settings can be updated in the same way as other conriguration parameters do; for example, the global configuration should be updated through the [Configuration Update service](configuration.md)
+The settings can be updated in the same way as other configuration parameters do; for example, the global configuration should be updated through the [Configuration Update service](configuration.md)
 
 ### Bitcoind node
 
@@ -38,23 +38,23 @@ You need to specify the following settings to access the bitcoind node:
 - bitcoind rpc username
 - bitcoind rpc password
 
-It is strongly advised to have a separate bitcoind node for every validator; otherwise the single bitcoind node represents a centralisation point and brings a weakness into the anchoring process.
+It is strongly advised to have a separate bitcoind node for every validator; otherwise the single bitcoind node represents a centralization point and brings a weakness into the anchoring process.
 
 ### Anchoring private keys
 
-Every validator should posess its own secp256k1 EC keypair in order to participate in anchoring process. This is the standard (and currently the only suported) key format for bitcoin transactions. While the private keys should be secured by every validator, the public keys are shared among them and are written into Exonum blockchain.
+Every validator should possess its own secp256k1 EC keypair in order to participate in anchoring process. This is the standard (and currently the only supported) key format for bitcoin transactions. While the private keys should be secured by every validator, the public keys are shared among them and are written into Exonum blockchain.
 
 To create an anchoring transactions `+2/3` of validators' signatures are needed.
 
 ### Transaction fees
 
-A transaction fee represent a value in satoshis that is set as a fee for every anchoring transaction. It is advised to be a 2x-3x times bigger then average market fee, in order to be sure that anchoring transaction does not hang if the bitcoin network is spammed.
+A transaction fee represent a value in satoshis that is set as a fee for every anchoring transaction. It is advised to be a 2x-3x times bigger than average market fee, in order to be sure that anchoring transaction does not hang if the bitcoin network is spammed.
 
 This value is written to the global configuration and is applied by all the validators.
 
 ### Anchoring schedule
 
-This parameter defines how often does anchoring should be executed. It defines the difference between block heights for anchored data states.
+This parameter defines how often anchoring should be executed. It defines the difference between block heights for anchored data states.
 
 !!! note Example
 	It is recommended to anchor with fixed interval between block heights (e.g., blocks `#1000`, `#2000`, `#3000`, ...). The interval may be chosen in a way that under normal conditions the interval between anchored blocks is between 10 minutes and 1 hour.
@@ -75,22 +75,22 @@ The funding UTXO should get enough confirmations before being used. However, the
 
 ## Anchoring transactions
 
-### Multisig address as decentralisation method
+### Multisig address as decentralization method
 
-Decentralisation during anchoring process is built over internal bitcoin multisignature addresses architecture.
+Decentralization during anchoring process is built over internal bitcoin multisignature addresses architecture.
 
-When Exonum network should be anchored, every validator builds an anchoring transaction using [determenistic and uneqivocable algorithm](#build-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such a anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are publicated into Exonum blockchain.
+When Exonum network should be anchored, every validator builds an anchoring transaction using [deterministic and unequivocal algorithm] (#build-anchoring-transaction). Its results should are guaranteed to match for every legitimate node. Such an anchoring transaction spend one or more UTXOs from the current anchoring multisig address. Bitcoin allows different validators sign this transactions separately from each other, thus every validator can sign it without regard for other validators.  All signatures are publicized into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M` is the necessary amount of signatures. In Exonum PBFT consensus, `M = 2/3*N + 1` is used as supermajority.
 
 !!! note Example
 	If there are `N=10` validators, then `M=7` represents a supermajority. That means, 7 signatures are required to build an anchoring transaction. If `N=4`, then `M=3` signatures are required.
 
-After the necessary amount of signatures is publicated, any participant node can create correct and signed anchoring transaction and broadcast it to the bitcoin blockchain.
+After the necessary amount of signatures is publicized, any participant node can create correct and signed anchoring transaction and broadcast it to the bitcoin blockchain.
 
 ### Transaction malleability
 
-As it was told, we need `M` signatures out of `N` validators to spend bitcoins from previous change-output. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). More than `M` signatures can be publicated (and it is common situation); thus there is a special algorithm allowing to select `M` signatures deterministically. If all validators are legitimate, certain transaction is built uneqivocably.
+As it was told, we need `M` signatures out of `N` validators to spend bitcoins from previous change-output. These signatures are publicly available for every validator (as they are openly written in assets-blockchain). More than `M` signatures can be publicized (and it is common situation); thus there is a special algorithm allowing to select `M` signatures deterministically. If all validators are legitimate, certain transaction is built unequivocally.
 
 But any Byzantine node could step out from deterministic algorithm and change signature of anchoring transaction. Thus it creates transaction with the same anchor hash (the same data-output) but another tx-id and spread it to the bitcoin network. Such byzantine transactions make a problem: we want to build new anchoring transaction even if previous is still not included in any bitcoin block. But previous transaction could be substituted by byzantine one with another tx-id. That makes all later (already created) anchoring transactions useless.
 
@@ -98,9 +98,9 @@ To handle this problem, the process of selecting appropriate previous transactio
 
 ### LECT
 
-Every anchoring transaction should spent a previous anchoring tx. By a multiple reasons such a transaction can not be defined determenistically; thus, it is an object for validators' consensus.
+Every anchoring transaction should spent a previous anchoring tx. By a multiple reasons such a transaction cannot be defined deterministically; thus, it is an object for validators' consensus.
 
-Every validator defines which transaction should be spend in its opinion. Such transaction is called Last Expected Correct Transaction (LECT). LECT of all validators are publicated in the Exonum blockchain. While creating a new anchoring transaction, the network chooses common LECT (which is selected by validators' supermajority) and spend its change output.
+Every validator defines which transaction should be spend in its opinion. Such transaction is called Last Expected Correct Transaction (LECT). LECT of all validators are publicized in the Exonum blockchain. While creating a new anchoring transaction, the network chooses common LECT (which is selected by validators' supermajority) and spend its change output.
 
 Every validator should refresh its LECT with a custom schedule.
 To get new LECT, the validator uses [bitcoin node's](#bitcoin-node) API. New LECT must have the following properties:
@@ -109,7 +109,7 @@ To get new LECT, the validator uses [bitcoin node's](#bitcoin-node) API. New LEC
 - It may have any amount of confirmations, in particular, 0
 - Its change output should be not spent. That means that the specified validator believes there was no following anchoring transactions after this one
 - Among all bitcoin transactions satisfying the previous properties, LECT should have the greatest anchored Exonum block height
-- If multiple transactions respond to previous conditions, any of them may be choosed as a LECT.
+- If multiple transactions respond to previous conditions, any of them may be chosen as a LECT.
 
 The LECT solves transaction malleability problem, though anchoring chain may sometimes rollback and skip some anchoring transactions.
 
@@ -238,7 +238,7 @@ Note that initial anchoring pubkeys and initial `m` SHOULD be committed to the g
 Verifying authorization of `tx_anc`:
 
 1. Calculate the initial anchoring address `addr`.
-2. Load spending transactions from `addr` ordered as in the Bitcoin Blockchain, until the first transitional anchoring transaction. XXX: Is there an efficient way to query spending txs and/or transitional anchoring txs? is encountered, or spending txs are depleted. Let `txs` be the list of loaded transactions ordered as in the Bitcoin Blockchain.
+2. Load spending transactions from `addr` ordered as in the Bitcoin Blockchain, until the first transitional anchoring transaction is encountered, or spending txs are depleted. Let `txs` be the list of loaded transactions ordered as in the Bitcoin Blockchain.
 3. If `tx_anc` is in `txs`, the check succeeds. XXX: If any transaction in `txs` is not an anchoring transaction, fail.
 4. Else, if the last transaction in `txs` is a transitional anchoring transaction, assign `addr` to the new address specified by this transaction, and go to step 2.
 5. If the last transaction in `txs` is not a transitional anchoring transaction, fail.
@@ -250,9 +250,9 @@ This procedure assumes that the validators had not gone rogue before `tx_anc`. I
 The list of validators' anchoring keys may be changed by a multiple reasons:
 
 - periodic key rotation
-- changing the validators'list: add/replace/remove some validators
+- changing the validators’ list: add/replace/remove some validators
 
-Both ways require disabling old anchoring keys and add new ones. As well as the anchoring bitcoin address is a derivative from the list of anchoring public keys, it should be changed accordingly. Pub-keys list is stored in the global configuration; it can be updated by out-of-band means, for example, using [Configuration Update service](configuration.md). We may note only the following properties:
+Both ways require disabling old anchoring keys and add new ones. As well as the anchoring bitcoin address is a derivative from the list of anchoring public keys, it should be changed accordingly. Pub-keys list is stored in the global configuration; it can be updated by out-of-band means, for example, using [Configuration Update service](configuration.md). We may notice only the following properties:
 
 1. New configuration is spread over nodes. It is still not active.
 2. New configuration have additional parameter `height when this configuration should be applied`. It is chosen by administrator. The good sense is to choose height so config would be applied in ~3-6 hours after it was sent into Exonum blockchain.
@@ -275,7 +275,7 @@ If last LECT does not get enough confirmations before the Exonum blockchain move
 
 ## Recovering broken anchoring
 
-After anchoring chain was broken administrators must generate new funding transaction to the new anchoring address and add it to the global configuration as fundingUTXO. New anchoring chain will produced, starting with this funding tx. The very first anchoring transaction from this chain would include optional [anchoring-recovering data chunk](#recovery-data-chunk) in the data output.
+After anchoring chain was broken administrators must generate new funding transaction to the new anchoring address and add it to the global configuration as funding UTXO. New anchoring chain will produced, starting with this funding tx. The very first anchoring transaction from this chain would include optional [anchoring-recovering data chunk](#recovery-data-chunk) in the data output.
 
 ## Available API
 
