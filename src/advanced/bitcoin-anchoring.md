@@ -102,13 +102,11 @@ defines the difference between block heights for anchored data states.
     minutes), or 200 blocks (=10 minutes).
  Sometimes anchoring process timetable could differ from ideal. Such
 variations could be triggered by byzantine behavior of nodes, forking of
-bitcoin blockchain, or changing list of validators (anchoring PubKeys,
-see _Section 9.3_). For example, at the necessary height (`#1000`
-because of bitcoin blockchain fork nodes could not agree upon which
-anchoring transaction is the last one (and should be spent in the next
-anchoring tx). If so, nodes will wait until bitcoin network do not
-resolve its fork. Such situation is described in more details in the
-_Section 7_.
+bitcoin blockchain, or changing list of validators. For example, at the
+necessary height (`#1000` because of bitcoin blockchain fork nodes could
+not agree upon which anchoring transaction is the last one (and should
+be spent in the next anchoring tx). If so, nodes will wait until bitcoin
+network do not resolve its fork.
 
 ### Bitcoin public keys
 
