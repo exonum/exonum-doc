@@ -4,7 +4,7 @@
 presence of such information via consensus messages (for example, via a message
 indicating a blockchain height greater than the local blockchain height). The
 algorithm for generating and handling requests is an integral part of
-[the Exonum consensus algorithm](consensus.md).
+[the Exonum consensus algorithm][consensus].
 
 !!! note
     In the following description, +2/3 means more than two thirds of the
@@ -17,7 +17,7 @@ algorithm for generating and handling requests is an integral part of
 
 ## Learning from Consensus Messages
 
-Receiving [a consensus message](consensus.md#messages) from a node gives the
+Receiving [a consensus message][consensus#messages] from a node gives the
 message recepient
 an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
@@ -106,7 +106,7 @@ has the following fields:
   Each bit of this field indicates the need to send `Prevote` message from
   the corresponding validator (if bit value is 1, `Prevote` is requested; else
   `Prevote` is not needed). Indexing of the `validators` bits corresponds to the
-  indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
+  indexing of validator public keys in the [actual configuration][config#genesis].
 
 ### `RequestBlock`
 
@@ -123,7 +123,7 @@ Requests a committed block from a node. It has the following fields:
 
 Requests `Connect` messages from a node.
 `RequestPeers` message is sent regularly with the timeout `peers_timeout`
-defined in [the global configuration](../../architecture/configuration.md#global-parameters).
+defined in [the global configuration][config#global-parameters].
 It has the following fields:
 
 - **from**: PublicKey  
@@ -181,7 +181,7 @@ validator height.
 - If the node does not have the corresponding `Propose`, send
   `RequestPropose` to the author of `Prevote`
 - If the sender specified `lock_round`, which is greater than the stored  
-  [Proof-of-Lock (PoL)](consensus.md#locks), send
+  [Proof-of-Lock (PoL)][consensus#locks], send
   `RequestPrevotes` for the locked proposal to the author of `Prevote`
 - If the node have formed +2/3 `Prevote` messages for the same proposal, cancel
   the request `RequestPrevotes` for `Prevote` messages corresponding to this
@@ -208,8 +208,7 @@ validator height.
 ### Peers Timeout
 
 Send a `RequestPeers` request to a random peer (auditor or validator) from a
-list of known peers specified in [local
-configuration](../../architecture/configuration.md#local-parameters).
+list of known peers specified in [local configuration][config#local-parameters].
 
 ### Move to New Height
 
@@ -260,3 +259,10 @@ pool of unconfirmed transactions.
 ### `RequestPeers`
 
 Send all the saved `Connect` messages from peers to the requestor.
+
+[consensus]: ../../architecture/consensus.md
+[consensus#messages]: ../../architecture/consensus.md#messages
+[consensus#locks]: ../../architecture/consensus.md#locks
+[config#genesis]: ../../architecture/configuration.md#genesis
+[config#global-parameters]: ../../architecture/configuration.md#global-parameters
+[config#local-parameters]: ../../architecture/configuration.md#local-parameters

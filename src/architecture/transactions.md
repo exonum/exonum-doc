@@ -12,7 +12,7 @@ the transaction is completely rolled back, so that it does not have any
 effect on the persistent storage.
 
 If the transaction is correct, it can be committed, i.e., included into a block
-via the [consensus algorithm](../advanced/consensus/consensus.md)
+via the [consensus algorithm](consensus.md)
 among the blockchain validators. Consensus provides [total ordering][wiki:order]
 among all transactions; between any two transactions in the blockchain,
 it is possible to determine which one comes first.
@@ -62,7 +62,7 @@ separate implementation details from transaction invocation.
 ## Serialization
 
 Transactions in Exonum are subtypes of messages and share the serialization logic
-with [consensus messages](../advanced/consensus/consensus.md#messages).
+with [consensus messages](consensus.md#messages).
 All transaction messages are serialized in a uniform
 fashion. There are 2 serialization formats:
 
@@ -154,7 +154,7 @@ The body of the transaction, which includes data specific for a given
 transaction type. Format of the body is specified by the
 service identified by `service_id`.
 Binary serialization of the body is performed using
-[the Exonum serialization format](../advanced/serialization.md)
+[the Exonum serialization format](serialization.md)
 according to the transaction specification in the service.
 
 !!! note "Example"
@@ -233,12 +233,12 @@ fn execute(&self, view: &mut Fork);
 The `execute` method takes the current blockchain state and can modify it (but can
 choose not to if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
-storage [under certain conditions](../advanced/consensus/consensus.md).
+storage [under certain conditions](consensus.md).
 
 !!! note
     `verify` and `execute` are triggered at different times. `verify` checks
     internal consistency of a transaction before the transaction is included
-    into a [pool of unconfirmed transactions](../advanced/consensus/consensus.md).
+    into a [pool of unconfirmed transactions](consensus.md).
     `execute` is performed during the `Precommit` stage of consensus and when
     the block with the given transaction is committed into the blockchain.
 
@@ -401,7 +401,7 @@ essentially means that the blockchain looks like a centralized system for an
 external observer (e.g., a light client). All transactions in the blockchain
 affect the blockchain state as if they were executed one by one in the order
 specified by their ordering in blocks. Sequential consistency is guaranteed
-by the [consensus algorithm](../advanced/consensus/consensus.md).
+by the [consensus algorithm](consensus.md).
 
 ### Non-replayability
 
