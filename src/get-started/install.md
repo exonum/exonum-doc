@@ -67,17 +67,26 @@ curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 The toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
 
-A nightly (`2017-05-10`) Rust toolchain is used for the [clippy][clippy] linter.
-Install it with the following command:
+### Clippy
+
+A separate nightly Rust toolchain is required if you want to run
+the [clippy][clippy] linter locally. Clippy is used
+in CI builds of Exonum Core and other repositories to detect common Rust anti-patterns.
+In general, clippy supports the latest nightly version of Rust. It can be installed
+by
 
 ```shell
-rustup toolchain install nightly-2017-05-10
+rustup toolchain install <nightly-rust-version>
 ```
 
-Clippy checks can then be run as
+where `<nightly-rust-version>` is the nightly Rust version supported by clippy
+(e.g., `nightly-2017-05-10` for clippy version 0.0.131).
+Consult the clippy installation guide for more details.
+
+After installing nightly Rust, clippy checks can be run as
 
 ```shell
-cargo +nightly-2017-05-10 clippy
+cargo +<nightly-rust-version> clippy
 ```
 
 ## Compiling Exonum Core
