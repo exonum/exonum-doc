@@ -28,7 +28,7 @@ The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus algorithm
 assumes the worst; it operates under the assumption that any individual node
 or even a group of nodes in the blockchain network can crash or can be compromised
-by a resourceful adversary (say, a hacker or a corrupt administator). This
+by a resourceful adversary (say, a hacker or a corrupt administrator). This
 threat model is known in computer science as [Byzantine faults][wiki:bft];
 correspondingly, the Exonum consensus algorithm is Byzantine fault tolerant (BFT).
 
@@ -71,7 +71,7 @@ of the network.
 To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
-  for the next block and broadcasts it accross the network. The logic of selecting
+  for the next block and broadcasts it across the network. The logic of selecting
   the leader node is described [in a separate algorithm](../advanced/consensus/leader-election.md)
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
   A prevote means that the validator has been able to parse the proposal
@@ -175,7 +175,7 @@ Round4: |                    | R4     |                    | R4      ...
 
 Note that rounds have a fixed start time but they do not have a definite end
 time (they end when the next block is received). This differs from common
-behavior of partially synchoronous consensus algorithms, in which rounds have
+behavior of partially synchronous consensus algorithms, in which rounds have
 a definite conclusion (i.e., messages generated during the round `R`
 must be processed only during the round `R`).
 
