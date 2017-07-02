@@ -37,59 +37,81 @@ Multiple table types may be used in the Exonum applications.
     - `u64`: unsigned 64-bit int type.
     - `I`: an Iterator object.
     - `Hash`: `sha-256` hash object
-    - `Proofnode`: a custom class representing nodes from `MerkleTable`
+    - `Proofnode`: a custom class representing nodes from `ProofListIndex`
       proof trees.
     - `RootProofNode`: a custom class representing nodes from
-      `MerklePatriciaTable` proof trees.
+      `ProofMapIndex` proof trees.
 
-### MapTable
+### BaseIndex
 
-[`Maptable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_table.rs)
-is implementation of Key-Value storage. It represents the most basic
-table type. Although other table types do not inherit from it directly,
-they wrap around `map` field.
+[`BaseIndex`][base-index] represents the most basic table type. Other table types inherit from it directly.
+In the matter, `BaseIndex` implements a map interface:
+
+- `get(key: &K): V` receives a value by key. If Key is not found, error
+  is returned.
+- `contains(key: &K): bool`
+- `iter(subprefix: &K): I`
+- `iter_from(subprefix: &K, from: &K): I` **TODO: what is a subpefix?**
+- `put(key: &K, value: V)` inserts new value by key. If such key is
+  already exists, old value is overwritten with new one.
+- `remove(key: &K)` removes appropriate key-value pair. If Key is not
+- `clear()`
+
+!!! warning
+    It should not be used directly; the better approach is to use other implemented table types, or write your own table type wrapping `BaseIndex`.
+
+### MapIndex
+
+[`MapIndex`][map-index] is implementation of Key-Value storage. It wraps around the `BaseIndex` field.
 
 The following actions are supported:
 
 - `get(key: &K): V` receives a value by key. If Key is not found, error
   is returned.
+- `contains(key: &K): bool`
+- `iter(): I`
+- `iter_from(from: &K): I` **TODO: what is a subpefix?**
 - `put(key: &K, value: V)` inserts new value by key. If such key is
   already exists, old value is overwritten with new one.
-- `delete(key: &K)` removes appropriate key-value pair. If Key is not
-  found, error is returned.
-- `find_key(origin_key: &K): K` returns the biggest existed key that is
-  less or equal to the `origin_key`.
+- `remove(key: &K)` removes appropriate key-value pair. If Key is not
+- `clear()`
+- `keys(): I`
+- `keys_from(from: &K): I`
+- `values(): I`
+- `values_from(from: &K): I`
 
-### ListTable
+### ListIndex
 
-[`ListTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_table.rs)
-represesnts an array list. The following actions are supported:
+[`ListIndex`][list-index] represesnts an array list. It wraps around the `BaseIndex` field. 
 
-- `values(): Vec<V>` returns the copy of all values stored in the list.
-  Be careful, values are copied into the memory. It is not advised to use
-  on the big tables.
-- `append(value: V)` adds new value to the end of the list.
-- `extend<I>(iter: I)` appends values from the iterator to the list
-  one-by-one.
+The following actions are supported:
+
 - `get( index: u64): V` returns a value already saved in the list. If
   index is bigger then the list size, error is returned.
-- `set(index: u64, value: V)` updates a value already saved in the list.
 - `last(): V` returns the latest value in the list.
 - `is_empty(): bool` returns True if nothing was written; else, False.
 - `len(): u64` returns the number of elements stored in the list.
+- `iter(): I`
+- `iter_from(from: u64): I`
+- `set_len(len: u64)`
+- `push(value: V)` adds new value to the end of the list.
+- `pop(): V`
+- `extend(iter: I)` appends values from the iterator to the list
+  one-by-one.
+- `truncate(len: u64)`
+- `set(index: u64, value: V)` updates a value already saved in the list.
+- `clear()`
 
-List value does not support neither inserting in the middle (although it
-is still possible), nor deleting.
+List value does not support inserting in the middle (although it
+is still possible).
 
-Inside, a `ListTable` wraps around `map` storage; usually `MapTable` is
-used. `ListTable` saves its elements to this map with element indices as
+`ListIndex` saves its elements to the internal `base` map with element indices as
 keys.
 
-### MerkleTable
+### ProofListIndex
 
-[`MerkleTable`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/mod.rs)
-is an extended version for array list. It implements the `ListTable`
-interface, however adds additional feature. Basing on Merkle Trees, such
+[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is an extended version for array list. 
+It implements the same methods as `ListIndex`, however adds additional feature. Basing on Merkle Trees, such
 table allows creating a proofs of existence for its values. The table
 cells are divided into leafs and intermediate nodes. Leafs store the
 data itself; inner nodes values are calculated as
@@ -249,3 +271,7 @@ You may find implementation examples in the our tutorial:
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
+[base-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/base_index.rs
+[map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_index.rs
+[list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_table.rs
+[proof-list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_table/mod.rs
