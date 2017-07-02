@@ -7,14 +7,14 @@ network.
 The configuration is stored in the [TOML][toml] format. A path to the
 configuration file should be specified on the node start up.
 
-The configuration may be changed using [the global variables updater service](../advanced/services/configuration.md)
+The configuration may be changed using [the global variables updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. Initialization on the node
 start up passes the configuration to all services deployed on the blockchain.
 
 !!! note "Example"
-    [The anchoring service](../advanced/services/anchoring.md)
+    [The anchoring service](../advanced/bitcoin-anchoring.md)
     stores in the configuration parameters of the RPC connection to
     a Bitcoin Core node, as well as the Bitcoin address used for anchoring.
 
@@ -48,7 +48,7 @@ The configuration used to create a genesis block.
 
 #### [genesis.consensus]
 
-[Consensus algorithm](../advanced/consensus/consensus.md) parameters.
+[Consensus algorithm](consensus.md) parameters.
 
 - **peers_timeout**  
   Peer exchange timeout (in ms).

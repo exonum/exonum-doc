@@ -88,7 +88,7 @@ and allows external parties (e.g., regulators, auditors and end clients of the s
 to continuously verify the system operation against these definitions.
 
 !!! note "Example"
-    In a [sample cryptocurrency implementation](cryptocurrency/intro.md),
+    In a [sample cryptocurrency implementation](create-service.md),
     users can monitor the state of their wallet in real time.
     The state returned to a user by network nodes is supplied with an unforgeable
     cryptographic proof.
@@ -165,7 +165,7 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 
 ### Byzantine Consensus
 
-Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../advanced/consensus/consensus.md)
+Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
 to synchronize data among the nodes in the network.
 The Exonum network would continue operating even if up to 1/3 validators are hacked,
 compromised or switched off. Hence, there is no single point of failure
@@ -180,7 +180,7 @@ through web or mobile apps. A thin client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
 !!! note "Example"
-    [In the cryptocurrency tutorial](cryptocurrency/intro.md),
+    [In the cryptocurrency tutorial](create-service.md),
     a client corresponds to an owner of currency; it is only interested in transactions
     that involve the owner.
 
@@ -193,7 +193,7 @@ among the blockchain maintainers.
 
 ### Bitcoin Anchoring
 
-Exonum provides [an anchoring service](../advanced/services/anchoring.md)
+Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)
 to achieve the most complete security for thin clients. The anchoring service
 periodically publishes a hash digest of the entire blockchain state
 to the Bitcoin Blockchain. This makes it impossible to revise the transaction
@@ -205,9 +205,9 @@ stored in thin clients could still be verified.
 ## What’s Next
 
 - [Read about the Exonum design](design-overview.md)
-- [Build your first Exonum application](cryptocurrency/intro.md)
-- [Find out about Exonum planned features and milestones](../dev/roadmap.md)
-- [Learn how to contribute to Exonum development](../dev/contributing.md)
+- [Build your first Exonum application](create-service.md)
+- [Find out about Exonum planned features and milestones](../roadmap.md)
+- [Learn how to contribute to Exonum development](../contributing.md)
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
 [wiki:ca]: https://en.wikipedia.org/wiki/Certificate_authority
