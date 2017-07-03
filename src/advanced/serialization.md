@@ -125,8 +125,9 @@ specification):
   stores serialization of a certain serializable type instance
 - **Segment pointer** is a pair of two unsigned integers: a 0-based
   starting position of a segment relative to the beginning of the entire
-  serialization buffer, and the byte size of the segment (or number of elements
-  for slice)
+  serialization buffer, and the byte size of the segment (or the number of
+  elements in [the slice](#slices) in the case a slice is being serialized
+  within the segment)
 
 The segment pointer mechanism is slightly similar to the concept of heap in
 [memory management](https://en.wikipedia.org/wiki/Memory_management). Similarly
@@ -206,8 +207,8 @@ Segment pointers take 8 bytes:
 
 - 4 bytes for the position of the corresponding segment
   (counted from the beginning of the entire serialization buffer)
-- 4 bytes for the byte size of the segment (for number of elements in case of
-  slice)
+- 4 bytes for the byte size of the segment (or the number of elements in the
+  case of [a slice](#slices))
 
 Both the position and byte size are serialized as little-endian unsigned integers
 (i.e., in the same way as `u32`). Hence, segment pointer can be viewed
