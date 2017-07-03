@@ -232,7 +232,7 @@ The [snapshot][snapshot] interface represents a read API to the storage. It may 
 
 ### Forks 
 
-Forks implement the same interfaces as the database underneath, transparently
+[Forks][fork] implement the same interfaces as the database underneath, transparently
 wrapping the real data storage state, and add some additional changes.
 From the outer point of view, the changes are already applied to the data
 storage; however, these changes may be easily rolled back. Moreover, there
@@ -329,9 +329,6 @@ data tables, service should handle `genesis_block` [event][genesis-block-creatio
 !!! note Notice
     Genesis Block creation procedure is called every time Exonum
     node starts.
-
-You may find implementation examples in the our tutorial:
-[cryptocurrency-service-genesis-block]() **TODO: fill the link**
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
