@@ -18,7 +18,7 @@ algorithm for generating and handling requests is an integral part of
 ## Learning from Consensus Messages
 
 Receiving [a consensus message][consensus#messages] from a node gives the
-message recepient
+message recipient
 an opportunity to learn certain information about the state of the message
 author (a node that has signed the message; the message author may differ from
 the peer that the message recipient got the message from), if the author is not
@@ -47,7 +47,7 @@ Byzantine. The receiving node saves this information in
 
 ### `Connect`
 
-- It is possible to access the author by using the IP adress + port
+- It is possible to access the author by using the IP address + port
   mentioned in the message
 
 ## Request Messages
@@ -71,7 +71,7 @@ Requests a `Propose` message from a node. It has the following fields:
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
-  Height of the blochchain for which information is requested.
+  Height of the blockchain for which information is requested.
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
 
@@ -96,7 +96,7 @@ has the following fields:
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
-  Blochchain height for which information is requested.
+  Blockchain height for which information is requested.
 - **round**: u32  
   Round number (at the blockchain height specified in `height` field) for which
   information is requested.
@@ -117,7 +117,7 @@ Requests a committed block from a node. It has the following fields:
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
-  Height of the blochchain for which information is requested.
+  Height of the blockchain for which information is requested.
 
 ### `RequestPeers`
 
