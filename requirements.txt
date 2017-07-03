@@ -1,9 +1,6 @@
-# Main dependencies
-jinja2 >= 2.8
+# Main requirements
+Jinja2 >= 2.8
 mkdocs
-pygments
+Pygments
 pygments-github-lexers
 mkdocs-material
-# Linters
-linkchecker >= 9.0
-html5validator

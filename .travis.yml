@@ -9,7 +9,7 @@ branches:
     # tags
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 install:
-  - pip install -r requirements.txt
+  - pip install -r requirements.txt -r dev-requirements.txt
   # Markdown linter
   - gem install mdl --bindir ~/.local/bin
   # Dirty hack for what seems like a bug in linkchecker
