@@ -10,7 +10,7 @@ points.
   storage architecture.
 2. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
   data on the hard disk. Now LevelDB is used.
-3. [DBView layer](#dbview-layer) introduces the wrapper over DB engine.
+3. [Snapshots layer](#view-layer) introduces the wrapper over DB engine.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
   discarded.
@@ -201,24 +201,38 @@ supported:
 ## Low-level storage
 
 Exonum uses third-party database engines to save blockchain data
-locally. To use the particular database, [`Map`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/mod.rs#L55)
+locally. To use the particular database, a minimal map
 interface should be implemented for it. It means that database should support
 the following procedures:
 
 - Get value by key;
 - Put new value at the key (insert or update already saved one);
-- Delete pair by key;
-- Find the nearest key to the requested one.
+- Delete pair by key.
+
+Actually, all the previous high-level tables functionality is reduced to these atomic call types.
+
+To add a new storage, [Database][database] interface should be implemented for it. The implementation example can be found at [LevelDB wrapper][leveldb-wrapper].
 
 At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
 Also we plan to add [RocksDB][rocks-db] support in the
 [future](../roadmap.md).
 
-## DBView layer
+## View layer
 
 Exonum introduces additional layer over database to handle with
-unapplied changes. [`View`](https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/leveldb.rs#L30)
-implements the same interfaces as the database underneath, transparently
+unapplied changes. That layer consist of multiple classes.
+
+### Patches
+
+The [patch][patch] is a set of serial changes that should be applied to the low-level storage atomically. Such patch may include two types of operations: put a value by key, or delete a value by key.
+
+### Snapshots
+
+The [snapshot][snapshot] represents a read API to the storage. It may be based not on the storage itself, but, for example, on the other snapshot.
+
+### Forks 
+
+Forks implement the same interfaces as the database underneath, transparently
 wrapping the real data storage state, and add some additional changes.
 From the outer point of view, the changes are already applied to the data
 storage; however, these changes may be easily rolled back. Moreover, there
@@ -230,7 +244,7 @@ decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with error during
 validation, its changes are promptly reverted.
 
-During the block execution, View layer allows to create the list of
+During the block execution, fork allows to create the list of
 changes and, if all changes are accurate, apply it to the data storage
 atomically.
 
@@ -328,3 +342,6 @@ You may find implementation examples in the our tutorial:
 [proof-map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs
 [value-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/value_set_index.rs
 [key-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/key_set_index.rs
+[database]:
+[leveldb-wrapper]:
+[patch]:
