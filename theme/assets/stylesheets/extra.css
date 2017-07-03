@@ -9,6 +9,14 @@
   box-shadow: none; /* Remove box shadow from tables in admonitions, it looks ugly. */
 }
 
+/* Fix ulgy x overflow on tables inside admonitions */
+.admonition .md-typeset__scrollwrap {
+  margin: 1em 0;
+}
+.md-typeset .admonition .md-typeset__table {
+  padding: 0;
+}
+
 /* New elements. */
 
 .edit-on-github {
