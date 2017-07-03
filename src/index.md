@@ -23,10 +23,10 @@ together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
-[Cryptocurrency tutorial](home/cryptocurrency/intro.md) showcases how Exonum Core
+[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum Core
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum Core, the tutorial also makes use of [the light client][client] –
-a JavaScript library intented for client-side verification of blockchain information
+a JavaScript library intended for client-side verification of blockchain information
 and for performing cryptographic operations (such as digital signing).
 
 The source code of the tutorial [is available on GitHub][tutorial].
@@ -35,8 +35,9 @@ The source code of the tutorial [is available on GitHub][tutorial].
 
 ### Framework Design & Motivations
 
-Refer to [*What is Exonum*](home/what-is-exonum.md) for the motivations behind building
-yet another permissioned blockchain framework. [*Design Overview*](home/design-overview.md)
+Refer to [*What is Exonum*](get-started/what-is-exonum.md)
+for the motivations behind building
+yet another permissioned blockchain framework. [*Design Overview*](get-started/design-overview.md)
 takes a more technical approach and gives in-depth description of the Exonum design.
 
 ### Services & Clients
@@ -50,21 +51,21 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 !!! tip
     See [the anchoring][anchoring] and [configuration update][config] services
-    for the examples of real-world Exonum services, and [the cryptocurency tutorial][tutorial]
+    for the examples of real-world Exonum services, and [the cryptocurrency tutorial][tutorial]
     for an example how to use the light client library.
 
 ### Specifications
 
 Exonum documentation contains in-depth discussions for numerous other aspects
-of the framework, such as [binary serialization](advanced/serialization.md),
+of the framework, such as [binary serialization](architecture/serialization.md),
 [storage](architecture/storage.md), [networking](advanced/network.md), and
 [Merkle](advanced/merkle-index.md) and [Merkle Patricia](advanced/merkle-patricia-index.md)
 indexes.
 
 ## Contributing
 
-See the [contributing guide](dev/contributing.md) to get information on how
-to contribute to Exonum development, and the [roadmap](dev/roadmap.md) to find out
+See the [contributing guide](contributing.md) to get information on how
+to contribute to Exonum development, and the [roadmap](roadmap.md) to find out
 what features are coming soon.
 
 [rust]: http://rust-lang.org/
