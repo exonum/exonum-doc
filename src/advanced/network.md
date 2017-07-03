@@ -33,3 +33,43 @@ interested in, and to send transactions. Exonum provides a [â€œproofs mechanismâ
 based on cryptographic commitments via Merkle / Merkle Patricia
 trees. This mechanism allows verifying that a response from the full node
 has been really authorized by supermajority of validators.
+
+## Communication among Nodes
+
+The nodes communicate with each other via TCP/IP. Messages in the own [Exonum
+serialization format](../glossary.md#binary-serialization) are used to communicate
+among the full nodes. Light clients use [JSON Serialization](../glossary.md#json-serialization)
+to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
+
+### Network Events Processing
+
+Full nodes use Mio library (version 0.5) for event multiplexing. Each node has
+an event loop, through which the node receives events about new messages from
+the external network, timeouts, and new transactions received via REST API.
+
+### `Connect` Messages
+
+On establishing connection, the nodes exchange `Connect` messages in which nodes
+public keys are indicated. The `Connect` message also contains the public IP
+address of the node. Each node stores all received `Connect` messages in
+the _list of known peers_. As soon as a handshake is reached (`Connect` message
+is received and successfully processed) from both sides, the nodes begin to
+exchange messages.
+
+#### Whitelist
+
+If the whitelist is turned on, then upon receiving the `Connect` message, the
+node checks the presence of the public key from the message in the node's
+whitelist. If the public key is not included in the whitelist, connection is not
+accepted.
+
+#### Peer Discovery
+
+Node sends [`RequestPeers`](consensus/requests.md#requestpeers) to a random
+known node regularly with the timeout `peers_timeout` defined in the
+[globalconfiguration](../architecture/configuration.md#genesisconsensus).
+[In response](consensus/requests.md#requestpeers-1), the addressee sends its
+list of known peers. Thus, it is enough to connect to one node at the start and
+after some time it will be possible to collect `Connect` messages from the
+entire network. If some node changes its IP address, then through peer discovery
+mechanism new address becomes known to all other nodes in some time.
