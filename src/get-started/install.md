@@ -89,6 +89,29 @@ After installing nightly Rust, clippy checks can be run as
 cargo +<nightly-rust-version> clippy
 ```
 
+### Rustfmt
+
+[`rustfmt`][rustfmt] is used to perform automatic code formatting and code
+style checks in CI builds. Note that Exonum repositories pin the version
+of `rustfmt` in order to get consistent formatting.
+
+You can install `rustfmt` locally with
+
+```shell
+cargo install rustfmt --version <rustfmt-version> --force
+```
+
+where `<rustfmt-version>` is the supported version of the formatter.
+You may find the supported version in [the Travis configuration of Exonum Core][core-travis].
+
+After installing the formatter, its checks can be run via
+
+```shell
+cargo fmt --write-mode=diff
+```
+
+Consult the `rustfmt` readme for more details.
+
 ## Compiling Exonum Core
 
 You can verify that you installed dependencies and the Rust toolchain correctly
@@ -133,6 +156,8 @@ guide on how to develop applications on top of the Exonum framework.
 [openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
 [clippy]: https://github.com/Manishearth/rust-clippy
+[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
+[core-travis]: https://github.com/exonum/exonum-core/blob/master/.travis.yml
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/
