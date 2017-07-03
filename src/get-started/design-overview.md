@@ -215,14 +215,22 @@ Exonum supports several types of data tables, representing typed collections
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
+<<<<<<< HEAD
 - [`ProofListIndex`](../architecture/storage.md#prooflistindex)
   is an enhanced version of
+=======
+- [`ProofListIndex`](../advanced/merkle-index.md) is an enhanced version of
+>>>>>>> 7997202... Rename table types
   array storage. It implements a balanced (but not necessarily full) binary
   Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from concatenated
   children data. `ProofListIndex` only allows to append the data or update the
   already stored items
+<<<<<<< HEAD
 - [`ProofMapIndex`](../architecture/storage.md#proofmapindex) extends the
+=======
+- [`ProofMapIndex`](../advanced/merkle-patricia-index.md) extends the
+>>>>>>> 7997202... Rename table types
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
   Leaves of the tree keep the actual
   values from the map. Intermediate nodes consist of the following four parts:
@@ -232,6 +240,7 @@ Exonum supports several types of data tables, representing typed collections
     - Key for the left child node
     - Key for the right child node
 
+<<<<<<< HEAD
 - `ValueSetIndex` and `KeySetIndex` both implement sets, and both reduce them to
   maps (as it is commonly done in programming languages). `ValueSetIndex`
   maps hashes of the set items to the items themselves,
@@ -247,6 +256,11 @@ updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex` support
 adding and removing elements from the set. Finally, all collections support
 iterations over items (or keys, values, and key-value pairs in the case of
 maps).
+=======
+Both `ListIndex` and `ProofListIndex` support updating by index and
+appending only; `MapIndex` and `ProofMapIndex` allow inserting,
+updating or deleting key-value pairs.
+>>>>>>> 7997202... Rename table types
 
 ### Proofs
 
