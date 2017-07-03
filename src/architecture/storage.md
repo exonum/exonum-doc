@@ -97,7 +97,6 @@ The following actions are supported:
 - `values_from(from: &K): I<K,V>` iterates through table values,
   starting from `from` key.
 
-
 ### ListIndex
 
 [`ListIndex`][list-index] represesnts an array list. It wraps around the
@@ -173,19 +172,23 @@ The following procedures are implemented:
 
 ### ProofListIndex
 
-[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is an extended version for array list.
-It implements the same methods as `ListIndex`, however adds additional feature. Basing on Merkle Trees, such
-table allows creating a proofs of existence for its values. The table
-cells are divided into leafs and intermediate nodes. Leafs store the
-data itself; inner nodes values are calculated as
+[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is
+an extended version for array list. It implements the same methods as
+`ListIndex`, however adds additional feature. Basing on Merkle Trees,
+such table allows creating a proofs of existence for its values. The
+table cells are divided into leafs and intermediate nodes. Leafs store
+the data itself; inner nodes values are calculated as
 `hash(concatenate(left_child_value, right_child_value)`. You may read
-more detailed specification at [Merkle Trees](../advanced/merkle-index.md).
-The following procedures are implemented: **TODO: it is strange that ProofList do not implement some operations from the usual list (pop, truncate). Why?**
+more detailed specification at [Merkle
+Trees](../advanced/merkle-index.md). The following procedures are
+implemented: **TODO: it is strange that ProofList do not implement some
+operations from the usual list (pop, truncate). Why?**
 
 - `get( index: u64): V` returns a value already saved in the list. If
   index is bigger then the list size, error is returned.
 - `iter(): I<u64,V>` returns an iterator through the index-value pairs.
-- `iter_from(from: u64):  I<u64,V>` iterates through the index-values pairs, starting from `from` position.
+- `iter_from(from: u64): I<u64,V>` iterates through the index-values
+  pairs, starting from `from` position.
 - `clear()` deletes all the records stored in this table.
 - `last(): V` returns the latest value in the list.
 - `is_empty(): bool` returns `True` if nothing was written; else, `False`.
@@ -205,7 +208,6 @@ The following procedures are implemented: **TODO: it is strange that ProofList d
 - `get_range_proof(from: u64, to: u64): ListProof` builds a proof tree
   for data values at indices `[from..to - 1]`. The tree consists of
   [`ListProof`][list-proof] objects.
-
 
 When thin client asks Exonum full-node about some data, the proof is
 built and sent along with the actual data values. Having block headers
