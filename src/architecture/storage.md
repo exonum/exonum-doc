@@ -288,29 +288,29 @@ Table names may be created using `gen_prefix(service_id, table_id, table_suffix)
 ## List of system tables
 
 The Core owns its own tables that are used for providing the service.
-These tables are created here: [src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs#L47)
+These tables are created [here][blockchain-schema]
 
 There are the following system tables:
 
-- `transactions`, `MapTable`. It represents a map from transaction hash
+- `transactions`, `MapIndex`. It represents a map from transaction hash
   into raw transaction structure
-- `tx_location_by_hash`, `MapTable`. It keeps the block height and tx
+- `tx_location_by_hash`, `MapIndex`. It keeps the block height and tx
   position inside block for every transaction hash.
-- `blocks`, `MapTable`. It stores block object for every block height.
-- `block_hashes_by_height`, `ListTable`. It saves a list of block hashes
+- `blocks`, `MapIndex`. It stores block object for every block height.
+- `block_hashes_by_height`, `ListIndex`. It saves a list of block hashes
   that had the requested height.
-- `block_txs`, `MerkleTable`. It keeps a list of transactions for the
+- `block_txs`, `ProofListIndex`. It keeps a list of transactions for the
   each block.
-- `precommits`, `ListTable`. The list of validators' precommits is
+- `precommits`, `ListIndex`. The list of validators' precommits is
   stored here.
-- `configs`, `MerklePatriciaTable`. It stores the actual configuration
+- `configs`, `ProofMapIndex`. It stores the actual configuration
   in the JSON format for block heights.
-- `configs_actual_from`, `ListTable`. It builds an index to get config
+- `configs_actual_from`, `ListIndex`. It builds an index to get config
   starting height quickly.
-- `state_hash_aggregator`, `MerklePatriciaTable`. It is the accessory
+- `state_hash_aggregator`, `ProofMapIndex`. It is the accessory
   table for calculating patches in the DBView layer.
 
-## Indices
+## Indexing
 
 Exonum does not support indices as the individual entity. However, you
 can always create additional table with an index meaning. For example,
@@ -324,8 +324,8 @@ transaction was approved. In the Exonum, we just create a
 
 At the very start of the blockchain, services should initialize its
 tables. It should be done during Genesis block creation. To set up its
-data tables, service should handle `genesis_block` event:
-[src](https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L92).
+data tables, service should handle `genesis_block` [event][genesis-block-creation].
+
 !!! note Notice
     Genesis Block creation procedure is called every time Exonum
     node starts.
@@ -343,7 +343,10 @@ You may find implementation examples in the our tutorial:
 [proof-map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs
 [value-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/value_set_index.rs
 [key-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/key_set_index.rs
-[database]:
-[leveldb-wrapper]:
-[patch]:
-[blockchain-schema]:
+[database]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/db.rs#L43
+[patch]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/db.rs#L11
+[snapshot]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/db.rs#L57
+[fork]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/db.rs#L104
+[leveldb-wrapper]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/leveldb.rs
+[blockchain-schema]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs#L56
+[genesis-block-creation]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/mod.rs#L129
