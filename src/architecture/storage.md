@@ -10,7 +10,7 @@ points.
   storage architecture.
 2. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
   data on the hard disk. Now LevelDB is used.
-3. [Snapshots layer](#view-layer) introduces the wrapper over DB engine.
+3. [View layer](#view-layer) introduces the wrapper over DB engine.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
   discarded.
@@ -19,7 +19,7 @@ points.
   matched into LevelDB.
 5. [List of system tables](#list-of-system-tables) describes what tables
   are used directly by Exonum Core.
-6. [Indices](#indices) reveals how indices can be built.
+6. [Indexing](#indexing) reveals how indices can be built.
 7. [Genesis block](#genesis-block) describes how tables are initialized.
 
 ## Exonum table types
