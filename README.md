@@ -54,17 +54,17 @@ First, you need to install [Python](http://python.org/) and [python-pip](https:/
 Then, install the `mkdocs` theme together with its dependencies:
 
 ```
-pip install mkdocs pygments pygments-github-lexers mkdocs-material
-```
-
-Alternatively, you may use
-
-```
 pip install -r requirements.txt
 ```
 
-This will install the theme with all dependencies and the linters, except
-for `markdownlint` (which is written in Ruby and uses `gem` as the package manager).
+To install linters, use
+
+```
+pip install -r dev-requirements.txt
+```
+
+`markdownlint` needs to be installed separately, as it is written in Ruby and uses
+`gem` as the package manager.
 
 ### Viewing Documents Locally
 
