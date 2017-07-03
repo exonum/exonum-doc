@@ -57,6 +57,9 @@ Then, install the `mkdocs` theme together with its dependencies:
 pip install -r requirements.txt
 ```
 
+You may use [`requirements.lock`](requirements.lock) instead of [`requirements.txt`](requirements.txt)
+in order to get repeatable builds.
+
 To install linters, use
 
 ```
