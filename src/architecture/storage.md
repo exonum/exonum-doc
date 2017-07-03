@@ -39,102 +39,141 @@ Multiple table types may be used in the Exonum applications.
     - `Hash`: `sha-256` hash object
     - `ListProof`: a custom class representing nodes from `ProofListIndex`
       proof trees.
-    - `MapProof`: a custom class representing nodes from
-      `ProofMapIndex` proof trees.
+    - `MapProof`: a custom class representing nodes from  `ProofMapIndex`
+      proof trees.
 
 ### BaseIndex
 
-[`BaseIndex`][base-index] represents the most basic table type. Other table types inherit from it directly.
-In the matter, `BaseIndex` implements a map interface:
+[`BaseIndex`][base-index] represents the most basic table type. Other
+table types inherit from it directly. In the matter, `BaseIndex`
+implements a map interface:
 
-
-- `get(key: &K): V` receives a value by key. If key is not found, error is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the table.
-- `iter(subprefix: &K): I<K,V>` returns an iterator through the key-value pairs, where keys starts with `subprefix`. **TODO: what is subprefix for? why is it not enough `self.prefix`?**
-- `iter_from(subprefix: &K, from: &K): I<K,V>` iterates through the key-values pairs, starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not found, error is returned.
-- `clear()` deletes all the key-value pairs referring to the `self.prefix` table. **TODO: may be `new` proc should be also described here, otherwise `self.prefix` is unclear**
+- `get(key: &K): V` receives a value by key. If key is not found, error
+  is returned.
+- `contains(key: &K): bool` checks if the specific key presents in the
+  table.
+- `iter(subprefix: &K): I<K,V>` returns an iterator through the
+  key-value pairs, where keys starts with `subprefix`. **TODO: what is
+  subprefix for? why is it not enough `self.prefix`?**
+- `iter_from(subprefix: &K, from: &K): I<K,V>` iterates through the
+  key-values pairs, starting from `from` key.
+- `put(key: &K, value: V)` inserts new value by key. If such key is
+  already exists, old value is overwritten with new one.
+- `remove(key: &K)` removes appropriate key-value pair. If key is not
+  found, error is returned.
+- `clear()` deletes all the key-value pairs referring to the
+  `self.prefix` table. **TODO: may be `new` proc should be also described
+  here, otherwise `self.prefix` is unclear**
 
 !!! warning
-    It should not be used directly; the better approach is to use other implemented table types, or write your own table type wrapping `BaseIndex`.
+    It should not be used directly; the better approach is to use other
+    implemented table types, or write your own table type wrapping
+    `BaseIndex`.
 
 ### MapIndex
 
-[`MapIndex`][map-index] is implementation of Key-Value storage. It wraps around the `BaseIndex` field.
+[`MapIndex`][map-index] is implementation of Key-Value storage. It wraps
+around the `BaseIndex` field.
 
 The following actions are supported:
 
-- `get(key: &K): V` receives a value by key. If key is not found, error is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the table.
+- `get(key: &K): V` receives a value by key. If key is not found, error
+  is returned.
+- `contains(key: &K): bool` checks if the specific key presents in the
+  table.
 - `iter(): I<K,V>` returns an iterator through the key-value pairs.
-- `iter_from(from: &K): I<K,V>` iterates through the key-values pairs, starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not found, error is returned.
+- `iter_from(from: &K): I<K,V>` iterates through the key-values pairs,
+  starting from `from` key.
+- `put(key: &K, value: V)` inserts new value by key. If such key is
+  already exists, old value is overwritten with new one.
+- `remove(key: &K)` removes appropriate key-value pair. If key is not
+  found, error is returned.
 - `clear()` deletes all the records stored in this table.
-- `keys(): I<K>` returns an iterator through table keys. **TODO: how are keys ordered? asc / desc / FIFO / LIFO**
-- `keys_from(from: &K): I<K>` iterates through table keys, starting from `from` key.
-- `values(): I<K,V>`  returns an iterator through table values.
-- `values_from(from: &K): I<K,V>`  iterates through table values, starting from `from` key.
+- `keys(): I<K>` returns an iterator through table keys. **TODO: how are
+  keys ordered? asc / desc / FIFO / LIFO**
+- `keys_from(from: &K): I<K>` iterates through table keys, starting from
+  `from` key.
+- `values(): I<K,V>` returns an iterator through table values.
+- `values_from(from: &K): I<K,V>` iterates through table values,
+  starting from `from` key.
+
 
 ### ListIndex
 
-[`ListIndex`][list-index] represesnts an array list. It wraps around the `BaseIndex` field. 
+[`ListIndex`][list-index] represesnts an array list. It wraps around the
+`BaseIndex` field.
 
 The following actions are supported:
 
-- `get( index: u64): V` returns a value already saved in the list. If index is bigger then the list size, error is returned.
+- `get( index: u64): V` returns a value already saved in the list. If
+  index is bigger then the list size, error is returned.
 - `iter(): I<u64,V>` returns an iterator through the index-value pairs.
-- `iter_from(from: u64):  I<u64,V>` iterates through the index-values pairs, starting from `from` position.
+- `iter_from(from: u64): I<u64,V>` iterates through the index-values
+  pairs, starting from `from` position.
 - `clear()` deletes all the records stored in this table.
 - `last(): V` returns the latest value in the list.
-- `is_empty(): bool` returns `True` if nothing was written; else, `False`.
+- `is_empty(): bool` returns `True` if nothing was written; else,
+  `False`.
 - `len(): u64` returns the number of elements stored in the list.
 - `push(value: V)` adds new value to the end of the list.
-- `pop(): V` returns the value from the end of the list; returned element is deleted from table. The length of the list decreases on 1.
-- `extend(iter: I)` appends values from the iterator to the list one-by-one.
-- `truncate(len: u64)` deletes all the elements starting from `len` position. Only `len` elements are saved.
+- `pop(): V` returns the value from the end of the list; returned
+  element is deleted from table. The length of the list decreases on 1.
+- `extend(iter: I)` appends values from the iterator to the list
+  one-by-one.
+- `truncate(len: u64)` deletes all the elements starting from `len`
+  position. Only `len` elements are saved.
 - `set(index: u64, value: V)` updates a value already saved in the list.
 
 List value does not support inserting in the middle (although it
 is still possible to do manually).
 
-`ListIndex` saves its elements to the internal `base` map with element indices as
-keys. The list length also is saved at `base` with `&()` key. **TODO: what does this key mean? an empty (0-length) byte sequence?**
+`ListIndex` saves its elements to the internal `base` map with element
+indices as keys. The list length also is saved at `base` with `&()` key.
+**TODO: what does this key mean? an empty (0-length) byte sequence?**
 
 ### ValueSetIndex
 
-[`ValueSetIndex`][value-set-index] implements a hashmap, storing the element using its hash as a key. It wraps around the `BaseIndex` field. 
+[`ValueSetIndex`][value-set-index] implements a hashmap, storing the
+element using its hash as a key. It wraps around the `BaseIndex` field.
 The following procedures are implemented:
 
-- `contains(item: &V): bool` checks if the specific item presents in the table.
-- `contains_by_hash(hash: &Hash): bool` checks if there is an item with specific hash.
+- `contains(item: &V): bool` checks if the specific item presents in the
+  table.
+- `contains_by_hash(hash: &Hash): bool` checks if there is an item with
+  specific hash.
 - `iter(): I<V>` returns an iterator through the stored items.
-- `iter_from(from: &Hash):  I<V>` iterates through the stored items, starting from  the value with `from` hash.
-- `hashes(): I<Hash>` returns an iterator through the hashes of stored items.
-- `hashes_from(from: &Hash):  I<Hash>` iterates through the hashes of stored items, starting from `from` position.
+- `iter_from(from: &Hash): I<V>` iterates through the stored items,
+  starting from the value with `from` hash.
+- `hashes(): I<Hash>` returns an iterator through the hashes of stored
+  items.
+- `hashes_from(from: &Hash): I<Hash>` iterates through the hashes of
+  stored items, starting from `from` position.
 - `insert(item: V)` adds the item to the hashmap.
-- `remove(item: &V)` removes the item if exists. Otherwise, the error is returned.
-- `remove_by_hash(hash: &Hash)` removes the item with specified hash, if such one exists. Otherwise, the error is returned.
+- `remove(item: &V)` removes the item if exists. Otherwise, the error is
+  returned.
+- `remove_by_hash(hash: &Hash)` removes the item with specified hash, if
+  such one exists. Otherwise, the error is returned.
 - `clear()` removes all the items stored in the hashmap.
 
 ### KeySetIndex
 
-[`KeySetIndex`][key-set-index] implements a set. Any unique value can be stored just once.
-It wraps `BaseIndex`; the stored elements are inserted to the `BaseIndex` storage as `(key: item, value: null)`.
+[`KeySetIndex`][key-set-index] implements a set. Any unique value can be
+stored just once. It wraps `BaseIndex`; the stored elements are inserted
+to the `BaseIndex` storage as `(key: item, value: null)`.
 
 The following procedures are implemented:
 
 - `contains(item: &K)` checks if the specified item presents in the set.
 - `iter(): I<K>` returns an iterator through the stored items.
-- `iter_from(from: &K):  I<K>` iterates through the stored items, starting from  the `from` value.
+- `iter_from(from: &K): I<K>` iterates through the stored items,
+  starting from the `from` value.
 - `insert(item: K)` adds the item to the set.
 - `remove(item: &K)` removes the item if exists. Otherwise, the error is returned.
 - `clear()` removes all the items stored in the set.
 
 ### ProofListIndex
 
-[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is an extended version for array list. 
+[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is an extended version for array list.
 It implements the same methods as `ListIndex`, however adds additional feature. Basing on Merkle Trees, such
 table allows creating a proofs of existence for its values. The table
 cells are divided into leafs and intermediate nodes. Leafs store the
@@ -155,12 +194,18 @@ The following procedures are implemented: **TODO: it is strange that ProofList d
 - `extend(iter: I)` appends values from the iterator to the list
   one-by-one.
 - `set(index: u64, value: V)` updates a value already saved in the list.
-- `height(): u8` returns the height of the tree. As the tree is balanced (though may be not fully filled), the height is near to `log2(list length)`
-- `root_hash(): Hash` returns the value of root element (that contains the hash of root node's children).
-- `get_proof(index: u64): ListProof`   builds a proof tree for data value at `index` position. The tree consists of [`ListProof`][list-proof] objects.
-- `get_range_proof(from: u64, to: u64): ListProof`
-  builds a proof tree for data values at indices
-  `[from..to - 1]`. The tree consists of [`ListProof`][list-proof] objects.
+- `height(): u8` returns the height of the tree. As the tree is balanced
+  (though may be not fully filled), the height is near to `log2(list
+  length)`
+- `root_hash(): Hash` returns the value of root element (that contains
+  the hash of root node's children).
+- `get_proof(index: u64): ListProof` builds a proof tree for data value
+  at `index` position. The tree consists of [`ListProof`][list-proof]
+  objects.
+- `get_range_proof(from: u64, to: u64): ListProof` builds a proof tree
+  for data values at indices `[from..to - 1]`. The tree consists of
+  [`ListProof`][list-proof] objects.
+
 
 When thin client asks Exonum full-node about some data, the proof is
 built and sent along with the actual data values. Having block headers
@@ -168,50 +213,63 @@ and such proof, thin client may check that received data was really
 authorized by the validators.
 
 !!! note
-	The `ProofListIndex` do not allow deleting specific values. The only way to delete something is a clearing table entirely.
-	
+    The `ProofListIndex` do not allow deleting specific values. The only
+    way to delete something is a clearing table entirely.
+
 ### ProofMapIndex
 
-[`ProofMapIndex`][proof-map-index]
-is an extended version for a map based on Merkle Patricia Tree. It implements the same methods as the `MapIndex`,
-adding the ability to create proofs of existence for its key-value
-pairs, or proofs of absense if requested key do not exist in this table.
-For a more detailed description, see [Merkle Patricia
-Trees](../advanced/merkle-patricia-index.md). The following procedures are
-supported:
+[`ProofMapIndex`][proof-map-index] is an extended version for a map
+based on Merkle Patricia Tree. It implements the same methods as the
+`MapIndex`, adding the ability to create proofs of existence for its
+key-value pairs, or proofs of absense if requested key do not exist in
+this table. For a more detailed description, see [Merkle Patricia
+Trees](../advanced/merkle-patricia-index.md). The following procedures
+are supported:
 
-- `get(key: &K): V` receives a value by key. If key is not found, error is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the table.
+- `get(key: &K): V` receives a value by key. If key is not found, error
+  is returned.
+- `contains(key: &K): bool` checks if the specific key presents in the
+  table.
 - `iter(): I<K,V>` returns an iterator through the key-value pairs.
-- `iter_from(from: &K): I<K,V>` iterates through the key-values pairs, starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not found, error is returned.
+- `iter_from(from: &K): I<K,V>` iterates through the key-values pairs,
+  starting from `from` key.
+- `put(key: &K, value: V)` inserts new value by key. If such key is
+  already exists, old value is overwritten with new one.
+- `remove(key: &K)` removes appropriate key-value pair. If key is not
+  found, error is returned.
 - `clear()` deletes all the records stored in this table.
 - `keys(): I<K>` returns an iterator through table keys.
-- `keys_from(from: &K): I<K>` iterates through table keys, starting from `from` key.
-- `values(): I<K,V>`  returns an iterator through table values.
-- `values_from(from: &K): I<K,V>`  iterates through table values, starting from `from` key.
+- `keys_from(from: &K): I<K>` iterates through table keys, starting from
+  `from` key.
+- `values(): I<K,V>` returns an iterator through table values.
+- `values_from(from: &K): I<K,V>` iterates through table values,
+  starting from `from` key.
 - `root_hash(): Hash` returns the root node's value.
-- `get_proof(key: K): MapProof` builds a proof
-  tree for the requested key. Tree proves either key presence (and its
-  according value), or key absence. The proof tree is used in the same way
-  as in the Merkle Table: it is sent to the client along with the
-  requested data.
+- `get_proof(key: K): MapProof` builds a proof tree for the requested
+  key. Tree proves either key presence (and its according value), or key
+  absence. The proof tree is used in the same way as in the Merkle Table:
+  it is sent to the client along with the requested data.
 
 ## Low-level storage
 
 Exonum uses third-party database engines to save blockchain data
-locally. To use the particular database, a minimal map
-interface should be implemented for it. It means that database should support
-the following procedures:
+locally. To use the particular database, a minimal map interface should
+be implemented for it. It means that database should support the
+following procedures:
 
 - Get value by key;
 - Put new value at the key (insert or update already saved one);
 - Delete pair by key.
 
-Actually, all the values from different tables are stored in one big key-value table at the low-level storage. Thus, the high-level tables really just implements a handy API for accessing to the values with specific sense.  All the tables functionality is reduced to these atomic call types.
+Actually, all the values from different tables are stored in one big
+key-value table at the low-level storage. Thus, the high-level tables
+really just implements a handy API for accessing to the values with
+specific sense. All the tables functionality is reduced to these atomic
+call types.
 
-To add a new storage, [Database][database] interface should be implemented for it. The implementation example can be found at [LevelDB wrapper][leveldb-wrapper].
+To add a new storage, [Database][database] interface should be
+implemented for it. The implementation example can be found at [LevelDB
+wrapper][leveldb-wrapper].
 
 At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
 Also we plan to add [RocksDB][rocks-db] support in the
@@ -224,19 +282,24 @@ unapplied changes. That layer consist of multiple classes.
 
 ### Patches
 
-The [patch][patch] is a set of serial changes that should be applied to the low-level storage atomically. Such patch may include two types of operations: put a value by key, or delete a value by key.
+The [patch][patch] is a set of serial changes that should be applied to
+the low-level storage atomically. Such patch may include two types of
+operations: put a value by key, or delete a value by key.
 
 ### Snapshots
 
-The [snapshot][snapshot] interface represents a read API to the storage. It may be based not on the storage itself, but, for example, on the other snapshot. Every table is created over a snapshot instance.
+The [snapshot][snapshot] interface represents a read API to the storage.
+It may be based not on the storage itself, but, for example, on the
+other snapshot. Every table is created over a snapshot instance.
 
-### Forks 
+### Forks
 
-[Forks][fork] implement the same interfaces as the database underneath, transparently
-wrapping the real data storage state, and add some additional changes.
-From the outer point of view, the changes are already applied to the data
-storage; however, these changes may be easily rolled back. Moreover, there
-may be different forks of database state.
+[Forks][fork] implement the same interfaces as the database underneath,
+transparently wrapping the real data storage state, and add some
+additional changes. From the outer point of view, the changes are
+already applied to the data storage; however, these changes may be
+easily rolled back. Moreover, there may be different forks of database
+state.
 
 This technology is used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
@@ -244,8 +307,8 @@ decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with error during
 validation, its changes are promptly reverted.
 
-During the block execution, fork allows to create the list of
-changes and, if all changes are accurate, apply it to the data storage
+During the block execution, fork allows to create the list of changes
+and, if all changes are accurate, apply it to the data storage
 atomically.
 
 ## Table naming convention
@@ -258,20 +321,28 @@ Exonum tables are divided into two groups.
 
 Such differentiation corresponds to schemas in the relational database
 world. There may be different tables with the same name, located in the
-different schemas. Actually, system tables may be considered as tables for Consensus service.
+different schemas. Actually, system tables may be considered as tables
+for Consensus service.
 
-As it was said, at the LevelDB scale, all values from all Exonum tables are saved into
-one big LevelDB map, wherein the keys are represented as bytes sequence,
-and values are serialized objects, in fact, byte sequences too.
+As it was said, at the LevelDB scale, all values from all Exonum tables
+are saved into one big LevelDB map, wherein the keys are represented as
+bytes sequence, and values are serialized objects, in fact, byte
+sequences too.
 
 To distinguish values from different tables, additional prefix is used
-for every key. Such prefix consist of service name and table number. As well as tables represent just a handy API for access to data (no data items are really stored at the table class instance; all values are saved in leveldb storage), all tables created with the same ID will share the data.
+for every key. Such prefix consist of service name and table number. As
+well as tables represent just a handy API for access to data (no data
+items are really stored at the table class instance; all values are
+saved in leveldb storage), all tables created with the same ID will
+share the data.
 
-Services are named with a 2-byte arrays, starting from `0x00 0x01`.`0x00 0x00` name is reserved to the Core. Tables inside
-services are named with a integers and an optional suffixes.
+Services are named with a 2-byte arrays, starting from `0x00 0x01`.`0x00
+0x00` name is reserved to the Core. Tables inside services are named
+with a integers and an optional suffixes.
 
-Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in ASCII) for the `0x00 0x01` service matches
-with the following key in the LevelDB map:
+Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in
+ASCII) for the `0x00 0x01` service matches with the following key in the
+LevelDB map:
 
 `0x00 0x01 | 0x03 } 0x42 0x54 0x43 | key`
 
@@ -283,7 +354,9 @@ Here, `|` stands for bytes sequences concatenation.
     cases may cause the ineligible coincidences between the different keys
     and elements.
 
-Table names may be created using `gen_prefix(service_id, table_id, table_suffix)` procedure. Example of implementation is [here][blockchain-schema].
+Table names may be created using `gen_prefix(service_id, table_id,
+table_suffix)` procedure. Example of implementation is
+[here][blockchain-schema].
 
 ## List of system tables
 
@@ -324,7 +397,8 @@ transaction was approved. In the Exonum, we just create a
 
 At the very start of the blockchain, services should initialize its
 tables. It should be done during Genesis block creation. To set up its
-data tables, service should handle `genesis_block` [event][genesis-block-creation].
+data tables, service should handle `genesis_block`
+[event][genesis-block-creation].
 
 !!! note Notice
     Genesis Block creation procedure is called every time Exonum
