@@ -59,12 +59,7 @@ parameters as `key` for each element: `height` and `index`.
   - `index` is index of element at the given height consisting of `58` bits
   - `height` and `index` are serialized within `key` as
     [BigEndian][wiki:big-endian]
-Each Merkle tree element is addressed by `key = height || index`, where
-  - `key` is an `8` byte array
-  - `height` and `index` are written to byte array as
-    [BigEndian][wiki:big-endian] for efficient range proofs and element
-    retrieval.
-2. The elements of the underlying list are stored in `(height = 0, index)` 
+2. The elements of the underlying list are stored in `(height = 0, index)`
   cells, where `index` is in interval `[0, len(merkle_table))`, where
   `table.len()` is the number of leaves in the tree (or, equivalently, the
   number of elements in the underlying list)
@@ -80,7 +75,8 @@ Each Merkle tree element is addressed by `key = height || index`, where
     nodes are present, the node `(height, index)` has 2 children hashes.
   - If only `(height - 1, index * 2)` node is present, the
     node at `(height, index)` has single child hash.
-6. `max_height` is the height where only a single hash is stored at `index = 0`.
+6. `max_height` is the height where only a single hash is stored at
+  `index = 0`.
   - `max_height = pow + 1`, where `pow` is the smallest integer such that
     `2^pow >= len(merkle_table)`
   - `(max_height, 0)` is the root hash of the Merkle tree.
@@ -103,9 +99,10 @@ containing `6` values `v0...v5`.
 
 Let `T(height, index)` be a value at tree node for element `index` at height
 `height`. Elements `T(0, index)` contains arbitrary binary data. Elements
-`T(height, index)` for `height > 0` are hashes corresponding the following rules
+`T(height, index)` for `height > 0` are hashes corresponding the following
+rules
 
-#### Rule 1. Empty tree 
+#### Rule 1. Empty tree
 
 Hash of empty tree is defined as `32` zero bytes.
 
