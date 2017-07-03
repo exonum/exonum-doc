@@ -37,9 +37,9 @@ Multiple table types may be used in the Exonum applications.
     - `u64`: unsigned 64-bit int type.
     - `I`: an Iterator object.
     - `Hash`: `sha-256` hash object
-    - `Proofnode`: a custom class representing nodes from `ProofListIndex`
+    - `ListProof`: a custom class representing nodes from `ProofListIndex`
       proof trees.
-    - `RootProofNode`: a custom class representing nodes from
+    - `MapProof`: a custom class representing nodes from
       `ProofMapIndex` proof trees.
 
 ### BaseIndex
