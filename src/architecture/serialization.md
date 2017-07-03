@@ -269,19 +269,6 @@ All slices are var-length datatypes.
 
 ## Message Serialization
 
-A message is a [digitally signed](../glossary.md#digital-signature) piece of data
-transmitted through an Exonum network. There are 2 major kinds of messages:
-
-- **Consensus messages** are used among full
-  nodes in the course of [the consensus algorithm](../glossary.md#consensus)
-- **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
-  changes and usually come from [external clients](../glossary.md#light-client)
-
-The message serialization consists of 3 main parts: header (includes `network_id`,
-`protocol_version`, `service_id`, `message_id`, and `payload_length` fields),
-body, and signature.
-
-=======
 Fields used in message serialization are listed below.
 
 | Field              | Binary format     | Binary offset | JSON       |
@@ -302,7 +289,6 @@ Fields used in message serialization are listed below.
 
 ### Network ID
 
->>>>>>> 43e3c5f... move message serialization from transactions to serialization
 This field will be used to send inter-blockchain messages in the future
 releases. Not used currently.
 
@@ -384,6 +370,23 @@ message! {
 
 Here the message body is serialized as a `struct` with fields `first` and `second`
 having type `u64`.
+=======
+Serialized message consists of the following parts:
+
+- [Message header](#message-header)
+- Structure (with its header and body) described on `message!` macro call
+- Ed25519 signature on the two previous parts
+
+### Message Header
+
+The message header includes:
+
+- network ID: 1 byte
+- protocol version: 1 byte
+- message ID: 2 bytes
+- service ID: 2 bytes
+- message size (excluding signature): 4 bytes
+>>>>>>> 77235f8... add Message Serialization section
 
 ## Types to Be Supported in Future
 
