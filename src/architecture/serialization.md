@@ -207,8 +207,7 @@ Segment pointers take 8 bytes:
 
 - 4 bytes for the position of the corresponding segment
   (counted from the beginning of the entire serialization buffer)
-- 4 bytes for the byte size of the segment (or the number of elements in the
-  case of [a slice](#slices))
+- 4 bytes for the number of elements
 
 Both the position and byte size are serialized as little-endian unsigned integers
 (i.e., in the same way as `u32`). Hence, segment pointer can be viewed
@@ -228,12 +227,6 @@ adjacent to each other for each serialized structure):
 Fixed-length fields are stored completely in the header.
 Var-length fields are allocated as segments in the body,
 plus take 8 bytes for the serialized segment pointer, as described [above](#segment-pointers).
-
-!!! note
-    If field is slice, corresponding 8 bytes in the header of structure mean a
-    corresponding segment pointer (4 bytes) and number of slice elements (4
-    bytes). Slice size in bytes is calculated based on number of elements and
-    size of one element.
 
 Thus, a segment pointer in the header (the position of which is known in compile
 time) points to the segment in the body,
@@ -273,6 +266,24 @@ All slices are var-length datatypes.
     implementation for borrowed types.
     For example slice of `&str` can not be serialized/deserialized.
     This is planned to be fixed in future.
+
+## Message Serialization
+
+Serialized message consists of the following parts:
+
+- [Message header](#message-header)
+- Structure (with its header and body) described on `message!` macro call
+- Ed25519 signature on the two previous parts
+
+### Message Header
+
+The message header includes:
+
+- network ID: 1 byte
+- protocol version: 1 byte
+- message ID: 2 bytes
+- service ID: 2 bytes
+- message size (excluding signature): 4 bytes
 
 ## Types to Be Supported in Future
 
