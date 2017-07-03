@@ -15,7 +15,7 @@ site_favicon: 'images/favicon.ico'
 copyright: © 2017 Bitfury Group Limited. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
-  og_image: 'images/logo-square.jpg'
+  og_image: 'images/logo-docs.png'
   logo: 'images/logo.svg" alt="Exonum Logo'
   github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
   palette:
