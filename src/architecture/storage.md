@@ -209,7 +209,7 @@ the following procedures:
 - Put new value at the key (insert or update already saved one);
 - Delete pair by key.
 
-Actually, all the previous high-level tables functionality is reduced to these atomic call types.
+Actually, all the values from different tables are stored in one big key-value table at the low-level storage. Thus, the high-level tables really just implements a handy API for accessing to the values with specific sense.  All the tables functionality is reduced to these atomic call types.
 
 To add a new storage, [Database][database] interface should be implemented for it. The implementation example can be found at [LevelDB wrapper][leveldb-wrapper].
 
@@ -228,7 +228,7 @@ The [patch][patch] is a set of serial changes that should be applied to the low-
 
 ### Snapshots
 
-The [snapshot][snapshot] represents a read API to the storage. It may be based not on the storage itself, but, for example, on the other snapshot.
+The [snapshot][snapshot] interface represents a read API to the storage. It may be based not on the storage itself, but, for example, on the other snapshot. Every table is created over a snapshot instance.
 
 ### Forks 
 
@@ -258,23 +258,22 @@ Exonum tables are divided into two groups.
 
 Such differentiation corresponds to schemas in the relational database
 world. There may be different tables with the same name, located in the
-different schemas.
+different schemas. Actually, system tables may be considered as tables for Consensus service.
 
-At the LevelDB scale, all values from all Exonum tables are saved into
+As it was said, at the LevelDB scale, all values from all Exonum tables are saved into
 one big LevelDB map, wherein the keys are represented as bytes sequence,
 and values are serialized objects, in fact, byte sequences too.
 
 To distinguish values from different tables, additional prefix is used
-for every key. Such prefix consist of service name and table name.
+for every key. Such prefix consist of service name and table number. As well as tables represent just a handy API for access to data (no data items are really stored at the table class instance; all values are saved in leveldb storage), all tables created with the same ID will share the data.
 
-Services are named with a byte arrays, starting from `0x01`. Name length
-is not limited. `0x00 0x00` name is reserved to the Core. Tables inside
-services are named with a byte sequences.
+Services are named with a 2-byte arrays, starting from `0x00 0x01`.`0x00 0x00` name is reserved to the Core. Tables inside
+services are named with a integers and an optional suffixes.
 
-Thus, key `key` at the table `0x00` for the `0x00 0x01` service matches
+Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in ASCII) for the `0x00 0x01` service matches
 with the following key in the LevelDB map:
 
-`0x00 0x01 | 0x00 | key`
+`0x00 0x01 | 0x03 } 0x42 0x54 0x43 | key`
 
 Here, `|` stands for bytes sequences concatenation.
 
@@ -283,6 +282,8 @@ Here, `|` stands for bytes sequences concatenation.
     the service is a prefix for the other table in the same service. Such
     cases may cause the ineligible coincidences between the different keys
     and elements.
+
+Table names may be created using `gen_prefix(service_id, table_id, table_suffix)` procedure. Example of implementation is [here][blockchain-schema].
 
 ## List of system tables
 
@@ -345,3 +346,4 @@ You may find implementation examples in the our tutorial:
 [database]:
 [leveldb-wrapper]:
 [patch]:
+[blockchain-schema]:
