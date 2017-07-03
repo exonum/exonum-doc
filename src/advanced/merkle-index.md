@@ -59,7 +59,7 @@ parameters as `key` for each element: `height` and `index`.
   - `index` is index of element at the given height consisting of `58` bits
   - `height` and `index` are serialized within `key` as
     [BigEndian][wiki:big-endian]
-2. The elements of the underlying list are stored in `(height = 0, index)` 
+2. The elements of the underlying list are stored in `(height = 0, index)`
   cells, where `index` is in interval `[0, len(merkle_table))`, where
   `table.len()` is the number of leaves in the tree (or, equivalently, the
   number of elements in the underlying list)
@@ -102,7 +102,7 @@ Let `T(height, index)` be a value at tree node for element `index` at height
 `T(height, index)` for `height > 0` are hashes corresponding the following
 rules
 
-#### Rule 1. Empty tree 
+#### Rule 1. Empty tree
 
 Hash of empty tree is defined as `32` zero bytes.
 
