@@ -46,8 +46,6 @@ Lifecycle for a service in Exonum would look like as the following:
 - If necessary services can be removed by the
   [consensus](../advanced/consensus/consensus.md) of validators
 
-## Interoperability
-
 ## Java Binding
 
 [Rust](https://www.rust-lang.org/en-US/) is a systems programming language,
@@ -180,8 +178,6 @@ with *transaction finalization*.
     changes in storage). This potentially results in problems with the size
     of data storage, but gives protection against [replay
     attacks](https://en.wikipedia.org/wiki/Replay_attack).
-
-## Protection Agains DoS Attacks
 
 ## Networking Improvements
 
