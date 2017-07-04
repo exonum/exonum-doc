@@ -1,6 +1,6 @@
 # Main requirements
-Jinja2 >= 2.8
-mkdocs
-Pygments
-pygments-github-lexers
-mkdocs-material
+Jinja2~=2.8
+mkdocs~=0.16
+Pygments~=2.2
+pygments-github-lexers~=0.0.5
+mkdocs-material~=1.7
