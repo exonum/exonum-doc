@@ -172,14 +172,27 @@ separate entities rather than datatypes. This directly leads to the ability to
 incorporate within transaction object additional logic. As a first step we
 consider implementing the ability to determine **transaction ordering**
 mechanics as a method of transaction interface. This logic comes hand-by-hand
-with the question of transaction finalization.
+with *transaction finalization*.
 
 !!! note
     In current Exonum implementation transactions are finalized only by
-    recording into blockchain. This potentially leads to problems with the size
+    recording into blockchain (even if transaction execution does not lead to
+    changes in storage). This potentially results in problems with the size
     of data storage, but gives protection against [replay
     attacks](https://en.wikipedia.org/wiki/Replay_attack).
 
 ## Protection Agains DoS Attacks
 
 ## Networking Improvements
+
+Currently all network channels in Exonum (channels between validators, full
+nodes and light clients) are unsafe. Because of this 3rd parties can possibly
+get an access to a blockchain data, even if they're not allowed to.
+
+!!! note
+    [Packet sniffing](https://en.wikipedia.org/wiki/Packet_analyzer) is a
+    common network attack strategy.
+
+We're going to solve this issue by introducing **encrypted channels** (this can
+be done, for example, using [Diffie-Hellman key
+exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange))
