@@ -36,10 +36,15 @@ has been really authorized by supermajority of validators.
 
 ## Communication among Nodes
 
-The nodes communicate with each other via TCP/IP. Messages in the own [Exonum
-serialization format](../glossary.md#binary-serialization) are used to communicate
-among the full nodes. Light clients use [JSON Serialization](../glossary.md#json-serialization)
+The nodes communicate with each other via TCP/IP.
+
+Messages in the own [Exonum binary serialization format](../glossary.md#binary-serialization)
+are sent over TCP to communicate among the full nodes.
+
+Light clients use [JSON Serialization](../glossary.md#json-serialization)
 to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
+Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
+HTTP API. 
 
 ### Network Events Processing
 
