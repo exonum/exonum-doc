@@ -116,3 +116,11 @@ several important features. Here are two of them.
   clients' ability to get it), will allow the light client to determine proof
   structure automatically and there will be no need for customization of a
   light client for different Exonum-based systems.
+
+## Service Isolation and Events
+
+## Transactions Improvements
+
+## Protection Agains DoS Attacks
+
+## Networking Improvements
