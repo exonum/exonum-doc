@@ -5,6 +5,10 @@ Exonum is an open source software, so there is no particular concept of
 there're preferred directions of the development. These include maintainers
 opinions, natural improvements and a will to correspond to good practices.
 
+!!! Warning
+    This document is provided for informational purposes only. It is subjected
+    to changes at any time without specific notifications and approvals.
+
 ## Overall Direction
 
 Currently Exonum is a
