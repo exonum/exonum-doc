@@ -67,6 +67,11 @@ so explain the reasoning for your decisions.
 
 !!! tip
     Further explanation about commit message conventions is available [here][git:messages].
+    In short, the title line of the commit should be capitalized,
+    not end with a period, and describe the action performed by the commit
+    in the imperative mood, so that it can complete the sentence
+    “If applied, this commit will <commit title line\>”. Note that commits automatically
+    created by `git` (say, merge commits) satisfy these criteria.
 
 If a particular commit references another issue or PR, please add the reference,
 for example `refs #1234`, or `fixes #4321`.
