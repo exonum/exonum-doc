@@ -58,7 +58,7 @@ Workability is not guaranteed yet.
 ## Rust Toolchain
 
 Exonum repositories use the stable Rust toolchain that can be installed
-by using the [rustup](https://www.rustup.rs) utility.
+by using the [rustup](https://www.rustup.rs) program:
 
 ```shell
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
@@ -73,7 +73,7 @@ A separate nightly Rust toolchain is required if you want to run
 the [clippy][clippy] linter locally. Clippy is used
 in CI builds of Exonum Core and other repositories to detect common Rust anti-patterns.
 In general, clippy supports the latest nightly version of Rust. It can be installed
-by
+with
 
 ```shell
 rustup toolchain install <nightly-rust-version>
@@ -83,7 +83,7 @@ where `<nightly-rust-version>` is the nightly Rust version supported by clippy
 (e.g., `nightly-2017-05-10` for clippy version 0.0.131).
 Consult the clippy installation guide for more details.
 
-After installing nightly Rust, clippy checks can be run as
+After installing nightly Rust, clippy checks can be run with
 
 ```shell
 cargo +<nightly-rust-version> clippy
@@ -104,7 +104,7 @@ cargo install rustfmt --version <rustfmt-version> --force
 where `<rustfmt-version>` is the supported version of the formatter.
 You may find the supported version in [the Travis configuration of Exonum Core][core-travis].
 
-After installing the formatter, its checks can be run via
+After installing the formatter, its checks can be run with
 
 ```shell
 cargo fmt --write-mode=diff
@@ -123,7 +123,7 @@ cd exonum-core
 cargo test --manifest-path exonum/Cargo.toml
 ```
 
-You may also run the extended test suite located in the `sandbox` directory.
+You may also run the extended test suite located in the `sandbox` directory:
 
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml
@@ -133,15 +133,16 @@ cargo test --manifest-path sandbox/Cargo.toml
 
 ### Light Client Library
 
-[The light client library][exonum-client] uses a standard JavaScript
+[The light client library][exonum-client] uses a fairly standard JavaScript
 development toolchain:
 [Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for testing
-(+ [Karma][karma] for browser testing),
+(and [Karma][karma] for browser testing),
 [istanbul][istanbul] for measuring test coverage, and
-[Babel][babel] for transpiling to ES5. Workability is tested on Node 4+.
+[Babel][babel] for transpiling to ES5. Workability of the development environment
+is tested on Node 4+.
 
 !!! note
-    The library itself can run both on Node and in browsers.
+    The light client library itself can run both on Node and in browsers.
 
 ## Developing with Exonum
 
