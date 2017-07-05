@@ -132,8 +132,8 @@ List value does not support inserting in the middle (although it
 is still possible to do manually).
 
 `ListIndex` saves its elements to the internal `base` map with element
-indices as keys. The list length also is saved at `base` with `&()` key.
-**TODO: what does this key mean? an empty (0-length) byte sequence?**
+indices as keys. The list length also is saved at `base` with an
+zero-length tuple `&()` as a key.
 
 ### ValueSetIndex
 
