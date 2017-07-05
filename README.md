@@ -86,10 +86,12 @@ The generated pages will be available in the **site/** directory.
 
 ## License
 
-Copyright 2016, Bitfury Group
+Copyright 2017, Bitfury Group
 
-Exonum Documentation is licensed under the Apache License (Version 2.0). See
-[LICENSE](LICENSE) for details.
+The Exonum documentation is licensed under the Creative Commons Non-Commercial
+Share-Alike International License (version 4.0). Code samples are licensed
+under the Apache License (version 2.0).
+See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 
 [wiki:lint]: https://en.wikipedia.org/wiki/Lint_(software)
 [mdl]: https://github.com/mivok/markdownlint

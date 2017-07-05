@@ -1,6 +1,6 @@
 # Configuration Update Service
 
-**Configuration update service** allows modifying [the global configuration](../../architecture/configuration.md)
+**Configuration update service** allows modifying [the global configuration](../architecture/configuration.md)
 by the means of *proposing* a new configuration and *voting* for proposed configurations
 among the validators.
 
@@ -9,7 +9,7 @@ The global configuration may need to be modified for various reasons:
 - Changes in the validator set (validators being added, replaced, or removed)
 - Fine tuning of the consensus algorithm parameters
 - Changes in the global configuration of services (e.g., the anchoring interval
-  in [the anchoring service](anchoring.md))
+  in [the anchoring service](bitcoin-anchoring.md))
 
 ## General Idea
 
@@ -40,7 +40,7 @@ execution rules guarantee that only one of them will get activated.
 
 !!! note
     The threshold of 2/3 of validators is chosen to reflect the security
-    model used in [the consensus algorithm](../consensus/consensus.md). According
+    model used in [the consensus algorithm](../architecture/consensus.md). According
     to this model, up to 1/3 of validators may be compromised or be non-responsive
     at any time.
 
@@ -66,7 +66,7 @@ All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
 
 !!! tip
-    See [*Services*](../../architecture/services.md) for a description of
+    See [*Services*](../architecture/services.md) for a description of
     types of endpoints in services.
 
 !!! tip
@@ -216,13 +216,14 @@ Looks up votes for a configuration proposal by the configuration hash.
 
 #### Response
 
-JSON object with the following fields:
-
-- **Votes**: Array<?Vote\>  
-  Votes for the configuration. Indexing of the `Votes` array corresponds
-  to the indexing of validator public keys in the [actual configuration](../../architecture/configuration.md#genesis).
-  If a vote from the validator is absent, then `null` is returned
-  at the corresponding index.
+A nullable JSON array `?Array<?Vote>` containing
+votes for the configuration, where each vote is [the JSON serialization](../architecture/transactions.md#serialization)
+of [the corresponding vote transaction](#vote-for-proposal).
+Indexing of the votes in the array corresponds
+to the indexing of validator public keys in the [actual configuration](../architecture/configuration.md#genesis).
+If a vote from the validator is absent, then `null` is returned
+at the corresponding index. If the configuration with `config_hash` is absent,
+`null` is returned instead of the whole array.
 
 ### Committed Configurations
 
@@ -366,7 +367,7 @@ Creates a [`TxConfigPropose` transaction](#configuration-proposal).
 The `from` field of the transaction and its signature are computed
 automatically based on the identity of the node that processes the POST request:
 `from` is set to the node’s public key, and the signature is computed
-based on the corresponding private key stored in [the local configuration](../../architecture/configuration.md).
+based on the corresponding private key stored in [the local configuration](../architecture/configuration.md).
 
 #### Parameters
 

@@ -18,6 +18,11 @@
 {%- endblock %}
 
 {% block extrahead %}
+  {% set title = page.meta.title | first |
+    default(page.title + ' - ' + config.site_name
+      if not page.is_homepage
+      else config.site_name
+    ) %}
   {% set description = page.meta.description | join(' ')
     | default(page.content.partition('</h1>')[2].partition('</p>')[0] | striptags, True)
     | default(config.site_description, True)
@@ -25,7 +30,7 @@
   <meta name="description" content="{{ description }}">
 
   {% if page and page.canonical_url %}
-  <meta name="og:title" content="{{ page.meta.title | default(page.title) }}">
+  <meta name="og:title" content="{{ title }}">
   <meta name="og:url" content="{{ page.canonical_url }}">
   <meta name="og:description" content="{{ description }}">
   <meta name="og:type" content="article">
@@ -35,7 +40,7 @@
     | selectattr('type', 'equalto', 'twitter')
     | first %}
   {% if twitter_site %}<meta name="twitter:site" content="@{{ twitter_site.link | replace('https://twitter.com/', '') }}">{% endif %}
-  <meta name="twitter:title" content="{{ page.meta.title | default(page.title) }}">
+  <meta name="twitter:title" content="{{ title }}">
   <meta name="twitter:description" content="{{ description }}">
   {% endif %}
 {% endblock %}
