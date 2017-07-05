@@ -44,7 +44,7 @@ are sent over TCP to communicate among the full nodes.
 Light clients use [JSON Serialization](../glossary.md#json-serialization)
 to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
 Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
-HTTP API. 
+HTTP API.
 
 ### Network Events Processing
 
@@ -60,6 +60,12 @@ address of the node. Each node stores all received `Connect` messages in
 the _list of known peers_. As soon as a handshake is reached (`Connect` message
 is received and successfully processed) from both sides, the nodes begin to
 exchange messages.
+
+### Transactions Broadcasting
+
+Node broadcasts transactions obtained via API or created by the node itself, but
+does not broadcast transactions received from the other nodes (via broadcasting
+or [requests mechanism](consensus/requests.md)).
 
 #### Whitelist
 
