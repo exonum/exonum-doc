@@ -368,11 +368,11 @@ for creating table prefixes. Example of such prefixes generation can be found
 [here][blockchain-schema].
 
 !!! warning ""
-    Table identifiers can also be created manually. If you refuse from
-    using `gen_prefix`, it is strongly advised not to admit situation when
-    one table identifier inside the service is a prefix for the other table
-    in the same service. Such cases may cause the ineligible coincidences
-    between the different keys and elements.
+    Table identifiers can also be created manually though it is risky. If
+    you refuse from using `gen_prefix`, it is strongly advised not to admit
+    situation when one table identifier inside the service is a prefix for
+    the other table in the same service. Such cases may cause the ineligible
+    coincidences between the different keys and elements.
 
 ## List of system tables
 
