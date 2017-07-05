@@ -215,7 +215,7 @@ operations from the usual list (pop, truncate). Why?**
   at `index` position. The tree consists of [`ListProof`][list-proof]
   objects.
 - `get_range_proof(from: u64, to: u64): ListProof` builds a proof tree
-  for data values at indices since `from` until `to - 1` inclusively. 
+  for data values at indices since `from` until `to - 1` inclusively.
   The tree consists of [`ListProof`][list-proof] objects.
 
 When thin client asks Exonum full-node about some data, the proof is
@@ -304,13 +304,13 @@ is updated, the snapshot still refers to the old table content.
 
 ### Forks
 
-[Forks][fork] implement the same interfaces as the database underneath, 
-transparently wrapping the real data storage state, and add some 
-additional changes. Every fork is basen on the storage snapshot. From 
-the outer point of view, the changes are already applied to the data 
-storage; however, these changes are stored directly in the fork and may 
-be easily rolled back. Moreover, there may be different forks of 
-database state. 
+[Forks][fork] implement the same interfaces as the database underneath,
+transparently wrapping the real data storage state, and add some
+additional changes. Every fork is basen on the storage snapshot. From
+the outer point of view, the changes are already applied to the data
+storage; however, these changes are stored directly in the fork and may
+be easily rolled back. Moreover, there may be different forks of
+database state.
 
 Forks are used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
@@ -318,8 +318,8 @@ decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with error during
 validation, its changes are promptly reverted.
 
-During the block execution, fork allows to create the [list of 
-changes](#patches) and, if all changes are accurate, apply it to the 
+During the block execution, fork allows to create the [list of
+changes](#patches) and, if all changes are accurate, apply it to the
 data storage atomically.
 
 ## Table identifiers convention
@@ -341,15 +341,15 @@ are saved into one big LevelDB map, wherein the keys are represented as
 bytes sequence, and values are serialized objects, in fact, byte
 sequences too.
 
-Every table is uniquely identified by the complex prefix. Such prefix is 
-added to the every key of the specific table, thus allows to distinguish 
-values from different tables. 
+Every table is uniquely identified by the complex prefix. Such prefix is
+added to the every key of the specific table, thus allows to distinguish
+values from different tables.
 
-The prefix consist of service ID and internal identifier inside the 
-service. As well as tables represent just a handy API for access to data 
-(no data items are really stored at the table class instance; all values 
-are saved in leveldb storage), all tables created with the same prefix 
-will share the data. 
+The prefix consist of service ID and internal identifier inside the
+service. As well as tables represent just a handy API for access to data
+(no data items are really stored at the table class instance; all values
+are saved in leveldb storage), all tables created with the same prefix
+will share the data.
 
 Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
 0x00` ID is reserved to the Core. Tables inside services are named
@@ -374,7 +374,6 @@ for creating table prefixes. Example of such prefixes generation can be found
     in the same service. Such cases may cause the ineligible coincidences
     between the different keys and elements.
 
-
 ## List of system tables
 
 The Core owns its own tables that are used for providing the service.
@@ -385,7 +384,7 @@ There are the following system tables:
 - `transactions`, `MapIndex`.
   Represents a map from transaction hash into raw transaction structure
 - `tx_location_by_hash`, `MapIndex`.
-  Keeps the block height and tx position inside block for every 
+  Keeps the block height and tx position inside block for every
   transaction hash.
 - `blocks`, `MapIndex`.
   Stores block object for every block height.
@@ -394,7 +393,7 @@ There are the following system tables:
 - `block_txs`, `ProofListIndex`.
   The set of tables with different `block_height`. Every table keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`. 
+- `precommits`, `ListIndex`.
   The set of tables with different `block_hash`. Stores the list of
   validators' precommits for the specific block.
 - `configs`, `ProofMapIndex`.
@@ -402,7 +401,7 @@ There are the following system tables:
 - `configs_actual_from`, `ListIndex`.
   Builds an index to get config starting height quickly.
 - `state_hash_aggregator`, `ProofMapIndex`.
-  The table is used to calculate the final state hash based on the 
+  The table is used to calculate the final state hash based on the
   aggregate hashes of other tables.
 
 ## Indexing
