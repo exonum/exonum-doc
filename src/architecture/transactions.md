@@ -62,7 +62,8 @@ separate implementation details from transaction invocation.
 ## Serialization
 
 Transactions in Exonum are subtypes of messages and share the serialization logic
-with [consensus messages](consensus.md#messages).
+with [consensus messages](consensus.md#messages) (see the [Serialization](serialization.md)
+article for more details).
 All transaction messages are serialized in a uniform
 fashion. There are 2 serialization formats:
 
@@ -76,15 +77,11 @@ fashion. There are 2 serialization formats:
     they implement serialization internally in order to sign transactions
     and calculate their hashes.
 
-Fields used in serializing transactions are the same as for [serializing
-messages in general](serialization.md#message-serialization). The specificity of
-transaction serialization is the structure of the [`body` field](#transaction-body).
-
 !!! note
     Each unique transaction message serialization is hashed with
-    [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2)
-    (including all the fields `network_id`, `protocol_version`, `service_id`,
-    `message_id`, `payload_length`, `body` and `signature`). Hashes are used as
+    [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2).
+    A transaction hash is taken over the entire transaction serialization
+    (including its signature). Hashes are used as
     unique identifiers for transactions where such an identifier is needed
     (e.g., when determining whether a specific transaction has been committed
     previously).
@@ -98,7 +95,7 @@ transaction serialization is the structure of the [`body` field](#transaction-bo
 
 ### Transaction Body
 
-The body of the transaction, which includes data specific for a given
+Transaction body includes data specific for a given
 transaction type. Format of the body is specified by the
 service identified by `service_id`.
 Binary serialization of the body is performed using
