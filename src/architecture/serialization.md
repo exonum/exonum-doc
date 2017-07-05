@@ -270,6 +270,41 @@ All slices are var-length datatypes.
 ## Message Serialization
 
 Fields used in message serialization are listed below.
+Serialized [structure](#structures) (including its header and body) described on
+`message!` macro call.
+
+### Signature
+
+[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
+serialization of the message (excluding the signature bytes,
+i.e., the last 64 bytes of the serialization).
+
+**Binary presentation:** Ed25519 signature (64 bytes).  
+**JSON presentation:** hex string.
+
+### Example of `message!` Usage
+
+```Rust
+const MY_SERVICE_ID: u16 = 777;
+const MY_NEW_MESSAGE_ID: u16 = 1;
+
+message! {
+    struct MessageTwoIntegers {
+        const TYPE = MY_NEW_MESSAGE_ID;
+        const ID   = MY_SERVICE_ID;
+        const SIZE = 16;
+
+        field first: u64 [0 => 8]
+        field second: u64 [8 => 16]
+    }
+}
+```
+
+Here the message body is serialized as a `struct` with fields `first` and `second`
+having type `u64`.
+=======
+Serialized message consists of the following parts:
+=======
 
 | Field              | Binary format     | Binary offset | JSON       |
 |--------------------|:-----------------:|--------------:|:----------:|
@@ -337,9 +372,6 @@ signature length.
 
 Serialized structure (with its header and body) described on `message!` macro
 call.
-=======
-Serialized [structure](#structures) (including its header and body) described on
-`message!` macro call.
 
 ### Signature
 
@@ -349,44 +381,6 @@ i.e., the last 64 bytes of the serialization).
 
 **Binary presentation:** Ed25519 signature (64 bytes).  
 **JSON presentation:** hex string.
-
-### Example of `message!` Usage
-
-```Rust
-const MY_SERVICE_ID: u16 = 777;
-const MY_NEW_MESSAGE_ID: u16 = 1;
-
-message! {
-    struct MessageTwoIntegers {
-        const TYPE = MY_NEW_MESSAGE_ID;
-        const ID   = MY_SERVICE_ID;
-        const SIZE = 16;
-
-        field first: u64 [0 => 8]
-        field second: u64 [8 => 16]
-    }
-}
-```
-
-Here the message body is serialized as a `struct` with fields `first` and `second`
-having type `u64`.
-=======
-Serialized message consists of the following parts:
-
-- [Message header](#message-header)
-- Structure (with its header and body) described on `message!` macro call
-- Ed25519 signature on the two previous parts
-
-### Message Header
-
-The message header includes:
-
-- network ID: 1 byte
-- protocol version: 1 byte
-- message ID: 2 bytes
-- service ID: 2 bytes
-- message size (excluding signature): 4 bytes
->>>>>>> 77235f8... add Message Serialization section
 
 ## Types to Be Supported in Future
 
