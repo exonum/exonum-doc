@@ -84,6 +84,10 @@ fashion. There are 2 serialization formats:
     they implement serialization internally in order to sign transactions
     and calculate their hashes.
 
+Fields used in serializing transactions are the same as for [serializing
+messages in general](serialization.md#message-serialization). The specificity of
+transaction serialization is the structure of the [`body` field](#transaction-body).
+
 !!! note
     Each unique transaction message serialization is hashed with
     [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2).
@@ -93,9 +97,22 @@ fashion. There are 2 serialization formats:
     (e.g., when determining whether a specific transaction has been committed
     previously).
 
+<<<<<<< HEAD
 ### Transaction Body
 
 Transaction body includes data specific for a given
+=======
+!!! tip
+    It is recommended for transaction signing to be decentralized in order
+    to minimize security risks. Roughly speaking, there should not be a single
+    server signing all transactions in the system; this could create a security
+    chokepoint. One of options to decentralize signing is to use
+    the [light client library](https://github.com/exonum/exonum-client).
+
+### Transaction Body
+
+The body of the transaction, which includes data specific for a given
+>>>>>>> 43e3c5f... move message serialization from transactions to serialization
 transaction type. Format of the body is specified by the
 service identified by `service_id`.
 Binary serialization of the body is performed using
@@ -364,7 +381,11 @@ on the verify step.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
+<<<<<<< HEAD
 [core-tx]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
+=======
+[core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
+>>>>>>> 43e3c5f... move message serialization from transactions to serialization
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying
