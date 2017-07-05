@@ -333,7 +333,8 @@ Exonum tables are divided into two groups.
 Such differentiation corresponds to schemas in the relational database
 world. There may be different tables with the same name, located in the
 different schemas. Actually, system tables may be considered as tables
-for Consensus service.
+for the especial Consensus "service". The Core creates and use its
+tables in the same way as usual services do.
 
 As it was said, at the LevelDB scale, all values from all Exonum tables
 are saved into one big LevelDB map, wherein the keys are represented as
