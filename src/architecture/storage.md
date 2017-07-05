@@ -304,12 +304,13 @@ is updated, the snapshot still refers to the old table content.
 
 ### Forks
 
-[Forks][fork] implement the same interfaces as the database underneath,
-transparently wrapping the real data storage state, and add some
-additional changes. From the outer point of view, the changes are
-already applied to the data storage; however, these changes may be
-easily rolled back. Moreover, there may be different forks of database
-state.
+[Forks][fork] implement the same interfaces as the database underneath, 
+transparently wrapping the real data storage state, and add some 
+additional changes. Every fork is basen on the storage snapshot. From 
+the outer point of view, the changes are already applied to the data 
+storage; however, these changes are stored directly in the fork and may 
+be easily rolled back. Moreover, there may be different forks of 
+database state. 
 
 Forks are used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
@@ -317,9 +318,9 @@ decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with error during
 validation, its changes are promptly reverted.
 
-During the block execution, fork allows to create the list of changes
-and, if all changes are accurate, apply it to the data storage
-atomically.
+During the block execution, fork allows to create the [list of 
+changes](#patches) and, if all changes are accurate, apply it to the 
+data storage atomically.
 
 ## Table naming convention
 
