@@ -159,6 +159,9 @@ The following procedures are implemented:
   such one exists. Otherwise, the error is returned.
 - `clear()` removes all the items stored in the hashmap.
 
+The used hash is calculated as `hash()` method of `StorageValue` trait.
+It is supposed to return cryptographic hash, specifically, SHA-256 hash.
+
 ### KeySetIndex
 
 [`KeySetIndex`][key-set-index] implements a set. Any unique value can be
