@@ -152,6 +152,12 @@ The following fields are present for all messages:
 - `state_hash`  
   Hash of the blockchain state after the execution of all transactions in the
   `Propose` referenced by the precommit.
+- `time`  
+  Local time of the validator during precommit generation. This field does not
+  influence the validity of the precommit; rather, it is used
+  by [light clients](../../architecture/clients.md)
+  to check whether responses from full nodes correspond to the
+  current state of the blockchain.
 
 ## Algorithm Stages
 
