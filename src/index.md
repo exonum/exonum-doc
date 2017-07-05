@@ -18,15 +18,15 @@ and client security.
 
 [Exonum Core][core] is a open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
-You may refer to [the installation guide][install] in order to install the library
-together with its prerequisites.
+You may refer to [the installation guide](get-started/install.md) in order to install
+the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
 [Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum Core
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum Core, the tutorial also makes use of [the light client][client] –
-a JavaScript library intented for client-side verification of blockchain information
+a JavaScript library intended for client-side verification of blockchain information
 and for performing cryptographic operations (such as digital signing).
 
 The source code of the tutorial [is available on GitHub][tutorial].
@@ -51,7 +51,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 !!! tip
     See [the anchoring][anchoring] and [configuration update][config] services
-    for the examples of real-world Exonum services, and [the cryptocurency tutorial][tutorial]
+    for the examples of real-world Exonum services, and [the cryptocurrency tutorial][tutorial]
     for an example how to use the light client library.
 
 ### Specifications

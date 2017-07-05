@@ -19,7 +19,7 @@ extra:
   logo: 'images/logo.svg" alt="Exonum Logo'
   github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
   palette:
-    primary: 'blue grey'
+    primary: 'light green'
     accent: 'lime'
   social:
     - type: 'github'
@@ -35,6 +35,7 @@ markdown_extensions:
   - codehilite
   - admonition
   - meta
+  - pymdownx.superfences
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'

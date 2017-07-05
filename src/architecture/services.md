@@ -132,16 +132,16 @@ cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented
-using [LevelDB][leveldb]. Each service needs to define a set of data collections,
-in which the service persists the service-specific data;
-these collections abstract away the need for the service to deal with the blockchain
+using [LevelDB][leveldb]. Each service needs to define a set of data collections
+(*tables*), in which the service persists the service-specific data;
+these tables abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
-maps and append-only lists (`MapTable` and `ListTable`, respectively).
+maps and append-only lists (`MapIndex` and `ListIndex`, respectively).
 
 Exonum also provides helpers for *merklizing* data collections, i.e.,
 making it possible to efficiently compute proofs for read requests that involve
 the items of the collection. Merklized versions of maps and lists are
-`MerklePatriciaTable` and `MerkleTable`, respectively.
+`ProofMapIndex` and `ProofListIndex`, respectively.
 
 Naturally, the items of collections (and keys in the case of maps) need to be
 serializable. Exonum provides a simple and robust [binary serialization format](serialization.md),
@@ -150,14 +150,39 @@ Exonum datatypes to JSON for communication with thin clients.
 
 ### Configuration
 
-Besides blockchain, a service may read or write data in [the local configuration](configuration.md).
-Logically, the local configuration represents parameters local to a specific
-node instance. A good example is a private anchoring key used in
-[the anchoring service](../advanced/bitcoin-anchoring.md);
+Services may use [configuration](configuration.md)
+to store parameters that will be received by the service constructor during
+[node initialization](#initialization). Configuration consists of two parts:
+*global configuration*, which is stored on the blockchain, and *local configuration*,
+which is specific to each node instance.
+
+#### Global Configuration
+
+Global configuration is common for all nodes in the blockchain network.
+An example of a global configuration parameter is the anchoring address
+in [the anchoring service](../advanced/bitcoin-anchoring.md). The anchoring address
+is common for all nodes in the blockchain network, its changes should be auditable
+and authorized by specific nodes, etc.
+
+Global configuration is managed by the system maintainers via
+[the configuration update service](../advanced/configuration-updater.md).
+From the point of view of a service, global configuration is *volatile*;
+it can be changed without touching service endpoints.
+A service may view the current global configuration via [dedicated methods][core-schema.rs]
+of the core API.
+
+#### Local Configuration
+
+Local configuration is specific to each node instance.
+An example of a local configuration parameter is a private anchoring key
+used in [the anchoring service](../advanced/bitcoin-anchoring.md);
 naturally, nodes have different private keys and they cannot be put on the blockchain
 for security reasons.
 
-Local configuration can be changed via private API.
+Local configuration can be changed via editing the local configuration file
+of the node instance. As of Exonum 0.1, the only
+way for a service to read its local configuration is to retain it after it’s passed
+to the service constructor during [service initialization](#initialization).
 
 ## Lifecycle
 
@@ -178,7 +203,7 @@ service configuration and initializes its persistent storage.
 ### Initialization
 
 Each time a validating or auditing node is started, it initializes all
-deployed services. Initialization passes local and public blockchain configuration
+deployed services. Initialization passes local and global blockchain configuration
 to the service, so it can properly initialize its state.
 If the configuration is updated, the services are automatically restarted.
 
@@ -260,6 +285,146 @@ Unlike common web frameworks, Exonum 0.1 does not provide authentication middlew
 for service endpoints. Implementing authentication and authorization is thus
 the responsibility of a service developer.
 
+## Interface with Exonum Framework
+
+Internally, services communicate with the Exonum framework via an interface
+established in the [`Service`][service.rs] trait.
+This trait defines the following methods that need to be implemented by
+a service developer.
+
+### Service Identifiers
+
+```rust
+fn service_id(&self) -> u16;
+fn service_name(&self) -> &'static str;
+```
+
+`service_id` returns a 2-byte service identifier, which needs to be unique
+within a specific Exonum blockchain. `service_name` is similarly a unique identifier,
+only it is a string instead of an integer.
+
+`service_id` is used:
+
+- To identify [transactions](transactions.md) handled by the service
+- Within the blockchain state. See [`state_hash`](#state-hash) below and
+  [*Storage*](storage.md)
+
+`service_name` is used:
+
+- In [the configuration](configuration.md). Service configuration
+  is stored in the overall configuration under the key `service_name`
+  in the `services` variable
+- To compute API endpoints for the service. All service endpoints
+  are mounted on `/api/services/{service_name}`
+
+!!! note "Example"
+    [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
+    defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the service
+    are available on `/api/services/btc_anchoring/`, and its configuration is
+    stored in the `services.btc_anchoring` section of the overall configuration.
+
+### State Hash
+
+```rust
+fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash> {
+    Vec::new()
+}
+```
+
+The `state_hash` method returns a list of hashes for all
+Merklized tables defined by the service. Hashes are calculated based on the
+current blockchain state `snapshot`.
+The core uses this list to aggregate
+hashes of tables defined by all services into a single Merklized meta-map.
+The hash of this meta-map is considered the hash of the entire blockchain state
+and is recorded as such in blocks and [`Precommit` messages](consensus.md).
+
+The default trait implementation returns an empty list. This corresponds to
+the case when a service doesn’t have any Merklized tables.
+
+!!! note
+    The keys of the meta-map are defined as pairs `(service_id, table_id)`,
+    where `service_id` is a 2-byte [service identifier](#service-identifiers)
+    and `table_id` is a 2-byte identifier of a table within the service.
+    Keys are then hashed in order to provide
+    a more even key distribution, which results in a more balanced
+    Merkle Patricia tree.
+
+### Parse Raw Transaction
+
+```rust
+fn tx_from_raw(&self, raw: RawTransaction)
+               -> Result<Box<Transaction>, MessageError>;
+```
+
+The `tx_from_raw` method is used to parse raw transactions received from the network
+into specific transaction types handled by the service. The core calls this method
+for all incoming transactions at the beginning of transaction processing.
+The service, which `tx_from_raw` method
+will be called for a particular transaction, is chosen
+based on the `service_id` field in the transaction serialization.
+
+### Genesis Block Handler
+
+```rust
+use serde_json::Value;
+
+fn handle_genesis_block(&self, fork: &mut Fork)
+                        -> Value {
+    Value::Null
+}
+```
+
+`handle_genesis_block` returns an initial [global configuration](#global-configuration)
+of the service in the JSON format.
+This method is invoked for all deployed services during
+the blockchain initialization. A result of the method call for each service
+is recorded under [the string service identifier](#service-identifiers)
+in the configuration. The resulting initial configuration is augmented
+by non-service parameters (such as public keys of the validators) and recorded in
+the genesis block, hence the method name.
+
+The default trait implementation returns `null` (i.e., no configuration).
+It must be redefined for services that have global configuration parameters.
+
+### Commit Handler
+
+```rust
+fn handle_commit(&self, context: &mut ServiceContext) { }
+```
+
+`handle_commit` is invoked for every deployed service each time a block
+is committed in the blockchain locally. This method is so far the only example
+of [event-based processing](#event-handling). The method receives the service
+context, which can be used to inspect the blockchain state, create transactions
+and push them in the queue for broadcasting, etc.
+
+!!! note
+    Keep in mind that `handle_commit` is sequentially invoked for each block
+    in the blockchain during an initial full node synchronization.
+
+### REST API Initialization
+
+```rust
+use iron::Handler;
+
+fn public_api_handler(&self, context: &ApiContext)
+                      -> Option<Box<Handler>> {
+    None
+}
+fn private_api_handler(&self, context: &ApiContext)
+                       -> Option<Box<Handler>> {
+    None
+}
+```
+
+`public_api_handler` and `private_api_handler` provide hooks for defining
+public and private API endpoints respectively using [Iron framework][iron].
+These methods receive an API context, which allows to read information from
+the blockchain, and to translate POST requests into Exonum transactions.
+
+The default trait implementation does not define any public or private endpoints.
+
 ## Tips and Tricks
 
 ### Communication with External World
@@ -308,3 +473,5 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
+[service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
+[core-schema.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs

@@ -39,7 +39,7 @@ are applied to the key-value storage.
 All data in the Exonum blockchain is divided into two parts:
 
 - **Data storage**, which contains data structured into tables
-- **Trasaction log**, i.e., the complete history of all transactions ever applied
+- **Transaction log**, i.e., the complete history of all transactions ever applied
   to the data storage
 
 As transactions include operations on the key-value storage such as creating
@@ -134,7 +134,7 @@ Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
 of the blockchain. It is assumed that the environment is decentralized,
 i.e., any node is allowed to fail or be compromised.
-Consensus is *authenticated*; consensus paritcipants (i.e., validators)
+Consensus is *authenticated*; consensus participants (i.e., validators)
 are identified with the help of public-key cryptography.
 
 To generate a new block and vote upon it, a 3-phase approach is used.
@@ -214,13 +214,13 @@ Exonum supports several types of data tables, representing typed collections
 
 - `ListTable` implements an array list
 - `MapTable` represents a map / key-value storage
-- [`MerkleTable`](../advanced/merkle-index) is an enhanced version of
+- [`MerkleTable`](../advanced/merkle-index.md) is an enhanced version of
   array storage. It implements a balanced (but not necessarily full) binary
   Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from concatenated
   children data. `MerkleTable` only allows to append the data or update the
   already stored items
-- [`MerklePatriciaTable`](../advanced/merkle-patricia-index) extends the
+- [`MerklePatriciaTable`](../advanced/merkle-patricia-index.md) extends the
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
   Leaves of the tree keep the actual
   values from the map. Intermediate nodes consist of the following four parts:
@@ -272,14 +272,14 @@ A service may define 3 types of endpoints:
   and cannot modify the blockchain state
 - **Private endpoints** provide an administrative interface to the local
   instance of the service. They could be used to adjust local service
-  configutation, e.g., manage secret keys specific to the service.
+  configuration, e.g., manage secret keys specific to the service.
   Private endpoints are executed locally, are not globally ordered, and
   cannot modify the blockchain state directly (although they
   can generate transactions and push them to the network)
 
 !!! note
     Another type of endpoints, *events*, [is coming soon](../roadmap.md).
-    Events will implement the [pub/sub architecure pattern][wiki:pubsub],
+    Events will implement the [pub/sub architecture pattern][wiki:pubsub],
     allowing light clients and services to subscribe to events emitted
     by services.
 
@@ -297,7 +297,7 @@ community, or open your service for other uses.
 
 Endpoints defined by services fulfill the same role as smart contracts
 in other blockchain platforms. They define business logic of the blockchain,
-allow to retrieve data from the blockchain, and can be reused accross
+allow to retrieve data from the blockchain, and can be reused across
 different projects. Partial analogies for this execution model are
 endpoints of RESTful web services and stored procedures for DBMSs.
 
