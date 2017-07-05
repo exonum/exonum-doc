@@ -41,6 +41,13 @@ In the table descriptions the following parameters types are used:
 - `MapProof`: a custom class representing nodes from  `ProofMapIndex`
   proof trees.
 
+!!! note "Keys sorting"
+    The tables implement iterators over keys and/or stored items. Such
+    iterators uses a ordering by key to define next returned element. The
+    way keys are sorted depends on the selected low-level database engine;
+    Exonum uses a [LevelDB](#low-level-storage) wher the keys are ordered
+    lexicographically.
+
 ### BaseIndex
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
@@ -88,8 +95,7 @@ The following actions are supported:
 - `remove(key: &K)` removes appropriate key-value pair. If key is not
   found, error is returned.
 - `clear()` deletes all the records stored in this table.
-- `keys(): Iter<K>` returns an iterator through table keys. **TODO: how are
-  keys ordered? asc / desc / FIFO / LIFO**
+- `keys(): Iter<K>` returns an iterator through table keys.
 - `keys_from(from: &K): I<K>` iterates through table keys, starting from
   `from` key.
 - `values(): Iter<V>` returns an iterator through table values.
