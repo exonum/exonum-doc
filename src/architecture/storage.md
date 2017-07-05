@@ -194,24 +194,9 @@ table cells are divided into leafs and intermediate nodes. Leafs store
 the data itself; inner nodes values are calculated as
 `hash(concatenate(left_child_value, right_child_value)`. You may read
 more detailed specification at [Merkle
-Trees](../advanced/merkle-index.md). The following procedures are
-implemented: **TODO: it is strange that ProofList do not implement some
-operations from the usual list (pop, truncate). Why?**
+Trees](../advanced/merkle-index.md). The following additional procedures are
+implemented:
 
-- `get( index: u64): V` returns a value already saved in the list. If
-  index is bigger then the list size, error is returned.
-- `iter(): Iter<(u64,V)>` returns an iterator through the index-value pairs.
-- `iter_from(from: u64): Iter<(u64,V)>` iterates through the index-values
-  pairs, starting from `from` position.
-- `clear()` deletes all the records stored in this table.
-- `last(): V` returns the latest value in the list.
-- `is_empty(): bool` returns `true` if the table has no values; else,
-  `false`.
-- `len(): u64` returns the number of elements stored in the list.
-- `push(value: V)` adds new value to the end of the list.
-- `extend(iter: Iter)` appends values from the iterator to the list
-  one-by-one.
-- `set(index: u64, value: V)` updates a value already saved in the list.
 - `height(): u8` returns the height of the tree. As the tree is balanced
   (though may be not fully filled), the height is near to `log2(list
   length)`
@@ -240,27 +225,9 @@ based on Merkle Patricia Tree. It implements the same methods as the
 `MapIndex`, adding the ability to create proofs of existence for its
 key-value pairs, or proofs of absense if requested key do not exist in
 this table. For a more detailed description, see [Merkle Patricia
-Trees](../advanced/merkle-patricia-index.md). The following procedures
-are supported:
+Trees](../advanced/merkle-patricia-index.md). The following additional
+procedures are supported:
 
-- `get(key: &K): V` receives a value by key. If key is not found, error
-  is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the
-  table.
-- `iter(): Iter<(K,V)>` returns an iterator through the key-value pairs.
-- `iter_from(from: &K): Iter<(K,V)>` iterates through the key-values pairs,
-  starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is
-  already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not
-  found, error is returned.
-- `clear()` deletes all the records stored in this table.
-- `keys(): Iter<K>` returns an iterator through table keys.
-- `keys_from(from: &K): Iter<K>` iterates through table keys, starting from
-  `from` key.
-- `values(): Iter<V>` returns an iterator through table values.
-- `values_from(from: &K): Iter<V>` iterates through table values,
-  starting from `from` key.
 - `root_hash(): Hash` returns the root node's value.
 - `get_proof(key: K): MapProof` builds a proof tree for the requested
   key. Tree proves either key presence (and its according value), or key
