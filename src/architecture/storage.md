@@ -14,8 +14,8 @@ points.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
   discarded.
-4. [Table naming convention](#table-naming-convention) elaborates how
-  user tables should be called, and shows how the Exonum tables are
+4. [Table identifiers convention](#table-identifiers-convention) elaborates how
+  user tables are identified, and shows how the Exonum tables are
   matched into LevelDB.
 5. [List of system tables](#list-of-system-tables) describes what tables
   are used directly by Exonum Core.
@@ -322,7 +322,7 @@ During the block execution, fork allows to create the [list of
 changes](#patches) and, if all changes are accurate, apply it to the 
 data storage atomically.
 
-## Table naming convention
+## Table identifiers convention
 
 Exonum tables are divided into two groups.
 
@@ -340,12 +340,15 @@ are saved into one big LevelDB map, wherein the keys are represented as
 bytes sequence, and values are serialized objects, in fact, byte
 sequences too.
 
-To distinguish values from different tables, additional prefix is used
-for every key. Such prefix consist of service ID and table number. As
-well as tables represent just a handy API for access to data (no data
-items are really stored at the table class instance; all values are
-saved in leveldb storage), all tables created with the same ID will
-share the data.
+Every table is uniquely identified by the complex prefix. Such prefix is 
+added to the every key of the specific table, thus allows to distinguish 
+values from different tables. 
+
+The prefix consist of service ID and internal identifier inside the 
+service. As well as tables represent just a handy API for access to data 
+(no data items are really stored at the table class instance; all values 
+are saved in leveldb storage), all tables created with the same prefix 
+will share the data. 
 
 Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
 0x00` ID is reserved to the Core. Tables inside services are named
@@ -359,15 +362,17 @@ LevelDB map:
 
 Here, `|` stands for bytes sequences concatenation.
 
-!!! warning ""
-    It is strongly advised not to admit situation when one table name inside
-    the service is a prefix for the other table in the same service. Such
-    cases may cause the ineligible coincidences between the different keys
-    and elements.
-
 It is advised to use a `gen_prefix(service_id, table_id, table_suffix)`
 for creating table prefixes. Example of such prefixes generation can be found
 [here][blockchain-schema].
+
+!!! warning ""
+    Table identifiers can also be created manually. If you refuse from
+    using `gen_prefix`, it is strongly advised not to admit situation when
+    one table identifier inside the service is a prefix for the other table
+    in the same service. Such cases may cause the ineligible coincidences
+    between the different keys and elements.
+
 
 ## List of system tables
 
