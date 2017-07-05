@@ -76,23 +76,9 @@ fashion. There are 2 serialization formats:
     they implement serialization internally in order to sign transactions
     and calculate their hashes.
 
-Fields used in transaction serialization are listed below.
-
-| Field              | Binary format     | Binary offset | JSON       |
-|--------------------|:-----------------:|--------------:|:----------:|
-| `network_id`       | `u8`              | 0             | number     |
-| `protocol_version` | `u8`              | 1             | number     |
-| `service_id`       | `u16`             | 4..6          | number     |
-| `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `u32`             | 6..10         | -          |
-| `body`             | `&[u8]`           | 10..-64       | object     |
-| `signature`        | Ed25519 signature | -64..         | hex string |
-
-!!! tip
-    For the binary format, the table uses the type notation taken
-    from [Rust][rust]. Offsets also correspond to [the slicing syntax][rust-slice],
-    with the exception that Rust does not support negative offsets,
-    which denote an offset relative to the end of the byte buffer.
+Fields used in serializing transactions are the same as for [serializing
+messages in general](serialization.md#message-serialization). The specificity of
+transaction serialization is the structure of the [`body` field](#transaction-body).
 
 !!! note
     Each unique transaction message serialization is hashed with
@@ -103,52 +89,14 @@ Fields used in transaction serialization are listed below.
     (e.g., when determining whether a specific transaction has been committed
     previously).
 
-### Network ID
+!!! tip
+    It is recommended for transaction signing to be decentralized in order
+    to minimize security risks. Roughly speaking, there should not be a single
+    server signing all transactions in the system; this could create a security
+    chokepoint. One of options to decentralize signing is to use
+    the [light client library](https://github.com/exonum/exonum-client).
 
-This field will be used to send inter-blockchain messages in the future
-releases. Not used currently.
-
-**Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number.
-
-### Protocol Version
-
-The major version of the Exonum serialization protocol. Currently, `0`.
-
-**Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number.
-
-### Service ID
-
-Sets the [service](services.md) that a transaction belongs to.
-The pair `(service_id, message_id)` is
-used to look up the implementation of [the transaction interface](#interface)
-(e.g., `verify` and `execute` methods).
-
-**Binary presentation:** `u16` (unsigned 2-byte integer).  
-**JSON presentation:** number.
-
-### Message ID
-
-`message_id` defines the type of message within the service.
-
-!!! note "Example"
-    [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `TxIssue` for coins issuance
-    and `TxTransfer` for coin transfer.
-
-**Binary presentation:** `u16` (unsigned 2-byte integer).  
-**JSON presentation:** number.
-
-### Payload length
-
-The length of the message body after the header. Does not include the
-signature length.
-
-**Binary presentation:** `u32` (unsigned 4-byte integer).  
-**JSON presentation:** (not serialized).
-
-### Body
+### Transaction Body
 
 The body of the transaction, which includes data specific for a given
 transaction type. Format of the body is specified by the
@@ -178,22 +126,6 @@ according to the transaction specification in the service.
 
 **Binary presentation:** binary sequence with `payload_length` bytes.  
 **JSON presentation:** JSON.
-
-### Signature
-
-[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
-serialization of the message (excluding the signature bytes,
-i.e., the last 64 bytes of the serialization).
-
-!!! tip
-    It is recommended for transaction signing to be decentralized in order
-    to minimize security risks. Roughly speaking, there should not be a single
-    server signing all transactions in the system; this could create a security
-    chokepoint. One of options to decentralize signing is to use
-    the [light client library](https://github.com/exonum/exonum-client).
-
-**Binary presentation:** Ed25519 signature (64 bytes).  
-**JSON presentation:** hex string.
 
 ## Interface
 
@@ -436,8 +368,6 @@ on the verify step.
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
-[rust]: http://rust-lang.org/
-[rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying
