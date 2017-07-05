@@ -298,9 +298,9 @@ operations: put a value by key, or delete a value by key.
 
 ### Snapshots
 
-The [snapshot][snapshot] interface represents a read API to the storage.
-It may be based not on the storage itself, but, for example, on the
-other snapshot. Every table is created over a snapshot instance.
+The [snapshot][snapshot] fixes the storage state on the moment of
+creation and provides a read-only API to it. Even if the storage state
+is updated, the snapshot still refers to the old table content.
 
 ### Forks
 
