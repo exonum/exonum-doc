@@ -269,38 +269,17 @@ All slices are var-length datatypes.
 
 ## Message Serialization
 
-<<<<<<< HEAD
 A message is a [digitally signed](../glossary.md#digital-signature) piece of data
 transmitted through an Exonum network. There are 2 major kinds of messages:
 
-- **Consensus messages** are used among full
+- [Consensus messages](../glossary.md#consensus-message) are used among full
   nodes in the course of [the consensus algorithm](../glossary.md#consensus)
-- **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
+- [Transactions](../glossary.md#transaction) are used to invoke [blockchain state](../glossary.md#blockchain-state)
   changes and usually come from [external clients](../glossary.md#light-client)
 
 The message serialization consists of 3 main parts: header (includes `network_id`,
 `protocol_version`, `service_id`, `message_id`, and `payload_length` fields),
 body, and signature.
-
-Fields used in message serialization are listed below.
-
-| Field              | Binary format     | Binary offset | JSON       |
-|--------------------|:-----------------:|--------------:|:----------:|
-| `network_id`       | `u8`              | 0             | number     |
-| `protocol_version` | `u8`              | 1             | number     |
-| `service_id`       | `u16`             | 4..6          | number     |
-| `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `u32`             | 6..10         | -          |
-| `body`             | `&[u8]`           | 10..-64       | object     |
-| `signature`        | Ed25519 signature | -64..         | hex string |
-
-!!! tip
-    For the binary format, the table uses the type notation taken
-    from [Rust][rust]. Offsets also correspond to [the slicing syntax][rust-slice],
-    with the exception that Rust does not support negative offsets,
-    which denote an offset relative to the end of the byte buffer.
-
-### Network ID
 
 =======
 Fields used in message serialization are listed below.
@@ -376,12 +355,36 @@ signature length.
 ### Body
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Serialized [structure](#structures) (including its header and body) described on
 `message!` macro call.
 =======
 Serialized structure (with its header and body) described on `message!` macro
 call.
 >>>>>>> 43e3c5f... move message serialization from transactions to serialization
+=======
+Serialized [structure](#structures) (including its header and body) described on
+`message!` macro call.
+
+#### Example of `message!` Usage
+
+```Rust
+const MY_SERVICE_ID: u16 = 777;
+const MY_NEW_MESSAGE_ID: u16 = 1;
+
+message! {
+    struct SendTwoInteger {
+        const SIZE = 16;
+
+        field first: u64 [0 => 8]
+        field second: u64 [8 => 16]
+    }
+}
+```
+
+Here the message body is serialized as a `struct` with fields `first` and `second`
+of type `u64`.
+>>>>>>> 230e88d... apply review notes
 
 ### Signature
 
