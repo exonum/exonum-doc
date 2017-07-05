@@ -306,7 +306,7 @@ database state.
 Forks are used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
 decides which transactions should be applied to the data and which
-should not. If one of the transactions falls with error during
+should not. If one of the transactions falls with `panic` during
 validation, its changes are promptly reverted.
 
 During the block execution, fork allows to create the [list of
