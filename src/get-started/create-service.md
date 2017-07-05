@@ -4,9 +4,12 @@ This section explains how to create a safe transactional system to transfer
 money. It implements a minimal cryptocurrency.
 
 In this demo we create and run single-node blockchain network. That network
-will accept three types of transactions: create a wallet, issue money for
-a wallet, transfer money between the wallets. Also we define a persistent
-storage to keep the balance of wallets.
+will accept two types of transactions: create a wallet with a default balance,
+transfer money between the wallets. Also we define a persistent storage to keep
+the balance of wallets.
+
+The full source code of this example you can download
+[here](https://github.com/exonum/minibank).
 
 ## Create the single node
 
@@ -17,14 +20,14 @@ compiler to build this demo. If you haven't one, install it from
 Let's create minimal crate with `exonum-core` dependency.
 
 ```sh
-cargo new --bin cryptocurrency
+cargo new --bin minibank
 ```
 
 Add to your `Cargo.toml` `exonum-core` dependency.
 
 ```toml
 [package]
-name = "cryptocurrency"
+name = "minibank"
 version = "0.1.0"
 authors = ["Your Name <your@email.com>"]
 
@@ -222,15 +225,14 @@ with a new one.
 
 Transaction is a kind of message which performs actions with a blockchain.
 
-For our cryptocurrency demonstration we need three transaction types:
+For our cryptocurrency demonstration we need two transaction types:
 
-1. Create a new wallet
-2. Add some money to the wallet
-3. Transfer money between two different wallets
+1. Create a new wallet and add some money to it
+2. Transfer money between two different wallets
 
 Declaration of any transaction have to contain:
 
-1. Type of transaction (a service identifier)
+1. Service identifier
 2. Unique identifier of message
 2. Size of fixed size of the message
 
@@ -257,35 +259,10 @@ message! {
 
 ```
 
-Message is used for insreasing the balance of the wallet has to contain public
-key of the wallet and amount of money to add:
-
-> You can add money to the wallet, because we made this to simplify the example.
-In real-world app you shouldn't do that.
-
-The field `seed` contains random number to make every transaction unique.
-You can read more in the [Transaction artice](../../architecture/transactions.md).
-
-```rust
-pub const TX_ISSUE_ID: u16 = 2;
-
-message! {
-    struct TxIssue {
-        const TYPE = SERVICE_ID;
-        const ID = TX_ISSUE_ID;
-        const SIZE = 48;
-
-        field pub_key:     &PublicKey  [00 => 32]
-        field amount:      u64         [32 => 40]
-        field seed:        u64         [40 => 48]
-    }
-}
-```
-
 Transaction to transfer money between different wallets:
 
 ```rust
-pub const TX_TRANSFER_ID: u16 = 3;
+pub const TX_TRANSFER_ID: u16 = 2;
 
 message! {
     struct TxTransfer {
@@ -331,32 +308,16 @@ impl Transaction for TxCreateWallet {
     fn execute(&self, view: &mut Fork) {
         let mut schema = CurrencySchema { view };
         if let None = schema.wallet(self.pub_key()) {
-            let wallet = Wallet::new(self.pub_key(), self.name(), 0);
+            let wallet = Wallet::new(self.pub_key(), self.name(), 100);
             schema.wallets().put(self.pub_key(), wallet)
         }
     }
 }
 ```
 
-`TxIssue` transaction finds the wallet, adds `amount` of money and puts the
-changed wallet back into the storage. Storage will be updated when block
-applied:
-
-```rust
-impl Transaction for TxIssue {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.pub_key())
-    }
-
-    fn execute(&self, view: &mut Fork) {
-        let mut schema = CurrencySchema { view };
-        if let Some(mut wallet) = schema.wallet(self.pub_key()) {
-            wallet.increase(self.amount());
-            schema.wallets().put(self.pub_key(), wallet)
-        }
-    }
-}
-```
+This transaction also adds `100` to the balance of wallet. In case of
+demonstration we don't add transaction to change this balance directly. But
+the balance could be changed with a transfer transactions.
 
 `TxTransfer` transaction finds two wallets for both sides of a transfer
 transaction. If they have been found it checks the balance of the sender and if
@@ -426,7 +387,6 @@ impl Service for CurrencyService {
        -> Result<Box<Transaction>, encoding::Error> {
         let trans: Box<Transaction> = match raw.message_type() {
             TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
-            TX_ISSUE_ID => Box::new(TxIssue::from_raw(raw)?),
             TX_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
             _ => {
                 return Err(encoding::Error::IncorrectMessageType {
@@ -475,7 +435,6 @@ For responses we will return the `Hash` of a transaction.
 #[derive(Clone, Serialize, Deserialize)]
 enum TransactionRequest {
     CreateWallet(TxCreateWallet),
-    Issue(TxIssue),
     Transfer(TxTransfer),
 }
 
@@ -483,7 +442,6 @@ impl Into<Box<Transaction>> for TransactionRequest {
     fn into(self) -> Box<Transaction> {
         match self {
             TransactionRequest::CreateWallet(trans) => Box::new(trans),
-            TransactionRequest::Issue(trans) => Box::new(trans),
             TransactionRequest::Transfer(trans) => Box::new(trans),
         }
     }
