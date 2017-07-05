@@ -166,10 +166,9 @@ It is supposed to return cryptographic hash, specifically, SHA-256 hash.
 
 [`KeySetIndex`][key-set-index] implements a set. Any unique value can be
 stored just once. It wraps `BaseIndex`; the stored elements are inserted
-to the `BaseIndex` storage as `(key: item, value: null)`. While
-`ValueSetIndex` uses a hash as a key (which may coincide for different
-objects), the `KeySetIndex` put an entire binary object's serialization
-into a key.
+to the `BaseIndex` storage as `(key: item, value: null)`. As the keys
+are ordered in the underlying storage engine, `KeySetIndex` provides a
+sorting over stored items.
 
 The following procedures are implemented:
 
@@ -178,8 +177,24 @@ The following procedures are implemented:
 - `iter_from(from: &K): Iter<K>` iterates through the stored items,
   starting from the `from` value.
 - `insert(item: K)` adds the item to the set.
-- `remove(item: &K)` removes the item if exists. Otherwise, the error is returned.
+- `remove(item: &K)` removes the item if exists. Otherwise, the error is
+returned.
 - `clear()` removes all the items stored in the set.
+
+### KeySetIndex vs ValueSetIndex
+
+While `ValueSetIndex` uses a hash as a key, the `KeySetIndex` put an
+entire binary object's serialization into a key.
+
+- The `KeySetIndex` do not have an additional overhead on hashing each
+  incoming object;
+- The `KeySetIndex` may not be used when the items are relatively big;
+  only small objects can be stored (such as integers, small strings, small
+  tuples, and other). In contrary, the `ValueSetIndex` more easily handles
+  with storing big and complex objects.
+- The `KeySetIndex` introduces a lexicographical order over stored
+  items, while the `ValueSetIndex` order elements arbitrary due to hash
+  properties.
 
 ### Merklized indexes
 
