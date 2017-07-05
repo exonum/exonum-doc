@@ -269,6 +269,18 @@ All slices are var-length datatypes.
 
 ## Message Serialization
 
+A message is a [digitally signed](../glossary.md#digital-signature) piece of data
+transmitted through an Exonum network. There are 2 major kinds of messages:
+
+- [Consensus messages](../glossary.md#consensus-message) are used among full
+  nodes in the course of [the consensus algorithm](../glossary.md#consensus)
+- [Transactions](../glossary.md#transaction) are used to invoke [blockchain state](../glossary.md#blockchain-state)
+  changes and usually come from [external clients](../glossary.md#light-client)
+
+The message serialization consists of 3 main parts: header (includes `network_id`,
+`protocol_version`, `service_id`, `message_id`, and `payload_length` fields),
+body, and signature.
+
 Fields used in message serialization are listed below.
 
 | Field              | Binary format     | Binary offset | JSON       |
@@ -335,8 +347,27 @@ signature length.
 
 ### Body
 
-Serialized structure (with its header and body) described on `message!` macro
-call.
+Serialized [structure](#structures) (including its header and body) described on
+`message!` macro call.
+
+#### Example of `message!` Usage
+
+```Rust
+const MY_SERVICE_ID: u16 = 777;
+const MY_NEW_MESSAGE_ID: u16 = 1;
+
+message! {
+    struct SendTwoInteger {
+        const SIZE = 16;
+
+        field first: u64 [0 => 8]
+        field second: u64 [8 => 16]
+    }
+}
+```
+
+Here the message body is serialized as a `struct` with fields `first` and `second`
+of type `u64`.
 
 ### Signature
 
