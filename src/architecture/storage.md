@@ -25,6 +25,11 @@ Storage architecture can be overlooked from different points.
 
 ## Exonum table types
 
+As Exonum blockchain actually is a data storage for the application,
+Tables (also named `Indexes`) are introduced. They perform the same role
+as in usual RDBMS: every table stores the records of fixed type.
+However, all Exonum tables actually are a Key-Value storages.
+
 Multiple table types may be used in the Exonum applications.
 
 In the table descriptions the following parameters types are used:
