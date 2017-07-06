@@ -210,7 +210,7 @@ minimal storage overhead.
 ### Table Types
 
 Exonum supports several types of data tables, representing typed collections
-(lists and maps):
+(lists, sets and maps):
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
@@ -230,9 +230,21 @@ Exonum supports several types of data tables, representing typed collections
     - Key for the left child node
     - Key for the right child node
 
+- `ValueSetIndex` and `KeySetIndex` both implement sets, and both reduce them to
+  maps (as it is commonly done in programming languages). `ValueSetIndex`
+  maps hashes of the set items to the items themselves,
+  while `KeySetIndex` maps set items to `null`.
+  Thus, `KeySetIndex` is preferable when set items have relatively
+  short serialization and need to be iterated in a deterministic order.
+  `ValueSetIndex` is a better match for complex items or items that needs to
+  be looked up by a hash.
+
 Both `ListIndex` and `ProofListIndex` support updating by index and
-appending only; `MapIndex` and `ProofMapIndex` allow inserting,
-updating or deleting key-value pairs.
+appending only. `MapIndex` and `ProofMapIndex` allow inserting,
+updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex` support
+adding and removing elements from the set. Finally, all collections support
+iterations over items (or keys, values, and key-value pairs in the case of
+maps).
 
 ### Proofs
 
