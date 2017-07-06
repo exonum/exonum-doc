@@ -1,9 +1,10 @@
 # Exonum Data Model
 
-This page describes how Exonum stores different data, from the lowest
+This page describes how Exonum persists data, from the lowest
 (LevelDB) to the high abstract layers that are used in the client
-applications. Storage architecture can be overlooked from different
-points.
+applications.
+
+Storage architecture can be overlooked from different points.
 
 1. [Exonum table types](#exonum-table-types) lists supported types for
   data storage. These tables represent the highest level at the data
@@ -14,7 +15,7 @@ points.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
   discarded.
-4. [Table identifiers convention](#table-identifiers-convention) elaborates how
+4. [Table identifiers](#table-identifiers) elaborates how
   user tables are identified, and shows how the Exonum tables are
   matched into LevelDB.
 5. [List of system tables](#list-of-system-tables) describes what tables
@@ -41,12 +42,13 @@ In the table descriptions the following parameters types are used:
 - `MapProof`: a custom class representing nodes from  `ProofMapIndex`
   proof trees.
 
-!!! note "Keys sorting"
-    The tables implement iterators over keys and/or stored items. Such
-    iterators uses a ordering by key to define next returned element. The
-    way keys are sorted depends on the selected low-level database engine;
-    Exonum uses a [LevelDB](#low-level-storage) wher the keys are ordered
-    lexicographically.
+### Keys sorting
+
+The tables implement iterators over keys and/or stored items. Such
+iterators uses a ordering by key to define next returned element. The
+way keys are sorted depends on the selected low-level database engine;
+Exonum uses a [LevelDB](#low-level-storage) where the keys are ordered
+lexicographically over binary sequences.
 
 ### BaseIndex
 
@@ -167,8 +169,8 @@ It is supposed to return cryptographic hash, specifically, SHA-256 hash.
 [`KeySetIndex`][key-set-index] implements a set. Any unique value can be
 stored just once. It wraps `BaseIndex`; the stored elements are inserted
 to the `BaseIndex` storage as `(key: item, value: null)`. As the keys
-are ordered in the underlying storage engine, `KeySetIndex` provides a
-sorting over stored items.
+are ordered in the underlying storage engine, `KeySetIndex` iterates
+over set items in the sorting order.
 
 The following procedures are implemented:
 
@@ -187,10 +189,10 @@ While `ValueSetIndex` uses a hash as a key, the `KeySetIndex` put an
 entire binary object's serialization into a key.
 
 - The `KeySetIndex` do not have an additional overhead on hashing each
-  incoming object;
-- The `KeySetIndex` may not be used when the items are relatively big;
+  incoming object.
+- The `KeySetIndex` may not be used when the items are relatively big.
   only small objects can be stored (such as integers, small strings, small
-  tuples, and other). In contrary, the `ValueSetIndex` more easily handles
+  tuples). In contrary, the `ValueSetIndex` more easily handles
   with storing big and complex objects.
 - The `KeySetIndex` introduces a lexicographical order over stored
   items, while the `ValueSetIndex` order elements arbitrary due to hash
@@ -217,7 +219,7 @@ implemented:
 
 - `height(): u8` returns the height of the tree. As the tree is balanced
   (though may be not fully filled), the height is near to `log2(list
-  length)`
+  length)`.
 - `root_hash(): Hash` returns the value of root element (that contains
   the hash of root node's children).
 - `get_proof(index: u64): ListProof` builds a proof tree for data value
@@ -278,8 +280,8 @@ Also [RocksDB][rocks-db] support is [planned](../roadmap.md).
 
 ## View layer
 
-Exonum introduces additional layer over database to handle with
-unapplied changes. That layer consist of multiple classes.
+Exonum introduces additional layer over database to handle transaction 
+and block atomicity.
 
 ### Patches
 
@@ -301,7 +303,7 @@ additional changes. Every fork is basen on the storage snapshot. From
 the outer point of view, the changes are already applied to the data
 storage; however, these changes are stored directly in the fork and may
 be easily rolled back. Moreover, there may be different forks of
-database state.
+the same database snapshot.
 
 Forks are used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
@@ -313,7 +315,7 @@ During the block execution, fork allows to create the [list of
 changes](#patches) and, if all changes are accurate, apply it to the
 data storage atomically.
 
-## Table identifiers convention
+## Table identifiers
 
 Exonum tables are divided into two groups.
 
@@ -332,9 +334,10 @@ are saved into one big LevelDB map, wherein the keys are represented as
 bytes sequence, and values are serialized objects, in fact, byte
 sequences too.
 
-Every table is uniquely identified by the complex prefix. Such prefix is
-added to the every key of the specific table, thus allows to distinguish
-values from different tables.
+Every table is uniquely identified by the complex prefix used when
+mapping table keys into keys of the underlying low-level storage. The
+keys are prepended with this prefix which is unique to each table, thus
+allows to distinguish values from different tables.
 
 The prefix consist of service ID and internal identifier inside the
 service. As well as tables represent just a handy API for access to data
@@ -343,16 +346,17 @@ are saved in leveldb storage), all tables created with the same prefix
 will share the data.
 
 Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
-0x00` ID is reserved to the Core. Tables inside services are named
-with a integers and an optional suffixes.
+0x00` ID is reserved to the Core. Tables inside services are identified
+with a `u8` integers and an optional suffixes.
 
 Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in
 ASCII) for the `0x00 0x01` service matches with the following key in the
 LevelDB map:
 
-`0x00 0x01 | 0x03 } 0x42 0x54 0x43 | key`
+`0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key`
 
-Here, `|` stands for bytes sequences concatenation.
+Here, `|` separates logical components of the low-level key, which is a
+concatenation of its parts.
 
 It is advised to use a `gen_prefix(service_id, table_id, table_suffix)`
 for creating table prefixes. Example of such prefixes generation can be found
@@ -372,26 +376,26 @@ These tables are created [here][blockchain-schema]
 
 There are the following system tables:
 
-- `transactions`, `MapIndex`.
+- `transactions`, `MapIndex`.  
   Represents a map from transaction hash into raw transaction structure
-- `tx_location_by_hash`, `MapIndex`.
+- `tx_location_by_hash`, `MapIndex`.  
   Keeps the block height and tx position inside block for every
   transaction hash.
-- `blocks`, `MapIndex`.
+- `blocks`, `MapIndex`.  
   Stores block object for every block height.
-- `block_hashes_by_height`, `ListIndex`.
+- `block_hashes_by_height`, `ListIndex`.  
   Saves a block hash that has the requested height.
-- `block_txs`, `ProofListIndex`.
+- `block_txs`, `ProofListIndex`.  
   The set of tables with different `block_height`. Every table keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`.
+- `precommits`, `ListIndex`.  
   The set of tables with different `block_hash`. Stores the list of
   validators' precommits for the specific block.
-- `configs`, `ProofMapIndex`.
+- `configs`, `ProofMapIndex`.  
   Stores the actual configuration in the JSON format for block heights.
-- `configs_actual_from`, `ListIndex`.
+- `configs_actual_from`, `ListIndex`.  
   Builds an index to get config starting height quickly.
-- `state_hash_aggregator`, `ProofMapIndex`.
+- `state_hash_aggregator`, `ProofMapIndex`.  
   The table is used to calculate the final state hash based on the
   aggregate hashes of other tables.
 
@@ -408,8 +412,9 @@ transaction was approved. In the Exonum, we create a
 ## Genesis block
 
 At the node start, services should initialize its tables. It should be
-done during Genesis block creation. To set up its data tables, service
-should handle `genesis_block` [event][genesis-block-creation].
+done during `Genesis block creation` procedure. To set up its data
+tables, service should handle `genesis_block`
+[event][genesis-block-creation].
 
 !!! note Notice
     Genesis Block creation procedure is called every time Exonum
