@@ -333,12 +333,7 @@ used to look up the implementation of [the transaction interface](transactions.m
 
 !!! note "Example"
     [The sample cryptocurrency service][cryptocurrency] includes 2 main
-<<<<<<< HEAD
-    types of transactions: `TxCreateWallet` for creating a wallet with an initial
-    coins balance,
-=======
     types of transactions: `TxIssue` for coins issuance
->>>>>>> 43e3c5f... move message serialization from transactions to serialization
     and `TxTransfer` for coin transfer.
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
@@ -354,14 +349,8 @@ signature length.
 
 ### Body
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-Serialized [structure](#structures) (including its header and body) described on
-`message!` macro call.
-=======
 Serialized structure (with its header and body) described on `message!` macro
 call.
->>>>>>> 43e3c5f... move message serialization from transactions to serialization
 =======
 Serialized [structure](#structures) (including its header and body) described on
 `message!` macro call.
@@ -382,7 +371,7 @@ const MY_SERVICE_ID: u16 = 777;
 const MY_NEW_MESSAGE_ID: u16 = 1;
 
 message! {
-    struct SendTwoInteger {
+    struct MessageTwoIntegers {
         const TYPE = MY_NEW_MESSAGE_ID;
         const ID   = MY_SERVICE_ID;
         const SIZE = 16;
@@ -394,8 +383,7 @@ message! {
 ```
 
 Here the message body is serialized as a `struct` with fields `first` and `second`
-of type `u64`.
->>>>>>> 230e88d... apply review notes
+having type `u64`.
 
 ## Types to Be Supported in Future
 
