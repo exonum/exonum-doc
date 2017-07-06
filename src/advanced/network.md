@@ -7,17 +7,16 @@ connected via peer-to-peer connections, and [_light clients_](../glossary.md#lig
 
 ### Full Nodes
 
-**Full nodes** replicate the entire contents of the blockchain and correspond to
-replicas in distributed databases. All the full nodes are authenticated with
-[public-key cryptography](../glossary.md#digital-signature). Full nodes are
-further subdivided into 2 categories:
+**Full nodes** store the entire contents of the blockchain. All the full nodes
+are authenticated with [public-key cryptography](../glossary.md#digital-signature).
+Full nodes are further subdivided into 2 categories:
 
 - [**Auditors**](../glossary.md#auditor) replicate the entire contents of the
   blockchain. They can generate new transactions, but cannot choose which
   transactions should be committed (i.e., cannot generate new blocks)
-- [**Validators**](../glossary.md#validator) provide the network liveness. Only
-  validators can generate new blocks by using a [Byzantine fault](../glossary.md#byzantine-node)
-  tolerant consensus algorithm. Validators receive transactions, verify them,
+- [**Validators**](../glossary.md#validator) exchange consensus messages with
+  each other to reach consensus and add new block into the blockchain.
+  Validators receive transactions, verify them,
   and include into a new block. The list of the validators is restricted by
   network maintainers, and normally should consist of 4–15 nodes
 
@@ -34,17 +33,15 @@ based on cryptographic commitments via Merkle / Merkle Patricia
 trees. This mechanism allows verifying that a response from the full node
 has been really authorized by supermajority of validators.
 
-## Communication among Nodes
+## Peer-to-peer Full Node Network
 
 The nodes communicate with each other via TCP/IP.
 
 Messages in the own [Exonum binary serialization format](../glossary.md#binary-serialization)
 are sent over TCP to communicate among the full nodes.
 
-Light clients use [JSON Serialization](../glossary.md#json-serialization)
-to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
-Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
-HTTP API.
+Auditor nodes do not receive consensus messages (`Propose`, `Prevote`,
+`Precommit`).
 
 ### Network Events Processing
 
@@ -99,3 +96,16 @@ An initial list of IP addresses node obtain from the [local configuration](../gl
 (parameter `listen_address`) on the node start up. If some node changes its IP
 address, then through peer discovery mechanism new address becomes known to all
 other nodes in some time.
+
+## Communication with Light Clients
+
+Light clients use [JSON Serialization](../glossary.md#json-serialization)
+to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
+Transactions from the light clients are authenticated with the help of signatures
+within the JSON serialization, while read requests are not authenticated.
+
+Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
+HTTP API. Addresses for public and private API endpoints are specified in the
+[`node.api`](../architecture/configuration.md#nodeapi) section of the local
+configuration. Full nodes receive transactions from the light clients via POST
+requests, and the light clients get info from the full nodes via GET requests.
