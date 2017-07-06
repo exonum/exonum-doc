@@ -107,3 +107,9 @@ HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration. Full nodes receive transactions from the light clients via POST
 requests, and the light clients get info from the full nodes via GET requests.
+
+### API Endpoints
+
+Endpoints for a particular service are defined via
+[public_api_handler and private_api_handler hooks](../architecture/services.md#rest-api-initialization)
+and are [prefixed with /api/services/{service_name}](../architecture/services.md#service-identifiers).
