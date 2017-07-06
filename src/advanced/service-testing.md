@@ -35,6 +35,38 @@ Following parts of the consensus algorithm are tested:
     See [source code](https://github.com/exonum/exonum-core/blob/master/sandbox/tests/consensus.rs)
     for more details how sandbox is used for testing the consensus algorithm.
 
+Functions for consensus algorithm testing:
+
+- `timestamping_sandbox`  
+  Creates sandbox with `TimestampingService` and `ConfigUpdateService`
+
+- `recv`  
+  Simulate receiving message by the node
+
+- `send`  
+  Check if the node sent message
+
+- `broadcast`  
+  Checks if the node broadcasted message
+
+Code example:
+
+```Rust
+// Check for `Connect` message exchange
+
+#[test]
+fn test_sandbox_recv_and_send() {
+    let s = timestamping_sandbox();
+    let (public, secret) = gen_keypair();
+
+    // Simulate receiving Connect message by the node
+    s.recv(Connect::new(&public, s.a(2), s.time(), &secret));
+
+    // Check if the node sent Connect message
+    s.send(s.a(2), Connect::new(&s.p(0), s.a(0), s.time(), s.s(0)));
+}
+```
+
 ## Service Test Examples
 
 !!! tip
@@ -45,6 +77,14 @@ Following parts of the consensus algorithm are tested:
 !!! tip
     See [anchoring service source code](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests)
     for more details how sandbox is used for testing [the anchoring service](bitcoin-anchoring.md).
+
+To test some set of services, one can pass services list to sandbox constructor:
+
+```Rust
+let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
+                                   Box::new(ConfigUpdateService::new())])
+
+```
 
 ## Service Endpoints Test Examples
 
