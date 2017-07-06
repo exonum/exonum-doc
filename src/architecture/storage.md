@@ -59,24 +59,12 @@ lexicographically over binary sequences.
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
 table types inherit from it directly. In the matter, `BaseIndex`
-implements a map interface:
+[implements][base-procedures] a map interface:
 
-- `get(key: &K): V` receives a value by key. If key is not found, error
-  is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the
-  table.
-- `iter(subprefix: &K): Iter<(K,V)>` returns an iterator through the
-  key-value pairs, where keys starts with `subprefix`. **TODO: what is
-  subprefix for? why is it not enough `self.prefix`?**
-- `iter_from(subprefix: &K, from: &K): Iter<(K,V)>` iterates through the
-  key-values pairs, starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is
-  already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not
-  found, error is returned.
-- `clear()` deletes all the key-value pairs referring to the
-  `self.prefix` table. **TODO: may be `new` proc should be also described
-  here, otherwise `self.prefix` is unclear**
+- get, set and remove value by key
+- check if the specific key presents
+- iterate over the key-value pairs
+- clear the table (removing all stored values)
 
 !!! warning
     It should not be used directly; the better approach is to use other
@@ -88,52 +76,29 @@ implements a map interface:
 [`MapIndex`][map-index] is implementation of Key-Value storage. It wraps
 around the `BaseIndex` field.
 
-The following actions are supported:
+It creates a usable Map, which [extends][map-procedures] the Base functionality:
 
-- `get(key: &K): V` receives a value by key. If key is not found, error
-  is returned.
-- `contains(key: &K): bool` checks if the specific key presents in the
-  table.
-- `iter(): Iter<(K,V)>` returns an iterator through the key-value pairs.
-- `iter_from(from: &K): Iter<(K,V)>` iterates through the key-values pairs,
-  starting from `from` key.
-- `put(key: &K, value: V)` inserts new value by key. If such key is
-  already exists, old value is overwritten with new one.
-- `remove(key: &K)` removes appropriate key-value pair. If key is not
-  found, error is returned.
-- `clear()` deletes all the records stored in this table.
-- `keys(): Iter<K>` returns an iterator through table keys.
-- `keys_from(from: &K): I<K>` iterates through table keys, starting from
-  `from` key.
-- `values(): Iter<V>` returns an iterator through table values.
-- `values_from(from: &K): Iter<V>` iterates through table values,
-  starting from `from` key.
+- get, set and remove value by key
+- check if the specific key presents
+- iterate over the key-value pairs
+- iterate only over keys
+- iterate only over values
+- clear the table (removing all stored values)
 
 ### ListIndex
 
 [`ListIndex`][list-index] represesnts an array list. It wraps around the
 `BaseIndex` field.
 
-The following actions are supported:
+The following actions are [supported][list-procedures]:
 
-- `get( index: u64): V` returns a value already saved in the list. If
-  index is bigger then the list size, error is returned.
-- `iter(): Iter<(u64,V)>` returns an iterator through the index-value pairs.
-- `iter_from(from: u64): Iter<(u64,V)>` iterates through the index-values
-  pairs, starting from `from` position.
-- `clear()` deletes all the records stored in this table.
-- `last(): V` returns the latest value in the list.
-- `is_empty(): bool` returns `true` if the table has no values; else,
-  `false`.
-- `len(): u64` returns the number of elements stored in the list.
-- `push(value: V)` adds new value to the end of the list.
-- `pop(): V` returns the value from the end of the list; returned
-  element is deleted from table. The length of the list decreases on 1.
-- `extend(iter: Iter)` appends values from the iterator to the list
-  one-by-one.
-- `truncate(len: u64)` deletes all the elements starting from `len`
-  position. Only `len` elements are saved.
-- `set(index: u64, value: V)` updates a value already saved in the list.
+- get and set an item by index. No removing by index allowed
+- append list, pop the last item (with or without removal)
+- get the list length, check if the list is empty
+- iterate over key-value pairs
+- insert the sequence of values from other iterator
+- truncate the list to the specific length
+- clear the table (removing all stored values)
 
 List value does not support inserting in the middle (although it
 is still possible to do manually).
@@ -146,25 +111,13 @@ zero-length tuple `&()` as a key.
 
 [`ValueSetIndex`][value-set-index] implements a hashmap, storing the
 element using its hash as a key. It wraps around the `BaseIndex` field.
-The following procedures are implemented:
+The following procedures are [implemented][valueset-procedures]:
 
-- `contains(item: &V): bool` checks if the specific item presents in the
-  table.
-- `contains_by_hash(hash: &Hash): bool` checks if there is an item with
-  specific hash.
-- `iter(): Iter<V>` returns an iterator through the stored items.
-- `iter_from(from: &Hash): Iter<V>` iterates through the stored items,
-  starting from the value with `from` hash.
-- `hashes(): Iter<Hash>` returns an iterator through the hashes of stored
-  items.
-- `hashes_from(from: &Hash): Iter<Hash>` iterates through the hashes of
-  stored items, starting from `from` position.
-- `insert(item: V)` adds the item to the hashmap.
-- `remove(item: &V)` removes the item if exists. Otherwise, the error is
-  returned.
-- `remove_by_hash(hash: &Hash)` removes the item with specified hash, if
-  such one exists. Otherwise, the error is returned.
-- `clear()` removes all the items stored in the hashmap.
+- add and remove values
+- check if value already presents - using value itself, or just its hash
+- iterate over stored values
+- iterate over hashes of stored values
+- clear the table (removing all stored values)
 
 The used hash is calculated as `hash()` method of `StorageValue` trait.
 It is supposed to return cryptographic hash, specifically, SHA-256 hash.
@@ -177,23 +130,19 @@ to the `BaseIndex` storage as `(key: item, value: null)`. As the keys
 are ordered in the underlying storage engine, `KeySetIndex` iterates
 over set items in the sorting order.
 
-The following procedures are implemented:
+The following procedures are [implemented][keyset-procedures]:
 
-- `contains(item: &K)` checks if the specified item presents in the set.
-- `iter(): Iter<K>` returns an iterator through the stored items.
-- `iter_from(from: &K): Iter<K>` iterates through the stored items,
-  starting from the `from` value.
-- `insert(item: K)` adds the item to the set.
-- `remove(item: &K)` removes the item if exists. Otherwise, the error is
-returned.
-- `clear()` removes all the items stored in the set.
+- add and remove items
+- check if the specific item presents in the table
+- iterate over items
+- clear the table (removing all stored values)
 
 ### KeySetIndex vs ValueSetIndex
 
 While `ValueSetIndex` uses a hash as a key, the `KeySetIndex` put an
 entire binary object's serialization into a key.
 
-- The `KeySetIndex` do not have an additional overhead on hashing each
+- The `KeySetIndex` does not have an additional overhead on hashing each
   incoming object.
 - The `KeySetIndex` may not be used when the items are relatively big.
   only small objects can be stored (such as integers, small strings, small
@@ -220,19 +169,16 @@ the data itself; inner nodes values are calculated as
 `hash(concatenate(left_child_value, right_child_value)`. You may read
 more detailed specification at [Merkle
 Trees](../advanced/merkle-index.md). The following additional procedures are
-implemented:
+[implemented][prooflist-procedures]:
 
-- `height(): u8` returns the height of the tree. As the tree is balanced
-  (though may be not fully filled), the height is near to `log2(list
-  length)`.
-- `root_hash(): Hash` returns the value of root element (that contains
-  the hash of root node's children).
-- `get_proof(index: u64): ListProof` builds a proof tree for data value
-  at `index` position. The tree consists of [`ListProof`][list-proof]
-  objects.
-- `get_range_proof(from: u64, to: u64): ListProof` builds a proof tree
-  for data values at indices since `from` until `to - 1` inclusively.
-  The tree consists of [`ListProof`][list-proof] objects.
+- get the height of the tree. As the tree is balanced (though may be not
+  fully filled), the height is near to `log2(list length)`
+- get the value of root element (that contains the hash of root node's
+  children)
+- build a proof tree for data value at `index` position, consisting of
+  [`ListProof`][list-proof] objects
+- build a proof tree for data values at specific index range, consisting
+of [`ListProof`][list-proof] objects
 
 When thin client asks Exonum full-node about some data, the proof is
 built and sent along with the actual data values. Having block headers
@@ -251,13 +197,13 @@ based on Merkle Patricia Tree. It implements the same methods as the
 key-value pairs, or proofs of absense if requested key do not exist in
 this table. For a more detailed description, see [Merkle Patricia
 Trees](../advanced/merkle-patricia-index.md). The following additional
-procedures are supported:
+procedures are [supported][proofmap-procedures]:
 
-- `root_hash(): Hash` returns the root node's value.
-- `get_proof(key: K): MapProof` builds a proof tree for the requested
-  key. Tree proves either key presence (and its according value), or key
-  absence. The proof tree is used in the same way as in the Merkle Table:
-  it is sent to the client along with the requested data.
+- get the root node's value
+- build a proof tree for the requested key. Tree proves either key
+  presence (and its according value), or key absence. The proof tree is
+  used in the same way as in the `ProofListIndex`: it is sent to the client
+  along with the requested data
 
 ## Low-level storage
 
@@ -428,13 +374,20 @@ tables, service should handle `genesis_block`
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
 [base-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/base_index.rs
+[base-procedures]:
 [map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_index.rs
+[map-procedures]:
 [list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_index.rs
+[list-procedures]:
 [proof-list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/proof_list_index/mod.rs
+[prooflist-procedures]:
 [list-proof]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/proof_list_index/proof.rs
 [proof-map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs
+[proofmap-procedures]:
 [value-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/value_set_index.rs
+[valueset-procedures]:
 [key-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/key_set_index.rs
+[keyset-procedures]:
 [database]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L43
 [patch]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L11
 [snapshot]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L57
