@@ -83,8 +83,21 @@ To test some set of services, one can pass services list to sandbox constructor:
 ```Rust
 let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
                                    Box::new(ConfigUpdateService::new())])
-
 ```
+
+A service should be tested by committing service transaction and observing
+subsequent changes in the blockchain and the storage state.
+
+!!! note
+    Transaction constructors are service-specific.
+
+Useful functions for service testing:
+
+- `add_one_height_with_transactions`  
+  Allows committing a transaction.
+
+- `broadcast`  
+  Allows to check broadcasting message with particular content (transaction).
 
 ## Service Endpoints Test Examples
 
@@ -92,3 +105,7 @@ let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
     See [source code](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/api_tests.rs)
     for more details how sandbox is used for testing the configuration update
     service endpoints.
+
+!!! note
+    Each service should provide its own interface for sandbox testing of service
+    endpoints.
