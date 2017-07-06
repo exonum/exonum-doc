@@ -14,8 +14,8 @@ The full source code of this example you can download
 ## Create the single node
 
 Exonum is written in Rust and you have to install the stable Rust
-compiler to build this demo. If you haven't one, install it from
-[official Rust website](https://www.rust-lang.org).
+compiler to build this demo. If you haven't a necessary environment follow
+[the installation guide](./install.md), please.
 
 Let's create minimal crate with `exonum-core` dependency.
 
@@ -45,16 +45,18 @@ fn main() {
 }
 ```
 
-In the code above we prepared a logger which will show us what Exonum Node does.
+In the code above we prepared a logger which will show us what Exonum node does.
 
 Exonum contais `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
 provided services. While we haven't implemented a service we keep the list
-empty.
+empty. You can read more about services in the [Services](../architecture/services.md)
+article.
 
 We use `MemoryDB` to store our data in this demo, because `MemoryDB` is an
 in-memory database implementation useful for development and testing purposes.
 But there is `LevelDB` support as well as we recommend to use it in production.
+Put this code after logger initialization into `main` function body:
 
 ```rust
 let db = MemoryDB::new();
@@ -62,17 +64,14 @@ let services: Vec<Box<Service>> = vec![ ];
 let blockchain = Blockchain::new(db, services);
 ```
 
-Minimal blockchain is ready. To work with our blocks we have to create a node
-which maintains a database, writes new blocks and provides REST API to interact
-with the blockchain. Every node needs public and private keys. We'll create
+Minimal blockchain is ready. In addition to defining blockchain object, we need
+to create a node (with a keypair) and provide an API to interact with the
+blockchain. Every node needs public and private keys. We'll create
 a temporary pair, but for ordinary use you should use the keys from node
 configuration file.
 
-If you want to generate new keypair, you can call `exonum::crypto::gen_keypair()`
-method to take random pair of keys.
-
 Node expects a blockchain instance and a configuration.
-[Node configuration](../../architecture/configuration.md) consists of two
+[Node configuration](../architecture/configuration.md) consists of two
 parts:
 
 * Local configuration which includes
@@ -81,15 +80,21 @@ parts:
 * Global configuration or genesis configuration (includes all members
   to achieve a consensus)
 
+### Create keys
+
 This code makes a pair of keys. They determine the uniqueness of the node.
-Every node has own unique pair of keys.
+We use `exonum::crypto::gen_keypair()` function take random pair of keys:
 
 ```rust
 let (public_key, secret_key) = exonum::crypto::gen_keypair();
 ```
 
-Genesis configuration contains a list of public keys of validators: nodes which
-can vote for block acceptance. Fill it with your public key value:
+### Configure node
+
+Genesis configuration contains a list of public keys of
+[validators](../glossary.md#validator): nodes which can vote for block
+acceptance. Our demo blockchain network has only one validator. Fill this
+list with your public key value:
 
 ```rust
 let genesis = GenesisConfig::new(vec![public_key].into_iter());
@@ -218,12 +223,12 @@ impl<'a> CurrencySchema<'a> {
 ```
 
 Exonum indices are handy data mapping which you can use like collections from
-standard library of Rust. If we found and get the value we also can replace it
-with a new one.
+standard library of Rust.
 
 ## Transactions
 
-Transaction is a kind of message which performs actions with a blockchain.
+[Transaction](../architecture/transactions.md) is a kind of message which
+performs actions with a blockchain.
 
 For our cryptocurrency demonstration we need two transaction types:
 
@@ -280,34 +285,38 @@ message! {
 
 The last consists of two public keys: for wallet of sender and the second key
 of wallet of receiver. And of course it contains amount of money to move
-between them.
+between them. We add `seed` field to make our transaction is impossible to
+replay. You can get more in [Non-replayability](../architecture/transactions.md#non-replayability)
+section.
 
-## Contracts
+## Transaction execution
 
 Every transaction in Exonum has an attached contract. The contract is a
 busiless-logic of the blockchain. Actually we declared structs and we also have
-to implement `Trasaction` trait which includes `verify` method to verify every
-incoming transaction and `execute` method which contains contract logic which
-applied to the storage when a transaction is executed.
+to implement `Trasaction` trait which includes `verify` method to verify the
+internal integrity of the transaction and `execute` method which contains
+contract logic which applied to the storage when a transaction is executed.
 
-For every transaction we will check the signature. For money transfer
-transaction we also will check that sender is not the receiver to prevent
-useless transactions flood.
-
-`execute` method gets the reference to a `Fork` of a storage. We can wrap it
-with our schema to turn it into structured storage with our data layout inside.
-
-`TxCreateWallet` checks the wallet is not exists and add a new one if so:
+For every transaction we will check the signature:
 
 ```rust
 impl Transaction for TxCreateWallet {
     fn verify(&self) -> bool {
         self.verify_signature(self.pub_key())
     }
+```
 
+`execute` method gets the reference to a `Fork` of a storage. We can wrap it
+with our schema to turn it into structured storage with our data layout inside.
+
+In the following method we check that the wallet is not exists and
+add a new one if so:
+
+```rust
+impl Transaction for TxCreateWallet {
     fn execute(&self, view: &mut Fork) {
         let mut schema = CurrencySchema { view };
-        if let None = schema.wallet(self.pub_key()) {
+        if schema.wallet(self.pub_key()).is_none() {
             let wallet = Wallet::new(self.pub_key(), self.name(), 100);
             schema.wallets().put(self.pub_key(), wallet)
         }
@@ -315,9 +324,12 @@ impl Transaction for TxCreateWallet {
 }
 ```
 
-This transaction also adds `100` to the balance of wallet. In case of
-demonstration we don't add transaction to change this balance directly. But
-the balance could be changed with a transfer transactions.
+For money transfer transaction we also will check that sender is not the
+receiver to prevent useless transactions flood.
+
+This transaction also adds `100` to the balance of wallet. For demonstration
+we don't add transaction to change this balance directly. But the balance
+could be changed with a transfer transactions.
 
 `TxTransfer` transaction finds two wallets for both sides of a transfer
 transaction. If they have been found it checks the balance of the sender and if
@@ -360,10 +372,12 @@ struct CurrencyService;
 ```
 
 We created `CurrencyService` struct and to turn it into a blockchain service
-we should implement `Service` trait to it.
+we should implement `Service` trait to it. You can read more in the
+[Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
+section.
 
 Two first methods are simple: `service_name` returns the name of our service,
-`service_is` return the unique id of our service (`SERVICE_ID` constant used).
+`service_id` return the unique id of our service (`SERVICE_ID` constant used).
 
 The method `tx_from_raw` is used to convert into a transaction any data which
 coming to the node. To choose the right deserializer we can use `message_type()`
@@ -383,8 +397,9 @@ impl Service for CurrencyService {
 
     fn service_id(&self) -> u16 { SERVICE_ID }
 
-   fn tx_from_raw(&self, raw: RawTransaction)
-       -> Result<Box<Transaction>, encoding::Error> {
+    fn tx_from_raw(&self, raw: RawTransaction)
+        -> Result<Box<Transaction>, encoding::Error> {
+
         let trans: Box<Transaction> = match raw.message_type() {
             TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
             TX_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
@@ -496,3 +511,11 @@ let services: Vec<Box<Service>> = vec![
     Box::new(CurrencyService),
 ];
 ```
+
+To compile and run the final code enter:
+
+```sh
+cargo run
+```
+
+It builds the code and start a compiled binary.
