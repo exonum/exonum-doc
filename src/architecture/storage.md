@@ -106,6 +106,8 @@ The following procedures are [implemented][valueset-procedures]:
 
 The used hash is calculated as `hash()` method of `StorageValue` trait.
 It is supposed to return cryptographic hash, specifically, SHA-256 hash.
+Also, generally, it is reasonable to calculate the hash of the binary
+serialisation for specific hashing object.
 
 ### KeySetIndex
 
