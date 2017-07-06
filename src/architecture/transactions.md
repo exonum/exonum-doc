@@ -26,6 +26,13 @@ actually has the right to perform the transaction) can be accomplished
 with the help of building a [public key infrastructure][wiki:pki] and/or
 various constraints based on this key.
 
+!!! tip
+    It is recommended for transaction signing to be decentralized in order
+    to minimize security risks. Roughly speaking, there should not be a single
+    server signing all transactions in the system; this could create a security
+    chokepoint. One of options to decentralize signing is to use
+    the [light client library](https://github.com/exonum/exonum-client).
+
 !!! note "Example"
     In a sample [cryptocurrency service][cryptocurrency],
     an owner of cryptocurrency may authorize transferring his coins by signing
@@ -85,13 +92,6 @@ fashion. There are 2 serialization formats:
     unique identifiers for transactions where such an identifier is needed
     (e.g., when determining whether a specific transaction has been committed
     previously).
-
-!!! tip
-    It is recommended for transaction signing to be decentralized in order
-    to minimize security risks. Roughly speaking, there should not be a single
-    server signing all transactions in the system; this could create a security
-    chokepoint. One of options to decentralize signing is to use
-    the [light client library](https://github.com/exonum/exonum-client).
 
 ### Transaction Body
 
