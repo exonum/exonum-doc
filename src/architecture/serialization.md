@@ -401,7 +401,7 @@ const MY_SERVICE_ID: u16 = 777;
 const MY_NEW_MESSAGE_ID: u16 = 1;
 
 message! {
-    struct SendTwoInteger {
+    struct MessageTwoIntegers {
         const TYPE = MY_NEW_MESSAGE_ID;
         const ID   = MY_SERVICE_ID;
         const SIZE = 16;
@@ -413,7 +413,7 @@ message! {
 ```
 
 Here the message body is serialized as a `struct` with fields `first` and `second`
-of type `u64`.
+having type `u64`.
 
 ## Types to Be Supported in Future
 
