@@ -62,10 +62,18 @@ implemented in Exonum light client.
 1. The client forms an HTTP GET request and sends it to a full node in the Exonum
   blockchain network
 2. The node forms a response to the request and the corresponding
-  cryptographic proof and sends both back to the client
+  cryptographic proof and sends both back to the client. The cryptographic proof
+  includes a block header together with [`Precommit` messages](consensus.md#precommit)
+  that certify its validity, and one or more [Merkle paths](../glossary.md#merkle-proof)
+  that links the response to the block header.
 3. The client, on receiving the response from the blockchain, *verifies the structure*
-  and *validates cryptographic proofs* for the response
-4. The result of checks is shown in the user interface
+  and *validates cryptographic proofs* for the response.
+4. The verification procedure includes *checking whether a returned response
+  is stale*. This is accomplished by calculating the median of timestamps recorded
+  in `Precommit`s and comparing it against the local time of the client.
+  If the median time in `Precommit`s is too far in the past, the response
+  is considered stale, and its verification fails.
+5. The result of checks is shown in the user interface
 
 !!! note
     In the case user authentication is needed (for example, for data
