@@ -32,21 +32,6 @@ However, all Exonum tables actually are a Key-Value storages.
 
 Multiple table types may be used in the Exonum applications.
 
-In the table descriptions the following parameters types are used:
-
-- `K`: key type at the map definitions. Exonum uses byte sequences for
-  the keys.
-- `V`: value type at the map definitions. Map stores the objects of
-  particular class defined by user in the table initialization. At the
-  bottom level objects are serialized and are stored as byte sequences.
-- `u64`: unsigned 64-bit int type.
-- `Iter`: an Iterator object.
-- `Hash`: `sha-256` hash object
-- `ListProof`: a custom class representing nodes from `ProofListIndex`
-  proof trees.
-- `MapProof`: a custom class representing nodes from  `ProofMapIndex`
-  proof trees.
-
 ### Keys sorting
 
 The tables implement iterators over keys and/or stored items. Such
