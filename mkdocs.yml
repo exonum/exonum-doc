@@ -35,6 +35,7 @@ markdown_extensions:
   - codehilite
   - admonition
   - meta
+  - pymdownx.superfences
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
