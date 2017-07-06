@@ -366,7 +366,16 @@ call.
 Serialized [structure](#structures) (including its header and body) described on
 `message!` macro call.
 
-#### Example of `message!` Usage
+### Signature
+
+[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
+serialization of the message (excluding the signature bytes,
+i.e., the last 64 bytes of the serialization).
+
+**Binary presentation:** Ed25519 signature (64 bytes).  
+**JSON presentation:** hex string.
+
+### Example of `message!` Usage
 
 ```Rust
 const MY_SERVICE_ID: u16 = 777;
@@ -374,6 +383,8 @@ const MY_NEW_MESSAGE_ID: u16 = 1;
 
 message! {
     struct SendTwoInteger {
+        const TYPE = MY_NEW_MESSAGE_ID;
+        const ID   = MY_SERVICE_ID;
         const SIZE = 16;
 
         field first: u64 [0 => 8]
@@ -385,15 +396,6 @@ message! {
 Here the message body is serialized as a `struct` with fields `first` and `second`
 of type `u64`.
 >>>>>>> 230e88d... apply review notes
-
-### Signature
-
-[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
-serialization of the message (excluding the signature bytes,
-i.e., the last 64 bytes of the serialization).
-
-**Binary presentation:** Ed25519 signature (64 bytes).  
-**JSON presentation:** hex string.
 
 ## Types to Be Supported in Future
 
