@@ -272,9 +272,9 @@ All slices are var-length datatypes.
 A message is a [digitally signed](../glossary.md#digital-signature) piece of data
 transmitted through an Exonum network. There are 2 major kinds of messages:
 
-- [Consensus messages](../glossary.md#consensus-message) are used among full
+- **Consensus messages** are used among full
   nodes in the course of [the consensus algorithm](../glossary.md#consensus)
-- [Transactions](../glossary.md#transaction) are used to invoke [blockchain state](../glossary.md#blockchain-state)
+- **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
   changes and usually come from [external clients](../glossary.md#light-client)
 
 The message serialization consists of 3 main parts: header (includes `network_id`,
