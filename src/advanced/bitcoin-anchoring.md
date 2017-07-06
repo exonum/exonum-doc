@@ -106,11 +106,11 @@ defines the difference between block heights for anchored data states.
 !!! note Example
     If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
     `#3000`, ... would be anchored.
-   
+
 !!! tip "Choosing the interval"
     The interval may be chosen in a way that under normal conditions the
     interval between anchored blocks is between 10 minutes and 1 hour.
-   
+
 Sometimes anchoring process timetable could differ from ideal. Such
 variations could be triggered by byzantine behavior of nodes, forking of
 bitcoin blockchain, or changing list of validators. For example, at the
