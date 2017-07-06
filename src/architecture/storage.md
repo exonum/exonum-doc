@@ -208,10 +208,11 @@ implemented for it. The implementation example can be found at [LevelDB
 wrapper][leveldb-wrapper].
 
 Actually, all the values from different tables are stored in one big
-key-value table at the low-level storage. Thus, the high-level tables
-really just implements a handy API for accessing to the values with
-specific sense. All the tables functionality is reduced to these atomic
-call types.
+key-value table at the low-level storage, wherein the keys are
+represented as bytes sequence, and values are serialized objects, in
+fact, byte sequences too. Thus, the high-level tables really just
+implements a handy API for accessing to the values with specific sense.
+All the tables functionality is reduced to these atomic call types.
 
 At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
 Also [RocksDB][rocks-db] support is [planned](../roadmap.md).
@@ -266,11 +267,6 @@ world. There may be different tables with the same name, located in the
 different schemas. Actually, system tables may be considered as tables
 for the especial Consensus "service". The Core creates and use its
 tables in the same way as usual services do.
-
-As it was said, at the LevelDB scale, all values from all Exonum tables
-are saved into one big LevelDB map, wherein the keys are represented as
-bytes sequence, and values are serialized objects, in fact, byte
-sequences too.
 
 Every table is uniquely identified by the complex prefix used when
 mapping table keys into keys of the underlying low-level storage. The
