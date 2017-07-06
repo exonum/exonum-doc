@@ -35,10 +35,8 @@ has been really authorized by supermajority of validators.
 
 ## Peer-to-peer Full Node Network
 
-The nodes communicate with each other via TCP/IP.
-
-Messages in the own [Exonum binary serialization format](../glossary.md#binary-serialization)
-are sent over TCP to communicate among the full nodes.
+Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
+over TCP to communicate with each other.
 
 Auditor nodes do not receive consensus messages (`Propose`, `Prevote`,
 `Precommit`).
@@ -92,7 +90,7 @@ list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the
 entire network.
 
-An initial list of IP addresses node obtain from the [local configuration](../glossary.md#local-configuration)
+A node obtains an initial list of IP addresses from the [local configuration](../glossary.md#local-configuration)
 (parameter `listen_address`) on the node start up. If some node changes its IP
 address, then through peer discovery mechanism new address becomes known to all
 other nodes in some time.
