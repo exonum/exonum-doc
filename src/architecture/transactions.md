@@ -93,13 +93,6 @@ fashion. There are 2 serialization formats:
     (e.g., when determining whether a specific transaction has been committed
     previously).
 
-!!! tip
-    It is recommended for transaction signing to be decentralized in order
-    to minimize security risks. Roughly speaking, there should not be a single
-    server signing all transactions in the system; this could create a security
-    chokepoint. One of options to decentralize signing is to use
-    the [light client library](https://github.com/exonum/exonum-client).
-
 ### Transaction Body
 
 <<<<<<< HEAD
