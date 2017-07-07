@@ -97,34 +97,44 @@ other nodes in some time.
 
 ## Communication with Light Clients
 
-Light clients use [JSON Serialization](../glossary.md#json-serialization)
+Light clients use [JSON serialization](../glossary.md#json-serialization)
 to interact with the full nodes via [service endpoints](../glossary.md#service-endpoint).
-Transactions from the light clients are authenticated with the help of signatures
-within the JSON serialization, while read requests are not authenticated.
+Full nodes receive transactions from the light clients via POST
+requests, and the light clients get info from the full nodes via GET requests.
+Transactions from the light clients are authenticated with the help of signatures,
+which are the part of JSON serialization of transactions. Read requests are generally
+not authenticated.
 
 Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
 HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
-configuration. Full nodes receive transactions from the light clients via POST
-requests, and the light clients get info from the full nodes via GET requests.
+configuration.
 
 ### API Endpoints
 
 Endpoints for a particular service are defined via
 [`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
-
-Endpoints are prefixed with [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
-where `service_name` is a string service identifier, which needs to be unique
-within a specific Exonum blockchain.
-
-!!! note "Example"
-    For configuration update service:
-
-    - `GET /api/services/configuration/v1/configs/actual`  
-      Looks up the actual global configuration
-    - `POST /api/services/configuration/v1/configs/postpropose`  
-      Propose new configuration
+All service endpoints are prefixed with [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
+where `service_name` is a string service identifier. This identifier needs
+to be unique within a specific Exonum blockchain.
 
 !!! note
-    There is no unified format for GET endpoints, so services need to implement
-    them individually using best practices for RESTful services.
+    There is no unified format for naming endpoints (e.g., passing parameters for
+    GET endpoints via path components and/or query parameters).
+    Thus, services need to use best practices for RESTful services.
+
+!!! note "Example"
+    The [configuration update service](configuration-updater.md) defines the following
+    endpoints among others:
+
+    - `GET /api/services/configuration/v1/configs/{config_hash}`  
+      Looks up the global configuration by its hash
+    - `POST /api/services/configuration/v1/configs/postpropose`  
+      Proposes new configuration of the service
+
+    Note that both endpoints are prefixed with `/api/services/configuration` prefix
+    as specified above (an additional common prefix `v1` is used for forward-compatible
+    versioning). The POST endpoint consumes urlencoded JSON representation
+    of the corresponding service transaction, as it can be inferred from the semantics
+    of POST requests. The GET endpoint consumes `{config_hash}` param, which is
+    specified as a part of the URL path.
