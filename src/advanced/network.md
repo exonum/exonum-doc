@@ -111,5 +111,20 @@ requests, and the light clients get info from the full nodes via GET requests.
 ### API Endpoints
 
 Endpoints for a particular service are defined via
-[public_api_handler and private_api_handler hooks](../architecture/services.md#rest-api-initialization)
-and are [prefixed with /api/services/{service_name}](../architecture/services.md#service-identifiers).
+[`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
+
+Endpoints are prefixed with [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
+where `service_name` is a string service identifier, which needs to be unique
+within a specific Exonum blockchain.
+
+!!! note "Example"
+    For configuration update service:
+
+    - `GET /api/services/configuration/v1/configs/actual`  
+      Looks up the actual global configuration
+    - `POST /api/services/configuration/v1/configs/postpropose`  
+      Propose new configuration
+
+!!! note
+    There is no unified format for GET endpoints, so services need to implement
+    them individually using best practices for RESTful services.
