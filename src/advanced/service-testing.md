@@ -49,6 +49,23 @@ Functions for consensus algorithm testing:
 - `broadcast`  
   Checks if the node broadcasted message
 
+- `add_time`  
+  Emulates the situation after the specified time (as a `std::time::Duration`
+  struct). Used for timeouts testing.
+
+- `a`  
+  Gets socket address of the validator with the specified number.
+
+- `p`  
+  Gets public key of the validator with the specified number.
+
+- `s`  
+  Gets private key of the validator with the specified number.
+
+!!! note
+    The validator numbers correspond to validator keys in the [`validators` list](../architecture/configuration.md#genesis)
+    specified in the global configuration.
+
 Code example:
 
 ```Rust
@@ -108,7 +125,7 @@ Useful functions for service testing:
 
 Code example:
 
-```
+```Rust
 #[test]
 fn test_get_actual_config() {
     let _ = init_logger();
