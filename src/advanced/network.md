@@ -2,8 +2,8 @@
 
 ## Network Structure
 
-The Exonum network consists of [_full nodes_](../glossary.md#full-node)
-connected via peer-to-peer connections, and [_light clients_](../glossary.md#light-client).
+The Exonum network consists of [*full nodes*](../glossary.md#full-node)
+connected via peer-to-peer connections, and [*light clients*](../glossary.md#light-client).
 
 ### Full Nodes
 
@@ -37,15 +37,11 @@ has been really authorized by supermajority of validators.
 
 Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
-
-Auditor nodes do not receive consensus messages (`Propose`, `Prevote`,
-`Precommit`).
-
-### Network Events Processing
-
-Full nodes use Mio library (version 0.5) for event multiplexing. Each node has
+Mio library is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
 the external network, timeouts, and new transactions received via REST API.
+
+Messages exchanged by full nodes include consensus messages and transactions.
 
 ### Transactions Broadcasting
 
@@ -53,10 +49,18 @@ Node broadcasts transactions obtained via API or created by the node itself, but
 does not broadcast transactions received from the other nodes (via broadcasting
 or [requests mechanism](consensus/requests.md)).
 
+### Consensus Messages and Requests
+
+Validators generate and process consensus messages as specified
+by [the consensus algorithm](consensus/specification.md).
+Auditor nodes are set not to receive consensus messages (`Propose`, `Prevote`,
+`Precommit`) when they are broadcast by the validators.
+
 ### `Connect` Messages
 
-On establishing connection, the nodes exchange `Connect` messages in which nodes
-public keys are indicated. The `Connect` message also contains the public IP
+On establishing a P2P connection, the nodes exchange `Connect` messages
+in which a node indicates its public key. The `Connect` message also contains
+the public IP
 address of the node. Each node stores all received `Connect` messages in
 the _list of known peers_. As soon as a handshake is reached (`Connect` message
 is received and successfully processed) from both sides, the nodes begin to
@@ -65,7 +69,7 @@ exchange messages.
 #### Whitelist
 
 If the whitelist is turned on, then upon receiving the `Connect` message, the
-node checks the presence of the public key from the message in the node's
+node checks the presence of the public key from the message in the node’s
 whitelist. If the public key is not included in the whitelist, connection is not
 accepted.
 
