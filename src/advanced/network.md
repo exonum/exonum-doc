@@ -1,9 +1,12 @@
 # Networking Specification
 
-## Network Structure
+**The Exonum network** consists of [full nodes](../glossary.md#full-node)
+connected via peer-to-peer connections, and [light clients](../glossary.md#light-client).
+Full nodes communicate with each other
+using [Exonum binary serialization format](../glossary.md#binary-serialization)
+over TCP, and clients interact with full nodes via a RESTful service interface.
 
-The Exonum network consists of [*full nodes*](../glossary.md#full-node)
-connected via peer-to-peer connections, and [*light clients*](../glossary.md#light-client).
+## Network Structure
 
 ### Full Nodes
 
@@ -33,7 +36,7 @@ based on cryptographic commitments via Merkle / Merkle Patricia
 trees. This mechanism allows verifying that a response from the full node
 has been really authorized by supermajority of validators.
 
-## Peer-to-peer Full Node Network
+## Peer-to-Peer Full Node Network
 
 Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
@@ -43,7 +46,7 @@ the external network, timeouts, and new transactions received via REST API.
 
 Messages exchanged by full nodes include consensus messages and transactions.
 
-### Transactions Broadcasting
+### Transaction Broadcasting
 
 Node broadcasts transactions obtained via API or created by the node itself, but
 does not broadcast transactions received from the other nodes (via broadcasting
@@ -114,7 +117,7 @@ HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration.
 
-### API Endpoints
+### Service Endpoints
 
 Endpoints for a particular service are defined via
 [`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
