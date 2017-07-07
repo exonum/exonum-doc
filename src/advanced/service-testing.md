@@ -70,13 +70,9 @@ fn test_sandbox_recv_and_send() {
 ## Service Test Examples
 
 !!! tip
-    See [source code](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/lib.rs)
-    for more details how sandbox is used for testing
-    [the configuration update service](configuration-updater.md).
-
-!!! tip
-    See [anchoring service source code](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests)
-    for more details how sandbox is used for testing [the anchoring service](bitcoin-anchoring.md).
+    See source code for more details how sandbox is used for testing
+    [the configuration update service](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/lib.rs)
+    and [the anchoring service](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests).
 
 To test some set of services, one can pass services list to sandbox constructor:
 
@@ -109,3 +105,29 @@ Useful functions for service testing:
 !!! note
     Each service should provide its own interface for sandbox testing of service
     endpoints.
+
+Code example:
+
+```
+#[test]
+fn test_get_actual_config() {
+    let _ = init_logger();
+
+    //create sandbox for testing configuration update service endpoints
+    let api_sandbox = ConfigurationApiSandbox::new();
+
+    // read current configuration
+    let sand_cfg = api_sandbox.sandbox.cfg();
+    let expected_body = ApiResponseConfigHashInfo {
+        hash: sand_cfg.hash(),
+        config: sand_cfg,
+    };
+
+    // read current configuration via REST API
+    let resp_actual_config = api_sandbox.get_actual_config().unwrap();
+    let actual_body = response_body(resp_actual_config);
+
+    // compare current configuration with GET response
+    assert_eq!(actual_body, serde_json::to_value(expected_body).unwrap());
+}
+```
