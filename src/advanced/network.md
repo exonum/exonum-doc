@@ -97,9 +97,11 @@ list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the
 entire network.
 
-A node obtains an initial list of IP addresses from the [local configuration](../glossary.md#local-configuration)
-(parameter `listen_address`) on the node start up. If some node changes its IP
-address, then through peer discovery mechanism new address becomes known to all
+The initial list of IP addresses where other full nodes may be is specified
+in the [local configuration](../glossary.md#local-configuration)
+(parameter `listen_address`) of the node. This list is used to discover
+an initial set of peers on the node start up. If some node changes its IP
+address, then through peer discovery mechanism a new address becomes known to all
 other nodes in some time.
 
 ## Communication with Light Clients
@@ -112,14 +114,14 @@ Transactions from the light clients are authenticated with the help of signature
 which are the part of JSON serialization of transactions. Read requests are generally
 not authenticated.
 
-Full nodes uses [Iron framework](http://ironframework.io/) to implement RESTful
+Full nodes use [Iron framework](http://ironframework.io/) to implement RESTful
 HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration.
 
 ### Service Endpoints
 
-Endpoints for a particular service are defined via
+API endpoints for a particular service are defined via
 [`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
 All service endpoints are prefixed with [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
 where `service_name` is a string service identifier. This identifier needs
