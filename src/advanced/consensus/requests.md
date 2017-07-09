@@ -183,8 +183,8 @@ validator height.
 - If the sender specified `lock_round`, which is greater than the stored  
   [Proof-of-Lock (PoL)][consensus#locks], send
   `RequestPrevotes` for the locked proposal to the author of `Prevote`
-- If the node have formed +2/3 `Prevote` messages for the same proposal, cancel
-  the request `RequestPrevotes` for `Prevote` messages corresponding to this
+- If the node have formed +2/3 `Prevote` messages for the same proposal and round,
+  cancel the request `RequestPrevotes` for `Prevote` messages corresponding to this
   proposal (if they were requested earlier)
 
 ### Receiving `Precommit`

@@ -1,3 +1,24 @@
+/* Theme overrides. */
+.admonition {
+  background: none !important;
+  /* Same raised box shadow as for tables. */
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12),0 3px 1px -2px rgba(0,0,0,.2);
+}
+
+.md-typeset .admonition table:not([class]) {
+  box-shadow: none; /* Remove box shadow from tables in admonitions, it looks ugly. */
+}
+
+/* Fix ulgy x overflow on tables inside admonitions */
+.admonition .md-typeset__scrollwrap {
+  margin: 1em 0;
+}
+.md-typeset .admonition .md-typeset__table {
+  padding: 0;
+}
+
+/* New elements. */
+
 .edit-on-github {
   font-size: 80%;
 }
