@@ -46,7 +46,7 @@ lexicographically over binary sequences.
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
 table types inherit from it directly. `BaseIndex`
-[implements][base-procedures] a map interface:
+implements a map interface:
 
 - get, set and remove value by key
 - check if the specific key presents
@@ -61,7 +61,7 @@ table types inherit from it directly. `BaseIndex`
 ### MapIndex
 
 [`MapIndex`][map-index] is implementation of Key-Value storage. It is a
-wrapper for `BaseIndex` that [extends][map-procedures] its functionality:
+wrapper for `BaseIndex` that extends its functionality:
 
 - get, set and remove value by key
 - check if the specific key presents
@@ -75,7 +75,7 @@ wrapper for `BaseIndex` that [extends][map-procedures] its functionality:
 [`ListIndex`][list-index] represents an array list. It wraps around the
 `BaseIndex` field.
 
-The following actions are [supported][list-procedures]:
+The following actions are supported:
 
 - get and set an item by index. No removing by index allowed
 - append list, pop the last item (with or without removal)
@@ -96,7 +96,7 @@ zero-length tuple `&()` as a key.
 
 [`ValueSetIndex`][value-set-index] implements a hashmap, storing the
 element using its hash as a key. It wraps around the `BaseIndex` field.
-The following procedures are [implemented][valueset-procedures]:
+The following procedures are implemented:
 
 - add and remove values
 - check if value already presents - using value itself, or just its hash
@@ -116,7 +116,7 @@ to the `BaseIndex` storage as `(key: item, value: null)`. As the keys
 are ordered in the underlying storage engine, `KeySetIndex` iterates
 over set items in the sorting order.
 
-The following procedures are [implemented][keyset-procedures]:
+The following procedures are implemented:
 
 - add and remove items
 - check if the specific item presents in the table
@@ -158,7 +158,7 @@ additional feature. Basing on Merkle Trees, such table allows creating a
 proofs of existence for its values. Tree leafs store the data itself;
 inner nodes values are calculated as `hash(concatenate(left_child_value,
 right_child_value)`. The following additional procedures are
-[implemented][prooflist-procedures]:
+implemented:
 
 - get the height of the tree. As the tree is balanced (though may be not
   fully filled), the height is near to `log2` of the list length.
@@ -179,7 +179,7 @@ based on [Merkle Patricia tree](../advanced/merkle-patricia-index.md).
 It implements the same methods as the `MapIndex`, adding the ability to
 create proofs of existence for its key-value pairs, or proofs of absence
 if requested key do not exist in this table. The following additional
-procedures are [supported][proofmap-procedures]:
+procedures are supported:
 
 - get the root node's value
 - build a proof tree for the requested key. Tree proves either key
@@ -350,20 +350,13 @@ should handle `genesis_block` [event][genesis-block-creation].
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
 [base-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/base_index.rs
-[base-procedures]:
 [map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/map_index.rs
-[map-procedures]:
 [list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/list_index.rs
-[list-procedures]:
 [proof-list-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/proof_list_index/mod.rs
-[prooflist-procedures]:
 [list-proof]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/proof_list_index/proof.rs
 [proof-map-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs
-[proofmap-procedures]:
 [value-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/value_set_index.rs
-[valueset-procedures]:
 [key-set-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/key_set_index.rs
-[keyset-procedures]:
 [database]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L43
 [patch]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L11
 [snapshot]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L57
