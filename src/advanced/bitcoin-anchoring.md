@@ -236,6 +236,11 @@ private keys should be secured by every validator, the [public
 keys](#bitcoin-public-keys) are shared among them and are written into
 Exonum blockchain.
 
+#### Observer interval
+
+After observing interval is set, node tracks anchoring chain. It helps
+to get the [nearest anchoring transaction](#nearest-lect) for every Exonum block.
+
 ### Global settings
 
 #### Bitcoin public keys
@@ -495,6 +500,28 @@ JSON object with the following fields:
   which is considered to be a LECT.
 
 Returns an error if the specified `id` is greater or equal to validators amount.
+
+### Nearest LECT
+
+```None
+GET {base_path}/nearest_lect/{height}
+```
+
+Requires [observing interval](observing-interval) to be set.
+
+Returns the content of the anchoring transaction which anchors the specific block.
+
+#### Parameters
+
+`height`: unsigned 64-bit integer
+
+#### Response
+
+The string which value is a hex-encoded content of the nearest bitcoin
+anchoring transaction.
+
+Returns `null` if the asked block was not anchored yet or if the
+observing interval is not set.
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
