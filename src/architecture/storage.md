@@ -25,10 +25,11 @@ Storage architecture can be overlooked from different points.
 
 ## Exonum table types
 
-As Exonum blockchain actually is a data storage for the application,
-Tables (also named `Indexes`) are introduced. They perform the same role
-as in usual RDBMS: every table stores the records of fixed type.
-However, all Exonum tables actually are a Key-Value storages.
+Tables (aka `Indexes`) perform the same role as in usual RDBMS: every
+table stores the records of fixed type. However, unlike RDBMS tables,
+all Exonum tables actually are implemented as Key-Value storages. Both
+keys and values are stored as byte sequences, and Exonum do not split
+the stored item on a fields.
 
 Multiple table types may be used in the Exonum applications.
 
@@ -85,8 +86,8 @@ The following actions are [supported][list-procedures]:
 - truncate the list to the specific length
 - clear the table (removing all stored values)
 
-List value does not support inserting in the middle (although it
-is still possible to do manually).
+`ListIndex` does not support inserting elements in the middle of the list (although it
+is still possible to do so manually).
 
 `ListIndex` saves its elements to the internal `base` map with element
 indices as keys. The list length also is saved at `base` with an
@@ -124,7 +125,7 @@ The following procedures are [implemented][keyset-procedures]:
 - iterate over items
 - clear the table (removing all stored values)
 
-### KeySetIndex vs ValueSetIndex
+#### KeySetIndex vs ValueSetIndex
 
 While `ValueSetIndex` uses a hash as a key, the `KeySetIndex` put an
 entire binary object's serialization into a key.
@@ -141,27 +142,24 @@ entire binary object's serialization into a key.
 
 ### Merklized indexes
 
-The Merklized indexes represent an List and Map with additional
+The Merklized indexes represent a list and map with additional
 features. Such indexes may create the proofs of existence or absence for
 the stored data items.
 
 #### ProofListIndex
 
-[`ProofListIndex`][proof-list-index] implements a Merkle Tree which is
+[`ProofListIndex`][proof-list-index] implements a [Merkle Tree](../advanced/merkle-index.md) which is
 an extended version for array list. It implements the same methods as
 `ListIndex`, however adds additional feature. Basing on Merkle Trees,
 such table allows creating a proofs of existence for its values. The
 table cells are divided into leafs and intermediate nodes. Leafs store
 the data itself; inner nodes values are calculated as
-`hash(concatenate(left_child_value, right_child_value)`. You may read
-more detailed specification at [Merkle
-Trees](../advanced/merkle-index.md). The following additional procedures are
+`hash(concatenate(left_child_value, right_child_value)`. The following additional procedures are
 [implemented][prooflist-procedures]:
 
 - get the height of the tree. As the tree is balanced (though may be not
-  fully filled), the height is near to `log2(list length)`
-- get the value of root element (that contains the hash of root node's
-  children)
+  fully filled), the height is near to `log2` of the list length.
+- get the value of the tree root (i.e., the hash of the enntire Merkle Tree)
 - build a proof tree for data value at `index` position, consisting of
   [`ListProof`][list-proof] objects
 - build a proof tree for data values at specific index range, consisting
@@ -179,11 +177,10 @@ authorized by the validators.
 #### ProofMapIndex
 
 [`ProofMapIndex`][proof-map-index] is an extended version for a map
-based on Merkle Patricia Tree. It implements the same methods as the
+based on [Merkle Patricia Tree](../advanced/merkle-patricia-index.md). It implements the same methods as the
 `MapIndex`, adding the ability to create proofs of existence for its
 key-value pairs, or proofs of absense if requested key do not exist in
-this table. For a more detailed description, see [Merkle Patricia
-Trees](../advanced/merkle-patricia-index.md). The following additional
+this table. The following additional
 procedures are [supported][proofmap-procedures]:
 
 - get the root node's value
@@ -201,21 +198,20 @@ following procedures:
 
 - Get value by key;
 - Put new value at the key (insert or update already saved one);
-- Delete pair by key.
+- Delete key-value pair by key.
+
+All the tables functionality is reduced to these atomic call types.
 
 To add a new storage, [Database][database] interface should be
 implemented for it. The implementation example can be found at [LevelDB
-wrapper][leveldb-wrapper].
+wrapper][leveldb-wrapper]. At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
+Also [RocksDB][rocks-db] support is [planned](../roadmap.md).
 
-Actually, all the values from different tables are stored in one big
+
+All the values from different tables are stored in one big
 key-value table at the low-level storage, wherein the keys are
 represented as bytes sequence, and values are serialized objects, in
-fact, byte sequences too. Thus, the high-level tables really just
-implements a handy API for accessing to the values with specific sense.
-All the tables functionality is reduced to these atomic call types.
-
-At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
-Also [RocksDB][rocks-db] support is [planned](../roadmap.md).
+fact, byte sequences too. The keys are transformed in a predetermined way using [table identifiers](#table-identifiers).
 
 ## View layer
 
@@ -238,8 +234,8 @@ is updated, the snapshot still refers to the old table content.
 
 [Forks][fork] implement the same interfaces as the database underneath,
 transparently wrapping the real data storage state, and add some
-additional changes. Every fork is basen on the storage snapshot. From
-the outer point of view, the changes are already applied to the data
+additional changes. Every fork is based on the storage snapshot. From
+the outer point of view, the changes are eagerly applied to the data
 storage; however, these changes are stored directly in the fork and may
 be easily rolled back. Moreover, there may be different forks of
 the same database snapshot.
@@ -248,10 +244,10 @@ Forks are used during block creation: validator node apply some
 transactions, check its correctness, apply other ones, and finally
 decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with `panic` during
-validation, its changes are promptly reverted.
+execution, its changes are promptly reverted.
 
 During the block execution, fork allows to create the [list of
-changes](#patches) and, if all changes are accurate, apply it to the
+changes](#patches) and apply all changes to the
 data storage atomically.
 
 ## Table identifiers
@@ -277,20 +273,19 @@ The prefix consist of service ID and internal identifier inside the
 service. As well as tables represent just a handy API for access to data
 (no data items are really stored at the table class instance; all values
 are saved in leveldb storage), all tables created with the same prefix
-will share the data.
+will be the views of the same data.
 
 Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
 0x00` ID is reserved to the Core. Tables inside services are identified
 with a `u8` integers and an optional suffixes.
 
 Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in
-ASCII) for the `0x00 0x01` service matches with the following key in the
+ASCII) for the service with ID `1` matches with the following key in the
 LevelDB map:
 
 `0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key`
 
-Here, `|` separates logical components of the low-level key, which is a
-concatenation of its parts.
+Here, `|` separates logical components of the low-level key.
 
 It is advised to use a `gen_prefix(service_id, table_id, table_suffix)`
 for creating table prefixes. Example of such prefixes generation can be found
@@ -305,13 +300,13 @@ for creating table prefixes. Example of such prefixes generation can be found
 
 ## List of system tables
 
-The Core owns its own tables that are used for providing the service.
+The Core owns its own tables that are used for maintainaing blockchain functioning.
 These tables are created [here][blockchain-schema]
 
 There are the following system tables:
 
 - `transactions`, `MapIndex`.  
-  Represents a map from transaction hash into raw transaction structure
+  Represents a map from transaction hash into raw transaction structure.
 - `tx_location_by_hash`, `MapIndex`.  
   Keeps the block height and tx position inside block for every
   transaction hash.
@@ -320,32 +315,30 @@ There are the following system tables:
 - `block_hashes_by_height`, `ListIndex`.  
   Saves a block hash that has the requested height.
 - `block_txs`, `ProofListIndex`.  
-  The set of tables with different `block_height`. Every table keeps
+  The set of tables for every `block_height`. Keeps
   a list of transactions for the specific block.
 - `precommits`, `ListIndex`.  
-  The set of tables with different `block_hash`. Stores the list of
+  The set of tables for every `block_hash`. Stores the list of
   validators' precommits for the specific block.
 - `configs`, `ProofMapIndex`.  
-  Stores the actual configuration in the JSON format for block heights.
+  Stores the configurations content in `JSON` format, using its hash as a key.
 - `configs_actual_from`, `ListIndex`.  
   Builds an index to get config starting height quickly.
 - `state_hash_aggregator`, `ProofMapIndex`.  
-  The table is used to calculate the final state hash based on the
+  Calculates the final state hash based on the
   aggregate hashes of other tables.
 
 ## Indexing
 
 Exonum does not support indices as the individual entity. However, you
 can always create additional table with an index meaning. For example,
-there are system table `block_txs` that stores a list of transactions
-for every block. In relational databases, we may want to create a
-backward index over tx, to quickly get a block height at which
-transaction was approved. In the Exonum, we create a
-`tx_location_by_hash` map table that provides with this operation.
+there is the system table `block_txs` that stores a list of transactions
+for every block. In the Exonum, we create a
+`tx_location_by_hash` map table that provides with the necessary index.
 
 ## Genesis block
 
-At the node start, services should initialize its tables. It should be
+At the node start, services should initialize its tables, by creating the table instances with a specific prefixes. It should be
 done during `Genesis block creation` procedure. To set up its data
 tables, service should handle `genesis_block`
 [event][genesis-block-creation].
