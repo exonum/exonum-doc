@@ -86,8 +86,8 @@ The following actions are [supported][list-procedures]:
 - truncate the list to the specific length
 - clear the table (removing all stored values)
 
-`ListIndex` does not support inserting elements in the middle of the list (although it
-is still possible to do so manually).
+`ListIndex` does not support inserting elements in the middle of the
+list (although it is still possible to do so manually).
 
 `ListIndex` saves its elements to the internal `base` map with element
 indices as keys. The list length also is saved at `base` with a
@@ -148,13 +148,14 @@ the stored data items.
 
 #### ProofListIndex
 
-[`ProofListIndex`][proof-list-index] implements a [Merkle Tree](../advanced/merkle-index.md) which is
-an extended version for array list. It implements the same methods as
-`ListIndex`, however adds additional feature. Basing on Merkle Trees,
-such table allows creating a proofs of existence for its values. The
-table cells are divided into leafs and intermediate nodes. Leafs store
-the data itself; inner nodes values are calculated as
-`hash(concatenate(left_child_value, right_child_value)`. The following additional procedures are
+[`ProofListIndex`][proof-list-index] implements a [Merkle
+Tree](../advanced/merkle-index.md) which is an extended version for
+array list. It implements the same methods as `ListIndex`, however adds
+additional feature. Basing on Merkle Trees, such table allows creating a
+proofs of existence for its values. The table cells are divided into
+leafs and intermediate nodes. Leafs store the data itself; inner nodes
+values are calculated as `hash(concatenate(left_child_value,
+right_child_value)`. The following additional procedures are
 [implemented][prooflist-procedures]:
 
 - get the height of the tree. As the tree is balanced (though may be not
@@ -177,10 +178,10 @@ authorized by the validators.
 #### ProofMapIndex
 
 [`ProofMapIndex`][proof-map-index] is an extended version for a map
-based on [Merkle Patricia Tree](../advanced/merkle-patricia-index.md). It implements the same methods as the
-`MapIndex`, adding the ability to create proofs of existence for its
-key-value pairs, or proofs of absence if requested key do not exist in
-this table. The following additional
+based on [Merkle Patricia Tree](../advanced/merkle-patricia-index.md).
+It implements the same methods as the `MapIndex`, adding the ability to
+create proofs of existence for its key-value pairs, or proofs of absence
+if requested key do not exist in this table. The following additional
 procedures are [supported][proofmap-procedures]:
 
 - get the root node's value
@@ -204,18 +205,19 @@ All the tables functionality is reduced to these atomic call types.
 
 To add a new storage, [Database][database] interface should be
 implemented for it. The implementation example can be found at [LevelDB
-wrapper][leveldb-wrapper]. At this moment, key-value storage [LevelDB][level-db] v1.20 is used.
-Also [RocksDB][rocks-db] support is [planned](../roadmap.md).
+wrapper][leveldb-wrapper]. At this moment, key-value storage
+[LevelDB][level-db] v1.20 is used. Also [RocksDB][rocks-db] support is
+[planned](../roadmap.md).
 
-
-All the values from different tables are stored in one big
-key-value table at the low-level storage, wherein the keys are
-represented as bytes sequence, and values are serialized objects, in
-fact, byte sequences too. The keys are transformed in a predetermined way using [table identifiers](#table-identifiers).
+All the values from different tables are stored in one big key-value
+table at the low-level storage, wherein the keys are represented as
+bytes sequence, and values are serialized objects, in fact, byte
+sequences too. The keys are transformed in a predetermined way using
+[table identifiers](#table-identifiers).
 
 ## View layer
 
-Exonum introduces additional layer over database to handle transaction 
+Exonum introduces additional layer over database to handle transaction
 and block atomicity.
 
 ### Patches
@@ -300,31 +302,31 @@ for creating table prefixes. Example of such prefixes generation can be found
 
 ## List of system tables
 
-The Core owns its own tables that are used for maintaining blockchain functioning.
-These tables are created [here][blockchain-schema]
+The Core owns its own tables that are used for maintaining blockchain
+functioning. These tables are created [here][blockchain-schema].
 
 There are the following system tables:
 
-- `transactions`, `MapIndex`.  
+- `transactions`, `MapIndex`. 
   Represents a map from transaction hash into raw transaction structure.
-- `tx_location_by_hash`, `MapIndex`.  
+- `tx_location_by_hash`, `MapIndex`. 
   Keeps the block height and tx position inside block for every
   transaction hash.
-- `blocks`, `MapIndex`.  
+- `blocks`, `MapIndex`. 
   Stores block object for every block height.
-- `block_hashes_by_height`, `ListIndex`.  
+- `block_hashes_by_height`, `ListIndex`. 
   Saves a block hash that has the requested height.
-- `block_txs`, `ProofListIndex`.  
+- `block_txs`, `ProofListIndex`. 
   The set of tables for every `block_height`. Keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`.  
+- `precommits`, `ListIndex`. 
   The set of tables for every `block_hash`. Stores the list of
   validators' precommits for the specific block.
-- `configs`, `ProofMapIndex`.  
+- `configs`, `ProofMapIndex`. 
   Stores the configurations content in `JSON` format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`.  
+- `configs_actual_from`, `ListIndex`. 
   Builds an index to get config starting height quickly.
-- `state_hash_aggregator`, `ProofMapIndex`.  
+- `state_hash_aggregator`, `ProofMapIndex`. 
   Calculates the final state hash based on the
   aggregate hashes of other tables.
 
@@ -338,10 +340,10 @@ for every block. In the Exonum, we create a
 
 ## Genesis block
 
-At the node start, services should initialize its tables, by creating the table instances with a specific prefixes. It should be
-done during `Genesis block creation` procedure. To set up its data
-tables, service should handle `genesis_block`
-[event][genesis-block-creation].
+At the node start, services should initialize its tables, by creating
+the table instances with a specific prefixes. It should be done during
+`Genesis block creation` procedure. To set up its data tables, service
+should handle `genesis_block` [event][genesis-block-creation].
 
 !!! note Notice
     Genesis Block creation procedure is called every time Exonum
