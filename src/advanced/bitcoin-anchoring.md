@@ -73,10 +73,11 @@ it to the bitcoin blockchain.
 
 ### Transaction malleability
 
-Validators' signatures are openly written in
-Exonum blockchain; more than `M` signatures can be published (and it is
-common situation). There is a special algorithm selecting `M` signatures deterministically. If all validators are legitimate,
-certain transaction is built unequivocally.
+Validators' signatures are openly written in Exonum blockchain; more
+than `M` signatures can be published (and it is common situation). There
+is a special algorithm selecting `M` signatures deterministically. If
+all validators are legitimate, certain transaction is built
+unequivocally.
 
 But any Byzantine node could step out from deterministic algorithm and
 use another signatures list for anchoring transaction. It may create a transaction
@@ -142,13 +143,16 @@ The data output consists of the following parts:
 - 1-byte, the length of stored data
 - `EXONUM` at the ASCII-code (`0x45 0x58 0x4f 0x4e 0x55 0x4d`)
 - a 1-byte version of the current data output, currently is `1`.
-- a 1-byte type of payload: 0 if only blockchain state is included, 1 if both chunks are used
+- a 1-byte type of payload: 0 if only blockchain state is included, 1 if
+  both chunks are used
 - 40 bytes of blockchain-state data chunk
 - (optional) 32 bytes of a recovering data chunk
 
-All integer chunk parts are little-endian, as per the general guidelines of Bitcoin Script.
+All integer chunk parts are little-endian, as per the general guidelines
+of Bitcoin Script.
 
-In total, anchoring transaction payload takes 48 bytes in regular way and enlarges to 80 bytes when recovering is needed.
+In total, anchoring transaction payload takes 48 bytes in regular way
+and enlarges to 80 bytes when recovering is needed.
 
 #### Anchored hash data chunk
 
@@ -166,9 +170,10 @@ reasons of such stops are described further.
 =======
 #### Recovery data chunk
 
-The data of the recovery chunk include just a 32-byte bitcoin transaction hash. This hash shows that the current
-  anchoring chain is the prolongation of previously stopped anchoring
-  chain. The possible reasons of such stops are described further.
+The data of the recovery chunk include just a 32-byte bitcoin
+transaction hash. This hash shows that the current anchoring chain is
+the prolongation of previously stopped anchoring chain. The possible
+reasons of such stops are described further.
 
 The recovery chunk is optional and may appear in the very first bitcoin
 anchoring transaction only if the previous anchoring chain was failed
@@ -188,8 +193,9 @@ chain](#recovering-broken-anchoring)).
 - After common LECT appears, every validator builds the anchoring
   transaction and sign every its input.
 - The signatures are publicated at the Exonum blockchain
-- Based on the signatures, _any_ Exonum node can create anchoring transaction and broadcast it to the
-  Bitcoin network. In particular, all agreed validators broadcast it.
+- Based on the signatures, _any_ Exonum node can create anchoring
+  transaction and broadcast it to the Bitcoin network. In particular, all
+  agreed validators broadcast it.
 - If at the block `#H` there is no common LECT (that is agreed upon
   `+2/3` validators) than no anchoring happened. Exonum blockchain
   continue creating new blocks. All validators wait until some of them
@@ -198,8 +204,9 @@ chain](#recovering-broken-anchoring)).
   found even after new time for anchoring comes. New state for anchoring
   is the last Exonum blockchain state we need to anchor. For example now
   we are at the height `#11000` and anchoring should be held every `1000`
-  blocks. But common LECT appeared only at the height `#12345`. We anchor block `#12000` but there would be no anchor for block
-  `#11000`.
+  blocks. But common LECT appeared only at the height `#12345`. We anchor
+  block `#12000` but there would be no anchor for block `#11000`.
+
 
 ## Setups and configuration
 
@@ -239,7 +246,8 @@ Exonum blockchain.
 #### Observer interval
 
 After observing interval is set, node tracks anchoring chain. It helps
-to get the [nearest anchoring transaction](#nearest-lect) for every Exonum block.
+to get the [nearest anchoring transaction](#nearest-lect) for every
+Exonum block.
 
 ### Global settings
 
@@ -323,7 +331,8 @@ Anchoring pubkeys define new Anchoring BTC-address. In order to prolong
 anchoring chain, new anchoring transaction should spend previous
 anchoring address UTXO and send it to the new anchoring address. We must
 be confident such transaction would be written to the blockchain
-**before** we really change the list of validators. Thus the anchoring process is suspended.
+**before** we really change the list of validators. Thus the anchoring
+process is suspended.
 
 - The anchoring service wait until common LECT is written to the Bitcoin
   blockchain.
@@ -499,7 +508,8 @@ JSON object with the following fields:
 - **content.txid**: the hash for the anchoring bitcoin transaction,
   which is considered to be a LECT.
 
-Returns an error if the specified `id` is greater or equal to validators amount.
+Returns an error if the specified `id` is greater or equal to validators
+amount.
 
 ### Nearest LECT
 
@@ -509,7 +519,8 @@ GET {base_path}/nearest_lect/{height}
 
 Requires [observing interval](observing-interval) to be set.
 
-Returns the content of the anchoring transaction which anchors the specific block.
+Returns the content of the anchoring transaction which anchors the
+specific block.
 
 #### Parameters
 
