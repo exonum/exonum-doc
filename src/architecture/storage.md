@@ -209,7 +209,7 @@ All the tables functionality is reduced to these atomic call types.
 To add a new storage, [Database][database] interface should be
 implemented for it. The implementation example can be found at [LevelDB
 wrapper][leveldb-wrapper]. At this moment, key-value storage
-[LevelDB][level-db] v1.20 is used. Also [RocksDB][rocks-db] support is
+[LevelDB][level-db] is used. Also [RocksDB][rocks-db] support is
 [planned](../roadmap.md).
 
 All the values from different tables are stored in one big key-value
