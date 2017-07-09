@@ -41,95 +41,6 @@ Sometimes additional inputs called [funding UTXO](#funding-utxo) are
 used. Such input is necessary to refill balance of anchoring chain, that
 is spending to transaction fees.
 
-## Setups and configuration
-
-Anchoring requires additional settings to be set. There are both local
-and global [configuration settings](../architecture/configuration.md).
-Local are accepted just to the current node, while global are shared
-between all the validators.
-
-The settings can be updated in the same way as other configuration
-parameters do; for example, the global configuration should be updated
-through the [Configuration Update service](configuration-updater.md)
-
-### Local settings
-
-#### Bitcoind node
-
-The service uses third-party bitcoin node to communicate with the
-bitcoin blockchain network. As for Exonum v 0.1, [Bitcoin
-Core][bitcoind] is supported only.
-
-You need to specify the following settings to access the bitcoind node:
-
-- bitcoind host
-- bitcoind rpc username
-- bitcoind rpc password
-
-!!! tip
-    It is strongly advised to have a separate bitcoind node for every
-    validator; otherwise the single bitcoind node represents a
-    centralization point and brings a weakness into the anchoring process.
-
-#### Bitcoin private keys
-
-Every validator should possess its own secp256k1 EC keypair in order to
-participate in anchoring process. This is the standard (and currently
-the only supported) key format for bitcoin transactions. While the
-private keys should be secured by every validator, the [public
-keys](#bitcoin-public-keys) are shared among them and are written into
-Exonum blockchain.
-
-### Global settings
-
-#### Bitcoin public keys
-
-As it was written earlier, every validator should store its own [private
-key](#bitcoin-private-keys). According public keys are stored in the
-global configuration.
-
-#### Transaction fees
-
-A transaction fee represent a value in satoshis that is set as a fee for
-every anchoring transaction. It is advised to be a 2x-3x times bigger
-than average market fee, in order to be sure that anchoring transaction
-does not hang if the bitcoin network is spammed.
-
-This value is written to the global configuration and is applied by all
-the validators.
-
-#### Anchoring schedule
-
-This parameter defines how often anchoring should be executed. It
-defines the difference between block heights for anchored data states.
-
-!!! note Example
-    If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
-    `#3000`, ... would be anchored.
-
-!!! tip "Choosing the interval"
-    The interval may be chosen in a way that under normal conditions the
-    interval between anchored blocks is between 10 minutes and 1 hour.
-
-Sometimes anchoring process timetable could differ from ideal. Such
-variations could be triggered by byzantine behavior of nodes, forking of
-bitcoin blockchain, or changing list of validators. For example, at the
-necessary height (`#1000` because of bitcoin blockchain fork nodes could
-not agree upon which anchoring transaction is the last one (and should
-be spent in the next anchoring tx). If so, nodes will wait until bitcoin
-network do not resolve its fork.
-
-#### Funding UTXO
-
-To refill anchoring address balance, the bitcoin funding transaction
-should be generated that sends money to the current anchoring address.
-Such transaction should be manually written to the global settings to
-ensure all validators include it further.
-
-The funding UTXO should get enough confirmations before being used.
-However, the network do not check number of confirmations for the
-provided funding transaction; it is on administrators' duty.
-
 ## Anchoring transactions
 
 ### Multisig address as decentralization method
@@ -316,6 +227,95 @@ Todos. **TODO: what length does recovery chunk have?**
   blocks. But common LECT appeared only at the height `#12345`. In that
   case we anchor block `#12000` but there would be no anchor for block
   `#11000`
+
+## Setups and configuration
+
+Anchoring requires additional settings to be set. There are both local
+and global [configuration settings](../architecture/configuration.md).
+Local are accepted just to the current node, while global are shared
+between all the validators.
+
+The settings can be updated in the same way as other configuration
+parameters do; for example, the global configuration should be updated
+through the [Configuration Update service](configuration-updater.md)
+
+### Local settings
+
+#### Bitcoind node
+
+The service uses third-party bitcoin node to communicate with the
+bitcoin blockchain network. As for Exonum v 0.1, [Bitcoin
+Core][bitcoind] is supported only.
+
+You need to specify the following settings to access the bitcoind node:
+
+- bitcoind host
+- bitcoind rpc username
+- bitcoind rpc password
+
+!!! tip
+    It is strongly advised to have a separate bitcoind node for every
+    validator; otherwise the single bitcoind node represents a
+    centralization point and brings a weakness into the anchoring process.
+
+#### Bitcoin private keys
+
+Every validator should possess its own secp256k1 EC keypair in order to
+participate in anchoring process. This is the standard (and currently
+the only supported) key format for bitcoin transactions. While the
+private keys should be secured by every validator, the [public
+keys](#bitcoin-public-keys) are shared among them and are written into
+Exonum blockchain.
+
+### Global settings
+
+#### Bitcoin public keys
+
+As it was written earlier, every validator should store its own [private
+key](#bitcoin-private-keys). According public keys are stored in the
+global configuration.
+
+#### Transaction fees
+
+A transaction fee represent a value in satoshis that is set as a fee for
+every anchoring transaction. It is advised to be a 2x-3x times bigger
+than average market fee, in order to be sure that anchoring transaction
+does not hang if the bitcoin network is spammed.
+
+This value is written to the global configuration and is applied by all
+the validators.
+
+#### Anchoring schedule
+
+This parameter defines how often anchoring should be executed. It
+defines the difference between block heights for anchored data states.
+
+!!! note Example
+    If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
+    `#3000`, ... would be anchored.
+
+!!! tip "Choosing the interval"
+    The interval may be chosen in a way that under normal conditions the
+    interval between anchored blocks is between 10 minutes and 1 hour.
+
+Sometimes anchoring process timetable could differ from ideal. Such
+variations could be triggered by byzantine behavior of nodes, forking of
+bitcoin blockchain, or changing list of validators. For example, at the
+necessary height (`#1000` because of bitcoin blockchain fork nodes could
+not agree upon which anchoring transaction is the last one (and should
+be spent in the next anchoring tx). If so, nodes will wait until bitcoin
+network do not resolve its fork.
+
+#### Funding UTXO
+
+To refill anchoring address balance, the bitcoin funding transaction
+should be generated that sends money to the current anchoring address.
+Such transaction should be manually written to the global settings to
+ensure all validators include it further.
+
+The funding UTXO should get enough confirmations before being used.
+However, the network do not check number of confirmations for the
+provided funding transaction; it is on administrators' duty.
 
 ## Changing validators list
 
