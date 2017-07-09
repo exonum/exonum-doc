@@ -51,7 +51,7 @@ multisignature addresses architecture.
 When Exonum network should be anchored, every validator builds an
 anchoring transaction using [deterministic algorithm](#creating-anchoring-transaction).
 Its results are guaranteed to
-match for every legitimate node. Such an anchoring transaction spend one
+match for every honest validator. Such an anchoring transaction spend one
 or more UTXOs from the current anchoring multisig address. Bitcoin
 allows different validators sign this transactions separately from each
 other, thus every validator can sign it without regard for other
@@ -59,7 +59,7 @@ validators. All signatures are published into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
 anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M`
-is the necessary amount of signatures. In Exonum PBFT consensus, `M =
+is the necessary amount of signatures. In Exonum consensus, `M =
 2/3*N + 1` is used as supermajority.
 
 !!! note
@@ -79,14 +79,17 @@ is a special algorithm selecting `M` signatures deterministically. If
 all validators are legitimate, certain transaction is built
 unequivocally.
 
-But any Byzantine node could step out from deterministic algorithm and
-use another signatures list for anchoring transaction. It may create a transaction
-with the same anchor hash (the same data-output) but another tx-id and
-spread it to the bitcoin network. Such non-standard transactions make a
-problem: we want to build new anchoring transaction even if previous is
-still not included in any bitcoin block. But previous transaction could
-be substituted by non-standard one with another tx-id. That makes all later
-(already created) anchoring transactions useless.
+But any Byzantine node could step out from deterministic algorithm and 
+use another signatures list for anchoring transaction. It may create a
+transaction with the same anchor hash (the same data-output) but another
+tx-id and spread it to the bitcoin network. Such non-standard
+transactions make a problem: we want to build new anchoring transaction
+even if previous is still not included in any bitcoin block. However,
+there is a chance that this previous transaction or one of its ancestors
+were mutated by a malicious validator as described above, and the
+mutated transaction has been committed on the Bitcoin blockchain. This
+would make the previous transaction ineligible for inclusion into the
+Bitcoin blockchain.
 
 To handle this problem, the consensus is used to select appropriate previous
 transaction ([LECT](#lect) section).
@@ -94,8 +97,8 @@ transaction ([LECT](#lect) section).
 ### LECT
 
 Every validator defines which anchoring transaction is considered to be
-the last one; this transaction should be spend in the new anchoring
-transaction in its opinion. Such transaction is called Last Expected
+the latest one; this transaction should be spend in the new anchoring
+transaction in its opinion. Such transaction is called Latest Expected
 Correct Transaction (LECT). LECT of all validators are published in the
 Exonum blockchain. While creating a new anchoring transaction, the
 validators' supermajority select common LECT and spend its change output.
@@ -199,7 +202,7 @@ chain](#recovering-broken-anchoring)).
   would update its anchoring chain and common LECT would be found. By the
   reason of uncertainty in the bitcoin blockchain common LECT could be
   found even after new time for anchoring comes. New state for anchoring
-  is the last Exonum blockchain state we need to anchor. For example now
+  is the latest Exonum blockchain state we need to anchor. For example now
   we are at the height `#11000` and anchoring should be held every `1000`
   blocks. But common LECT appeared only at the height `#12345`. We anchor
   block `#12000` but there would be no anchor for block `#11000`.
@@ -273,7 +276,7 @@ Sometimes anchoring process timetable could differ from ideal. Such
 variations could be triggered by byzantine behavior of nodes, forking of
 bitcoin blockchain, or changing list of validators. For example, at the
 necessary height (`#1000` because of bitcoin blockchain fork nodes could
-not agree upon which anchoring transaction is the last one (and should
+not agree upon which anchoring transaction is the latest one (and should
 be spent in the next anchoring tx). If so, nodes will wait until bitcoin
 network do not resolve its fork.
 
@@ -315,7 +318,7 @@ properties:
 !!! warning
     It is important that pause between configuration appearing and
     configuration applying is big enough. It should be defined in accordance
-    with necessary number of confirmations for the last LECT.
+    with necessary number of confirmations for the latest LECT.
 
 ### Transitional transaction
 
@@ -341,7 +344,7 @@ Such process could suspend anchoring transaction on fairly a big time.
 For example, if the service waits until 24 confirmations, total pause
 could last for 4-6 hours.
 
-If last LECT does not get enough confirmations before the Exonum
+If latest LECT does not get enough confirmations before the Exonum
 blockchain moves to the new validators list then anchoring chain is
 **BROKEN** and could not be prolonged. Anchoring service would log a lot
 of warnings. To ensure anchoring chain would not be broken during
