@@ -77,7 +77,7 @@ pages:
     - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
     - 'Consensus':
       # Consensus specification
-      - 'Specification': 'advanced/consensus/specification.md'
+      - 'Consensus specification': 'advanced/consensus/specification.md'
       # Leader election algorithm specification
       - 'Leader election': 'advanced/consensus/leader-election.md'
       # Requests specification
