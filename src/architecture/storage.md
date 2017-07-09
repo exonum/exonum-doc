@@ -73,7 +73,7 @@ It creates a usable Map, which [extends][map-procedures] the Base functionality:
 
 ### ListIndex
 
-[`ListIndex`][list-index] represesnts an array list. It wraps around the
+[`ListIndex`][list-index] represents an array list. It wraps around the
 `BaseIndex` field.
 
 The following actions are [supported][list-procedures]:
@@ -90,7 +90,7 @@ The following actions are [supported][list-procedures]:
 is still possible to do so manually).
 
 `ListIndex` saves its elements to the internal `base` map with element
-indices as keys. The list length also is saved at `base` with an
+indices as keys. The list length also is saved at `base` with a
 zero-length tuple `&()` as a key.
 
 ### ValueSetIndex
@@ -108,7 +108,7 @@ The following procedures are [implemented][valueset-procedures]:
 The used hash is calculated as `hash()` method of `StorageValue` trait.
 It is supposed to return cryptographic hash, specifically, SHA-256 hash.
 Also, generally, it is reasonable to calculate the hash of the binary
-serialisation for specific hashing object.
+serialization for specific hashing object.
 
 ### KeySetIndex
 
@@ -132,7 +132,7 @@ entire binary object's serialization into a key.
 
 - The `KeySetIndex` does not have an additional overhead on hashing each
   incoming object.
-- The `KeySetIndex` may not be used when the items are relatively big.
+- The `KeySetIndex` may not be used when the items are relatively big,
   only small objects can be stored (such as integers, small strings, small
   tuples). In contrary, the `ValueSetIndex` more easily handles
   with storing big and complex objects.
@@ -159,7 +159,7 @@ the data itself; inner nodes values are calculated as
 
 - get the height of the tree. As the tree is balanced (though may be not
   fully filled), the height is near to `log2` of the list length.
-- get the value of the tree root (i.e., the hash of the enntire Merkle Tree)
+- get the value of the tree root (i.e., the hash of the entire Merkle Tree)
 - build a proof tree for data value at `index` position, consisting of
   [`ListProof`][list-proof] objects
 - build a proof tree for data values at specific index range, consisting
@@ -179,7 +179,7 @@ authorized by the validators.
 [`ProofMapIndex`][proof-map-index] is an extended version for a map
 based on [Merkle Patricia Tree](../advanced/merkle-patricia-index.md). It implements the same methods as the
 `MapIndex`, adding the ability to create proofs of existence for its
-key-value pairs, or proofs of absense if requested key do not exist in
+key-value pairs, or proofs of absence if requested key do not exist in
 this table. The following additional
 procedures are [supported][proofmap-procedures]:
 
@@ -300,7 +300,7 @@ for creating table prefixes. Example of such prefixes generation can be found
 
 ## List of system tables
 
-The Core owns its own tables that are used for maintainaing blockchain functioning.
+The Core owns its own tables that are used for maintaining blockchain functioning.
 These tables are created [here][blockchain-schema]
 
 There are the following system tables:
