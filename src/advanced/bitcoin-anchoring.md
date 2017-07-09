@@ -117,6 +117,10 @@ LECT must have the following properties:
 The LECT solves transaction malleability problem, though anchoring chain
 may sometimes rollback and skip some anchoring transactions.
 
+Exonum uses a [bitcoind-client](#bitcoind-node), and only one of the
+transactions satisfying conditions can be considered as valid by
+bitcoind-node.
+
 ### Anchoring Transaction Proposal detailed structure
 
 An anchoring transaction proposal is constructed as follows:
