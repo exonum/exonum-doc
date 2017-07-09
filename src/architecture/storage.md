@@ -10,11 +10,13 @@ Storage architecture can be overlooked from different points.
   data storage. These tables represent the highest level at the data
   storage architecture.
 2. [Storage](#storage) explains how tables content is stored.
-    2.1. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
+
+    - [Low-level storage](#low-level-storage) shows, how Exonum keeps the
       data on the hard disk. Now LevelDB is used.
-    2.2. [Table identifiers](#table-identifiers) elaborates how
+    - [Table identifiers](#table-identifiers) elaborates how
       user tables are identified, and shows how the Exonum tables are
       matched into LevelDB.
+
 3. [View layer](#view-layer) introduces the wrapper over DB engine.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
@@ -28,11 +30,9 @@ Storage architecture can be overlooked from different points.
 
 Tables (aka `Indexes`) perform the same role as in usual RDBMS: every
 table stores the records of fixed type. However, unlike RDBMS tables,
-all Exonum tables actually are implemented as Key-Value storages. Both
+all Exonum tables internally are implemented as Key-Value storages. Both
 keys and values are stored as byte sequences, and Exonum do not split
 the stored item on a fields.
-
-Multiple table types may be used in the Exonum applications.
 
 ### Keys sorting
 
@@ -45,7 +45,7 @@ lexicographically over binary sequences.
 ### BaseIndex
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
-table types inherit from it directly. In the matter, `BaseIndex`
+table types inherit from it directly. `BaseIndex`
 [implements][base-procedures] a map interface:
 
 - get, set and remove value by key
@@ -60,10 +60,8 @@ table types inherit from it directly. In the matter, `BaseIndex`
 
 ### MapIndex
 
-[`MapIndex`][map-index] is implementation of Key-Value storage. It wraps
-around the `BaseIndex` field.
-
-It creates a usable Map, which [extends][map-procedures] the Base functionality:
+[`MapIndex`][map-index] is implementation of Key-Value storage. It is a
+wrapper for `BaseIndex` that [extends][map-procedures] its functionality:
 
 - get, set and remove value by key
 - check if the specific key presents
@@ -107,9 +105,8 @@ The following procedures are [implemented][valueset-procedures]:
 - clear the table (removing all stored values)
 
 The used hash is calculated as `hash()` method of `StorageValue` trait.
-It is supposed to return cryptographic hash, specifically, SHA-256 hash.
-Also, generally, it is reasonable to calculate the hash of the binary
-serialization for specific hashing object.
+All built-in types implementing StorageValue compute a hash as SHA-256
+of the binary serialization of a type instance.
 
 ### KeySetIndex
 
@@ -147,30 +144,29 @@ The Merklized indexes represent a list and map with additional
 features. Such indexes may create the proofs of existence or absence for
 the stored data items.
 
+When thin client asks Exonum full-node about some data, the proof is
+built and sent along with the actual data values. Having block headers
+and such proof, thin client may check that received data was really
+authorized by the validators.
+
 #### ProofListIndex
 
 [`ProofListIndex`][proof-list-index] implements a [Merkle
-Tree](../advanced/merkle-index.md) which is an extended version for
+tree](../advanced/merkle-index.md) which is an extended version for
 array list. It implements the same methods as `ListIndex`, however adds
 additional feature. Basing on Merkle Trees, such table allows creating a
-proofs of existence for its values. The table cells are divided into
-leafs and intermediate nodes. Leafs store the data itself; inner nodes
-values are calculated as `hash(concatenate(left_child_value,
+proofs of existence for its values. Tree leafs store the data itself;
+inner nodes values are calculated as `hash(concatenate(left_child_value,
 right_child_value)`. The following additional procedures are
 [implemented][prooflist-procedures]:
 
 - get the height of the tree. As the tree is balanced (though may be not
   fully filled), the height is near to `log2` of the list length.
-- get the value of the tree root (i.e., the hash of the entire Merkle Tree)
+- get the value of the tree root (i.e., the hash of the entire Merkle tree)
 - build a proof tree for data value at `index` position, consisting of
   [`ListProof`][list-proof] objects
 - build a proof tree for data values at specific index range, consisting
   of [`ListProof`][list-proof] objects
-
-When thin client asks Exonum full-node about some data, the proof is
-built and sent along with the actual data values. Having block headers
-and such proof, thin client may check that received data was really
-authorized by the validators.
 
 !!! note
     The `ProofListIndex` do not allow deleting specific values. The only
@@ -179,7 +175,7 @@ authorized by the validators.
 #### ProofMapIndex
 
 [`ProofMapIndex`][proof-map-index] is an extended version for a map
-based on [Merkle Patricia Tree](../advanced/merkle-patricia-index.md).
+based on [Merkle Patricia tree](../advanced/merkle-patricia-index.md).
 It implements the same methods as the `MapIndex`, adding the ability to
 create proofs of existence for its key-value pairs, or proofs of absence
 if requested key do not exist in this table. The following additional
@@ -197,8 +193,7 @@ procedures are [supported][proofmap-procedures]:
 
 Exonum uses third-party database engines to save blockchain data
 locally. To use the particular database, a minimal map interface should
-be implemented for it. It means that database should support the
-following procedures:
+be implemented for it:
 
 - Get value by key;
 - Put new value at the key (insert or update already saved one);
@@ -215,8 +210,8 @@ wrapper][leveldb-wrapper]. At this moment, key-value storage
 All the values from different tables are stored in one big key-value
 table at the low-level storage, wherein the keys are represented as
 bytes sequence, and values are serialized objects, in fact, byte
-sequences too. The keys are transformed in a predetermined way using
-[table identifiers](#table-identifiers).
+sequences too. The keys are mapped to the keys of the low-level storage
+in a predetermined way using [table identifiers](#table-identifiers).
 
 ### Table identifiers
 
@@ -247,9 +242,9 @@ Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
 0x00` ID is reserved to the Core. Tables inside services are identified
 with a `u8` integers and an optional suffixes.
 
-Thus, key `key` at the table `3` with suffix _BTC_ (`0x42 0x54 0x43` in
-ASCII) for the service with ID `1` matches with the following key in the
-LevelDB map:
+Thus, key `key` at the table named _BTC_ (`0x42 0x54 0x43` in ASCII) at
+the table group `3` for the service with ID `1` matches with the
+following key in the LevelDB map:
 
 `0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key`
 
@@ -327,7 +322,7 @@ There are the following system tables:
   validators' precommits for the specific block.
 - `configs`, `ProofMapIndex`.  
   Stores the configurations content in `JSON` format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`.  
+- `configs_actual_from`, `ListIndex`. 
   Builds an index to get config starting height quickly.
 - `state_hash_aggregator`, `ProofMapIndex`.  
   Calculates the final state hash based on the
