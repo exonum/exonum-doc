@@ -322,7 +322,7 @@ There are the following system tables:
   validators' precommits for the specific block.
 - `configs`, `ProofMapIndex`.  
   Stores the configurations content in `JSON` format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`. 
+- `configs_actual_from`, `ListIndex`.  
   Builds an index to get config starting height quickly.
 - `state_hash_aggregator`, `ProofMapIndex`.  
   Calculates the final state hash based on the
