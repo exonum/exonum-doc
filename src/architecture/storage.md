@@ -12,7 +12,7 @@ Storage architecture can be overlooked from different points.
 2. [Storage](#storage) explains how tables content is stored.
     2.1. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
       data on the hard disk. Now LevelDB is used.
-	2.2. [Table identifiers](#table-identifiers) elaborates how
+    2.2. [Table identifiers](#table-identifiers) elaborates how
       user tables are identified, and shows how the Exonum tables are
       matched into LevelDB.
 3. [View layer](#view-layer) introduces the wrapper over DB engine.
@@ -165,7 +165,7 @@ right_child_value)`. The following additional procedures are
 - build a proof tree for data value at `index` position, consisting of
   [`ListProof`][list-proof] objects
 - build a proof tree for data values at specific index range, consisting
-of [`ListProof`][list-proof] objects
+  of [`ListProof`][list-proof] objects
 
 When thin client asks Exonum full-node about some data, the proof is
 built and sent along with the actual data values. Having block headers
@@ -266,7 +266,6 @@ for creating table prefixes. Example of such prefixes generation can be found
     the other table in the same service. Such cases may cause the ineligible
     coincidences between the different keys and elements.
 
-
 ## View layer
 
 Exonum introduces additional layer over database to handle transaction
@@ -311,26 +310,26 @@ functioning. These tables are created [here][blockchain-schema].
 
 There are the following system tables:
 
-- `transactions`, `MapIndex`. 
+- `transactions`, `MapIndex`.
   Represents a map from transaction hash into raw transaction structure.
-- `tx_location_by_hash`, `MapIndex`. 
+- `tx_location_by_hash`, `MapIndex`.
   Keeps the block height and tx position inside block for every
   transaction hash.
-- `blocks`, `MapIndex`. 
+- `blocks`, `MapIndex`.
   Stores block object for every block height.
-- `block_hashes_by_height`, `ListIndex`. 
+- `block_hashes_by_height`, `ListIndex`.
   Saves a block hash that has the requested height.
-- `block_txs`, `ProofListIndex`. 
+- `block_txs`, `ProofListIndex`.
   The set of tables for every `block_height`. Keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`. 
+- `precommits`, `ListIndex`.
   The set of tables for every `block_hash`. Stores the list of
   validators' precommits for the specific block.
-- `configs`, `ProofMapIndex`. 
+- `configs`, `ProofMapIndex`.
   Stores the configurations content in `JSON` format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`. 
+- `configs_actual_from`, `ListIndex`.
   Builds an index to get config starting height quickly.
-- `state_hash_aggregator`, `ProofMapIndex`. 
+- `state_hash_aggregator`, `ProofMapIndex`.
   Calculates the final state hash based on the
   aggregate hashes of other tables.
 
