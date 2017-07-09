@@ -9,19 +9,20 @@ Storage architecture can be overlooked from different points.
 1. [Exonum table types](#exonum-table-types) lists supported types for
   data storage. These tables represent the highest level at the data
   storage architecture.
-2. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
-  data on the hard disk. Now LevelDB is used.
+2. [Storage](#storage) explains how tables content is stored.
+    2.1. [Low-level storage](#low-level-storage) shows, how Exonum keeps the
+      data on the hard disk. Now LevelDB is used.
+	2.2. [Table identifiers](#table-identifiers) elaborates how
+      user tables are identified, and shows how the Exonum tables are
+      matched into LevelDB.
 3. [View layer](#view-layer) introduces the wrapper over DB engine.
   This layer implements a "sandbox" above the real data and provides block
   is applied atomically: either whole block is applied, or whole block is
   discarded.
-4. [Table identifiers](#table-identifiers) elaborates how
-  user tables are identified, and shows how the Exonum tables are
-  matched into LevelDB.
-5. [List of system tables](#list-of-system-tables) describes what tables
+4. [List of system tables](#list-of-system-tables) describes what tables
   are used directly by Exonum Core.
-6. [Indexing](#indexing) reveals how indices can be built.
-7. [Genesis block](#genesis-block) describes how tables are initialized.
+5. [Indexing](#indexing) reveals how indices can be built.
+6. [Genesis block](#genesis-block) describes how tables are initialized.
 
 ## Exonum table types
 
@@ -190,7 +191,9 @@ procedures are [supported][proofmap-procedures]:
   used in the same way as in the `ProofListIndex`: it is sent to the client
   along with the requested data
 
-## Low-level storage
+## Storage
+
+### Low-level storage
 
 Exonum uses third-party database engines to save blockchain data
 locally. To use the particular database, a minimal map interface should
@@ -215,44 +218,7 @@ bytes sequence, and values are serialized objects, in fact, byte
 sequences too. The keys are transformed in a predetermined way using
 [table identifiers](#table-identifiers).
 
-## View layer
-
-Exonum introduces additional layer over database to handle transaction
-and block atomicity.
-
-### Patches
-
-The [patch][patch] is a set of serial changes that should be applied to
-the low-level storage atomically. Such patch may include two types of
-operations: put a value by key, or delete a value by key.
-
-### Snapshots
-
-The [snapshot][snapshot] fixes the storage state on the moment of
-creation and provides a read-only API to it. Even if the storage state
-is updated, the snapshot still refers to the old table content.
-
-### Forks
-
-[Forks][fork] implement the same interfaces as the database underneath,
-transparently wrapping the real data storage state, and add some
-additional changes. Every fork is based on the storage snapshot. From
-the outer point of view, the changes are eagerly applied to the data
-storage; however, these changes are stored directly in the fork and may
-be easily rolled back. Moreover, there may be different forks of
-the same database snapshot.
-
-Forks are used during block creation: validator node apply some
-transactions, check its correctness, apply other ones, and finally
-decides which transactions should be applied to the data and which
-should not. If one of the transactions falls with `panic` during
-execution, its changes are promptly reverted.
-
-During the block execution, fork allows to create the [list of
-changes](#patches) and apply all changes to the
-data storage atomically.
-
-## Table identifiers
+### Table identifiers
 
 Exonum tables are divided into two groups.
 
@@ -299,6 +265,44 @@ for creating table prefixes. Example of such prefixes generation can be found
     situation when one table identifier inside the service is a prefix for
     the other table in the same service. Such cases may cause the ineligible
     coincidences between the different keys and elements.
+
+
+## View layer
+
+Exonum introduces additional layer over database to handle transaction
+and block atomicity.
+
+### Patches
+
+The [patch][patch] is a set of serial changes that should be applied to
+the low-level storage atomically. Such patch may include two types of
+operations: put a value by key, or delete a value by key.
+
+### Snapshots
+
+The [snapshot][snapshot] fixes the storage state on the moment of
+creation and provides a read-only API to it. Even if the storage state
+is updated, the snapshot still refers to the old table content.
+
+### Forks
+
+[Forks][fork] implement the same interfaces as the database underneath,
+transparently wrapping the real data storage state, and add some
+additional changes. Every fork is based on the storage snapshot. From
+the outer point of view, the changes are eagerly applied to the data
+storage; however, these changes are stored directly in the fork and may
+be easily rolled back. Moreover, there may be different forks of
+the same database snapshot.
+
+Forks are used during block creation: validator node apply some
+transactions, check its correctness, apply other ones, and finally
+decides which transactions should be applied to the data and which
+should not. If one of the transactions falls with `panic` during
+execution, its changes are promptly reverted.
+
+During the block execution, fork allows to create the [list of
+changes](#patches) and apply all changes to the
+data storage atomically.
 
 ## List of system tables
 
