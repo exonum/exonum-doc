@@ -310,26 +310,26 @@ functioning. These tables are created [here][blockchain-schema].
 
 There are the following system tables:
 
-- `transactions`, `MapIndex`.
+- `transactions`, `MapIndex`.  
   Represents a map from transaction hash into raw transaction structure.
-- `tx_location_by_hash`, `MapIndex`.
+- `tx_location_by_hash`, `MapIndex`.  
   Keeps the block height and tx position inside block for every
   transaction hash.
-- `blocks`, `MapIndex`.
+- `blocks`, `MapIndex`.  
   Stores block object for every block height.
-- `block_hashes_by_height`, `ListIndex`.
+- `block_hashes_by_height`, `ListIndex`.  
   Saves a block hash that has the requested height.
-- `block_txs`, `ProofListIndex`.
+- `block_txs`, `ProofListIndex`.  
   The set of tables for every `block_height`. Keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`.
+- `precommits`, `ListIndex`.  
   The set of tables for every `block_hash`. Stores the list of
   validators' precommits for the specific block.
-- `configs`, `ProofMapIndex`.
+- `configs`, `ProofMapIndex`.  
   Stores the configurations content in `JSON` format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`.
+- `configs_actual_from`, `ListIndex`.  
   Builds an index to get config starting height quickly.
-- `state_hash_aggregator`, `ProofMapIndex`.
+- `state_hash_aggregator`, `ProofMapIndex`.  
   Calculates the final state hash based on the
   aggregate hashes of other tables.
 
