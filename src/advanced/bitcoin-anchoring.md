@@ -1,28 +1,28 @@
 # Anchoring service
 
 The anchoring service is developed to increase product security and
-provide non-repudiation for Exonum applications. Service publishes
+provide non-repudiation for Exonum applications. Service periodically publishes
 Exonum blockchain state hash to the bitcoin blockchain, so that it is
 publicly auditable by anyone having access to the Exonum blockchain. Even in
-the case of validators collusion old transactions can not be
+the case of validators collusion transation history can not be
 falsified; disrepancy between actual Exonum blockchain state and the
 one written to the bitcoin blockchain would be found instantly.
 
-!!! note "Another pages about anchoring service"
-    This page describe mostly how the service do work; however, there is a
+!!! note
+    This page describe mostly how the service do work. There is a
     separate page, describing how the service should be [configured and
-    deployed][anchoring-deploy]. The sources are located [on the
+    deployed][anchoring-deploy]. The source code is located [on the
     GitHub][github-anchoring].
 
 ## General idea
 
-The service writes the hash of the last Exonum block to the permanent
+The service writes the hash of the latest Exonum block to the permanent
 read-only persistent storage available to everyone. The block is called
 _anchored block, and its hash is referred as _blockchain state hash_
 further.
 
-To write a blockchain state hash, the service builds a _anchoring chain_ on
-the top of bitcoin blockchain. Such chain consists of multiple _bitcoin
+The service builds a _anchoring chain_ on
+the top of bitcoin blockchain, which consists of multiple _bitcoin
 anchoring transactions_. Each anchoring transaction have at least 1
 input and only 2 outputs: data output and change output. Data output
 contains written data storage hash, while change output transfers money
@@ -62,7 +62,7 @@ anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M`
 is the necessary amount of signatures. In Exonum PBFT consensus, `M =
 2/3*N + 1` is used as supermajority.
 
-!!! note Example
+!!! note
     If there are `N=10` validators, then `M=7` represents a supermajority.
     That means, 7 signatures are required to build an anchoring transaction.
     If `N=4`, then `M=3` signatures are required.
@@ -207,12 +207,10 @@ chain](#recovering-broken-anchoring)).
 
 ## Setups and configuration
 
-Anchoring requires additional settings to be set. There are both local
-and global [configuration settings](../architecture/configuration.md).
-Local are accepted just to the current node, while global are shared
-between all the validators.
+Anchoring requires additional [global and local configuration
+parameters](../architecture/configuration.md) to be set.
 
-### Local settings
+### Local configuration
 
 #### Bitcoind node
 
@@ -235,10 +233,7 @@ You need to specify the following settings to access the bitcoind node:
 
 Every validator should possess its own secp256k1 EC keypair in order to
 participate in anchoring process. This is the standard (and currently
-the only supported) key format for bitcoin transactions. While the
-private keys should be secured by every validator, the [public
-keys](#bitcoin-public-keys) are shared among them and are written into
-Exonum blockchain.
+the only supported) key format for bitcoin transactions.
 
 #### Observer interval
 
@@ -266,11 +261,11 @@ does not hang if the bitcoin network is spammed.
 This parameter defines how often anchoring should be executed. It
 defines the difference between block heights for anchored data states.
 
-!!! note Example
+!!! note
     If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
     `#3000`, ... would be anchored.
 
-!!! tip "Choosing the interval"
+!!! tip
     The interval may be chosen in a way that under normal conditions the
     interval between anchored blocks is between 10 minutes and 1 hour.
 
@@ -317,7 +312,7 @@ properties:
   every validator simultaneously. The list of validators finally is
   changed.
 
-!!! warning Pause should be big
+!!! warning
     It is important that pause between configuration appearing and
     configuration applying is big enough. It should be defined in accordance
     with necessary number of confirmations for the last LECT.
