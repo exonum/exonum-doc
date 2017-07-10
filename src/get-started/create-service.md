@@ -1,10 +1,9 @@
 # Cryptocurrency Tutorial: Intro
 
-This section explains how to create a safe transactional system to transfer
-money. It implements a minimal cryptocurrency.
+In this demo we create and run single-node blockchain network that implements
+a minimal cryptocurrency.
 
-In this demo we create and run single-node blockchain network. That network
-will accept two types of transactions: create a wallet with a default balance,
+It will accept two types of transactions: create a wallet with a default balance,
 transfer money between the wallets. Also we define a persistent storage to keep
 the balance of wallets.
 
@@ -102,7 +101,7 @@ You can try to run it with command:
 cargo run
 ```
 
-Exonum contais `Blockchain` type.
+Exonum contains `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
 [provided services](../architecture/services.md). While we haven't implemented
 a service we keep the list empty.
@@ -205,9 +204,8 @@ node.run().unwrap();
 
 ## Declare persistent data
 
-Blockchain is a middleware to keep operations in protected blocks and execute
-it to restore the data. We should declare what kind of data we want to store
-and update.
+Blockchain is a database which keep the data in protected blocks.
+We should declare what kind of data we want to store in a blockchain.
 
 For our case we should declare a container to store the information about
 wallets and its balance. Inside the wallet we want to store the public key
@@ -264,12 +262,12 @@ pub struct CurrencySchema<'a> {
 For access to the objects inside the storage we have to declare the layout of
 the data. For example, if we want to keep the wallets in the storage we will
 use an instance of `MapIndex`: key-value view to our data where key of index
-is a public key of walet, but value is a serialized `Wallet` struct.
+is a public key of wallet, but value is a serialized `Wallet` struct.
 
 Fork provides random access to every data inside the database.
 To separate the data we should add a unique prefix to every group of data.
-To store all wallets in a separate logically domain we add the prefix
-in the first argument to `MapIndex::new` call:
+To store all wallets in a separate domain we will add the prefix in the
+first argument to `MapIndex::new` call:
 
 ```rust
 impl<'a> CurrencySchema<'a> {
@@ -373,16 +371,15 @@ impl Transaction for TxCreateWallet {
 }
 ```
 
-For money transfer transaction we also will check that sender is not the
-receiver, because the implementation below will create money out of nowhere if
-sender is equal to receiver
-
 This transaction also adds `100` to the balance of wallet.
 
 `TxTransfer` transaction finds two wallets for both sides of a transfer
 transaction. If they have been found it checks the balance of the sender and if
 it has enough money then decreases the sender balance and increases the balance
 of receiver.
+
+We also have to check that sender is not the receiver, because the implementation
+below will create money out of nowhere if the sender is equal to the receiver.
 
 ```rust
 impl Transaction for TxTransfer {
@@ -454,8 +451,9 @@ To join our handler with http handler of a web-server we implemented `wire`
 method. This method takes the reference to a router. In the method below we add
 one handler to convert any input `JSON` data to a `Transaction` instance.
 
-Transaction gives the hash which will be send to the client. Also every
-transaction sends to the channel of the blockchain node.
+The transactions endpoint responds with a hash of the transaction. It also
+sends the transaction via the channel, so that it will be broadcast over the
+blockchain network and included into a block.
 
 We bind the transaction handler to `/v1/wallets/transaction` route.
 
@@ -590,7 +588,20 @@ Use `curl` command to send this transaction to the node by HTTP:
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
-This transactions creates first wallet and return hash of the transaction.
+This transactions creates first wallet and return hash of the transaction:
+
+```js
+{
+  "tx_hash": "44c6c2c58eaab71f8d627d75ca72f244289bc84586a7fb42186a676b2ec4626b"
+}
+```
+
+Node will show that first wallet created:
+
+```none
+Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
+                            name: "Johnny Doe", balance: 100 }
+```
 
 To create the second wallet put the code into `create-wallet-2.json` file:
 
@@ -612,6 +623,21 @@ Send it with `curl` to the node:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+```
+
+It returns the hash of the second transaction:
+
+```js
+{
+  "tx_hash": "8714e90607afc05f43b82c475c883a484eecf2193df97b243b0d8630812863fd"
+}
+```
+
+Node prints the second wallet created successfully:
+
+```none
+Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
+                            name: "Janie Roe", balance: 100 }
 ```
 
 Now we have 2 wallets in the database and we can transfer money between them.
@@ -640,18 +666,22 @@ To send it to the node enter:
 curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
-This call returns a hash of the transaction and node prints to the console:
+The last transaction returns the hash:
 
-```sh
-Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
-                            name: "Johnny Doe", balance: 100 }
-Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
-                            name: "Janie Roe", balance: 100 }
+```js
+{
+  "tx_hash": "e63b28caa07adffb6e2453390a59509a1469e66698c75b4cfb2f0ae7a6887fdc"
+}
+```
+
+Node prints to the console an information about this transfer:
+
+```none
 Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                                    name: "Johnny Doe", balance: 90 }
                        => Wallet { pub_key: PublicKey(D1E87747),
                                    name: "Janie Roe", balance: 110 }
 ```
 
-You've created the first blockchain with 2 walltes and transfered some money
+You've created the first blockchain with 2 wallets and transfered some money
 between them.
