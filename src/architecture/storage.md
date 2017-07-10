@@ -1,21 +1,22 @@
 # Exonum Data Model
 
-This page describes how Exonum persists data, from the lowest
-(LevelDB) to the high abstract layers that are used in the client
+This page describes Exonum **data storage** principles, from the database engine
+used (LevelDB), to the abstractions that are used in client
 applications.
 
-1. [Exonum table types](#exonum-table-types) lists supported types of
+1. [Exonum table types](#table-types) lists supported types of
   data storage collections. Tables represent the highest abstraction level
   for data storage
-2. [Storage](#storage) explains how tables are persisted using LevelDB
+2. [Low-level storage](#low-level-storage) explains how tables are persisted
+  using LevelDB
 3. [View layer](#view-layer) describes the wrapper over the DB engine
   that ensures atomicity of blocks and transactions
-4. [List of system tables](#list-of-system-tables) contains tables
+4. [List of system tables](#system-tables) contains tables
   used directly by Exonum Core
 5. [Indexing](#indexing) gives an insight how indexes over structured data
   can be built in Exonum
 
-## Exonum table types
+## Table Types
 
 Tables (aka indexes) perform the same role as in relational database
 management systems (RDBMSs). Every
@@ -25,7 +26,7 @@ Both keys and values in the wrapped stores are persisted as byte sequences.
 Exonum does not natively support operations (matching, grouping, sorting, etc.)
 over separate value fields, as it is the case with other key-value storages.
 
-### Key sorting and iterators
+### Key Sorting and Iterators
 
 Exonum tables implement iterators over stored items (or keys, values, and key-value
 pairs in the case of maps). Such
@@ -137,7 +138,7 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
   elements, while the `ValueSetIndex` order elements arbitrarily due to hash
   function properties.
 
-### Merklized indexes
+### Merklized Indexes
 
 Merklized indexes represent a list and map with additional
 features. Such indexes can create the proofs of existence or absence for
@@ -187,9 +188,7 @@ procedures are supported:
 - Build a proof for the requested key. Tree proves either key
   existence (and its value), or key absence
 
-## Storage
-
-### Low-level storage
+## Low-level Storage
 
 Exonum uses third-party database engines to persist blockchain state
 locally. To use the particular database, a minimal [`Database`][database]
@@ -211,7 +210,7 @@ format. Keys of the wrapped `BaseIndex` of a specific table
 are mapped to the low-level storage keys
 in a deterministic manner using [table identifiers](#table-identifiers).
 
-### Table identifiers
+### Table Identifiers
 
 Every table is uniquely identified by the compound prefix, which is used
 to map table keys into keys of the underlying low-level storage. The
@@ -224,7 +223,7 @@ service.
 All tables created with the same prefix will be the views of the same data.
 
 Services identifier is a 2-byte unsigned integer, `u16`.
-[System tables](#list-of-system-tables) have service ID equal to `0`.
+[System tables](#system-tables) have service ID equal to `0`.
 Tables inside services are identified
 with `u8` integers and an optional suffix. If the suffix is present,
 the `u8` integer denotes a *group* of tables, rather than a single table,
@@ -252,7 +251,7 @@ for an example.
     another table in the same service. Such cases may cause unpredictable
     collisions between logically different keys and elements.
 
-## View layer
+## View Layer
 
 Exonum introduces additional layer over database to handle transaction
 and block atomicity.
@@ -288,7 +287,7 @@ raises `panic`) during
 execution, its changes are promptly rolled back, so that execution of the following
 transactions continues normally.
 
-## List of system tables
+## System Tables
 
 The Core [maintains tables][blockchain-schema] that are used
 for core blockchain functionality:
