@@ -279,15 +279,14 @@ storage; however, these changes are stored directly in the fork and may
 be easily rolled back. Moreover, there may be different forks of
 the same database snapshot.
 
-Forks are used during block creation: validator node applies
-transactions, check its correctness, apply other ones, and finally
-decides which transactions should be applied to the data and which
-should not. If one of the transactions falls with `panic` during
-execution, its changes are promptly reverted.
-
-During the block execution, fork allows to create a [patch](#patches)
-comprising changes made by all transactions in the block
-and then apply the patch atomically.
+Forks are used during transaction and block processing.
+A fork [is successively passed](transactions.md#execute)
+to each transaction in the block to accumulate changes produced by the transactions,
+in a [patch](#patches).
+If one of transactions in the block quits with an unhandled exception (i.e.,
+raises `panic`) during
+execution, its changes are promptly rolled back, so that execution of the following
+transactions continues normally.
 
 ## List of system tables
 
