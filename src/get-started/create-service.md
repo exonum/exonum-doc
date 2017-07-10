@@ -73,10 +73,13 @@ configuration file.
 ### Create keys
 
 This code makes a pair of keys. They determine the uniqueness of the node.
-We use `exonum::crypto::gen_keypair()` function take random pair of keys:
+We use `exonum::crypto::gen_keypair()` function take random pair of keys.
+The node needs pair of keys for a consensus and pair for service needs.
 
 ```rust
-let (public_key, secret_key) = exonum::crypto::gen_keypair();
+let (consensus_public_key, consensus_secret_key) = exonum::crypto::gen_keypair();
+let (service_public_key, service_secret_key) = exonum::crypto::gen_keypair();
+
 ```
 
 ### Configure node
@@ -94,10 +97,14 @@ parts:
 Genesis configuration contains a list of public keys of
 [validators](../glossary.md#validator): nodes which can vote for block
 acceptance. Our demo blockchain network has only one validator. Fill this
-list with your public key value:
+list with your public keys:
 
 ```rust
-let genesis = GenesisConfig::new(vec![public_key].into_iter());
+let validator_keys = ValidatorKeys {
+    consensus_key: consensus_public_key,
+    service_key: service_public_key,
+};
+let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
 ```
 
 Let's configure REST API to open the node for external web requests.
@@ -125,12 +132,17 @@ let peer_address = "0.0.0.0:2000".parse().unwrap();
 let node_cfg = NodeConfig {
     listen_address: peer_address,
     peers: vec![],
-    public_key,
-    secret_key,
+    service_public_key,
+    service_secret_key,
+    consensus_public_key,
+    consensus_secret_key,
     genesis,
+    external_address: None,
     network: Default::default(),
     whitelist: Default::default(),
     api: api_cfg,
+    mempool: Default::default(),
+    services_configs: Default::default(),
 };
 
 let mut node = Node::new(blockchain, node_cfg);
@@ -423,8 +435,8 @@ contains a channel - a connection to the blockchain node instance.
 
 ```rust
 #[derive(Clone)]
-struct CryptocurrencyApi<T> {
-    channel: T,
+struct CryptocurrencyApi {
+    channel: TxSender<NodeChannel>,
 }
 ```
 
@@ -468,7 +480,7 @@ transaction sends to the channel of the blockchain node.
 We bind the transaction handler to `/v1/wallets/transaction` route.
 
 ```rust
-impl<T: TransactionSend + Clone + 'static> Api for CryptocurrencyApi<T> {
+impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
 
         let self_ = self.clone();
