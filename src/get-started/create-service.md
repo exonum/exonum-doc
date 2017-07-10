@@ -291,14 +291,14 @@ performs actions with a blockchain.
 
 For our cryptocurrency demonstration we need two transaction types:
 
-1. Create a new wallet and add some money to it
-2. Transfer money between two different wallets
+- Create a new wallet and add some money to it
+- Transfer money between two different wallets
 
 Declaration of any transaction needs to contain:
 
-1. Service identifier
-2. Unique (within the service) identifier of message
-2. Size of fixed part of the message
+- Service identifier
+- Unique (within the service) identifier of message
+- Size of the fixed part of the message
 
 You have to add service and message identifiers, because Exonum will use it
 for deserialization purposes.
