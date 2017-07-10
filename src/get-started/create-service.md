@@ -570,7 +570,7 @@ Let's send transactions to our demo.
 
 Create `create-wallet-1.json` file and put the content:
 
-```js
+```json
 {
     "body": {
         "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
@@ -587,18 +587,20 @@ Create `create-wallet-1.json` file and put the content:
 Use `curl` command to send this transaction to the node by HTTP:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
+http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
-This transactions creates first wallet and return hash of the transaction:
+This transaction creates the first wallet associated with user Johnny Doe.
+The transaction endpoint returns the hash of the transaction:
 
-```js
+```json
 {
   "tx_hash": "44c6c2c58eaab71f8d627d75ca72f244289bc84586a7fb42186a676b2ec4626b"
 }
 ```
 
-Node will show that first wallet created:
+The node will show in the log that the first wallet has been created:
 
 ```none
 Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
@@ -607,7 +609,7 @@ Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
 
 To create the second wallet put the code into `create-wallet-2.json` file:
 
-```js
+```json
 {
     "body": {
         "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
@@ -624,18 +626,19 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 Send it with `curl` to the node:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json \
+http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
 It returns the hash of the second transaction:
 
-```js
+```json
 {
   "tx_hash": "8714e90607afc05f43b82c475c883a484eecf2193df97b243b0d8630812863fd"
 }
 ```
 
-Node prints the second wallet created successfully:
+The node will show in the log that the second wallet has been created:
 
 ```none
 Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
@@ -645,7 +648,7 @@ Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
 Now we have 2 wallets in the database and we can transfer money between them.
 Create `transfer-funds.json` and add to the file:
 
-```js
+```json
 {
     "body": {
         "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
@@ -665,12 +668,13 @@ This transaction transfer 10 units from the first wallet to the second.
 To send it to the node enter:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json \
+http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
 The last transaction returns the hash:
 
-```js
+```json
 {
   "tx_hash": "e63b28caa07adffb6e2453390a59509a1469e66698c75b4cfb2f0ae7a6887fdc"
 }
