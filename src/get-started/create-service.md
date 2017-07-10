@@ -55,9 +55,11 @@ extern crate router;
 extern crate bodyparser;
 extern crate iron;
 
-use exonum::blockchain::{self, Blockchain, Service, GenesisConfig, ValidatorKeys, Transaction, ApiContext};
+use exonum::blockchain::{self, Blockchain, Service, GenesisConfig,
+                         ValidatorKeys, Transaction, ApiContext};
+use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
+                   TxSender, NodeChannel};
 use exonum::messages::{RawTransaction, FromRaw, Message};
-use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend, TxSender, NodeChannel};
 use exonum::storage::{Fork, MemoryDB, MapIndex};
 use exonum::crypto::{PublicKey, Hash};
 use exonum::encoding::{self, Field};
@@ -336,7 +338,6 @@ with our schema to turn it into structured storage with our data layout inside.
 
 In the following method we verify the signature of a transaction, check that
 the wallet is not exists and add a new one if so:
-
 
 ```rust
 impl Transaction for TxCreateWallet {
@@ -624,10 +625,15 @@ curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json http://
 
 This call returns a hash of the transaction and node prints to the console:
 
-```
-Create the wallet: Wallet { pub_key: PublicKey(3E657AE), name: "Johnny Doe", balance: 100 }
-Create the wallet: Wallet { pub_key: PublicKey(D1E87747), name: "Janie Roe", balance: 100 }
-Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE), name: "Johnny Doe", balance: 90 } => Wallet { pub_key: PublicKey(D1E87747), name: "Janie Roe", balance: 110 }
+```sh
+Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
+                            name: "Johnny Doe", balance: 100 }
+Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
+                            name: "Janie Roe", balance: 100 }
+Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
+                                   name: "Johnny Doe", balance: 90 }
+                       => Wallet { pub_key: PublicKey(D1E87747),
+                                   name: "Janie Roe", balance: 110 }
 ```
 
 You've created the first blockchain with 2 walltes and transfered some money
