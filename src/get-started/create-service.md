@@ -496,7 +496,7 @@ impl Api for CryptocurrencyApi {
                 Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
             }
         };
-        
+
         // Bind the transaction handler to a specific route.
         let route_post = "/v1/wallets/transaction";
         router.post(&route_post, tx_handler, "transaction");
