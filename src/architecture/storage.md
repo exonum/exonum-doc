@@ -18,7 +18,7 @@ Storage architecture can be viewed from different points:
       mapped into LevelDB global keyspace
 
 3. [View layer](#view-layer) describes the wrapper over the DB engine.
-  This layer implements a "sandbox" above the real data and ensures atomicity
+  This layer implements a “sandbox” above the real data and ensures atomicity
   of block commitment
 4. [List of system tables](#list-of-system-tables) describes tables
   used directly by Exonum Core
@@ -181,7 +181,7 @@ create proofs of existence for its key-value pairs, or proofs of absence
 if a key is absent in the map. The following additional
 procedures are supported:
 
-- Get the root node's value
+- Get the root node’s value
 - Build a proof for the requested key. Tree proves either key
   existence (and its value), or key absence
 
@@ -223,7 +223,7 @@ Exonum tables are divided into two groups.
 Such differentiation corresponds to schemas in the relational databases.
 There may be different tables with the same name located in
 different schemas. System tables may be considered as tables
-for the especial consensus "service"; Exonum Core creates and uses these
+for the especial consensus “service”; Exonum Core creates and uses these
 tables using the same APIs as services do.
 
 Every table is uniquely identified by the compound prefix, which is used
@@ -317,7 +317,7 @@ There are the following system tables:
   a list of transactions for the specific block.
 - `precommits`, `ListIndex`.  
   Group of tables keyed by the block hash. Each table stores a list of
-  validators' precommits for the specific block.
+  validators’ precommits for the specific block.
 - `configs`, `ProofMapIndex`.  
   Stores the configurations content in JSON format, using its hash as a key.
 - `configs_actual_from`, `ListIndex`.  
