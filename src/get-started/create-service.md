@@ -408,70 +408,6 @@ impl Transaction for TxTransfer {
 }
 ```
 
-## Define minimal service
-
-Service is a group of templated transactions (we've defined them before). It
-has a name and a unique id to determine the service inside a blockchain.
-
-```rust
-struct CurrencyService;
-```
-
-We created `CurrencyService` struct and to turn it into a blockchain service
-we should implement `Service` trait to it. You can read more in the
-[Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
-section.
-
-Two first methods are simple: `service_name` returns the name of our service,
-`service_id` return the unique id of our service (`SERVICE_ID` constant used).
-
-The method `tx_from_raw` is used to convert into a transaction any data which
-coming to the node. To choose the right deserializer we can use `message_type()`
-to get the unique identifier of message we declared before. If transaction
-built sucessfully we put it into the `Box<_>`.
-
-The last method `public_api_handler` have to make REST `Handler` to handle
-web requests to the REST API. We can put any handler for eny request and we will
-implement the capability to add transaction with the REST API. As our API needs
-to send transactions to the node we add `node_channel` to our
-`CryptocurrencyApi` instance.
-
-```rust
-
-impl Service for CurrencyService {
-    fn service_name(&self) -> &'static str { "cryptocurrency" }
-
-    fn service_id(&self) -> u16 { SERVICE_ID }
-
-    fn tx_from_raw(&self, raw: RawTransaction)
-        -> Result<Box<Transaction>, encoding::Error> {
-
-        let trans: Box<Transaction> = match raw.message_type() {
-            TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
-            TX_CREATE_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
-            _ => {
-                return Err(encoding::Error::IncorrectMessageType {
-                    message_type: raw.message_type()
-                });
-            },
-        };
-        Ok(trans)
-    }
-
-    fn public_api_handler(&self, ctx: &ApiContext) -> Option<Box<Handler>> {
-        let mut router = Router::new();
-        let api = CryptocurrencyApi {
-            channel: ctx.node_channel().clone(),
-        };
-        api.wire(&mut router);
-        Some(Box::new(router))
-    }
-}
-```
-
-`CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
-`Api::wire` method to connect this `Api` instance to the `Router`.
-
 ## API implementation
 
 Node's API is a struct which implements `Api` trait. We defined one which
@@ -546,6 +482,70 @@ impl Api for CryptocurrencyApi {
     }
 }
 ```
+
+## Define minimal service
+
+Service is a group of templated transactions (we've defined them before). It
+has a name and a unique id to determine the service inside a blockchain.
+
+```rust
+struct CurrencyService;
+```
+
+We created `CurrencyService` struct and to turn it into a blockchain service
+we should implement `Service` trait to it. You can read more in the
+[Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
+section.
+
+Two first methods are simple: `service_name` returns the name of our service,
+`service_id` return the unique id of our service (`SERVICE_ID` constant used).
+
+The method `tx_from_raw` is used to convert into a transaction any data which
+coming to the node. To choose the right deserializer we can use `message_type()`
+to get the unique identifier of message we declared before. If transaction
+built sucessfully we put it into the `Box<_>`.
+
+The last method `public_api_handler` have to make REST `Handler` to handle
+web requests to the REST API. We can put any handler for eny request and we will
+implement the capability to add transaction with the REST API. As our API needs
+to send transactions to the node we add `node_channel` to our
+`CryptocurrencyApi` instance.
+
+```rust
+
+impl Service for CurrencyService {
+    fn service_name(&self) -> &'static str { "cryptocurrency" }
+
+    fn service_id(&self) -> u16 { SERVICE_ID }
+
+    fn tx_from_raw(&self, raw: RawTransaction)
+        -> Result<Box<Transaction>, encoding::Error> {
+
+        let trans: Box<Transaction> = match raw.message_type() {
+            TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
+            TX_CREATE_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
+            _ => {
+                return Err(encoding::Error::IncorrectMessageType {
+                    message_type: raw.message_type()
+                });
+            },
+        };
+        Ok(trans)
+    }
+
+    fn public_api_handler(&self, ctx: &ApiContext) -> Option<Box<Handler>> {
+        let mut router = Router::new();
+        let api = CryptocurrencyApi {
+            channel: ctx.node_channel().clone(),
+        };
+        api.wire(&mut router);
+        Some(Box::new(router))
+    }
+}
+```
+
+`CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
+`Api::wire` method to connect this `Api` instance to the `Router`.
 
 ## Run
 
