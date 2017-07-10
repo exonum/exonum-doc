@@ -143,10 +143,12 @@ Node expects a blockchain instance and a configuration.
 [Node configuration](../architecture/configuration.md) consists of two
 parts:
 
-* Local configuration which includes:
-    * Node configuration (e.g., IP settings and other configuration parts)
-    * API configuration (e.g., settings of REST API)
-* Global configuration or genesis configuration (all parameters
+- Local configuration which includes:
+
+    - Node configuration (e.g., IP settings and other configuration parts)
+    - API configuration (e.g., settings of REST API)
+
+- Global configuration or genesis configuration (all parameters
   that need to be the same for all nodes in the network)
 
 The genesis configuration contains a list of public keys of
