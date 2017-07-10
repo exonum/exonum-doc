@@ -290,39 +290,40 @@ transactions continues normally.
 
 ## List of system tables
 
-The Core owns its own tables that are used for maintaining blockchain
-functioning. These tables are initialized [here][blockchain-schema].
+The Core [maintains tables][blockchain-schema] that are used
+for core blockchain functionality:
 
-There are the following system tables:
-
-- `transactions`, `MapIndex`.  
+- `transactions: MapIndex`  
   Represents a map from transaction hash into raw transaction structure.
-- `tx_location_by_hash`, `MapIndex`.  
+- `tx_location_by_hash: MapIndex`  
   Keeps the block height and tx position inside block for every
   transaction hash.
-- `blocks`, `MapIndex`.  
+- `blocks: MapIndex`  
   Stores block object for every block height.
-- `block_hashes_by_height`, `ListIndex`.  
+- `block_hashes_by_height: ListIndex`  
   Saves a block hash that has the requested height.
-- `block_txs`, `ProofListIndex`.  
+- `block_txs: ProofListIndex`  
   Group of tables keyed by the block height. Each table keeps
   a list of transactions for the specific block.
-- `precommits`, `ListIndex`.  
+- `precommits: ListIndex`  
   Group of tables keyed by the block hash. Each table stores a list of
   validators’ precommits for the specific block.
-- `configs`, `ProofMapIndex`.  
+- `configs: ProofMapIndex`  
   Stores the configurations content in JSON format, using its hash as a key.
-- `configs_actual_from`, `ListIndex`.  
+- `configs_actual_from: ListIndex`  
   Builds an index to get a configuration activating at a specific height quickly.
 
 ## Indexing
 
-Exonum does not support indices over fields of stored elements
-as an individual entity. However, it is
-possible to create additional table with indexing semantics. For example,
-there is the system table `block_txs` that stores a list of transactions
-for every block. `tx_location_by_hash` is an auxiliary table that provides
-an index to quickly lookup `block_txs` by a transaction hash.
+Unlike relational databases, Exonum does not support indices over fields
+of table elements as an first-class entity. However, it is
+possible to create additional tables with indexing semantics and update their
+content together with the tables being indexed.
+
+!!! note "Example"
+    The system table `block_txs` stores a list of transactions
+    for every block. `tx_location_by_hash` is an auxiliary table that provides
+    an index to quickly lookup `block_txs` by a transaction hash.
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
