@@ -4,40 +4,40 @@ This page describes how Exonum persists data, from the lowest
 (LevelDB) to the high abstract layers that are used in the client
 applications.
 
-Storage architecture can be overlooked from different points.
+Storage architecture can be viewed from different points:
 
-1. [Exonum table types](#exonum-table-types) lists supported types for
-  data storage. These tables represent the highest level at the data
-  storage architecture.
+1. [Exonum table types](#exonum-table-types) lists supported types of
+  data storage collections. These tables represent the highest level
+  at the data storage architecture.
 2. [Storage](#storage) explains how tables content is stored.
 
-    - [Low-level storage](#low-level-storage) shows, how Exonum keeps the
-      data on the hard disk. Now LevelDB is used.
+    - [Low-level storage](#low-level-storage) shows how Exonum keeps the
+      data on the hard disk using LevelDB
     - [Table identifiers](#table-identifiers) elaborates how
       user tables are identified, and shows how the Exonum tables are
-      matched into LevelDB.
+      mapped into LevelDB global keyspace
 
-3. [View layer](#view-layer) introduces the wrapper over DB engine.
-  This layer implements a "sandbox" above the real data and provides block
-  is applied atomically: either whole block is applied, or whole block is
-  discarded.
-4. [List of system tables](#list-of-system-tables) describes what tables
-  are used directly by Exonum Core.
-5. [Indexing](#indexing) reveals how indices can be built.
-6. [Genesis block](#genesis-block) describes how tables are initialized.
+3. [View layer](#view-layer) describes the wrapper over the DB engine.
+  This layer implements a "sandbox" above the real data and ensures atomicity
+  of block commitment
+4. [List of system tables](#list-of-system-tables) describes tables
+  used directly by Exonum Core
+5. [Indexing](#indexing) reveals how indices can be built
+6. [Genesis block](#genesis-block) describes how tables are initialized
 
 ## Exonum table types
 
-Tables (aka `Indexes`) perform the same role as in usual RDBMS: every
-table stores the records of fixed type. However, unlike RDBMS tables,
-all Exonum tables internally are implemented as Key-Value storages. Both
-keys and values are stored as byte sequences, and Exonum do not split
-the stored item on a fields.
+Tables (aka indexes) perform the same role as in relational database
+management systems (RDBMSs). Every
+table stores records of a specific type. However, unlike RDBMS tables,
+all Exonum tables internally are implemented as key-value stores. Both
+keys and values are stored as byte sequences, and Exonum does not support
+operations (matching, grouping, etc.) over separate value fields.
 
 ### Keys sorting
 
 The tables implement iterators over keys and/or stored items. Such
-iterators uses a ordering by key to define next returned element. The
+iterators use ordering by keys to define the iteration order. The
 way keys are sorted depends on the selected low-level database engine;
 Exonum uses a [LevelDB](#low-level-storage) where the keys are ordered
 lexicographically over binary sequences.
@@ -45,48 +45,48 @@ lexicographically over binary sequences.
 ### BaseIndex
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
-table types inherit from it directly. `BaseIndex`
-implements a map interface:
+table types wrap `BaseIndex`, enhancing its functionality for specific use cases.
+`BaseIndex` implements a map interface:
 
-- get, set and remove value by key
-- check if the specific key presents
-- iterate over the key-value pairs
-- clear the table (removing all stored values)
+- Get, set and remove value by key
+- Check if the specific key presents
+- Iterate over the key-value pairs
+- Clear the table (i.e., remove all stored values)
 
 !!! warning
-    It should not be used directly; the better approach is to use other
-    implemented table types, or write your own table type wrapping
-    `BaseIndex`.
+    `BaseIndex` should not be used directly. Rather, you should use a built-in
+    table type that wraps `BaseIndex`, or write your own.
 
 ### MapIndex
 
-[`MapIndex`][map-index] is implementation of Key-Value storage. It is a
-wrapper for `BaseIndex` that extends its functionality:
+[`MapIndex`][map-index] implements a key-value store aka a map. It has
+the following functionality:
 
-- get, set and remove value by key
-- check if the specific key presents
-- iterate over the key-value pairs
-- iterate only over keys
-- iterate only over values
-- clear the table (removing all stored values)
+- Get, set and remove value by key
+- Check if the specific key presents
+- Iterate over the key-value pairs
+- Iterate only over keys
+- Iterate only over values
+- Clear the map (i.e., remove all stored values)
 
 ### ListIndex
 
-[`ListIndex`][list-index] represents an array list. It wraps around the
-`BaseIndex` field.
+[`ListIndex`][list-index] represents an array list.
+The following operations are supported:
 
-The following actions are supported:
-
-- get and set an item by index. No removing by index allowed
-- append list, pop the last item (with or without removal)
-- get the list length, check if the list is empty
-- iterate over key-value pairs
-- insert the sequence of values from other iterator
-- truncate the list to the specific length
-- clear the table (removing all stored values)
+- Get and set an item by index
+- Append an item
+- Pop the last item from the list (with or without removal)
+- Get the list length
+- Check if the list is empty
+- Iterate over key-value pairs
+- Insert a sequence of values from an iterator
+- Truncate the list to the specified length
+- Clear the list (i.e., remove all stored values)
 
 `ListIndex` does not support inserting elements in the middle of the
-list (although it is still possible to do so manually).
+list or removing elements by index
+(although it is still possible to implement these operations manually).
 
 `ListIndex` saves its elements to the internal `base` map with element
 indices as keys. The list length also is saved at `base` with a
@@ -94,98 +94,96 @@ zero-length tuple `&()` as a key.
 
 ### ValueSetIndex
 
-[`ValueSetIndex`][value-set-index] implements a hashmap, storing the
-element using its hash as a key. It wraps around the `BaseIndex` field.
-The following procedures are implemented:
+[`ValueSetIndex`][value-set-index] implements a hash set. Internally,
+`ValueSetIndex` uses `BaseIndex` with element hashes as keys,
+and elements themselves as corresponding values.
+The following operations are implemented:
 
-- add and remove values
-- check if value already presents - using value itself, or just its hash
-- iterate over stored values
-- iterate over hashes of stored values
-- clear the table (removing all stored values)
+- Add and remove values
+- Check if a value already present using the value itself or its hash
+- Iterate over stored values
+- Iterate over hashes of stored values
+- Clear the set (i.e., remove all stored values)
 
 The used hash is calculated as `hash()` method of `StorageValue` trait.
-All built-in types implementing StorageValue compute a hash as SHA-256
+All built-in types implementing `StorageValue` compute this hash as SHA-256
 of the binary serialization of a type instance.
 
 ### KeySetIndex
 
-[`KeySetIndex`][key-set-index] implements a set. Any unique value can be
-stored just once. It wraps `BaseIndex`; the stored elements are inserted
-to the `BaseIndex` storage as `(key: item, value: null)`. As the keys
+[`KeySetIndex`][key-set-index] implements a set. Internally, stored set elements
+are inserted to the underlying `BaseIndex` as `(&element, ())`
+(i.e., the element is used as key, and the value is always empty). As the keys
 are ordered in the underlying storage engine, `KeySetIndex` iterates
 over set items in the sorting order.
 
 The following procedures are implemented:
 
-- add and remove items
-- check if the specific item presents in the table
-- iterate over items
-- clear the table (removing all stored values)
+- Add and remove items
+- Check if a specific item is in the set
+- Iterate over items
+- Clear the set (i.e., remove all stored values)
 
 #### KeySetIndex vs ValueSetIndex
 
-While `ValueSetIndex` uses a hash as a key, the `KeySetIndex` put an
-entire binary object's serialization into a key.
+While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
+`KeySetIndex` puts an entire binary serialization of an element into the key.
 
-- The `KeySetIndex` does not have an additional overhead on hashing each
-  incoming object.
-- The `KeySetIndex` may not be used when the items are relatively big,
-  only small objects can be stored (such as integers, small strings, small
+- `KeySetIndex` does not have an additional overhead on hashing each
+  incoming set element.
+- `KeySetIndex` should not be used when the items are relatively big;
+  only small items can be stored (such as integers, small strings, small
   tuples). In contrary, the `ValueSetIndex` more easily handles
-  with storing big and complex objects.
+  with storing big and complex items.
 - The `KeySetIndex` introduces a lexicographical order over stored
   items, while the `ValueSetIndex` order elements arbitrary due to hash
   properties.
 
 ### Merklized indexes
 
-The Merklized indexes represent a list and map with additional
+Merklized indexes represent a list and map with additional
 features. Such indexes may create the proofs of existence or absence for
 the stored data items.
 
-When thin client asks Exonum full-node about some data, the proof is
+When a light client requests data from an Exonum full node, the proof can be
 built and sent along with the actual data values. Having block headers
-and such proof, thin client may check that received data was really
-authorized by the validators.
+and such proof, the client may check that received data was really
+authorized by the validators without having to replicate the entire blockchain
+contents.
 
 #### ProofListIndex
 
 [`ProofListIndex`][proof-list-index] implements a [Merkle
-tree](../advanced/merkle-index.md) which is an extended version for
-array list. It implements the same methods as `ListIndex`, however adds
-additional feature. Basing on Merkle Trees, such table allows creating a
+tree](../advanced/merkle-index.md), which is a Merklized version of an
+array list. It implements the same methods as `ListIndex`, and adds an
+additional feature. Basing on Merkle trees, `ProofListIndex` allows creating a
 proofs of existence for its values. Tree leafs store the data itself;
 inner nodes values are calculated as `hash(concatenate(left_child_value,
 right_child_value)`. The following additional procedures are
 implemented:
 
-- get the height of the tree. As the tree is balanced (though may be not
-  fully filled), the height is near to `log2` of the list length.
-- get the value of the tree root (i.e., the hash of the entire Merkle tree)
-- build a proof tree for data value at `index` position, consisting of
-  [`ListProof`][list-proof] objects
-- build a proof tree for data values at specific index range, consisting
-  of [`ListProof`][list-proof] objects
+- Get the height of the Merkle tree. As the tree is balanced (though may be not
+  full), its height is close to `log2` of the list length
+- Get the value of the tree root (i.e., the hash of the entire Merkle tree)
+- Build a proof of existence for an item at a specific position
+- Build a proof of existence for items at a specific contiguous index range
 
 !!! note
-    The `ProofListIndex` do not allow deleting specific values. The only
-    way to delete something is a clearing table entirely.
+    The `ProofListIndex` is *append-only*; it does not allow deleting specific values.
+    The only way to delete an item from the table is clearing the table.
 
 #### ProofMapIndex
 
-[`ProofMapIndex`][proof-map-index] is an extended version for a map
+[`ProofMapIndex`][proof-map-index] is a Merklized version of a map
 based on [Merkle Patricia tree](../advanced/merkle-patricia-index.md).
 It implements the same methods as the `MapIndex`, adding the ability to
 create proofs of existence for its key-value pairs, or proofs of absence
-if requested key do not exist in this table. The following additional
+if a key is absent in the map. The following additional
 procedures are supported:
 
-- get the root node's value
-- build a proof tree for the requested key. Tree proves either key
-  presence (and its according value), or key absence. The proof tree is
-  used in the same way as in the `ProofListIndex`: it is sent to the client
-  along with the requested data
+- Get the root node's value
+- Build a proof for the requested key. Tree proves either key
+  existence (and its value), or key absence
 
 ## Storage
 
@@ -195,13 +193,13 @@ Exonum uses third-party database engines to save blockchain data
 locally. To use the particular database, a minimal map interface should
 be implemented for it:
 
-- Get value by key;
-- Put new value at the key (insert or update already saved one);
-- Delete key-value pair by key.
+- Get value by key
+- Put new value at the key (insert or update the saved one)
+- Delete key-value pair by key
 
 All the tables functionality is reduced to these atomic call types.
 
-To add a new storage, [Database][database] interface should be
+To add a new storage, [`Database`][database] interface should be
 implemented for it. The implementation example can be found at [LevelDB
 wrapper][leveldb-wrapper]. At this moment, key-value storage
 [LevelDB][level-db] is used. Also [RocksDB][rocks-db] support is
@@ -209,9 +207,10 @@ wrapper][leveldb-wrapper]. At this moment, key-value storage
 
 All the values from different tables are stored in one big key-value
 table at the low-level storage, wherein the keys are represented as
-bytes sequence, and values are serialized objects, in fact, byte
-sequences too. The keys are mapped to the keys of the low-level storage
-in a predetermined way using [table identifiers](#table-identifiers).
+a byte sequence, and values are serialized according to Exonum binary serialization
+format. Keys of the `BaseIndex` of a specific table
+are mapped to the low-level storage keys
+in a deterministic manner using [table identifiers](#table-identifiers).
 
 ### Table identifiers
 
@@ -221,45 +220,44 @@ Exonum tables are divided into two groups.
   operation.
 - Services tables are created, maintained and used by the appropriate service.
 
-Such differentiation corresponds to schemas in the relational database
-world. There may be different tables with the same name, located in the
-different schemas. Actually, system tables may be considered as tables
-for the especial Consensus "service". The Core creates and use its
-tables in the same way as usual services do.
+Such differentiation corresponds to schemas in the relational databases.
+There may be different tables with the same name located in
+different schemas. System tables may be considered as tables
+for the especial consensus "service"; Exonum Core creates and uses these
+tables using the same APIs as services do.
 
-Every table is uniquely identified by the complex prefix used when
-mapping table keys into keys of the underlying low-level storage. The
+Every table is uniquely identified by the compound prefix, which is used
+to map table keys into keys of the underlying low-level storage. The
 keys are prepended with this prefix which is unique to each table, thus
 allows to distinguish values from different tables.
 
-The prefix consist of service ID and internal identifier inside the
-service. As well as tables represent just a handy API for access to data
-(no data items are really stored at the table class instance; all values
-are saved in leveldb storage), all tables created with the same prefix
-will be the views of the same data.
+The table prefix consists of the service ID and an internal identifier inside the
+service. All tables created with the same prefix will be the views of the same data.
 
 Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
 0x00` ID is reserved to the Core. Tables inside services are identified
-with a `u8` integers and an optional suffixes.
+with `u8` integers and an optional suffix.
 
 Thus, key `key` at the table named _BTC_ (`0x42 0x54 0x43` in ASCII) at
 the table group `3` for the service with ID `1` matches with the
 following key in the LevelDB map:
 
-`0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key`
+```none
+0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
+```
 
 Here, `|` separates logical components of the low-level key.
 
-It is advised to use a `gen_prefix(service_id, table_id, table_suffix)`
+It is advised to use a `gen_prefix` function
 for creating table prefixes. Example of such prefixes generation can be found
 [here][blockchain-schema].
 
-!!! warning ""
-    Table identifiers can also be created manually though it is risky. If
-    you refuse from using `gen_prefix`, it is strongly advised not to admit
-    situation when one table identifier inside the service is a prefix for
-    the other table in the same service. Such cases may cause the ineligible
-    coincidences between the different keys and elements.
+!!! warning
+    Table identifiers can also be created manually though it is risky.
+    It is strongly advised not to admit
+    a situation when one table identifier inside the service is a prefix for
+    another table in the same service. Such cases may cause unpredictable
+    collisions between logically different keys and elements.
 
 ## View layer
 
@@ -268,40 +266,40 @@ and block atomicity.
 
 ### Patches
 
-The [patch][patch] is a set of serial changes that should be applied to
-the low-level storage atomically. Such patch may include two types of
-operations: put a value by key, or delete a value by key.
+[Patch][patch] is a set of serial changes that should be applied to
+the low-level storage atomically. A patch may include two types of
+operations: put a value addressed by a key, or delete a value by a key.
 
 ### Snapshots
 
-The [snapshot][snapshot] fixes the storage state on the moment of
+[Snapshot][snapshot] fixes the storage state at the moment of snapshot
 creation and provides a read-only API to it. Even if the storage state
 is updated, the snapshot still refers to the old table content.
 
 ### Forks
 
 [Forks][fork] implement the same interfaces as the database underneath,
-transparently wrapping the real data storage state, and add some
+transparently wrapping the real data storage state, and some
 additional changes. Every fork is based on the storage snapshot. From
 the outer point of view, the changes are eagerly applied to the data
 storage; however, these changes are stored directly in the fork and may
 be easily rolled back. Moreover, there may be different forks of
 the same database snapshot.
 
-Forks are used during block creation: validator node apply some
+Forks are used during block creation: validator node applies
 transactions, check its correctness, apply other ones, and finally
 decides which transactions should be applied to the data and which
 should not. If one of the transactions falls with `panic` during
 execution, its changes are promptly reverted.
 
-During the block execution, fork allows to create the [list of
-changes](#patches) and apply all changes to the
-data storage atomically.
+During the block execution, fork allows to create a [patch](#patches)
+comprising changes made by all transactions in the block
+and then apply the patch atomically.
 
 ## List of system tables
 
 The Core owns its own tables that are used for maintaining blockchain
-functioning. These tables are created [here][blockchain-schema].
+functioning. These tables are initialized [here][blockchain-schema].
 
 There are the following system tables:
 
@@ -315,37 +313,33 @@ There are the following system tables:
 - `block_hashes_by_height`, `ListIndex`.  
   Saves a block hash that has the requested height.
 - `block_txs`, `ProofListIndex`.  
-  The set of tables for every `block_height`. Keeps
+  Group of tables keyed by the block height. Each table keeps
   a list of transactions for the specific block.
 - `precommits`, `ListIndex`.  
-  The set of tables for every `block_hash`. Stores the list of
+  Group of tables keyed by the block hash. Each table stores a list of
   validators' precommits for the specific block.
 - `configs`, `ProofMapIndex`.  
-  Stores the configurations content in `JSON` format, using its hash as a key.
+  Stores the configurations content in JSON format, using its hash as a key.
 - `configs_actual_from`, `ListIndex`.  
-  Builds an index to get config starting height quickly.
-- `state_hash_aggregator`, `ProofMapIndex`.  
-  Calculates the final state hash based on the
-  aggregate hashes of other tables.
+  Builds an index to get a configuration activating at a specific height quickly.
 
 ## Indexing
 
-Exonum does not support indices as the individual entity. However, you
-can always create additional table with an index meaning. For example,
+Exonum does not support indices over fields of stored elements
+as an individual entity. However, it is
+possible to create additional table with indexing semantics. For example,
 there is the system table `block_txs` that stores a list of transactions
-for every block. In the Exonum, we create a
-`tx_location_by_hash` map table that provides with the necessary index.
+for every block. `tx_location_by_hash` is an auxiliary table that provides
+an index to quickly lookup `block_txs` by a transaction hash.
 
 ## Genesis block
 
 At the node start, services should initialize its tables, by creating
-the table instances with a specific prefixes. It should be done during
-`Genesis block creation` procedure. To set up its data tables, service
-should handle `genesis_block` [event][genesis-block-creation].
+the table instances with a specific prefixes. To set up its data tables,
+service should handle `genesis_block` [event][genesis-block-creation].
 
-!!! note Notice
-    Genesis Block creation procedure is called every time Exonum
-    node starts.
+!!! note
+    `genesis_block` event is called every time an Exonum node starts.
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
