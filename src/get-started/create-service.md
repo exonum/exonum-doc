@@ -246,7 +246,7 @@ in the first argument to `MapIndex::new` call:
 ```rust
 impl<'a> CurrencySchema<'a> {
     pub fn wallets(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
-        let prefix = gen_prefix(SERVICE_ID, 1, &());
+        let prefix = blockchain::gen_prefix(SERVICE_ID, 0, &());
         MapIndex::new(prefix, self.view)
     }
 
