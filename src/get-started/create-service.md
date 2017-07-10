@@ -310,7 +310,7 @@ name of user who created this wallet:
 message! {
     struct TxCreateWallet {
         const TYPE = SERVICE_ID;
-        const ID = TX_WALLET_ID;
+        const ID = TX_CREATE_WALLET_ID;
         const SIZE = 40;
 
         field pub_key:     &PublicKey  [00 => 32]
@@ -370,6 +370,7 @@ impl Transaction for TxCreateWallet {
             schema.wallets().put(self.pub_key(), wallet)
         }
     }
+}
 ```
 
 For money transfer transaction we also will check that sender is not the
@@ -447,7 +448,7 @@ impl Service for CurrencyService {
 
         let trans: Box<Transaction> = match raw.message_type() {
             TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
-            TX_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
+            TX_CREATE_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
             _ => {
                 return Err(encoding::Error::IncorrectMessageType {
                     message_type: raw.message_type()
