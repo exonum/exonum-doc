@@ -43,7 +43,7 @@ table types wrap `BaseIndex`, enhancing its functionality for specific use cases
 - Get, set and remove value by key
 - Check if the specific key presents
 - Iterate over the key-value pairs in the lexicographic key order
-- Clear the table (i.e., remove all stored values)
+- Clear the table (i.e., remove all stored key-value pairs)
 
 !!! warning
     `BaseIndex` should not be used directly. Rather, you should use a built-in
@@ -59,84 +59,93 @@ the following functionality:
 - Iterate over the key-value pairs in the lexicographic key order
 - Iterate over keys in the lexicographic key order
 - Iterate over values in the lexicographic key order
-- Clear the map (i.e., remove all stored values)
+- Clear the map (i.e., remove all stored key-value pairs)
 
 ### ListIndex
 
 [`ListIndex`][list-index] represents an array list.
 The following operations are supported:
 
-- Get and set an item by index
+- Get and set a list item by index
 - Append an item to the list
 - Pop or poll the last item from the list
 - Get the list length
 - Check if the list is empty
-- Iterate over index-value pairs ordered by index
-- Insert a sequence of values from an iterator
+- Iterate over index-item pairs ordered by index
+- Insert a sequence of items from an iterator
 - Truncate the list to the specified length
-- Clear the list (i.e., remove all stored values)
+- Clear the list (i.e., remove all stored items from the list)
 
-`ListIndex` does not support inserting elements in the middle of the
-list or removing elements by index
+`ListIndex` does not support inserting items in the middle of the
+list or removing items by index
 (although it is still possible to implement these operations manually).
 
-`ListIndex` saves its elements to the internal `base` map with element
-indices as keys. The list length also is saved at `base` with a
-zero-length tuple `&()` as a key.
+!!! summary "Implementation Details"
+    `ListIndex` saves its items to the internal `BaseIndex` map
+    with 8-byte unsigned item
+    indexes as keys, serialized in big-endian form (to support proper iteration).
+    The list length is saved in this map with a
+    zero-length byte sequence as the key.
 
 ### ValueSetIndex
 
-[`ValueSetIndex`][value-set-index] implements a hash set. Internally,
-`ValueSetIndex` uses `BaseIndex` with element hashes as keys,
-and elements themselves as corresponding values.
+[`ValueSetIndex`][value-set-index] implements a hash set.
 The following operations are implemented:
 
-- Add and remove values
-- Check if a value already present using the value itself or its hash
-- Iterate over stored values in the lexicographic order of their hashes
-- Iterate over hashes of stored values in the lexicographic order
-- Clear the set (i.e., remove all stored values)
+- Add and remove set elements
+- Check if an element is already present using the element itself or its hash
+- Iterate over stored elements in the lexicographic order of their hashes
+- Iterate over hashes of elements in the lexicographic order
+- Clear the set (i.e., remove all elements)
 
-The used hash is calculated as `hash()` method of `StorageValue` trait.
+The hash used in `ValueSetIndex` is calculated using the `hash()` method
+of the `StorageValue` trait.
 All built-in types implementing `StorageValue` compute this hash as SHA-256
 of the binary serialization of a type instance.
 
+!!! summary "Implementation Details"
+    Internally, `ValueSetIndex` uses `BaseIndex` with element hashes as keys,
+    and elements themselves as corresponding values.
+
 ### KeySetIndex
 
-[`KeySetIndex`][key-set-index] implements a set. Internally, stored set elements
-are inserted to the underlying `BaseIndex` as `(&element, ())`
-(i.e., the element is used as key, and the value is always empty).
+[`KeySetIndex`][key-set-index] implements a set.
 The following procedures are implemented:
 
-- Add and remove items
-- Check if a specific item is in the set
-- Iterate over items in the lexicographic order
-- Clear the set (i.e., remove all stored values)
+- Add and remove set elements
+- Check if a specific element is in the set
+- Iterate over elements in the lexicographic order
+- Clear the set (i.e., remove all stored elements)
+
+!!! summary "Implementation Details"
+    Internally, set elements
+    are inserted to the underlying `BaseIndex` as `(&element, ())`
+    (i.e., the element is used as a key, and the value is always empty).
 
 #### KeySetIndex vs ValueSetIndex
 
 While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
 `KeySetIndex` puts an entire binary serialization of an element into the key.
 
-- `KeySetIndex` does not have an additional overhead on hashing each
-  incoming set element.
-- `KeySetIndex` should not be used when the items are relatively big;
-  only small items can be stored (such as integers, small strings, small
-  tuples). In contrary, the `ValueSetIndex` more easily handles
-  with storing big and complex items.
+- `KeySetIndex` does not have an additional overhead on hashing
+  set elements.
+- `KeySetIndex` should not be used when the set elements are relatively big;
+  only small elements should be stored in it (such as integers, small strings, small
+  tuples). On the other hand, the `ValueSetIndex` more easily handles
+  storing big and complex elements.
 - The `KeySetIndex` introduces a lexicographical order over stored
-  items, while the `ValueSetIndex` order elements arbitrary due to hash
-  properties.
+  elements, while the `ValueSetIndex` order elements arbitrarily due to hash
+  function properties.
 
 ### Merklized indexes
 
 Merklized indexes represent a list and map with additional
-features. Such indexes may create the proofs of existence or absence for
-the stored data items.
+features. Such indexes can create the proofs of existence or absence for
+stored data items.
 
 When a light client requests data from an Exonum full node, the proof can be
-built and sent along with the actual data values. Having block headers
-and such proof, the client may check that received data was really
+built and sent along with the actual data. Having block headers
+and this proof, the client may check that received data was really
 authorized by the validators without having to replicate the entire blockchain
 contents.
 
@@ -145,11 +154,9 @@ contents.
 [`ProofListIndex`][proof-list-index] implements a [Merkle
 tree](../advanced/merkle-index.md), which is a Merklized version of an
 array list. It implements the same methods as `ListIndex`, and adds an
-additional feature. Basing on Merkle trees, `ProofListIndex` allows creating a
-proofs of existence for its values. Tree leafs store the data itself;
-inner nodes values are calculated as `hash(concatenate(left_child_value,
-right_child_value)`. The following additional procedures are
-implemented:
+additional feature: based on Merkle trees, `ProofListIndex` allows efficiently
+creating compact proofs of existence for the list items.
+The following additional procedures are implemented:
 
 - Get the height of the Merkle tree. As the tree is balanced (though may be not
   full), its height is close to `log2` of the list length
@@ -158,8 +165,14 @@ implemented:
 - Build a proof of existence for items at a specific contiguous index range
 
 !!! note
-    The `ProofListIndex` is *append-only*; it does not allow deleting specific values.
-    The only way to delete an item from the table is clearing the table.
+    `ProofListIndex` is *append-only*; it does not allow deleting list items.
+    The only way to delete an item from a `ProofListIndex` is clearing it.
+
+!!! summary "Implementation Details"
+    As with `ListIndex`, list items are stored with 8-byte keys. However,
+    `ProofListIndex` also persists all intermediate nodes of the Merkle tree
+    built on top of the list, in order to quickly build proofs and recalculate
+    the Merkle tree after operations on the list.
 
 #### ProofMapIndex
 
