@@ -44,7 +44,7 @@ git = "ssh://git@github.com/exonum/exonum-core.git"
 rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
 ```
 
-We need to import crates and necessary types. Add to your `src/main.rs`:
+We need to import crates with necessary types. Add to your `src/main.rs`:
 
 ```rust
 extern crate serde;
@@ -68,6 +68,28 @@ use iron::prelude::*;
 use iron::Handler;
 use router::Router;
 
+```
+
+Put constants to this file:
+
+```rust
+const SERVICE_ID: u16 = 1;
+
+const TX_CREATE_WALLET_ID: u16 = 1;
+
+const TX_TRANSFER_ID: u16 = 2;
+
+const INIT_BALANCE: u64 = 100;
+```
+
+`SERVICE_ID` is an service identifier. `TX_CREATE_WALLET_ID` will be used as
+identifier for wallet creating transaction. `TX_TRANSFER_ID` is an identifier
+for funds transferring transaction. The latest `INIT_BALANCE` will be used as
+started balance for every created wallet.
+
+Declare `main` function:
+
+```rust
 fn main() {
     exonum::helpers::init_logger().unwrap();
 }
