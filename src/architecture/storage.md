@@ -27,10 +27,9 @@ operations (matching, grouping, etc.) over separate value fields.
 ### Keys sorting
 
 The tables implement iterators over keys and/or stored items. Such
-iterators use ordering by keys to define the iteration order. The
-way keys are sorted depends on the selected low-level database engine;
-Exonum uses a [LevelDB](#low-level-storage) where the keys are ordered
-lexicographically over binary sequences.
+iterators use ordering by keys to define the iteration order.
+Namely, keys are lexicographically ordered over binary serializations;
+this ordering coincides with that used in [LevelDB](#low-level-storage).
 
 ### BaseIndex
 
@@ -40,7 +39,7 @@ table types wrap `BaseIndex`, enhancing its functionality for specific use cases
 
 - Get, set and remove value by key
 - Check if the specific key presents
-- Iterate over the key-value pairs
+- Iterate over the key-value pairs in the lexicographic key order
 - Clear the table (i.e., remove all stored values)
 
 !!! warning
@@ -53,10 +52,10 @@ table types wrap `BaseIndex`, enhancing its functionality for specific use cases
 the following functionality:
 
 - Get, set and remove value by key
-- Check if the specific key presents
-- Iterate over the key-value pairs
-- Iterate only over keys
-- Iterate only over values
+- Check if a specific key is present in the map
+- Iterate over the key-value pairs in the lexicographic key order
+- Iterate over keys in the lexicographic key order
+- Iterate over values in the lexicographic key order
 - Clear the map (i.e., remove all stored values)
 
 ### ListIndex
@@ -65,11 +64,11 @@ the following functionality:
 The following operations are supported:
 
 - Get and set an item by index
-- Append an item
-- Pop the last item from the list (with or without removal)
+- Append an item to the list
+- Pop or poll the last item from the list
 - Get the list length
 - Check if the list is empty
-- Iterate over key-value pairs
+- Iterate over index-value pairs ordered by index
 - Insert a sequence of values from an iterator
 - Truncate the list to the specified length
 - Clear the list (i.e., remove all stored values)
@@ -91,8 +90,8 @@ The following operations are implemented:
 
 - Add and remove values
 - Check if a value already present using the value itself or its hash
-- Iterate over stored values
-- Iterate over hashes of stored values
+- Iterate over stored values in the lexicographic order of their hashes
+- Iterate over hashes of stored values in the lexicographic order
 - Clear the set (i.e., remove all stored values)
 
 The used hash is calculated as `hash()` method of `StorageValue` trait.
@@ -103,15 +102,12 @@ of the binary serialization of a type instance.
 
 [`KeySetIndex`][key-set-index] implements a set. Internally, stored set elements
 are inserted to the underlying `BaseIndex` as `(&element, ())`
-(i.e., the element is used as key, and the value is always empty). As the keys
-are ordered in the underlying storage engine, `KeySetIndex` iterates
-over set items in the sorting order.
-
+(i.e., the element is used as key, and the value is always empty).
 The following procedures are implemented:
 
 - Add and remove items
 - Check if a specific item is in the set
-- Iterate over items
+- Iterate over items in the lexicographic order
 - Clear the set (i.e., remove all stored values)
 
 #### KeySetIndex vs ValueSetIndex
