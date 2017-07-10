@@ -23,7 +23,7 @@ Let's create minimal crate with `exonum-core` dependency.
 cargo new --bin minibank
 ```
 
-Add to your `Cargo.toml` `exonum-core` dependency.
+Add to your `Cargo.toml` necessary dependencies:
 
 ```toml
 [package]
@@ -44,7 +44,7 @@ git = "ssh://git@github.com/exonum/exonum-core.git"
 rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
 ```
 
-Add to your `src/main.rs`:
+We need to import crates and necessary types. Add to your `src/main.rs`:
 
 ```rust
 extern crate serde;
@@ -72,6 +72,11 @@ fn main() {
 ```
 
 In the code above we prepared a logger which will show us what Exonum node does.
+You can try to run it with command:
+
+```sh
+cargo run
+```
 
 Exonum contais `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
@@ -105,7 +110,6 @@ The node needs pair of keys for a consensus and pair for service needs.
 ```rust
 let (consensus_public_key, consensus_secret_key) = exonum::crypto::gen_keypair();
 let (service_public_key, service_secret_key) = exonum::crypto::gen_keypair();
-
 ```
 
 ### Configure node
@@ -547,3 +551,88 @@ cargo run
 ```
 
 It builds the code and start a compiled binary.
+
+Let's send transactions to our demo.
+
+Create `create-wallet-1.json` file and put the content:
+
+```js
+{
+    "body": {
+        "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+        "name": "Johnny Doe"
+    },
+    "network_id": 0,
+    "protocol_version": 0,
+    "service_id": 1,
+    "message_id": 1,
+    "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
+}
+```
+
+Use `curl` command to send this transaction to the node by HTTP:
+
+```sh
+curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+```
+
+This transactions creates first wallet and return hash of the transaction.
+
+To create the second wallet put the code into `create-wallet-2.json` file:
+
+```js
+{
+    "body": {
+        "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+        "name": "Janie Roe"
+    },
+    "network_id": 0,
+    "protocol_version": 0,
+    "service_id": 1,
+    "message_id": 1,
+    "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
+}
+```
+
+Send it with `curl` to the node:
+
+```sh
+curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+```
+
+Now we have 2 wallets in the database and we can transfer money between them.
+Create `transfer-funds.json` and add to the file:
+
+```js
+{
+    "body": {
+        "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+        "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+        "amount": "10",
+        "seed": "12623766328194547469"
+    },
+    "network_id": 0,
+    "protocol_version": 0,
+    "service_id": 1,
+    "message_id": 2,
+    "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
+}
+```
+
+This transaction transfer 10 units from the first wallet to the second.
+To send it to the node enter:
+
+```sh
+curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+```
+
+This call returns a hash of the transaction and node prints to the console:
+
+```
+Create the wallet: Wallet { pub_key: PublicKey(3E657AE), name: "Johnny Doe", balance: 100 }
+Create the wallet: Wallet { pub_key: PublicKey(D1E87747), name: "Janie Roe", balance: 100 }
+Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE), name: "Johnny Doe", balance: 90 } => Wallet { pub_key: PublicKey(D1E87747), name: "Janie Roe", balance: 110 }
+```
+
+You've created the first blockchain with 2 walltes and transfered some money
+between them.
