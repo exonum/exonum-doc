@@ -49,13 +49,13 @@ In the code above we prepared a logger which will show us what Exonum node does.
 
 Exonum contais `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
-provided services. While we haven't implemented a service we keep the list
-empty. You can read more about services in the [Services](../architecture/services.md)
-article.
+[provided services](../architecture/services.md). While we haven't implemented
+a service we keep the list empty.
 
-We use `MemoryDB` to store our data in this demo, because `MemoryDB` is an
-in-memory database implementation useful for development and testing purposes.
-But there is `LevelDB` support as well as we recommend to use it in production.
+We use `MemoryDB` to store our data in this demo. `MemoryDB` is an in-memory
+database implementation useful for development and testing purposes.
+There is LevelDB support as well; it's recommended to use it for production
+applications.
 Put this code after logger initialization into `main` function body:
 
 ```rust
@@ -70,16 +70,6 @@ blockchain. Every node needs public and private keys. We'll create
 a temporary pair, but for ordinary use you should use the keys from node
 configuration file.
 
-Node expects a blockchain instance and a configuration.
-[Node configuration](../architecture/configuration.md) consists of two
-parts:
-
-* Local configuration which includes
-    * Node configuration (includes IP settings and other configuration parts)
-    * Api configuration (includes sessings of REST API)
-* Global configuration or genesis configuration (includes all members
-  to achieve a consensus)
-
 ### Create keys
 
 This code makes a pair of keys. They determine the uniqueness of the node.
@@ -90,6 +80,16 @@ let (public_key, secret_key) = exonum::crypto::gen_keypair();
 ```
 
 ### Configure node
+
+Node expects a blockchain instance and a configuration.
+[Node configuration](../architecture/configuration.md) consists of two
+parts:
+
+* Local configuration which includes
+    * Node configuration (includes IP settings and other configuration parts)
+    * Api configuration (includes settings of REST API)
+* Global configuration or genesis configuration (includes all members
+  to achieve a consensus)
 
 Genesis configuration contains a list of public keys of
 [validators](../glossary.md#validator): nodes which can vote for block
@@ -116,9 +116,9 @@ let api_cfg = NodeApiConfig {
 };
 ```
 
-The next configuration collects all settings we defined earlier.
-Also we bind our node to port **2000**.
-Peer port used by nodes to interact each other.
+We also configure our node to listen for peer-to-peer connections on the
+port 2000 for all network interfaces. This port is used for interactions among
+full nodes in the Exonum network.
 
 ```rust
 let peer_address = "0.0.0.0:2000".parse().unwrap();
@@ -137,8 +137,6 @@ let mut node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
 
-> TODO Add curl to check the explorer
-
 ## Declare persistent data
 
 Blockchain is a middleware to keep operations in protected blocks and execute
@@ -146,9 +144,9 @@ it to restore the data. We should declare what kind of data we want to store
 and update.
 
 For our case we should declare a container to store the information about
-a wallet and its balance. Inside the wallet we want to store the public key
+wallets and its balance. Inside the wallet we want to store the public key
 to validate requests from wallet's owner. Also we want to store a name of owner
-for convenience reasons. And we have to keep the actual balance of the wallet.
+for convenience reasons. And we need to keep the actual balance of the wallet.
 We've got the following:
 
 ```rust
@@ -164,8 +162,8 @@ encoding_struct! {
 ```
 
 Macro `encoding_struct!` helps to declare a struct and determine bounds of
-evere piece of data. If you want to manipulate the data you can add some methods
-to the type:
+evere piece of data. We need to change wallet balance, so we add methods to
+the `Wallet` type:
 
 ```rust
 impl Wallet {
@@ -187,7 +185,7 @@ and we have to overwrite data directly in the blob.
 
 ## Create the schema
 
-Schema of data is a capability to access to the data in the persistent storage.
+Schema is a structured view of the key-value storage implemented by `MemoryDB`.
 Actually, to access to the storage we have to use a mutable reference of `Fork`.
 Fork of a database is a database snapshot with upcoming changes:
 
@@ -199,14 +197,12 @@ pub struct CurrencySchema<'a> {
 
 For access to the objects inside the storage we have to declare the layout of
 the data. For example, if we want to keep the wallets in the storage we will
-use an instance of `MapIndex`. Exonum has two types of indices to interact
-with the data: `ListIndex` and `MapIndex`. The list-based index is a layout to
-store a sequence of the data. And map is a layout to handle key-value pairs.
-Because our wallets have a unique public key we will use `MapIndex` to
-store them: key of index is a public key of walet, but value is a serialized
-`Wallet` struct. Fork provides random access to every data inside the database.
-To separate the data logically we should add a unique prefix to every group
-of data. To store all wallets in a separate logically domain we add the prefix
+use an instance of `MapIndex`: key-value view to our data where key of index
+is a public key of walet, but value is a serialized `Wallet` struct.
+
+Fork provides random access to every data inside the database.
+To separate the data we should add a unique prefix to every group of data.
+To store all wallets in a separate logically domain we add the prefix
 in the first argument to `MapIndex::new` call:
 
 ```rust
@@ -222,9 +218,6 @@ impl<'a> CurrencySchema<'a> {
 }
 ```
 
-Exonum indices are handy data mapping which you can use like collections from
-standard library of Rust.
-
 ## Transactions
 
 [Transaction](../architecture/transactions.md) is a kind of message which
@@ -235,15 +228,14 @@ For our cryptocurrency demonstration we need two transaction types:
 1. Create a new wallet and add some money to it
 2. Transfer money between two different wallets
 
-Declaration of any transaction have to contain:
+Declaration of any transaction needs to contain:
 
 1. Service identifier
-2. Unique identifier of message
-2. Size of fixed size of the message
+2. Unique (within the service) identifier of message
+2. Size of fixed part of the message
 
 You have to add service and message identifiers, because Exonum will use it
-for deserialization purposes. Also it helps to maintain future versioning if
-messages are changed.
+for deserialization purposes.
 
 Transaction to create a new wallet have to contain public key of a wallet and
 name of user who created this wallet:
@@ -284,18 +276,17 @@ message! {
 ```
 
 The last consists of two public keys: for wallet of sender and the second key
-of wallet of receiver. And of course it contains amount of money to move
-between them. We add `seed` field to make our transaction is impossible to
-replay. You can get more in [Non-replayability](../architecture/transactions.md#non-replayability)
-section.
+of wallet of receiver. Also it contains amount of money to move between them.
+We add `seed` field to make our transaction is
+[impossible to replay](../architecture/transactions.md#non-replayability).
 
 ## Transaction execution
 
-Every transaction in Exonum has an attached contract. The contract is a
-busiless-logic of the blockchain. Actually we declared structs and we also have
-to implement `Trasaction` trait which includes `verify` method to verify the
-internal integrity of the transaction and `execute` method which contains
-contract logic which applied to the storage when a transaction is executed.
+Every transaction in Exonum has an attached busiless-logic of the blockchain.
+Actually we declared structs and we also have to implement `Trasaction` trait
+which includes `verify` method to verify the internal integrity of the
+transaction and `execute` method which contains logic which applied to the
+storage when a transaction is executed.
 
 For every transaction we will check the signature:
 
@@ -325,11 +316,10 @@ impl Transaction for TxCreateWallet {
 ```
 
 For money transfer transaction we also will check that sender is not the
-receiver to prevent useless transactions flood.
+receiver, because the implementation below will create money out of nowhere if
+sender is equal to receiver
 
-This transaction also adds `100` to the balance of wallet. For demonstration
-we don't add transaction to change this balance directly. But the balance
-could be changed with a transfer transactions.
+This transaction also adds `100` to the balance of wallet.
 
 `TxTransfer` transaction finds two wallets for both sides of a transfer
 transaction. If they have been found it checks the balance of the sender and if
@@ -362,7 +352,7 @@ impl Transaction for TxTransfer {
 
 ## Define minimal service
 
-Service is a group of acceptable transactions (we've defined them before). It
+Service is a group of templated transactions (we've defined them before). It
 has a name and a unique id to determine the service inside a blockchain.
 
 ```rust
@@ -424,9 +414,9 @@ impl Service for CurrencyService {
 ```
 
 `CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
-`Api::wire` method to connect this API instance to the `Router`.
+`Api::wire` method to connect this `Api` instance to the `Router`.
 
-## Api implementation
+## API implementation
 
 Node's API is a struct which implements `Api` trait. We defined one which
 contains a channel - a connection to the blockchain node instance.
