@@ -32,13 +32,39 @@ version = "0.1.0"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = { git = "ssh://git@github.com/exonum/exonum-core.git" }
+iron = "0.5.1"
+bodyparser = "0.7.0"
+router = "0.5.1"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+
+[dependencies.exonum]
+git = "ssh://git@github.com/exonum/exonum-core.git"
+rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
 ```
 
 Add to your `src/main.rs`:
 
 ```rust
-extern crate exonum;
+extern crate serde;
+extern crate serde_json;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate exonum;
+extern crate router;
+extern crate bodyparser;
+extern crate iron;
+
+use exonum::blockchain::{self, Blockchain, Service, GenesisConfig, ValidatorKeys, Transaction, ApiContext};
+use exonum::messages::{RawTransaction, FromRaw, Message};
+use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend, TxSender, NodeChannel};
+use exonum::storage::{Fork, MemoryDB, MapIndex};
+use exonum::crypto::{PublicKey, Hash};
+use exonum::encoding::{self, Field};
+use exonum::api::{Api, ApiError};
+use iron::prelude::*;
+use iron::Handler;
+use router::Router;
 
 fn main() {
     exonum::helpers::init_logger().unwrap();
@@ -61,7 +87,7 @@ Put this code after logger initialization into `main` function body:
 ```rust
 let db = MemoryDB::new();
 let services: Vec<Box<Service>> = vec![ ];
-let blockchain = Blockchain::new(db, services);
+let blockchain = Blockchain::new(Box::new(db), services);
 ```
 
 Minimal blockchain is ready. In addition to defining blockchain object, we need
