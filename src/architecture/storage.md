@@ -20,15 +20,18 @@ applications.
 Tables (aka indexes) perform the same role as in relational database
 management systems (RDBMSs). Every
 table stores records of a specific type. However, unlike RDBMS tables,
-all Exonum tables internally are implemented as key-value stores. Both
-keys and values are stored as byte sequences, and Exonum does not support
-operations (matching, grouping, etc.) over separate value fields.
+all Exonum tables internally are implemented [as wrappers around key-value stores](#base-index).
+Both keys and values in the wrapped stores are persisted as byte sequences.
+Exonum does not natively support operations (matching, grouping, sorting, etc.)
+over separate value fields, as it is the case with other key-value storages.
 
-### Keys sorting
+### Key sorting and iterators
 
-The tables implement iterators over keys and/or stored items. Such
-iterators use ordering by keys to define the iteration order.
-Namely, keys are lexicographically ordered over binary serializations;
+Exonum tables implement iterators over stored items (or keys, values, and key-value
+pairs in the case of maps). Such
+iterators use key ordering of the underlying key-value storage to determine
+the iteration order.
+Namely, keys are lexicographically ordered over their binary serializations;
 this ordering coincides with that used in [LevelDB](#low-level-storage).
 
 ### BaseIndex
