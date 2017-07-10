@@ -191,9 +191,9 @@ procedures are supported:
 
 ### Low-level storage
 
-Exonum uses third-party database engines to save blockchain data
-locally. To use the particular database, a minimal map interface should
-be implemented for it:
+Exonum uses third-party database engines to persist blockchain state
+locally. To use the particular database, a minimal [`Database`][database]
+interface should be implemented for it:
 
 - Get value by key
 - Put new value at the key (insert or update the saved one)
@@ -201,61 +201,52 @@ be implemented for it:
 
 All the tables functionality is reduced to these atomic call types.
 
-To add a new storage, [`Database`][database] interface should be
-implemented for it. The implementation example can be found at [LevelDB
-wrapper][leveldb-wrapper]. At this moment, key-value storage
-[LevelDB][level-db] is used. Also [RocksDB][rocks-db] support is
-[planned](../roadmap.md).
+As of Exonum 0.1, [LevelDB][level-db] is used as the database engine.
+[RocksDB][rocks-db] support is [planned](../roadmap.md).
 
 All the values from different tables are stored in one big key-value
 table at the low-level storage, wherein the keys are represented as
 a byte sequence, and values are serialized according to Exonum binary serialization
-format. Keys of the `BaseIndex` of a specific table
+format. Keys of the wrapped `BaseIndex` of a specific table
 are mapped to the low-level storage keys
 in a deterministic manner using [table identifiers](#table-identifiers).
 
 ### Table identifiers
-
-Exonum tables are divided into two groups.
-
-- System tables are used directly by the Core and provide Exonum
-  operation.
-- Services tables are created, maintained and used by the appropriate service.
-
-Such differentiation corresponds to schemas in the relational databases.
-There may be different tables with the same name located in
-different schemas. System tables may be considered as tables
-for the especial consensus “service”; Exonum Core creates and uses these
-tables using the same APIs as services do.
 
 Every table is uniquely identified by the compound prefix, which is used
 to map table keys into keys of the underlying low-level storage. The
 keys are prepended with this prefix which is unique to each table, thus
 allows to distinguish values from different tables.
 
-The table prefix consists of the service ID and an internal identifier inside the
-service. All tables created with the same prefix will be the views of the same data.
+The table prefix consists of [the service ID](services.md#service-identifiers)
+and an internal identifier inside the
+service.
+All tables created with the same prefix will be the views of the same data.
 
-Services are enumerated with `u16`, starting from `0x00 0x01`.`0x00
-0x00` ID is reserved to the Core. Tables inside services are identified
-with `u8` integers and an optional suffix.
+Services identifier is a 2-byte unsigned integer, `u16`.
+[System tables](#list-of-system-tables) have service ID equal to `0`.
+Tables inside services are identified
+with `u8` integers and an optional suffix. If the suffix is present,
+the `u8` integer denotes a *group* of tables, rather than a single table,
+and suffixes are used to distinguish tables within the group.
 
-Thus, key `key` at the table named _BTC_ (`0x42 0x54 0x43` in ASCII) at
-the table group `3` for the service with ID `1` matches with the
-following key in the LevelDB map:
+!!! note "Example"
+    Key `key` at the table named `BTC` (`0x42 0x54 0x43` in ASCII) at
+    the table group `0x03` for the service with ID `0x00 0x01` matches the
+    following key in the LevelDB map:
 
-```none
-0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
-```
+    ```none
+    0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
+    ```
 
-Here, `|` separates logical components of the low-level key.
+    Here, `|` separates logical components of the low-level key.
 
 It is advised to use a `gen_prefix` function
-for creating table prefixes. Example of such prefixes generation can be found
-[here][blockchain-schema].
+for creating table prefixes. See the [schema of Exonum Core][blockchain-schema]
+for an example.
 
 !!! warning
-    Table identifiers can also be created manually though it is risky.
+    Table identifiers can also be created manually, but it could be risky.
     It is strongly advised not to admit
     a situation when one table identifier inside the service is a prefix for
     another table in the same service. Such cases may cause unpredictable
