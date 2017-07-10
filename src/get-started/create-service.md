@@ -364,7 +364,9 @@ impl Transaction for TxCreateWallet {
     fn execute(&self, view: &mut Fork) {
         let mut schema = CurrencySchema { view };
         if schema.wallet(self.pub_key()).is_none() {
-            let wallet = Wallet::new(self.pub_key(), self.name(), INIT_BALANCE);
+            let wallet = Wallet::new(self.pub_key(),
+                                     self.name(),
+                                     INIT_BALANCE);
             println!("Create the wallet: {:?}", wallet);
             schema.wallets().put(self.pub_key(), wallet)
         }
@@ -385,7 +387,8 @@ below will create money out of nowhere if the sender is equal to the receiver.
 ```rust
 impl Transaction for TxTransfer {
     fn verify(&self) -> bool {
-         (*self.from() != *self.to()) && self.verify_signature(self.from())
+         (*self.from() != *self.to()) &&
+             self.verify_signature(self.from())
     }
 
     fn execute(&self, view: &mut Fork) {
@@ -397,7 +400,9 @@ impl Transaction for TxTransfer {
             if sender.balance() >= amount {
                 sender.decrease(amount);
                 receiver.increase(amount);
-                println!("Transfer between wallets: {:?} => {:?}", sender, receiver);
+                println!("Transfer between wallets: {:?} => {:?}",
+                         sender,
+                         receiver);
                 let mut wallets = schema.wallets();
                 wallets.put(self.from(), sender);
                 wallets.put(self.to(), receiver);
@@ -462,23 +467,26 @@ We bind the transaction handler to `/v1/wallets/transaction` route.
 ```rust
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
-
         let self_ = self.clone();
-        let transaction = move |req: &mut Request| -> IronResult<Response> {
+        let tx_handler = move |req: &mut Request| -> IronResult<Response> {
             match req.get::<bodyparser::Struct<TransactionRequest>>() {
-                Ok(Some(transaction)) => {
-                    let transaction: Box<Transaction> = transaction.into();
-                    let tx_hash = transaction.hash();
-                    self_.channel.send(transaction).map_err(|e| ApiError::Events(e))?;
+                Ok(Some(tx)) => {
+                    let tx: Box<Transaction> = tx.into();
+                    let tx_hash = tx.hash();
+                    self_.channel.send(tx)
+                                 .map_err(|e| ApiError::Events(e))?;
                     let json = TransactionResponse { tx_hash };
                     self_.ok_response(&serde_json::to_value(&json).unwrap())
                 }
-                Ok(None) => Err(ApiError::IncorrectRequest("Empty request body".into()))?,
+                Ok(None) => Err(ApiError::IncorrectRequest(
+                    "Empty request body".into()))?,
                 Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
             }
         };
+        
+        // Bind the transaction handler to a specific route.
         let route_post = "/v1/wallets/transaction";
-        router.post(&route_post, transaction, "transaction");
+        router.post(&route_post, tx_handler, "transaction");
     }
 }
 ```
