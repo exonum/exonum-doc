@@ -66,25 +66,20 @@ use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
 use router::Router;
-
 ```
 
 Put constants to this file:
 
 ```rust
+// Service identifier
 const SERVICE_ID: u16 = 1;
-
+// Identifier for wallet creating transaction
 const TX_CREATE_WALLET_ID: u16 = 1;
-
+// Identifier for coins transferring transaction
 const TX_TRANSFER_ID: u16 = 2;
-
+// Starting balance of a newly created wallet
 const INIT_BALANCE: u64 = 100;
 ```
-
-`SERVICE_ID` is an service identifier. `TX_CREATE_WALLET_ID` will be used as
-identifier for wallet creating transaction. `TX_TRANSFER_ID` is an identifier
-for funds transferring transaction. The latest `INIT_BALANCE` will be used as
-started balance for every created wallet.
 
 Declare `main` function:
 
@@ -133,8 +128,10 @@ We use `exonum::crypto::gen_keypair()` function take random pair of keys.
 The node needs pair of keys for a consensus and pair for service needs.
 
 ```rust
-let (consensus_public_key, consensus_secret_key) = exonum::crypto::gen_keypair();
-let (service_public_key, service_secret_key) = exonum::crypto::gen_keypair();
+let (consensus_public_key, consensus_secret_key) =
+    exonum::crypto::gen_keypair();
+let (service_public_key, service_secret_key) =
+    exonum::crypto::gen_keypair();
 ```
 
 ### Configure Node
@@ -184,6 +181,8 @@ full nodes in the Exonum network.
 
 ```rust
 let peer_address = "0.0.0.0:2000".parse().unwrap();
+
+// Complete node configuration
 let node_cfg = NodeConfig {
     listen_address: peer_address,
     peers: vec![],
@@ -278,6 +277,7 @@ impl<'a> CurrencySchema<'a> {
         MapIndex::new(prefix, self.view)
     }
 
+    // Utility method to quickly get a separate wallet from the storage
     pub fn wallet(&mut self, pub_key: &PublicKey) -> Option<Wallet> {
         self.wallets().get(pub_key)
     }
