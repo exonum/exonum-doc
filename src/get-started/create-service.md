@@ -1,4 +1,4 @@
-# Cryptocurrency Tutorial: Intro
+# Cryptocurrency Tutorial: How to Create Services
 
 In this demo we create and run single-node blockchain network that implements
 a minimal cryptocurrency.
