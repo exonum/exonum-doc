@@ -23,7 +23,6 @@ Storage architecture can be viewed from different points:
 4. [List of system tables](#list-of-system-tables) describes tables
   used directly by Exonum Core
 5. [Indexing](#indexing) reveals how indices can be built
-6. [Genesis block](#genesis-block) describes how tables are initialized
 
 ## Exonum table types
 
@@ -332,15 +331,6 @@ there is the system table `block_txs` that stores a list of transactions
 for every block. `tx_location_by_hash` is an auxiliary table that provides
 an index to quickly lookup `block_txs` by a transaction hash.
 
-## Genesis block
-
-At the node start, services should initialize its tables, by creating
-the table instances with a specific prefixes. To set up its data tables,
-service should handle `genesis_block` [event][genesis-block-creation].
-
-!!! note
-    `genesis_block` event is called every time an Exonum node starts.
-
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
 [base-index]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/base_index.rs
@@ -357,4 +347,3 @@ service should handle `genesis_block` [event][genesis-block-creation].
 [fork]: https://github.com/exonum/exonum-core/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L104
 [leveldb-wrapper]: https://github.com/exonum/exonum-core/blob/master/exonum/src/storage/leveldb.rs
 [blockchain-schema]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs
-[genesis-block-creation]: services.md#genesis-block-handler
