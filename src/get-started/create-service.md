@@ -365,6 +365,7 @@ impl Transaction for TxCreateWallet {
         let mut schema = CurrencySchema { view };
         if schema.wallet(self.pub_key()).is_none() {
             let wallet = Wallet::new(self.pub_key(), self.name(), INIT_BALANCE);
+            println!("Create the wallet: {:?}", wallet);
             schema.wallets().put(self.pub_key(), wallet)
         }
     }
@@ -396,6 +397,7 @@ impl Transaction for TxTransfer {
             if sender.balance() >= amount {
                 sender.decrease(amount);
                 receiver.increase(amount);
+                println!("Transfer between wallets: {:?} => {:?}", sender, receiver);
                 let mut wallets = schema.wallets();
                 wallets.put(self.from(), sender);
                 wallets.put(self.to(), receiver);
