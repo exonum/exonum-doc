@@ -4,25 +4,16 @@ This page describes how Exonum persists data, from the lowest
 (LevelDB) to the high abstract layers that are used in the client
 applications.
 
-Storage architecture can be viewed from different points:
-
 1. [Exonum table types](#exonum-table-types) lists supported types of
-  data storage collections. These tables represent the highest level
-  at the data storage architecture.
-2. [Storage](#storage) explains how tables content is stored.
-
-    - [Low-level storage](#low-level-storage) shows how Exonum keeps the
-      data on the hard disk using LevelDB
-    - [Table identifiers](#table-identifiers) elaborates how
-      user tables are identified, and shows how the Exonum tables are
-      mapped into LevelDB global keyspace
-
-3. [View layer](#view-layer) describes the wrapper over the DB engine.
-  This layer implements a “sandbox” above the real data and ensures atomicity
-  of block commitment
-4. [List of system tables](#list-of-system-tables) describes tables
+  data storage collections. Tables represent the highest abstraction level
+  for data storage
+2. [Storage](#storage) explains how tables are persisted using LevelDB
+3. [View layer](#view-layer) describes the wrapper over the DB engine
+  that ensures atomicity of blocks and transactions
+4. [List of system tables](#list-of-system-tables) contains tables
   used directly by Exonum Core
-5. [Indexing](#indexing) reveals how indices can be built
+5. [Indexing](#indexing) gives an insight how indexes over structured data
+  can be built in Exonum
 
 ## Exonum table types
 
