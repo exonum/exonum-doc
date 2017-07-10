@@ -330,23 +330,20 @@ which includes `verify` method to verify the internal integrity of the
 transaction and `execute` method which contains logic which applied to the
 storage when a transaction is executed.
 
-For every transaction we will check the signature:
+For every transaction we will check the signature.
+`execute` method gets the reference to a `Fork` of a storage. We can wrap it
+with our schema to turn it into structured storage with our data layout inside.
+
+In the following method we verify the signature of a transaction, check that
+the wallet is not exists and add a new one if so:
+
 
 ```rust
 impl Transaction for TxCreateWallet {
     fn verify(&self) -> bool {
         self.verify_signature(self.pub_key())
     }
-```
 
-`execute` method gets the reference to a `Fork` of a storage. We can wrap it
-with our schema to turn it into structured storage with our data layout inside.
-
-In the following method we check that the wallet is not exists and
-add a new one if so:
-
-```rust
-impl Transaction for TxCreateWallet {
     fn execute(&self, view: &mut Fork) {
         let mut schema = CurrencySchema { view };
         if schema.wallet(self.pub_key()).is_none() {
@@ -354,7 +351,6 @@ impl Transaction for TxCreateWallet {
             schema.wallets().put(self.pub_key(), wallet)
         }
     }
-}
 ```
 
 For money transfer transaction we also will check that sender is not the
