@@ -10,7 +10,7 @@ the balance of wallets.
 The full source code of this example you can download
 [here](https://github.com/exonum/minibank).
 
-## Create the single node
+## Create Node
 
 Exonum is written in Rust and you have to install the stable Rust
 compiler to build this demo. If you haven't a necessary environment follow
@@ -101,6 +101,8 @@ You can try to run it with command:
 cargo run
 ```
 
+### Initialize Blockchain
+
 Exonum contains `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
 [provided services](../architecture/services.md). While we haven't implemented
@@ -124,7 +126,7 @@ blockchain. Every node needs public and private keys. We'll create
 a temporary pair, but for ordinary use you should use the keys from node
 configuration file.
 
-### Create keys
+### Create Keys
 
 This code makes a pair of keys. They determine the uniqueness of the node.
 We use `exonum::crypto::gen_keypair()` function take random pair of keys.
@@ -135,7 +137,7 @@ let (consensus_public_key, consensus_secret_key) = exonum::crypto::gen_keypair()
 let (service_public_key, service_secret_key) = exonum::crypto::gen_keypair();
 ```
 
-### Configure node
+### Configure Node
 
 Node expects a blockchain instance and a configuration.
 [Node configuration](../architecture/configuration.md) consists of two
@@ -202,7 +204,7 @@ let mut node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
 
-## Declare persistent data
+## Declare Persistent Data
 
 Blockchain is a database which keep the data in protected blocks.
 We should declare what kind of data we want to store in a blockchain.
@@ -247,7 +249,7 @@ We've added two methods: to increase the wallet's balance and other to decrease
 it. We used `Field::write` method there, because the data stored as binary blob
 and we have to overwrite data directly in the blob.
 
-## Create the schema
+## Create Schema
 
 Schema is a structured view of the key-value storage implemented by `MemoryDB`.
 Actually, to access to the storage we have to use a mutable reference of `Fork`.
@@ -282,7 +284,7 @@ impl<'a> CurrencySchema<'a> {
 }
 ```
 
-## Transactions
+## Define Transactions
 
 [Transaction](../architecture/transactions.md) is a kind of message which
 performs actions with a blockchain.
@@ -300,6 +302,7 @@ Declaration of any transaction needs to contain:
 
 You have to add service and message identifiers, because Exonum will use it
 for deserialization purposes.
+### Creating New Wallet
 
 Transaction to create a new wallet have to contain public key of a wallet and
 name of user who created this wallet:
@@ -318,7 +321,9 @@ message! {
 
 ```
 
-Transaction to transfer money between different wallets:
+### Transferring Coins
+
+Transaction to transfer coins between different wallets is declared as follows:
 
 ```rust
 message! {
@@ -340,7 +345,7 @@ of wallet of receiver. Also it contains amount of money to move between them.
 We add `seed` field to make our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
 
-## Transaction execution
+### Transaction Execution
 
 Every transaction in Exonum has an attached busiless-logic of the blockchain.
 Actually we declared structs and we also have to implement `Trasaction` trait
@@ -412,7 +417,7 @@ impl Transaction for TxTransfer {
 }
 ```
 
-## API implementation
+## Implement API
 
 Node's API is a struct which implements `Api` trait. We defined one which
 contains a channel - a connection to the blockchain node instance.
@@ -491,7 +496,7 @@ impl Api for CryptocurrencyApi {
 }
 ```
 
-## Define minimal service
+## Define Service
 
 Service is a group of templated transactions (we've defined them before). It
 has a name and a unique id to determine the service inside a blockchain.
@@ -555,7 +560,7 @@ impl Service for CurrencyService {
 `CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
 `Api::wire` method to connect this `Api` instance to the `Router`.
 
-## Run
+## Run Service
 
 We've implemented all pieces of minimal blockchain. Add `CryptocyrrencyService`
 to services list of the blockchain and run the demo:
@@ -574,9 +579,13 @@ cargo run
 
 It builds the code and start a compiled binary.
 
+### Send Transactions via REST API
+
 Let's send transactions to our demo.
 
-Create `create-wallet-1.json` file and put the content:
+#### Create First Wallet
+
+Create `create-wallet-1.json` file and put there:
 
 ```json
 {
@@ -615,6 +624,8 @@ Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
                             name: "Johnny Doe", balance: 100 }
 ```
 
+#### Second Wallet
+
 To create the second wallet put the code into `create-wallet-2.json` file:
 
 ```json
@@ -652,6 +663,8 @@ The node will show in the log that the second wallet has been created:
 Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
                             name: "Janie Roe", balance: 100 }
 ```
+
+#### Transfer Between Wallets
 
 Now we have 2 wallets in the database and we can transfer money between them.
 Create `transfer-funds.json` and add to the file:
