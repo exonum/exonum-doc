@@ -580,15 +580,15 @@ Create `create-wallet-1.json` file and put the content:
 
 ```json
 {
-    "body": {
-        "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-        "name": "Johnny Doe"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 1,
-    "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
+  "body": {
+    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+    "name": "Johnny Doe"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 1,
+  "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
 }
 ```
 
@@ -619,15 +619,15 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 
 ```json
 {
-    "body": {
-        "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-        "name": "Janie Roe"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 1,
-    "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
+  "body": {
+    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+    "name": "Janie Roe"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 1,
+  "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
 }
 ```
 
@@ -658,17 +658,17 @@ Create `transfer-funds.json` and add to the file:
 
 ```json
 {
-    "body": {
-        "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-        "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-        "amount": "10",
-        "seed": "12623766328194547469"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 2,
-    "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
+  "body": {
+    "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+    "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+    "amount": "10",
+    "seed": "12623766328194547469"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 2,
+  "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
 }
 ```
 
