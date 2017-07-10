@@ -103,10 +103,6 @@ To create blockchain we should create a database instance and declare a list of
 [provided services](../architecture/services.md). While we haven't implemented
 a service we keep the list empty.
 
-We use `MemoryDB` to store our data in this demo. `MemoryDB` is an in-memory
-database implementation useful for development and testing purposes.
-There is LevelDB support as well; it's recommended to use it for production
-applications.
 Put this code after logger initialization into `main` function body:
 
 ```rust
@@ -115,11 +111,15 @@ let services: Vec<Box<Service>> = vec![ ];
 let blockchain = Blockchain::new(Box::new(db), services);
 ```
 
-Minimal blockchain is ready. In addition to defining blockchain object, we need
-to create a node (with a keypair) and provide an API to interact with the
-blockchain. Every node needs public and private keys. We'll create
-a temporary pair, but for ordinary use you should use the keys from node
-configuration file.
+We use `MemoryDB` to store our data in the code above. `MemoryDB` is an in-memory
+database implementation useful for development and testing purposes.
+There is LevelDB support as well; it's recommended to use it for production
+applications.
+
+Minimal blockchain is ready, but it's pretty much useless, because there is
+no way to interact with it. To fix this, we need
+to create a node and provide an API to interact with the
+blockchain.
 
 ### Create Keys
 
