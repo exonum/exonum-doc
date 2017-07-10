@@ -307,8 +307,6 @@ Transaction to create a new wallet have to contain public key of a wallet and
 name of user who created this wallet:
 
 ```rust
-pub const TX_WALLET_ID: u16 = 1;
-
 message! {
     struct TxCreateWallet {
         const TYPE = SERVICE_ID;
@@ -325,8 +323,6 @@ message! {
 Transaction to transfer money between different wallets:
 
 ```rust
-pub const TX_TRANSFER_ID: u16 = 2;
-
 message! {
     struct TxTransfer {
         const TYPE = SERVICE_ID;
@@ -417,8 +413,6 @@ Service is a group of templated transactions (we've defined them before). It
 has a name and a unique id to determine the service inside a blockchain.
 
 ```rust
-pub const SERVICE_ID: u16 = 1;
-
 struct CurrencyService;
 ```
 
