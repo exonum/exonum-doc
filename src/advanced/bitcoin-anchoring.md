@@ -2,7 +2,7 @@
 
 The anchoring service is developed to increase product security and
 provide non-repudiation for Exonum applications. Service periodically publishes
-Exonum blockchain state hash to the bitcoin blockchain, so that it is
+Exonum blockchain block hash to the bitcoin blockchain, so that it is
 publicly auditable by anyone having access to the Exonum blockchain. Even in
 the case of validators collusion transation history can not be
 falsified; disrepancy between actual Exonum blockchain state and the
@@ -18,14 +18,14 @@ one written to the bitcoin blockchain would be found instantly.
 
 The service writes the hash of the latest Exonum block to the permanent
 read-only persistent storage available to everyone. The block is called
-_anchored block, and its hash is referred as _blockchain state hash_
+_anchored block, and its hash is referred as _anchored hash_
 further.
 
 The service builds a _anchoring chain_ on
 the top of bitcoin blockchain, which consists of multiple _bitcoin
 anchoring transactions_. Each anchoring transaction have at least 1
 input and only 2 outputs: data output and change output. Data output
-contains written data storage hash, while change output transfers money
+contains written anchored hash, while change output transfers money
 to the next anchoring transaction.
 
 ```None
@@ -80,7 +80,7 @@ unequivocally.
 
 But any Byzantine node could step out from deterministic algorithm and 
 use another signatures list for anchoring transaction. It may create a
-transaction with the same anchor hash (the same data-output) but another
+transaction with the same anchored hash (the same data-output) but another
 tx-id and broadcast it to the bitcoin network. Such non-standard
 transactions make a problem: new anchoring transaction may be built
 even if previous is still not included in any bitcoin block. However,
@@ -152,9 +152,9 @@ The data output consists of the following parts:
 - 1-byte, the length of stored data
 - `EXONUM` at the ASCII-code (`0x45 0x58 0x4f 0x4e 0x55 0x4d`)
 - a 1-byte version of the current data output, currently is `1`.
-- a 1-byte type of payload: 0 if only blockchain state is included, 1 if
+- a 1-byte type of payload: 0 if only anchored hash is included, 1 if
   both chunks are used
-- 40 bytes of blockchain-state data chunk
+- 40 bytes of anchored hash data chunk
 - (optional) 32 bytes of a recovering data chunk
 
 All integer chunk parts are little-endian, as per the general guidelines
@@ -163,7 +163,7 @@ of Bitcoin Script.
 In total, anchoring transaction payload takes 48 bytes in regular way
 and enlarges to 80 bytes when recovering is needed.
 
-#### Blockchain-state data chunk
+#### Anchored hash data chunk
 
 - 8-byte zero-based unsigned height of the anchored block (i.e., the
   height of the genesis block is `0`)
@@ -203,8 +203,8 @@ chain](#recovering-broken-anchoring)).
   continue creating new blocks. All validators wait until some of them
   would update its anchoring chain and common LECT would be found. By the
   reason of uncertainty in the bitcoin blockchain common LECT could be
-  found even after new time for anchoring comes. New state for anchoring
-  is the latest Exonum blockchain state needed to be anchored. For example now
+  found even after new time for anchoring comes. New block for anchoring
+  is the latest Exonum blockchain block needed to be anchored. For example now
   Exonum blockchain is at the height `#11000` and anchoring should be held every `1000`
   blocks. But common LECT appeared only at the height `#12345`. 
   block `#12000` is anchored, though there would be no anchor for block `#11000`.
@@ -264,7 +264,7 @@ does not hang if the bitcoin network is spammed.
 #### Anchoring schedule
 
 This parameter defines how often anchoring should be executed. It
-defines the difference between block heights for anchored data states.
+defines the distance between anchored block heights.
 
 !!! note
     If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
