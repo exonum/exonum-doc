@@ -198,17 +198,17 @@ chain](#recovering-broken-anchoring)).
 - Based on the signatures, _any_ Exonum node can create anchoring
   transaction and broadcast it to the Bitcoin network. In particular, all
   agreed validators broadcast it.
-- If at the block `#H` there is no common LECT (that is agreed upon
-  `+2/3` validators) than no anchoring happened. Exonum blockchain
-  continue creating new blocks. All validators wait until some of them
-  would update its anchoring chain and common LECT would be found. By the
-  reason of uncertainty in the bitcoin blockchain common LECT could be
-  found even after new time for anchoring comes. New block for anchoring
-  is the latest Exonum blockchain block needed to be anchored. For example now
-  Exonum blockchain is at the height `#11000` and anchoring should be held every `1000`
-  blocks. But common LECT appeared only at the height `#12345`. 
-  block `#12000` is anchored, though there would be no anchor for block `#11000`.
+  
+#### Skipping anchoring
 
+If Exonum should make anchoring, but there is no LECT agreed upon `+2/3`
+validators, than no anchoring happened. Anchoring service waits until
+some validators update its anchoring chain and common LECT would be
+found. New block for anchoring is the latest Exonum blockchain block
+needed to be anchored. For example, Exonum blockchain is at the height
+`#11000` with anchoring interval in `1000` blocks. If common LECT
+appears at the height `#12345`, block `#12000` is anchored, though there
+would be no anchor for block `#11000`.
 
 ## Setups and configuration
 
