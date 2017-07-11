@@ -52,10 +52,9 @@ When Exonum network should be anchored, every validator builds an
 anchoring transaction using [deterministic algorithm](#creating-anchoring-transaction).
 Its results are guaranteed to
 match for every honest validator. Such an anchoring transaction spend one
-or more UTXOs from the current anchoring multisig address. Bitcoin
-allows different validators sign this transactions separately from each
-other, thus every validator can sign it without regard for other
-validators. All signatures are published into Exonum blockchain.
+or more UTXOs from the current anchoring multisig address. Every
+validator can sign it without regard for other validators as it is
+allowed by Bitcoin. All signatures are published into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
 anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M`
@@ -82,8 +81,8 @@ unequivocally.
 But any Byzantine node could step out from deterministic algorithm and 
 use another signatures list for anchoring transaction. It may create a
 transaction with the same anchor hash (the same data-output) but another
-tx-id and spread it to the bitcoin network. Such non-standard
-transactions make a problem: we want to build new anchoring transaction
+tx-id and broadcast it to the bitcoin network. Such non-standard
+transactions make a problem: new anchoring transaction may be built
 even if previous is still not included in any bitcoin block. However,
 there is a chance that this previous transaction or one of its ancestors
 were mutated by a malicious validator as described above, and the
@@ -137,10 +136,13 @@ An anchoring transaction proposal is constructed as follows:
 
 - The outputs contain a data output and the change output only. The
   change output is first, and the data output is second.
-- The data output consist of multiple [data chunks](#data-chunks)
+- The data output contains a single `OP_RETURN` instruction with
+  anchored data. Such a data consist of multiple [data
+  chunks](#data-chunks)
 - The change output reroutes funds to the next anchoring address if the
-  anchoring address should be changed (see [Changing validators list](#changing-validators-list)).
-  Otherwise, the current address is used.
+  anchoring address should be changed (see 
+  [Changing validators list](#changing-validators-list)). Otherwise, the
+  current address is used.
 
 ### Data chunks
 
@@ -209,10 +211,10 @@ chain](#recovering-broken-anchoring)).
   would update its anchoring chain and common LECT would be found. By the
   reason of uncertainty in the bitcoin blockchain common LECT could be
   found even after new time for anchoring comes. New state for anchoring
-  is the latest Exonum blockchain state we need to anchor. For example now
-  we are at the height `#11000` and anchoring should be held every `1000`
-  blocks. But common LECT appeared only at the height `#12345`. We anchor
-  block `#12000` but there would be no anchor for block `#11000`.
+  is the latest Exonum blockchain state needed to be anchored. For example now
+  Exonum blockchain is at the height `#11000` and anchoring should be held every `1000`
+  blocks. But common LECT appeared only at the height `#12345`. 
+  block `#12000` is anchored, though there would be no anchor for block `#11000`.
 
 
 ## Setups and configuration
@@ -310,8 +312,7 @@ as the anchoring bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. Pub-keys list
 is stored in the global configuration; it can be updated by out-of-band
 means, for example, using [Configuration Update
-service](configuration-updater.md). We may notice only the following
-properties:
+service](configuration-updater.md). The following properties should be noticed:
 
 1. New configuration is spread over nodes. It is still not active.
 2. New configuration have additional parameter `height when this
@@ -331,14 +332,13 @@ properties:
 
 Anchoring pubkeys define new Anchoring BTC-address. In order to prolong
 anchoring chain, new anchoring transaction should spend previous
-anchoring address UTXO and send it to the new anchoring address. We must
-be confident such transaction would be written to the blockchain
-**before** we really change the list of validators. Thus the anchoring
+anchoring address UTXO and send it to the new anchoring address. Such transaction should be commited to the blockchain
+**before** the list of validators is changed. Thus the anchoring
 process is suspended.
 
-- The anchoring service wait until common LECT is written to the Bitcoin
+- The anchoring service wait until common LECT is commited to the Bitcoin
   blockchain.
-- After common LECT appears and is written to the Bitcoin blockchain,
+- After common LECT appears and is commited to the Bitcoin blockchain,
   the service waits until it will gather sufficient number of
   confirmations (ex., `24`).
 - Further transitional Anchoring transaction proposal is generated. That
@@ -385,7 +385,7 @@ equal to `/api/services/btc_anchoring/v1`.
 
 ### Actual address
 
-``` None
+```None
 GET {base_path}/address/actual
 ```
 
@@ -405,9 +405,8 @@ The string with a value of anchoring address in Base58Check format.
 GET {base_path}/address/following
 ```
 
-If the network plans to [change the validators list in
-future](#transitional-transaction), then the next anchoring address is
-returned. Otherwise, `null` is returned.
+If the [change the validators list](#transitional-transaction) is scheduled, returns the next anchoring address.
+Otherwise, returns `null`.
 
 #### Parameters
 
@@ -415,7 +414,7 @@ None.
 
 #### Response
 
-The same format as for the actual anchoring address, the string with a
+The string with a
 value of anchoring address in Base58Check format.
 
 ### Actual LECT for this validator
@@ -424,7 +423,7 @@ value of anchoring address in Base58Check format.
 GET {base_path}/actual_lect
 ```
 
-The current LECT for this validator is returned.
+Returns the current LECT it the current node is a validator. Otherwise, returns error.
 
 #### Parameters
 
@@ -432,34 +431,18 @@ None.
 
 #### Response
 
-Example of JSON response:
+The example of responded JSON:
 
 ```JSON
 {
   "payload": {
-    "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-    "block_height": 0,
-    "prev_tx_chain": null
+	"block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+	"block_height": 0,
+	"prev_tx_chain": null
   },
   "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
 }
 ```
-
-- **payload.blockhash**: the hash of the anchored Exonum block
-- **payload.block_height**: the height of the anchored Exonum block
-- **content.payload.prev_tx_chain**: last tx-id of previous chain of
-  anchoring transactions if it has been broken. Otherwise, `null`.
-- **txid**: the hash for the anchoring bitcoin transaction, which is
-  considered to be a LECT.
-
-        {
-          "payload": {
-            "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-            "block_height": 0,
-            "prev_tx_chain": null
-          },
-          "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-        }
 
 - **payload.blockhash**: the hash of the anchored Exonum block
 - **payload.block_height**: the height of the anchored Exonum block
@@ -468,16 +451,16 @@ Example of JSON response:
 - **txid**: the hash for the anchoring bitcoin transaction, which is
   considered to be a LECT.
 
-Returns an error if the current node is not a validator.
-
 ### Actual LECT for another validator
 
 ```None
 GET {base_path}/actual_lect/{id}
 ```
 
-The actual LECT for the specified validator is returned, along with the
+Returns the actual LECT for the specified validator, along with the
 hash of Exonum transaction published this LECT.
+If the specified `id` is greater or equal to validators
+amount, returns an error.
 
 #### Parameters
 
@@ -485,19 +468,21 @@ hash of Exonum transaction published this LECT.
 
 #### Response
 
-JSON object with the following fields:
+The example of the responded JSON:
 
-        {
-          "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
-          "content": {
-            "payload": {
-              "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-              "block_height": 0,
-              "prev_tx_chain": null
-            },
-            "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-          }
-        }
+```JSON
+{
+  "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
+  "content": {
+	"payload": {
+	  "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
+	  "block_height": 0,
+	  "prev_tx_chain": null
+	},
+	"txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+  }
+}
+```
 
 - **hash**: the hash of Exonum transaction, where the specified
   validator published this LECT
@@ -510,9 +495,6 @@ JSON object with the following fields:
 - **content.txid**: the hash for the anchoring bitcoin transaction,
   which is considered to be a LECT.
 
-Returns an error if the specified `id` is greater or equal to validators
-amount.
-
 ### Nearest LECT
 
 ```None
@@ -522,7 +504,9 @@ GET {base_path}/nearest_lect/{height}
 Requires [observing interval](observing-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
-specific block.
+specific block. If the asked block was not anchored yet or if the
+observing interval is not set, returns `null`.
+
 
 #### Parameters
 
@@ -532,9 +516,6 @@ specific block.
 
 The string which value is a hex-encoded content of the nearest bitcoin
 anchoring transaction.
-
-Returns `null` if the asked block was not anchored yet or if the
-observing interval is not set.
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
