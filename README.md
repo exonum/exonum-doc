@@ -86,7 +86,7 @@ The generated pages will be available in the **site/** directory.
 
 ## License
 
-Copyright 2017, Bitfury Group
+Copyright 2017, Exonum Team
 
 The Exonum documentation is licensed under the Creative Commons Non-Commercial
 Share-Alike International License (version 4.0). Code samples are licensed

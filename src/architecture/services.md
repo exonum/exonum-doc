@@ -136,7 +136,7 @@ using [LevelDB][leveldb]. Each service needs to define a set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
-maps and append-only lists (`MapIndex` and `ListIndex`, respectively).
+maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists (`ListIndex`).
 
 Exonum also provides helpers for *merklizing* data collections, i.e.,
 making it possible to efficiently compute proofs for read requests that involve

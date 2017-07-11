@@ -422,7 +422,7 @@ logic to convert data to a platform-independent representation.
 
 ## Table
 
-A structured collection of data (e.g., a map or a list) that provides a high-level
+A structured collection of data (e.g., a map, set or a list) that provides a high-level
 abstraction on top of [the blockchain state](#blockchain-state). Tables are used
 by [services](#service) to simplify data management. Additionally, some types
 of tables allow to efficiently compute [Merkle proofs](#merkle-proof) for
