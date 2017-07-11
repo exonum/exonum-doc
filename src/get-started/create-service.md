@@ -11,10 +11,10 @@ You can view and download the full source code of this demo
 ## Create Node
 
 Exonum is written in Rust and you have to install the stable Rust
-compiler to build this demo. If you don't have the environment set up, follow
+compiler to build this demo. If you don’t have the environment set up, follow
 [the installation guide](./install.md).
 
-Let's create minimal crate with `exonum-core` dependency.
+Let’s create minimal crate with `exonum-core` dependency.
 
 ```sh
 cargo new --bin minibank
@@ -100,7 +100,7 @@ cargo run
 
 Exonum contains `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
-[provided services](../architecture/services.md). As we haven't implemented
+[provided services](../architecture/services.md). As we haven’t implemented
 a service yet, we keep the list empty.
 
 Put this code after logger initialization into `main` function body:
@@ -113,10 +113,10 @@ let blockchain = Blockchain::new(Box::new(db), services);
 
 We use `MemoryDB` to store our data in the code above. `MemoryDB` is an in-memory
 database implementation useful for development and testing purposes.
-There is LevelDB support as well; it's recommended to use it for production
+There is LevelDB support as well; it’s recommended to use it for production
 applications.
 
-Minimal blockchain is ready, but it's pretty much useless, because there is
+Minimal blockchain is ready, but it’s pretty much useless, because there is
 no way to interact with it. To fix this, we need
 to create a node and provide an API to interact with the
 blockchain.
@@ -125,7 +125,7 @@ blockchain.
 
 Every node needs public and private keys. Keys are unique to every node
 and are used to identify it within the network.
-We'll create temporary keys using `exonum::crypto::gen_keypair()` function,
+We’ll create temporary keys using `exonum::crypto::gen_keypair()` function,
 but for ordinary use you should use the keys from the node configuration file.
 The node needs 2 pairs of keys, actually: one for consensus and another
 for service needs.
@@ -154,7 +154,7 @@ parts:
 The genesis configuration contains a list of public keys of
 [validators](../glossary.md#validator), i.e., nodes that can vote for block
 acceptance. Our demo blockchain network has only one validator (our node).
-Fill this list with the public keys we've just generated:
+Fill this list with the public keys we’ve just generated:
 
 ```rust
 let validator_keys = ValidatorKeys {
@@ -164,9 +164,9 @@ let validator_keys = ValidatorKeys {
 let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
 ```
 
-Let's configure REST API to open the node for external web requests.
+Let’s configure REST API to open the node for external web requests.
 We should set an address of public API (there is a private API,
-but it is used for administration purposes and we won't call it now).
+but it is used for administration purposes and we won’t call it now).
 We also activate the blockchain explorer, a tool to get and explore
 blocks and transactions on the blockchain.
 Our node will expose API on port 8000 of every network interface.
@@ -214,7 +214,7 @@ We should declare what kind of data we want to store in a blockchain.
 
 For our case, we need to declare a container to store the information about
 wallets and its balance. Inside the wallet we want to store the public key
-to validate requests from wallet's owner. We want to store a name of owner
+to validate requests from wallet’s owner. We want to store a name of owner
 for convenience reasons. Also, we need to keep the current balance of the wallet.
 Summing all it up, `Wallet` type will look like:
 
@@ -249,7 +249,7 @@ impl Wallet {
 }
 ```
 
-We've added two methods: to increase the wallet's balance, and another one to decrease
+We’ve added two methods: to increase the wallet’s balance, and another one to decrease
 it. We used `Field::write`, because the data in structs processed by `encoding_struct`
 is stored as a binary blob
 and we need to overwrite it in-place.
@@ -257,9 +257,9 @@ and we need to overwrite it in-place.
 ## Create Schema
 
 Schema is a structured view of the key-value storage implemented by `MemoryDB`.
-To access to the storage, however, we won't use `MemoryDB` directly, but
+To access to the storage, however, we won’t use `MemoryDB` directly, but
 rather a `Fork`. `Fork` is a mutable snapshot of the database, the changes
-in which can be easily rolled back; that's why it's used when dealing with transactions
+in which can be easily rolled back; that’s why it’s used when dealing with transactions
 and blocks in the blockchain.
 
 ```rust
@@ -349,8 +349,8 @@ message! {
 }
 ```
 
-The transaction involves two public keys: for the sender's wallet (`from`) and
-receiver's one (`to`). It also contains the amount of money to move between them.
+The transaction involves two public keys: for the sender’s wallet (`from`) and
+receiver’s one (`to`). It also contains the amount of money to move between them.
 We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
 
@@ -367,7 +367,7 @@ In our case, `verify` for both transaction types will check the transaction sign
 with our `CurrencySchema` to access our data layout.
 
 For the wallet creation, we check that
-the wallet doesn't exist and add a new wallet if so:
+the wallet doesn’t exist and add a new wallet if so:
 
 ```rust
 impl Transaction for TxCreateWallet {
@@ -392,8 +392,8 @@ This transaction also sets the wallet balance to 100.
 
 `TxTransfer` transaction gets two wallets for both sides of a transfer
 transaction. If they have been found, we checks the balance of the sender. If
-the sender has enough coins, then we decrease the sender's balance
-and increases the receiver's balance.
+the sender has enough coins, then we decrease the sender’s balance
+and increases the receiver’s balance.
 
 We also need to check that the sender does not send the coins to himself.
 Otherwise, the implementation
@@ -444,7 +444,7 @@ struct CryptocurrencyApi {
 To simplify request processing, we add a `TransactionRequest` enum
 which joins both types of our transactions.
 We also implement the `Into<Box<Transaction>>` trait for this enum
-to make sure deserialized `TransactionRequest`s fit into the node's channel.
+to make sure deserialized `TransactionRequest`s fit into the node’s channel.
 
 ```rust
 #[serde(untagged)]
@@ -506,7 +506,7 @@ impl Api for CryptocurrencyApi {
 
 ## Define Service
 
-Service is a group of templated transactions (we've defined them before). It
+Service is a group of templated transactions (we’ve defined them before). It
 has a name and a unique id to determine the service inside a blockchain.
 
 ```rust
@@ -573,7 +573,7 @@ impl Service for CurrencyService {
 
 ## Run Service
 
-We've implemented all pieces of a minimalistic blockchain. Now,
+We’ve implemented all pieces of a minimalistic blockchain. Now,
 add `CryptocyrrencyService` to services list of the blockchain and run the demo:
 
 ```rust
@@ -592,7 +592,7 @@ This will build the code and start a compiled binary.
 
 ### Send Transactions via REST API
 
-Let's send some transactions to our demo.
+Let’s send some transactions to our demo.
 
 #### Create First Wallet
 
@@ -721,5 +721,5 @@ Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                                    name: "Janie Roe", balance: 110 }
 ```
 
-Hurray! 🎉 You've created the first fully functional Exonum blockchain
+Hurray! 🎉 You’ve created the first fully functional Exonum blockchain
 with 2 wallets and transferred some money between them.
