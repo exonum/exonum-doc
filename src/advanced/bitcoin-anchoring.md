@@ -102,7 +102,7 @@ Correct Transaction (LECT). LECT of all validators are published in the
 Exonum blockchain. While creating a new anchoring transaction, the
 validators' supermajority select common LECT and spend its change output.
 
-Every validator refresh its LECT with a custom schedule. To get
+Every validator refresh its LECT with a [custom schedule](#LECT-updating-interval). To get
 new LECT, the validator uses [bitcoin node's](#bitcoind-node) API. New
 LECT must have the following properties:
 
@@ -245,6 +245,10 @@ the only supported) key format for bitcoin transactions.
 After observing interval is set, node tracks anchoring chain. It helps
 to get the [nearest anchoring transaction](#nearest-lect) for every
 Exonum block.
+
+#### LECT updating interval
+
+Each `N` Exonum blocks validator checks out the bitcoin blockchain to find new LECT.
 
 ### Global settings
 
