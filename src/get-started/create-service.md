@@ -1,28 +1,26 @@
 # Cryptocurrency Tutorial: How to Create Services
 
-In this demo we create and run single-node blockchain network that implements
-a minimal cryptocurrency.
+In this demo we create a single-node blockchain network that implements
+a minimalistic cryptocurrency.
+The networks accepts two types of transactions: create a wallet with a default balance,
+and transfer money between wallets.
 
-It will accept two types of transactions: create a wallet with a default balance,
-transfer money between the wallets. Also we define a persistent storage to keep
-the balance of wallets.
-
-The full source code of this example you can download
+You can view and download the full source code of this demo
 [here](https://github.com/exonum/minibank).
 
-## Create the single node
+## Create Node
 
 Exonum is written in Rust and you have to install the stable Rust
-compiler to build this demo. If you haven't a necessary environment follow
-[the installation guide](./install.md), please.
+compiler to build this demo. If you don’t have the environment set up, follow
+[the installation guide](./install.md).
 
-Let's create minimal crate with `exonum-core` dependency.
+Let’s create minimal crate with `exonum-core` dependency.
 
 ```sh
 cargo new --bin minibank
 ```
 
-Add to your `Cargo.toml` necessary dependencies:
+Add necessary dependencies to your `Cargo.toml`:
 
 ```toml
 [package]
@@ -43,7 +41,7 @@ git = "ssh://git@github.com/exonum/exonum-core.git"
 rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
 ```
 
-We need to import crates with necessary types. Add to your `src/main.rs`:
+We need to import crates with necessary types. Edit your `src/main.rs`:
 
 ```rust
 extern crate serde;
@@ -66,25 +64,20 @@ use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
 use router::Router;
-
 ```
 
-Put constants to this file:
+Define constants:
 
 ```rust
+// Service identifier
 const SERVICE_ID: u16 = 1;
-
+// Identifier for wallet creating transaction
 const TX_CREATE_WALLET_ID: u16 = 1;
-
+// Identifier for coins transferring transaction
 const TX_TRANSFER_ID: u16 = 2;
-
+// Starting balance of a newly created wallet
 const INIT_BALANCE: u64 = 100;
 ```
-
-`SERVICE_ID` is an service identifier. `TX_CREATE_WALLET_ID` will be used as
-identifier for wallet creating transaction. `TX_TRANSFER_ID` is an identifier
-for funds transferring transaction. The latest `INIT_BALANCE` will be used as
-started balance for every created wallet.
 
 Declare `main` function:
 
@@ -94,22 +87,22 @@ fn main() {
 }
 ```
 
-In the code above we prepared a logger which will show us what Exonum node does.
-You can try to run it with command:
+In the code above we prepared a logger that will output what Exonum node does
+to the console.
+
+You can try to run the blockchain at this point with
 
 ```sh
 cargo run
 ```
 
+### Initialize Blockchain
+
 Exonum contains `Blockchain` type.
 To create blockchain we should create a database instance and declare a list of
-[provided services](../architecture/services.md). While we haven't implemented
-a service we keep the list empty.
+[provided services](../architecture/services.md). As we haven’t implemented
+a service yet, we keep the list empty.
 
-We use `MemoryDB` to store our data in this demo. `MemoryDB` is an in-memory
-database implementation useful for development and testing purposes.
-There is LevelDB support as well; it's recommended to use it for production
-applications.
 Put this code after logger initialization into `main` function body:
 
 ```rust
@@ -118,39 +111,50 @@ let services: Vec<Box<Service>> = vec![ ];
 let blockchain = Blockchain::new(Box::new(db), services);
 ```
 
-Minimal blockchain is ready. In addition to defining blockchain object, we need
-to create a node (with a keypair) and provide an API to interact with the
-blockchain. Every node needs public and private keys. We'll create
-a temporary pair, but for ordinary use you should use the keys from node
-configuration file.
+We use `MemoryDB` to store our data in the code above. `MemoryDB` is an in-memory
+database implementation useful for development and testing purposes.
+There is LevelDB support as well; it’s recommended to use it for production
+applications.
 
-### Create keys
+Minimal blockchain is ready, but it’s pretty much useless, because there is
+no way to interact with it. To fix this, we need
+to create a node and provide an API to interact with the
+blockchain.
 
-This code makes a pair of keys. They determine the uniqueness of the node.
-We use `exonum::crypto::gen_keypair()` function take random pair of keys.
-The node needs pair of keys for a consensus and pair for service needs.
+### Create Keys
+
+Every node needs public and private keys. Keys are unique to every node
+and are used to identify it within the network.
+We’ll create temporary keys using `exonum::crypto::gen_keypair()` function,
+but for ordinary use you should use the keys from the node configuration file.
+The node needs 2 pairs of keys, actually: one for consensus and another
+for service needs.
 
 ```rust
-let (consensus_public_key, consensus_secret_key) = exonum::crypto::gen_keypair();
-let (service_public_key, service_secret_key) = exonum::crypto::gen_keypair();
+let (consensus_public_key, consensus_secret_key) =
+    exonum::crypto::gen_keypair();
+let (service_public_key, service_secret_key) =
+    exonum::crypto::gen_keypair();
 ```
 
-### Configure node
+### Configure Node
 
 Node expects a blockchain instance and a configuration.
 [Node configuration](../architecture/configuration.md) consists of two
 parts:
 
-* Local configuration which includes
-    * Node configuration (includes IP settings and other configuration parts)
-    * Api configuration (includes settings of REST API)
-* Global configuration or genesis configuration (includes all members
-  to achieve a consensus)
+- Local configuration which includes:
 
-Genesis configuration contains a list of public keys of
-[validators](../glossary.md#validator): nodes which can vote for block
-acceptance. Our demo blockchain network has only one validator. Fill this
-list with your public keys:
+    - Node configuration (e.g., IP settings and other configuration parts)
+    - API configuration (e.g., settings of REST API)
+
+- Global configuration or genesis configuration (all parameters
+  that need to be the same for all nodes in the network)
+
+The genesis configuration contains a list of public keys of
+[validators](../glossary.md#validator), i.e., nodes that can vote for block
+acceptance. Our demo blockchain network has only one validator (our node).
+Fill this list with the public keys we’ve just generated:
 
 ```rust
 let validator_keys = ValidatorKeys {
@@ -160,12 +164,12 @@ let validator_keys = ValidatorKeys {
 let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
 ```
 
-Let's configure REST API to open the node for external web requests.
-For the REST API we should set an address of public API (there is a private API,
-but it is used for administration purposes and we won't call it now). Also you
-can activate blockchain explorer. It's a tool to get and explore all blocks of
-the blockchain. Our node will expose API on **8000** port of every network
-interface.
+Let’s configure REST API to open the node for external web requests.
+We should set an address of public API (there is a private API,
+but it is used for administration purposes and we won’t call it now).
+We also activate the blockchain explorer, a tool to get and explore
+blocks and transactions on the blockchain.
+Our node will expose API on port 8000 of every network interface.
 
 ```rust
 let api_address = "0.0.0.0:8000".parse().unwrap();
@@ -182,6 +186,8 @@ full nodes in the Exonum network.
 
 ```rust
 let peer_address = "0.0.0.0:2000".parse().unwrap();
+
+// Complete node configuration
 let node_cfg = NodeConfig {
     listen_address: peer_address,
     peers: vec![],
@@ -202,16 +208,15 @@ let mut node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
 
-## Declare persistent data
+## Declare Persistent Data
 
-Blockchain is a database which keep the data in protected blocks.
 We should declare what kind of data we want to store in a blockchain.
 
-For our case we should declare a container to store the information about
+For our case, we need to declare a container to store the information about
 wallets and its balance. Inside the wallet we want to store the public key
-to validate requests from wallet's owner. Also we want to store a name of owner
-for convenience reasons. And we need to keep the actual balance of the wallet.
-We've got the following:
+to validate requests from wallet’s owner. We want to store a name of owner
+for convenience reasons. Also, we need to keep the current balance of the wallet.
+Summing all it up, `Wallet` type will look like:
 
 ```rust
 encoding_struct! {
@@ -225,8 +230,9 @@ encoding_struct! {
 }
 ```
 
-Macro `encoding_struct!` helps to declare a struct and determine bounds of
-evere piece of data. We need to change wallet balance, so we add methods to
+Macro `encoding_struct!` helps declare a [serializable](../architecture/serialization.md)
+struct and determine bounds of
+its fields. We need to change wallet balances, so we add methods to
 the `Wallet` type:
 
 ```rust
@@ -243,15 +249,18 @@ impl Wallet {
 }
 ```
 
-We've added two methods: to increase the wallet's balance and other to decrease
-it. We used `Field::write` method there, because the data stored as binary blob
-and we have to overwrite data directly in the blob.
+We’ve added two methods: to increase the wallet’s balance, and another one to decrease
+it. We used `Field::write`, because the data in structs processed by `encoding_struct`
+is stored as a binary blob
+and we need to overwrite it in-place.
 
-## Create the schema
+## Create Schema
 
 Schema is a structured view of the key-value storage implemented by `MemoryDB`.
-Actually, to access to the storage we have to use a mutable reference of `Fork`.
-Fork of a database is a database snapshot with upcoming changes:
+To access to the storage, however, we won’t use `MemoryDB` directly, but
+rather a `Fork`. `Fork` is a mutable snapshot of the database, the changes
+in which can be easily rolled back; that’s why it’s used when dealing with transactions
+and blocks in the blockchain.
 
 ```rust
 pub struct CurrencySchema<'a> {
@@ -259,15 +268,17 @@ pub struct CurrencySchema<'a> {
 }
 ```
 
-For access to the objects inside the storage we have to declare the layout of
-the data. For example, if we want to keep the wallets in the storage we will
-use an instance of `MapIndex`: key-value view to our data where key of index
-is a public key of wallet, but value is a serialized `Wallet` struct.
+For access to the objects inside the storage we need to declare the layout of
+the data. As we want to keep the wallets in the storage, we will
+use an instance of [`MapIndex`](../architecture/storage.md#mapindex),
+a map abstraction.
+Keys of the index will correspond to public keys of wallets,
+and its values will be serialized `Wallet` structs.
 
-Fork provides random access to every data inside the database.
-To separate the data we should add a unique prefix to every group of data.
-To store all wallets in a separate domain we will add the prefix in the
-first argument to `MapIndex::new` call:
+`Fork` provides random access to every piece of data inside the database.
+To isolate the wallets map into a separate entity,
+we add a unique prefix to it,
+which is the first argument to `MapIndex::new` call:
 
 ```rust
 impl<'a> CurrencySchema<'a> {
@@ -276,30 +287,32 @@ impl<'a> CurrencySchema<'a> {
         MapIndex::new(prefix, self.view)
     }
 
+    // Utility method to quickly get a separate wallet from the storage
     pub fn wallet(&mut self, pub_key: &PublicKey) -> Option<Wallet> {
         self.wallets().get(pub_key)
     }
 }
 ```
 
-## Transactions
+## Define Transactions
 
 [Transaction](../architecture/transactions.md) is a kind of message which
-performs actions with a blockchain.
+performs atomic actions on the blockchain state.
 
 For our cryptocurrency demonstration we need two transaction types:
 
-1. Create a new wallet and add some money to it
-2. Transfer money between two different wallets
+- Create a new wallet and add some money to it
+- Transfer money between two different wallets
 
 Declaration of any transaction needs to contain:
 
-1. Service identifier
-2. Unique (within the service) identifier of message
-2. Size of fixed part of the message
+- Service identifier
+- Unique (within the service) identifier of message
+- Size of the fixed part of the message
 
-You have to add service and message identifiers, because Exonum will use it
-for deserialization purposes.
+Exonum will use these constants for (de)serialization of the messages.
+
+### Creating New Wallet
 
 Transaction to create a new wallet have to contain public key of a wallet and
 name of user who created this wallet:
@@ -315,10 +328,11 @@ message! {
         field name:        &str        [32 => 40]
     }
 }
-
 ```
 
-Transaction to transfer money between different wallets:
+### Transferring Coins
+
+Transaction to transfer coins between different wallets is declared as follows:
 
 ```rust
 message! {
@@ -335,25 +349,25 @@ message! {
 }
 ```
 
-The last consists of two public keys: for wallet of sender and the second key
-of wallet of receiver. Also it contains amount of money to move between them.
-We add `seed` field to make our transaction is
+The transaction involves two public keys: for the sender’s wallet (`from`) and
+receiver’s one (`to`). It also contains the amount of money to move between them.
+We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
 
-## Transaction execution
+### Transaction Execution
 
-Every transaction in Exonum has an attached busiless-logic of the blockchain.
-Actually we declared structs and we also have to implement `Trasaction` trait
-which includes `verify` method to verify the internal integrity of the
-transaction and `execute` method which contains logic which applied to the
+Every transaction in Exonum has an attached business-logic of the blockchain,
+which is encapulated in the `Transaction` trait.
+This trait includes the `verify` method to verify the integrity of the
+transaction, and the `execute` method which contains logic which applied to the
 storage when a transaction is executed.
 
-For every transaction we will check the signature.
-`execute` method gets the reference to a `Fork` of a storage. We can wrap it
-with our schema to turn it into structured storage with our data layout inside.
+In our case, `verify` for both transaction types will check the transaction signature.
+`execute` method gets the reference to a `Fork` of a storage, so we wrap it
+with our `CurrencySchema` to access our data layout.
 
-In the following method we verify the signature of a transaction, check that
-the wallet is not exists and add a new one if so:
+For the wallet creation, we check that
+the wallet doesn’t exist and add a new wallet if so:
 
 ```rust
 impl Transaction for TxCreateWallet {
@@ -364,7 +378,9 @@ impl Transaction for TxCreateWallet {
     fn execute(&self, view: &mut Fork) {
         let mut schema = CurrencySchema { view };
         if schema.wallet(self.pub_key()).is_none() {
-            let wallet = Wallet::new(self.pub_key(), self.name(), INIT_BALANCE);
+            let wallet = Wallet::new(self.pub_key(),
+                                     self.name(),
+                                     INIT_BALANCE);
             println!("Create the wallet: {:?}", wallet);
             schema.wallets().put(self.pub_key(), wallet)
         }
@@ -372,20 +388,22 @@ impl Transaction for TxCreateWallet {
 }
 ```
 
-This transaction also adds `100` to the balance of wallet.
+This transaction also sets the wallet balance to 100.
 
-`TxTransfer` transaction finds two wallets for both sides of a transfer
-transaction. If they have been found it checks the balance of the sender and if
-it has enough money then decreases the sender balance and increases the balance
-of receiver.
+`TxTransfer` transaction gets two wallets for both sides of a transfer
+transaction. If they have been found, we checks the balance of the sender. If
+the sender has enough coins, then we decrease the sender’s balance
+and increases the receiver’s balance.
 
-We also have to check that sender is not the receiver, because the implementation
-below will create money out of nowhere if the sender is equal to the receiver.
+We also need to check that the sender does not send the coins to himself.
+Otherwise, the implementation
+below will create money out of thin air if the sender is equal to the receiver.
 
 ```rust
 impl Transaction for TxTransfer {
     fn verify(&self) -> bool {
-         (*self.from() != *self.to()) && self.verify_signature(self.from())
+         (*self.from() != *self.to()) &&
+             self.verify_signature(self.from())
     }
 
     fn execute(&self, view: &mut Fork) {
@@ -397,7 +415,9 @@ impl Transaction for TxTransfer {
             if sender.balance() >= amount {
                 sender.decrease(amount);
                 receiver.increase(amount);
-                println!("Transfer between wallets: {:?} => {:?}", sender, receiver);
+                println!("Transfer between wallets: {:?} => {:?}",
+                         sender,
+                         receiver);
                 let mut wallets = schema.wallets();
                 wallets.put(self.from(), sender);
                 wallets.put(self.to(), receiver);
@@ -407,10 +427,12 @@ impl Transaction for TxTransfer {
 }
 ```
 
-## API implementation
+## Implement API
 
-Node's API is a struct which implements `Api` trait. We defined one which
-contains a channel - a connection to the blockchain node instance.
+Finally, we need to implement the node API.
+To do this, we declare a struct which implements the `Api` trait.
+A struct will
+contains a channel, i.e., a connection to the blockchain node instance.
 
 ```rust
 #[derive(Clone)]
@@ -419,12 +441,10 @@ struct CryptocurrencyApi {
 }
 ```
 
-For requests need we've added `TransactionRequest` enumeration which joins all
-types of our transactions. We also implemented `Into<Box<Transacstion>>`
-to convert every deserialized `TransactionRequest` into the boxed
-`Transaction` to send to the node's channel later.
-
-For responses we will return the `Hash` of a transaction.
+To simplify request processing, we add a `TransactionRequest` enum
+which joins both types of our transactions.
+We also implement the `Into<Box<Transaction>>` trait for this enum
+to make sure deserialized `TransactionRequest`s fit into the node’s channel.
 
 ```rust
 #[serde(untagged)]
@@ -449,70 +469,74 @@ struct TransactionResponse {
 }
 ```
 
-To join our handler with http handler of a web-server we implemented `wire`
-method. This method takes the reference to a router. In the method below we add
-one handler to convert any input `JSON` data to a `Transaction` instance.
-
-The transactions endpoint responds with a hash of the transaction. It also
-sends the transaction via the channel, so that it will be broadcast over the
+To join our handler with the HTTP handler of a web-server, we need to implement
+the `wire` method. This method takes the reference to a router.
+In the method below we add
+one handler to convert input JSON into a `Transaction`.
+The handler responds with a hash of the transaction. It also
+sends the transaction to the channel, so that it will be broadcast over the
 blockchain network and included into a block.
-
-We bind the transaction handler to `/v1/wallets/transaction` route.
 
 ```rust
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
-
         let self_ = self.clone();
-        let transaction = move |req: &mut Request| -> IronResult<Response> {
+        let tx_handler = move |req: &mut Request| -> IronResult<Response> {
             match req.get::<bodyparser::Struct<TransactionRequest>>() {
-                Ok(Some(transaction)) => {
-                    let transaction: Box<Transaction> = transaction.into();
-                    let tx_hash = transaction.hash();
-                    self_.channel.send(transaction).map_err(|e| ApiError::Events(e))?;
+                Ok(Some(tx)) => {
+                    let tx: Box<Transaction> = tx.into();
+                    let tx_hash = tx.hash();
+                    self_.channel.send(tx)
+                                 .map_err(|e| ApiError::Events(e))?;
                     let json = TransactionResponse { tx_hash };
                     self_.ok_response(&serde_json::to_value(&json).unwrap())
                 }
-                Ok(None) => Err(ApiError::IncorrectRequest("Empty request body".into()))?,
+                Ok(None) => Err(ApiError::IncorrectRequest(
+                    "Empty request body".into()))?,
                 Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
             }
         };
+
+        // Bind the transaction handler to a specific route.
         let route_post = "/v1/wallets/transaction";
-        router.post(&route_post, transaction, "transaction");
+        router.post(&route_post, tx_handler, "transaction");
     }
 }
 ```
 
-## Define minimal service
+## Define Service
 
-Service is a group of templated transactions (we've defined them before). It
+Service is a group of templated transactions (we’ve defined them before). It
 has a name and a unique id to determine the service inside a blockchain.
 
 ```rust
 struct CurrencyService;
 ```
 
-We created `CurrencyService` struct and to turn it into a blockchain service
-we should implement `Service` trait to it. You can read more in the
-[Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
-section.
+To turn `CurrencyService` into a blockchain service,
+we should implement the `Service` trait to it.
 
-Two first methods are simple: `service_name` returns the name of our service,
-`service_id` return the unique id of our service (`SERVICE_ID` constant used).
+!!! tip
+    You can read more in the [Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
+    section.
 
-The method `tx_from_raw` is used to convert into a transaction any data which
-coming to the node. To choose the right deserializer we can use `message_type()`
-to get the unique identifier of message we declared before. If transaction
-built sucessfully we put it into the `Box<_>`.
+Two methods of the `Service` trait are simple:
 
-The last method `public_api_handler` have to make REST `Handler` to handle
-web requests to the REST API. We can put any handler for eny request and we will
-implement the capability to add transaction with the REST API. As our API needs
-to send transactions to the node we add `node_channel` to our
-`CryptocurrencyApi` instance.
+- `service_name` returns the name of our service
+- `service_id` returns the unique id of our service
+   (i.e., the `SERVICE_ID` constant)
+
+The `tx_from_raw` method is used to deserialize transactions
+coming to the node. To choose the right deserializer, we can use `message_type()`
+to get the unique identifier of message we declared before. If the incoming
+transaction is built successfully, we put it into a `Box<_>`.
+
+The remaining method, `public_api_handler`, creates a REST `Handler` to process
+web requests to the node. We will use it to
+receive transactions via REST API using the logic we defined in `CryptocurrencyApi`
+earlier.
 
 ```rust
-
 impl Service for CurrencyService {
     fn service_name(&self) -> &'static str { "cryptocurrency" }
 
@@ -547,10 +571,10 @@ impl Service for CurrencyService {
 `CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
 `Api::wire` method to connect this `Api` instance to the `Router`.
 
-## Run
+## Run Service
 
-We've implemented all pieces of minimal blockchain. Add `CryptocyrrencyService`
-to services list of the blockchain and run the demo:
+We’ve implemented all pieces of a minimalistic blockchain. Now,
+add `CryptocyrrencyService` to services list of the blockchain and run the demo:
 
 ```rust
 let services: Vec<Box<Service>> = vec![
@@ -564,23 +588,27 @@ To compile and run the final code enter:
 cargo run
 ```
 
-It builds the code and start a compiled binary.
+This will build the code and start a compiled binary.
 
-Let's send transactions to our demo.
+### Send Transactions via REST API
 
-Create `create-wallet-1.json` file and put the content:
+Let’s send some transactions to our demo.
+
+#### Create First Wallet
+
+Create `create-wallet-1.json` file and put there:
 
 ```json
 {
-    "body": {
-        "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-        "name": "Johnny Doe"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 1,
-    "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
+  "body": {
+    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+    "name": "Johnny Doe"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 1,
+  "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
 }
 ```
 
@@ -588,7 +616,7 @@ Use `curl` command to send this transaction to the node by HTTP:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
-http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
 This transaction creates the first wallet associated with user Johnny Doe.
@@ -607,19 +635,21 @@ Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
                             name: "Johnny Doe", balance: 100 }
 ```
 
+#### Second Wallet
+
 To create the second wallet put the code into `create-wallet-2.json` file:
 
 ```json
 {
-    "body": {
-        "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-        "name": "Janie Roe"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 1,
-    "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
+  "body": {
+    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+    "name": "Janie Roe"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 1,
+  "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
 }
 ```
 
@@ -627,7 +657,7 @@ Send it with `curl` to the node:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json \
-http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
 It returns the hash of the second transaction:
@@ -645,34 +675,36 @@ Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
                             name: "Janie Roe", balance: 100 }
 ```
 
+#### Transfer Between Wallets
+
 Now we have 2 wallets in the database and we can transfer money between them.
 Create `transfer-funds.json` and add to the file:
 
 ```json
 {
-    "body": {
-        "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-        "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-        "amount": "10",
-        "seed": "12623766328194547469"
-    },
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 1,
-    "message_id": 2,
-    "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
+  "body": {
+    "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
+    "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
+    "amount": "10",
+    "seed": "12623766328194547469"
+  },
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 1,
+  "message_id": 2,
+  "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
 }
 ```
 
-This transaction transfer 10 units from the first wallet to the second.
-To send it to the node enter:
+This transaction transfers 10 coins from the first wallet to the second.
+Send it to the node with:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json \
-http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
 ```
 
-The last transaction returns the hash:
+This requests returns the transaction hash:
 
 ```json
 {
@@ -689,5 +721,5 @@ Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                                    name: "Janie Roe", balance: 110 }
 ```
 
-You've created the first blockchain with 2 wallets and transfered some money
-between them.
+Hurray! 🎉 You’ve created the first fully functional Exonum blockchain
+with 2 wallets and transferred some money between them.
