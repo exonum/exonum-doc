@@ -128,7 +128,8 @@ has been really authorized by supermajority of validators.
 
 !!! tip
     See separate articles for more details: [*Consensus*](../architecture/consensus.md),
-    [*Leader Election*](../advanced/consensus/leader-election.md).
+    [*Consensus spec*](../advanced/consensus/specification.md),
+    [*Requests*](../advanced/consensus/requests.md).
 
 Exonum uses a custom modification of Byzantine fault tolerant
 consensus (similar to PBFT) to guarantee that in any time there is one agreed version
