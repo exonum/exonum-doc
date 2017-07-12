@@ -147,7 +147,7 @@ Consensus messages include:
 ## Core
 
 In Exonum: the functionality present in any Exonum blockchain regardless of
-the deployed [services](#service). Encapsulated in the [exonum][exonum]
+the deployed [services](#service). Encapsulated in the [**exonum**][exonum]
 repository.
 
 For example, the core includes a collection of system [tables](#table) (such as
