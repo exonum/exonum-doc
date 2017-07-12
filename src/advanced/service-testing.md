@@ -7,19 +7,19 @@ and [service endpoints](../glossary.md#service-endpoint).
 Sandbox is a mechanism that simulates the rest of the network for a node. Using
 sandbox one can send a message to the node and expect some response from it
 which is then checked against the reference response. The sandbox can be used to
-test the consensus algorithm and the operation of the services by sending them
-transactions and verifying the service response. Similarly, tests of the public
-REST API can be performed.
+test the consensus algorithm (by sending consensus messages to the node and
+verifying its response) and the operation of the services (by committing
+transactions to the blockchain and verifying the service response). Similarly,
+tests of the public REST API can be performed.
 
-The sandbox itself has a stub service for testing transactions.
+## Consensus Algorithm Testing
 
-## Consensus Algorithm tests
-
-Sandbox tests are used to check node behavior compliance with the consensus
-algorithm. The following parts of the consensus algorithm are tested:
+Testing of the consensus algorithm implies checking compliance of the node
+behavior with the algorithm. The following components of the consensus
+algorithm are tested:
 
 - [Consensus messages processing](consensus/specification.md#message-processing)
-- Behavior at each [stage of the consensus algorithm](consensus/specification.md#consensus-algorithm-stages)
+- Node behavior at each [stage of the consensus algorithm](consensus/specification.md#consensus-algorithm-stages)
 - Timeouts processing:
 
     - [round timeout](consensus/specification.md#round-timeout-processing)
@@ -42,17 +42,17 @@ Functions for consensus algorithm testing:
   Creates sandbox with `TimestampingService` and `ConfigUpdateService`
 
 - `recv`  
-  Simulates receiving message by the node
+  Simulates receiving a message by the node
 
 - `send`  
   Checks if a message has been sent by the node
 
 - `broadcast`  
-  Checks if the node broadcasted the message
+  Checks if the node has broadcasted the message
 
 - `add_time`  
-  Emulates the situation after the specified time (as a `std::time::Duration`
-  struct). Is used for timeouts testing.
+  Emulates the situation upon expiration of the specified time period (as a
+  `std::time::Duration`struct). Is used for timeouts testing.
 
 - `a`  
   Gets socket address of the validator with the specified number.
@@ -71,30 +71,25 @@ Functions for consensus algorithm testing:
 Code example:
 
 ```rust
-// Check for `Connect` message exchange
+// Check for "Connect" message exchange
 
 #[test]
 fn test_sandbox_recv_and_send() {
     let s = timestamping_sandbox();
     let (public, secret) = gen_keypair();
 
-    // Simulate receiving Connect message by the node
+    // Simulate receiving "Connect" message by the node
     s.recv(Connect::new(&public, s.a(2), s.time(), &secret));
 
-    // Check if the node sent Connect message
+    // Check if the node has sent the "Connect" message
     s.send(s.a(2), Connect::new(&s.p(0), s.a(0), s.time(), s.s(0)));
 }
 ```
 
-## Service Test Examples
+## Service Testing
 
-!!! tip
-    See source code for more details on how sandbox is used for testing
-    [the configuration update service](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/lib.rs)
-    and [the anchoring service](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests).
-
-To test some set of the services, one can pass the services list to the sandbox
-constructor:
+To test a certain set of the services, one should pass the services list to the
+sandbox constructor:
 
 ```rust
 let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
@@ -113,17 +108,18 @@ Useful functions for service testing:
   Allows committing a transaction.
 
 - `broadcast`  
-  Allows to check broadcasting message with a particular content (transaction).
-
-## Service Endpoints Test Examples
+  Allows to check if the message of a particular content (i.e. in this case, a
+  transaction) is broadcasted.
 
 !!! tip
-    See [source code](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/api_tests.rs)
-    for more details on how sandbox is used for testing the configuration update
-    service endpoints.
+    See source code for more details on how sandbox is used for testing
+    [the configuration update service](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/lib.rs)
+    and [the anchoring service](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests).
+
+## Service Endpoints Testing
 
 !!! note
-    Each service should provide its own interface for sandbox testing of
+    Each service should provide its own interface for sandbox testing of the
     service endpoints.
 
 Code example:
@@ -151,3 +147,8 @@ fn test_get_actual_config() {
     assert_eq!(actual_body, serde_json::to_value(expected_body).unwrap());
 }
 ```
+
+!!! tip
+    See [source code](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/api_tests.rs)
+    for more details on how sandbox is used for testing the configuration update
+    service endpoints.
