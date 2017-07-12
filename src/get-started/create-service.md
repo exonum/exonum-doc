@@ -14,7 +14,7 @@ Exonum is written in Rust and you have to install the stable Rust
 compiler to build this demo. If you don’t have the environment set up, follow
 [the installation guide](./install.md).
 
-Let’s create minimal crate with `exonum-core` dependency.
+Let’s create minimal crate with `exonum` dependency.
 
 ```sh
 cargo new --bin minibank
@@ -37,7 +37,7 @@ serde_json = "1.0"
 serde_derive = "1.0"
 
 [dependencies.exonum]
-git = "ssh://git@github.com/exonum/exonum-core.git"
+git = "ssh://git@github.com/exonum/exonum.git"
 rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
 ```
 
