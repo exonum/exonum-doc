@@ -1,6 +1,6 @@
 # Sandbox Testing
 
-Sandbox is a mechanism that simulates the rest of the network for a node.
+Sandbox is a package that simulates the rest of the network for a node.
 The sandbox is used to test [services](../architecture/services.md),
 [the consensus algorithm](consensus/specification.md),
 and [service endpoints](../glossary.md#service-endpoint).
@@ -14,8 +14,8 @@ tests of the public REST API can be performed.
 
 ## Sandbox Interface
 
-Sandbox can be created with `sandbox_with_services` method, which allows to
-specify a list of services for testing.
+A sandbox instance can be created with `sandbox_with_services` method, which
+allows to specify a list of services for testing.
 
 Sandbox provides network emulation capabilities:
 
@@ -51,9 +51,9 @@ Finally, sandbox provides utility methods:
 
 ## Consensus Algorithm Testing
 
-Testing of the consensus algorithm implies checking compliance of the node
-behavior with the algorithm. The following components of the consensus
-algorithm are tested:
+Testing the consensus algorithm implies checking compliance of the node
+behavior with the algorithm specification. The following components of the
+consensus algorithm are tested:
 
 - [Consensus messages processing](consensus/specification.md#message-processing)
 - Node behavior at each [stage of the consensus algorithm](consensus/specification.md#consensus-algorithm-stages)
@@ -78,11 +78,10 @@ algorithm are tested:
     [`validators` list](../architecture/configuration.md#genesis) specified in
     the global configuration.
 
-Code example:
+The example below shows how sandbox could be used to check `Connect` message
+exchange.
 
 ```rust
-// Check for "Connect" message exchange
-
 #[test]
 fn test_sandbox_recv_and_send() {
     let s = sandbox_with_services(vec![Box::new(ConfigUpdateService::new())]);
@@ -123,28 +122,29 @@ subsequent changes in the blockchain and the storage state.
     Each service should provide its own interface for sandbox testing of the
     service endpoints.
 
-Code example:
+The example below shows how sandbox could be used to check `actual_config`
+endpoint of the configuration update service.
 
 ```rust
 #[test]
 fn test_get_actual_config() {
     let _ = init_logger();
 
-    //create sandbox for testing configuration update service endpoints
+    // Create sandbox for testing configuration update service endpoints
     let api_sandbox = ConfigurationApiSandbox::new();
 
-    // read current configuration
+    // Read current configuration
     let sand_cfg = api_sandbox.sandbox.cfg();
     let expected_body = ApiResponseConfigHashInfo {
         hash: sand_cfg.hash(),
         config: sand_cfg,
     };
 
-    // read current configuration via REST API
+    // Read current configuration via REST API
     let resp_actual_config = api_sandbox.get_actual_config().unwrap();
     let actual_body = response_body(resp_actual_config);
 
-    // compare current configuration with GET response
+    // Compare current configuration with GET response
     assert_eq!(actual_body, serde_json::to_value(expected_body).unwrap());
 }
 ```
