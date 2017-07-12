@@ -117,9 +117,7 @@ Hash of a value, contained in `(height = 0, index)`, is defined as:
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist then:
 
-```None
-T(height , index) = hash(T(height - 1, index * 2) || T(height - 1, index * 2 + 1)).
-```
+```T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).```
 
 #### Rule 4. `height > 1` and the only child
 
