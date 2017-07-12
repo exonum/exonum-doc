@@ -4,8 +4,8 @@ theme: material
 theme_dir: theme
 extra_css:
   - assets/stylesheets/extra.css
-repo_name: 'exonum/exonum-core'
-repo_url: 'https://github.com/exonum/exonum-core'
+repo_name: 'exonum/exonum'
+repo_url: 'https://github.com/exonum/exonum'
 
 site_url: 'http://exonum.com/doc/'
 site_author: 'BitFury Group'
