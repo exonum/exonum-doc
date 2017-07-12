@@ -1,1 +1,0 @@
-# Merkle Index
