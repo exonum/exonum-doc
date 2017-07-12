@@ -103,7 +103,7 @@ Binary serialization of the body is performed using
 according to the transaction specification in the service.
 
 !!! note "Example"
-    The body of `TxTransfer` in the sample cryptocurrency service
+    The body of `TxTransfer` transaction type in the sample cryptocurrency service
     is structured as follows:
 
     | Field      | Binary format | Binary offset | JSON       |
