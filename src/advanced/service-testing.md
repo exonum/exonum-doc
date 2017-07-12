@@ -1,16 +1,47 @@
 # Sandbox Testing
 
+Sandbox is a mechanism that simulates the rest of the network for a node.
 The sandbox is used to test [services](../architecture/services.md),
 [the consensus algorithm](consensus/specification.md),
 and [service endpoints](../glossary.md#service-endpoint).
 
-Sandbox is a mechanism that simulates the rest of the network for a node. Using
-sandbox one can send a message to the node and expect some response from it
+Using sandbox one can send a message to the node and expect some response from it
 which is then checked against the reference response. The sandbox can be used to
 test the consensus algorithm (by sending consensus messages to the node and
 verifying its response) and the operation of the services (by committing
 transactions to the blockchain and verifying the service response). Similarly,
 tests of the public REST API can be performed.
+
+## Sandbox Interface
+
+- `timestamping_sandbox`  
+  Creates sandbox with `TimestampingService` and `ConfigUpdateService`
+
+- `recv`  
+  Simulates receiving a message by the node
+
+- `send`  
+  Checks if a message has been sent by the node
+
+- `broadcast`  
+  Checks if the node has broadcasted the message of a particular content
+  (e.g. a transaction).
+
+- `add_time`  
+  Emulates the situation upon expiration of the specified time period (as a
+  `std::time::Duration`struct). Is used for timeouts testing.
+
+- `a`  
+  Gets socket address of the validator with the specified number.
+
+- `p`  
+  Gets public key of the validator with the specified number.
+
+- `s`  
+  Gets private key of the validator with the specified number.
+
+- `add_one_height_with_transactions`  
+  Allows committing a transaction.
 
 ## Consensus Algorithm Testing
 
@@ -35,33 +66,6 @@ algorithm are tested:
 !!! tip
     See [source code](https://github.com/exonum/exonum-core/blob/master/sandbox/tests/consensus.rs)
     for more details on how sandbox is used for testing the consensus algorithm.
-
-Functions for consensus algorithm testing:
-
-- `timestamping_sandbox`  
-  Creates sandbox with `TimestampingService` and `ConfigUpdateService`
-
-- `recv`  
-  Simulates receiving a message by the node
-
-- `send`  
-  Checks if a message has been sent by the node
-
-- `broadcast`  
-  Checks if the node has broadcasted the message
-
-- `add_time`  
-  Emulates the situation upon expiration of the specified time period (as a
-  `std::time::Duration`struct). Is used for timeouts testing.
-
-- `a`  
-  Gets socket address of the validator with the specified number.
-
-- `p`  
-  Gets public key of the validator with the specified number.
-
-- `s`  
-  Gets private key of the validator with the specified number.
 
 !!! note
     The validator numbers correspond to the validator keys in the
@@ -101,15 +105,6 @@ subsequent changes in the blockchain and the storage state.
 
 !!! note
     Transaction constructors are service-specific.
-
-Useful functions for service testing:
-
-- `add_one_height_with_transactions`  
-  Allows committing a transaction.
-
-- `broadcast`  
-  Allows to check if the message of a particular content (i.e. in this case, a
-  transaction) is broadcasted.
 
 !!! tip
     See source code for more details on how sandbox is used for testing
