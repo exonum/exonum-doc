@@ -28,7 +28,7 @@ The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus algorithm
 assumes the worst; it operates under the assumption that any individual node
 or even a group of nodes in the blockchain network can crash or can be compromised
-by a resourceful adversary (say, a hacker or a corrupt administator). This
+by a resourceful adversary (say, a hacker or a corrupt administrator). This
 threat model is known in computer science as [Byzantine faults][wiki:bft];
 correspondingly, the Exonum consensus algorithm is Byzantine fault tolerant (BFT).
 
@@ -71,15 +71,15 @@ of the network.
 To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
-  for the next block and broadcasts it accross the network. The logic of selecting
-  the leader node is described [in a separate algorithm](leader-election.md)
+  for the next block and broadcasts it across the network. The logic of selecting
+  the leader node is described [in a separate algorithm](../advanced/consensus/leader-election.md)
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
   A prevote means that the validator has been able to parse the proposal
   and has all transactions specified in it
 3. After a validator has collected enough prevotes from a supermajority
   of other validators, it applies transactions specified in the prevoted proposal,
   and broadcasts a *precommit* message. This message contains the result of
-  the proposal execution in the form of [a new state hash](../../architecture/storage.md).
+  the proposal execution in the form of [a new state hash](storage.md).
   The precommit expresses that the sender is ready to commit the corresponding
   proposed block to the blockchain, but needs to see what the other validators
   have to say on the matter just to be sure
@@ -89,8 +89,9 @@ To put it *very* simply, rounds proceed as follows:
 
 ### Non-Strawman Version
 
-**Note.** In the following description, +2/3 means more than two thirds of the validators,
-and -1/3 means less than one third.
+!!! note
+    In the following description, +2/3 means more than two thirds of the validators,
+    and -1/3 means less than one third.
 
 The algorithm above is overly simplified:
 
@@ -125,9 +126,10 @@ the it’s locked on a certain proposal. Other validators may request prevotes
 that led to the lock from a locked validator, if they do not have them locally
 (these proposals are known as *proof of lock*).
 
-**Example.** Validator A gets prevotes from validators B and C,
-and they do not get prevotes from each other because of the connection problems.
-Then validators B and C can request each other’s prevotes from validator A.
+!!! note "Example"
+    Validator A gets prevotes from validators B and C,
+    and they do not get prevotes from each other because of the connection problems.
+    Then validators B and C can request each other’s prevotes from validator A.
 
 Locks can be changed: if A locked on a propose and during next round all other
 validators locked on the next proposal, A would update its lock eventually.
@@ -140,10 +142,11 @@ A request is sent by a validator to its peer
 if the peer has information of interest, which is unknown to the validator,
 and which has been discovered during the previous communication with the peer.
 
-**Example.** A request is sent if the node receives a consensus message from
-a height greater than the local height. The peer is supposed to respond with
-a message that contains transactions in an accepted block, together with a proof
-that the block is indeed accepted (i.e., precommits of +2/3 validators).
+!!! note "Example"
+    A request is sent if the node receives a consensus message from
+    a height greater than the local height. The peer is supposed to respond with
+    a message that contains transactions in an accepted block, together with a proof
+    that the block is indeed accepted (i.e., precommits of +2/3 validators).
 
 There are requests for all consensus messages: proposals, prevotes, and precommits.
 As consensus messages are authenticated with digital signatures, they can be sent
@@ -172,14 +175,15 @@ Round4: |                    | R4     |                    | R4      ...
 
 Note that rounds have a fixed start time but they do not have a definite end
 time (they end when the next block is received). This differs from common
-behavior of partially synchoronous consensus algorithms, in which rounds have
+behavior of partially synchronous consensus algorithms, in which rounds have
 a definite conclusion (i.e., messages generated during the round `R`
 must be processed only during the round `R`).
 
 ## Network Communication
 
-**Tip.** See [source code][src-messages] for more technical details on
-consensus messages.
+!!! tip
+    See [source code][src-messages] for more technical details on
+    consensus messages.
 
 ### Messages
 
@@ -217,7 +221,7 @@ as the next block into blockchain. `Precommit` is broadcast to all validators.
 
 `Status` is an information message about the current height. It is sent with a
 periodicity written in the `status_timeout`
-[global configuration parameter](../../architecture/configuration.md).
+[global configuration parameter](configuration.md).
 
 #### Block
 
@@ -230,10 +234,11 @@ set of `Precommit` messages that allowed that block to be accepted.
 There are request messages for transactions, `Propose` and `Prevote` messages, and
 blocks. The generation and processing rules for these messages are fairly obvious.
 
-**Example.** A `RequestPropose` message is generated if a validator receives a consensus
-message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
-is unknown to the validator. A receiver of a `RequestPropose` message sends a requested
-`Propose` in response.
+!!! note "Example"
+    A `RequestPropose` message is generated if a validator receives a consensus
+    message (`Prevote` or `Precommit`) that refers to the `Propose` message, which
+    is unknown to the validator. A receiver of a `RequestPropose` message sends
+    a requested `Propose` in response.
 
 ## Distinguishing Features
 
