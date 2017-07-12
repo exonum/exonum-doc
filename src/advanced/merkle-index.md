@@ -34,7 +34,7 @@ as [Tor][tor] and [Bitcoin][bitcoin]. The usage of Merkle index for blockchains
 
 1. minimization of the data transfer during the blockchain state agreement
   during *Precommit* phase of the
-  [consensus algorithm](./consensus/consensus.md)
+  [consensus algorithm](../architecture/consensus.md)
 2. the possibility of [lightweight clients](../architecture/clients.md)
   implementation.
 
@@ -162,7 +162,7 @@ Variant | Child `Proofnode`(s) indices | Hashing rule
 4. `i` for the outmost proofnode is `0`.
 5. Custom functions to compute "val" hash for each individual entity type are
   required on client. Each function should construct a byte array from
-  `ValueJson` fields using specific [Exonum serialization](./serialization.md)
+  `ValueJson` fields using specific [Exonum serialization](../architecture/serialization.md)
   and compute "val" hash according to [2](#hashing-rules).
 
 ### Proof verification
