@@ -59,7 +59,7 @@ allowed by Bitcoin. All signatures are published into Exonum blockchain.
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
 anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M`
 is the necessary amount of signatures. In Exonum consensus, `M =
-2/3*N + 1` is used as supermajority.
+floor(2/3*N) + 1` is used as supermajority.
 
 !!! note
     If there are `N=10` validators, then `M=7` represents a supermajority.
