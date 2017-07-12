@@ -65,7 +65,8 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
   The hash of the previous block
 - **proposer_id**: integer  
   ID of validator who created an approved block proposal
-- **schema_version**: **TODO: ???**
+- **schema_version**: integer  
+  Information schema version. Currently, `0`
 - **tx_count**: integer  
   Number of transactions included into block
 - **tx_hash**: Hash  
@@ -95,15 +96,15 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 - **body.validator**: integer  
   ID of the validator who created this precommit
 - **message_id**: integer  
-  **TODO: ???**
+  ID of the `Precommit` message. Equals `4`
 - **network_id**: integer  
-  **TODO: ???**
+  Network ID. Is not used currently
 - **protocol_version**: integer  
-  **TODO: ???**
+  The major version of the Exonum serialization protocol. Currently, `0`
 - **service_id**: integer  
-  **TODO: ???**
+  Unique 2-byte service identifier
 - **signature**: Signature  
-  precommit's creator signature
+  `Precommit` message's creator signature
 
 ## SerializedTransaction
 
