@@ -210,17 +210,17 @@ minimal storage overhead.
 ### Table Types
 
 Exonum supports several types of data tables, representing typed collections
-(lists and maps):
+(lists, sets and maps):
 
-- `ListTable` implements an array list
-- `MapTable` represents a map / key-value storage
-- [`MerkleTable`](../advanced/merkle-index.md) is an enhanced version of
+- `ListIndex` implements an array list
+- `MapIndex` represents a map / key-value storage
+- [`ProofListIndex`](../advanced/merkle-index.md) is an enhanced version of
   array storage. It implements a balanced (but not necessarily full) binary
   Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from concatenated
-  children data. `MerkleTable` only allows to append the data or update the
+  children data. `ProofListIndex` only allows to append the data or update the
   already stored items
-- [`MerklePatriciaTable`](../advanced/merkle-patricia-index.md) extends the
+- [`ProofMapIndex`](../advanced/merkle-patricia-index.md) extends the
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
   Leaves of the tree keep the actual
   values from the map. Intermediate nodes consist of the following four parts:
@@ -230,13 +230,25 @@ Exonum supports several types of data tables, representing typed collections
     - Key for the left child node
     - Key for the right child node
 
-Both `ListTable` and `MerkleTable` support updating by index and
-appending only; `MapTable` and `MerklePatriciaTable` allow inserting,
-updating or deleting key-value pairs.
+- `ValueSetIndex` and `KeySetIndex` both implement sets, and both reduce them to
+  maps (as it is commonly done in programming languages). `ValueSetIndex`
+  maps hashes of the set items to the items themselves,
+  while `KeySetIndex` maps set items to `null`.
+  Thus, `KeySetIndex` is preferable when set items have relatively
+  short serialization and need to be iterated in a deterministic order.
+  `ValueSetIndex` is a better match for complex items or items that needs to
+  be looked up by a hash.
+
+Both `ListIndex` and `ProofListIndex` support updating by index and
+appending only. `MapIndex` and `ProofMapIndex` allow inserting,
+updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex` support
+adding and removing elements from the set. Finally, all collections support
+iterations over items (or keys, values, and key-value pairs in the case of
+maps).
 
 ### Proofs
 
-`MerkleTable` and `MerklePatriciaTable` allow efficiently
+`ProofListIndex` and `ProofMapIndex` allow efficiently
 creating a proof that specific values are saved under particular keys.
 To prove that, it is sufficient to return a list of hashes from
 the tree root to a particular cell (a Merkle path). Merkle Patricia

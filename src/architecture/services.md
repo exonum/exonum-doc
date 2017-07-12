@@ -136,7 +136,7 @@ using [LevelDB][leveldb]. Each service needs to define a set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
-maps and append-only lists (`MapIndex` and `ListIndex`, respectively).
+maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists (`ListIndex`).
 
 Exonum also provides helpers for *merklizing* data collections, i.e.,
 making it possible to efficiently compute proofs for read requests that involve
@@ -473,5 +473,5 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
-[service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
-[core-schema.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs
+[service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
+[core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs

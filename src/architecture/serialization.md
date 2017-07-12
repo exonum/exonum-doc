@@ -451,8 +451,8 @@ Serialized representation of `my_wallet`:
 `40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
 `48 => 54` | Andrew| `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
 
-[message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
-[encoding_struct_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/encoding/spec.rs
+[message_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/spec.rs
+[encoding_struct_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/encoding/spec.rs
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [asn_der]: https://en.wikipedia.org/wiki/X.690#DER_encoding
 [wiki_protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
