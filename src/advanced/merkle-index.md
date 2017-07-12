@@ -202,6 +202,7 @@ elements, that are a saved inside a proof for range `[3, 5)` in
 
 Which corresponds to the following JSON representation of `Proofnode`.
 
+
 ```JSON
 {
   "left": {
@@ -226,12 +227,13 @@ Which corresponds to the following JSON representation of `Proofnode`.
           6
         ]
       },
-      "right": 
+      "right":
         "b7e6094605808a34fc79c72986555c84db28a8be33a7ff20ac35745eaddd683a"
     }
   }
 }
 ```
+
 
 ## See Also
 
