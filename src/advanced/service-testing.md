@@ -14,14 +14,14 @@ tests of the public REST API can be performed.
 
 ## Sandbox Interface
 
-- `timestamping_sandbox`  
-  Creates sandbox with `TimestampingService` and `ConfigUpdateService`
+- `sandbox_with_services`  
+  Creates a sandbox with the specified services.
 
 - `recv`  
-  Simulates receiving a message by the node
+  Simulates receiving a message by the node.
 
 - `send`  
-  Checks if a message has been sent by the node
+  Checks if a message has been sent by the node.
 
 - `broadcast`  
   Checks if the node has broadcasted the message of a particular content
@@ -79,7 +79,7 @@ Code example:
 
 #[test]
 fn test_sandbox_recv_and_send() {
-    let s = timestamping_sandbox();
+    let s = sandbox_with_services(vec![Box::new(ConfigUpdateService::new())]);
     let (public, secret) = gen_keypair();
 
     // Simulate receiving "Connect" message by the node
@@ -97,7 +97,7 @@ sandbox constructor:
 
 ```rust
 let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
-                                   Box::new(ConfigUpdateService::new())])
+                                   Box::new(ConfigUpdateService::new())]);
 ```
 
 A service should be tested by committing the service transaction and observing
