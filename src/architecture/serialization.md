@@ -366,7 +366,8 @@ used to look up the implementation of [the transaction interface](transactions.m
 
 !!! note "Example"
     [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `TxIssue` for coins issuance
+    types of transactions: `TxCreateWallet` for creating a wallet with an initial
+    coins balance,
     and `TxTransfer` for coin transfer.
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
