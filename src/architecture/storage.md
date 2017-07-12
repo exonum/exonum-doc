@@ -152,8 +152,8 @@ contents.
 
 #### ProofListIndex
 
-[`ProofListIndex`][proof-list-index] implements a [Merkle
-tree](../advanced/merkle-index.md), which is a Merklized version of an
+[`ProofListIndex`][proof-list-index] implements a Merkle
+tree, which is a Merklized version of an
 array list. It implements the same methods as `ListIndex`, and adds an
 additional feature: based on Merkle trees, `ProofListIndex` allows efficiently
 creating compact proofs of existence for the list items.
@@ -178,7 +178,7 @@ The following additional procedures are implemented:
 #### ProofMapIndex
 
 [`ProofMapIndex`][proof-map-index] is a Merklized version of a map
-based on [Merkle Patricia tree](../advanced/merkle-patricia-index.md).
+based on Merkle Patricia tree.
 It implements the same methods as the `MapIndex`, adding the ability to
 create proofs of existence for its key-value pairs, or proofs of absence
 if a key is absent in the map. The following additional
