@@ -427,7 +427,7 @@ value of anchoring address in Base58Check format.
 GET {base_path}/actual_lect
 ```
 
-Returns the LECT that is agreed by validators supermajority now, if such exists. Otherwise, returns error.
+Returns the LECT that is agreed by validators supermajority now, if such exists. Otherwise, returns `null`.
 
 #### Parameters
 
@@ -463,6 +463,7 @@ GET {base_path}/actual_lect/{id}
 
 Returns the actual LECT for the specified validator, along with the
 hash of Exonum transaction published this LECT.
+
 If the specified `id` is greater or equal to validators
 amount, returns an error.
 
@@ -505,11 +506,13 @@ The example of the responded JSON:
 GET {base_path}/nearest_lect/{height}
 ```
 
-Requires [observing interval](observing-interval) to be set.
+Requires [observer interval](observer-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
 specific block. If the asked block was not anchored yet or if the
-observing interval is not set, returns `null`.
+[observer interval](#observer-interval) is not set, returns `null`.
+
+If height is not specified, returns error.
 
 
 #### Parameters
