@@ -377,8 +377,8 @@ The service provides the following public API endpoints:
 
 - [Get actual anchoring address](#actual-address)
 - [Get next anchoring address](#following-address)
-- [Get actual lect for this validator](#actual-lect-for-this-validator)
-- [Get actual lect for another validator](#actual-lect-for-another-validator)
+- [Get actual common lect](#actual-common-lect)
+- [Get actual lect for specific validator](#actual-lect-for-specific-validator)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/btc_anchoring/v1`.
@@ -421,13 +421,13 @@ None.
 The string with a
 value of anchoring address in Base58Check format.
 
-### Actual LECT for this validator
+### Actual common LECT
 
 ```None
 GET {base_path}/actual_lect
 ```
 
-Returns the current LECT it the current node is a validator. Otherwise, returns error.
+Returns the LECT that is agreed by validators supermajority now, if such exists. Otherwise, returns error.
 
 #### Parameters
 
@@ -455,7 +455,7 @@ The example of responded JSON:
 - **txid**: the hash for the anchoring bitcoin transaction, which is
   considered to be a LECT.
 
-### Actual LECT for another validator
+### Actual LECT for specific validator
 
 ```None
 GET {base_path}/actual_lect/{id}
