@@ -454,8 +454,8 @@ The example of responded JSON:
 
 - **payload.blockhash**: the hash of the anchored Exonum block
 - **payload.block_height**: the height of the anchored Exonum block
-- **payload.prev_tx_chain**: the tx-id for the anchoring transaction
-  which is spent by the specified LECT. **TODO: yes?**
+- **content.payload.prev_tx_chain**: last tx-id of previous transactions
+  chain if it has been broken. Otherwise, `null`.
 - **txid**: the hash for the anchoring bitcoin transaction, which is
   considered to be a LECT.
 
@@ -499,8 +499,8 @@ The example of the responded JSON:
 - **content.payload.blockhash**: the hash of the anchored Exonum block
 - **content.payload.block_height**: the height of the anchored Exonum
   block
-- **content.payload.prev_tx_chain**: the tx-id for the anchoring
-  transaction which is spent by the specified LECT. **TODO: yes?**
+- **content.payload.prev_tx_chain**: last tx-id of previous transactions
+  chain if it has been broken. Otherwise, `null`.
 - **content.txid**: the hash for the anchoring bitcoin transaction,
   which is considered to be a LECT.
 
