@@ -510,7 +510,7 @@ The example of the responded JSON:
 GET {base_path}/nearest_lect/{height}
 ```
 
-Requires [observer interval](observer-interval) to be set.
+Requires [observer interval](#observer-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
 specific block. If the asked block was not anchored yet or if the
