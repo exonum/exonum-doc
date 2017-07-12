@@ -26,29 +26,36 @@ Typical workflow in this case is as follows:
 
 For the convenience, we want to make Exonum a *standalone application*. Thus,
 after downloading and building Exonum (or even downloading a pre-built
-version), one can deploy the 'clean solution' at once. Afterwards it can be
-extended with additional modules, possibly, custom-built directly for the
-purpose of the specific project.
+version), one can deploy it at once. Afterwards it can be extended with
+additional modules, possibly, custom-built directly for the purpose of the
+specific project.
 
 !!! note
-    This automatically means that [services](../architecture/services) will
-    become similar to [shared
+    This automatically means that [services](architecture/services) should
+    be able to connect to already working Exonum application. Similar property
+    is valid for [shared
     libraries](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries)
-    (`.dll` in Windows or `.so` in Unix-based systems). So Exonum will support
-    '**dynamically added smart-contracts**', which are known in other blockchain
-    systems (see
-    [Ethereum](http://www.ethdocs.org/en/latest/contracts-and-transactions/contracts.html))
+    (`.dll` in Windows or `.so` in Unix-based systems): one can override a
+    library while programs are running using it.
 
-Lifecycle for a service in Exonum would look like as the following:
+    In other words, this means that Exonum will support
+    '**dynamically added smart-contracts**', which are known in other blockchain
+    systems. The difference of our approach from public blockchains is the
+    following. A service can be *added* to a blockchain, however, in order to
+    *use* it, validators need to approve new
+    [configuration](architecture/configuration) with the service marked as
+    active.
+
+Lifecycle for a service in Exonum would looks like as the following:
 
 - The service is uploaded as a shared library within a specific transaction in
   Exonum blockchain
-- [Validators](./architecture/consensus/#assumptions) make a decision on
+- [Validators](architecture/consensus/#assumptions) make a decision on
   inclusion of a service into active
-  [configuration](./architecture/configuration)
+  [configuration](architecture/configuration)
 - A service becomes active, that is available for users of the system
 - If necessary services can be removed by the
-  [consensus](./architecture/consensus) of validators
+  [consensus](architecture/consensus) of validators
 
 ## Java Binding
 
@@ -64,43 +71,47 @@ the implementation of Java binding.
 !!! note
     Java binding consist of two substantially different parts:
 
-    - **High level binding**, or a binding for Exonum's public API. This part
-      allows the developer to connect blockchain to Java applications
-      directly. Technically, within this part Java calls Rust.
-    - **Service binding**. This part allows to implement services (and
-      potentially other Exonum modules) in Java. Thus, Exonum Core (Rust
-      programming language) should be able to run JVM and launch services
-      written in Java.
+    - **High level binding**, or a Java interface for Exonum's public API. This
+      part allows the developer to connect blockchain to Java applications
+      directly. Technically, within this part Rust code (Exonum Core) is called
+      from Java code (the application that makes use of Exonum).
+    - **Service binding**. This part allows to implement services and
+      potentially other Exonum modules (for example, [Leader
+      Election](advanced/consensus/leader-election)) in Java. Thus, Exonum
+      Core (Rust code) should be able to run JVM and launch
+      Java code.
 
 ## Object Relational Mapping
 
 Exonums' current implementation implies that a service developer should
-manually specify the set of tables ([Merkle](./advanced/merkle-index) and
-[Merkle-Patricia](./advanced/merkle-patricia-index) indexes) in blockchain
-database (see [storage](./architecture/storage)). This specification is
-unclear, leads to a big number of potential problems. As a solution of this
-issue a declarative format is considered for service specification. Such
-technique is similar to [object relational
-mapping](https://en.wikipedia.org/wiki/Object-relational_mapping), which is
-common in ordinary databases.
+manually specify a number of parameters (service ID, transaction ID's, binary
+offsets of data in [transactions](architecture/transactions)). This
+specification is unclear, leads to a big number of potential problems.
 
-Declarative service description can be added in a blockchain using specific
+!!! note "Example"
+    One can easily imagine a huge problem caused by two different services
+    having the same ID.
+
+As a solution of this issue a declarative format is considered for service
+specification. Such technique is similar to [interface description language, or IDL](https://en.wikipedia.org/wiki/Interface_description_language).
+
+Declarative service description can be added to a blockchain using specific
 transaction. It should include:
 
-- [Data schema](./architecture/services/#data-schema) (a set of indexes,
+- [Data schema](architecture/services/#data-schema) (a set of indexes,
   related to a service)
-- A list of [transactions](./architecture/services/#transactions)
-- API description (both [public](./architecture/services/#read-requests) and
-  [private](./architecture/services/#private-api))
+- A list of [transactions](architecture/services/#transactions)
+- API description (both [public](architecture/services/#read-requests) and
+  [private](architecture/services/#private-api))
 
 !!! note
     The main part of the service, which cannot be stated (at least in a
     simple way) within the declarative description, is transactions application
     to a database (see [`execute`
-    method](./architecture/transactions/#execute)).
+    method](architecture/transactions/#execute)).
 
-Declarative description is useless by itself. However it is an enabler for
-several important features. Here are two of them.
+Declarative description is a feature that helps developer make less mistakes.
+Besides, it also enables several important features. Here are two of them.
 
 - **Server-side code generation**. Having service description, one can generate
   the major part of the 'formal' server code. This refers to the definition of
@@ -109,10 +120,10 @@ several important features. Here are two of them.
   developers' work, leaving him only the implementation of service business
   logic.
 - **Unified light client**. In the current version of the [light
-  client](./architecture/clients), one need to specify it for each
+  client](architecture/clients), one need to specify it for each
   Exonum-based project. This is a consequence of unknown index hierarchy, which
   leads to inability to check entire cryptographic proofs (see [Merkle
-  index](./advanced/merkle-index), for example), which are returned from the
+  index](advanced/merkle-index), for example), which are returned from the
   backend. Instead light client is able to check the proof within a single
   Merkle proof. Having declarative description in the blockchain (and thus
   clients' ability to get it), will allow the light client to determine proof
@@ -122,14 +133,18 @@ several important features. Here are two of them.
 ## Service Isolation and Events
 
 An essential part of Exonum services is [Data
-schema](./architecture/services/#data-schema). It represents the data, which
-is directly related to service. In current version of Exonum service data is
-not isolated within storage. On one hand, this brings the ability of service
+schema](architecture/services/#data-schema). It represents the data, which
+is directly related to service. In current version of Exonum there's no data
+access control within storage. On one hand, this brings the ability of service
 interaction: service A can change the data, which is described in the data
-schema of service B. Using this mechanism, for example, the key rotation in
-[bitcoin anchoring service](./advanced/bitcoin-anchoring) is implemented (keys
-are updated using [configuration updater](./advanced/configuration-updater)
-service).
+schema of service B.
+
+!!! note "Example"
+    The key rotation in
+    [bitcoin anchoring service](advanced/bitcoin-anchoring) is implemented
+    using this mechanism (keys
+    are updated using [configuration updater](advanced/configuration-updater)
+    service).
 
 However, this approach has its drawbacks: a broken service can harm other
 services and even halt the whole blockchain. This problem can be solved using
@@ -169,12 +184,12 @@ pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern).
 ## Transactions Improvements
 
 As mentioned in [services
-description](./architecture/services/#transaction-interface), transactions are
+description](architecture/services/#transaction-interface), transactions are
 separate entities rather than datatypes. This directly leads to the ability to
 incorporate within transaction object additional logic. As a first step we
 consider implementing the ability to determine **transaction ordering**
-mechanics as a method of transaction interface. This logic comes hand-by-hand
-with *transaction finalization*.
+mechanics (unconfirmed transactions prioritization) as a method of transaction
+interface. This logic comes hand-by-hand with *transaction finalization*.
 
 !!! note
     In current Exonum implementation transactions are finalized only by
@@ -194,5 +209,5 @@ get an access to a blockchain data, even if they're not allowed to.
     common network attack strategy.
 
 We're going to solve this issue by introducing **encrypted channels** (this can
-be done, for example, using [Diffie-Hellman key
-exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange))
+be done, for example, using [transport level security
+protocol](https://en.wikipedia.org/wiki/Transport_Layer_Security))
