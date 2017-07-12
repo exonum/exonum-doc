@@ -76,9 +76,7 @@ pages:
     - 'Merkle index': 'advanced/merkle-index.md'
     - 'Consensus':
       # Consensus specification
-      - 'Consensus specification': 'advanced/consensus/consensus-spec.md'
-      # Leader election algorithm specification
-      - 'Leader election': 'advanced/consensus/leader-election.md'
+      - 'Consensus specification': 'advanced/consensus/specification.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
   # Includes roadmap and features list
