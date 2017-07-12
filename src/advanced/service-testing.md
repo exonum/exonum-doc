@@ -14,8 +14,10 @@ tests of the public REST API can be performed.
 
 ## Sandbox Interface
 
-- `sandbox_with_services`  
-  Creates a sandbox with the specified services.
+Sandbox can be created with `sandbox_with_services` method, which allows to
+specify a list of services for testing.
+
+Sandbox provides network emulation capabilities:
 
 - `recv`  
   Simulates receiving a message by the node.
@@ -27,9 +29,16 @@ tests of the public REST API can be performed.
   Checks if the node has broadcasted the message of a particular content
   (e.g. a transaction).
 
+Sandbox also allows to emulate block acceptance and time:
+
 - `add_time`  
   Emulates the situation upon expiration of the specified time period (as a
   `std::time::Duration`struct). Is used for timeouts testing.
+
+- `add_one_height_with_transactions`  
+  Allows committing a transaction.
+
+Finally, sandbox provides utility methods:
 
 - `a`  
   Gets socket address of the validator with the specified number.
@@ -39,9 +48,6 @@ tests of the public REST API can be performed.
 
 - `s`  
   Gets private key of the validator with the specified number.
-
-- `add_one_height_with_transactions`  
-  Allows committing a transaction.
 
 ## Consensus Algorithm Testing
 
