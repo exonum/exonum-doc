@@ -89,10 +89,14 @@ parameters (service ID, transaction ID's, binary offsets of data in
 leads to a big number of potential problems.
 
 !!! note "Example"
-    One can easily imagine a problem caused by two different services having the same ID. Such code will [panic](https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/mod.rs#L60) during the execution.
+    One can easily imagine a problem caused by two different services having
+    the same ID. Such code will
+    [panic](https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/mod.rs#L60)
+    during the execution.
 
 As a solution of this issue a declarative format is considered for service
-specification. Such technique is similar to [interface description language, or IDL](https://en.wikipedia.org/wiki/Interface_description_language).
+specification. Such technique is similar to [interface description language, or
+IDL](https://en.wikipedia.org/wiki/Interface_description_language).
 
 Declarative service description can be added to a blockchain using specific
 transaction. It should include:
@@ -211,4 +215,5 @@ get an access to a blockchain data, even if they're not allowed to.
     common network attack strategy.
 
 We're going to solve this issue by introducing **encrypted channels** (this can
-be done, for example, using [SSL/TSL](https://en.wikipedia.org/wiki/Transport_Layer_Security))
+be done, for example, using
+[SSL/TSL](https://en.wikipedia.org/wiki/Transport_Layer_Security))
