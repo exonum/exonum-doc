@@ -215,13 +215,14 @@ Exonum supports several types of data tables, representing typed collections
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
-- [`ProofListIndex`](../advanced/merkle-index.md) is an enhanced version of
+- [`ProofListIndex`](../architecture/storage.md#prooflistindex)
+  is an enhanced version of
   array storage. It implements a balanced (but not necessarily full) binary
   Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from concatenated
   children data. `ProofListIndex` only allows to append the data or update the
   already stored items
-- [`ProofMapIndex`](../advanced/merkle-patricia-index.md) extends the
+- [`ProofMapIndex`](../architecture/storage.md#proofmapindex) extends the
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
   Leaves of the tree keep the actual
   values from the map. Intermediate nodes consist of the following four parts:
