@@ -115,10 +115,11 @@ Hash of a value, contained in `(height = 0, index)`, is defined as:
 #### Rule 3. `height > 1`, two children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
-`T(height - 1, index * 2 + 1)` exist then :
+`T(height - 1, index * 2 + 1)` exist then:
 
-```T(height , index) = hash(T(height - 1, index * 2) || T(height - 1, index *
-2 + 1)).```
+```None
+T(height , index) = hash(T(height - 1, index * 2) || T(height - 1, index * 2 + 1)).
+```
 
 #### Rule 4. `height > 1` and the only child
 
@@ -203,7 +204,7 @@ elements, that are a saved inside a proof for range `[3, 5)` in
 
 Which corresponds to the following JSON representation of `Proofnode`.
 
-```javascript
+```JSON
 {
     "left": {
         "left": "fcb40354a7aff5ad066b19ae2f1818a78a77f93715f493881c7d57cbcaeb25c9",
