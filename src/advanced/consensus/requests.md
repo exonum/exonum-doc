@@ -1,3 +1,6 @@
+---
+title: Requests in consensus algorithm
+---
 # Requests in Consensus Algorithm
 
 **Requests** are used to obtain unknown information from nodes that signal the
