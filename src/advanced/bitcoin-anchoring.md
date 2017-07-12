@@ -104,7 +104,7 @@ Exonum blockchain. While creating a new anchoring transaction, the
 validators' supermajority select common LECT and spend its change output.
 
 Every validator refresh its LECT with a [custom
-schedule](#LECT-updating-interval). To get new LECT, the validator uses
+schedule](#lect-updating-interval). To get new LECT, the validator uses
 [bitcoin node's](#bitcoind-node) API. New LECT must have the following
 properties:
 
@@ -118,10 +118,12 @@ properties:
 - If multiple transactions respond to previous conditions, any of them
   may be chosen as a LECT.
 
-The LECT solves transaction malleability problem, though anchoring chain
-may sometimes rollback and skip some anchoring transactions.
+The LECT solves transaction malleability problem, though anchoring
+transactions sometimes may be orphaned and never written to the Bitcoin
+blockchain. However, it is safe enough as the following anchoring
+transactions effectively anchor all previous ones. 
 
-Exonum uses a [bitcoind-client](#bitcoind-node), and only one of the
+Exonum uses a [`bitcoind` client](#bitcoind-node), and only one of the
 transactions satisfying conditions can be considered as valid by
 bitcoind-node.
 
@@ -142,9 +144,8 @@ An anchoring transaction proposal is constructed as follows:
   anchored data. Such a data consist of multiple [data
   chunks](#data-chunks)
 - The change output reroutes funds to the next anchoring address if the
-  anchoring address should be changed (see
-  [Changing validators list](#changing-validators-list)). Otherwise, the
-  current address is used.
+  anchoring address [should be changed](#changing-validators-list).
+  Otherwise, the current address is used.
 
 ### Data chunks
 
@@ -152,7 +153,7 @@ The data output consists of the following parts:
 
 - an OP_RETURN instruction (`0x6a`)
 - 1-byte, the length of stored data
-- `EXONUM` at the ASCII-code (`0x45 0x58 0x4f 0x4e 0x55 0x4d`)
+- `EXONUM` in the ASCII encoding (`0x45 0x58 0x4f 0x4e 0x55 0x4d`)
 - a 1-byte version of the current data output, currently is `1`.
 - a 1-byte type of payload: 0 if only anchored hash is included, 1 if
   both chunks are used
@@ -245,19 +246,21 @@ You need to specify the following settings to access the bitcoind node:
 #### Bitcoin private keys
 
 Every validator should possess its own secp256k1 EC keypair in order to
-participate in anchoring process. This is the standard (and currently
-the only supported) key format for bitcoin transactions.
+participate in anchoring process. The private key should be strongly secured.
 
 #### Observer interval
 
-After observing interval is set, node tracks anchoring chain. It helps
-to get the [nearest anchoring transaction](#nearest-lect) for every
-Exonum block.
+Observer interval defines an interval between Exonum blocks when node
+should refresh its view of anchoring chain. If observer interval is not
+defined, than node do not track anchoring chain at all.
+
+Tracking is needed to get the [nearest anchoring transaction](#nearest-lect)
+for every Exonum block.
 
 #### LECT updating interval
 
-Each `N` Exonum blocks validator checks out the bitcoin blockchain to
-find new LECT.
+The frequency (in number of Exonum blocks) between checking the Bitcoin
+blockchain to update the node's LECT.
 
 ### Global settings
 
@@ -277,7 +280,7 @@ does not hang if the bitcoin network is spammed.
 #### Anchoring schedule
 
 This parameter defines how often anchoring should be executed. It
-defines the distance between anchored block heights.
+defines the distance between anchored block heights on the Exonum blockchain.
 
 !!! note
     If the interval is set to 1000 blocks, then blocks `#1000`, `#2000`,
@@ -287,13 +290,8 @@ defines the distance between anchored block heights.
     The interval may be chosen in a way that under normal conditions the
     interval between anchored blocks is between 10 minutes and 1 hour.
 
-Sometimes anchoring process timetable could differ from ideal. Such
-variations could be triggered by byzantine behavior of nodes, forking of
-bitcoin blockchain, or changing list of validators. For example, at the
-necessary height (`#1000` because of bitcoin blockchain fork nodes could
-not agree upon which anchoring transaction is the latest one (and should
-be spent in the next anchoring tx). If so, nodes will wait until bitcoin
-network do not resolve its fork.
+Sometimes anchoring process timetable could differ from ideal. Example
+is described [here](#skipping-anchoring).
 
 #### Funding UTXO
 
@@ -321,8 +319,8 @@ means, for example, using [Configuration Update
 service](configuration-updater.md). The following properties should be noticed:
 
 1. New configuration is spread over nodes. It is still not active.
-2. New configuration have additional parameter `height when this
-  configuration should be applied`. It is chosen by administrator. The
+2. New configuration have additional parameter height when this
+  configuration should be applied. It is chosen by administrator. The
   good sense is to choose height so config would be applied in ~3-6 hours
   after it was sent into Exonum blockchain.
 3. After mentioned height takes place, new configuration is applied by
@@ -359,8 +357,8 @@ could last for 4-6 hours.
 
 If latest LECT does not get enough confirmations before the Exonum
 blockchain moves to the new validators list then anchoring chain is
-**BROKEN** and could not be prolonged. Anchoring service would log a lot
-of warnings. To ensure anchoring chain would not be broken during
+**BROKEN** and could not be prolonged.
+To ensure anchoring chain would not be broken during
 changing pubkeys list, the new configuration activating height should be
 set big enough.
 
@@ -515,8 +513,6 @@ Requires [observer interval](#observer-interval) to be set.
 Returns the content of the anchoring transaction which anchors the
 specific block. If the asked block was not anchored yet or if the
 [observer interval](#observer-interval) is not set, returns `null`.
-
-If height is not specified, returns error.
 
 #### Parameters
 
