@@ -1,6 +1,6 @@
 # Installation Guide
 
-[Exonum Core][exonum-core] and most [other Exonum repositories][exonum-org] use
+[Exonum Core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
@@ -115,11 +115,11 @@ Consult the `rustfmt` readme for more details.
 ## Compiling Exonum Core
 
 You can verify that you installed dependencies and the Rust toolchain correctly
-by cloning the `exonum-core` repository and running its built-in unit test suite:
+by cloning the `exonum` repository and running its built-in unit test suite:
 
 ```shell
-git clone https://github.com/exonum/exonum-core.git
-cd exonum-core
+git clone https://github.com/exonum/exonum.git
+cd exonum
 cargo test --manifest-path exonum/Cargo.toml
 ```
 
@@ -149,7 +149,7 @@ is tested on Node 4+.
 [The cryptocurrency tutorial](create-service.md) provides a step-by-step
 guide on how to develop applications on top of the Exonum framework.
 
-[exonum-core]: https://github.com/exonum/exonum-core/
+[exonum]: https://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
@@ -158,7 +158,7 @@ guide on how to develop applications on top of the Exonum framework.
 [homebrew]: https://brew.sh/
 [clippy]: https://github.com/Manishearth/rust-clippy
 [rustfmt]: https://github.com/rust-lang-nursery/rustfmt
-[core-travis]: https://github.com/exonum/exonum-core/blob/master/.travis.yml
+[core-travis]: https://github.com/exonum/exonum/blob/master/.travis.yml
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/

@@ -364,7 +364,7 @@ on the verify step.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
-[core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
+[core-tx]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying

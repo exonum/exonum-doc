@@ -1,6 +1,6 @@
 # Contributing to Exonum
 
-The [Exonum Core project][exonum-core] and [other public Exonum repositories][exonum-org]
+The [Exonum Core project][exonum] and [other public Exonum repositories][exonum-org]
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
@@ -262,7 +262,7 @@ Any work contributed where you are not the original author
 must contain its license header with the original author(s) and source.
 
 [btc-contrib]: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
-[exonum-core]: http://github.com/exonum/exonum-core/
+[exonum]: http://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [gh:pr]: https://help.github.com/articles/about-pull-requests/
 [gh:task-lists]: https://help.github.com/articles/basic-writing-and-formatting-syntax/#task-lists
