@@ -1,7 +1,7 @@
 # Exonum Roadmap
 
 Exonum is an open source software, so there is no particular concept of
-“Exonum core developers” (see [contributing guide](contributing)). However,
+“Exonum core developers” (see [contributing guide](contributing.md)). However,
 there're preferred directions of the development. These include maintainers
 opinions, natural improvements and a will to correspond to good practices.
 
@@ -31,66 +31,65 @@ additional modules, possibly, custom-built directly for the purpose of the
 specific project.
 
 !!! note
-    This automatically means that [services](architecture/services) should
+    This automatically means that [services](architecture/services.md) should
     be able to connect to already working Exonum application. Similar property
     is valid for [shared
     libraries](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries)
     (`.dll` in Windows or `.so` in Unix-based systems): one can override a
     library while programs are running using it.
 
-    In other words, this means that Exonum will support
-    '**dynamically added smart-contracts**', which are known in other blockchain
-    systems. The difference of our approach from public blockchains is the
-    following. A service can be *added* to a blockchain, however, in order to
-    *use* it, validators need to approve new
-    [configuration](architecture/configuration) with the service marked as
+    In other words, this means that Exonum will support **dynamically added
+    smart-contracts**, as they are known in other blockchain systems. The
+    difference of our approach from public blockchains is the following. A
+    service can be *added* to a blockchain, however, in order to *use* it,
+    validators need to approve new
+    [configuration](architecture/configuration.md) with the service marked as
     active.
 
-Lifecycle for a service in Exonum would looks like as the following:
+Lifecycle for a service in Exonum would look as follows:
 
 - The service is uploaded as a shared library within a specific transaction in
   Exonum blockchain
-- [Validators](architecture/consensus/#assumptions) make a decision on
+- [Validators](architecture/consensus.md#assumptions) make a decision on
   inclusion of a service into active
-  [configuration](architecture/configuration)
+  [configuration](architecture/configuration.md)
 - A service becomes active, that is available for users of the system
 - If necessary services can be removed by the
-  [consensus](architecture/consensus) of validators
+  [consensus](architecture/consensus.md) of validators
 
 ## Java Binding
 
 [Rust](https://www.rust-lang.org/en-US/) is a systems programming language,
-which is focused on memory safety. It seems to be a good fit for a security
-critical applications. However, the community of Rust developers is small. This
-fact can become a problem on the way of adoption of Exonum. It would be logical
-to extend its functionality to other programming languages by implementing
+which is focused on memory safety. It is a good fit for security critical
+applications. However, the community of Rust developers is small. This fact can
+become a problem on the way of adoption of Exonum. It would be logical to
+extend its functionality to other programming languages by implementing
 [bindings](https://en.wikipedia.org/wiki/Language_binding). Java was chosen for
-the first binding since it has a wast developer community. We already started
+the first binding since it has a vast developer community. We already started
 the implementation of Java binding.
 
 !!! note
-    Java binding consist of two substantially different parts:
+    Java binding consists of two substantially different parts:
 
     - **High level binding**, or a Java interface for Exonum's public API. This
       part allows the developer to connect blockchain to Java applications
       directly. Technically, within this part Rust code (Exonum Core) is called
       from Java code (the application that makes use of Exonum).
     - **Service binding**. This part allows to implement services and
-      potentially other Exonum modules (for example, [Leader
-      Election](advanced/consensus/leader-election)) in Java. Thus, Exonum
+      potentially other Exonum modules (for example,
+      [storage](architecture/storage.md)) in Java. Thus, Exonum
       Core (Rust code) should be able to run JVM and launch
       Java code.
 
-## Object Relational Mapping
+## Interface Description
 
-Exonums' current implementation implies that a service developer should
-manually specify a number of parameters (service ID, transaction ID's, binary
-offsets of data in [transactions](architecture/transactions)). This
-specification is unclear, leads to a big number of potential problems.
+Exonums 0.1 requires that a service developer manually specify a number of
+parameters (service ID, transaction ID's, binary offsets of data in
+[transactions](architecture/transactions.md)). This specification is unclear,
+leads to a big number of potential problems.
 
 !!! note "Example"
-    One can easily imagine a huge problem caused by two different services
-    having the same ID.
+    One can easily imagine a problem caused by two different services having the same ID. Such code will [panic](https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/mod.rs#L60) during the execution.
 
 As a solution of this issue a declarative format is considered for service
 specification. Such technique is similar to [interface description language, or IDL](https://en.wikipedia.org/wiki/Interface_description_language).
@@ -98,17 +97,17 @@ specification. Such technique is similar to [interface description language, or 
 Declarative service description can be added to a blockchain using specific
 transaction. It should include:
 
-- [Data schema](architecture/services/#data-schema) (a set of indexes,
+- [Data schema](architecture/services.md#data-schema) (a set of indexes,
   related to a service)
-- A list of [transactions](architecture/services/#transactions)
-- API description (both [public](architecture/services/#read-requests) and
-  [private](architecture/services/#private-api))
+- A list of [transactions](architecture/services.md#transactions)
+- API description (both [public](architecture/services.md#read-requests) and
+  [private](architecture/services.md#private-api))
 
 !!! note
     The main part of the service, which cannot be stated (at least in a
     simple way) within the declarative description, is transactions application
     to a database (see [`execute`
-    method](architecture/transactions/#execute)).
+    method](architecture/transactions.md#execute)).
 
 Declarative description is a feature that helps developer make less mistakes.
 Besides, it also enables several important features. Here are two of them.
@@ -120,10 +119,10 @@ Besides, it also enables several important features. Here are two of them.
   developers' work, leaving him only the implementation of service business
   logic.
 - **Unified light client**. In the current version of the [light
-  client](architecture/clients), one need to specify it for each
+  client](architecture/clients.md), one need to specify it for each
   Exonum-based project. This is a consequence of unknown index hierarchy, which
   leads to inability to check entire cryptographic proofs (see [Merkle
-  index](advanced/merkle-index), for example), which are returned from the
+  index](advanced/merkle-index.md), for example), which are returned from the
   backend. Instead light client is able to check the proof within a single
   Merkle proof. Having declarative description in the blockchain (and thus
   clients' ability to get it), will allow the light client to determine proof
@@ -133,27 +132,30 @@ Besides, it also enables several important features. Here are two of them.
 ## Service Isolation and Events
 
 An essential part of Exonum services is [Data
-schema](architecture/services/#data-schema). It represents the data, which
+schema](architecture/services.md#data-schema). It represents the data, which
 is directly related to service. In current version of Exonum there's no data
 access control within storage. On one hand, this brings the ability of service
 interaction: service A can change the data, which is described in the data
-schema of service B.
+schema of service B. This approach is similar to [inter-process
+communication](https://en.wikipedia.org/wiki/Inter-process_communication) using
+[shared memory](https://en.wikipedia.org/wiki/Shared_memory).
 
 !!! note "Example"
     The key rotation in
-    [bitcoin anchoring service](advanced/bitcoin-anchoring) is implemented
+    [bitcoin anchoring service](advanced/bitcoin-anchoring.md) is implemented
     using this mechanism (keys
-    are updated using [configuration updater](advanced/configuration-updater)
+    are updated using [configuration updater](advanced/configuration-updater.md)
     service).
 
-However, this approach has its drawbacks: a broken service can harm other
-services and even halt the whole blockchain. This problem can be solved using
-**service isolation** concept, that is separating service data and execution on
-the middleware level (on the level of Exonum Core).
+However, this approach has its drawbacks: a malicious or bogus service can harm
+other services and even halt the whole blockchain. This problem can be solved
+using **service isolation** concept, that is separating service data and
+execution on the middleware level (on the level of Exonum Core).
 
 !!! note
-    Virtual machine or docker containers for service execution are examples of
-    approaches, which automatically lead to service isolation
+    Virtual machine or docker containers are examples of approaches, which
+    automatically lead to service execution isolation (but not necessary for
+    data access control)
 
 Service isolation leads to impossibility of service interaction using storage.
 The mechanism of **events** can fill this gap. Events work as follows:
@@ -184,7 +186,7 @@ pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern).
 ## Transactions Improvements
 
 As mentioned in [services
-description](architecture/services/#transaction-interface), transactions are
+description](architecture/services.md#transaction-interface), transactions are
 separate entities rather than datatypes. This directly leads to the ability to
 incorporate within transaction object additional logic. As a first step we
 consider implementing the ability to determine **transaction ordering**
@@ -209,5 +211,4 @@ get an access to a blockchain data, even if they're not allowed to.
     common network attack strategy.
 
 We're going to solve this issue by introducing **encrypted channels** (this can
-be done, for example, using [transport level security
-protocol](https://en.wikipedia.org/wiki/Transport_Layer_Security))
+be done, for example, using [SSL/TSL](https://en.wikipedia.org/wiki/Transport_Layer_Security))
