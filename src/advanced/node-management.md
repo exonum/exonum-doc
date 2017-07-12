@@ -1,6 +1,8 @@
 # Node management
 
-Exonum nodes can be controlled via RPC implemented as REST API. Managing endpoints are handled by Exonum Core and mainly are purposed to receive information about the current node and blockchain states.
+Exonum nodes can be controlled via RPC implemented as REST API. Managing
+endpoints are handled by Exonum Core and mainly are purposed to receive
+information about the current node and blockchain states.
 
 ## API endpoints
 
@@ -8,7 +10,8 @@ The managing endpoints URL is structured as follows:
 
 `{base_path}/system/v1/{endpoint_name}`
 
-Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands for node address.
+Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands
+for node address.
 
 ## Add new peer
 
@@ -48,12 +51,29 @@ None.
 
 ### Response
 
-The example of the responded JSON:
+JSON object with the following fields:
+
+- **incoming_connections**: Array<PeerAddress>  
+  Address list of peers connected to this node
+- **outgoing_connections**: Array<PeerAddress>  
+  Address list of peers this node connected to
+- **reconnects**: Array<ReconnectInfo>  
+  List of peers (with the corresponding reconnect delays) this node should reconnect
+
+`PeerAddress` is a string containing address in format `IP:port`
+
+`ReconnectInfo` is a JSON object with the following fields:
+- **addr**: PeerAddress
+  Peer address
+- **delay**: integer  
+  Delay for reconnect (ms)
+
+### Response example
 
 ```JSON
 {
-  "incoming_connections": [127.0.0.1:76638],
-  "outgoing_connections": [127.0.0.1:6332],
+  "incoming_connections": ["127.0.0.1:76638"],
+  "outgoing_connections": ["127.0.0.1:6332"],
   "reconnects": [
     {
       "addr": "127.0.0.1:6335",
@@ -70,12 +90,6 @@ The example of the responded JSON:
   ]
 }
 ```
-
-- **incoming_connections**: list of peers connected to this node.
-- **outgoing_connections**: list of peers node connected to.
-- **reconnects**: list of peers node should reconnect.
-- **reconnect.addr**: peer address.
-- **reconnect.delay**: time in which we should reconnect (ms).
 
 ## Mempool size
 
