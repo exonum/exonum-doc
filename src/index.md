@@ -74,6 +74,6 @@ what features are coming soon.
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/cryptocurrency
+[tutorial]: https://github.com/exonum/cryptocurrency-advanced
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum-configuration
