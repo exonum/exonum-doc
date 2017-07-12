@@ -1,6 +1,8 @@
 # Node management
 
-Exonum nodes can be controlled via RPC implemented as REST API. Managing endpoints are handled by Exonum Core and mainly are purposed to receive information about the current node and blockchain states.
+Exonum nodes can be controlled via RPC implemented as REST API. Managing
+endpoints are handled by Exonum Core and mainly are purposed to receive
+information about the current node and blockchain states.
 
 ## API endpoints
 
@@ -8,7 +10,8 @@ The managing endpoints URL is structured as follows:
 
 `{base_path}/system/v1/{endpoint_name}`
 
-Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands for node address.
+Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands
+for node address.
 
 ## Add new peer
 
@@ -18,7 +21,7 @@ Adds new Exonum node to the list of peers for the current node.
 
 ### Parameters
 
-**ip** : peer address in format `ip:port`. 
+**ip** : peer address in format `ip:port`.
 
 ### Example:
 ```None
@@ -48,12 +51,29 @@ None.
 
 ### Response
 
-The example of the responded JSON:
+JSON object with the following fields:
+
+- **incoming_connections**: Array<PeerAddress>  
+  Address list of peers connected to this node
+- **outgoing_connections**: Array<PeerAddress>  
+  Address list of peers this node connected to
+- **reconnects**: Array<ReconnectInfo>  
+  List of peers (with the corresponding reconnect delays) this node should reconnect
+
+`PeerAddress` is a string containing address in format `IP:port`
+
+`ReconnectInfo` is a JSON object with the following fields:
+- **addr**: PeerAddress
+  Peer address
+- **delay**: integer  
+  Delay for reconnect (ms)
+
+### Response example
 
 ```JSON
 {
-  "incoming_connections": [127.0.0.1:76638],
-  "outgoing_connections": [127.0.0.1:6332],
+  "incoming_connections": ["127.0.0.1:76638"],
+  "outgoing_connections": ["127.0.0.1:6332"],
   "reconnects": [
     {
       "addr": "127.0.0.1:6335",
@@ -70,12 +90,6 @@ The example of the responded JSON:
   ]
 }
 ```
-
-- **incoming_connections**: list of peers connected to this node.
-- **outgoing_connections**: list of peers node connected to.
-- **reconnects**: list of peers node should reconnect.
-- **reconnect.addr**: peer address.
-- **reconnect.delay**: time in which we should reconnect (ms).
 
 ## Mempool size
 
@@ -104,7 +118,7 @@ The example of responded JSON:
 ## Get block by height
 
 ```
- http://127.0.0.1:7779/api/explorer/v1/blocks/20 
+ http://127.0.0.1:7779/api/explorer/v1/blocks/20
 {
   "block": {
     "height": "20",
@@ -175,7 +189,7 @@ The example of responded JSON:
 }   
 ```
 
-## Get blocks in range 
+## Get blocks in range
 
 ```None
 GET{base_path}/explorer/v1/blocks\?count\=500\&skip_empty_blocks\=true\&from\=22
@@ -306,11 +320,11 @@ Returns transaction from mempool if it is not commited yet; otherwise, returns t
 ### Unknown Transaction
 If we trying to request unknown transaction.
 
-``` http://127.0.0.1:7780/api/system/v1/mempool/d24e650f552bbb382f23d275630c1413d526d49a8a4c577cadf43a3363bf02cd 
+``` http://127.0.0.1:7780/api/system/v1/mempool/d24e650f552bbb382f23d275630c1413d526d49a8a4c577cadf43a3363bf02cd
 
 {
   "type": "Unknown"
-}% 
+}%
 ```
 
 ### Known uncommited transaction
@@ -406,5 +420,5 @@ If we trying to request already commited transaction.
       "name": "cryptocurrency"
     }
   ]
-}% 
+}%
 ```
