@@ -13,6 +13,112 @@ The managing endpoints URL is structured as follows:
 Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands
 for node address.
 
+## Types
+
+As per [Google Closure Compiler][closurec] conventions,
+`?` before the type denotes a nullable type, and `=` after the type denotes
+an optional type.
+
+### Integer
+
+`integer` type denotes a non-negative integer number.
+
+### Bool
+
+`bool` type denotes a simple boolean `true/false` value.
+
+### Hash, PublicKey, Signature
+
+`Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
+appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
+`Signature` consists of 64 bytes.
+
+### PeerAddress
+
+`PeerAddress` is a string containing address in format `IP:port`
+
+### ReconnectInfo
+
+`ReconnectInfo` is a JSON object with the following fields:
+
+- **addr**: PeerAddress  
+  Peer address
+- **delay**: integer  
+  Delay for reconnect (ms)
+
+### ServiceInfo
+
+`ServiceInfo` is a JSON object with the following fields:
+
+- **id**: integer  
+  Unique 2-byte service identifier
+- **name**: string  
+  Unique string service identifier
+
+### BlockHeader
+
+`BlockHeader` is a JSON object with the following fields:
+
+- **height**: integer  
+  The height of the block
+- **prev_hash**: Hash  
+  The hash of the previous block
+- **proposer_id**: integer  
+  ID of validator who created an approved block proposal
+- **schema_version**: **TODO: ???**
+- **tx_count**: integer  
+  Number of transactions included into block
+- **tx_hash**: Hash  
+  the root hash of transactions Merkle tree
+
+### Time
+
+`Time` is a JSON object with the following fields:
+
+- **seconds**: integer  
+  Number of seconds in UNIX format
+- **nanos**: integer  
+  Number of nanoseconds
+
+### Precommit
+
+- **body**: JSON
+  The content of precommit message
+- **body.block_hash**: Hash  
+  The hash of the current block (which precommit was created for)
+- **body.height**: integer  
+  The height of the current block
+- **body.round**: integer  
+  The round when block proposal was created
+- **body.time**: Time  
+  Local clocks time of validator who created block proposal
+- **body.validator**: integer  
+  ID of the validator who created this precommit
+- **message_id**: integer  
+  **TODO: ???**
+- **network_id**: integer  
+  **TODO: ???**
+- **protocol_version**: integer  
+  **TODO: ???**
+- **service_id**: integer  
+  **TODO: ???**
+- **signature**: Signature  
+  precommit's creator signature
+
+## SerializedTransaction
+
+`SerializedTransaction` is a JSON object corresponding to
+[transaction serialization format](../architecture/transactions.md#serialization)
+
+## TransactionLocation
+
+`TransactionLocation` is a JSON object with the following fields:
+
+- **block_height**: integer  
+  Height of the block including this transaction
+- **position_in_block**: integer  
+  Position of the transaction in the block
+
 ## Add new peer
 
 `POST {base_path}/system/v1/peeradd`
@@ -21,9 +127,10 @@ Adds new Exonum node to the list of peers for the current node.
 
 ### Parameters
 
-**ip** : peer address in format `ip:port`.
+**ip** : PeerAddress
 
-### Example:
+### Example
+
 ```None
 POST http://127.0.0.1:7780/api/system/v1/peeradd
 body: "ip=127.0.0.1:8800"
@@ -31,13 +138,11 @@ body: "ip=127.0.0.1:8800"
 
 ### Response
 
-```
+```None
 "Ok"
 ```
 
-**TODO: what if not an IP received? is there an error?**
-
-## Get peers info
+## Peers info
 
 ```None
 GET {base_path}/system/v1/peers
@@ -53,20 +158,12 @@ None.
 
 JSON object with the following fields:
 
-- **incoming_connections**: Array<PeerAddress>  
+- **incoming_connections**: Array\<PeerAddress\>  
   Address list of peers connected to this node
-- **outgoing_connections**: Array<PeerAddress>  
+- **outgoing_connections**: Array\<PeerAddress\>  
   Address list of peers this node connected to
-- **reconnects**: Array<ReconnectInfo>  
+- **reconnects**: Array\<ReconnectInfo\>  
   List of peers (with the corresponding reconnect delays) this node should reconnect
-
-`PeerAddress` is a string containing address in format `IP:port`
-
-`ReconnectInfo` is a JSON object with the following fields:
-- **addr**: PeerAddress
-  Peer address
-- **delay**: integer  
-  Delay for reconnect (ms)
 
 ### Response example
 
@@ -105,20 +202,46 @@ None.
 
 ### Response
 
-The example of responded JSON:
+JSON object with the following fields:
+
+- **size**: integer  
+  Amount of unconfirmed transactions.
+
+### Response example
 
 ```JSON
 {
   "size": 0
-}        
+}
 ```
 
-- **size**: amount of unconfirmed transactions.
+## Block by height
 
-## Get block by height
-
+```None
+GET {base_path}/api/explorer/v1/blocks/{height}
 ```
- http://127.0.0.1:7779/api/explorer/v1/blocks/20
+
+Returns the content for block with specific height.
+
+### Parameters
+
+**height**: integer  
+  The height of desired block
+
+### Response
+
+JSON object with following fields:
+
+- **block**: BlockHeader  
+  The header of the specified block
+- **precommits**: Array\<Precommit\>  
+  The list of precommit transactions voted for this block
+- **txs**: Array\<SerializedTransaction\>  
+  The list of the transactions included into block
+
+### Response example
+
+```JSON
 {
   "block": {
     "height": "20",
@@ -186,20 +309,34 @@ The example of responded JSON:
     }
   ],
   "txs": []
-}   
+}
 ```
 
-## Get blocks in range
+## Blocks in range
 
 ```None
-GET{base_path}/explorer/v1/blocks\?count\=500\&skip_empty_blocks\=true\&from\=22
+GET {base_path}/explorer/v1/blocks?count={count}&skip_empty_blocks={skip}&from={height}
 ```
 
-Returns the details about block
+Returns the headers for the last `count` blocks up to `height`
+
+### Parameters
+
+- **count**: integer  
+  The number of blocks to return. Should be not greater than `1000`.
+- **skip_empty_blocks**: bool  
+  If `true`, then only non-empty blocks are returned.
+- **from**: integer  
+  Block height, up to which blocks are returned. The blocks are returned
+  in backward order, starting from `from` and at least up to `from - count`.
 
 ### Response
 
-``` http://127.0.0.1:7779/api/explorer/v1/blocks\?count\=500\&skip_empty_blocks\=true\&from\=22
+The `JSON` array of the BlockHeader objects.
+
+### Response example
+
+```JSON
 [
   {
     "height": "18",
@@ -246,14 +383,34 @@ Returns the details about block
     "tx_count": 1000,
     "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
   }
-]```
+]
+```
 
-## Get commited transaction by hash
+## Committed transaction
+
+`GET {base_path}/explorer/v1/transactions/{transaction_hash}`
+
+Looks up committed transaction by the hash.
+
+### Parameters
+
+- **transaction_hash**: Hash
+  Hash of transaction to look up.
 
 ### Response
 
-```
-➜  sandbox-timestamping git:(master) curl --get  http://127.0.0.1:7779/api/explorer/v1/transactions/388c6875077db80282af3c2915aa98b610b5192fe0367def57ef84cbab44ebc6
+JSON object with the following fields:
+
+- **content**: SerializedTransaction  
+  Transaction with the specified hash
+- **location**: TransactionLocation  
+  Transaction position in the blockchain
+- **proof_to_block_merkle_root**: MerkleRoot  
+  Merkle root proving transaction existence
+
+### Response example
+
+```JSON
 {
   "content": {
     "body": {
@@ -305,31 +462,51 @@ Returns the details about block
       }
     }
   }
-}%      
+}
 ```
 
-## Get transaction from mempool
+## Transaction from the pool of unconfirmed transactions
 
-`GET {base_path}/system/v1/mempool/:hash`
+`GET {base_path}/system/v1/mempool/{transaction_hash}`
 
-Returns transaction from mempool if it is not commited yet; otherwise, returns transaction from blockchain.
+Looks up transaction (possibly uncommitted) by the hash.
 
 ### Parameters
 
-```{hash}`
-### Unknown Transaction
-If we trying to request unknown transaction.
+- **transaction_hash**: Hash
+  Hash of transaction to look up.
 
-``` http://127.0.0.1:7780/api/system/v1/mempool/d24e650f552bbb382f23d275630c1413d526d49a8a4c577cadf43a3363bf02cd
+### Response
 
+Returns transaction from the pool of unconfirmed transactions if it is not
+committed yet; otherwise, returns transaction from the blockchain.
+
+Response is a JSON object with one necessary field:
+
+- **type**: string  
+  Type of transaction, could be:
+
+    - "Commited": committed transaction (in blockchain)
+    - "MemPool": uncommitted transaction (in the pool of unconfirmed
+    transactions)
+    - "Unknown": unknown transaction
+
+### Unknown Transaction Response Example
+
+Response JSON contains only `type` field. Its value is "Unknown":
+
+```JSON
 {
   "type": "Unknown"
-}%
+}
 ```
 
-### Known uncommited transaction
+### Known Uncommitted Transaction Response Example
 
-```curl --get  http://127.0.0.1:7780/api/system/v1/mempool/f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf
+Response JSON has same fields as `SerializedTransaction` plus `type` field with
+value equal to "MemPool":
+
+```JSON
 {
   "body": {
     "amount": "152",
@@ -343,14 +520,15 @@ If we trying to request unknown transaction.
   "service_id": 128,
   "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00",
   "type": "MemPool"
-}%   
+}
 ```
 
-### Known commited transaction
+### Known Committed Transaction Response Example
 
-If we trying to request already commited transaction.
+Response JSON has same fields as response to committed transaction request plus
+`type` field with value equal to "Commited":
 
-```curl --get  http://127.0.0.1:7780/api/system/v1/mempool/f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf
+```JSON
 {
   "content": {
     "body": {
@@ -400,17 +578,34 @@ If we trying to request already commited transaction.
     }
   },
   "type": "Commited"
-}%  
+}
 ```
 
-- **type** - type of transaction, could be:
+## Network info
 
-1. Commited - commited transaction (in blockchain).
-2. MemPool - uncommited transaction (in mempool).
-3. Unknown - unknown transaction.
+`GET {base_path}/system/v1/network`
 
+Gets info about the serialization protocol and the services functioning
+in the network.
 
-```sandbox-timestamping git:(master) curl --get  http://127.0.0.1:7778/api/system/v1/network
+### Parameters
+
+None.
+
+### Response
+
+JSON object with the following fields:
+
+- **network_id**: integer  
+  Network ID. Is not used currently
+- **protocol_version**: integer  
+  The major version of the Exonum serialization protocol. Currently, `0`
+- **services**: Array\<ServiceInfo\>  
+  Info about services functioning in the network
+
+### Response Example
+
+```JSON
 {
   "network_id": 0,
   "protocol_version": 0,
@@ -420,5 +615,5 @@ If we trying to request already commited transaction.
       "name": "cryptocurrency"
     }
   ]
-}%
+}
 ```
