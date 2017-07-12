@@ -11,19 +11,19 @@ one written to the bitcoin blockchain would be found instantly.
 !!! note
     This page describe mostly how the service do work. There is a
     separate page, describing how the service should be [configured and
-    deployed][anchoring-deploy]. The source code is located [on the
+    deployed][anchoring-deploy]. The source code is located [on
     GitHub][github-anchoring].
 
 ## General idea
 
 The service writes the hash of the latest Exonum block to the permanent
 read-only persistent storage available to everyone. The block is called
-_anchored block, and its hash is referred as _anchored hash_
+_anchored block_, and its hash is referred as _anchored hash_
 further.
 
-The service builds a _anchoring chain_ on
+The service builds an _anchoring chain_ on
 the top of bitcoin blockchain, which consists of multiple _bitcoin
-anchoring transactions_. Each anchoring transaction have at least 1
+anchoring transactions_. Each anchoring transaction has at least 1
 input and only 2 outputs: data output and change output. Data output
 contains written anchored hash, while change output transfers money
 to the next anchoring transaction.
@@ -58,7 +58,7 @@ validators as it is allowed by Bitcoin. All signatures are published
 into Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
-anchoring validators (`N` <= 15 because of bitcoin restrictions) and `M`
+anchoring validators (`N <= 15` because of bitcoin restrictions) and `M`
 is the necessary amount of signatures. In Exonum consensus, `M =
 floor(2/3*N) + 1` is used as supermajority.
 
@@ -169,20 +169,13 @@ and enlarges to 80 bytes when recovering is needed.
 #### Anchored hash data chunk
 
 - 8-byte zero-based unsigned height of the anchored block (i.e., the
-  height of the genesis block is `0`)
+  height of the genesis block is `0`) which is used for efficient lookups.
 - 32-byte block hash
 
-
-The data of the recovery chunk is a 32-byte bitcoin
-transaction hash. This hash shows that the current anchoring chain is
-the prolongation of previously stopped anchoring chain. The possible
-reasons of such stops are described further.
-
-- 32-byte bitcoin transaction hash. This hash shows that the current
 =======
 #### Recovery data chunk
 
-The data of the recovery chunk include just a 32-byte bitcoin
+The data of the recovery chunk is a 32-byte bitcoin
 transaction hash. This hash shows that the current anchoring chain is
 the prolongation of previously stopped anchoring chain. The possible
 reasons of such stops are described further.
@@ -232,7 +225,7 @@ The service uses third-party bitcoin node to communicate with the
 bitcoin blockchain network. As for Exonum v 0.1, [Bitcoin
 Core][bitcoind] is supported only.
 
-You need to specify the following settings to access the bitcoind node:
+The following settings need to be specified to access the bitcoind node:
 
 - bitcoind host
 - bitcoind rpc username
@@ -272,7 +265,7 @@ global configuration.
 
 #### Transaction fees
 
-A transaction fee represent a value in satoshis that is set as a fee for
+Transaction fee represents a value in satoshis that is set as a fee for
 every anchoring transaction. It is advised to be a 2x-3x times bigger
 than average market fee, in order to be sure that anchoring transaction
 does not hang if the bitcoin network is spammed.
@@ -419,8 +412,7 @@ None.
 
 #### Response
 
-The string with a
-value of anchoring address in Base58Check format.
+The string with a value of anchoring address in Base58Check format.
 
 ### Actual common LECT
 
@@ -437,7 +429,7 @@ None.
 
 #### Response
 
-The example of responded JSON:
+Example of JSON response:
 
 ```JSON
 {
@@ -452,8 +444,8 @@ The example of responded JSON:
 
 - **payload.blockhash**: the hash of the anchored Exonum block
 - **payload.block_height**: the height of the anchored Exonum block
-- **content.payload.prev_tx_chain**: last tx-id of previous transactions
-  chain if it has been broken. Otherwise, `null`.
+- **content.payload.prev_tx_chain**: last tx-id of previous chain of
+  anchoring transactions if it has been broken. Otherwise, `null`.
 - **txid**: the hash for the anchoring bitcoin transaction, which is
   considered to be a LECT.
 
@@ -475,7 +467,7 @@ amount, returns an error.
 
 #### Response
 
-The example of the responded JSON:
+Example of JSON response:
 
 ```JSON
 {
@@ -500,7 +492,7 @@ The example of the responded JSON:
 - **content.payload.prev_tx_chain**: last tx-id of previous transactions
   chain if it has been broken. Otherwise, `null`.
 - **content.txid**: the hash for the anchoring bitcoin transaction,
-  which is considered to be a LECT.
+  which is considered to be the current LECT by the validator.
 
 ### Nearest LECT
 
