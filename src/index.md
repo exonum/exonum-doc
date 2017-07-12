@@ -73,7 +73,6 @@ what features are coming soon.
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
-[install]: https://github.com/exonum/exonum-core/blob/master/INSTALL.md
 [client]: https://github.com/exonum/exonum-client
 [tutorial]: https://github.com/exonum/cryptocurrency
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
