@@ -4,8 +4,8 @@ The anchoring service is developed to increase product security and
 provide non-repudiation for Exonum applications. Service periodically publishes
 Exonum blockchain block hash to the bitcoin blockchain, so that it is
 publicly auditable by anyone having access to the Exonum blockchain. Even in
-the case of validators collusion transation history can not be
-falsified; disrepancy between actual Exonum blockchain state and the
+the case of validators collusion transaction history cannot be
+falsified; discrepancy between actual Exonum blockchain state and the
 one written to the bitcoin blockchain would be found instantly.
 
 !!! note
@@ -38,7 +38,7 @@ to the next anchoring transaction.
 ```
 
 Sometimes additional inputs called [funding UTXO](#funding-utxo) are
-used. Such input is necessary to refill balance of anchoring chain, that
+used. Such input is necessary to refill balance of anchoring chain that
 is spending to transaction fees.
 
 ## Anchoring transactions
@@ -202,8 +202,8 @@ chain](#recovering-broken-anchoring)).
   transaction without validators' sigs) is completely defined and is
   agreed upon by `+2/3` validators.
 - After common LECT appears, every validator builds the anchoring
-  transaction and sign every its input.
-- The signatures are publicated at the Exonum blockchain
+  transaction and sign it's every input.
+- The signatures are publicized at the Exonum blockchain
 - Based on the signatures, _any_ Exonum node can create anchoring
   transaction and broadcast it to the Bitcoin network. In particular, all
   agreed validators broadcast it.
@@ -337,12 +337,12 @@ service](configuration-updater.md). The following properties should be noticed:
 Anchoring pubkeys define new Anchoring BTC-address. In order to prolong
 anchoring chain, new anchoring transaction should spend previous
 anchoring address UTXO and send it to the new anchoring address. Such
-transaction should be commited to the blockchain **before** the list of
+transaction should be committed to the blockchain **before** the list of
 validators is changed. Thus the anchoring process is suspended.
 
-- The anchoring service wait until common LECT is commited to the Bitcoin
+- The anchoring service wait until common LECT is committed to the Bitcoin
   blockchain.
-- After common LECT appears and is commited to the Bitcoin blockchain,
+- After common LECT appears and is committed to the Bitcoin blockchain,
   the service waits until it will gather sufficient number of
   confirmations (ex., `24`).
 - Further transitional Anchoring transaction proposal is generated. That
@@ -377,8 +377,8 @@ The service provides the following public API endpoints:
 
 - [Get actual anchoring address](#actual-address)
 - [Get next anchoring address](#following-address)
-- [Get actual common lect](#actual-common-lect)
-- [Get actual lect for specific validator](#actual-lect-for-specific-validator)
+- [Get actual common LECT](#actual-common-lect)
+- [Get actual LECT for specific validator](#actual-lect-for-specific-validator)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/btc_anchoring/v1`.
