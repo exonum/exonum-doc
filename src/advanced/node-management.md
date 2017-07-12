@@ -183,7 +183,8 @@ GET{base_path}/explorer/v1/blocks\?count\=500\&skip_empty_blocks\=true\&from\=22
 
 Returns the details about block
 
-### 
+### Response
+
 ``` http://127.0.0.1:7779/api/explorer/v1/blocks\?count\=500\&skip_empty_blocks\=true\&from\=22
 [
   {
@@ -234,6 +235,64 @@ Returns the details about block
 ]```
 
 ## Get commited transaction by hash
+
+### Response
+
+```
+➜  sandbox-timestamping git:(master) curl --get  http://127.0.0.1:7779/api/explorer/v1/transactions/388c6875077db80282af3c2915aa98b610b5192fe0367def57ef84cbab44ebc6
+{
+  "content": {
+    "body": {
+      "amount": "936",
+      "from": "994aba30557b6eededf145b7e6b65c3851229b86f49d97a9e571b5af82a11aa3",
+      "seed": "12048737414620495018",
+      "to": "38ba56717b0047ca31fcc84cecbb79489ebd47844c7dda84bc5df05d48b753b3"
+    },
+    "message_id": 128,
+    "network_id": 0,
+    "protocol_version": 0,
+    "service_id": 128,
+    "signature": "27f27670cf2751b46fcb4ec2f470c1089bb011cec18513c7014f0e9e97556cd71be98eda83109f91bc5c24548ba15100a4ce954c5cc848c1a62efaf5434b350d"
+  },
+  "location": {
+    "block_height": "2",
+    "position_in_block": "979"
+  },
+  "proof_to_block_merkle_root": {
+    "left": "e66a1459533e6542835afd972ca3a71a803770b5ede9779ee726180fcecea0a3",
+    "right": {
+      "left": "264513e3063a0b8052f6ec953434fc25dc24ade5eedca5ef27c3a39395ffafda",
+      "right": {
+        "left": "e0dd72846464db2fbde591922489413da1663489eb8b5a733a048a7ae43f79b3",
+        "right": {
+          "left": "99da5dfe04b944f1f656ea2b7ca78dab7d7c21134f762a313c6a80771f6bc3cf",
+          "right": {
+            "left": {
+              "left": "2d038a5fbb501d5c274aa2fa74732e431406fd01c4675b2b9af2c669cf9d9e51",
+              "right": {
+                "left": {
+                  "left": {
+                    "left": "a3fec1be2088b1b14574447f18639d55ab00abf8c5ea3f9f697d6638d311ad86",
+                    "right": {
+                      "left": "3873dd22eca1dd6d221c03847564be7d20915059a8ccdb75187b0547ec9b449a",
+                      "right": {
+                        "val": "388c6875077db80282af3c2915aa98b610b5192fe0367def57ef84cbab44ebc6"
+                      }
+                    }
+                  },
+                  "right": "50671bcaf8a1b737aaeace7820bac2479416748575efff8a002712672ceea8d9"
+                },
+                "right": "41d0baf6ca0a111a1fdef91ea67afc5c73154c4145e1e470708fcd4568789bdd"
+              }
+            },
+            "right": "11eb62d8f94c87bd3e3c447d856b5d0d4c72681bf0f078f084ce27ee13b8d7f1"
+          }
+        }
+      }
+    }
+  }
+}%      
+```
 
 ## Get transaction from mempool
 
