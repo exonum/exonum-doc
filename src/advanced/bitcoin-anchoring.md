@@ -121,7 +121,7 @@ properties:
 The LECT solves transaction malleability problem, though anchoring
 transactions sometimes may be orphaned and never written to the Bitcoin
 blockchain. However, it is safe enough as the following anchoring
-transactions effectively anchor all previous ones. 
+transactions effectively anchor all previous ones.
 
 Exonum uses a [`bitcoind` client](#bitcoind-node), and only one of the
 transactions satisfying conditions can be considered as valid by
