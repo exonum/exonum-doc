@@ -473,5 +473,5 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
-[service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
-[core-schema.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs
+[service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
+[core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs

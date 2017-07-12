@@ -147,7 +147,7 @@ Consensus messages include:
 ## Core
 
 In Exonum: the functionality present in any Exonum blockchain regardless of
-the deployed [services](#service). Encapsulated in the [exonum-core][exonum-core]
+the deployed [services](#service). Encapsulated in the [exonum][exonum]
 repository.
 
 For example, the core includes a collection of system [tables](#table) (such as
@@ -467,7 +467,7 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [leveldb]: http://leveldb.org/
-[exonum-core]: https://github.com/exonum/exonum-core/
+[exonum]: https://github.com/exonum/exonum/
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
