@@ -6,7 +6,7 @@ The networks accepts two types of transactions: create a wallet with a default b
 and transfer money between wallets.
 
 You can view and download the full source code of this demo
-[here](https://github.com/exonum/minibank).
+[here](https://github.com/exonum/cryptocurrency).
 
 ## Create Node
 
@@ -17,14 +17,14 @@ compiler to build this demo. If you don’t have the environment set up, follow
 Let’s create minimal crate with `exonum` dependency.
 
 ```sh
-cargo new --bin minibank
+cargo new --bin cryptocurrency
 ```
 
 Add necessary dependencies to your `Cargo.toml`:
 
 ```toml
 [package]
-name = "minibank"
+name = "cryptocurrency"
 version = "0.1.0"
 authors = ["Your Name <your@email.com>"]
 
