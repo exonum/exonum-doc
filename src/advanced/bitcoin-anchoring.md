@@ -92,7 +92,7 @@ would make the previous transaction ineligible for inclusion into the
 Bitcoin blockchain.
 
 To handle this problem, the consensus is used to select appropriate previous
-transaction ([LECT](#lect) section).
+transaction via [LECTs](#lect).
 
 ### LECT
 
