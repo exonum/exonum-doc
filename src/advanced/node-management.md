@@ -100,12 +100,12 @@ address formatted as 4 octets separated by points.
 - **signature**: Signature  
   `Precommit` message's creator signature
 
-## SerializedTransaction
+### SerializedTransaction
 
 `SerializedTransaction` is a JSON object corresponding to
 [transaction serialization format](../architecture/transactions.md#serialization)
 
-## TransactionLocation
+### TransactionLocation
 
 `TransactionLocation` is a JSON object with the following fields:
 
@@ -119,7 +119,7 @@ address formatted as 4 octets separated by points.
 All system API endpoints share the same base path, denoted **{system_base_path}**,
 equal to `/api/system/v1`.
 
-## Add new peer
+### Add new peer
 
 ```none
 POST {system_base_path}/peeradd
@@ -127,23 +127,23 @@ POST {system_base_path}/peeradd
 
 Adds new Exonum node to the list of peers for the current node.
 
-### Parameters
+#### Parameters
 
 - **ip** : PeerAddress
 
-### Example
+#### Example
 
 ```None
 curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peeradd
 ```
 
-### Response
+#### Response
 
 ```None
 "Ok"
 ```
 
-## Peers info
+### Peers info
 
 ```none
 GET {system_base_path}/peers
@@ -151,11 +151,11 @@ GET {system_base_path}/peers
 
 Returns detailed list of peers.
 
-### Parameters
+#### Parameters
 
 None.
 
-### Response
+#### Response
 
 JSON object with the following fields:
 
@@ -166,7 +166,7 @@ JSON object with the following fields:
 - **reconnects**: Array\<ReconnectInfo\>  
   List of peers (with the corresponding reconnect delays) this node should reconnect
 
-### Response example
+#### Response example
 
 ```JSON
 {
@@ -189,7 +189,7 @@ JSON object with the following fields:
 }
 ```
 
-## Mempool size
+### Mempool size
 
 ```none
 GET {system_base_path}/mempool
@@ -197,18 +197,18 @@ GET {system_base_path}/mempool
 
 Returns the number of transactions in node's mempool.
 
-### Parameters
+#### Parameters
 
 None.
 
-### Response
+#### Response
 
 JSON object with the following fields:
 
 - **size**: integer  
   Amount of unconfirmed transactions.
 
-### Response example
+#### Response example
 
 ```JSON
 {
@@ -216,7 +216,7 @@ JSON object with the following fields:
 }
 ```
 
-## Transaction from the pool of unconfirmed transactions
+### Transaction from the pool of unconfirmed transactions
 
 ```none
 GET {system_base_path}/mempool/{transaction_hash}
@@ -224,12 +224,12 @@ GET {system_base_path}/mempool/{transaction_hash}
 
 Looks up transaction (possibly uncommitted) by the hash.
 
-### Parameters
+#### Parameters
 
 - **transaction_hash**: Hash
   Hash of transaction to look up.
 
-### Response
+#### Response
 
 Returns transaction from the pool of unconfirmed transactions if it is not
 committed yet; otherwise, returns transaction from the blockchain.
@@ -244,7 +244,7 @@ Response is a JSON object with one necessary field:
     transactions)
     - "Unknown": unknown transaction
 
-### Unknown Transaction Response Example
+#### Unknown Transaction Response Example
 
 Response JSON contains only `type` field. Its value is "Unknown":
 
@@ -254,7 +254,7 @@ Response JSON contains only `type` field. Its value is "Unknown":
 }
 ```
 
-### Known Uncommitted Transaction Response Example
+#### Known Uncommitted Transaction Response Example
 
 Response JSON has same fields as `SerializedTransaction` plus `type` field with
 value equal to "MemPool":
@@ -276,7 +276,7 @@ value equal to "MemPool":
 }
 ```
 
-### Known Committed Transaction Response Example
+#### Known Committed Transaction Response Example
 
 Response JSON has same fields as response to committed transaction request plus
 `type` field with value equal to "Committed":
@@ -334,7 +334,7 @@ Response JSON has same fields as response to committed transaction request plus
 }
 ```
 
-## Network info
+### Network info
 
 ```none
 GET {system_base_path}/network
@@ -343,11 +343,11 @@ GET {system_base_path}/network
 Gets info about the serialization protocol and the services functioning
 in the network.
 
-### Parameters
+#### Parameters
 
 None.
 
-### Response
+#### Response
 
 JSON object with the following fields:
 
@@ -358,7 +358,7 @@ JSON object with the following fields:
 - **services**: Array\<ServiceInfo\>  
   Info about services functioning in the network
 
-### Response Example
+#### Response Example
 
 ```JSON
 {
@@ -378,7 +378,7 @@ JSON object with the following fields:
 All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
 
-## Block by height
+### Block by height
 
 ```none
 GET {explorer_base_path}/blocks/{height}
@@ -386,12 +386,12 @@ GET {explorer_base_path}/blocks/{height}
 
 Returns the content for block with specific height.
 
-### Parameters
+#### Parameters
 
 **height**: integer  
   The height of desired block
 
-### Response
+#### Response
 
 JSON object with following fields:
 
@@ -402,7 +402,7 @@ JSON object with following fields:
 - **txs**: Array\<SerializedTransaction\>  
   The list of the transactions included into block
 
-### Response example
+#### Response example
 
 ```JSON
 {
@@ -475,7 +475,7 @@ JSON object with following fields:
 }
 ```
 
-## Blocks in range
+### Blocks in range
 
 ```none
 GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&from={height}
@@ -483,7 +483,7 @@ GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&from={hei
 
 Returns the headers for the last `count` blocks up to `height`
 
-### Parameters
+#### Parameters
 
 - **count**: integer  
   The number of blocks to return. Should be not greater than `1000`.
@@ -493,12 +493,12 @@ Returns the headers for the last `count` blocks up to `height`
   Block height, up to which blocks are returned. The blocks are returned
   in backward order, starting from `from` and at least up to `from - count`.
 
-### Response
+#### Response
 
 The `JSON` array of the `BlockHeader` objects. Blocks in the array are sorted in
 descending order of their heights.
 
-### Response example
+#### Response example
 
 ```JSON
 [
@@ -550,7 +550,7 @@ descending order of their heights.
 ]
 ```
 
-## Committed transaction
+### Committed transaction
 
 ```none
 GET {explorer_base_path}/transactions/{transaction_hash}
@@ -558,12 +558,12 @@ GET {explorer_base_path}/transactions/{transaction_hash}
 
 Looks up committed transaction by the hash.
 
-### Parameters
+#### Parameters
 
 - **transaction_hash**: Hash
   Hash of transaction to look up.
 
-### Response
+#### Response
 
 JSON object with the following fields:
 
@@ -574,7 +574,7 @@ JSON object with the following fields:
 - **proof_to_block_merkle_root**: MerkleRoot  
   Merkle root proving transaction existence
 
-### Response example
+#### Response example
 
 ```JSON
 {
