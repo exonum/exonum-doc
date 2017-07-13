@@ -124,8 +124,7 @@ Besides, it also enables several important features. Here are two of them.
 - **Unified light client**. In the current version of the [light
   client](architecture/clients.md), one need to specify it for each
   Exonum-based project. This is a consequence of unknown index hierarchy, which
-  leads to inability to check entire cryptographic proofs (see [Merkle
-  index](advanced/merkle-index.md), for example), which are returned from the
+  leads to inability to check entire cryptographic proofs, which are returned from the
   backend. Instead light client is able to check the proof within a single
   Merkle proof. Having declarative description in the blockchain (and thus
   clients’ ability to get it), will allow the light client to determine proof
