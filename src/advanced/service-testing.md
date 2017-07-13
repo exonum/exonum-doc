@@ -70,7 +70,7 @@ consensus algorithm are tested:
 - Acting as a [round leader](../architecture/consensus.md#strawman-version)
 
 !!! tip
-    See [source code](https://github.com/exonum/exonum-core/blob/master/sandbox/tests/consensus.rs)
+    See [source code](https://github.com/exonum/exonum/blob/master/sandbox/tests/consensus.rs)
     for more details on how sandbox is used for testing the consensus algorithm.
 
 !!! note
