@@ -207,7 +207,7 @@ Which corresponds to the following JSON representation of `Proofnode`.
   "left": {
     "left": "fcb40354a7aff5ad066b19ae2f1818a78a77f93715f493881c7d57cbcaeb25c9",
     "right": {
-      "left": 
+      "left":
         "1e6175315920374caa0a86b45d862dee3ddaa28257652189fc1dfbe07479436a",
       "right": {
         "val": [
