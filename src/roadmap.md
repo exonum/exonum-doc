@@ -37,7 +37,7 @@ specific project.
     (`.dll` in Windows or `.so` in Unix-based systems): one can override a
     library while programs are running using it.
 
-    In other words, this means that Exonum will support **dynamically added
+    In other words, this means that Exonum will support **(dynamic)
     smart contracts**, as they are known in other blockchain systems. The
     difference of our approach from public blockchains is the following. A
     service can be *added* to a blockchain, however, in order to *use* it,
@@ -47,13 +47,16 @@ specific project.
 
 Lifecycle for a service in Exonum would look as follows:
 
-- The service is uploaded as a shared library within a specific transaction in
-  Exonum blockchain
+- The service is uploaded as a shared library (or an authenticated commitment
+  to the library, e.g., its cryptographic hash, and list of URIs to get the
+  library from)
+  within a specific transaction in the Exonum blockchain
 - [Validators](architecture/consensus.md#assumptions) make a decision on
-  inclusion of a service into active
-  [configuration](architecture/configuration.md)
-- A service becomes active, that is available for users of the system
-- If necessary services can be removed by the
+  activating the service, which is performed using
+  [configuration](architecture/configuration.md) management
+- The service becomes active, that is available for processing requests on
+  its endpoints
+- If necessary, services can be removed in a similar way by the
   [consensus](architecture/consensus.md) of validators
 
 ## Java Binding
@@ -124,7 +127,8 @@ Besides, it also enables several important features. Here are two of them.
 - **Unified light client**. In the current version of the [light
   client](architecture/clients.md), one need to specify it for each
   Exonum-based project. This is a consequence of unknown index hierarchy, which
-  leads to inability to check entire cryptographic proofs, which are returned from the
+  leads to inability to check entire cryptographic proofs,
+  which are returned from the
   backend. Instead light client is able to check the proof within a single
   Merkle proof. Having declarative description in the blockchain (and thus
   clients’ ability to get it), will allow the light client to determine proof
