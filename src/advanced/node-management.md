@@ -129,13 +129,12 @@ Adds new Exonum node to the list of peers for the current node.
 
 ### Parameters
 
-**ip** : PeerAddress
+- **ip** : PeerAddress
 
 ### Example
 
 ```None
-POST http://127.0.0.1:7780/api/system/v1/peeradd
-body: "ip=127.0.0.1:8800"
+curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peeradd
 ```
 
 ### Response
