@@ -93,7 +93,7 @@ received the request.
 
 One of distinguishing features of the Exonum framework is that it provides
 a rich set of tools to bundle responses to reads with cryptographic proofs.
-Proofs allow thin clients
+Proofs allow light clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
