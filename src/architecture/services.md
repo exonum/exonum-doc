@@ -92,9 +92,8 @@ of the consensus algorithm; they are processed locally by the node that
 received the request.
 
 One of distinguishing features of the Exonum framework is that it provides
-a rich set of tools to bundle responses to reads with cryptographic proofs;
-see [Merkle index](../advanced/merkle-index.md) and [Merkle Patricia index](../advanced/merkle-patricia-index.md)
-for more details. Proofs allow thin clients
+a rich set of tools to bundle responses to reads with cryptographic proofs.
+Proofs allow thin clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 

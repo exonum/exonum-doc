@@ -15,8 +15,8 @@ The client functions are divided into the following submodules:
   and validating digital signatures
 - **Proofs**. Functions for checking cryptographic proofs that
   are returned by the blockchain, such as the functions for
-  checking the proofs for [Merkle](../advanced/merkle-index.md)
-  and [Merkle Patricia](../advanced/merkle-patricia-index.md) indexes
+  checking the proofs for [Merkle][mt-index]
+  and [Merkle Patricia][mpt-index] indexes
 - **Blockchain integrity checks**. Function for checking the
   validity of a block (its compliance with [consensus algorithm](consensus.md))
 
@@ -113,8 +113,8 @@ programs able to replicate and verify a small portion of information stored in t
 blockchain. Usually clients verify information relevant to a specific
 user (for example, the history of his transactions). This verification is
 possible due to the use of specific data containers in a blockchain:
-[Merkle](../advanced/merkle-index.md) and
-[Merkle Patricia](../advanced/merkle-patricia-index.md) indexes.
+[Merkle][mt-index] and
+[Merkle Patricia][mpt-index] indexes.
 
 Advantages of this approach are:
 
@@ -167,3 +167,5 @@ largely remove the necessity of trust to third parties**.
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
+[mt-index]: storage.md#prooflistindex
+[mpt-index]: storage.md#proofmapindex

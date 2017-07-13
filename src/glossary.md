@@ -314,10 +314,6 @@ and to provide [proofs](#merkle-proof) to [light clients](#light-client).
     to the list of elements in such a way that the size of any opening of the commitment
     is logarithmic with respect to the number of elements in the list.
 
-!!! tip
-    See [*Merkle index*](advanced/merkle-index.md) and
-    [*Merkle Patricia index*](advanced/merkle-patricia-index.md) for more details.
-
 ## Message
 
 A [digitally signed](#digital-signature) piece of data transmitted
