@@ -208,8 +208,7 @@ Which corresponds to the following JSON representation of `Proofnode`.
   "left": {
     "left": "fcb40354a7aff5ad066b19ae2f1818a78a77f93715f493881c7d57cbcaeb25c9",
     "right": {
-      "left":
-        "1e6175315920374caa0a86b45d862dee3ddaa28257652189fc1dfbe07479436a",
+      "left": "1e6175315920374caa0a86b45d862dee3ddaa28257652189fc1dfbe07479436a",
       "right": {
         "val": [
           3,
@@ -228,8 +227,7 @@ Which corresponds to the following JSON representation of `Proofnode`.
           6
         ]
       },
-      "right":
-        "b7e6094605808a34fc79c72986555c84db28a8be33a7ff20ac35745eaddd683a"
+      "right": "b7e6094605808a34fc79c72986555c84db28a8be33a7ff20ac35745eaddd683a"
     }
   }
 }
