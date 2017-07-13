@@ -1,8 +1,9 @@
 # Node management
 
 Exonum nodes can be controlled using RPC implemented via REST API. Managing
-endpoints are handled by Exonum Core and are mainly purposed to receive
-information about the current node and blockchain states.
+endpoints are handled by Exonum сore and are mainly purposed to receive
+information about the current node and blockchain states as well as to change
+node [local configuration](../architecture/configuration.md#local-parameters).
 
 ## Types
 
@@ -26,7 +27,7 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 
 ### PeerAddress
 
-`PeerAddress` is a string containing address in format `IP:port`. `IP` is IPv4
+`PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
 address formatted as 4 octets separated by points.
 
 ### ReconnectInfo
@@ -56,13 +57,13 @@ address formatted as 4 octets separated by points.
 - **prev_hash**: Hash  
   The hash of the previous block
 - **proposer_id**: integer  
-  ID of validator who created an approved block proposal
+  ID of the validator that created an approved block proposal
 - **schema_version**: integer  
   Information schema version. Currently, `0`
 - **tx_count**: integer  
-  Number of transactions included into block
+  Number of transactions included into the block
 - **tx_hash**: Hash  
-  the root hash of transactions Merkle tree
+  The root hash of the transactions Merkle tree
 
 ### Time
 
@@ -78,17 +79,17 @@ address formatted as 4 octets separated by points.
 `Precommit` is a message, serialized according to [message serialization rules](../architecture/serialization.md#message-serialization).
 
 - **body**: JSON
-  The content of precommit message
+  The content of the `Precommit` message
 - **body.block_hash**: Hash  
-  The hash of the current block (which precommit was created for)
+  The hash of the current block (the `Precommit` message was created for)
 - **body.height**: integer  
   The height of the current block
 - **body.round**: integer  
-  The round when block proposal was created
+  The round when the block proposal was created
 - **body.time**: Time  
-  Local clocks time of validator who created block proposal
+  Local time of the validator that created the block proposal
 - **body.validator**: integer  
-  ID of the validator who created this precommit
+  ID of the validator that created this `Precommit` message
 - **message_id**: integer  
   ID of the `Precommit` message. Equals `4`
 - **network_id**: integer  
@@ -98,7 +99,7 @@ address formatted as 4 octets separated by points.
 - **service_id**: integer  
   Unique service identifier. Equals `0`
 - **signature**: Signature  
-  `Precommit` message's creator signature
+  `Precommit` message creator's signature
 
 ### SerializedTransaction
 
@@ -110,7 +111,7 @@ address formatted as 4 octets separated by points.
 `TransactionLocation` is a JSON object with the following fields:
 
 - **block_height**: integer  
-  Height of the block including this transaction
+  The height of the block including this transaction
 - **position_in_block**: integer  
   Position of the transaction in the block
 
@@ -125,7 +126,7 @@ equal to `/api/system/v1`.
 POST {system_base_path}/peeradd
 ```
 
-Adds new Exonum node to the list of peers for the current node. The node will
+Adds new Exonum node to the list of peers for the current node. The latter will
 attempt to connect to the new node asynchronously. If the public key of the new
 node is not in the whitelist, `Connect` message exchange cannot be performed.
 
@@ -407,7 +408,7 @@ JSON object with following fields:
 - **precommits**: Array<Precommit\>  
   The list of precommit transactions voted for this block
 - **txs**: Array<SerializedTransaction\>  
-  The list of the transactions included into block
+  The list of the transactions included into the block
 
 #### Response example
 
