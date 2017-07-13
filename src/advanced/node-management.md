@@ -239,7 +239,7 @@ Response is a JSON object with one necessary field:
 - **type**: string  
   Type of transaction, could be:
 
-    - "Commited": committed transaction (in blockchain)
+    - "Committed": committed transaction (in blockchain)
     - "MemPool": uncommitted transaction (in the pool of unconfirmed
     transactions)
     - "Unknown": unknown transaction
@@ -279,7 +279,7 @@ value equal to "MemPool":
 ### Known Committed Transaction Response Example
 
 Response JSON has same fields as response to committed transaction request plus
-`type` field with value equal to "Commited":
+`type` field with value equal to "Committed":
 
 ```JSON
 {
@@ -330,7 +330,7 @@ Response JSON has same fields as response to committed transaction request plus
       "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
     }
   },
-  "type": "Commited"
+  "type": "Committed"
 }
 ```
 
