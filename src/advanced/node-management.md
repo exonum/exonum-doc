@@ -8,7 +8,9 @@ information about the current node and blockchain states.
 
 The managing endpoints URL is structured as follows:
 
-`{base_path}/system/v1/{endpoint_name}`
+```none
+{base_path}/system/v1/{endpoint_name}
+```
 
 Here, `base_path` should be replaced with `ip:port/api/`, where `ip:port` stands
 for node address.
@@ -35,7 +37,8 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 
 ### PeerAddress
 
-`PeerAddress` is a string containing address in format `IP:port`
+`PeerAddress` is a string containing address in format `IP:port`. `IP` is IPv4
+address formatted as 4 octets separated by points.
 
 ### ReconnectInfo
 
@@ -51,7 +54,7 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 `ServiceInfo` is a JSON object with the following fields:
 
 - **id**: integer  
-  Unique 2-byte service identifier
+  Unique service identifier
 - **name**: string  
   Unique string service identifier
 
@@ -83,6 +86,8 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 
 ### Precommit
 
+`Precommit` is a message, serialized according to [message serialization rules](../architecture/serialization.md#message-serialization).
+
 - **body**: JSON
   The content of precommit message
 - **body.block_hash**: Hash  
@@ -102,7 +107,7 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 - **protocol_version**: integer  
   The major version of the Exonum serialization protocol. Currently, `0`
 - **service_id**: integer  
-  Unique 2-byte service identifier
+  Unique service identifier. Equals `0`
 - **signature**: Signature  
   `Precommit` message's creator signature
 
@@ -122,7 +127,9 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 
 ## Add new peer
 
-`POST {base_path}/system/v1/peeradd`
+```none
+POST {base_path}/system/v1/peeradd
+```
 
 Adds new Exonum node to the list of peers for the current node.
 
@@ -145,7 +152,7 @@ body: "ip=127.0.0.1:8800"
 
 ## Peers info
 
-```None
+```none
 GET {base_path}/system/v1/peers
 ```
 
@@ -191,7 +198,7 @@ JSON object with the following fields:
 
 ## Mempool size
 
-```None
+```none
 GET {base_path}/system/v1/mempool
 ```
 
@@ -218,7 +225,7 @@ JSON object with the following fields:
 
 ## Block by height
 
-```None
+```none
 GET {base_path}/api/explorer/v1/blocks/{height}
 ```
 
@@ -315,7 +322,7 @@ JSON object with following fields:
 
 ## Blocks in range
 
-```None
+```none
 GET {base_path}/explorer/v1/blocks?count={count}&skip_empty_blocks={skip}&from={height}
 ```
 
@@ -333,7 +340,8 @@ Returns the headers for the last `count` blocks up to `height`
 
 ### Response
 
-The `JSON` array of the BlockHeader objects.
+The `JSON` array of the `BlockHeader` objects. Blocks in the array are sorted in
+descending order of their heights.
 
 ### Response example
 
@@ -389,7 +397,9 @@ The `JSON` array of the BlockHeader objects.
 
 ## Committed transaction
 
-`GET {base_path}/explorer/v1/transactions/{transaction_hash}`
+```none
+GET {base_path}/explorer/v1/transactions/{transaction_hash}
+```
 
 Looks up committed transaction by the hash.
 
@@ -468,7 +478,9 @@ JSON object with the following fields:
 
 ## Transaction from the pool of unconfirmed transactions
 
-`GET {base_path}/system/v1/mempool/{transaction_hash}`
+```none
+GET {base_path}/system/v1/mempool/{transaction_hash}
+```
 
 Looks up transaction (possibly uncommitted) by the hash.
 
@@ -584,7 +596,9 @@ Response JSON has same fields as response to committed transaction request plus
 
 ## Network info
 
-`GET {base_path}/system/v1/network`
+```none
+GET {base_path}/system/v1/network
+```
 
 Gets info about the serialization protocol and the services functioning
 in the network.
