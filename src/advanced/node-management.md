@@ -5,6 +5,11 @@ endpoints are handled by Exonum сore and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
 
+Endpoints are divided into two types: private and public endpoints. Each
+endpoint type is hosted on the separate address, which is specified in the
+[`node.api` section](../architecture/configuration.md#nodeapi) of the local
+configuration.
+
 ## Types
 
 As per [Google Closure Compiler][closurec] conventions,
@@ -30,14 +35,27 @@ appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
 address formatted as 4 octets separated by points.
 
-### ReconnectInfo
+### OutgiongConnectionState
 
-`ReconnectInfo` is a JSON object with the following fields:
+`OutgiongConnectionState` is a JSON object with the following fields:
 
-- **addr**: PeerAddress  
-  Peer address
-- **delay**: integer  
-  Time between reconnect attempts (ms)
+- **type**: string  
+  Connection type, could be:
+
+    - `Active` for established connections
+    - `Reconnect` for yet unestablished connections
+
+- **delay**: integer=  
+  Interval between reconnect attempts (ms). Is present only if `type` is
+  `Reconnect`
+
+### OutgoingConnectionInfo
+
+`OutgoingConnectionInfo` is a JSON object with the following fields:
+
+- **public_key**: ?PublicKey  
+  The public key of the peer or `null` if the public key is unknown
+- **state**: OutgiongConnectionState
 
 ### ServiceInfo
 
@@ -120,82 +138,7 @@ address formatted as 4 octets separated by points.
 All system API endpoints share the same base path, denoted **{system_base_path}**,
 equal to `/api/system/v1`.
 
-### Add new peer
-
-```none
-POST {system_base_path}/peeradd
-```
-
-Adds new Exonum node to the list of peers for the current node. The latter will
-attempt to connect to the new node asynchronously. If the public key of the new
-node is not in the whitelist, `Connect` message exchange cannot be performed.
-
-#### Parameters
-
-- **ip** : PeerAddress
-
-#### Example
-
-```None
-curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peeradd
-```
-
-#### Response
-
-```None
-"Ok"
-```
-
-### Peers info
-
-```none
-GET {system_base_path}/peers
-```
-
-Returns list of peers.
-
-#### Parameters
-
-None.
-
-#### Response
-
-JSON object with the following fields:
-
-- **incoming_connections**: Array<PeerAddress\>  
-  List of peers' addresses connected to this node
-- **outgoing_connections**: Array<PeerAddress\>  
-  List of peers' addresses this node is connected to
-- **reconnects**: Array<ReconnectInfo\>  
-  List of peers to be reconnected by the node with indication of the
-  corresponding reconnection timeouts. This list is formed on the node startup
-  based on the [list of known peers](../architecture/configuration.md#local-parameters)
-  from the local configuration. Also, new nodes can be appended when they are
-  added to the local configuration. Nodes are removed from this list when the
-  connection is established.
-
-#### Response example
-
-```JSON
-{
-  "incoming_connections": ["127.0.0.1:76638"],
-  "outgoing_connections": ["127.0.0.1:6332"],
-  "reconnects": [
-    {
-      "addr": "127.0.0.1:6335",
-      "delay": 2000
-    },
-    {
-      "addr": "127.0.0.1:6336",
-      "delay": 2000
-    },
-    {
-      "addr": "127.0.0.1:6334",
-      "delay": 2000
-    }
-  ]
-}
-```
+### Public endpoints
 
 ### Mempool size
 
@@ -224,10 +167,10 @@ JSON object with the following fields:
 }
 ```
 
-### Transaction from the pool of unconfirmed transactions
+### Transaction
 
 ```none
-GET {system_base_path}/mempool/{transaction_hash}
+GET {system_base_path}/transactions/{transaction_hash}
 ```
 
 Looks up transaction (possibly uncommitted) by the hash.
@@ -254,7 +197,8 @@ Response is a JSON object with one necessary field:
 
 #### Unknown Transaction Response Example
 
-Response JSON contains only `type` field. Its value is `Unknown`:
+Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
+returns HTTP status `404`
 
 ```JSON
 {
@@ -342,6 +286,96 @@ Response JSON has same fields as response to committed transaction request plus
 }
 ```
 
+### Private endpoints
+
+### Add new peer
+
+```none
+POST {system_base_path}/peers
+```
+
+Adds new Exonum node to the list of peers for the current node.
+The latter will attempt to connect to the new node asynchronously. If the public
+key of the new node is not in the whitelist, `Connect` message exchange cannot
+be performed.
+
+#### Parameters
+
+- **ip** : PeerAddress
+
+#### Example
+
+```None
+curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peers
+```
+
+#### Response
+
+```None
+"Ok"
+```
+
+### Peers info
+
+```none
+GET {system_base_path}/peers
+```
+
+Returns list of peers.
+
+#### Parameters
+
+None.
+
+#### Response
+
+JSON object with the following fields:
+
+- **incoming_connections**: Array<PeerAddress\>  
+  List of peers' addresses connected to this node
+- **outgoing_connections**: Object  
+  Its fields are peers' addresses this node is connected to, corresponding values
+  have type `OutgoingConnectionInfo`
+
+#### Response example
+
+```JSON
+{
+  "incoming_connections": [
+    "127.0.0.1:58635",
+    "127.0.0.1:58656"
+  ],
+  "outgoing_connections": {
+    "127.0.0.1:6334": {
+      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+      "state": {
+        "type": "Active"
+      }
+    },
+    "127.0.0.1:6335": {
+      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+      "state": {
+        "delay": 4000,
+        "type": "Reconnect"
+      }
+    },
+    "127.0.0.1:6336": {
+      "public_key": null,
+      "state": {
+        "type": "Active"
+      }
+    },
+    "127.0.0.1:6337": {
+      "public_key": null,
+      "state": {
+        "delay": 4000,
+        "type": "Reconnect"
+      }
+    }
+  }
+}
+```
+
 ### Network info
 
 ```none
@@ -385,6 +419,9 @@ JSON object with the following fields:
 
 All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
+
+All explorer endpoints are public. `enable_blockchain_explorer` local
+configuration parameter allows turn explorer endpoints on/off.
 
 ### Block by height
 
@@ -486,7 +523,7 @@ JSON object with following fields:
 ### Blocks in range
 
 ```none
-GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&from={height}
+GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={height}
 ```
 
 Returns the headers for the last `count` blocks up to `height`
@@ -497,9 +534,9 @@ Returns the headers for the last `count` blocks up to `height`
   The number of blocks to return. Should be not greater than `1000`.
 - **skip_empty_blocks**: bool  
   If `true`, then only non-empty blocks are returned.
-- **from**: integer  
+- **latest**: integer  
   Block height, up to which blocks are returned. The blocks are returned
-  in backward order, starting from `from` and at least up to `from - count`.
+  in backward order, starting from `latest` and at least up to `latest - count`.
 
 #### Response
 
@@ -556,85 +593,4 @@ descending order of their heights.
     "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
   }
 ]
-```
-
-### Committed transaction
-
-```none
-GET {explorer_base_path}/transactions/{transaction_hash}
-```
-
-Looks up committed transaction by the hash.
-
-#### Parameters
-
-- **transaction_hash**: Hash
-  Hash of transaction to look up.
-
-#### Response
-
-JSON object with the following fields:
-
-- **content**: SerializedTransaction  
-  Transaction with the specified hash
-- **location**: TransactionLocation  
-  Transaction position in the blockchain
-- **proof_to_block_merkle_root**: MerkleRoot  
-  Merkle root proving transaction existence
-
-#### Response example
-
-```JSON
-{
-  "content": {
-    "body": {
-      "amount": "936",
-      "from": "994aba30557b6eededf145b7e6b65c3851229b86f49d97a9e571b5af82a11aa3",
-      "seed": "12048737414620495018",
-      "to": "38ba56717b0047ca31fcc84cecbb79489ebd47844c7dda84bc5df05d48b753b3"
-    },
-    "message_id": 128,
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 128,
-    "signature": "27f27670cf2751b46fcb4ec2f470c1089bb011cec18513c7014f0e9e97556cd71be98eda83109f91bc5c24548ba15100a4ce954c5cc848c1a62efaf5434b350d"
-  },
-  "location": {
-    "block_height": "2",
-    "position_in_block": "979"
-  },
-  "proof_to_block_merkle_root": {
-    "left": "e66a1459533e6542835afd972ca3a71a803770b5ede9779ee726180fcecea0a3",
-    "right": {
-      "left": "264513e3063a0b8052f6ec953434fc25dc24ade5eedca5ef27c3a39395ffafda",
-      "right": {
-        "left": "e0dd72846464db2fbde591922489413da1663489eb8b5a733a048a7ae43f79b3",
-        "right": {
-          "left": "99da5dfe04b944f1f656ea2b7ca78dab7d7c21134f762a313c6a80771f6bc3cf",
-          "right": {
-            "left": {
-              "left": "2d038a5fbb501d5c274aa2fa74732e431406fd01c4675b2b9af2c669cf9d9e51",
-              "right": {
-                "left": {
-                  "left": {
-                    "left": "a3fec1be2088b1b14574447f18639d55ab00abf8c5ea3f9f697d6638d311ad86",
-                    "right": {
-                      "left": "3873dd22eca1dd6d221c03847564be7d20915059a8ccdb75187b0547ec9b449a",
-                      "right": {
-                        "val": "388c6875077db80282af3c2915aa98b610b5192fe0367def57ef84cbab44ebc6"
-                      }
-                    }
-                  },
-                  "right": "50671bcaf8a1b737aaeace7820bac2479416748575efff8a002712672ceea8d9"
-                },
-                "right": "41d0baf6ca0a111a1fdef91ea67afc5c73154c4145e1e470708fcd4568789bdd"
-              }
-            },
-            "right": "11eb62d8f94c87bd3e3c447d856b5d0d4c72681bf0f078f084ce27ee13b8d7f1"
-          }
-        }
-      }
-    }
-  }
-}
 ```
