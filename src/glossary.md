@@ -147,7 +147,7 @@ Consensus messages include:
 ## Core
 
 In Exonum: the functionality present in any Exonum blockchain regardless of
-the deployed [services](#service). Encapsulated in the [exonum-core][exonum-core]
+the deployed [services](#service). Encapsulated in the [**exonum**][exonum]
 repository.
 
 For example, the core includes a collection of system [tables](#table) (such as
@@ -314,10 +314,6 @@ and to provide [proofs](#merkle-proof) to [light clients](#light-client).
     to the list of elements in such a way that the size of any opening of the commitment
     is logarithmic with respect to the number of elements in the list.
 
-!!! tip
-    See [*Merkle index*](advanced/merkle-index.md) and
-    [*Merkle Patricia index*](advanced/merkle-patricia-index.md) for more details.
-
 ## Message
 
 A [digitally signed](#digital-signature) piece of data transmitted
@@ -422,7 +418,7 @@ logic to convert data to a platform-independent representation.
 
 ## Table
 
-A structured collection of data (e.g., a map or a list) that provides a high-level
+A structured collection of data (e.g., a map, set or a list) that provides a high-level
 abstraction on top of [the blockchain state](#blockchain-state). Tables are used
 by [services](#service) to simplify data management. Additionally, some types
 of tables allow to efficiently compute [Merkle proofs](#merkle-proof) for
@@ -467,7 +463,7 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [leveldb]: http://leveldb.org/
-[exonum-core]: https://github.com/exonum/exonum-core/
+[exonum]: https://github.com/exonum/exonum/
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme

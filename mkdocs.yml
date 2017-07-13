@@ -4,15 +4,15 @@ theme: material
 theme_dir: theme
 extra_css:
   - assets/stylesheets/extra.css
-repo_name: 'exonum/exonum-core'
-repo_url: 'https://github.com/exonum/exonum-core'
+repo_name: 'exonum/exonum'
+repo_url: 'https://github.com/exonum/exonum'
 
 site_url: 'http://exonum.com/doc/'
 site_author: 'BitFury Group'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 site_favicon: 'images/favicon.ico'
 
-copyright: © 2017 Bitfury Group Limited. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2017 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
   og_image: 'images/logo-square.jpg'
@@ -73,13 +73,9 @@ pages:
     - 'Configuration updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
-    - 'Merkle index': 'advanced/merkle-index.md'
-    - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
     - 'Consensus':
       # Consensus specification
-      - 'Specification': 'advanced/consensus/specification.md'
-      # Leader election algorithm specification
-      - 'Leader election': 'advanced/consensus/leader-election.md'
+      - 'Consensus specification': 'advanced/consensus/specification.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
   # Includes roadmap and features list
