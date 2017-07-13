@@ -1,7 +1,7 @@
 # Node management
 
-Exonum nodes can be controlled via RPC implemented as REST API. Managing
-endpoints are handled by Exonum Core and mainly are purposed to receive
+Exonum nodes can be controlled using RPC implemented via REST API. Managing
+endpoints are handled by Exonum Core and are mainly purposed to receive
 information about the current node and blockchain states.
 
 ## Types
@@ -36,7 +36,7 @@ address formatted as 4 octets separated by points.
 - **addr**: PeerAddress  
   Peer address
 - **delay**: integer  
-  Delay for reconnect (ms)
+  Time between reconnect attempts (ms)
 
 ### ServiceInfo
 
@@ -125,7 +125,9 @@ equal to `/api/system/v1`.
 POST {system_base_path}/peeradd
 ```
 
-Adds new Exonum node to the list of peers for the current node.
+Adds new Exonum node to the list of peers for the current node. The node will
+attempt to connect to the new node asynchronously. If the public key of the new
+node is not in the whitelist, `Connect` message exchange cannot be performed.
 
 #### Parameters
 
@@ -149,7 +151,7 @@ curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peeradd
 GET {system_base_path}/peers
 ```
 
-Returns detailed list of peers.
+Returns list of peers.
 
 #### Parameters
 
@@ -159,12 +161,13 @@ None.
 
 JSON object with the following fields:
 
-- **incoming_connections**: Array\<PeerAddress\>  
-  Address list of peers connected to this node
-- **outgoing_connections**: Array\<PeerAddress\>  
-  Address list of peers this node connected to
-- **reconnects**: Array\<ReconnectInfo\>  
-  List of peers (with the corresponding reconnect delays) this node should reconnect
+- **incoming_connections**: Array<PeerAddress\>  
+  List of peers' addresses connected to this node
+- **outgoing_connections**: Array<PeerAddress\>  
+  List of peers' addresses this node is connected to
+- **reconnects**: Array<ReconnectInfo\>  
+  List of peers to be reconnected by the node with indication of the
+  corresponding reconnection timeouts
 
 #### Response example
 
@@ -239,14 +242,14 @@ Response is a JSON object with one necessary field:
 - **type**: string  
   Type of transaction, could be:
 
-    - "Committed": committed transaction (in blockchain)
-    - "MemPool": uncommitted transaction (in the pool of unconfirmed
+    - `Committed`: committed transaction (in blockchain)
+    - `MemPool`: uncommitted transaction (in the pool of unconfirmed
     transactions)
-    - "Unknown": unknown transaction
+    - `Unknown`: unknown transaction
 
 #### Unknown Transaction Response Example
 
-Response JSON contains only `type` field. Its value is "Unknown":
+Response JSON contains only `type` field. Its value is `Unknown`:
 
 ```JSON
 {
@@ -257,7 +260,7 @@ Response JSON contains only `type` field. Its value is "Unknown":
 #### Known Uncommitted Transaction Response Example
 
 Response JSON has same fields as `SerializedTransaction` plus `type` field with
-value equal to "MemPool":
+value equal to `MemPool`:
 
 ```JSON
 {
@@ -279,7 +282,7 @@ value equal to "MemPool":
 #### Known Committed Transaction Response Example
 
 Response JSON has same fields as response to committed transaction request plus
-`type` field with value equal to "Committed":
+`type` field with value equal to `Committed`:
 
 ```JSON
 {
@@ -355,7 +358,7 @@ JSON object with the following fields:
   Network ID. Is not used currently
 - **protocol_version**: integer  
   The major version of the Exonum serialization protocol. Currently, `0`
-- **services**: Array\<ServiceInfo\>  
+- **services**: Array<ServiceInfo\>  
   Info about services functioning in the network
 
 #### Response Example
@@ -397,9 +400,9 @@ JSON object with following fields:
 
 - **block**: BlockHeader  
   The header of the specified block
-- **precommits**: Array\<Precommit\>  
+- **precommits**: Array<Precommit\>  
   The list of precommit transactions voted for this block
-- **txs**: Array\<SerializedTransaction\>  
+- **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into block
 
 #### Response example
