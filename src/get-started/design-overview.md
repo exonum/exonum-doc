@@ -267,7 +267,7 @@ with the requested data. This allows to prove data authenticity efficiently.
     for more details.
 
 Besides the core, Exonum includes the framework for building **services**.
-While the Core is responsible for the consensus, and provides middleware
+While the core is responsible for the consensus, and provides middleware
 functionality for sending and receiving transactions and blocks,
 services implement all business logic of the blockchain
 and are the main point to extend Exonum functionality.

@@ -1,6 +1,6 @@
 # Contributing to Exonum
 
-The [Exonum Core project][exonum] and [other public Exonum repositories][exonum-org]
+The [Exonum core project][exonum] and [other public Exonum repositories][exonum-org]
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
@@ -247,10 +247,10 @@ of consensus critical code.
 
 ## Release Policy
 
-The lead maintainer of the Exonum Core repository is the release manager
-for each Exonum Core release. Likewise, releases of other projects are managed
+The lead maintainer of the Exonum core repository is the release manager
+for each Exonum core release. Likewise, releases of other projects are managed
 by the respective lead maintainers.
-The Core releases are synchronized with releases of other Exonum projects
+The core releases are synchronized with releases of other Exonum projects
 through informal communication among repository maintainers.
 
 ## Copyright
