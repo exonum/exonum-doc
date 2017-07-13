@@ -63,7 +63,7 @@ middleware layer.
 ### Transactions
 
 Transactions come from the entities external to the blockchain, e.g.,
-[thin clients](clients.md). Generally speaking, a transaction modifies the blockchain
+[light clients](clients.md). Generally speaking, a transaction modifies the blockchain
 state if the transaction is considered “correct”. All transactions are recorded
 in the blockchain as a part of the transaction log. As the name implies,
 transactions are [atomic][wiki:atomicity]; they are deterministically ordered
@@ -93,7 +93,7 @@ received the request.
 
 One of distinguishing features of the Exonum framework is that it provides
 a rich set of tools to bundle responses to reads with cryptographic proofs.
-Proofs allow thin clients
+Proofs allow light clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
@@ -101,7 +101,7 @@ is as secure as if the client queried a supermajority of blockchain validators.
     In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
     to data in the blockchain, where the commitment is stored in a block header
     in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
-    allows to make proofs compact enough to be processed by thin clients.
+    allows to make proofs compact enough to be processed by light clients.
 
 !!! note "Example"
     Retrieving information on a particular wallet (e.g., the current
@@ -145,7 +145,7 @@ the items of the collection. Merklized versions of maps and lists are
 Naturally, the items of collections (and keys in the case of maps) need to be
 serializable. Exonum provides a simple and robust [binary serialization format](serialization.md),
 and the corresponding set of tools for (de)serialization and conversion of
-Exonum datatypes to JSON for communication with thin clients.
+Exonum datatypes to JSON for communication with light clients.
 
 ### Configuration
 
@@ -224,7 +224,7 @@ blockchain network
 !!! note
     As of Exonum 0.1, the only built-in event is block commit. More events
     will be added in the future, including possibility for services to define
-    and emit events and for services and thin clients to subscribe to events
+    and emit events and for services and light clients to subscribe to events
     emitted by the services.
 
 ## Service Development
