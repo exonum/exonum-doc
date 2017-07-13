@@ -18,7 +18,7 @@ this application with the aid of Exonum public API. This approach is similar
 to using [third-party libraries](https://en.wikipedia.org/wiki/Third-party_software_component).
 Typical workflow in this case is as follows:
 
-- Download the source code of Exonum Core and additional modules
+- Download the source code of Exonum and additional modules
 - Implement the logic of interaction with blockchain and other functionality
 - Build the application
 - Deploy it on the necessary hardware infrastructure
@@ -81,12 +81,12 @@ We already started the implementation of Java binding.
 
     - **High level binding**, or a Java interface for Exonum public API. This
       part allows the developer to connect blockchain to Java applications
-      directly. Technically, within this part Rust code (Exonum Core) is called
+      directly. Technically, within this part Rust code (Exonum core) is called
       from Java code (the application that makes use of Exonum).
     - **Service binding**. This part allows to implement services and
       potentially other Exonum modules (for example,
       [storage](architecture/storage.md)) in Java. Thus, Exonum
-      Core (Rust code) should be able to run JVM and launch
+      core (Rust code) should be able to run JVM and launch
       Java code.
 
 ## Interface Description
@@ -162,7 +162,7 @@ communication](https://en.wikipedia.org/wiki/Inter-process_communication) using
 However, this approach has its drawbacks: a malicious or bogus service can harm
 other services and even halt the whole blockchain. This problem can be solved
 using **service isolation** concept, that is separating service data and
-execution on the middleware level (on the level of Exonum Core).
+execution on the middleware level (on the level of Exonum core).
 
 !!! note
     Virtual machine or Docker containers are examples of approaches that

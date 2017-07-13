@@ -131,7 +131,7 @@ Transaction interface defines 3 methods: [`verify`](#verify),
 
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
-    See [Exonum Core][core-tx] for more details.
+    See [Exonum core code][core-tx] for more details.
 
 ### Verify
 

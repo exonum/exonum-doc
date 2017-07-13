@@ -12,7 +12,7 @@ applications.
 3. [View layer](#view-layer) describes the wrapper over the DB engine
   that ensures atomicity of blocks and transactions
 4. [List of system tables](#system-tables) contains tables
-  used directly by Exonum Core
+  used directly by the Exonum core
 5. [Indexing](#indexing) gives an insight how indexes over structured data
   can be built in Exonum
 
@@ -241,7 +241,7 @@ and suffixes are used to distinguish tables within the group.
     Here, `|` separates logical components of the low-level key.
 
 It is advised to use a `gen_prefix` function
-for creating table prefixes. See the [schema of Exonum Core][blockchain-schema]
+for creating table prefixes. See the [schema of Exonum core][blockchain-schema]
 for an example.
 
 !!! warning
@@ -289,7 +289,7 @@ transactions continues normally.
 
 ## System Tables
 
-The Core [maintains tables][blockchain-schema] that are used
+The core [maintains tables][blockchain-schema] that are used
 for core blockchain functionality:
 
 - `transactions: MapIndex`  
