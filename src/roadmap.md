@@ -141,7 +141,7 @@ Besides, it also enables several important features. Here are two of them.
   structure automatically and there will be no need for customization of a
   light client for different Exonum-based systems.
 
-## Service Isolation and Events
+## Service Isolation
 
 An essential part of Exonum services is [Data
 schema](architecture/services.md#data-schema). It represents the data, which
@@ -168,32 +168,6 @@ execution on the middleware level (on the level of Exonum Core).
     Virtual machine or Docker containers are examples of approaches that
     lead to isolation of service execution (but not necessary isolate
     service persistent data)
-
-Service isolation leads to impossibility of service interaction using storage.
-The mechanism of **events** can fill this gap. Events work as follows:
-
-- Service A defines a set of events
-- Using functions from service A implementation, service B can subscribe on
-  events
-- In case the event is triggered, service A notifies all subscribers, calling
-  their call-back functions (which were specified during the subscription)
-
-This approach is often referred to as [pub/sub (publish-subscribe)
-pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern).
-
-!!! note "Example"
-    Using events mechanism, one can implement specific services which are
-    called **oracles**. An oracle implements a simple function on notifying
-    subscribers on some event. For example, one can imagine *election oracle*,
-    managed by the government, which will put into the blockchain trusted
-    information about the winner of elections. *Bets service* can use this
-    information to determine winning bids.
-
-!!! warning
-    In current Exonum version because of insufficient service isolation, one
-    also can implement events mechanism. However, such implementation will be
-    custom for every use case and may lead to serious problems due to the lack
-    of general approach on blockchain level.
 
 ## Transactions Improvements
 
