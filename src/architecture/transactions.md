@@ -26,6 +26,13 @@ actually has the right to perform the transaction) can be accomplished
 with the help of building a [public key infrastructure][wiki:pki] and/or
 various constraints based on this key.
 
+!!! tip
+    It is recommended for transaction signing to be decentralized in order
+    to minimize security risks. Roughly speaking, there should not be a single
+    server signing all transactions in the system; this could create a security
+    chokepoint. One of options to decentralize signing is to use
+    the [light client library](https://github.com/exonum/exonum-client).
+
 !!! note "Example"
     In a sample [cryptocurrency service][cryptocurrency],
     an owner of cryptocurrency may authorize transferring his coins by signing
@@ -62,7 +69,8 @@ separate implementation details from transaction invocation.
 ## Serialization
 
 Transactions in Exonum are subtypes of messages and share the serialization logic
-with [consensus messages](consensus.md#messages).
+with [consensus messages](consensus.md#messages) (see the [Serialization](serialization.md)
+article for more details).
 All transaction messages are serialized in a uniform
 fashion. There are 2 serialization formats:
 
@@ -76,81 +84,18 @@ fashion. There are 2 serialization formats:
     they implement serialization internally in order to sign transactions
     and calculate their hashes.
 
-Fields used in transaction serialization are listed below.
-
-| Field              | Binary format     | Binary offset | JSON       |
-|--------------------|:-----------------:|--------------:|:----------:|
-| `network_id`       | `u8`              | 0             | number     |
-| `protocol_version` | `u8`              | 1             | number     |
-| `service_id`       | `u16`             | 4..6          | number     |
-| `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `u32`             | 6..10         | -          |
-| `body`             | `&[u8]`           | 10..-64       | object     |
-| `signature`        | Ed25519 signature | -64..         | hex string |
-
-!!! tip
-    For the binary format, the table uses the type notation taken
-    from [Rust][rust]. Offsets also correspond to [the slicing syntax][rust-slice],
-    with the exception that Rust does not support negative offsets,
-    which denote an offset relative to the end of the byte buffer.
-
 !!! note
     Each unique transaction message serialization is hashed with
-    [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2)
-    (including all the fields `network_id`, `protocol_version`, `service_id`,
-    `message_id`, `payload_length`, `body` and `signature`). Hashes are used as
+    [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2).
+    A transaction hash is taken over the entire transaction serialization
+    (including its signature). Hashes are used as
     unique identifiers for transactions where such an identifier is needed
     (e.g., when determining whether a specific transaction has been committed
     previously).
 
-### Network ID
+### Transaction Body
 
-This field will be used to send inter-blockchain messages in the future
-releases. Not used currently.
-
-**Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number.
-
-### Protocol Version
-
-The major version of the Exonum serialization protocol. Currently, `0`.
-
-**Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number.
-
-### Service ID
-
-Sets the [service](services.md) that a transaction belongs to.
-The pair `(service_id, message_id)` is
-used to look up the implementation of [the transaction interface](#interface)
-(e.g., `verify` and `execute` methods).
-
-**Binary presentation:** `u16` (unsigned 2-byte integer).  
-**JSON presentation:** number.
-
-### Message ID
-
-`message_id` defines the type of message within the service.
-
-!!! note "Example"
-    [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `TxIssue` for coins issuance
-    and `TxTransfer` for coin transfer.
-
-**Binary presentation:** `u16` (unsigned 2-byte integer).  
-**JSON presentation:** number.
-
-### Payload length
-
-The length of the message body after the header. Does not include the
-signature length.
-
-**Binary presentation:** `u32` (unsigned 4-byte integer).  
-**JSON presentation:** (not serialized).
-
-### Body
-
-The body of the transaction, which includes data specific for a given
+Transaction body includes data specific for a given
 transaction type. Format of the body is specified by the
 service identified by `service_id`.
 Binary serialization of the body is performed using
@@ -158,7 +103,7 @@ Binary serialization of the body is performed using
 according to the transaction specification in the service.
 
 !!! note "Example"
-    The body of `TxTransfer` in the sample cryptocurrency service
+    The body of `TxTransfer` transaction type in the sample cryptocurrency service
     is structured as follows:
 
     | Field      | Binary format | Binary offset | JSON       |
@@ -178,22 +123,6 @@ according to the transaction specification in the service.
 
 **Binary presentation:** binary sequence with `payload_length` bytes.  
 **JSON presentation:** JSON.
-
-### Signature
-
-[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
-serialization of the message (excluding the signature bytes,
-i.e., the last 64 bytes of the serialization).
-
-!!! tip
-    It is recommended for transaction signing to be decentralized in order
-    to minimize security risks. Roughly speaking, there should not be a single
-    server signing all transactions in the system; this could create a security
-    chokepoint. One of options to decentralize signing is to use
-    the [light client library](https://github.com/exonum/exonum-client).
-
-**Binary presentation:** Ed25519 signature (64 bytes).  
-**JSON presentation:** hex string.
 
 ## Interface
 
@@ -435,9 +364,7 @@ on the verify step.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
-[core-tx]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
-[rust]: http://rust-lang.org/
-[rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
+[core-tx]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying

@@ -72,7 +72,7 @@ To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
   for the next block and broadcasts it across the network. The logic of selecting
-  the leader node is described [in a separate algorithm](../advanced/consensus/leader-election.md)
+  the leader node is described in a separate algorithm
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
   A prevote means that the validator has been able to parse the proposal
   and has all transactions specified in it
@@ -307,4 +307,4 @@ validators. This has a positive effect on system liveness.
 [wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
-[src-messages]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/protocol.rs
+[src-messages]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/protocol.rs

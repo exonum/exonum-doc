@@ -63,7 +63,7 @@ middleware layer.
 ### Transactions
 
 Transactions come from the entities external to the blockchain, e.g.,
-[thin clients](clients.md). Generally speaking, a transaction modifies the blockchain
+[light clients](clients.md). Generally speaking, a transaction modifies the blockchain
 state if the transaction is considered “correct”. All transactions are recorded
 in the blockchain as a part of the transaction log. As the name implies,
 transactions are [atomic][wiki:atomicity]; they are deterministically ordered
@@ -92,9 +92,8 @@ of the consensus algorithm; they are processed locally by the node that
 received the request.
 
 One of distinguishing features of the Exonum framework is that it provides
-a rich set of tools to bundle responses to reads with cryptographic proofs;
-see [Merkle index](../advanced/merkle-index.md) and [Merkle Patricia index](../advanced/merkle-patricia-index.md)
-for more details. Proofs allow thin clients
+a rich set of tools to bundle responses to reads with cryptographic proofs.
+Proofs allow light clients
 to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
@@ -102,7 +101,7 @@ is as secure as if the client queried a supermajority of blockchain validators.
     In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
     to data in the blockchain, where the commitment is stored in a block header
     in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
-    allows to make proofs compact enough to be processed by thin clients.
+    allows to make proofs compact enough to be processed by light clients.
 
 !!! note "Example"
     Retrieving information on a particular wallet (e.g., the current
@@ -136,7 +135,7 @@ using [LevelDB][leveldb]. Each service needs to define a set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
-maps and append-only lists (`MapIndex` and `ListIndex`, respectively).
+maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists (`ListIndex`).
 
 Exonum also provides helpers for *merklizing* data collections, i.e.,
 making it possible to efficiently compute proofs for read requests that involve
@@ -146,7 +145,7 @@ the items of the collection. Merklized versions of maps and lists are
 Naturally, the items of collections (and keys in the case of maps) need to be
 serializable. Exonum provides a simple and robust [binary serialization format](serialization.md),
 and the corresponding set of tools for (de)serialization and conversion of
-Exonum datatypes to JSON for communication with thin clients.
+Exonum datatypes to JSON for communication with light clients.
 
 ### Configuration
 
@@ -225,7 +224,7 @@ blockchain network
 !!! note
     As of Exonum 0.1, the only built-in event is block commit. More events
     will be added in the future, including possibility for services to define
-    and emit events and for services and thin clients to subscribe to events
+    and emit events and for services and light clients to subscribe to events
     emitted by the services.
 
 ## Service Development
@@ -454,5 +453,5 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [leveldb]: http://leveldb.org/
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
-[service.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/service.rs
-[core-schema.rs]: https://github.com/exonum/exonum-core/blob/master/exonum/src/blockchain/schema.rs
+[service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
+[core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs

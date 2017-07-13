@@ -58,9 +58,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 Exonum documentation contains in-depth discussions for numerous other aspects
 of the framework, such as [binary serialization](architecture/serialization.md),
-[storage](architecture/storage.md), [networking](advanced/network.md), and
-[Merkle](advanced/merkle-index.md) and [Merkle Patricia](advanced/merkle-patricia-index.md)
-indexes.
+[storage](architecture/storage.md) and [networking](advanced/network.md).
 
 ## Contributing
 
@@ -71,10 +69,9 @@ what features are coming soon.
 [rust]: http://rust-lang.org/
 [wiki:soa]: https://en.wikipedia.org/wiki/Service-oriented_architecture
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
-[core]: http://github.com/exonum/exonum-core/
+[core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
-[install]: https://github.com/exonum/exonum-core/blob/master/INSTALL.md
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/cryptocurrency
+[tutorial]: https://github.com/exonum/cryptocurrency-advanced
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum-configuration

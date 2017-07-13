@@ -15,10 +15,10 @@ created already "serialized" and Exonum works directly with the serialized data
 
 ### Communication Among Full Nodes
 
-Full nodes can both serialize messages for sending and deserialize messages
-when they are received. All the information that passes in the network between
-nodes turns into messages (the [`message!` macro][message_macro]). Data
-received as a message is validated against [serialization rules](#serialization-principles).
+Full nodes can both [serialize messages](#message-serialization) for sending and
+deserialize messages when they are received. All the information that passes in
+the network between nodes turns into messages (the [`message!` macro][message_macro]).
+Data received as a message is validated against [serialization rules](#serialization-principles).
 
 ### Communication with Light Clients
 
@@ -269,21 +269,117 @@ All slices are var-length datatypes.
 
 ## Message Serialization
 
-Serialized message consists of the following parts:
+A message is a [digitally signed](../glossary.md#digital-signature) piece of data
+transmitted through an Exonum network. There are 2 major kinds of messages:
 
-- [Message header](#message-header)
-- Structure (with its header and body) described on `message!` macro call
-- Ed25519 signature on the two previous parts
+- **Consensus messages** are used among full
+  nodes in the course of [the consensus algorithm](../glossary.md#consensus)
+- **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
+  changes and usually come from [external clients](../glossary.md#light-client)
 
-### Message Header
+The message serialization consists of 3 main parts: header (includes `network_id`,
+`protocol_version`, `service_id`, `message_id`, and `payload_length` fields),
+body, and signature.
 
-The message header includes:
+Fields used in message serialization are listed below.
 
-- network ID: 1 byte
-- protocol version: 1 byte
-- message ID: 2 bytes
-- service ID: 2 bytes
-- message size (excluding signature): 4 bytes
+| Field              | Binary format     | Binary offset | JSON       |
+|--------------------|:-----------------:|--------------:|:----------:|
+| `network_id`       | `u8`              | 0             | number     |
+| `protocol_version` | `u8`              | 1             | number     |
+| `service_id`       | `u16`             | 4..6          | number     |
+| `message_id`       | `u16`             | 2..4          | number     |
+| `payload_length`   | `u32`             | 6..10         | -          |
+| `body`             | `&[u8]`           | 10..-64       | object     |
+| `signature`        | Ed25519 signature | -64..         | hex string |
+
+!!! tip
+    For the binary format, the table uses the type notation taken
+    from [Rust][rust]. Offsets also correspond to [the slicing syntax][rust-slice],
+    with the exception that Rust does not support negative offsets,
+    which denote an offset relative to the end of the byte buffer.
+
+### Network ID
+
+This field will be used to send inter-blockchain messages in the future
+releases. Not used currently.
+
+**Binary presentation:** `u8` (unsigned 1-byte integer).  
+**JSON presentation:** number.
+
+### Protocol Version
+
+The major version of the Exonum serialization protocol. Currently, `0`.
+
+**Binary presentation:** `u8` (unsigned 1-byte integer).  
+**JSON presentation:** number.
+
+### Service ID
+
+Used when the message is a transaction.
+Sets the [service](services.md) that a transaction belongs to.
+The pair `(service_id, message_id)` is
+used to look up the implementation of [the transaction interface](transactions.md#interface)
+(e.g., `verify` and `execute` methods).
+
+**Binary presentation:** `u16` (unsigned 2-byte integer).  
+**JSON presentation:** number.
+
+### Message ID
+
+`message_id` defines the type of message within the service.
+
+!!! note "Example"
+    [The sample cryptocurrency service][cryptocurrency] includes 2 main
+    types of transactions: `TxCreateWallet` for creating a wallet with an initial
+    coins balance,
+    and `TxTransfer` for coin transfer.
+
+**Binary presentation:** `u16` (unsigned 2-byte integer).  
+**JSON presentation:** number.
+
+### Payload length
+
+The length of the message body after the header. Does not include the
+signature length.
+
+**Binary presentation:** `u32` (unsigned 4-byte integer).  
+**JSON presentation:** (not serialized).
+
+### Body
+
+Serialized [structure](#structures) (including its header and body) described on
+`message!` macro call.
+
+### Signature
+
+[Ed25519 digital signature](https://ed25519.cr.yp.to/) over the binary
+serialization of the message (excluding the signature bytes,
+i.e., the last 64 bytes of the serialization).
+
+**Binary presentation:** Ed25519 signature (64 bytes).  
+**JSON presentation:** hex string.
+
+### Example of `message!` Usage
+
+```Rust
+const MY_SERVICE_ID: u16 = 777;
+const MY_NEW_MESSAGE_ID: u16 = 1;
+
+message! {
+    struct MessageTwoIntegers {
+        const TYPE = MY_NEW_MESSAGE_ID;
+        const ID   = MY_SERVICE_ID;
+        const SIZE = 16;
+
+        field first: u64 [0 => 8]
+        field second: u64 [8 => 16]
+    }
+}
+```
+
+Here the message body is serialized as a `struct` with fields `first` and `second`
+having type `u64`.
 
 ## Types to Be Supported in Future
 
@@ -356,8 +452,8 @@ Serialized representation of `my_wallet`:
 `40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
 `48 => 54` | Andrew| `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
 
-[message_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/messages/spec.rs
-[encoding_struct_macro]: https://github.com/exonum/exonum-core/blob/master/exonum/src/encoding/spec.rs
+[message_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/spec.rs
+[encoding_struct_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/encoding/spec.rs
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [asn_der]: https://en.wikipedia.org/wiki/X.690#DER_encoding
 [wiki_protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
@@ -369,3 +465,6 @@ Serialized representation of `my_wallet`:
 [utf8]: https://en.wikipedia.org/wiki/UTF-8
 [rust_structs]: https://doc.rust-lang.org/book/first-edition/structs.html
 [rust_enums]: https://doc.rust-lang.org/book/first-edition/enums.html
+[cryptocurrency]: https://github.com/exonum/cryptocurrency
+[rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
+[rust]: http://rust-lang.org/
