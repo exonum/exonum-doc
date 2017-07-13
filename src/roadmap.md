@@ -66,9 +66,15 @@ which is focused on memory safety. It is a good fit for security critical
 applications. However, the community of Rust developers is small. This fact can
 become a problem on the way of adoption of Exonum. It would be logical to
 extend its functionality to other programming languages by implementing
-[bindings](https://en.wikipedia.org/wiki/Language_binding). Java was chosen for
-the first binding since it has a large developer community. We already started
-the implementation of Java binding.
+[bindings](https://en.wikipedia.org/wiki/Language_binding).
+
+Java was chosen for
+the first Exonum binding since it has a large developer community
+and rich set of tools,
+has more or less adequate execution safety (e.g., via JVM sandboxing)
+and type safety (static typing, availability
+of static analysis tools like [JML](https://en.wikipedia.org/wiki/Java_Modeling_Language)).
+We already started the implementation of Java binding.
 
 !!! note
     Java binding consists of two substantially different parts:
