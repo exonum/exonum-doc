@@ -167,7 +167,11 @@ JSON object with the following fields:
   List of peers' addresses this node is connected to
 - **reconnects**: Array<ReconnectInfo\>  
   List of peers to be reconnected by the node with indication of the
-  corresponding reconnection timeouts
+  corresponding reconnection timeouts. This list is formed on the node startup
+  based on the [list of known peers](../architecture/configuration.md#local-parameters)
+  from the local configuration. Also, new nodes can be appended when they are
+  added to the local configuration. Nodes are removed from this list when the
+  connection is established.
 
 #### Response example
 
