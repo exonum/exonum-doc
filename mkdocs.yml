@@ -73,6 +73,8 @@ pages:
     - 'Configuration updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
+    # Merkle index overview
+    - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':
       # Consensus specification
       - 'Consensus specification': 'advanced/consensus/specification.md'
