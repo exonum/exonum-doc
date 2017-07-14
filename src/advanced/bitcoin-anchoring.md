@@ -183,6 +183,7 @@ The recovery chunk is optional and may appear in the very first bitcoin
 anchoring transaction only if the previous anchoring chain was failed
 (as described in the [Recovering the previous
 chain](#recovering-broken-anchoring)).
+>>>>>>> e009495... reformatted for linter
 
 ### Creating anchoring transaction
 
