@@ -15,8 +15,8 @@ The client functions are divided into the following submodules:
   and validating digital signatures
 - **Proofs**. Functions for checking cryptographic proofs that
   are returned by the blockchain, such as the functions for
-  checking the proofs for [Merkle](../advanced/merkle-index.md)
-  and [Merkle Patricia](../advanced/merkle-patricia-index.md) indexes
+  checking the proofs for [Merkle][mt-index]
+  and [Merkle Patricia][mpt-index] indexes
 - **Blockchain integrity checks**. Function for checking the
   validity of a block (its compliance with [consensus algorithm](consensus.md))
 
@@ -62,10 +62,18 @@ implemented in Exonum light client.
 1. The client forms an HTTP GET request and sends it to a full node in the Exonum
   blockchain network
 2. The node forms a response to the request and the corresponding
-  cryptographic proof and sends both back to the client
+  cryptographic proof and sends both back to the client. The cryptographic proof
+  includes a block header together with [`Precommit` messages](consensus.md#precommit)
+  that certify its validity, and one or more [Merkle paths](../glossary.md#merkle-proof)
+  that links the response to the block header.
 3. The client, on receiving the response from the blockchain, *verifies the structure*
-  and *validates cryptographic proofs* for the response
-4. The result of checks is shown in the user interface
+  and *validates cryptographic proofs* for the response.
+4. The verification procedure includes *checking whether a returned response
+  is stale*. This is accomplished by calculating the median of timestamps recorded
+  in `Precommit`s and comparing it against the local time of the client.
+  If the median time in `Precommit`s is too far in the past, the response
+  is considered stale, and its verification fails.
+5. The result of checks is shown in the user interface
 
 !!! note
     In the case user authentication is needed (for example, for data
@@ -105,8 +113,8 @@ programs able to replicate and verify a small portion of information stored in t
 blockchain. Usually clients verify information relevant to a specific
 user (for example, the history of his transactions). This verification is
 possible due to the use of specific data containers in a blockchain:
-[Merkle](../advanced/merkle-index.md) and
-[Merkle Patricia](../advanced/merkle-patricia-index.md) indexes.
+[Merkle][mt-index] and
+[Merkle Patricia][mpt-index] indexes.
 
 Advantages of this approach are:
 
@@ -159,3 +167,5 @@ largely remove the necessity of trust to third parties**.
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
+[mt-index]: storage.md#prooflistindex
+[mpt-index]: storage.md#proofmapindex

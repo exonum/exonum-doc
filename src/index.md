@@ -16,16 +16,16 @@ and client security.
 
 ### Installation
 
-[Exonum Core][core] is a open-source Rust library providing core functionality
+[Exonum][core] is a open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
 You may refer to [the installation guide](get-started/install.md) in order to install
 the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
-[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum Core
+[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum
 can be used to build a simple cryptocurrency app step by step.
-Besides Exonum Core, the tutorial also makes use of [the light client][client] –
+Besides Exonum core, the tutorial also makes use of [the light client][client] –
 a JavaScript library intended for client-side verification of blockchain information
 and for performing cryptographic operations (such as digital signing).
 
@@ -58,9 +58,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 Exonum documentation contains in-depth discussions for numerous other aspects
 of the framework, such as [binary serialization](architecture/serialization.md),
-[storage](architecture/storage.md), [networking](advanced/network.md), and
-[Merkle](advanced/merkle-index.md) and [Merkle Patricia](advanced/merkle-patricia-index.md)
-indexes.
+[storage](architecture/storage.md) and [networking](advanced/network.md).
 
 ## Contributing
 
@@ -71,10 +69,9 @@ what features are coming soon.
 [rust]: http://rust-lang.org/
 [wiki:soa]: https://en.wikipedia.org/wiki/Service-oriented_architecture
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
-[core]: http://github.com/exonum/exonum-core/
+[core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
-[install]: https://github.com/exonum/exonum-core/blob/master/INSTALL.md
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/cryptocurrency
+[tutorial]: https://github.com/exonum/cryptocurrency-advanced
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum-configuration

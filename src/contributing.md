@@ -1,6 +1,6 @@
 # Contributing to Exonum
 
-The [Exonum Core project][exonum-core] and [other public Exonum repositories][exonum-org]
+The [Exonum core project][exonum] and [other public Exonum repositories][exonum-org]
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
@@ -247,10 +247,10 @@ of consensus critical code.
 
 ## Release Policy
 
-The lead maintainer of the Exonum Core repository is the release manager
-for each Exonum Core release. Likewise, releases of other projects are managed
+The lead maintainer of the Exonum core repository is the release manager
+for each Exonum core release. Likewise, releases of other projects are managed
 by the respective lead maintainers.
-The Core releases are synchronized with releases of other Exonum projects
+The core releases are synchronized with releases of other Exonum projects
 through informal communication among repository maintainers.
 
 ## Copyright
@@ -262,7 +262,7 @@ Any work contributed where you are not the original author
 must contain its license header with the original author(s) and source.
 
 [btc-contrib]: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
-[exonum-core]: http://github.com/exonum/exonum-core/
+[exonum]: http://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [gh:pr]: https://help.github.com/articles/about-pull-requests/
 [gh:task-lists]: https://help.github.com/articles/basic-writing-and-formatting-syntax/#task-lists

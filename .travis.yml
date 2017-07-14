@@ -3,6 +3,9 @@ sudo: false
 language: python # for mkdocs
 python:
   - 2.7
+cache:
+  directories:
+    - $HOME/.cache/pip
 branches:
   only:
     - master

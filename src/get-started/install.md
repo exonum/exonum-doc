@@ -1,6 +1,6 @@
 # Installation Guide
 
-[Exonum Core][exonum-core] and most [other Exonum repositories][exonum-org] use
+[Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
@@ -16,7 +16,7 @@ to these projects, testing them, and developing using Exonum.
 
 ## Dependencies
 
-Exonum Core depends on the following third-party system libraries:
+Exonum depends on the following third-party system libraries:
 
 - [LevelDB][leveldb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
@@ -71,7 +71,7 @@ of which the most important one is [Cargo][cargo], the Rust package manager.
 
 A separate nightly Rust toolchain is required if you want to run
 the [clippy][clippy] linter locally. Clippy is used
-in CI builds of Exonum Core and other repositories to detect common Rust anti-patterns.
+in CI builds of Exonum and other repositories to detect common Rust anti-patterns.
 In general, clippy supports the latest nightly version of Rust. It can be installed
 with
 
@@ -102,7 +102,8 @@ cargo install rustfmt --version <rustfmt-version> --force
 ```
 
 where `<rustfmt-version>` is the supported version of the formatter.
-You may find the supported version in [the Travis configuration of Exonum Core][core-travis].
+You may find the supported version in
+[the Travis configuration of Exonum core repository][core-travis].
 
 After installing the formatter, its checks can be run with
 
@@ -112,14 +113,14 @@ cargo fmt --write-mode=diff
 
 Consult the `rustfmt` readme for more details.
 
-## Compiling Exonum Core
+## Compiling Exonum
 
 You can verify that you installed dependencies and the Rust toolchain correctly
-by cloning the `exonum-core` repository and running its built-in unit test suite:
+by cloning the `exonum` repository and running its built-in unit test suite:
 
 ```shell
-git clone https://github.com/exonum/exonum-core.git
-cd exonum-core
+git clone https://github.com/exonum/exonum.git
+cd exonum
 cargo test --manifest-path exonum/Cargo.toml
 ```
 
@@ -149,7 +150,7 @@ is tested on Node 4+.
 [The cryptocurrency tutorial](create-service.md) provides a step-by-step
 guide on how to develop applications on top of the Exonum framework.
 
-[exonum-core]: https://github.com/exonum/exonum-core/
+[exonum]: https://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
@@ -158,7 +159,7 @@ guide on how to develop applications on top of the Exonum framework.
 [homebrew]: https://brew.sh/
 [clippy]: https://github.com/Manishearth/rust-clippy
 [rustfmt]: https://github.com/rust-lang-nursery/rustfmt
-[core-travis]: https://github.com/exonum/exonum-core/blob/master/.travis.yml
+[core-travis]: https://github.com/exonum/exonum/blob/master/.travis.yml
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/

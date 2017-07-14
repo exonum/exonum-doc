@@ -406,8 +406,8 @@ JSON object with the following fields:
 - **tx_hash**: Hash  
   Hash of the corresponding `TxConfigVote` transaction.
 
-[stored_configuration]: http://exonum.com/doc/crates/exonum/blockchain/config/struct.StoredConfiguration.html
-[config_propose]: http://exonum.com/doc/crates/configuration_service/struct.StorageValueConfigProposeData.html
+[stored_configuration]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/config.rs
+[config_propose]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
 [http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
