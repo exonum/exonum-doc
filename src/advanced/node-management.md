@@ -88,7 +88,7 @@ address formatted as 4 octets separated by points.
 `Time` is a JSON object with the following fields:
 
 - **seconds**: integer  
-  Number of seconds in UNIX format
+  The UNIX timestamp
 - **nanos**: integer  
   Number of nanoseconds
 
@@ -105,7 +105,7 @@ address formatted as 4 octets separated by points.
 - **body.round**: integer  
   The round when the block proposal was created
 - **body.time**: Time  
-  Local time of the validator that created the block proposal
+  UTC time of the validator that created the block proposal
 - **body.validator**: integer  
   ID of the validator that created this `Precommit` message
 - **message_id**: integer  
@@ -198,7 +198,7 @@ Response is a JSON object with one necessary field:
 #### Unknown Transaction Response Example
 
 Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
-returns HTTP status `404`
+returns HTTP status `404`.
 
 ```JSON
 {
@@ -230,8 +230,16 @@ value equal to `MemPool`:
 
 #### Known Committed Transaction Response Example
 
-Response JSON has same fields as response to committed transaction request plus
-`type` field with value equal to `Committed`:
+Response is  a JSON object with the following fields:
+
+- **content**: SerializedTransaction  
+  Transaction with the specified hash
+- **location**: TransactionLocation  
+  Transaction position in the blockchain
+- **proof_to_block_merkle_root**: MerkleRoot  
+  Merkle root proving transaction existence
+- **type**: string  
+  Is `Committed` for committed transaction
 
 ```JSON
 {
@@ -301,7 +309,7 @@ be performed.
 
 #### Parameters
 
-- **ip** : PeerAddress
+- **ip**: PeerAddress
 
 #### Example
 
@@ -433,7 +441,7 @@ Returns the content for block with specific height.
 
 #### Parameters
 
-**height**: integer  
+- **height**: integer  
   The height of desired block
 
 #### Response
@@ -531,12 +539,13 @@ Returns the headers for the last `count` blocks up to `height`
 #### Parameters
 
 - **count**: integer  
-  The number of blocks to return. Should be not greater than `1000`.
+  The number of blocks to return. Should be not greater than
+  [`MAX_BLOCKS_PER_REQUEST`](https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs).
 - **skip_empty_blocks**: bool  
   If `true`, then only non-empty blocks are returned.
 - **latest**: integer  
   Block height, up to which blocks are returned. The blocks are returned
-  in backward order, starting from `latest` and at least up to `latest - count`.
+  in reverse order, starting from `latest` and at least up to `latest - count + 1`.
 
 #### Response
 
