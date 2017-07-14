@@ -6,7 +6,7 @@ information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
 
 Endpoints are divided into two types: private and public endpoints. Each
-endpoint type is hosted on the separate address, which is specified in the
+endpoint type is hosted at a separate address, which is specified in the
 [`node.api` section](../architecture/configuration.md#nodeapi) of the local
 configuration.
 
@@ -27,7 +27,7 @@ an optional type.
 ### Hash, PublicKey, Signature
 
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
-appropriate length. The `Hash` and `PublicKey` consist of 32 bytes.
+appropriate length. `Hash` and `PublicKey` consist of 32 bytes.
 `Signature` consists of 64 bytes.
 
 ### PeerAddress
@@ -40,7 +40,7 @@ address formatted as 4 octets separated by points.
 `OutgiongConnectionState` is a JSON object with the following fields:
 
 - **type**: string  
-  Connection type, could be:
+  Connection type, can be:
 
     - `Active` for established connections
     - `Reconnect` for yet unestablished connections
@@ -55,7 +55,8 @@ address formatted as 4 octets separated by points.
 
 - **public_key**: ?PublicKey  
   The public key of the peer or `null` if the public key is unknown
-- **state**: OutgiongConnectionState
+- **state**: OutgiongConnectionState  
+  Current connection state
 
 ### ServiceInfo
 
@@ -96,7 +97,7 @@ address formatted as 4 octets separated by points.
 
 `Precommit` is a message, serialized according to [message serialization rules](../architecture/serialization.md#message-serialization).
 
-- **body**: JSON
+- **body**: Object  
   The content of the `Precommit` message
 - **body.block_hash**: Hash  
   The hash of the current block (the `Precommit` message was created for)
@@ -140,13 +141,13 @@ equal to `/api/system/v1`.
 
 ### Public endpoints
 
-### Mempool size
+### Number of unconfirmed transactions
 
 ```none
 GET {system_base_path}/mempool
 ```
 
-Returns the number of transactions in node's mempool.
+Returns the number of transactions in the node pool of unconfirmed transactions.
 
 #### Parameters
 
@@ -157,7 +158,7 @@ None.
 JSON object with the following fields:
 
 - **size**: integer  
-  Amount of unconfirmed transactions.
+  Amount of unconfirmed transactions
 
 #### Response example
 
@@ -173,29 +174,29 @@ JSON object with the following fields:
 GET {system_base_path}/transactions/{transaction_hash}
 ```
 
-Looks up transaction (possibly uncommitted) by the hash.
+Searches for a transaction, either committed or uncommitted, by the hash.
 
 #### Parameters
 
-- **transaction_hash**: Hash
-  Hash of transaction to look up.
+- **transaction_hash**: Hash  
+  The hash of the transaction to be searched
 
 #### Response
 
-Returns transaction from the pool of unconfirmed transactions if it is not
-committed yet; otherwise, returns transaction from the blockchain.
+Returns a transaction from the pool of unconfirmed transactions if it is not
+committed yet, otherwise, returns a transaction from the blockchain.
 
-Response is a JSON object with one necessary field:
+Response is a JSON object with one required field:
 
 - **type**: string  
-  Type of transaction, could be:
+  Transaction type, can be:
 
     - `Committed`: committed transaction (in blockchain)
     - `MemPool`: uncommitted transaction (in the pool of unconfirmed
     transactions)
     - `Unknown`: unknown transaction
 
-#### Unknown Transaction Response Example
+##### Unknown Transaction Response Example
 
 Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
 returns HTTP status `404`.
@@ -206,7 +207,7 @@ returns HTTP status `404`.
 }
 ```
 
-#### Known Uncommitted Transaction Response Example
+##### Known Uncommitted Transaction Response Example
 
 Response JSON has same fields as `SerializedTransaction` plus `type` field with
 value equal to `MemPool`:
@@ -228,9 +229,9 @@ value equal to `MemPool`:
 }
 ```
 
-#### Known Committed Transaction Response Example
+##### Known Committed Transaction Response Example
 
-Response is  a JSON object with the following fields:
+Response is a JSON object with the following fields:
 
 - **content**: SerializedTransaction  
   Transaction with the specified hash
@@ -304,8 +305,8 @@ POST {system_base_path}/peers
 
 Adds new Exonum node to the list of peers for the current node.
 The latter will attempt to connect to the new node asynchronously. If the public
-key of the new node is not in the whitelist, `Connect` message exchange cannot
-be performed.
+key of the new node is not in the whitelist, the connection between said nodes
+will not be established.
 
 #### Parameters
 
@@ -540,16 +541,16 @@ Returns the headers for the last `count` blocks up to `height`
 
 - **count**: integer  
   The number of blocks to return. Should be not greater than
-  [`MAX_BLOCKS_PER_REQUEST`](https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs).
+  [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
 - **skip_empty_blocks**: bool  
-  If `true`, then only non-empty blocks are returned.
+  If `true`, then only non-empty blocks are returned
 - **latest**: integer  
   Block height, up to which blocks are returned. The blocks are returned
-  in reverse order, starting from `latest` and at least up to `latest - count + 1`.
+  in reverse order, starting from `latest` and at least up to `latest - count + 1`
 
 #### Response
 
-The `JSON` array of the `BlockHeader` objects. Blocks in the array are sorted in
+The JSON array of the `BlockHeader` objects. Blocks in the array are sorted in
 descending order of their heights.
 
 #### Response example
@@ -603,3 +604,6 @@ descending order of their heights.
   }
 ]
 ```
+
+[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
