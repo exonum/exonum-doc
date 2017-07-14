@@ -1,4 +1,5 @@
 all
+exclude_rule 'no-duplicate-header'
 rule 'line-length', :tables => false
 rule 'ol-prefix', :style => 'ordered'
 rule 'no-trailing-spaces', :br_spaces => 2

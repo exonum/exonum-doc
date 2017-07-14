@@ -159,12 +159,12 @@ which is specific to each node instance.
 
 Global configuration is common for all nodes in the blockchain network.
 An example of a global configuration parameter is the anchoring address
-in [the anchoring service](../advanced/services/anchoring.md). The anchoring address
+in [the anchoring service](../advanced/bitcoin-anchoring.md). The anchoring address
 is common for all nodes in the blockchain network, its changes should be auditable
 and authorized by specific nodes, etc.
 
 Global configuration is managed by the system maintainers via
-[the configuration update service](../advanced/services/configuration.md).
+[the configuration update service](../advanced/configuration-updater.md).
 From the point of view of a service, global configuration is *volatile*;
 it can be changed without touching service endpoints.
 A service may view the current global configuration via [dedicated methods][core-schema.rs]
@@ -174,7 +174,7 @@ of the core API.
 
 Local configuration is specific to each node instance.
 An example of a local configuration parameter is a private anchoring key
-used in [the anchoring service](../advanced/services/anchoring.md);
+used in [the anchoring service](../advanced/bitcoin-anchoring.md);
 naturally, nodes have different private keys and they cannot be put on the blockchain
 for security reasons.
 
@@ -265,6 +265,25 @@ Here’s a list of things to figure out when developing an Exonum service:
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
 
+### Limitations
+
+As of Exonum 0.1, there are some temporary limitations on what you can do
+with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
+on when and how these limitations are going to be lifted.
+
+#### Interaction Among Services
+
+In Exonum 0.1, there is no unified API for services to
+access other services’ endpoints. As an example, a service cannot call a transaction
+defined in another service, and cannot read data from another service
+via its read endpoint.
+
+#### Authentication Middleware
+
+Unlike common web frameworks, Exonum 0.1 does not provide authentication middleware
+for service endpoints. Implementing authentication and authorization is thus
+the responsibility of a service developer.
+
 ## Interface with Exonum Framework
 
 Internally, services communicate with the Exonum framework via an interface
@@ -298,7 +317,7 @@ only it is a string instead of an integer.
   are mounted on `/api/services/{service_name}`
 
 !!! note "Example"
-    [The Bitcoin anchoring service](../advanced/services/anchoring.md)
+    [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
     defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the service
     are available on `/api/services/btc_anchoring/`, and its configuration is
     stored in the `services.btc_anchoring` section of the overall configuration.
@@ -317,7 +336,7 @@ current blockchain state `snapshot`.
 The core uses this list to aggregate
 hashes of tables defined by all services into a single Merklized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
-and is recorded as such in blocks and [`Precommit` messages](../advanced/consensus/consensus.md).
+and is recorded as such in blocks and [`Precommit` messages](consensus.md).
 
 The default trait implementation returns an empty list. This corresponds to
 the case when a service doesn’t have any Merklized tables.

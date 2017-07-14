@@ -172,7 +172,6 @@ and enlarges to 80 bytes when recovering is needed.
   height of the genesis block is `0`) which is used for efficient lookups.
 - 32-byte block hash
 
-=======
 #### Recovery data chunk
 
 The data of the recovery chunk is a 32-byte bitcoin

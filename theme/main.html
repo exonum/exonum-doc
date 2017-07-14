@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block content %}
+  <a class="edit-on-github" href="{{ config.extra.github_edit_url }}{{ page.input_path | replace('\\', '/') }}" title="Edit page source on GitHub"><span class="md-icon">edit</span>Edit on GitHub</a>
+  {{- super() }}
+{% endblock %}
+
 {%- block site_meta %}
   {#- Remove description meta tag if it's present; it's reinserted later in the "extrahead" block #}
   {%- set super_meta = super() %}

@@ -44,11 +44,11 @@ pages:
     - 'What is Exonum': 'get-started/what-is-exonum.md'
     # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
     # links to necessary documentation parts
-    - 'Design overview': 'home/design-overview.md'
-    - 'Install': 'home/install.md'
-    - 'Glossary of terms': 'home/glossary.md'
-    - 'Cryptocurrency tutorial':
-      - 'Introduction': 'home/cryptocurrency/intro.md'
+    - 'Design overview': 'get-started/design-overview.md'
+    # Installation guide
+    - 'Install': 'get-started/install.md'
+    # Writing one's first Exonum service
+    - 'Create service': 'get-started/create-service.md'
   - 'Architecture':
     # Includes guidelines for services
     - 'Services': 'architecture/services.md'

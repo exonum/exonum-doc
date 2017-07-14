@@ -84,12 +84,6 @@ fashion. There are 2 serialization formats:
     they implement serialization internally in order to sign transactions
     and calculate their hashes.
 
-Fields used in serializing transactions are the same as for [serializing
-messages in general](serialization.md#message-serialization). The specificity of
-transaction serialization is the structure of the [`body` field](#transaction-body).
-
-=======
->>>>>>> 0ce7409... apply review notes
 !!! note
     Each unique transaction message serialization is hashed with
     [SHA-256 hash function](https://en.wikipedia.org/wiki/SHA-2).
