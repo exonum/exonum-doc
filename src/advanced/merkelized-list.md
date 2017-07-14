@@ -1,6 +1,6 @@
-# Merkle Index
+# Merkelized List
 
-A [Merkle tree][wiki-merkle-index] (hash tree or Tiger tree hash)
+A [Merkle tree][wiki-merkelized-list] (hash tree or Tiger tree hash)
 is a [tree][wiki-tree] in which every non-leaf node is labelled with the hash
 of the labels or values (in case of leaves) of its child nodes. Hash trees are
 a generalization of hash lists and chains. Merkle trees include both benefits of
@@ -11,9 +11,9 @@ a generalization of hash lists and chains. Merkle trees include both benefits of
 2. **hashes**: verification of the (blockchain) copies.
 
 Merkle trees are *trees* by design inside the Exonum core but they also are
-*tables* with verifiable content from the light client point of view and
-*append-only ists* which supports only simple types of queries for Exonum
-application developers.
+*lists* with proofs of existence for elements from the light client point of
+view and *append-only lists* which supports only simple types of queries for
+Exonum application developers.
 
 ## Motivation and Usage
 
@@ -28,8 +28,8 @@ Merkle trees are used. Basically, we want to limit the amount of data being
 sent over a network as much as possible. So, instead of sending an entire file
 over the network, we just send a hash of the file to see if it matches.
 
-Currently, their main uses of Merkle indexes are in peer-to-peer networks such
-as [Tor][tor] and [Bitcoin][bitcoin]. The usage of Merkle index for blockchains
+Currently, the main uses of Merkle trees are in peer-to-peer networks such
+as [Tor][tor] and [Bitcoin][bitcoin]. The usage of Merkle tree for blockchains
 (including Bitcoin and Exonum) is twofold
 
 1. minimization of the data transfer during the blockchain state agreement
@@ -49,8 +49,8 @@ The internal representation of tree is organized by utilizing 2 integer
 parameters as `key` for each element: `height` and `index`.
 
 !!! note
-  To distinguish values from different tables in Exomum, additional prefix is
-  used for every key. Such prefix consist of service name and table name. See
+  To distinguish values from different lists in Exomum, additional prefix is
+  used for every key. Such prefix consist of service name and list name. See
   [storage section](../architecture/storage.md) for more details.
 
 1. Each Merkle tree element is addressed by a 8-byte `key = height || index`,
@@ -61,15 +61,15 @@ parameters as `key` for each element: `height` and `index`.
   - `height` and `index` are serialized within `key` as
     [big-endian][wiki:big-endian]
 2. The elements of the underlying list are stored in `(height = 0, index)`
-  cells, where `index` is in interval `[0, table.len())`, where
-  `table.len()` is the number of leaves in the tree (or, equivalently, the
+  cells, where `index` is in interval `[0, list.len())`, where
+  `list.len()` is the number of leaves in the tree (or, equivalently, the
   number of elements in the underlying list)
-3. Hash of an tree leaf is stored in `(height = 1, index)`.
+3. Hash of a tree leaf is stored in `(height = 1, index)`.
   It corresponds to the tree leaf, stored in `(height = 0, index)` cell.
 4. Some of the rightmost intermediate nodes may have a single child, it's not
   required that the obtained tree is full binary. Appending an element to the
-  list corresponds to writing it to the cell `(0, table.len())` and updating
-  `O(log table.len())` nodes of the tree with `height > 0`.
+  list corresponds to writing it to the cell `(0, list.len())` and updating
+  `O(log list.len())` nodes of the tree with `height > 0`.
 5. A node at `(height > 1, index)` stores hashes of 1 or 2 child nodes.
   - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
     nodes are present, the node `(height, index)` has 2 children hashes.
@@ -78,16 +78,16 @@ parameters as `key` for each element: `height` and `index`.
 6. `max_height` is the height where only a single hash is stored at
   `index = 0`.
   - `max_height = pow + 1`, where `pow` is the smallest integer such that
-    `2^pow >= table.len()`
+    `2^pow >= list.len()`
   - `(max_height, 0)` is the root hash of the Merkle tree.
 
 An example of `key -> value` mappings in database.
 
 Key | Height | Index | Value
 ------------ | ------------- | ------------- | -------------
-**00** **00** **00** **FF** |  **0** |  **255**   | serialized value [..]
-**40** **00** **00** **05** |  **1** | **5**   | hash [..]
-**0C** **00** **00** **0A** |  **3** | **10**   | hash [..]
+**00** **00** **00** **00** **00** **00** **00** **FF** |  **0** |  **255**   | serialized value [..]
+**04** **00** **00** **00** **00** **00** **00** **05** |  **1** | **5**   | hash [..]
+**0C** **00** **00** **00** **00** **00** **00** **0A** |  **3** | **10**   | hash [..]
 
 ### Logical representation
 
@@ -110,21 +110,27 @@ Hash of empty tree is defined as `32` zero bytes.
 
 Hash of a value, contained in `(height = 0, index)`, is defined as:
 
-```T(1, index) = hash(T(0, index)).```
+```none
+T(1, index) = hash(T(0, index)).
+```
 
 #### Rule 3. `height > 1`, two children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist then:
 
-```T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).```
+```none
+T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).
+```
 
 #### Rule 4. `height > 1` and the only child
 
 If `height > 1` and node `T(height - 1, index * 2)` exists and
 node for `(height - 1, index * 2 + 1)` is absent in the table, then:
 
-```T(height > 1, index) = hash(T(height - 1, index * 2)).```
+```none
+T(height > 1, index) = hash(T(height - 1, index * 2)).
+```
 
 ## Merkle Tree range proofs structure: `Proofnode`
 
@@ -155,7 +161,7 @@ Variant | Child `Proofnode`(s) indices | Hashing rule
 { "val": `ValueJson` } | `val_i = i` | [2](#hashing-rules)
 
 1. `Hash` is a hexadecimal encoded string, representing a hash.
-2. An option without the right hash `\{"left": Proofnode\}` is present due to how
+2. An option without the right hash `{"left": Proofnode}` is present due to how
   trees, which are not full binary, are handled in this implementation.
 3. `i` is the index of a `Proofnode` itself. `left_i`, `right_i` and
   `val_i` are the indices of the nested (child) `Proofnode`(s).

@@ -74,7 +74,7 @@ pages:
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
     # Merkle index overview
-    - 'Merkle index': 'advanced/merkle-index.md'
+    - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':
       # Consensus specification
       - 'Consensus specification': 'advanced/consensus/specification.md'
