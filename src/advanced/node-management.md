@@ -342,9 +342,10 @@ JSON object with the following fields:
 
 - **incoming_connections**: Array<PeerAddress\>  
   List of peers' addresses connected to this node
-- **outgoing_connections**: Object  
-  Its fields are peers' addresses this node is connected to, corresponding values
-  have type `OutgoingConnectionInfo`
+- **outgoing_connections**: Map  
+  Its keys are peers' addresses this node is connected to, corresponding values
+  of type `OutgoingConnectionInfo` contain info about peers' public keys and
+  current connection status
 
 #### Response example
 
