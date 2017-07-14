@@ -53,14 +53,14 @@ is not validated, since it is assumed to be validated earlier.
 
 - **Schema-based verification**  
   It should be possible to set the data schema and check the message for
-  compliance with the schema (this allows to [check](#validation-rules) the
-  received message before reading its content). The schema should not allow the
-  presence of optional fields. In the Exonum serialization format the schema is
-  stored separately from the serializable data.
+  compliance with the schema (this allows to [check](#segment-validation-rules)
+  the received message before reading its content). The schema should not allow
+  the presence of optional fields. In the Exonum serialization format the schema
+  is stored separately from the serializable data.
 
 - **All-or-nothing approach to correctness**  
   Reading the fields does not happen until the validation is complete.
-  Validation on message reading can not be lazy: first [check](#validation-rules)
+  Validation on message reading can not be lazy: first [check](#segment-validation-rules)
   the entire message to the end, then read completely without checking.
 
 - **Tolerance to malicious messages**  
@@ -231,7 +231,7 @@ plus take 8 bytes for the serialized segment pointer, as described [above](#segm
 Thus, a segment pointer in the header (the position of which is known in compile
 time) points to the segment in the body,
 which contains the actual serialization of the field. Segments are placed
-in the correspondence with [the validation rules](#validation-rules).
+in the correspondence with [the validation rules](#segment-validation-rules).
 
 A structure type is fixed-length if and only if all its fields are fixed-length
 (i.e., the body of the binary representation is always empty).
