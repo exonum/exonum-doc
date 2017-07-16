@@ -1,5 +1,16 @@
 # Exonum Documentation
 
+[![Build status][travis-image]][travis-url]
+[![Generator][generator-image]][generator-url]
+[![Gitter][gitter-image]][gitter-url]
+
+[travis-image]: https://img.shields.io/travis/exonum/exonum-doc.svg?style=flat-square
+[travis-url]: https://travis-ci.org/exonum/exonum-doc
+[generator-image]: https://img.shields.io/badge/generator-mkdocs-blue.svg?style=flat-square
+[generator-url]: http://www.mkdocs.org/
+[gitter-image]: https://img.shields.io/gitter/room/exonum/exonum-doc.svg?style=flat-square
+[gitter-url]: https://gitter.im/exonum/exonum-doc
+
 This is the documentation repo for the Exonum platform. It contains source files
 used to build the documentation displayed on the [Exonum
 website](http://exonum.com/doc/).
