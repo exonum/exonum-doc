@@ -35,10 +35,7 @@ router = "0.5.1"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-
-[dependencies.exonum]
-git = "ssh://git@github.com/exonum/exonum.git"
-rev = "cf87780b3de1ba161c490e0700870a0f2c308136"
+exonum = "0.1.0"
 ```
 
 We need to import crates with necessary types. Edit your `src/main.rs`:
@@ -55,7 +52,7 @@ extern crate iron;
 use exonum::blockchain::{self, Blockchain, Service, GenesisConfig,
                          ValidatorKeys, Transaction, ApiContext};
 use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
-                   TxSender, NodeChannel};
+                   ApiSender, NodeChannel};
 use exonum::messages::{RawTransaction, FromRaw, Message};
 use exonum::storage::{Fork, MemoryDB, MapIndex};
 use exonum::crypto::{PublicKey, Hash};
@@ -165,18 +162,13 @@ let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
 ```
 
 Let’s configure REST API to open the node for external web requests.
-We should set an address of public API (there is a private API,
-but it is used for administration purposes and we won’t call it now).
-We also activate the blockchain explorer, a tool to get and explore
-blocks and transactions on the blockchain.
 Our node will expose API on port 8000 of every network interface.
 
 ```rust
 let api_address = "0.0.0.0:8000".parse().unwrap();
 let api_cfg = NodeApiConfig {
-    enable_blockchain_explorer: true,
     public_api_address: Some(api_address),
-    private_api_address: None,
+    ..Default::default()
 };
 ```
 
@@ -437,7 +429,7 @@ contains a channel, i.e., a connection to the blockchain node instance.
 ```rust
 #[derive(Clone)]
 struct CryptocurrencyApi {
-    channel: TxSender<NodeChannel>,
+    channel: ApiSender<NodeChannel>,
 }
 ```
 
