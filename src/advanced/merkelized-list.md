@@ -35,7 +35,7 @@ as [Tor][tor] and [Bitcoin][bitcoin]. The usage of Merkle tree for blockchains
 1. minimization of the data transfer during the blockchain state agreement
   during *Precommit* phase of the
   [consensus algorithm](../architecture/consensus.md)
-2. the possibility of [lightweight clients](../architecture/clients.md)
+2. the possibility of [light clients](../architecture/clients.md)
   implementation.
 
 ## `ProofListIndex` database storage structure
@@ -45,21 +45,21 @@ stands for [SHA-256][sha-256] hash of byte array `arg`.
 
 ### Representation in persistent storage
 
-The internal representation of tree is organized by utilizing 2 integer
+The internal representation of tree is organized by utilizing `2` integer
 parameters as `key` for each element: `height` and `index`.
 
 !!! note
-  To distinguish values from different lists in Exomum, additional prefix is
-  used for every key. Such prefix consist of service name and list name. See
-  [storage section](../architecture/storage.md) for more details.
+    To distinguish values from different lists in Exomum, additional prefix is
+    used for every key. Such prefix consist of service name and list name. See
+    [storage section](../architecture/storage.md) for more details.
 
 1. Each Merkle tree element is addressed by a 8-byte `key = height || index`,
   where:
-  - `height < 58` is height of element in the tree, where `0` is leaf, and is
-    represented as `6` bits
-  - `index` is index of element at the given height consisting of `58` bits
-  - `height` and `index` are serialized within `key` as
-    [big-endian][wiki:big-endian]
+    - `height < 58` is height of element in the tree, where `0` is leaf, and is
+      represented as `6` bits
+    - `index` is index of element at the given height consisting of `58` bits
+    - `height` and `index` are serialized within `key` as
+      [big-endian][wiki:big-endian]
 2. The elements of the underlying list are stored in `(height = 0, index)`
   cells, where `index` is in interval `[0, list.len())`, where
   `list.len()` is the number of leaves in the tree (or, equivalently, the
@@ -71,15 +71,15 @@ parameters as `key` for each element: `height` and `index`.
   list corresponds to writing it to the cell `(0, list.len())` and updating
   `O(log list.len())` nodes of the tree with `height > 0`.
 5. A node at `(height > 1, index)` stores hashes of 1 or 2 child nodes.
-  - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
-    nodes are present, the node `(height, index)` has 2 children hashes.
-  - If only `(height - 1, index * 2)` node is present, the
-    node at `(height, index)` has single child hash.
+    - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
+      nodes are present, the node `(height, index)` has 2 children hashes.
+    - If only `(height - 1, index * 2)` node is present, the
+      node at `(height, index)` has single child hash.
 6. `max_height` is the height where only a single hash is stored at
   `index = 0`.
-  - `max_height = pow + 1`, where `pow` is the smallest integer such that
-    `2^pow >= list.len()`
-  - `(max_height, 0)` is the root hash of the Merkle tree.
+    - `max_height = pow + 1`, where `pow` is the smallest integer such that
+      `2^pow >= list.len()`
+    - `(max_height, 0)` is the root hash of the Merkle tree.
 
 An example of `key -> value` mappings in database.
 
@@ -152,7 +152,7 @@ form.
 
 A `Proofnode<Value>` is defined to be one of the following (in terms of JSON values):
 
-Variant | Child `Proofnode`(s) indices | Hashing rule
+Variant | Child indices | Hashing rule
 ------------ | ------------- | -------------
 { "left": `Proofnode`, "right": `Proofnode` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
 { "left": `Proofnode`, "right": `Hash` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
@@ -166,7 +166,7 @@ Variant | Child `Proofnode`(s) indices | Hashing rule
 3. `i` is the index of a `Proofnode` itself. `left_i`, `right_i` and
   `val_i` are the indices of the nested (child) `Proofnode`(s).
 4. `i` for the outmost proofnode is `0`.
-5. Custom functions to compute "val" hash for each individual entity type are
+5. Custom functions to compute `val` hash for each individual entity type are
   required on client. Each function should construct a byte array from
   `ValueJson` fields using specific [Exonum serialization](../architecture/serialization.md)
   and compute "val" hash according to [2](#hashing-rules).
@@ -201,8 +201,7 @@ If either of these verifications fails, the proof is deemed invalid.
 
 Below is depicted a Merkle tree with `6` elements (*not full binary*) with
 elements, that are a saved inside a proof for range `[3, 5)` in
-**bold\_and\_underscored** on the bottom. Elements are `3`-byte arrays
-(`[u8; 3]`).
+**bold\_and\_underscored** on the bottom. `3`-element byte arrays `[u8; 3]`.
 
 ![Proof_Structure](../images/merkle-tree-example-2.png)
 
@@ -249,7 +248,7 @@ Which corresponds to the following JSON representation of `Proofnode`.
   Computer Science, Vol. 3027, pp. 541-554, 2004.
 3. [Merkle tree on Brilliant](https://brilliant.org/wiki/merkle-tree/).
 
-[wiki-merkle-index]: https://en.wikipedia.org/wiki/Merkle_tree
+[wiki-merkelized-list]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki-tree]: https://en.wikipedia.org/wiki/Tree_(data_structure)
 [wiki:p2p]: https://en.wikipedia.org/wiki/Peer-to-peer
 [bitcoin]: https://bitcoin.org/bitcoin.pdf
