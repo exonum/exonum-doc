@@ -1,19 +1,21 @@
 # Merkelized List
 
-A [Merkle tree][wiki-merkelized-list] (hash tree or Tiger tree hash)
+[**Merkelized list**](../architecture/storage.md#prooflistindex) is a version
+of a typed list that supports compact proofs of existence for its elements using
+Merkle trees. Merkelized lists in Exonum are designed as classic binary Merkle trees
+within the persistence module, but can also be viewed as append-only lists
+by [client](../architecture/clients.md)
+and [service](../architecture/services.md) developers.
+
+A [Merkle tree][wiki-merkelized-list] (aka hash tree or Tiger tree hash)
 is a [tree][wiki-tree] in which every non-leaf node is labelled with the hash
 of the labels or values (in case of leaves) of its child nodes. Hash trees are
 a generalization of hash lists and chains. Merkle trees include both benefits of
 
-1. **trees**: operations on elements (appending a new element, getting an
+1. **Trees**: operations on elements (appending a new element, getting an
   element) take `O(log N)` operations, where `N` is number of elements
   (for example, transactions)
-2. **hashes**: verification of the (blockchain) copies.
-
-Merkle trees are *trees* by design inside the Exonum core but they also are
-*lists* with proofs of existence for elements from the light client point of
-view and *append-only lists* which supports only simple types of queries for
-Exonum application developers.
+2. **Hashes**: verification of the (blockchain) copies.
 
 ## Motivation and Usage
 
