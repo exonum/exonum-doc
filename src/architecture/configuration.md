@@ -115,6 +115,8 @@ API configuration parameters.
 
 - **enable_blockchain_explorer**  
   Enable api endpoints for the blockchain explorer on the public API address.
+- **state_update_timeout**  
+  Timeout (ms) to update API state.
 - **public_api_address**  
   Listen address for public API endpoints.
 - **private_api_address**  
