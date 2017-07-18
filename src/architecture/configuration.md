@@ -42,6 +42,10 @@ This categorization holds both for core and service parameters.
     | Global  | Validators’ public keys | Anchoring address |
     | Local   | Validator’s private key | RPC params for Bitcoin Core |
 
+!!! tip
+    See [sample configuration file](https://github.com/exonum/exonum/blob/master/exonum/tests/testdata/config/config02.toml)
+    for reference.
+
 ### Global Parameters
 
 #### [genesis]
@@ -120,41 +124,6 @@ may be required to keep the system operational.
     To keep a node operating when changing its validator key,
     you also need to update the corresponding global variable (the list of
     validator keys) using the global variables updater service.
-
-## Sample Configuration File
-
-```toml
-listen_address = "127.0.0.1:2000"
-peers = ["127.0.0.1:2000", "127.0.0.1:2001", "127.0.0.1:2002", "127.0.0.1:2003"]
-public_key = "99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1"
-secret_key = """e319e88128e4e3588ae3c01d80de95a40082f5bc4fa899cf5401fee033a9b\
-78399ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1"""
-
-[genesis]
-validators = ["99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1",
-"a32464be9bef16a6186a7f29d5ebc3223346faab91ea10cc00e68ba26322a1b0",
-"c3f5730d81402e7453df97df2895884e0c49b5cf5ff54737c3dd28dc6537b3fd",
-"f542cdc91f73747ecc20076962a2ed91749b8e0af66693ba6f67dd92f99b1533"]
-
-[genesis.consensus]
-peers_timeout = 10000
-propose_timeout = 500
-round_timeout = 3000
-status_timeout = 5000
-txs_block_limit = 1000
-
-[network]
-max_incoming_connections = 128
-max_outgoing_connections = 128
-tcp_nodelay = false
-tcp_reconnect_timeout = 500
-tcp_reconnect_timeout_max = 600000
-
-[node.api]
-enable_blockchain_explorer = true
-public_api_address = "127.0.0.1:1024"
-private_api_address = "127.0.0.1:1025"
-```
 
 [toml]: https://en.wikipedia.org/wiki/TOML
 [rfc2126]: https://tools.ietf.org/html/rfc2126
