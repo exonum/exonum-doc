@@ -137,6 +137,10 @@ Configuring queues sizes.
 - **tx_pool_capacity**  
   Maximum number of transactions in the pool of unconfirmed transactions.
 
+#### [services_configs]
+
+Service-specific parameters.
+
 ## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
