@@ -118,6 +118,15 @@ API configuration parameters.
 - **private_api_address**  
   Listen address for private API endpoints.
 
+#### [whitelist]
+
+Whitelist parameters.
+
+- **whitelist_enabled**  
+  Enable whitelisting.
+- **whitelisted_peers**  
+  List containing consensus public keys of trusted peers.
+
 ## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
