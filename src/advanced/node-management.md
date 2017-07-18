@@ -240,7 +240,7 @@ Response is a JSON object with the following fields:
 - **proof_to_block_merkle_root**: MerkleRoot  
   Merkle root proving transaction existence
 - **type**: string  
-  Is `Committed` for committed transaction
+  Is `Committed` for the committed transaction
 
 ```JSON
 {
@@ -295,7 +295,7 @@ Response is a JSON object with the following fields:
 }
 ```
 
-### Private endpoints
+## Private endpoints
 
 ### Add new peer
 
@@ -341,11 +341,11 @@ None.
 JSON object with the following fields:
 
 - **incoming_connections**: Array<PeerAddress\>  
-  List of peers' addresses connected to this node
+  List of addresses of peers connected to this node
 - **outgoing_connections**: Map  
-  Its keys are peers' addresses this node is connected to, corresponding values
-  of type `OutgoingConnectionInfo` contain info about peers' public keys and
-  current connection status
+  The keys of the map are addresses of peers this node is connected to,
+  corresponding values of type `OutgoingConnectionInfo` contain info about
+  public keys and current connection status of peers.
 
 #### Response example
 
@@ -431,7 +431,7 @@ All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
 
 All explorer endpoints are public. `enable_blockchain_explorer` local
-configuration parameter allows turn explorer endpoints on/off.
+configuration parameter allows to turn explorer endpoints on/off.
 
 ### Block by height
 
@@ -439,21 +439,21 @@ configuration parameter allows turn explorer endpoints on/off.
 GET {explorer_base_path}/blocks/{height}
 ```
 
-Returns the content for block with specific height.
+Returns the content for a block of a specific height.
 
 #### Parameters
 
 - **height**: integer  
-  The height of desired block
+  The height of the desired block
 
 #### Response
 
-JSON object with following fields:
+JSON object with the following fields:
 
 - **block**: BlockHeader  
   The header of the specified block
 - **precommits**: Array<Precommit\>  
-  The list of precommit transactions voted for this block
+  The list of 'Precommit' messages supporting the block.
 - **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into the block
 
@@ -533,26 +533,27 @@ JSON object with following fields:
 ### Blocks in range
 
 ```none
-GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={height}
+GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}
 ```
 
-Returns the headers for the last `count` blocks up to `height`
+Returns the headers of the consecutive `count` blocks up to the `latest` height.
 
 #### Parameters
 
 - **count**: integer  
-  The number of blocks to return. Should be not greater than
+  The number of blocks to return. Should not be greater than
   [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
 - **skip_empty_blocks**: bool  
   If `true`, then only non-empty blocks are returned
 - **latest**: integer  
-  Block height, up to which blocks are returned. The blocks are returned
-  in reverse order, starting from `latest` and at least up to `latest - count + 1`
+  The maximum height of the returned blocks. The blocks are returned
+  in reverse order, starting from the `latest` and at least up to the `latest -
+  count + 1`
 
 #### Response
 
 The JSON array of the `BlockHeader` objects. Blocks in the array are sorted in
-descending order of their heights.
+descending order according to their heights.
 
 #### Response example
 
