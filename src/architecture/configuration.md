@@ -127,6 +127,16 @@ Whitelist parameters.
 - **whitelisted_peers**  
   List containing consensus public keys of trusted peers.
 
+#### [mempool]
+
+Configuring queues sizes.
+
+- **events_pool_capacity**  
+  Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing).
+
+- **tx_pool_capacity**  
+  Maximum number of transactions in the pool of unconfirmed transactions.
+
 ## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
