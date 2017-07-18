@@ -107,7 +107,7 @@ two parts:
 - **tcp_reconnect_timeout_max**  
   Maximum timeout (ms) for reconnect attempt.
 
-#### [node.api]
+#### [api]
 
 API configuration parameters.
 
