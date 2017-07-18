@@ -82,6 +82,8 @@ pages:
       - 'Consensus specification': 'advanced/consensus/specification.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
+      # Timeout adjustment algorithm
+      - 'Timeout adjustment': 'advanced/consensus/timeouts-adjustment.md'
   # Includes roadmap and features list
   - 'Roadmap': 'roadmap.md'
   # How to contribute to Exonum repositories
