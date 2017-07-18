@@ -52,8 +52,15 @@ This categorization holds both for core and service parameters.
 
 The configuration used to create a genesis block.
 
-- **validators**  
-  List of validators’ public keys as hex strings
+#### [genesis.validator_keys]
+
+List of validators’ public keys as hex strings. Each list element consists of
+two parts:
+
+- **consensus_key**  
+  Validator's public key (hex) for dealing with consensus messages.
+- **service_key**  
+  Validator's public key (hex) for dealing with service transactions.
 
 #### [genesis.consensus]
 
@@ -76,10 +83,14 @@ The configuration used to create a genesis block.
   Address to be listened by this node.
 - **peers**  
   List of known peers.
-- **public_key**  
-  Node's public key (hex) for the current configuration.
-- **secret_key**  
-  Node's private key (hex) for the current configuration.
+- **consensus_public_key**  
+  Node's public key (hex) for dealing with consensus messages.
+- **consensus_secret_key**  
+  Node's private key (hex) for dealing with consensus messages.
+- **service_public_key**  
+  Node's public key (hex) for dealing with service transactions.
+- **service_secret_key**  
+  Node's private key (hex) for dealing with service transactions.
 
 #### [network]
 
