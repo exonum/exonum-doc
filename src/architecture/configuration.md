@@ -79,6 +79,8 @@ two parts:
 
 ### Local Parameters
 
+- **external_address**  
+  The node address to be sent to the other peers using `Connect` messages.
 - **listen_address**  
   Address to be listened by this node.
 - **peers**  
