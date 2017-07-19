@@ -312,7 +312,7 @@ only it is a string instead of an integer.
 
 - In [the configuration](configuration.md). Service configuration
   is stored in the overall configuration under the key `service_name`
-  in the `services` variable
+  in the `services_configs` variable
 - To compute API endpoints for the service. All service endpoints
   are mounted on `/api/services/{service_name}`
 

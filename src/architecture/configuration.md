@@ -43,7 +43,7 @@ This categorization holds both for core and service parameters.
     | Local   | Validator’s private key | RPC params for Bitcoin Core |
 
 !!! tip
-    See [sample configuration file](https://github.com/exonum/exonum/blob/master/exonum/tests/testdata/config/config02.toml)
+    See [sample configuration file](https://github.com/exonum/exonum/blob/v0.1/exonum/tests/testdata/config/config02.toml)
     for reference.
 
 ### Global Parameters
@@ -58,9 +58,9 @@ List of validators’ public keys as hex strings. Each list element consists of
 two parts:
 
 - **consensus_key**  
-  Validator's public key (hex) for dealing with consensus messages.
+  Validator’s public key (hex) for use with consensus messages.
 - **service_key**  
-  Validator's public key (hex) for dealing with service transactions.
+  Validator’s public key (hex) for use with service transactions.
 
 #### [genesis.consensus]
 
@@ -86,13 +86,13 @@ two parts:
 - **peers**  
   List of known peers.
 - **consensus_public_key**  
-  Node's public key (hex) for dealing with consensus messages.
+  Node’s public key (hex) for use with consensus messages.
 - **consensus_secret_key**  
-  Node's private key (hex) for dealing with consensus messages.
+  Node’s private key (hex) for signing consensus messages.
 - **service_public_key**  
-  Node's public key (hex) for dealing with service transactions.
+  Node’s public key (hex) for use with service transactions.
 - **service_secret_key**  
-  Node's private key (hex) for dealing with service transactions.
+  Node’s private key (hex) for signing service transactions.
 
 #### [network]
 
@@ -114,9 +114,9 @@ two parts:
 API configuration parameters.
 
 - **enable_blockchain_explorer**  
-  Enable api endpoints for the blockchain explorer on the public API address.
+  Enable API endpoints for the blockchain explorer on the public API address.
 - **state_update_timeout**  
-  Timeout (ms) to update API state.
+  Timeout (ms) to update info about connected peers.
 - **public_api_address**  
   Listen address for public API endpoints.
 - **private_api_address**  
@@ -124,7 +124,7 @@ API configuration parameters.
 
 #### [whitelist]
 
-Whitelist parameters.
+[Whitelist](../advanced/network.md#whitelist) parameters.
 
 - **whitelist_enabled**  
   Enable whitelisting.
@@ -139,11 +139,11 @@ Configuring queues sizes.
   Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing).
 
 - **tx_pool_capacity**  
-  Maximum number of transactions in the pool of unconfirmed transactions.
+  Maximum number of transactions in the [pool of unconfirmed transactions](../advanced/consensus/specification.md#pool-of-unconfirmed-transactions).
 
 #### [services_configs]
 
-Service-specific parameters.
+Service-specific parameters under the keys named [`service_name`](services.md#service-identifiers).
 
 ## Changing Configuration
 
