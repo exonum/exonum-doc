@@ -43,7 +43,7 @@ This categorization holds both for core and service parameters.
     | Local   | Validator’s private key | RPC params for Bitcoin Core |
 
 !!! tip
-    See [sample configuration file](https://github.com/exonum/exonum/blob/v0.1/exonum/tests/testdata/config/config02.toml)
+    See [sample configuration file][github_config_file]
     for reference.
 
 ### Global Parameters
@@ -124,7 +124,7 @@ API configuration parameters.
 
 #### [whitelist]
 
-[Whitelist](../advanced/network.md#whitelist) parameters.
+[Network whitelisting](../advanced/network.md#whitelist) parameters.
 
 - **whitelist_enabled**  
   Enable whitelisting.
@@ -133,7 +133,7 @@ API configuration parameters.
 
 #### [mempool]
 
-Configuring queues sizes.
+Message processing parameters.
 
 - **events_pool_capacity**  
   Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing).
@@ -143,7 +143,8 @@ Configuring queues sizes.
 
 #### [services_configs]
 
-Service-specific parameters under the keys named [`service_name`](services.md#service-identifiers).
+Service-specific parameters under the keys named according to [`service_name`s](services.md#service-identifiers)
+of the blockchain services.
 
 ## Changing Configuration
 
@@ -164,4 +165,5 @@ may be required to keep the system operational.
     validator keys) using the global variables updater service.
 
 [toml]: https://en.wikipedia.org/wiki/TOML
+[github_config_file]: https://github.com/exonum/exonum/blob/v0.1/exonum/tests/testdata/config/config02.toml
 [rfc2126]: https://tools.ietf.org/html/rfc2126
