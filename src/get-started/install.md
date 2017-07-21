@@ -29,7 +29,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb
+brew install libsodium leveldb pkg-config
 ```
 
 ### Linux
