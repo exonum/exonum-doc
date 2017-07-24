@@ -1,7 +1,7 @@
 # System Configuration
 
-**System configuration** is a set of parameters that determine the access
-network parameters of a node and the behavior of the node while operating in the
+**System configuration** is a set of parameters that determine the network
+access parameters of a node and behavior of the node while operating in the
 network.
 
 The configuration is stored in the [TOML][toml] format. A path to the
@@ -10,17 +10,17 @@ configuration file should be specified on the node start up.
 The configuration may be changed using [the global variables updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
-Services may have their own configuration settings. Initialization on the node
-start up passes the configuration to all services deployed on the blockchain.
-The configuration for a service is stored in the `services` subtree
+Services may have their own configuration settings. On node initialization the
+configuration is passed to all services deployed in the blockchain.
+The configuration for a service is stored in the `services_configs` subtree
 of the overall configuration
 under a separate key equal to [the name of the service](services.md#service-identifiers).
 
 !!! note "Example"
-    [The anchoring service](../advanced/bitcoin-anchoring.md)
-    stores in the configuration parameters of the RPC connection to
-    a Bitcoin Core node, as well as the Bitcoin address used for anchoring.
-    These parameters are stored in the `services.btc_anchoring`
+    The configuration settings of [the anchoring service](../advanced/bitcoin-anchoring.md)
+    include the parameters of the RPC connection to
+    a Bitcoin Core node as well as a Bitcoin address used for anchoring.
+    These parameters are stored in the `services_configs.btc_anchoring`
     section of the overall configuration.
 
 ## Configuration Parameters
@@ -32,7 +32,7 @@ System configuration contains 2 types of configuration parameters:
   created
 - **Local parameters** may differ for each node
 
-This categorization holds both for core and service parameters.
+This categorization holds for both core and service parameters.
 
 !!! note "Example"
     The following table shows all 4 possible parameter categories.
@@ -58,106 +58,105 @@ List of validators’ public keys as hex strings. Each list element consists of
 two parts:
 
 - **consensus_key**  
-  Validator’s public key (hex) for use with consensus messages.
+  Validator’s public key (hex) for use with consensus messages
 - **service_key**  
-  Validator’s public key (hex) for use with service transactions.
+  Validator’s public key (hex) for use with service transactions
 
 #### [genesis.consensus]
 
 [Consensus algorithm](consensus.md) parameters.
 
 - **peers_timeout**  
-  Peer exchange timeout (in ms).
+  Peers exchange timeout (in ms)
 - **propose_timeout**  
-  Proposal timeout (ms) after the new height beginning.
+  Proposal timeout (ms) upon beginning of a new height
 - **round_timeout**  
-  Interval (ms) between rounds.
+  Timeout interval (ms) between rounds
 - **status_timeout**  
-  Period (ms) of sending a `Status` message.
+  Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
-  Maximum number of transactions per block.
+  Maximum number of transactions per block
 
 ### Local Parameters
 
 - **external_address**  
-  The node address to be sent to the other peers using `Connect` messages.
+  The node address broadcasted to other peers using `Connect` messages
 - **listen_address**  
-  Address to be listened by this node.
+  Listen address of the current node
 - **peers**  
-  List of known peers.
+  List of [full node](../glossary.md#full-node) addresses
 - **consensus_public_key**  
-  Node’s public key (hex) for use with consensus messages.
+  Node’s public key (hex) for use with consensus messages
 - **consensus_secret_key**  
-  Node’s private key (hex) for signing consensus messages.
+  Node’s private key (hex) for signing consensus messages
 - **service_public_key**  
-  Node’s public key (hex) for use with service transactions.
+  Node’s public key (hex) for use with service transactions
 - **service_secret_key**  
-  Node’s private key (hex) for signing service transactions.
+  Node’s private key (hex) for signing service transactions
 
 #### [network]
 
 [Local connection](../advanced/network.md) parameters.
 
 - **max_incoming_connections**  
-  Maximum number of incoming connections.
+  Maximum number of incoming connections
 - **max_outgoing_connections**  
-  Maximum number of outgoing connections.
+  Maximum number of outgoing connections
 - **tcp_nodelay**  
-  Activation of the NODELAY algorithm from the TCP stack (see [RFC2126][rfc2126]).
+  Activation of the NODELAY algorithm from the TCP stack (see [RFC2126][rfc2126])
 - **tcp_reconnect_timeout**  
-  Timeout (ms) for the first attempt to reconnect.
+  Timeout interval (ms) before the first reconnect attempt
 - **tcp_reconnect_timeout_max**  
-  Maximum timeout (ms) for reconnect attempt.
+  Maximum timeout interval (ms) for reconnect attempt
 
 #### [api]
 
 API configuration parameters.
 
 - **enable_blockchain_explorer**  
-  Enable API endpoints for the blockchain explorer on the public API address.
+  Enables API endpoints for the blockchain explorer at the public API address
 - **state_update_timeout**  
-  Timeout (ms) to update info about connected peers.
+  Timeout interval (ms) to update info about connected peers
 - **public_api_address**  
-  Listen address for public API endpoints.
+  Listen address for public API endpoints
 - **private_api_address**  
-  Listen address for private API endpoints.
+  Listen address for private API endpoints
 
 #### [whitelist]
 
 [Network whitelisting](../advanced/network.md#whitelist) parameters.
 
 - **whitelist_enabled**  
-  Enable whitelisting.
+  Enables whitelisting
 - **whitelisted_peers**  
-  List containing consensus public keys of trusted peers.
+  List of consensus public keys for trusted peers
 
 #### [mempool]
 
 Message processing parameters.
 
 - **events_pool_capacity**  
-  Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing).
-
+  Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing)
 - **tx_pool_capacity**  
-  Maximum number of transactions in the [pool of unconfirmed transactions](../advanced/consensus/specification.md#pool-of-unconfirmed-transactions).
+  Maximum number of transactions in the [pool of unconfirmed transactions](../advanced/consensus/specification.md#pool-of-unconfirmed-transactions)
 
 #### [services_configs]
 
-Service-specific parameters under the keys named according to [`service_name`s](services.md#service-identifiers)
+Service-specific parameters under the keys corresponding to [`service_name`s](services.md#service-identifiers)
 of the blockchain services.
 
 ## Changing Configuration
 
 Global parameters should be changed by using the global variables updater
 service. The service ensures that the configuration updates are synchronized
-among nodes in the network. Global parameters should not be changed
+among nodes in the network. It is not advisable to change global parameters
 by editing the configuration file because this may cause improper behavior of
-node. Global parameters can be influenced by the configuration file editing only
-before the genesis block is created.
+the node. Influencing global parameters by the configuration file editing is
+admittable only before the genesis block is created.
 
-Local parameters may be changed by editing the configuration file
-and restarting the node to apply changes. In certain cases, additional actions
-may be required to keep the system operational.
+Local parameters may be changed by editing the configuration file and restarting
+the node to apply changes. In certain cases additional actions may be required
+to keep the system operational.
 
 !!! note "Example"
     To keep a node operating when changing its validator key,
