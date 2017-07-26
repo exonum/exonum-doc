@@ -150,8 +150,8 @@ of the blockchain services.
 Global parameters should be changed by using the global variables updater
 service. The service ensures that the configuration updates are synchronized
 among nodes in the network. Changing global parameters by editing the
-configuration file is inadmissable as this may cause improper behavior of
-the node. Influencing global parameters by the configuration file editing is
+configuration file is inadmissible as this may cause improper behavior of
+the node. Modifying global parameters by the configuration file editing is
 admittable only before the genesis block is created.
 
 Local parameters may be changed by editing the configuration file and restarting
