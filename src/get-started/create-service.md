@@ -121,7 +121,7 @@ API to interact with the blockchain.
 Every node needs public and private keys. Keys are unique to every node
 and are used to identify it within the network. We will create temporary keys
 using `exonum::crypto::gen_keypair()` function, but for ordinary use you should
-apply the keys from the node configuration file. The node needs two pairs of
+load the keys from the node configuration file. The node needs two pairs of
 keys, actually: one for interaction with other nodes while reaching consensus
 and another one for service needs.
 
@@ -206,7 +206,7 @@ For our case we need to declare a type to store the information about
 the wallet and its balance. Inside the wallet we want to store the public key
 to validate requests from the owner of the wallet. We want to store the name of
 the owner for convenience reasons. Also, we need to keep the current balance of
-the wallet. Summing it all up, `Wallet` type will look like:
+the wallet. Summing it all up, `Wallet` datatype will look like:
 
 ```rust
 encoding_struct! {
@@ -220,7 +220,7 @@ encoding_struct! {
 }
 ```
 
-Macro `encoding_struct!` helps to declare a [serializable](../architecture/serialization.md)
+Macro `encoding_struct!` helps declare a [serializable](../architecture/serialization.md)
 struct and determine bounds of its fields. We need to change wallet balance,
 so we add methods to the `Wallet` type:
 
@@ -261,8 +261,8 @@ For access to the objects inside the storage we need to declare the layout of
 the data. As we want to keep the wallets in the storage, we will
 use an instance of [`MapIndex`](../architecture/storage.md#mapindex),
 a map abstraction.
-Keys of the index will correspond to public keys of the wallets,
-and its values will be serialized `Wallet` structs.
+Keys of the index will correspond to public keys of the wallets.
+Index values will be serialized `Wallet` structs.
 
 `Fork` provides random access to every piece of data inside the database.
 To isolate the wallets map into a separate entity,
@@ -345,7 +345,7 @@ between them. We add the `seed` field to make sure that our transaction is
 
 ### Transaction Execution
 
-Every transaction in Exonum has business-logic of the blockchain attached,
+Every transaction in Exonum has business logic of the blockchain attached,
 which is encapsulated in the `Transaction` trait.
 This trait includes the `verify` method to verify the integrity of the
 transaction, and the `execute` method which contains logic applied to the
@@ -461,7 +461,7 @@ struct TransactionResponse {
 To join our handler with the HTTP handler of the web-server we need to implement
 the `wire` method. This method takes the reference to a router.
 In the method below we add
-one handler to convert input JSON into a `Transaction`.
+one handler to convert JSON input into a `Transaction`.
 The handler responds with a hash of the transaction. It also
 sends the transaction to the channel, so that it will be broadcasted over the
 blockchain network and included into the block.
@@ -583,7 +583,7 @@ This will build the code and start the compiled binary.
 
 Let’s send some transactions to our demo.
 
-#### Create The First Wallet
+#### Create the First Wallet
 
 Create `create-wallet-1.json` file and put there:
 
@@ -624,7 +624,7 @@ Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
                             name: "Johnny Doe", balance: 100 }
 ```
 
-#### Create The Second Wallet
+#### Create the Second Wallet
 
 To create the second wallet put the code into `create-wallet-2.json` file:
 
