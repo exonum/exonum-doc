@@ -53,7 +53,7 @@ The internal representation of a Merkle tree is organized by utilizing 2 integer
 parameters as a key for each element: `height` and `index`.
 
 !!! note
-    To distinguish values from different lists in Exomum, an additional prefix is
+    To distinguish values from different lists in Exonum, an additional prefix is
     used for every key. Consult
     [storage section](../architecture/storage.md) for more details.
 
