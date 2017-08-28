@@ -80,7 +80,7 @@ rustup toolchain install <nightly-rust-version>
 ```
 
 where `<nightly-rust-version>` is the nightly Rust version supported by clippy
-(e.g., `nightly-2017-05-10` for clippy version 0.0.131).
+(e.g., `nightly-2017-07-05` for clippy version 0.0.142).
 Consult the clippy installation guide for more details.
 
 After installing nightly Rust, clippy checks can be run with
