@@ -233,8 +233,10 @@ time) points to the segment in the body,
 which contains the actual serialization of the field. Segments are placed
 in the correspondence with [the validation rules](#segment-validation-rules).
 
-A structure type is fixed-length if and only if all its fields are fixed-length
-(i.e., the body of the binary representation is always empty).
+!!! note
+    A field of structure type is always handled as var-length field (even if all
+    its fields are fixed-length): segment pointer in the header of the outer
+    structure points to the segment with the inner structure itself.
 
 !!! note "Example"
     Consider a structure containing `PublicKey`, `u64` and `bool` fields. In the
@@ -250,10 +252,10 @@ increasing their indexes.
 
 Slices like structures have header and body. Each element takes 8 bytes in the
 header for a corresponding segment pointer. If slice consists of fixed-length
-elements, then its body contain elements themselves. If slice consists of
-var-length elements, the body of such a slice contains segment
-pointers to the elements of the slice, and elements themselves are located
-further in memory as segments as per the validation rules.
+elements (except structures), then its body contains elements themselves. If
+slice consists of var-length elements (or fixed-length structures), the body of
+such a slice contains segment pointers to the elements of the slice, and elements
+themselves are located further in memory as segments as per the validation rules.
 
 Number of the slice elements is specified in the header of structure containing
 the slice.
