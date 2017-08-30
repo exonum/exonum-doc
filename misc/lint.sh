@@ -29,7 +29,8 @@ lint_html () {
   html5validator --root "$SITE_DIR" --show-warnings --ignore-re \
     'Illegal character in query: "\|" is not allowed' \
     '"(autocorrect|autocapitalize)" not allowed on element "input"' \
-    '"align" attribute on the "(td|th)" element is obsolete';
+    '"align" attribute on the "(td|th)" element is obsolete' \
+    'Document uses.* Unicode Private Use Area';
 }
 
 lint_links () {
