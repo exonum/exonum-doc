@@ -101,6 +101,51 @@ assure code quality and prevent regression in the future. Bug fixes should
 also include tests to prove that the bug had existed and was fixed. Generally, more
 tests are always welcome.
 
+#### Clippy
+
+A separate nightly Rust toolchain is required if you want to run
+the [clippy][clippy] linter locally. Clippy is used
+in CI builds of Exonum and other repositories to detect common Rust anti-patterns.
+In general, clippy supports the latest nightly version of Rust. It can be installed
+with
+
+```shell
+rustup toolchain install <nightly-rust-version>
+```
+
+where `<nightly-rust-version>` is the nightly Rust version supported by clippy.
+Consult the clippy installation guide for more details.
+
+After installing nightly Rust, clippy checks can be run with
+
+```shell
+cargo +<nightly-rust-version> clippy
+```
+
+#### Rustfmt
+
+[rustfmt][rustfmt] is used to perform automatic code formatting and code
+style checks in CI builds. Note that Exonum repositories pin the version
+of rustfmt in order to get consistent formatting.
+
+You can install rustfmt locally with
+
+```shell
+cargo install rustfmt --vers <rustfmt-version> --force
+```
+
+where `<rustfmt-version>` is the supported version of the formatter.
+You may find the supported version in
+[the Travis configuration of Exonum core repository][core-travis].
+
+After installing the formatter, its checks can be run with
+
+```shell
+cargo fmt --write-mode=diff
+```
+
+Consult the rustfmt readme for more details.
+
 ### Pull Request Naming and Descriptions
 
 If a pull request is specifically not to be considered for merging (yet),
@@ -270,5 +315,7 @@ must contain its license header with the original author(s) and source.
 [git:messages]: http://chris.beams.io/posts/git-commit/
 [travis]: https://docs.travis-ci.com/
 [clippy]: https://github.com/Manishearth/rust-clippy
+[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
+[core-travis]: https://github.com/exonum/exonum/blob/master/.travis.yml
 [gitter]: https://gitter.im/exonum
 [reddit]: https://www.reddit.com/r/Exonum/
