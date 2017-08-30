@@ -67,52 +67,6 @@ curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 The toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
 
-### Clippy
-
-A separate nightly Rust toolchain is required if you want to run
-the [clippy][clippy] linter locally. Clippy is used
-in CI builds of Exonum and other repositories to detect common Rust anti-patterns.
-In general, clippy supports the latest nightly version of Rust. It can be installed
-with
-
-```shell
-rustup toolchain install <nightly-rust-version>
-```
-
-where `<nightly-rust-version>` is the nightly Rust version supported by clippy
-(e.g., `nightly-2017-05-10` for clippy version 0.0.131).
-Consult the clippy installation guide for more details.
-
-After installing nightly Rust, clippy checks can be run with
-
-```shell
-cargo +<nightly-rust-version> clippy
-```
-
-### Rustfmt
-
-[`rustfmt`][rustfmt] is used to perform automatic code formatting and code
-style checks in CI builds. Note that Exonum repositories pin the version
-of `rustfmt` in order to get consistent formatting.
-
-You can install `rustfmt` locally with
-
-```shell
-cargo install rustfmt --vers <rustfmt-version> --force
-```
-
-where `<rustfmt-version>` is the supported version of the formatter.
-You may find the supported version in
-[the Travis configuration of Exonum core repository][core-travis].
-
-After installing the formatter, its checks can be run with
-
-```shell
-cargo fmt --write-mode=diff
-```
-
-Consult the `rustfmt` readme for more details.
-
 ## Compiling Exonum
 
 You can verify that you installed dependencies and the Rust toolchain correctly
@@ -157,9 +111,6 @@ guide on how to develop applications on top of the Exonum framework.
 [libsodium]: https://download.libsodium.org/doc/
 [openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
-[clippy]: https://github.com/Manishearth/rust-clippy
-[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
-[core-travis]: https://github.com/exonum/exonum/blob/master/.travis.yml
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/
