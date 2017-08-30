@@ -29,7 +29,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb
+brew install libsodium leveldb pkg-config
 ```
 
 ### Linux
@@ -98,7 +98,7 @@ of `rustfmt` in order to get consistent formatting.
 You can install `rustfmt` locally with
 
 ```shell
-cargo install rustfmt --version <rustfmt-version> --force
+cargo install rustfmt --vers <rustfmt-version> --force
 ```
 
 where `<rustfmt-version>` is the supported version of the formatter.

@@ -21,7 +21,7 @@ applications.
 Tables (aka indexes) perform the same role as in relational database
 management systems (RDBMSs). Every
 table stores records of a specific type. However, unlike RDBMS tables,
-all Exonum tables internally are implemented [as wrappers around key-value stores](#base-index).
+all Exonum tables internally are implemented [as wrappers around key-value stores](#baseindex).
 Both keys and values in the wrapped stores are persisted as byte sequences.
 Exonum does not natively support operations (matching, grouping, sorting, etc.)
 over separate value fields, as it is the case with other key-value storages.
@@ -331,7 +331,7 @@ content together with the tables being indexed.
 [list-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/list_index.rs
 [proof-list-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_list_index/mod.rs
 [list-proof]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_list_index/proof.rs
-[proof-map-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/merkle_patricia_table/mod.rs
+[proof-map-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_map_index/mod.rs
 [value-set-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/value_set_index.rs
 [key-set-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/key_set_index.rs
 [database]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L43

@@ -197,6 +197,8 @@ on auditability and accountability of the [system maintainers](#maintainer).
 
 ## Full Node
 
+**Aka** peer
+
 Node in the blockchain network that replicates all transactions in the blockchain
 and thus has a local copy of the entire [blockchain state](#blockchain-state).
 There are 2 categories of full nodes in Exonum: [validators](#validator)
