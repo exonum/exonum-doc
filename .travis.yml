@@ -11,8 +11,16 @@ branches:
     - master
     # tags
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+before_install:
+  # Lock dependencies for branch builds
+  - |
+    if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
+      export REQUIREMENTS_FILE=requirements.lock
+    else
+      export REQUIREMENTS_FILE=requirements.txt
+    fi
 install:
-  - pip install -r requirements.txt
+  - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
   # Markdown linter
   - gem install mdl --bindir ~/.local/bin
   # Dirty hack for what seems like a bug in linkchecker
