@@ -422,13 +422,18 @@ Finally, we need to implement the node API.
 With this aim we declare a struct which implements the `Api` trait.
 The struct will contain a channel, i.e., a connection to the blockchain node
 instance.
+Besides the channel, the API struct will contain a blockchain instance;
+it will be needed to implement [read requests](../architecture/services.md#read-requests).
 
 ```rust
 #[derive(Clone)]
 struct CryptocurrencyApi {
     channel: ApiSender<NodeChannel>,
+    blockchain: Blockchain,
 }
 ```
+
+### API for Transactions
 
 To simplify request processing we add a `TransactionRequest` enum
 which joins both types of our transactions.
@@ -470,6 +475,7 @@ blockchain network and included into the block.
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
+
         let tx_handler = move |req: &mut Request| -> IronResult<Response> {
             match req.get::<bodyparser::Struct<TransactionRequest>>() {
                 Ok(Some(tx)) => {
@@ -486,9 +492,12 @@ impl Api for CryptocurrencyApi {
             }
         };
 
+        // (Read request processing skipped)
+
         // Bind the transaction handler to a specific route.
         let route_post = "/v1/wallets/transaction";
         router.post(&route_post, tx_handler, "transaction");
+        // (Read request binding skipped)
     }
 }
 ```
