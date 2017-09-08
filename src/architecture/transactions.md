@@ -219,11 +219,6 @@ The `info` method returns the useful information (from service developers point
 of view) about the transaction in the JSON format.
 The method has no access to the blockchain state, same as `verify`.
 
-!!! note "Example"
-    In [the cryptocurrency service][cryptocurrency]
-    an `info` method of `TxTransfer` returns JSON with fields `from`, `to`,
-    `amount` and `seed`.
-
 ## Lifecycle
 
 ### 1. Creation
