@@ -534,6 +534,17 @@ impl CryptocurrencyApi {
 }
 ```
 
+!!! warning
+    An attentive reader may notice that we use the `fork()` method to get
+    information from the blockchain storage.
+    `Fork`s provide *read-write* access, not exactly what
+    you want to use for *read-only* access to the storage in production
+    (instead, you may want to use `Snapshot`s).
+    We use `Fork`s only to keep the tutorial reasonably short. If we used `Snapshot`s,
+    we would have to make `CurrencySchema` generic and implement it both for
+    `Fork` (which would be used in transactions) and `Snapshot` (which would
+    be used in read requests).
+
 Then, we need to add request processing to the `CryptocurrencyApi::wire()` method,
 just like we did for transactions:
 
