@@ -849,5 +849,7 @@ The response is:
 }
 ```
 
+## Conclusion
+
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them.
