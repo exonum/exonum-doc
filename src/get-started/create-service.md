@@ -495,8 +495,7 @@ impl Api for CryptocurrencyApi {
         // (Read request processing skipped)
 
         // Bind the transaction handler to a specific route.
-        let route_post = "/v1/wallets/transaction";
-        router.post(&route_post, tx_handler, "transaction");
+        router.post("/v1/wallets/transaction", transaction, "transaction");
         // (Read request binding skipped)
     }
 }
