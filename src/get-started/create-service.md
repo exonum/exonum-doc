@@ -502,6 +502,90 @@ impl Api for CryptocurrencyApi {
 }
 ```
 
+### API for Read Requests
+
+We want to implement 2 read requests:
+
+- Return the information about all wallets in the system
+- Return the information about a specific wallet identified by the public key
+
+To accomplish this, we define a couple of corresponding methods in `CryptocurrencyApi`,
+that use its `blockchain` field to read information from the blockchain storage.
+
+```rust
+impl CryptocurrencyApi {
+    fn get_wallet(&self, pub_key: &PublicKey) -> Option<Wallet> {
+        let mut view = self.blockchain.fork();
+        let mut schema = CurrencySchema { view: &mut view };
+        schema.wallet(pub_key)
+    }
+
+    fn get_wallets(&self) -> Option<Vec<Wallet>> {
+        let mut view = self.blockchain.fork();
+        let mut schema = CurrencySchema { view: &mut view };
+        let idx = schema.wallets();
+        let wallets: Vec<Wallet> = idx.values().collect();
+        if wallets.is_empty() {
+            None
+        } else {
+            Some(wallets)
+        }
+    }
+}
+```
+
+Then, we need to add request processing to the `CryptocurrencyApi::wire()` method,
+just like we did for transactions:
+
+```rust
+impl Api for CryptocurrencyApi {
+    fn wire(&self, router: &mut Router) {
+        let self_ = self.clone();
+
+        // (Transaction processing skipped)
+
+        // Gets status of all wallets in the database.
+        let self_ = self.clone();
+        let wallets_info = move |_: &mut Request| -> IronResult<Response> {
+            if let Some(wallets) = self_.get_wallets() {
+                self_.ok_response(&serde_json::to_value(wallets).unwrap())
+            } else {
+                self_.not_found_response(
+                    &serde_json::to_value("Wallets database is empty")
+                        .unwrap(),
+                )
+            }
+        };
+
+        // Gets status of the wallet corresponding to the public key.
+        let self_ = self.clone();
+        let wallet_info = move |req: &mut Request| -> IronResult<Response> {
+            // Get the hex public key as the last URL component;
+            // return an error if the public key cannot be parsed
+            let path = req.url.path();
+            let wallet_key = path.last().unwrap();
+            let public_key = PublicKey::from_hex(wallet_key)
+                .map_err(ApiError::FromHex)?;
+
+            if let Some(wallet) = self_.get_wallet(&public_key) {
+                self_.ok_response(&serde_json::to_value(wallet).unwrap())
+            } else {
+                self_.not_found_response(
+                    &serde_json::to_value("Wallet not found").unwrap(),
+                )
+            }
+        };
+
+        // (Transaction binding skipped)
+        // Bind read request endpoints
+        router.get("/v1/wallets", wallets_info, "wallets_info");
+        router.get("/v1/wallet/:pub_key", wallet_info, "wallet_info");
+    }
+```
+
+The request processing uses `get_wallets()` and `get_wallet()` methods we
+defined earlier.
+
 ## Define Service
 
 Service is a group of templated transactions (we have defined them before). It
