@@ -803,5 +803,51 @@ Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                                    name: "Janie Roe", balance: 110 }
 ```
 
+### Read Requests
+
+Let’s check that the defined read endpoints indeed work.
+
+#### Info on All Wallets
+
+```sh
+curl http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+```
+
+This request expectedly returns information on both wallets in the system:
+
+```json
+[
+  {
+    "balance": "90",
+    "name": "Johnny Doe",
+    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+  },
+  {
+    "balance": "110",
+    "name": "Janie Roe",
+    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819"
+  }
+]
+```
+
+#### Info on Specific Wallet
+
+The second read endpoint also works:
+
+```sh
+curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet/\
+03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+```
+
+The response is:
+
+```json
+{
+  "balance": "90",
+  "name": "Johnny Doe",
+  "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+}
+```
+
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them.
