@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-# Script allowing to execute one or more linters.
-# Runs from the project root directory.
-# It is assumed that the HTML pages are already built and are located in $SRC_DIR.
-
 # Copyright 2017 The Exonum Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
