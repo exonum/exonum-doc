@@ -505,8 +505,8 @@ impl Api for CryptocurrencyApi {
 
 We want to implement 2 read requests:
 
-- Return the information about all wallets in the system
-- Return the information about a specific wallet identified by the public key
+- Return the information about all wallets in the system;
+- Return the information about a specific wallet identified by the public key.
 
 To accomplish this, we define a couple of corresponding methods in `CryptocurrencyApi`,
 that use its `blockchain` field to read information from the blockchain storage.
@@ -571,7 +571,7 @@ impl Api for CryptocurrencyApi {
         let self_ = self.clone();
         let wallet_info = move |req: &mut Request| -> IronResult<Response> {
             // Get the hex public key as the last URL component;
-            // return an error if the public key cannot be parsed
+            // return an error if the public key cannot be parsed.
             let path = req.url.path();
             let wallet_key = path.last().unwrap();
             let public_key = PublicKey::from_hex(wallet_key)
@@ -587,7 +587,7 @@ impl Api for CryptocurrencyApi {
         };
 
         // (Transaction binding skipped)
-        // Bind read request endpoints
+        // Bind read request endpoints.
         router.get("/v1/wallets", wallets_info, "wallets_info");
         router.get("/v1/wallet/:pub_key", wallet_info, "wallet_info");
     }
