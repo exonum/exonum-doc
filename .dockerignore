@@ -1,0 +1,6 @@
+# Ignore everything except for specific files / directories
+*
+!requirements.lock
+!mkdocs.yml
+!src
+!theme

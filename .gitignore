@@ -1,6 +1,7 @@
 # Generic rules
 .*
 !.gitignore
+!.dockerignore
 !.travis.yml
 
 # IDE files
