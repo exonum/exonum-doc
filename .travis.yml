@@ -40,7 +40,7 @@ script:
   - bash ./misc/lint.sh html
   - docker build -t exonum-doc . && docker images
   - "docker run --rm -d -p 0.0.0.0:8000:8000 exonum-doc"
-  - bash ./misc/lint.sh links
+  - sleep 7 && bash ./misc/lint.sh links
 
 after_script:
   # Kill the docker container
