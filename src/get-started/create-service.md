@@ -422,13 +422,18 @@ Finally, we need to implement the node API.
 With this aim we declare a struct which implements the `Api` trait.
 The struct will contain a channel, i.e., a connection to the blockchain node
 instance.
+Besides the channel, the API struct will contain a blockchain instance;
+it will be needed to implement [read requests](../architecture/services.md#read-requests).
 
 ```rust
 #[derive(Clone)]
 struct CryptocurrencyApi {
     channel: ApiSender<NodeChannel>,
+    blockchain: Blockchain,
 }
 ```
+
+### API for Transactions
 
 To simplify request processing we add a `TransactionRequest` enum
 which joins both types of our transactions.
@@ -470,6 +475,7 @@ blockchain network and included into the block.
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
+
         let tx_handler = move |req: &mut Request| -> IronResult<Response> {
             match req.get::<bodyparser::Struct<TransactionRequest>>() {
                 Ok(Some(tx)) => {
@@ -486,12 +492,109 @@ impl Api for CryptocurrencyApi {
             }
         };
 
+        // (Read request processing skipped)
+
         // Bind the transaction handler to a specific route.
-        let route_post = "/v1/wallets/transaction";
-        router.post(&route_post, tx_handler, "transaction");
+        router.post("/v1/wallets/transaction", transaction, "transaction");
+        // (Read request binding skipped)
     }
 }
 ```
+
+### API for Read Requests
+
+We want to implement 2 read requests:
+
+- Return the information about all wallets in the system;
+- Return the information about a specific wallet identified by the public key.
+
+To accomplish this, we define a couple of corresponding methods in `CryptocurrencyApi`,
+that use its `blockchain` field to read information from the blockchain storage.
+
+```rust
+impl CryptocurrencyApi {
+    fn get_wallet(&self, pub_key: &PublicKey) -> Option<Wallet> {
+        let mut view = self.blockchain.fork();
+        let mut schema = CurrencySchema { view: &mut view };
+        schema.wallet(pub_key)
+    }
+
+    fn get_wallets(&self) -> Option<Vec<Wallet>> {
+        let mut view = self.blockchain.fork();
+        let mut schema = CurrencySchema { view: &mut view };
+        let idx = schema.wallets();
+        let wallets: Vec<Wallet> = idx.values().collect();
+        if wallets.is_empty() {
+            None
+        } else {
+            Some(wallets)
+        }
+    }
+}
+```
+
+!!! warning
+    An attentive reader may notice that we use the `fork()` method to get
+    information from the blockchain storage.
+    `Fork`s provide *read-write* access, not exactly what
+    you want to use for *read-only* access to the storage in production
+    (instead, you may want to use `Snapshot`s).
+    We use `Fork`s only to keep the tutorial reasonably short. If we used `Snapshot`s,
+    we would have to make `CurrencySchema` generic and implement it both for
+    `Fork` (which would be used in transactions) and `Snapshot` (which would
+    be used in read requests).
+
+Then, we need to add request processing to the `CryptocurrencyApi::wire()` method,
+just like we did for transactions:
+
+```rust
+impl Api for CryptocurrencyApi {
+    fn wire(&self, router: &mut Router) {
+        let self_ = self.clone();
+
+        // (Transaction processing skipped)
+
+        // Gets status of all wallets in the database.
+        let self_ = self.clone();
+        let wallets_info = move |_: &mut Request| -> IronResult<Response> {
+            if let Some(wallets) = self_.get_wallets() {
+                self_.ok_response(&serde_json::to_value(wallets).unwrap())
+            } else {
+                self_.not_found_response(
+                    &serde_json::to_value("Wallets database is empty")
+                        .unwrap(),
+                )
+            }
+        };
+
+        // Gets status of the wallet corresponding to the public key.
+        let self_ = self.clone();
+        let wallet_info = move |req: &mut Request| -> IronResult<Response> {
+            // Get the hex public key as the last URL component;
+            // return an error if the public key cannot be parsed.
+            let path = req.url.path();
+            let wallet_key = path.last().unwrap();
+            let public_key = PublicKey::from_hex(wallet_key)
+                .map_err(ApiError::FromHex)?;
+
+            if let Some(wallet) = self_.get_wallet(&public_key) {
+                self_.ok_response(&serde_json::to_value(wallet).unwrap())
+            } else {
+                self_.not_found_response(
+                    &serde_json::to_value("Wallet not found").unwrap(),
+                )
+            }
+        };
+
+        // (Transaction binding skipped)
+        // Bind read request endpoints.
+        router.get("/v1/wallets", wallets_info, "wallets_info");
+        router.get("/v1/wallet/:pub_key", wallet_info, "wallet_info");
+    }
+```
+
+The request processing uses `get_wallets()` and `get_wallet()` methods we
+defined earlier.
 
 ## Define Service
 
@@ -709,6 +812,54 @@ Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                        => Wallet { pub_key: PublicKey(D1E87747),
                                    name: "Janie Roe", balance: 110 }
 ```
+
+### Read Requests
+
+Let’s check that the defined read endpoints indeed work.
+
+#### Info on All Wallets
+
+```sh
+curl http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+```
+
+This request expectedly returns information on both wallets in the system:
+
+```json
+[
+  {
+    "balance": "90",
+    "name": "Johnny Doe",
+    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+  },
+  {
+    "balance": "110",
+    "name": "Janie Roe",
+    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819"
+  }
+]
+```
+
+#### Info on Specific Wallet
+
+The second read endpoint also works:
+
+```sh
+curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet/\
+03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+```
+
+The response is:
+
+```json
+{
+  "balance": "90",
+  "name": "Johnny Doe",
+  "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+}
+```
+
+## Conclusion
 
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them.
