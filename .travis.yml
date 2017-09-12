@@ -1,5 +1,7 @@
 dist: trusty
-sudo: false
+sudo: required
+services:
+  - docker
 language: python # for mkdocs
 python:
   - 2.7
@@ -36,11 +38,13 @@ script:
   - python -m mkdocs build
   - bash ./misc/lint.sh md
   - bash ./misc/lint.sh html
+  - docker build -t exonum-doc . && docker images
+  - "docker run --rm -d -p 0.0.0.0:8000:8000 exonum-doc"
   - bash ./misc/lint.sh links
 
 after_script:
-  # Kill mkdocs server if it's still running
-  - bash ./misc/lint.sh kill
+  # Kill the docker container
+  - docker stop $(docker ps -q -l)
 
 notifications:
   slack:
