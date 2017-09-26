@@ -243,6 +243,30 @@ in the correspondence with [the validation rules](#segment-validation-rules).
     binary format all fields of such structure are placed in the header, its body
     is empty. So such a structure is fixed-length.
 
+#### Structure composition
+
+The only way to make new composition of existing structures is `encoding_struct!`
+macro:
+
+```Rust
+encoding_struct! {
+  struct Pair {
+    const SIZE = 8;
+    field first: u32 [00 => 04]
+    field second: u32 [04 => 08]
+  }
+}
+
+encoding_struct! {
+  struct Pairs{
+    const SIZE = 8;
+    field inner : Vec<Pair> [00 => 08]
+  }
+}
+```
+
+Here `Pair` is used as a base type in `Pairs` declaration.
+
 ### Slices
 
 A slice is a data structure consisting of an arbitrary number of same type elements.
