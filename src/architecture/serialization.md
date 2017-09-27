@@ -249,18 +249,18 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 
 ```Rust
 encoding_struct! {
-  struct Pair {
-    const SIZE = 8;
-    field first: u32 [00 => 04]
-    field second: u32 [04 => 08]
-  }
+    struct Pair {
+        const SIZE = 8;
+        field first: u32 [00 => 04]
+        field second: u32 [04 => 08]
+    }
 }
 
 encoding_struct! {
-  struct Pairs {
-    const SIZE = 8;
-    field inner: Vec<Pair> [00 => 08]
-  }
+    struct Pairs {
+        const SIZE = 8;
+        field inner: Vec<Pair> [00 => 08]
+    }
 }
 ```
 
@@ -271,12 +271,12 @@ macro can be used within messages:
 
 ```Rust
 message! {
-  struct Pairs {
-    const TYPE = 42;
-    const ID   = 5;
-    const SIZE = 8;
-    field inner: Vec<Pair> [00 => 08]
-  }
+    struct MessagePairs {
+        const TYPE = 42;
+        const ID   = 5;
+        const SIZE = 8;
+        field inner: Vec<Pair> [00 => 08]
+    }
 }
 ```
 
