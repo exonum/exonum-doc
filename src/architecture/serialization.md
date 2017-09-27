@@ -245,8 +245,7 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 
 #### Structure composition
 
-The only way to make new composition of existing structures is `encoding_struct!`
-macro:
+`encoding_struct!` macro allows to make a composition of existing structures:
 
 ```Rust
 encoding_struct! {
@@ -266,6 +265,10 @@ encoding_struct! {
 ```
 
 Here `Pair` is used as a base type in `Pairs` declaration.
+
+!!! note
+    `message!` macro may be used instead of `encoding_struct!` for the outer
+    structure.
 
 ### Slices
 
