@@ -239,7 +239,7 @@ impl Wallet {
 ```
 
 We have added two methods: one to increase the wallet balance and another one
-to decrease it. These methods are *immutable*; they consume an old instance
+to decrease it. These methods are *immutable*; they consume the old instance
 of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
