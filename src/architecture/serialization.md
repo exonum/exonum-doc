@@ -245,7 +245,7 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 
 #### Structure composition
 
-`encoding_struct!` macro allows to make a composition of existing structures:
+`encoding_struct!` macro allows to compose existing structures:
 
 ```Rust
 encoding_struct! {
@@ -257,18 +257,28 @@ encoding_struct! {
 }
 
 encoding_struct! {
-  struct Pairs{
+  struct Pairs {
     const SIZE = 8;
-    field inner : Vec<Pair> [00 => 08]
+    field inner: Vec<Pair> [00 => 08]
   }
 }
 ```
 
 Here `Pair` is used as a base type in `Pairs` declaration.
 
-!!! note
-    `message!` macro may be used instead of `encoding_struct!` for the outer
-    structure.
+Analogously, fields derived from structures defined with `encoding_struct!`
+macro can be used within messages:
+
+```Rust
+message! {
+  struct Pairs {
+    const TYPE = 42;
+    const ID   = 5;
+    const SIZE = 8;
+    field inner: Vec<Pair> [00 => 08]
+  }
+}
+```
 
 ### Slices
 
