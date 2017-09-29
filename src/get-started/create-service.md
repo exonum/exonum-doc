@@ -55,7 +55,7 @@ use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
 use exonum::messages::{RawTransaction, FromRaw, Message};
 use exonum::storage::{Fork, MemoryDB, MapIndex};
 use exonum::crypto::{PublicKey, Hash};
-use exonum::encoding::{self, Field};
+use exonum::encoding;
 use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
@@ -226,22 +226,21 @@ so we add methods to the `Wallet` type:
 
 ```rust
 impl Wallet {
-    pub fn increase(&mut self, amount: u64) {
+    pub fn increase(self, amount: u64) -> Self {
         let balance = self.balance() + amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
+        Self::new(self.pub_key(), self.name(), balance)
     }
 
-    pub fn decrease(&mut self, amount: u64) {
+    pub fn decrease(self, amount: u64) -> Self {
         let balance = self.balance() - amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
+        Self::new(self.pub_key(), self.name(), balance)
     }
 }
 ```
 
 We have added two methods: one to increase the wallet balance and another one
-to decrease it. We used `Field::write` because the data in the structs processed
-by `encoding_struct` is stored as a binary blob and we need to overwrite it
-in-place.
+to decrease it. These methods are *immutable*; they consume the old instance
+of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
@@ -399,11 +398,11 @@ impl Transaction for TxTransfer {
         let mut schema = CurrencySchema { view };
         let sender = schema.wallet(self.from());
         let receiver = schema.wallet(self.to());
-        if let (Some(mut sender), Some(mut receiver)) = (sender, receiver) {
+        if let (Some(sender), Some(receiver)) = (sender, receiver) {
             let amount = self.amount();
             if sender.balance() >= amount {
-                sender.decrease(amount);
-                receiver.increase(amount);
+                let sender = sender.decrease(amount);
+                let receiver = receiver.increase(amount);
                 println!("Transfer between wallets: {:?} => {:?}",
                          sender,
                          receiver);
