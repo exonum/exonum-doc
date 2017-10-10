@@ -19,6 +19,7 @@ to these projects, testing them, and developing using Exonum.
 Exonum depends on the following third-party system libraries:
 
 - [LevelDB][leveldb] (persistent storage)
+- [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
 You can find instructions how to install them on the various environments
@@ -29,7 +30,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb pkg-config
+brew install libsodium leveldb rocksdb pkg-config
 ```
 
 ### Linux
@@ -39,7 +40,7 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev \
-    libleveldb-dev pkg-config
+    libleveldb-dev librocksdb-dev pkg-config
 ```
 
 libsodium is contained in a third-party PPA, so you may need to add it with
@@ -84,6 +85,16 @@ You may also run the extended test suite located in the `sandbox` directory:
 cargo test --manifest-path sandbox/Cargo.toml
 ```
 
+Since version `0.2.0` Exonum supports RocksDB as alternative data storage.
+To enable RocksDB support you need to pass  additional parameter to cargo:
+```shell
+cargo test --manifest-path exonum/Cargo.toml --features rocksdb
+```
+and for extended test suite:
+```shell
+cargo test --manifest-path sandbox/Cargo.toml --features rocksdb
+```
+
 ## Non-Rust Components
 
 ### Light Client Library
@@ -108,6 +119,7 @@ guide on how to develop applications on top of the Exonum framework.
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
+[rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
 [openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
