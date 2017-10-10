@@ -85,8 +85,8 @@ You may also run the extended test suite located in the `sandbox` directory:
 cargo test --manifest-path sandbox/Cargo.toml
 ```
 
-Since version `0.2.0` Exonum supports RocksDB as alternative data storage.
-To enable RocksDB support you need to pass  additional parameter to cargo:
+Since version [0.2.0][rel0.2.0] Exonum supports RocksDB as alternative data storage.
+To enable RocksDB support you need to pass additional parameter to cargo:
 ```shell
 cargo test --manifest-path exonum/Cargo.toml --features rocksdb
 ```
@@ -94,6 +94,12 @@ and for extended test suite:
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml --features rocksdb
 ```
+
+If you want to use Exonum framework with RocksDB support as dependency in you project 
+you should add into `Cargo.toml` line like this:
+```shell
+exonum = { version = "0.2.0", features = ["rocksdb"] }
+``` 
 
 ## Non-Rust Components
 
@@ -132,3 +138,4 @@ guide on how to develop applications on top of the Exonum framework.
 [karma]: http://karma-runner.github.io/1.0/index.html
 [istanbul]: https://istanbul.js.org/
 [babel]: http://babeljs.io/
+[rel0.2.0]: https://github.com/exonum/exonum/releases/tag/v0.2
