@@ -109,8 +109,8 @@ let blockchain = Blockchain::new(Box::new(db), services);
 
 We use `MemoryDB` to store our data in the code above. `MemoryDB` is an
 in-memory database implementation useful for development and testing purposes.
-There is LevelDB support as well that is recommendable for production
-applications.
+There is LevelDB and RocksDB support as well that is recommendable for
+production applications.
 
 A minimal blockchain is ready, but it is pretty much useless, because there is
 no way to interact with it. To fix this we need to create a node and provide an
@@ -220,7 +220,8 @@ encoding_struct! {
 }
 ```
 
-Macro `encoding_struct!` helps declare a [serializable](../architecture/serialization.md)
+Macro `encoding_struct!` helps declare a
+[serializable](../architecture/serialization.md)
 struct and determine bounds of its fields. We need to change wallet balance,
 so we add methods to the `Wallet` type:
 
@@ -419,10 +420,11 @@ impl Transaction for TxTransfer {
 
 Finally, we need to implement the node API.
 With this aim we declare a struct which implements the `Api` trait.
-The struct will contain a channel, i.e., a connection to the blockchain node
+The struct will contain a channel, i.e. a connection to the blockchain node
 instance.
 Besides the channel, the API struct will contain a blockchain instance;
-it will be needed to implement [read requests](../architecture/services.md#read-requests).
+it will be needed to implement
+[read requests](../architecture/services.md#read-requests).
 
 ```rust
 #[derive(Clone)]
@@ -507,7 +509,8 @@ We want to implement 2 read requests:
 - Return the information about all wallets in the system;
 - Return the information about a specific wallet identified by the public key.
 
-To accomplish this, we define a couple of corresponding methods in `CryptocurrencyApi`,
+To accomplish this, we define a couple of corresponding methods in
+`CryptocurrencyApi`,
 that use its `blockchain` field to read information from the blockchain storage.
 
 ```rust
@@ -538,12 +541,14 @@ impl CryptocurrencyApi {
     `Fork`s provide *read-write* access, not exactly what
     you want to use for *read-only* access to the storage in production
     (instead, you may want to use `Snapshot`s).
-    We use `Fork`s only to keep the tutorial reasonably short. If we used `Snapshot`s,
+    We use `Fork`s only to keep the tutorial reasonably short. If we used
+    `Snapshot`s,
     we would have to make `CurrencySchema` generic and implement it both for
     `Fork` (which would be used in transactions) and `Snapshot` (which would
     be used in read requests).
 
-Then, we need to add request processing to the `CryptocurrencyApi::wire()` method,
+Then, we need to add request processing to the `CryptocurrencyApi::wire()`
+method,
 just like we did for transactions:
 
 ```rust
