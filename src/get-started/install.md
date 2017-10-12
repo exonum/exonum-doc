@@ -47,14 +47,12 @@ apt-get install build-essential libsodium-dev \
     libleveldb-dev librocksdb-dev pkg-config
 ```
 
-libsodium is contained in a third-party PPA, so you may need to add it with
-
-```shell
-add-apt-repository ppa:chris-lea/libsodium
-```
-
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
+
+Depending on the version of your distributive, libsodium and RocksDB may not
+be present in the default package lists. In this case you may need to install
+these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
