@@ -22,8 +22,9 @@ Exonum depends on the following third-party system libraries:
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-`LevelDB` and `RocksDB` are used as alternative storage engines, with LevelDB used by default. 
-You need to install only the storage engine(s) you are intending to use.
+LevelDB and RocksDB are used as alternative storage engines, with LevelDB
+used by default. You need to install only the storage engine(s) you are
+intending to use.
 
 You can find instructions how to install them on the various environments
 below.
@@ -89,20 +90,24 @@ cargo test --manifest-path sandbox/Cargo.toml
 ```
 
 Exonum supports RocksDB as an alternative data storage since version [0.2.0][rel0.2.0].
-To enable RocksDB support you need to pass additional parameter to cargo:
+To enable RocksDB support you need to pass additional parameter to Cargo:
+
 ```shell
 cargo test --manifest-path exonum/Cargo.toml --features rocksdb
 ```
+
 and for extended test suite:
+
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml --features rocksdb
 ```
 
-If you want to use Exonum framework with RocksDB support as a dependency in your project, 
-you should add the following line into `Cargo.toml`:
-```shell
+If you want to use Exonum framework with RocksDB support as a dependency
+in your project, you should add the following line into `Cargo.toml`:
+
+```toml
 exonum = { version = "0.2.0", features = ["rocksdb"] }
-``` 
+```
 
 ## Non-Rust Components
 
