@@ -147,8 +147,9 @@ Usually, a service needs to persist some data. For example, the sample
 cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
-Exonum persists blockchain state in a global key-value storage implemented
-using [LevelDB][leveldb] and [RocksDB][rocksdb]. Each service needs to define a
+Exonum persists blockchain state in a global key-value storage implemented with
+one of the supported backends - [LevelDB][leveldb] (used by default) and
+[RocksDB][rocksdb] (introduced as of Exonum 0.2). Each service needs to define a
 set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain

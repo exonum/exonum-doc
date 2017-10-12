@@ -239,7 +239,7 @@ and suffixes are used to distinguish tables within the group.
 !!! note "Example"
     Key `key` at the table named `BTC` (`0x42 0x54 0x43` in ASCII) at
     the table group `0x03` for the service with ID `0x00 0x01` matches the
-    following key in the LevelDB map (and currently also in the RocksDB map):
+    following key in the LevelDB and RocksDB maps:
 
     ```none
     0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
