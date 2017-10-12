@@ -22,6 +22,9 @@ Exonum depends on the following third-party system libraries:
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
+`LevelDB` and `RocksDB` are used as alternative storage engines, with LevelDB used by default. 
+You need to install only the storage engine(s) you are intending to use.
+
 You can find instructions how to install them on the various environments
 below.
 
