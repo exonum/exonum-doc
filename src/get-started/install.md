@@ -19,7 +19,12 @@ to these projects, testing them, and developing using Exonum.
 Exonum depends on the following third-party system libraries:
 
 - [LevelDB][leveldb] (persistent storage)
+- [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
+
+LevelDB and RocksDB are used as alternative storage engines, with LevelDB
+used by default. You need to install only the storage engine(s) you are
+intending to use.
 
 You can find instructions how to install them on the various environments
 below.
@@ -29,7 +34,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb pkg-config
+brew install libsodium leveldb rocksdb pkg-config
 ```
 
 ### Linux
@@ -39,17 +44,15 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev \
-    libleveldb-dev pkg-config
-```
-
-libsodium is contained in a third-party PPA, so you may need to add it with
-
-```shell
-add-apt-repository ppa:chris-lea/libsodium
+    libleveldb-dev librocksdb-dev pkg-config
 ```
 
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
+
+Depending on the version of your distributive, libsodium and RocksDB may not
+be present in the default package lists. In this case you may need to install
+these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
@@ -84,6 +87,26 @@ You may also run the extended test suite located in the `sandbox` directory:
 cargo test --manifest-path sandbox/Cargo.toml
 ```
 
+Exonum supports RocksDB as an alternative data storage since version [0.2.0][rel0.2.0].
+To enable RocksDB support you need to pass additional parameter to Cargo:
+
+```shell
+cargo test --manifest-path exonum/Cargo.toml --features rocksdb
+```
+
+and for extended test suite:
+
+```shell
+cargo test --manifest-path sandbox/Cargo.toml --features rocksdb
+```
+
+If you want to use Exonum framework with RocksDB support as a dependency
+in your project, you should add the following line into `Cargo.toml`:
+
+```toml
+exonum = { version = "0.2.0", features = ["rocksdb"] }
+```
+
 ## Non-Rust Components
 
 ### Light Client Library
@@ -108,6 +131,7 @@ guide on how to develop applications on top of the Exonum framework.
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
+[rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
 [openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
@@ -120,3 +144,4 @@ guide on how to develop applications on top of the Exonum framework.
 [karma]: http://karma-runner.github.io/1.0/index.html
 [istanbul]: https://istanbul.js.org/
 [babel]: http://babeljs.io/
+[rel0.2.0]: https://github.com/exonum/exonum/releases/tag/v0.2
