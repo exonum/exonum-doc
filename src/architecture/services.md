@@ -420,7 +420,7 @@ the blockchain initialization. A result of the method call for each service
 is recorded under [the string service identifier](#service-identifiers)
 in the configuration. The resulting initial configuration is augmented
 by non-service parameters (such as public keys of the validators) and is
-recorded in the genesis block, hence the method name.
+recorded in the genesis block.
 
 The default trait implementation returns `null` (i.e., no configuration).
 It must be redefined for services that have global configuration parameters.
