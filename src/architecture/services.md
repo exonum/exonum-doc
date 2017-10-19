@@ -402,18 +402,17 @@ The service, which `tx_from_raw` method
 will be called for a particular transaction, is chosen
 based on the `service_id` field in the transaction serialization.
 
-### Genesis Block Handler
+### Initialization Handler
 
 ```rust
 use serde_json::Value;
 
-fn handle_genesis_block(&self, fork: &mut Fork)
-                        -> Value {
+fn initialize(&self, fork: &mut Fork) -> Value {
     Value::Null
 }
 ```
 
-`handle_genesis_block` returns an initial
+`initialize` returns an initial
 [global configuration](#global-configuration)
 of the service in the JSON format.
 This method is invoked for all deployed services during
