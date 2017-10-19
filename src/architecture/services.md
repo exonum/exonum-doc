@@ -402,18 +402,17 @@ The service, which `tx_from_raw` method
 will be called for a particular transaction, is chosen
 based on the `service_id` field in the transaction serialization.
 
-### Genesis Block Handler
+### Initialization Handler
 
 ```rust
 use serde_json::Value;
 
-fn handle_genesis_block(&self, fork: &mut Fork)
-                        -> Value {
+fn initialize(&self, fork: &mut Fork) -> Value {
     Value::Null
 }
 ```
 
-`handle_genesis_block` returns an initial
+`initialize` returns an initial
 [global configuration](#global-configuration)
 of the service in the JSON format.
 This method is invoked for all deployed services during
@@ -421,7 +420,7 @@ the blockchain initialization. A result of the method call for each service
 is recorded under [the string service identifier](#service-identifiers)
 in the configuration. The resulting initial configuration is augmented
 by non-service parameters (such as public keys of the validators) and is
-recorded in the genesis block, hence the method name.
+recorded in the genesis block.
 
 The default trait implementation returns `null` (i.e., no configuration).
 It must be redefined for services that have global configuration parameters.
