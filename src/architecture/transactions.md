@@ -221,6 +221,24 @@ The method has no access to the blockchain state, same as `verify`.
 `info()` is used within the core Exonum framework
 [in the blockchain explorer](../advanced/node-management#transaction).
 
+!!! tip
+    In most cases, you may implement `info()` to return the JSON serialization
+    of the transaction:
+
+    ```rust
+    impl Transaction for YourTransactionType {
+        // other methods
+
+        fn info(&self) -> serde_json::Value {
+            serde_json::to_value(self).expect("Cannot serialize transaction to JSON")
+        }
+    }
+    ```
+
+    JSON serialization is automatically implemented for all transactions
+    defined with the `message!` macro, so no additional coding is required
+    for them.
+
 ## Lifecycle
 
 ### 1. Creation
