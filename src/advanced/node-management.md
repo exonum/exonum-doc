@@ -35,9 +35,9 @@ appropriate length. `Hash` and `PublicKey` consist of 32 bytes.
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
 address formatted as 4 octets separated by points.
 
-### OutgiongConnectionState
+### OutgoingConnectionState
 
-`OutgiongConnectionState` is a JSON object with the following fields:
+`OutgoingConnectionState` is a JSON object with the following fields:
 
 - **type**: string  
   Connection type, can be:
@@ -55,7 +55,7 @@ address formatted as 4 octets separated by points.
 
 - **public_key**: ?PublicKey  
   The public key of the peer or `null` if the public key is unknown
-- **state**: OutgiongConnectionState  
+- **state**: OutgoingConnectionState  
   Current connection state
 
 ### ServiceInfo
