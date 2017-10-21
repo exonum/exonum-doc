@@ -218,6 +218,8 @@ fn info(&self) -> ::serde_json::Value
 The `info` method returns the useful information (from service developers point
 of view) about the transaction in the JSON format.
 The method has no access to the blockchain state, same as `verify`.
+`info()` is used within the core Exonum framework
+[in the blockchain explorer](../advanced/node-management#transaction).
 
 ## Lifecycle
 
