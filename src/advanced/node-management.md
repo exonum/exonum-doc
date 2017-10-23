@@ -179,7 +179,7 @@ Searches for a transaction, either committed or uncommitted, by the hash.
 !!! warning "Quirky behavior"
     As of Exonum 0.2, the returned information about a transaction is only
     accurate if the transaction type redefines the default [`info()`][info-method]
-    implementation, for example, to return the JSON serialization of the transaction.
+    implementation, for example, to return JSON serialization of the transaction.
     If `info()` is *not* redefined, the
     endpoint will always return `null` as the transaction information.
 

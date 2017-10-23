@@ -215,14 +215,14 @@ of the validators.
 fn info(&self) -> ::serde_json::Value
 ```
 
-The `info` method returns the useful information (from service developers point
-of view) about the transaction in the JSON format.
+The `info` method returns useful information (from the service developer’s point
+of view) about the transaction in JSON format.
 The method has no access to the blockchain state, same as `verify`.
-`info()` is used within the core Exonum framework
+`info()` is used within the core of Exonum framework
 [in the blockchain explorer](../advanced/node-management#transaction).
 
 !!! tip
-    In most cases, you may implement `info()` to return the JSON serialization
+    In most cases, you may implement `info()` to return JSON serialization
     of the transaction:
 
     ```rust
