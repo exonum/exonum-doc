@@ -35,9 +35,9 @@ appropriate length. `Hash` and `PublicKey` consist of 32 bytes.
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
 address formatted as 4 octets separated by points.
 
-### OutgiongConnectionState
+### OutgoingConnectionState
 
-`OutgiongConnectionState` is a JSON object with the following fields:
+`OutgoingConnectionState` is a JSON object with the following fields:
 
 - **type**: string  
   Connection type, can be:
@@ -55,7 +55,7 @@ address formatted as 4 octets separated by points.
 
 - **public_key**: ?PublicKey  
   The public key of the peer or `null` if the public key is unknown
-- **state**: OutgiongConnectionState  
+- **state**: OutgoingConnectionState  
   Current connection state
 
 ### ServiceInfo
@@ -175,6 +175,13 @@ GET {system_base_path}/transactions/{transaction_hash}
 ```
 
 Searches for a transaction, either committed or uncommitted, by the hash.
+
+!!! warning "Quirky behavior"
+    As of Exonum 0.2, the returned information about a transaction is only
+    accurate if the transaction type redefines the default [`info()`][info-method]
+    implementation, for example, to return JSON serialization of the transaction.
+    If `info()` is *not* redefined, the
+    endpoint will always return `null` as the transaction information.
 
 #### Parameters
 
@@ -609,3 +616,4 @@ descending order according to their heights.
 
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
+[info-method]: ../architecture/transactions.md#info
