@@ -544,11 +544,11 @@ Returns the headers of the consecutive `count` blocks up to the `latest` height.
   The number of blocks to return. Should not be greater than
   [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
 - **skip_empty_blocks**: bool=  
-  If `true`, then only non-empty blocks are returned. Default value is `false`
+  If `true`, then only non-empty blocks are returned. The default value is `false`
 - **latest**: integer=  
   The maximum height of the returned blocks. The blocks are returned
   in reverse order, starting from the `latest` and at least up to the `latest -
-  count + 1`. Default value is the height of the latest block in the blockchain
+  count + 1`. The default value is the height of the latest block in the blockchain
 
 #### Response
 
