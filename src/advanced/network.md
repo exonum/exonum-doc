@@ -43,7 +43,7 @@ has been really authorized by a supermajority of validators.
 
 Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
-Mio library is used for event multiplexing. Each node has
+[The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
 the external network, timeouts, and new transactions received via REST API.
 
@@ -154,3 +154,5 @@ to be unique within a specific Exonum blockchain.
     of the corresponding service transaction, as it can be inferred from the
     semantics of POST requests. The GET endpoint consumes `{config_hash}` param,
     which is specified as a part of the URL path.
+
+[tokio-lib]: https://tokio.rs/
