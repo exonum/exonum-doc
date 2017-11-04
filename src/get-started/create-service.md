@@ -24,17 +24,17 @@ Add necessary dependencies to your `Cargo.toml`:
 ```toml
 [package]
 name = "cryptocurrency"
-version = "0.1.0"
+version = "0.3.0" # corresponds to version of Exonum
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
+exonum = "0.3.0"
 iron = "0.5.1"
 bodyparser = "0.7.0"
 router = "0.5.1"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-exonum = "0.1.0"
 ```
 
 We need to import crates with necessary types. Edit your `src/main.rs`:
@@ -48,13 +48,13 @@ extern crate router;
 extern crate bodyparser;
 extern crate iron;
 
-use exonum::blockchain::{self, Blockchain, Service, GenesisConfig,
+use exonum::blockchain::{Blockchain, Service, GenesisConfig,
                          ValidatorKeys, Transaction, ApiContext};
 use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
-                   ApiSender, NodeChannel};
+                   ApiSender};
 use exonum::messages::{RawTransaction, FromRaw, Message};
 use exonum::storage::{Fork, MemoryDB, MapIndex};
-use exonum::crypto::{PublicKey, Hash};
+use exonum::crypto::{PublicKey, Hash, HexValue};
 use exonum::encoding;
 use exonum::api::{Api, ApiError};
 use iron::prelude::*;
@@ -194,7 +194,7 @@ let node_cfg = NodeConfig {
     services_configs: Default::default(),
 };
 
-let mut node = Node::new(blockchain, node_cfg);
+let node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
 
@@ -272,8 +272,7 @@ which is the first argument to the `MapIndex::new` call:
 ```rust
 impl<'a> CurrencySchema<'a> {
     pub fn wallets(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
-        let prefix = blockchain::gen_prefix(SERVICE_ID, 0, &());
-        MapIndex::new(prefix, self.view)
+        MapIndex::new("cryptocurrency.wallets", self.view)
     }
 
     // Utility method to quickly get a separate wallet from the storage
@@ -429,7 +428,7 @@ it will be needed to implement
 ```rust
 #[derive(Clone)]
 struct CryptocurrencyApi {
-    channel: ApiSender<NodeChannel>,
+    channel: ApiSender,
     blockchain: Blockchain,
 }
 ```
@@ -482,8 +481,7 @@ impl Api for CryptocurrencyApi {
                 Ok(Some(tx)) => {
                     let tx: Box<Transaction> = tx.into();
                     let tx_hash = tx.hash();
-                    self_.channel.send(tx)
-                                 .map_err(|e| ApiError::Events(e))?;
+                    self_.channel.send(tx).map_err(ApiError::from)?;
                     let json = TransactionResponse { tx_hash };
                     self_.ok_response(&serde_json::to_value(&json).unwrap())
                 }
@@ -657,6 +655,7 @@ impl Service for CurrencyService {
         let mut router = Router::new();
         let api = CryptocurrencyApi {
             channel: ctx.node_channel().clone(),
+            blockchain: ctx.blockchain().clone(),
         };
         api.wire(&mut router);
         Some(Box::new(router))
