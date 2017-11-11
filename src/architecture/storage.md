@@ -1,14 +1,14 @@
 # Exonum Data Model
 
 This page describes Exonum **data storage** principles, from the database engine
-used (LevelDB, RocksDB), to the abstractions that are used in client
+used (RocksDB), to the abstractions that are used in client
 applications.
 
 1. [Exonum table types](#table-types) lists supported types of
    data storage collections. Tables represent the highest abstraction level
    for data storage
 2. [Low-level storage](#low-level-storage) explains how tables are persisted
-   using LevelDB and RocksDB
+   using RocksDB
 3. [View layer](#view-layer) describes the wrapper over the DB engine
    that ensures atomicity of blocks and transactions
 4. [List of system tables](#system-tables) contains tables
@@ -36,7 +36,7 @@ iterators use key ordering of the underlying key-value storage to determine
 the iteration order.
 Namely, keys are lexicographically ordered over their binary serializations;
 this ordering coincides with that used in
-[LevelDB and RoсksDB](#low-level-storage).
+[RoсksDB](#low-level-storage).
 
 ### BaseIndex
 
@@ -200,63 +200,54 @@ Exonum uses third-party database engines to persist blockchain state
 locally. To use the particular database, a minimal [`Database`][database]
 interface should be implemented for it:
 
-- Get value by key
-- Put new value at the key (insert or update the saved one)
-- Delete key-value pair by key
+- Get a value by a [column family][col-family] name and a key
+- Put a new value at the specified column family / key (insert or update
+  the saved one)
+- Delete a key-value pair by column family name / key
 
 All the tables functionality is reduced to these atomic call types.
 
-As of Exonum 0.1, [LevelDB][level-db] is used as the database engine and
-as of Exonum 0.2 [RocksDB][rocks-db] support is realized.
+As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
+In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
+since 0.3, its support has been dropped.
 
-All the values from different tables are stored in one big key-value
-table at the low-level storage, wherein the keys are represented as
+Values from different tables are stored in column families in the low-level storage,
+wherein the keys are represented as
 a byte sequence, and values are serialized according to Exonum binary
-serialization
-format. Keys of the wrapped `BaseIndex` of a specific table
+serialization format. A single column family may store data for
+more than one table (see table groups below).
+Keys of the wrapped `BaseIndex` of a specific table
 are mapped to the low-level storage keys
 in a deterministic manner using [table identifiers](#table-identifiers).
 
 ### Table Identifiers
 
-Every table is uniquely identified by the compound prefix, which is used
-to map table keys into keys of the underlying low-level storage. The
-keys are prepended with this prefix which is unique to each table, and thus
-allows to distinguish values from different tables.
+Every table is uniquely identified by a compound identifier, which is used
+to map table keys into a column family and its keys in the underlying
+low-level storage. A table identifier consists of 2 parts:
 
-The table prefix consists of [the service ID](services.md#service-identifiers)
-and an internal identifier inside the
-service.
-All tables created with the same prefix will be the views of the same data.
+- String name, which is mapped 1-to-1 to a column family.
+  The name may contain uppercase and lowercase Latin letters, digits,
+  and underscores `_`.
+- Optional prefix presented as a sequence of bytes (`Vec<u8>` in Rust terms).
 
-Services identifier is a 2-byte unsigned integer, `u16`.
-[System tables](#system-tables) have service ID equal to `0`.
-Tables inside services are identified
-with `u8` integers and an optional suffix. If the suffix is present,
-the `u8` integer denotes a *group* of tables, rather than a single table,
-and suffixes are used to distinguish tables within the group.
+If the prefix is present, the column family identified by the table name
+stores a *group* of tables, rather than a single table.
+In this case, prefixes are used to distinguish tables within the group.
 
 !!! note "Example"
-    Key `key` at the table named `BTC` (`0x42 0x54 0x43` in ASCII) at
-    the table group `0x03` for the service with ID `0x00 0x01` matches the
-    following key in the LevelDB and RocksDB maps:
-
-    ```none
-    0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
-    ```
-
-    Here, `|` separates logical components of the low-level key.
-
-It is advised to use a `gen_prefix` function
-for creating table prefixes. See the [schema of Exonum core][blockchain-schema]
-for an example.
+    Key `key` at the table with name `crypto` and prefix `BTC`
+    (`0x42 0x54 0x43` in ASCII) matches key
+    `0x42 0x54 0x43 | key` in the column family in RocksDB named
+    `crypto`.
 
 !!! warning
-    Table identifiers can also be created manually, but it could be risky.
     It is strongly advised not to admit
-    a situation when one table identifier inside the service is a prefix for
-    another table in the same service. Such cases may cause unpredictable
+    a situation when a table prefix in a table group starts with
+    another table prefix in the same group. Such cases may cause unpredictable
     collisions between logically different keys and elements.
+    As a possible way to avoid this, prefixes within the group may have
+    a fixed byte size.
 
 ## View Layer
 
@@ -348,5 +339,5 @@ content together with the tables being indexed.
 [patch]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L11
 [snapshot]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L57
 [fork]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L104
-[leveldb-wrapper]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/leveldb.rs
+[col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families
 [blockchain-schema]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
