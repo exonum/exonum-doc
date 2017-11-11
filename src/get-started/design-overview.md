@@ -218,11 +218,11 @@ which more than 1/3 (but less than 2/3) of the validators are compromised.
     See the [*Data Storage*](../architecture/storage.md) article
     for more details.
 
-### LevelDB and RocksDB
+### RocksDB
 
-[LevelDB][level-db] and [RocksDB][rocks-db] are used to persist locally the data
-that transactions operate with. They provide high efficiency and minimal
-storage overhead.
+[RocksDB][rocks-db] is used to persist locally the data
+that transactions operate with. This storage engine provides high efficiency
+and minimal storage overhead.
 
 ### Table Types
 
@@ -466,7 +466,6 @@ for signing anchoring transactions in Bitcoin.
 
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
-[level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
 [wiki:sha256]: https://en.wikipedia.org/wiki/SHA-2
 [wiki:ed25519]: https://en.wikipedia.org/wiki/EdDSA

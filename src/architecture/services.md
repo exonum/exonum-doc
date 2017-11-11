@@ -148,8 +148,7 @@ cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented with
-one of the supported backends - [LevelDB][leveldb] (used by default) and
-[RocksDB][rocksdb] (introduced as of Exonum 0.2). Each service needs to define a
+[RocksDB][rocksdb]. Each service needs to define a
 set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain
@@ -518,7 +517,6 @@ running the service might not know this information.
 [iron]: http://ironframework.io/
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
-[leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
