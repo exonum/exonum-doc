@@ -350,13 +350,16 @@ only it is a string instead of an integer.
   in the `services_configs` variable
 - To compute API endpoints for the service. All service endpoints
   are mounted on `/api/services/{service_name}`
+- In naming service [tables](../glossary.md#table). By convention, table names
+  should start with `service_name` followed by a period `.`
 
 !!! note "Example"
     [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
     defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the
     service
-    are available on `/api/services/btc_anchoring/`, and its configuration is
-    stored in the `services.btc_anchoring` section of the overall configuration.
+    are available on `/api/services/btc_anchoring/`, its configuration is
+    stored in the `services.btc_anchoring` section of the overall configuration,
+    and its tables have names starting with `"btc_anchoring."`.
 
 ### State Hash
 

@@ -226,20 +226,24 @@ Every table is uniquely identified by a compound identifier, which is used
 to map table keys into a column family and its keys in the underlying
 low-level storage. A table identifier consists of 2 parts:
 
-- String name, which is mapped 1-to-1 to a column family.
+- **String name,** which is mapped 1-to-1 to a column family.
   The name may contain uppercase and lowercase Latin letters, digits,
-  and underscores `_`.
-- Optional prefix presented as a sequence of bytes (`Vec<u8>` in Rust terms).
+  underscores `_`, and periods `.`. By convention, table names in services should
+  start with [the service name][service-name] and a period. For example,
+  the only table in the cryptocurrency tutorial is named `cryptocurrency.wallets`,
+  where `cryptocurrency` is the service name, and `wallets` is the own name
+  of the table.
+- **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust terms).
 
 If the prefix is present, the column family identified by the table name
 stores a *group* of tables, rather than a single table.
 In this case, prefixes are used to distinguish tables within the group.
 
 !!! note "Example"
-    Key `key` at the table with name `crypto` and prefix `BTC`
+    Key `key` at the table with name `exchange.crypto` and prefix `BTC`
     (`0x42 0x54 0x43` in ASCII) matches key
     `0x42 0x54 0x43 | key` in the column family in RocksDB named
-    `crypto`.
+    `exchange.crypto`.
 
 !!! warning
     It is strongly advised not to admit
@@ -341,3 +345,4 @@ content together with the tables being indexed.
 [fork]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L104
 [col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families
 [blockchain-schema]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
+[service-name]: services.md#service-identifiers
