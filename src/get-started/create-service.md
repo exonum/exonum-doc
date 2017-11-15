@@ -109,7 +109,7 @@ let blockchain = Blockchain::new(Box::new(db), services);
 
 We use `MemoryDB` to store our data in the code above. `MemoryDB` is an
 in-memory database implementation useful for development and testing purposes.
-There is LevelDB and RocksDB support as well that is recommendable for
+There is RocksDB support as well that is recommendable for
 production applications.
 
 A minimal blockchain is ready, but it is pretty much useless, because there is

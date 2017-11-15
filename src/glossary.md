@@ -95,7 +95,7 @@ only
 the transactions log) is identical for all full nodes.
 
 In Exonum the blockchain state is implemented as a key-value storage. It is
-persisted using [LevelDB][leveldb] or [RocksDB][rocksdb]. The parts of the
+persisted using [RocksDB][rocksdb]. The parts of the
 storage correspond to
 [tables](#table) used by [the core](#core) and [services](#service).
 
@@ -539,7 +539,6 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
 [wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
-[leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org
 [exonum]: https://github.com/exonum/exonum/
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree

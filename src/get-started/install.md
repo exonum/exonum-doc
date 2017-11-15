@@ -6,7 +6,7 @@ This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
 
 !!! note
-    As of version 0.1, you need to compile the core locally for every application
+    As of version 0.3, you need to compile the core locally for every application
     that depends on it. [Cargo][cargo] (the Rust package manager) takes care
     of most things, but you still need to have dependencies
     installed locally as described below for the core to compile.
@@ -18,15 +18,14 @@ to these projects, testing them, and developing using Exonum.
 
 Exonum depends on the following third-party system libraries:
 
-- [LevelDB][leveldb] (persistent storage)
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-LevelDB and RocksDB are used as alternative storage engines, with LevelDB
-used by default. You need to install only the storage engine(s) you are
-intending to use.
+!!! note
+    Before version 0.3, Exonum supported [LevelDB][leveldb] as an alternative
+    storage engine. In [0.3 release][rel0.3.0], the support for LevelDB was dropped.
 
-You can find instructions how to install them on the various environments
+You can find instructions how to install dependencies in various environments
 below.
 
 ### MacOS
@@ -34,7 +33,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb rocksdb pkg-config
+brew install libsodium rocksdb pkg-config
 ```
 
 ### Linux
@@ -44,7 +43,7 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev \
-    libleveldb-dev librocksdb-dev pkg-config
+    librocksdb-dev pkg-config
 ```
 
 Package names and installation methods may differ in other Linux distributives;
@@ -87,26 +86,6 @@ You may also run the extended test suite located in the `sandbox` directory:
 cargo test --manifest-path sandbox/Cargo.toml
 ```
 
-Exonum supports RocksDB as an alternative data storage since version [0.2.0][rel0.2.0].
-To enable RocksDB support you need to pass additional parameter to Cargo:
-
-```shell
-cargo test --manifest-path exonum/Cargo.toml --features rocksdb
-```
-
-and for extended test suite:
-
-```shell
-cargo test --manifest-path sandbox/Cargo.toml --features rocksdb
-```
-
-If you want to use Exonum framework with RocksDB support as a dependency
-in your project, you should add the following line into `Cargo.toml`:
-
-```toml
-exonum = { version = "0.2.0", features = ["rocksdb"] }
-```
-
 ## Non-Rust Components
 
 ### Light Client Library
@@ -144,4 +123,4 @@ guide on how to develop applications on top of the Exonum framework.
 [karma]: http://karma-runner.github.io/1.0/index.html
 [istanbul]: https://istanbul.js.org/
 [babel]: http://babeljs.io/
-[rel0.2.0]: https://github.com/exonum/exonum/releases/tag/v0.2
+[rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3

@@ -148,8 +148,7 @@ cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented with
-one of the supported backends - [LevelDB][leveldb] (used by default) and
-[RocksDB][rocksdb] (introduced as of Exonum 0.2). Each service needs to define a
+[RocksDB][rocksdb]. Each service needs to define a
 set of data collections
 (*tables*), in which the service persists the service-specific data;
 these tables abstract away the need for the service to deal with the blockchain
@@ -351,13 +350,16 @@ only it is a string instead of an integer.
   in the `services_configs` variable
 - To compute API endpoints for the service. All service endpoints
   are mounted on `/api/services/{service_name}`
+- In naming service [tables](../glossary.md#table). By convention, table names
+  should start with `service_name` followed by a period `.`
 
 !!! note "Example"
     [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
     defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the
     service
-    are available on `/api/services/btc_anchoring/`, and its configuration is
-    stored in the `services.btc_anchoring` section of the overall configuration.
+    are available on `/api/services/btc_anchoring/`, its configuration is
+    stored in the `services.btc_anchoring` section of the overall configuration,
+    and its tables have names starting with `"btc_anchoring."`.
 
 ### State Hash
 
@@ -518,7 +520,6 @@ running the service might not know this information.
 [iron]: http://ironframework.io/
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
-[leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
