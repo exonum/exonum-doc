@@ -209,7 +209,7 @@ All the tables functionality is reduced to these atomic call types.
 
 As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
 In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
-since 0.3, its support has been dropped.
+since 0.3 its support has been dropped.
 
 Values from different tables are stored in column families in the low-level storage,
 wherein the keys are represented as
