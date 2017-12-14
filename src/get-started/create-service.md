@@ -60,6 +60,7 @@ use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
 use router::Router;
+use serde::Deserialize;
 ```
 
 Define constants:
