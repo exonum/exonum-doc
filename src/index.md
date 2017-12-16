@@ -51,7 +51,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 !!! tip
     See [the anchoring][anchoring] and [configuration update][config] services
-    for the examples of real-world Exonum services, and [the cryptocurrency tutorial][tutorial]
+    for the examples of real-world Exonum services, and [the cryptocurrency tutorial][tutorial-advanced]
     for an example how to use the light client library.
 
 ### Specifications
@@ -72,6 +72,7 @@ what features are coming soon.
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/cryptocurrency-advanced
+[tutorial]: https://github.com/exonum/cryptocurrency
+[tutorial-advanced]: https://github.com/exonum/cryptocurrency-advanced
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum-configuration
