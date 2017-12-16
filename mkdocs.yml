@@ -56,6 +56,27 @@ pages:
     - 'Transactions': 'architecture/transactions.md'
     # How to make Public API communication (both server and client side)
     - 'Clients': 'architecture/clients.md'
+    - 'JavaScript client':
+      # What is JavaScript light client
+      - 'Getting started': 'javascript-client/getting-started.md'
+      # Description of built-in types, declaration of custom types, arrays
+      - 'Data types': 'javascript-client/data-types.md'
+      # Serialization methods in light client
+      - 'Serialization': 'javascript-client/serialization.md'
+      # Cryptographic hash function
+      - 'Hash': 'javascript-client/hash.md'
+      # Sign data using key pair
+      - 'Signature': 'javascript-client/signature.md'
+      # Prepare transaction in light client
+      - 'Transactions': 'javascript-client/transactions.md'
+      # Merkle trees and their variants
+      - 'Cryptographic proofs': 'javascript-client/proofs.md'
+      # Prove the existence of data in a blockchain
+      - 'Integrity checks': 'javascript-client/integrity-checks.md'
+      # List of built-in helpers
+      - 'Helpers': 'javascript-client/helpers.md'
+      # Notes about contributing to light client
+      - 'Contributing': 'javascript-client/contributing.md'
     # Local configuration - how to roughly configure a node (make it ready to run)
     - 'Configuration': 'architecture/configuration.md'
     # Includes blockchain, genesis block, indexes, proofs, etc.
