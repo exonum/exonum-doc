@@ -560,13 +560,14 @@ smallest and largest heights traversed to collect at most `count` blocks.
 
 #### Response
 
-The JSON object of the explored block range `range` and the array `blocks` of the `BlockHeader`
-objects. The range specifies the largest and the smallest heights of blocks that have been
-traversed to collect at most `count` blocks. The largest height `to` equals to `latest` if provided or
-to the height of the latest block in the blockchain, the smallest height `from` takes values
-in `0..latest - count + 1`. Blocks in the array are sorted in descending order according
-to their heights. Height of any block in the array is greater or equal than `from` and less or equal
-than `to`.
+The JSON object of the explored block range `range` and the array `blocks` of
+the `BlockHeader` objects. The range specifies the largest and the smallest
+heights of blocks that have been traversed to collect at most `count` blocks.
+The largest height `to` equals to `latest` if provided or to the height of
+the latest block in the blockchain, the smallest height `from` takes values
+in `0..latest - count + 1`. Blocks in the array are sorted in descending order
+according to their heights. Height of any block in the array is greater or
+equal than `from` and less or equal than `to`.
 
 #### Response example
 
