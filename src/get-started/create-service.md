@@ -60,6 +60,7 @@ use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
 use router::Router;
+use serde::Deserialize;
 ```
 
 Define constants:
@@ -432,7 +433,7 @@ impl Transaction for TxCreateWallet {
 
 ## Implement API
 
-Finally, we need to implement the node API.
+Finally, we need to implement the node API with the help of [Iron framework][iron].
 With this aim we declare a struct which implements the `Api` trait.
 The struct will contain a channel, i.e. a connection to the blockchain node
 instance.
@@ -450,70 +451,51 @@ struct CryptocurrencyApi {
 
 ### API for Transactions
 
-To simplify request processing we add a `TransactionRequest` enum
-which joins both types of our transactions.
-We also implement the `Into<Box<Transaction>>` trait for this enum
-to make sure deserialized `TransactionRequest`s fit into the node channel.
+The core processing logic is essentially the same for both types of transactions:
+
+1. Convert JSON input into a `Transaction`
+2. Send the transaction to the channel, so that it will be broadcasted over the
+  blockchain network and included into the block.
+3. Synchronously respond with a hash of the transaction
+
+This logic can be encapsulated in a parameterized method in `CryptocurrencyApi`:
 
 ```rust
-#[serde(untagged)]
-#[derive(Clone, Serialize, Deserialize)]
-enum TransactionRequest {
-    CreateWallet(TxCreateWallet),
-    Transfer(TxTransfer),
-}
-
-impl Into<Box<Transaction>> for TransactionRequest {
-    fn into(self) -> Box<Transaction> {
-        match self {
-            TransactionRequest::CreateWallet(trans) => Box::new(trans),
-            TransactionRequest::Transfer(trans) => Box::new(trans),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize)]
 struct TransactionResponse {
     tx_hash: Hash,
 }
-```
 
-To join our handler with the HTTP handler of the web-server we need to implement
-the `wire` method. This method takes the reference to a router.
-In the method below we add
-one handler to convert JSON input into a `Transaction`.
-The handler responds with a hash of the transaction. It also
-sends the transaction to the channel, so that it will be broadcasted over the
-blockchain network and included into the block.
-
-```rust
-impl Api for CryptocurrencyApi {
-    fn wire(&self, router: &mut Router) {
-        let self_ = self.clone();
-
-        let tx_handler = move |req: &mut Request| -> IronResult<Response> {
-            match req.get::<bodyparser::Struct<TransactionRequest>>() {
-                Ok(Some(tx)) => {
-                    let tx: Box<Transaction> = tx.into();
-                    let tx_hash = tx.hash();
-                    self_.channel.send(tx).map_err(ApiError::from)?;
-                    let json = TransactionResponse { tx_hash };
-                    self_.ok_response(&serde_json::to_value(&json).unwrap())
-                }
-                Ok(None) => Err(ApiError::IncorrectRequest(
-                    "Empty request body".into()))?,
-                Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
+impl CryptocurrencyApi {
+    fn post_transaction<T>(&self, req: &mut Request) -> IronResult<Response>
+    where
+        T: Transaction + Clone + for<'de> Deserialize<'de>,
+    {
+        match req.get::<bodyparser::Struct<T>>() {
+            Ok(Some(transaction)) => {
+                let transaction: Box<Transaction> = Box::new(transaction);
+                let tx_hash = transaction.hash();
+                self.channel.send(transaction).map_err(ApiError::from)?;
+                let json = TransactionResponse { tx_hash };
+                self.ok_response(&serde_json::to_value(&json).unwrap())
             }
-        };
-
-        // (Read request processing skipped)
-
-        // Bind the transaction handler to a specific route.
-        router.post("/v1/wallets/transaction", transaction, "transaction");
-        // (Read request binding skipped)
+            Ok(None) => Err(ApiError::IncorrectRequest(
+                "Empty request body".into(),
+            ))?,
+            Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
+        }
     }
 }
 ```
+
+Type parameter `T` (the transaction type) determines
+the output type for JSON parsing, which is performed with the help
+of the [`bodyparser`][bodyparser] plugin for Iron.
+
+Notice that the `post_transaction()` method has an idiomatic signature
+`fn(&self, &mut Request) -> IronResult<Response>`,
+making it close to Iron’s [`Handler`][iron-handler]. This is to be
+expected; the method *is* a handler for processing transaction-related requests.
 
 ### API for Read Requests
 
@@ -523,30 +505,44 @@ We want to implement 2 read requests:
 - Return the information about a specific wallet identified by the public key.
 
 To accomplish this, we define a couple of corresponding methods in
-`CryptocurrencyApi`,
+`CryptocurrencyApi`
 that use its `blockchain` field to read information from the blockchain storage.
 
 ```rust
 impl CryptocurrencyApi {
-    fn get_wallet(&self, pub_key: &PublicKey) -> Option<Wallet> {
-        let mut view = self.blockchain.fork();
-        let mut schema = CurrencySchema { view: &mut view };
-        schema.wallet(pub_key)
+    fn get_wallet(&self, req: &mut Request) -> IronResult<Response> {
+        let path = req.url.path();
+        let wallet_key = path.last().unwrap();
+        let public_key = PublicKey::from_hex(wallet_key)
+            .map_err(ApiError::FromHex)?;
+
+        let wallet = {
+            let mut view = self.blockchain.fork();
+            let mut schema = CurrencySchema { view: &mut view };
+            schema.wallet(&public_key)
+        };
+
+        if let Some(wallet) = wallet {
+            self.ok_response(&serde_json::to_value(wallet).unwrap())
+        } else {
+            self.not_found_response(
+                &serde_json::to_value("Wallet not found").unwrap(),
+            )
+        }
     }
 
-    fn get_wallets(&self) -> Option<Vec<Wallet>> {
+    fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
         let mut view = self.blockchain.fork();
         let mut schema = CurrencySchema { view: &mut view };
         let idx = schema.wallets();
         let wallets: Vec<Wallet> = idx.values().collect();
-        if wallets.is_empty() {
-            None
-        } else {
-            Some(wallets)
-        }
+        self.ok_response(&serde_json::to_value(&wallets).unwrap())
     }
 }
 ```
+
+As with the transaction endpoint, the methods have an idiomatic signature
+`fn(&self, &mut Request) -> IronResult<Response>`.
 
 !!! warning
     An attentive reader may notice that we use the `fork()` method to get
@@ -560,58 +556,48 @@ impl CryptocurrencyApi {
     `Fork` (which would be used in transactions) and `Snapshot` (which would
     be used in read requests).
 
-Then, we need to add request processing to the `CryptocurrencyApi::wire()`
-method,
-just like we did for transactions:
+### Wire API
+
+Finally, we need to tie request processing logic to
+specific endpoints. We do this in the `CryptocurrencyApi::wire()`
+method:
 
 ```rust
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
-
-        // (Transaction processing skipped)
-
-        // Gets status of all wallets in the database.
-        let self_ = self.clone();
-        let wallets_info = move |_: &mut Request| -> IronResult<Response> {
-            if let Some(wallets) = self_.get_wallets() {
-                self_.ok_response(&serde_json::to_value(wallets).unwrap())
-            } else {
-                self_.not_found_response(
-                    &serde_json::to_value("Wallets database is empty")
-                        .unwrap(),
-                )
-            }
+        let post_create_wallet = move |req: &mut Request| {
+            self_.post_transaction::<TxCreateWallet>(req)
         };
-
-        // Gets status of the wallet corresponding to the public key.
         let self_ = self.clone();
-        let wallet_info = move |req: &mut Request| -> IronResult<Response> {
-            // Get the hex public key as the last URL component;
-            // return an error if the public key cannot be parsed.
-            let path = req.url.path();
-            let wallet_key = path.last().unwrap();
-            let public_key = PublicKey::from_hex(wallet_key)
-                .map_err(ApiError::FromHex)?;
-
-            if let Some(wallet) = self_.get_wallet(&public_key) {
-                self_.ok_response(&serde_json::to_value(wallet).unwrap())
-            } else {
-                self_.not_found_response(
-                    &serde_json::to_value("Wallet not found").unwrap(),
-                )
-            }
+        let post_transfer = move |req: &mut Request| {
+            self_.post_transaction::<TxTransfer>(req)
         };
+        let self_ = self.clone();
+        let get_wallets = move |req: &mut Request| self_.get_wallets(req);
+        let self_ = self.clone();
+        let get_wallet = move |req: &mut Request| self_.get_wallet(req);
 
-        // (Transaction binding skipped)
-        // Bind read request endpoints.
-        router.get("/v1/wallets", wallets_info, "wallets_info");
-        router.get("/v1/wallet/:pub_key", wallet_info, "wallet_info");
+        // Bind handlers to specific routes.
+        router.post("/v1/wallets", post_create_wallet, "post_create_wallet");
+        router.post("/v1/wallets/transfer", post_transfer, "post_transfer");
+        router.get("/v1/wallets", get_wallets, "get_wallets");
+        router.get("/v1/wallet/:pub_key", get_wallet, "get_wallet");
     }
+}
 ```
 
-The request processing uses `get_wallets()` and `get_wallet()` methods we
-defined earlier.
+We create a [closure][rust-closure] for each endpoint, converting handlers
+that we have defined, with a type signature
+`fn(&CryptocurrencyApi, &mut Request) -> IronResult<Response>`,
+to ones that Iron supports – `Fn(&mut Request) -> IronResult<Response>`.
+This can be accomplished by [currying][curry-fn], that is,
+cloning `CryptocurrencyApi` and moving it into each closure.
+For this to work, observe that cloning a `Blockchain` does not create
+a new blockchain from scratch,
+but rather produces a reference to the same blockchain instance.
+(That is, `Blockchain` is essentially a smart pointer type similar to [`Arc`][arc]
+or [`Ref`][ref].)
 
 ## Define Service
 
@@ -884,3 +870,10 @@ with two wallets and transferred some money between them.
 
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
+[iron]: http://ironframework.io/
+[bodyparser]: https://docs.rs/bodyparser/0.8.0/bodyparser/
+[iron-handler]: https://docs.rs/iron/0.6.0/iron/middleware/trait.Handler.html
+[rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
+[curry-fn]: https://en.wikipedia.org/wiki/Currying
+[arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
+[ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
