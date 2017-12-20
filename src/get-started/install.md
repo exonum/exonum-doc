@@ -1,3 +1,6 @@
+---
+title: Installation guide
+---
 # Installation Guide
 
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
