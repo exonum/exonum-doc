@@ -171,12 +171,12 @@ The Exonum network would continue operating even if up to 1/3 validators are hac
 compromised or switched off. Hence, there is no single point of failure
 in the network; the whole process of transaction processing is fully decentralized.
 
-### Thin Clients
+### Light Clients
 
-Exonum supports [thin clients](../architecture/clients.md),
+Exonum supports [light clients](../architecture/clients.md),
 network nodes that replicate only a very small part of the blockchain,
-which the client is interested in. Thin clients allow to provide access to blockchain
-through web or mobile apps. A thin client communicates with one or
+which the client is interested in. Light clients allow to provide access to blockchain
+through web or mobile apps. A light client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
 !!! note "Example"
@@ -184,7 +184,7 @@ more services on a full node with the help of [public APIs](#endpoints).
     a client corresponds to an owner of currency; it is only interested in transactions
     that involve the owner.
 
-Exonum pays much attention to the security of thin clients. Thin clients do not
+Exonum pays much attention to the security of light clients. Light clients do not
 unconditionally trust the responses from full nodes, but rather verify them
 against formally encoded rules. The verification uses cryptographic techniques,
 such as [Merkle trees][wiki:mt] and [linked timestamping][wiki:linked-ts],
@@ -194,13 +194,13 @@ among the blockchain maintainers.
 ### Bitcoin Anchoring
 
 Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)
-to achieve the most complete security for thin clients. The anchoring service
+to achieve the most complete security for light clients. The anchoring service
 periodically publishes a hash digest of the entire blockchain state
 to the Bitcoin Blockchain. This makes it impossible to revise the transaction
 history or to supply different clients with differing versions of the blockchain,
 even if all the blockchain maintainers collude. Moreover, anchoring is a fallback
 mechanism: even if the Exonum blockchain stops working, the authenticity of data
-stored in thin clients could still be verified.
+stored in light clients could still be verified.
 
 ## What’s Next
 

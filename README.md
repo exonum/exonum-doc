@@ -1,8 +1,19 @@
 # Exonum Documentation
 
+[![Build status][travis-image]][travis-url]
+[![Generator][generator-image]][generator-url]
+[![Gitter][gitter-image]][gitter-url]
+
+[travis-image]: https://img.shields.io/travis/exonum/exonum-doc.svg?style=flat-square
+[travis-url]: https://travis-ci.org/exonum/exonum-doc
+[generator-image]: https://img.shields.io/badge/generator-mkdocs-blue.svg?style=flat-square
+[generator-url]: http://www.mkdocs.org/
+[gitter-image]: https://img.shields.io/gitter/room/exonum/exonum-doc.svg?style=flat-square
+[gitter-url]: https://gitter.im/exonum/exonum-doc
+
 This is the documentation repo for the Exonum platform. It contains source files
 used to build the documentation displayed on the [Exonum
-website](http://exonum.com/).
+website](http://exonum.com/doc/).
 
 The Exonum documentation is written in [Markdown](https://en.wikipedia.org/wiki/Markdown),
 and uses [mkdocs](http://www.mkdocs.org/) to generate HTML from sources.
@@ -64,17 +75,20 @@ First, you need to install [Python](http://python.org/) and [python-pip](https:/
 Then, install the `mkdocs` theme together with its dependencies:
 
 ```
-pip install mkdocs pygments pygments-github-lexers mkdocs-material
-```
-
-Alternatively, you may use
-
-```
 pip install -r requirements.txt
 ```
 
-This will install the theme with all dependencies and the linters, except
-for `markdownlint` (which is written in Ruby and uses `gem` as the package manager).
+You may use [`requirements.lock`](requirements.lock) instead of [`requirements.txt`](requirements.txt)
+in order to get repeatable builds.
+
+To install linters, use
+
+```
+pip install -r dev-requirements.txt
+```
+
+`markdownlint` needs to be installed separately, as it is written in Ruby and uses
+`gem` as the package manager.
 
 ### Viewing Documents Locally
 
@@ -96,7 +110,7 @@ The generated pages will be available in the **site/** directory.
 
 ## License
 
-Copyright 2017, Bitfury Group
+Copyright 2017, Exonum Team
 
 The Exonum documentation is licensed under the Creative Commons Non-Commercial
 Share-Alike International License (version 4.0). Code samples are licensed

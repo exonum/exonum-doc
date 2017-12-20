@@ -4,22 +4,22 @@ theme: material
 theme_dir: theme
 extra_css:
   - assets/stylesheets/extra.css
-repo_name: 'exonum/exonum-core'
-repo_url: 'https://github.com/exonum/exonum-core'
+repo_name: 'exonum/exonum'
+repo_url: 'https://github.com/exonum/exonum'
 
 site_url: 'http://exonum.com/doc/'
 site_author: 'BitFury Group'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 site_favicon: 'assets/images/favicon.ico'
 
-copyright: © 2017 Bitfury Group Limited. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2017 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
   og_image: 'assets/images/logo-docs.png'
   logo: 'assets/images/logo.svg" alt="Exonum Logo'
   github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
   palette:
-    primary: 'blue grey'
+    primary: 'light green'
     accent: 'lime'
   social:
     - type: 'github'
@@ -35,6 +35,7 @@ markdown_extensions:
   - codehilite
   - admonition
   - meta
+  - pymdownx.superfences
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
@@ -66,19 +67,19 @@ pages:
   - 'Advanced':
     # How the network module works: peer discovery, p2p connections
     - 'Network': 'advanced/network.md'
+    # Managing node through managing API ("RPC")
+    - 'Node management': 'advanced/node-management.md'
     # What is sandbox testing and simple example of one of sandbox tests
     - 'Service testing': 'advanced/service-testing.md'
     # Configuration change service documentation
     - 'Configuration updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
-    - 'Merkle index': 'advanced/merkle-index.md'
-    - 'Merkle Patricia index': 'advanced/merkle-patricia-index.md'
+    # Merkle index overview
+    - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':
       # Consensus specification
-      - 'Specification': 'advanced/consensus/specification.md'
-      # Leader election algorithm specification
-      - 'Leader election': 'advanced/consensus/leader-election.md'
+      - 'Consensus specification': 'advanced/consensus/specification.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
   # Includes roadmap and features list
