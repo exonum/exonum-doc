@@ -7,7 +7,7 @@ extra_css:
 repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 
-site_url: 'http://exonum.com/doc/'
+site_url: 'https://exonum.com/doc/'
 site_author: 'BitFury Group'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 site_favicon: 'assets/images/favicon.ico'
