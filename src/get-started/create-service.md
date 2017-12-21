@@ -1,3 +1,6 @@
+---
+title: Service development tutorial
+---
 # Cryptocurrency Tutorial: How to Create Services
 
 In this demo we create a single-node blockchain network that implements

@@ -45,15 +45,25 @@ During the build process, `mkdocs` gathers meta information for each page, which
 is then used to provide page summary on social media, for search engines, etc.
 The main meta information of interest is the page description. By default,
 it is equal to the first paragraph of the page. You can override this default
-by providing an explicit description on the very top of the page:
+by providing an explicit description on the very top of the page
+with a front matter formatting:
 
 ```markdown
+---
 description: 1-3 sentence description of the page
-
+---
 # Page Title
 
 Page contents...
 ```
+
+Similarly, you can redefine the displayed page title by providing a `title` property
+in the front matter. The site-wide “Exonum Documentation” suffix will be added
+automatically.
+
+**Note.** Although it looks like YAML front matter in [Jekyll][jekyll]
+and some other static site generators, `mkdocs` actually uses [a simpler parser][mkdocs-meta]
+for the front matter. Be advised for possible discrepancies.
 
 ## Build Instructions
 
@@ -112,3 +122,5 @@ See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 [mdl-rules]: https://github.com/mivok/markdownlint/blob/master/docs/RULES.md
 [html5validator]: https://github.com/svenkreiss/html5validator
 [linkchecker]: https://github.com/wummel/linkchecker
+[mkdocs-meta]: https://pythonhosted.org/Markdown/extensions/meta_data.html
+[jekyll]: http://jekyllrb.com/
