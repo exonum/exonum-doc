@@ -9,12 +9,12 @@ to more easily debug service business logic (for example, panics).
 ## Installation
 
 In most cases you want to install `exonum-testkit` as a [development dependency][dev-dep],
-so it would be compiled for tests only. For this, add the dependency to
+so it would be compiled for tests only. For this, add the dependency
 to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.1"
+exonum-testkit = "0.1.0"
 ```
 
 !!! note
@@ -68,8 +68,8 @@ assert!(tx.verify());
 ```
 
 Testkit also allows to check different orderings of transactions, including transactions
-for multiple services. This could allow to more efficiently test margin cases,
-which would be difficult to reproduce otherwise.
+for multiple services. This could allow to more efficiently test margin cases
+that are quite difficult (but not impossible) to produce in the real network.
 
 ```rust
 let mut testkit = TestKitBuilder::validator()
@@ -79,7 +79,7 @@ let mut testkit = TestKitBuilder::validator()
 // Create transactions.
 let tx1 = MyTransaction::new(...);
 let tx2 = OtherTransaction::new(...);
-// Commit it into blockchain.
+// Commit them into the blockchain.
 testkit.create_block_with_transactions(txvec![tx1, tx2]);
 // Check the expected result.
 ```
@@ -155,12 +155,12 @@ such as getting data from external sources and reconfiguring the service.
 ### Oracles Testing
 
 The *oracle* is a service which can produce transactions
-with external data after the commit of the block.
+with external data after commit of the block.
 [The Bitcoin anchoring service](bitcoin-anchoring.md) is an example of an oracle.
 Just like a real Exonum node, the testkit maintains a pool of unconfirmed transactions
 (aka the *mempool*). Thus, transactions created by the oracle service
 during the [`handle_commit`][Service.handle_commit] execution
-will be stored in `TestKit` memory pool, and can be verified accordingly.
+will be stored in `TestKit` memory pool and can be verified accordingly.
 
 ```rust
 // Create testkit with the service which creates transaction
@@ -183,7 +183,7 @@ assert!(testkit.mempool().contains_key(&tx.hash()));
 
 !!! tip
     In order to invoke a `handle_commit` event, you need to create a block
-    with one of `create_block*` methods of the testkit.
+    with one of the `create_block*` methods of the testkit.
 
 If the oracle has to fetch any data from external world, you need to create
 a mock object that would generate said external data to accomplish testing.
