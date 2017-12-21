@@ -13,6 +13,7 @@ extra_css:
   - assets/stylesheets/extra.css
 repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
+edit_uri: 'doc/blob/master/src'
 
 site_url: 'https://exonum.com/doc/'
 site_author: 'Exonum Team'

@@ -51,3 +51,8 @@
   <meta name="twitter:description" content="{{ description }}">
   {% endif %}
 {% endblock %}
+
+{#- Patches the "Edit this page" link to reference a proper GitHub repository #}
+{% block content %}
+  {{- super() | replace(page.edit_url, page.edit_url | replace('exonum/doc', 'exonum-doc')) }}
+{% endblock %}
