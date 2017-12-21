@@ -1,26 +1,27 @@
 site_name: Exonum Documentation
 docs_dir: src
-theme: material
-theme_dir: theme
+theme:
+  name: material
+  favicon: 'assets/images/favicon.ico'
+  logo: 'assets/images/logo.svg" alt="Exonum Logo'
+  custom_dir: theme
+  palette:
+    primary: 'light green'
+    accent: 'lime'
+
 extra_css:
   - assets/stylesheets/extra.css
 repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 
 site_url: 'https://exonum.com/doc/'
-site_author: 'BitFury Group'
+site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
-site_favicon: 'assets/images/favicon.ico'
 
 copyright: © 2017 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
   og_image: 'assets/images/logo-docs.png'
-  logo: 'assets/images/logo.svg" alt="Exonum Logo'
-  github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
-  palette:
-    primary: 'light green'
-    accent: 'lime'
   social:
     - type: 'github'
       link: 'https://github.com/exonum'
