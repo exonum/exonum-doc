@@ -2,15 +2,10 @@
 
 {% block htmltitle %}
   {% if page and page.meta.title %}
-    <title>{{ page.meta.title | first }} - {{ config.site_name }}</title>
+    <title>{{ page.meta.title }} - {{ config.site_name }}</title>
   {% else %}
     {{- super() }}
   {% endif %}
-{% endblock %}
-
-{% block content %}
-  <a class="edit-on-github" href="{{ config.extra.github_edit_url }}{{ page.input_path | replace('\\', '/') }}" title="Edit page source on GitHub"><span class="md-icon">edit</span>Edit on GitHub</a>
-  {{- super() }}
 {% endblock %}
 
 {%- block site_meta %}
@@ -27,7 +22,7 @@
 
 {% block extrahead %}
   {% if page and page.meta.title %}
-    {% set title = page.meta.title | first + ' - ' + config.site_name %}
+    {% set title = page.meta.title + ' - ' + config.site_name %}
   {% else %}
     {% set title = page.title + ' - ' + config.site_name
       if not page.is_homepage
