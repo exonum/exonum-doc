@@ -72,7 +72,7 @@ of which the most important one is [Cargo][cargo], the Rust package manager.
 !!! note
     Exonum is tested against and is guaranteed to be compatible with
     the latest stable Rust toolchain, which can be obtained as specified above.
-    Other recent toolchains (starting from approximately `stable-1.20`) may work,
+    Other recent toolchains (starting from approximately `stable-1.20`) may work
     too. Older toolchains (for example, those that come with older Linux
     distributives) might cause Exonum compilation to fail, as Exonum uses
     some new language features. Please use rustup to install a compatible toolchain
