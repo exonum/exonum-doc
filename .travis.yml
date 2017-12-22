@@ -39,7 +39,7 @@ script:
   - bash ./misc/lint.sh md
   - bash ./misc/lint.sh html
   - docker build -t exonum-doc . && docker images
-  - "docker run --rm -d -p 0.0.0.0:8000:8000 exonum-doc"
+  - "docker run --rm -d -p 0.0.0.0:8000:80 exonum-doc"
   - sleep 7 && bash ./misc/lint.sh links
 
 after_script:

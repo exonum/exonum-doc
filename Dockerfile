@@ -1,10 +1,9 @@
-FROM python:2.7-slim
+FROM python:2.7-slim AS builder
 WORKDIR /app
-
 COPY requirements.lock /tmp/
 RUN pip install -r /tmp/requirements.lock
-
 COPY . /app
+RUN python -m mkdocs build
 
-EXPOSE 8000
-CMD ["python", "-m", "mkdocs", "serve", "--no-livereload", "-a", "0.0.0.0:8000"]
+FROM nginx:stable-alpine
+COPY --from=builder /app/site /usr/share/nginx/html
