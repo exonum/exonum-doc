@@ -32,7 +32,7 @@ BIN_DIR=~/.local/bin
 CFG_DIR="$ROOT_DIR/misc"
 
 lint_md () {
-  $BIN_DIR/mdl --style "$CFG_DIR/markdownlintrc" "$SRC_DIR";
+  $BIN_DIR/mdl --style "$CFG_DIR/markdownlintrc" --ignore-front-matter "$SRC_DIR";
 }
 
 lint_html () {

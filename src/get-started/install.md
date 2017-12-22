@@ -1,3 +1,6 @@
+---
+title: Installation guide
+---
 # Installation Guide
 
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
@@ -6,7 +9,7 @@ This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
 
 !!! note
-    As of version 0.1, you need to compile the core locally for every application
+    As of version 0.3, you need to compile the core locally for every application
     that depends on it. [Cargo][cargo] (the Rust package manager) takes care
     of most things, but you still need to have dependencies
     installed locally as described below for the core to compile.
@@ -18,10 +21,14 @@ to these projects, testing them, and developing using Exonum.
 
 Exonum depends on the following third-party system libraries:
 
-- [LevelDB][leveldb] (persistent storage)
+- [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-You can find instructions how to install them on the various environments
+!!! note
+    Before version 0.3, Exonum supported [LevelDB][leveldb] as an alternative
+    storage engine. In [0.3 release][rel0.3.0], the support for LevelDB was dropped.
+
+You can find instructions how to install dependencies in various environments
 below.
 
 ### MacOS
@@ -29,7 +36,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium leveldb pkg-config
+brew install libsodium rocksdb pkg-config
 ```
 
 ### Linux
@@ -39,17 +46,15 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev \
-    libleveldb-dev pkg-config
-```
-
-libsodium is contained in a third-party PPA, so you may need to add it with
-
-```shell
-add-apt-repository ppa:chris-lea/libsodium
+    librocksdb-dev pkg-config
 ```
 
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
+
+Depending on the version of your distributive, libsodium and RocksDB may not
+be present in the default package lists. In this case you may need to install
+these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
@@ -108,6 +113,7 @@ guide on how to develop applications on top of the Exonum framework.
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
+[rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
 [openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
@@ -120,3 +126,4 @@ guide on how to develop applications on top of the Exonum framework.
 [karma]: http://karma-runner.github.io/1.0/index.html
 [istanbul]: https://istanbul.js.org/
 [babel]: http://babeljs.io/
+[rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3

@@ -1,3 +1,6 @@
+---
+title: Requests in consensus algorithm
+---
 # Requests in Consensus Algorithm
 
 **Requests** are used to obtain unknown information from nodes that signal the
@@ -10,7 +13,8 @@ algorithm for generating and handling requests is an integral part of
     In the following description, +2/3 means more than two thirds of the
     validators number. For example, +2/3 `Precommit`s means a set of valid
     `Precommit` messages, each of which is digitally signed by a different
-    validator, and the size of the set is more than 2/3 of the validators number.
+    validator, and the size of the set is more than 2/3 of the validators
+    number.
 
 !!! note
     Auditors along with validators request information and respond to requests.
@@ -29,14 +33,16 @@ Byzantine. The receiving node saves this information in
 
 - The message author is at the height implied by the message
 - The author has blocks corresponding to all lesser heights
-- The author has +2/3 `Precommit` messages for each of previous blocks
+- The author has +2/3 `Precommit` messages for each of the previous blocks.
 
 ### `Prevote`
 
-- The author has a proposal (`Propose` message) referenced by the `Prevote` message
+- The author has a proposal (`Propose` message) referenced by the `Prevote`
+  message
 - The author has all transactions mentioned in this proposal
-- If the author indicated `lock_round` in the message, it has a +2/3 `Prevote`
-  messages for this proposal in the `locked_round` or round with lower number.
+- If the author indicated `lock_round` in the message, it has +2/3 `Prevote`
+  messages for this proposal in the `locked_round` or the round with lower
+  number.
 
 ### `Precommit`
 
@@ -48,7 +54,7 @@ Byzantine. The receiving node saves this information in
 ### `Connect`
 
 - It is possible to access the author by using the IP address + port
-  mentioned in the message
+  mentioned in the message.
 
 ## Request Messages
 
@@ -62,7 +68,7 @@ and take 32 bytes.
 `BitVec` is a bit vector containing as many bits as there are validators in
 the system.
 
-### `RequestPropose`
+### `ProposeRequest`
 
 Requests a `Propose` message from a node. It has the following fields:
 
@@ -75,7 +81,7 @@ Requests a `Propose` message from a node. It has the following fields:
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
 
-### `RequestTransactions`
+### `TransactionsRequest`
 
 Requests transactions from a node. It has the following fields:
 
@@ -84,9 +90,9 @@ Requests transactions from a node. It has the following fields:
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **txs**: Array<Hash\>  
-  List of requested transactions' hashes.
+  List of the hashes of the requested transactions.
 
-### `RequestPrevotes`
+### `PrevotesRequest`
 
 Requests `Prevote` messages from a node. It
 has the following fields:
@@ -103,12 +109,13 @@ has the following fields:
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
 - **validators**: BitVec  
-  Each bit of this field indicates the need to send `Prevote` message from
+  Each bit of this field indicates the need to send a `Prevote` message from
   the corresponding validator (if bit value is 1, `Prevote` is requested; else
-  `Prevote` is not needed). Indexing of the `validators` bits corresponds to the
-  indexing of validator public keys in the [actual configuration][config#genesis].
+  `Prevote` is not needed). Indexing of the `validator` bits corresponds to
+  indexing of the validator public keys in the
+  [actual configuration][config#genesis].
 
-### `RequestBlock`
+### `BlockRequest`
 
 Requests a committed block from a node. It has the following fields:
 
@@ -119,10 +126,10 @@ Requests a committed block from a node. It has the following fields:
 - **height**: u64  
   Height of the blockchain for which information is requested.
 
-### `RequestPeers`
+### `PeersRequest`
 
 Requests `Connect` messages from a node.
-`RequestPeers` message is sent regularly with the timeout `peers_timeout`
+`PeersRequest` message is sent regularly with the timeout `peers_timeout`
 defined in [the global configuration][config#global-parameters].
 It has the following fields:
 
@@ -133,15 +140,16 @@ It has the following fields:
 
 ## Sending Requests
 
-This algorithm determines the node's behavior at different stages of the
+This algorithm determines behavior of a node at different stages of the
 consensus algorithm if the node needs to request information from other nodes.
 The following subsections describe events that cause a specific response.
 
 For each sent request, the node stores a `RequestState` structure,
 which includes the number of request attempts made and a list of
 [nodes that should have the required information](#learning-from-consensus-messages).
-`RequestState` for each request is placed into hash map where key is identifier
-of requested data (hash for `Propose` and `Transactions`, round and hash for
+`RequestState` for each request is placed into a hash map where key is
+an identifier
+of the requested data (hash for `Propose` and `Transactions`, round and hash for
 `Prevotes`, height for `Block`). When the requested info is obtained, the node
 deletes `RequestState` for the corresponding request (cancels request).
 
@@ -155,59 +163,61 @@ Cancelling a request means cancelling a corresponding timeout as well.
 ### Receiving Transaction
 
 If this is the last transaction required to collect a known `Propose`,
-cancel the corresponding `RequestTransactions`.
+cancel the corresponding `TransactionsRequest`.
 
-### Consensus Message from Bigger Height
+### Receiving Consensus Message from a Bigger Height
 
-- Update info about the height of blockchain on the corresponding node
-- Send `RequestBlock` for the current height (height of the latest
-  committed block + 1) to the message author, if such a request was not sent earlier
+- Update info about the height of the blockchain on the corresponding node
+- Send `BlockRequest` for the current height (height of the latest
+  committed block + 1) to the message author, if such a request was not
+  sent earlier.
 
 All events below are applicable only if the height of the message is the same as
-validator height.
+the validator's height.
 
 ### Receiving `Propose`
 
 - If this `Propose` was requested, cancel the request. A list of
   [nodes that should have all transactions](#learning-from-consensus-messages)
   mentioned in the `Propose` message is copied from the `RequestState` before
-  its deletion to request missing transactions if necessary
+  its deletion to request missing transactions, if necessary
 - If certain transactions from the `Propose` are not known,
-  send `RequestTransactions` to the author of `Propose`. Set the nodes in
-  `RequestState` for this request as calculated on the previous step.
+  send `TransactionsRequest` to the author of `Propose`. Set the nodes in
+  `RequestState` for this request as calculated at the previous step.
 
 ### Receiving `Prevote`
 
 - If the node does not have the corresponding `Propose`, send
-  `RequestPropose` to the author of `Prevote`
+  `ProposeRequest` to the author of `Prevote`
 - If the sender specified `lock_round`, which is greater than the stored  
   [Proof-of-Lock (PoL)][consensus#locks], send
-  `RequestPrevotes` for the locked proposal to the author of `Prevote`
-- If the node have formed +2/3 `Prevote` messages for the same proposal and round,
-  cancel the request `RequestPrevotes` for `Prevote` messages corresponding to this
-  proposal (if they were requested earlier)
+  `PrevotesRequest` for the locked proposal to the author of `Prevote`
+- If the node has formed +2/3 `Prevote` messages for the same proposal and
+  round, cancel `PrevotesRequest` for `Prevote` messages
+  corresponding to this proposal (if they were requested earlier).
 
 ### Receiving `Precommit`
 
 - If the node does not have a corresponding `Propose`, send
-  `RequestPropose` to the author of `Precommit`
+  `ProposeRequest` to the author of `Precommit`
 - If the message corresponds to a larger round than the saved PoL,
-  send `RequestPrevotes` for this round to the author of `Precommit`
+  send `PrevotesRequest` for this round to the author of `Precommit`
 - If the node has formed +2/3 `Precommit` messages for the same proposal, cancel
-  the corresponding `RequestPrecommit`s (if they were requested earlier)
+  the corresponding `PrecommitRequest`(if it was sent earlier).
 
-### Receiving `Block`
+### Receiving `BlockResponse`
 
 - Request the following block in the blockchain from the node (if one exists)
-  that sent any message from the height greater than current height + 1. If there
+  that sent any message from the height greater than current height + 1. If
+  there
   are several such nodes, request is sent to the one from which the message from
-  the height greater than current height + 1 was received earlier
+  the height greater than current height + 1 was delivered first
 - Update current height after committing the block locally
-- Cancel `RequestBlock` for the height at which the block was just committed
+- Cancel `BlockRequest` for the height at which the block was just committed
 
 ### Peers Timeout
 
-Send a `RequestPeers` request to a random peer (auditor or validator) from a
+Send a `PeersRequest` request to a random peer (auditor or validator) from the
 list of known peers specified in [local configuration][config#local-parameters].
 
 ### Move to New Height
@@ -219,44 +229,44 @@ Cancel all requests.
 - Delete the node, to which the request was sent, from the list of
   [nodes that should have the requested data](#learning-from-consensus-messages)
   (that list is a part of the `RequestState` structure)
-- If the list of nodes having the data to be requested is empty, cancel
+- If the list of nodes having the data to be requested is empty, cancel the
   request
 - Otherwise, make one more request attempt to another node from the list of
-  nodes that should have the requested data and start a new timer
+  nodes that should have the requested data and start a new timer.
 
 ## Requests Processing
 
-This algorithm determines the processing of different types of request messages
-by the node.
+This algorithm determines processing of different types of request messages
+received by a node.
 
-### `RequestPropose`
+### `ProposeRequest`
 
-- If the message corresponds to a height that isn't equal to the current height
+- If the message corresponds to a height that is not equal to the current height
   of the node, ignore the message
 - If the node has `Propose` with the corresponding hash at the given height,
-  send it
+  send it.
 
-### `RequestTransactions`
+### `TransactionsRequest`
 
 Send all transactions the node has from those that were requested, as
 separate messages. Transactions can either be already committed or be in the
 pool of unconfirmed transactions.
 
-### `RequestPrevotes`
+### `PrevotesRequest`
 
 - If the message does not match the height at which the node is, ignore the
   message
 - Send as individual messages all the corresponding `Prevote`s except
-  those that the requestor has
+  those that the requestor has.
 
-### `RequestBlock`
+### `BlockRequest`
 
 - If the message corresponds to a height not less than that of the node,
   ignore the message
-- Form the message `Block` from the blockchain data and send it to the
-  requestor
+- Form a `BlockResponse` message from the blockchain data and send it to the
+  requestor.
 
-### `RequestPeers`
+### `PeersRequest`
 
 Send all the saved `Connect` messages from peers to the requestor.
 

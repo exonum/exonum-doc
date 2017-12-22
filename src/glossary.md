@@ -1,12 +1,14 @@
 # Glossary of Terms
 
-The Exonum documentation uses some specific terms to describe key Exonum concepts.
+Exonum documentation uses some specific terms to describe key Exonum
+concepts.
 Here, these terms are condensed to a single page.
 
 !!! note
     All terms here are defined with Exonum in mind. For
     example, [*Transaction*](#transaction) describes how transactions work
-    in Exonum; generally speaking, *transaction* may have a lot of other meanings
+    in Exonum; generally speaking, *transaction* may have a lot of other
+    meanings
     (but they are not covered in this document).
 
 ## Auditor
@@ -14,21 +16,24 @@ Here, these terms are condensed to a single page.
 **Aka** auditing node
 
 A [full node](#full-node) in the blockchain network that does not participate
-in creating new [blocks](#block), but rather performs continuous audit of all transactions
+in creating new [blocks](#block), but rather performs continuous audit of all
+transactions
 in the network. Auditors are identified by a [public key](#public-key)
 within the blockchain network.
 Unlike [validators](#validator),
-adding auditors does not create an overhead in transaction latency and throughput,
+adding auditors does not create an overhead in transaction latency and
+throughput,
 so there can be hundreds of auditors in the same blockchain network.
 
 !!! note "Example"
-    Consider an Exonum blockchain that implements public registry in a particular
+    Consider an Exonum blockchain that implements public registry in a
+    particular
     country. In this case, auditing nodes may belong to non-government agencies
     who are interested in monitoring the operation of the registry.
 
 ## Authenticated Consensus
 
-Type of [consensus](#consensus), in which the participants are known in advance
+The type of [consensus](#consensus), in which the participants are known in advance
 and are authenticated, usually with the help of public-key cryptography
 (such as [digital signatures](#digital-signature)).
 Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
@@ -40,12 +45,13 @@ and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 Serialization of [data stored in the blockchain](#stored-datatype) and
 [messages](#message) into a platform-independent sequence of bytes
 according to the set of rules defined by the Exonum framework.
-Binary serialization is used in Exonum for cryptographic operations, such as computing
+Binary serialization is used in Exonum for cryptographic operations, such as
+computing
 [hashes](#hash) and [digital signing](#digital-signature).
 It is implemented both in [the core](#core)
 and in [the light client library](#light-client).
 
-The Exonum serialization format is optimized to provide almost zero-cost
+Exonum serialization format is optimized to provide almost zero-cost
 deserialization in low-level programming environments (such as Rust).
 
 !!! tip
@@ -53,8 +59,10 @@ deserialization in low-level programming environments (such as Rust).
 
 ## Block
 
-Ordered list of [transactions](#transaction) in the blockchain, together with the
-authentication by at least 2/3 of the [validator set](#validator), and some additional
+The ordered list of [transactions](#transaction) in the blockchain, together
+with the
+authentication by at least 2/3 of the [validators set](#validator), and some
+additional
 information (such as the [hash](#hash) of the previous block and the hash
 of [the blockchain state](#blockchain-state) after applying transactions
 in the block). The compact block form, in which transactions are replaced
@@ -63,45 +71,55 @@ is used for communication with [light clients](#light-client).
 
 ## Blockchain
 
-A [distributed ledger](#distributed-ledger), which uses [hash linking][wiki:linked-ts]
-to achieve the immutability of the transaction log, and other cryptographic
-tools to improve accountability. Transactions in a blockchain are grouped in [blocks](#block)
+A [distributed ledger](#distributed-ledger), which uses
+[hash linking][wiki:linked-ts]
+to achieve immutability of the transactions log, and other cryptographic
+tools to improve accountability. Transactions in a blockchain are grouped in
+[blocks](#block)
 to improve auditing by [light clients](#light-client).
 
 Whereas the design goal
-of a distributed ledger is [decentralized](#decentralization) data management,
+of a distributed ledger is a [decentralized](#decentralization) data management,
 one of the design goals of a blockchain is achieving accountability of the
-[blockchain maintainers](#maintainer) and auditability of the system by third parties
+[blockchain maintainers](#maintainer) and auditability of the system by third
+parties
 (e.g., internal and external auditors, regulators and end users of the system).
 
 ## Blockchain State
 
-The persistent state maintained by each [full node](#full-node) in the blockchain
+The persistent state maintained by each [full node](#full-node) in the
+blockchain
 network, which [transactions](#transaction) are applied to.
-[The consensus algorithm](#consensus) ensures that the blockchain state (not only
-the transaction log) is identical for all full nodes.
+[The consensus algorithm](#consensus) ensures that the blockchain state (not
+only
+the transactions log) is identical for all full nodes.
 
-In Exonum, the blockchain state is implemented as a key-value storage. It is
-persisted using [LevelDB][leveldb]. The parts of the storage correspond to
+In Exonum the blockchain state is implemented as a key-value storage. It is
+persisted using [RocksDB][rocksdb]. The parts of the
+storage correspond to
 [tables](#table) used by [the core](#core) and [services](#service).
 
 ## Byzantine Node
 
-Node in a distributed network that acts outside of the behavior prescribed
+A node in a distributed network that acts outside of behavior prescribed
 by [the consensus algorithm](#consensus) in the network. Byzantine behavior
 may be caused by a malicious intent, malfunctioning software/hardware, or
 network connectivity problems.
 
 Consensus algorithms that are able to withstand Byzantine behavior are called
-Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by [PBFT][pbft].
-Exonum is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
+Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by
+[PBFT][pbft].
+Exonum is able to tolerate up to 1/3 of [validators](#validator) acting
+Byzantine,
 which is the best possible number under the security model that Exonum uses.
 
 ## Configuration
 
-Set of configurable parameters that determine the behavior of a [full node](#full-node).
+A set of configurable parameters that determine behavior of a
+[full node](#full-node).
 Configuration consists of 2 parts: [global configuration](#global-configuration)
-and [local configuration](#local-configuration). Certain configuration parameters
+and [local configuration](#local-configuration). Certain configuration
+parameters
 are defined by [the core](#core), e.g., the maximum number of transactions
 in a [block](#block). [Services](#service) can define and manage additional
 configuration parameters, too.
@@ -113,20 +131,24 @@ configuration parameters, too.
 
 **Aka** consensus algorithm
 
-Mechanism of reaching agreement among nodes in a network. In the [blockchain](#blockchain)
+A mechanism of reaching agreement among nodes in a network. In the
+[blockchain](#blockchain)
 context, consensus is required to withstand faults: nodes being non-responsive
 and/or outright trying to compromise the operation of the blockchain.
 
 There are 2 main types of consensus:
 
-- [Authenticated consensus](#authenticated-consensus), in which the participating
-  nodes are known in advance. This is the type of consensus implemented in Exonum
-- Anonymous consensus, in which the consensus participants are not known in advance.
+- [Authenticated consensus](#authenticated-consensus), in which the
+  participating
+  nodes are known in advance. This is the type of consensus implemented in
+  Exonum
+- Anonymous consensus, in which the consensus participants are not known in
+  advance.
   This type of consensus is commonly used in cryptocurrencies (e.g., Bitcoin)
 
 ## Consensus Message
 
-[Message](#message) generated by a [full node](#full-node) as prescribed
+A [message](#message) generated by a [full node](#full-node) as prescribed
 by [the consensus algorithm](#consensus). Validators exchange consensus messages
 to commit [transactions](#transaction) to the blockchain by creating new
 [blocks](#block).
@@ -147,7 +169,7 @@ Consensus messages include:
 ## Core
 
 In Exonum: the functionality present in any Exonum blockchain regardless of
-the deployed [services](#service). Encapsulated in the [**exonum**][exonum]
+the deployed [services](#service); encapsulated in the [**exonum**][exonum]
 repository.
 
 For example, the core includes a collection of system [tables](#table) (such as
@@ -155,21 +177,26 @@ a set of all transactions ever committed to the blockchain).
 
 ## Decentralization
 
-Absence of a single point of failure in the system. For example, absence of a single
+Absence of a single point of failure in the system. For example, absence of a
+single
 administrator having privileges to perform arbitrary actions.
 
 ## Digital Signature
 
 **Aka** signature
 
-Public-key digital signature in the [Ed25519][Ed25519] elliptic curve cryptosystem.
+A public-key digital signature in the [Ed25519][Ed25519] elliptic curve
+cryptosystem.
 A signature over a message proves that the signer knows
 a specific [private key](#private-key) corresponding to a publicly known
 [public key](#public-key). A signature can be verified
-against this public key and the signed message, thus providing message *authenticity*
+against this public key and the signed message, thus providing message
+*authenticity*
 (i.e., the message comes from a specific source) and *integrity*
-(the message is not modified after being signed). Ed25519 signatures are universally
-verifiable, meaning that a verifier doesn’t need to know any additional information
+(the message is not modified after being signed). Ed25519 signatures are
+universally
+verifiable, meaning that a verifier does not need to know any additional
+information
 to verify a signature.
 
 !!! summary "Implementation details"
@@ -177,29 +204,35 @@ to verify a signature.
     uses the [`sodiumoxide`][sodiumoxide] Rust crate (a [`libsodium`][libsodium]
     binding for Rust) to create and verify digital signatures
     on [full nodes](#full-node), and [TweetNaCl.js][tweetnacl] to do
-    the same operations on [light clients](#light-client).
+    similar operations on [light clients](#light-client).
 
 ## Distributed Ledger
 
-A distributed system that maintains a full [transaction](#transaction) log
+A distributed system that maintains a full [transactions](#transaction) log
 for all operations
-in the system, so that any piece of data in the system has a verifiable audit trail.
-All transactions are authenticated, usually via [public key cryptography][wiki:pkc]
-used together with some form of timestamping to provide [non-repudiation][wiki:non-rep].
+in the system, so that any piece of data in the system has a verifiable audit
+trail.
+All transactions are authenticated, usually via
+[public key cryptography][wiki:pkc]
+used together with some form of timestamping to provide
+[non-repudiation][wiki:non-rep].
 
 !!! note
     In a generic distributed ledger, the audit trail may be dispersed across
-    the system participants. Thus, it may be difficult to argue about consistency
+    the system participants. Thus, it may be difficult to argue about
+    consistency
     of the whole system.
 
-[Blockchains](#blockchain) are a particular kind of distributed ledgers with focus
+[Blockchains](#blockchain) are a particular kind of distributed ledgers with
+focus
 on auditability and accountability of the [system maintainers](#maintainer).
 
 ## Full Node
 
 **Aka** peer
 
-Node in the blockchain network that replicates all transactions in the blockchain
+A node in the blockchain network that replicates all transactions in the
+blockchain
 and thus has a local copy of the entire [blockchain state](#blockchain-state).
 There are 2 categories of full nodes in Exonum: [validators](#validator)
 and [auditors](#auditor).
@@ -209,7 +242,8 @@ and [auditors](#auditor).
 The very first [block](#block) in the blockchain. The genesis block does not
 link to the hash of the previous block in the blockchain; instead, this link
 is filled with a placeholder (32 bytes of zeros). The genesis block contains
-an initial [global configuration](#global-configuration) and no other transactions.
+an initial [global configuration](#global-configuration) and no other
+transactions.
 
 ## Global Configuration
 
@@ -228,7 +262,8 @@ Exonum uses hashes as unique identifiers for [transactions](#transaction).
 Hashes are also used to create [Merkle trees](#merkle-tree) and their variants.
 
 !!! summary "Implementation details"
-    SHA-256 hashes occupy 32 bytes in the binary form. Exonum uses [`sodiumoxide`][sodiumoxide]
+    SHA-256 hashes occupy 32 bytes in the binary form. Exonum uses
+    [`sodiumoxide`][sodiumoxide]
     to calculate hashes on [full nodes](#full-node) and [sha.js][sha.js] to do
     the same on [light clients](#light-client).
 
@@ -244,19 +279,23 @@ and in [the light client library](#light-client).
 
 **Aka** lightweight client, thin client
 
-Node in the blockchain network that does not replicate all transactions in the
+A node in the blockchain network that does not replicate all transactions in the
 blockchain, but rather only a small subset that the client is interested in
-and/or has access to. Light clients can communicate with [full nodes](#full-node)
+and/or has access to. Light clients can communicate with
+[full nodes](#full-node)
 to [retrieve information from the blockchain](#read-request)
 and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
-allows to minimize the trust during this communication and protect the client against
+allows to minimize the trust during this communication and protect the client
+against
 a range of attacks.
 
 ## Local Configuration
 
-Part of [configuration](#configuration) local to every [full node](#full-node).
-The local configuration is not a part of [the blockchain state](#blockchain-state);
-instead, it’s maintained as a local TOML file, which is read during the node startup.
+A part of [configuration](#configuration) local to every
+[full node](#full-node). The local configuration is not a part of
+[the blockchain state](#blockchain-state);
+instead, it is maintained as a local TOML file, which is read during the node
+startup.
 [The core](#core) defines several local configuration parameters,
 such as [the private key](#private-key) used to sign
 [consensus and network messages](#consensus-message) created by the node.
@@ -273,26 +312,33 @@ The maintainers set up and administer
 the transaction processing rules.
 
 !!! note "Example"
-    Consider an Exonum blockchain that implements public registry in a particular
-    country. In this case, the maintainers of the blockchain are government agency
+    Consider an Exonum blockchain that implements public registry in a
+    particular
+    country. In this case, the maintainers of the blockchain are government
+    agency
     or agencies, which are tasked with maintaining public registries by law.
 
 In contrast, in permissionless blockchains (e.g., Bitcoin), maintainers are not
-reflected within the blockchain protocol. Validators in such networks are usually
+reflected within the blockchain protocol. Validators in such networks are
+usually
 pseudonymous.
 
 ## Merkle Proof
 
-Cryptographic proof that certain data is a part of [the cryptographic commitment][wiki:commitment]
-based on [Merkle trees](#merkle-tree) or their variants. A Merkle proof allows to
-compactly prove that a certain data is stored at the specified key
+A cryptographic proof that certain data is a part of
+[the cryptographic commitment][wiki:commitment]
+based on [Merkle trees](#merkle-tree) or their variants. A Merkle proof allows
+to compactly prove that a certain data is stored at the specified key
 in [the blockchain state](#blockchain-state).
 At the same time the proof does not reveal
-other information about the state and does not require to replicate all [transactions](#transaction)
+other information about the state and does not require replication of all
+[transactions](#transaction)
 in the blockchain network.
 
-Merkle proofs are used in Exonum in the responses to [read requests](#read-request)
-by [light clients](#light-client). Using proofs, a client can verify the authenticity
+Merkle proofs are used in Exonum in the responses to
+[read requests](#read-request)
+by [light clients](#light-client). Using proofs, a client can verify the
+authenticity
 of the response without needing to communicate with multiple full nodes or
 replicating all transactions in the blockchain.
 
@@ -300,7 +346,8 @@ replicating all transactions in the blockchain.
 
 **Aka** hash tree
 
-Data structure based on a binary tree that allows to calculate an aggregate [hash](#hash)
+A data structure based on a binary tree that allows to calculate an aggregate
+[hash](#hash)
 from a list of elements in such a way that any particular element of the list
 is tied to the overall hash via a short link.
 (This link is called a *Merkle path* or [*Merkle proof*](#merkle-proof).)
@@ -312,8 +359,10 @@ to collect the entire [blockchain state](#blockchain-state) into a single
 and to provide [proofs](#merkle-proof) to [light clients](#light-client).
 
 !!! note
-    In cryptographic terms, a Merkle tree implements a [commitment scheme][wiki:commitment]
-    to the list of elements in such a way that the size of any opening of the commitment
+    In cryptographic terms, a Merkle tree implements a
+    [commitment scheme][wiki:commitment]
+    to the list of elements in such a way that the size of any opening of the
+    commitment
     is logarithmic with respect to the number of elements in the list.
 
 ## Message
@@ -321,32 +370,41 @@ and to provide [proofs](#merkle-proof) to [light clients](#light-client).
 A [digitally signed](#digital-signature) piece of data transmitted
 through an Exonum network. There are 2 major kinds of messages:
 
-- [Consensus messages](#consensus-message) are used among full nodes in the course
+- [Consensus messages](#consensus-message) are used among full nodes in the
+  course
   of [the consensus algorithm](#consensus)
-- [Transactions](#transaction) are used to invoke [blockchain state](#blockchain-state)
+- [Transactions](#transaction) are used to invoke
+  [blockchain state](#blockchain-state)
   changes and usually come from [external clients](#light-client)
 
 ## Permissioned Blockchain
 
-Blockchain, the [maintainers](#maintainer) of which are a limited set of entities
-with established real-world identities. Accordingly, [validator nodes](#validator)
+A blockchain which [maintainers](#maintainer) are a limited set of
+entities
+with established real-world identities. Accordingly,
+[validator nodes](#validator)
 in a permissioned blockchain
-are few in numbers and are authenticated with the help of public-key cryptography.
+are few in numbers and are authenticated with the help of public-key
+cryptography.
 
-Permissioned blockchains usually use variations of [authenticated consensus](#authenticated-consensus).
+Permissioned blockchains usually use variations of
+[authenticated consensus](#authenticated-consensus).
 
 ## Private API
 
-[Service endpoint](#service-endpoint) that can be used to administer a local
+A [service endpoint](#service-endpoint) that can be used to administer a local
 instance of the service. As an example, private API can be used to change the
 local configuration of the service.
 
 ## Private Key
 
-Private key as per the [Ed25519][ed25519] specification. Each private key corresponds
+Private key as per the [Ed25519][ed25519] specification. Each private key
+corresponds
 to a specific [public key](#public-key). The knowledge of a private key
-is necessary to create [digital signatures](#digital-signature) over [messages](#message),
-which could be later verified against the message and the corresponding public key.
+is necessary to create [digital signatures](#digital-signature) over
+[messages](#message),
+which could be later verified against the message and the corresponding public
+key.
 
 !!! summary "Implementation details"
     As per [`libsodium`][libsodium], private keys occupy 64 bytes in the binary
@@ -356,10 +414,11 @@ which could be later verified against the message and the corresponding public k
 
 ## Public Key
 
-Public key as per the [Ed25519][ed25519] specification. Public keys are used
+A public key as per the [Ed25519][ed25519] specification. Public keys are used
 to verify [digital signatures](#digital-signature) over [messages](#message).
 A public key can be linked with a real-world identity. For example,
-public keys used in [consensus](#consensus) are tied to specific [validators](#validator),
+public keys used in [consensus](#consensus) are tied to specific
+[validators](#validator),
 as only a specific validator is assumed to know
 the corresponding [private key](#private-key).
 
@@ -369,25 +428,29 @@ the corresponding [private key](#private-key).
 
 ## Read Request
 
-[Service endpoint](#service-endpoint) that can be used to retrieve data from
+A [service endpoint](#service-endpoint) that can be used to retrieve data from
 [the blockchain state](#blockchain-state). The data is usually returned with
 a [proof](#merkle-proof) that the data is indeed a part of the blockchain state
 and has been authorized by a supermajority of [validators](#validator).
 
 ## Serialization
 
-Process of converting Exonum data structures to a language-independent representation.
+A process of converting Exonum data structures to a language-independent
+representation.
 Exonum defines (de)serialization rules for [stored datatypes](#stored-datatype)
-and [messages](#message). Each of these can be converted from/to 2 representations:
+and [messages](#message). Each of these can be converted from/to 2
+representations:
 [binary](#binary-serialization) and [JSON](#json-serialization).
 
 ## Service
 
 The main extension point of the Exonum framework, similar in its design
-to a web service. Services define all [transaction](#transaction) processing logic
+to a web service. Services define all [transaction](#transaction) processing
+logic
 in any Exonum blockchain.
 
-Externally, a service is essentially a collection of [endpoints](#service-endpoint)
+Externally, a service is essentially a collection of
+[endpoints](#service-endpoint)
 that allow to manipulate data in [the blockchain state](#blockchain-state)
 and retrieve it, possibly with [proofs](#merkle-proof). Internally, a service
 may define a bunch of stuff, including [table](#table) schema,
@@ -411,7 +474,8 @@ via REST API. The configuration for REST API is specified in the service.
 
 ## Stored Datatype
 
-Datatype capable to be stored as a value in [the Exonum key-value storage](#blockchain-state).
+A datatype capable to be stored as a value in
+[the Exonum key-value storage](#blockchain-state).
 Stored datatypes use [binary serialization](#binary-serialization)
 logic to convert data to a platform-independent representation.
 
@@ -420,7 +484,8 @@ logic to convert data to a platform-independent representation.
 
 ## Table
 
-A structured collection of data (e.g., a map, set or a list) that provides a high-level
+A structured collection of data (e.g., a map, set or a list) that provides a
+high-level
 abstraction on top of [the blockchain state](#blockchain-state). Tables are used
 by [services](#service) to simplify data management. Additionally, some types
 of tables allow to efficiently compute [Merkle proofs](#merkle-proof) for
@@ -430,20 +495,26 @@ table items.
 
 An atomic patch to [the blockchain state](#blockchain-state)
 satisfying [ACID][wiki:acid] criteria. Transactions are
-authenticated with the help of [public-key digital signatures](#digital-signature);
+authenticated with the help of
+[public-key digital signatures](#digital-signature);
 i.e., the authorship
-of each transaction is known and cannot be easily repudiated. Transactions may be
-generated by various entities in the blockchain network, such as [light clients](#light-client).
+of each transaction is known and cannot be easily repudiated. Transactions may
+be generated by various entities in the blockchain network, such as
+[light clients](#light-client).
 
 Transactions are ordered and grouped into [blocks](#block) in the course of
-[the consensus algorithm](#consensus). Thus, transactions are applied in the same
+[the consensus algorithm](#consensus). Thus, transactions are applied in the
+same
 order on all [full nodes](#full-node) in the blockchain network.
 
-In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
+In Exonum transactions are a subtype of [service endpoints](#service-endpoint).
 All transactions are templated and defined within [services](#service),
-acting similarly to [stored procedures][mysql-stored] in database management systems.
-Transaction endpoints of a service usually specify certain verification rules, such
-as the validity of a digital signature in the transaction. If the rules don’t hold
+acting similarly to [stored procedures][mysql-stored] in database management
+systems.
+Transaction endpoints of a service usually specify certain verification rules,
+such
+as the validity of a digital signature in the transaction. If the rules do not
+hold
 for a particular transaction,
 it does not change the blockchain state, but may still be recorded in
 the transaction log.
@@ -453,18 +524,22 @@ the transaction log.
 
 ## Validator
 
-A [full node](#full-node) in the blockchain network with the right to participate
-in [the consensus algorithm](#consensus) to create [blocks](#block). In Exonum,
-validators are identified with the help of [the global configuration](#global-configuration),
-which contains public keys of all validators in the network. The set of validators
-can be changed by changing the global configuration. Usually, the set of validators
+A [full node](#full-node) in the blockchain network with the right to
+participate
+in [the consensus algorithm](#consensus) to create [blocks](#block). In Exonum
+validators are identified with the help of
+[the global configuration](#global-configuration),
+which contains public keys of all validators in the network. The set of
+validators
+can be changed by changing the global configuration. Usually, the set of
+validators
 is reasonably small, consisting of 4–15 nodes.
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
 [wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
 [wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
-[leveldb]: http://leveldb.org/
+[rocksdb]: http://rocksdb.org
 [exonum]: https://github.com/exonum/exonum/
 [wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
 [wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree

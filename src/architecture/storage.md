@@ -1,54 +1,58 @@
 # Exonum Data Model
 
 This page describes Exonum **data storage** principles, from the database engine
-used (LevelDB), to the abstractions that are used in client
+used (RocksDB), to the abstractions that are used in client
 applications.
 
 1. [Exonum table types](#table-types) lists supported types of
-  data storage collections. Tables represent the highest abstraction level
-  for data storage
+   data storage collections. Tables represent the highest abstraction level
+   for data storage
 2. [Low-level storage](#low-level-storage) explains how tables are persisted
-  using LevelDB
+   using RocksDB
 3. [View layer](#view-layer) describes the wrapper over the DB engine
-  that ensures atomicity of blocks and transactions
+   that ensures atomicity of blocks and transactions
 4. [List of system tables](#system-tables) contains tables
-  used directly by the Exonum core
-5. [Indexing](#indexing) gives an insight how indexes over structured data
-  can be built in Exonum
+   used directly by the Exonum core
+5. [Indexing](#indexing) gives an insight how indices over structured data
+   can be built in Exonum
 
 ## Table Types
 
-Tables (aka indexes) perform the same role as in relational database
+Tables (aka indices) perform the same role as in relational database
 management systems (RDBMSs). Every
 table stores records of a specific type. However, unlike RDBMS tables,
-all Exonum tables internally are implemented [as wrappers around key-value stores](#baseindex).
+all Exonum tables internally are implemented
+[as wrappers around key-value stores](#baseindex).
 Both keys and values in the wrapped stores are persisted as byte sequences.
 Exonum does not natively support operations (matching, grouping, sorting, etc.)
 over separate value fields, as it is the case with other key-value storages.
 
 ### Key Sorting and Iterators
 
-Exonum tables implement iterators over stored items (or keys, values, and key-value
+Exonum tables implement iterators over stored items (or keys, values, and
+key-value
 pairs in the case of maps). Such
 iterators use key ordering of the underlying key-value storage to determine
 the iteration order.
 Namely, keys are lexicographically ordered over their binary serializations;
-this ordering coincides with that used in [LevelDB](#low-level-storage).
+this ordering coincides with that used in
+[RoсksDB](#low-level-storage).
 
 ### BaseIndex
 
 [`BaseIndex`][base-index] represents the most basic table type. Other
-table types wrap `BaseIndex`, enhancing its functionality for specific use cases.
+table types wrap `BaseIndex`, enhancing its functionality for specific use
+cases.
 `BaseIndex` implements a map interface:
 
 - Get, set and remove value by key
-- Check if the specific key presents
+- Check if a specific key is present
 - Iterate over the key-value pairs in the lexicographic key order
 - Clear the table (i.e., remove all stored key-value pairs)
 
 !!! warning
     `BaseIndex` should not be used directly. Rather, you should use a built-in
-    table type that wraps `BaseIndex`, or write your own.
+    table type that wraps `BaseIndex`, or write your own one.
 
 ### MapIndex
 
@@ -84,9 +88,10 @@ list or removing items by index
 !!! summary "Implementation Details"
     `ListIndex` saves its items to the internal `BaseIndex` map
     with 8-byte unsigned item
-    indexes as keys, serialized in big-endian form (to support proper iteration).
+    indices as keys, serialized in big-endian form (to support proper
+    iteration).
     The list length is saved in this map with a
-    zero-length byte sequence as the key.
+    zero-length byte sequence as a key.
 
 ### ValueSetIndex
 
@@ -130,18 +135,19 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
 
 - `KeySetIndex` does not have an additional overhead on hashing
   set elements.
-- `KeySetIndex` should not be used when the set elements are relatively big;
-  only small elements should be stored in it (such as integers, small strings, small
+- `KeySetIndex` should not be used when set elements are relatively big;
+  only small elements should be stored in it (such as integers, small strings,
+  small
   tuples). On the other hand, the `ValueSetIndex` more easily handles
   storing big and complex elements.
 - The `KeySetIndex` introduces a lexicographical order over stored
-  elements, while the `ValueSetIndex` order elements arbitrarily due to hash
+  elements, while the `ValueSetIndex` orders elements arbitrarily due to hash
   function properties.
 
-### Merklized Indexes
+### Merklized Indices
 
-Merklized indexes represent a list and map with additional
-features. Such indexes can create the proofs of existence or absence for
+Merklized indices represent a list and map with additional
+features. Such indices can create the proofs of existence or absence for
 stored data items.
 
 When a light client requests data from an Exonum full node, the proof can be
@@ -194,62 +200,58 @@ Exonum uses third-party database engines to persist blockchain state
 locally. To use the particular database, a minimal [`Database`][database]
 interface should be implemented for it:
 
-- Get value by key
-- Put new value at the key (insert or update the saved one)
-- Delete key-value pair by key
+- Get a value by a [column family][col-family] name and a key
+- Put a new value at the specified column family / key (insert or update
+  the saved one)
+- Delete a key-value pair by column family name / key
 
 All the tables functionality is reduced to these atomic call types.
 
-As of Exonum 0.1, [LevelDB][level-db] is used as the database engine.
-[RocksDB][rocks-db] support is [planned](../roadmap.md).
+As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
+In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
+since 0.3 its support has been dropped.
 
-All the values from different tables are stored in one big key-value
-table at the low-level storage, wherein the keys are represented as
-a byte sequence, and values are serialized according to Exonum binary serialization
-format. Keys of the wrapped `BaseIndex` of a specific table
+Values from different tables are stored in column families in the low-level storage,
+wherein the keys are represented as
+a byte sequence, and values are serialized according to Exonum binary
+serialization format. A single column family may store data for
+more than one table (see table groups below).
+Keys of the wrapped `BaseIndex` of a specific table
 are mapped to the low-level storage keys
 in a deterministic manner using [table identifiers](#table-identifiers).
 
 ### Table Identifiers
 
-Every table is uniquely identified by the compound prefix, which is used
-to map table keys into keys of the underlying low-level storage. The
-keys are prepended with this prefix which is unique to each table, thus
-allows to distinguish values from different tables.
+Every table is uniquely identified by a compound identifier, which is used
+to map table keys into a column family and its keys in the underlying
+low-level storage. A table identifier consists of 2 parts:
 
-The table prefix consists of [the service ID](services.md#service-identifiers)
-and an internal identifier inside the
-service.
-All tables created with the same prefix will be the views of the same data.
+- **String name,** which is mapped 1-to-1 to a column family.
+  The name may contain uppercase and lowercase Latin letters, digits,
+  underscores `_`, and periods `.`. By convention, table names in services should
+  start with [the service name][service-name] and a period. For example,
+  the only table in the cryptocurrency tutorial is named `cryptocurrency.wallets`,
+  where `cryptocurrency` is the service name, and `wallets` is the own name
+  of the table.
+- **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust terms).
 
-Services identifier is a 2-byte unsigned integer, `u16`.
-[System tables](#system-tables) have service ID equal to `0`.
-Tables inside services are identified
-with `u8` integers and an optional suffix. If the suffix is present,
-the `u8` integer denotes a *group* of tables, rather than a single table,
-and suffixes are used to distinguish tables within the group.
+If the prefix is present, the column family identified by the table name
+stores a *group* of tables, rather than a single table.
+In this case, prefixes are used to distinguish tables within the group.
 
 !!! note "Example"
-    Key `key` at the table named `BTC` (`0x42 0x54 0x43` in ASCII) at
-    the table group `0x03` for the service with ID `0x00 0x01` matches the
-    following key in the LevelDB map:
-
-    ```none
-    0x00 0x01 | 0x03 | 0x42 0x54 0x43 | key
-    ```
-
-    Here, `|` separates logical components of the low-level key.
-
-It is advised to use a `gen_prefix` function
-for creating table prefixes. See the [schema of Exonum core][blockchain-schema]
-for an example.
+    Key `key` at the table with name `exchange.crypto` and prefix `BTC`
+    (`0x42 0x54 0x43` in ASCII) matches key
+    `0x42 0x54 0x43 | key` in the column family in RocksDB named
+    `exchange.crypto`.
 
 !!! warning
-    Table identifiers can also be created manually, but it could be risky.
     It is strongly advised not to admit
-    a situation when one table identifier inside the service is a prefix for
-    another table in the same service. Such cases may cause unpredictable
+    a situation when a table prefix in a table group starts with
+    another table prefix in the same group. Such cases may cause unpredictable
     collisions between logically different keys and elements.
+    As a possible way to avoid this, prefixes within the group may have
+    a fixed byte size.
 
 ## View Layer
 
@@ -280,11 +282,13 @@ the same database snapshot.
 
 Forks are used during transaction and block processing.
 A fork [is successively passed](transactions.md#execute)
-to each transaction in the block to accumulate changes produced by the transactions,
+to each transaction in the block to accumulate changes produced by the
+transactions,
 in a [patch](#patches).
 If one of transactions in the block quits with an unhandled exception (i.e.,
 raises `panic`) during
-execution, its changes are promptly rolled back, so that execution of the following
+execution, its changes are promptly rolled back, so that execution of the
+following
 transactions continues normally.
 
 ## System Tables
@@ -310,12 +314,13 @@ for core blockchain functionality:
 - `configs: ProofMapIndex`  
   Stores the configurations content in JSON format, using its hash as a key.
 - `configs_actual_from: ListIndex`  
-  Builds an index to get a configuration activating at a specific height quickly.
+  Builds an index to quickly get a configuration activating at a specific
+  height.
 
 ## Indexing
 
 Unlike relational databases, Exonum does not support indices over fields
-of table elements as an first-class entity. However, it is
+of table elements as a first-class entity. However, it is
 possible to create additional tables with indexing semantics and update their
 content together with the tables being indexed.
 
@@ -338,5 +343,6 @@ content together with the tables being indexed.
 [patch]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L11
 [snapshot]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L57
 [fork]: https://github.com/exonum/exonum/blob/d9e2fdc3d5a1d4e36078a7fbf1a9198d1b83cd5d/exonum/src/storage/db.rs#L104
-[leveldb-wrapper]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/leveldb.rs
+[col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families
 [blockchain-schema]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
+[service-name]: services.md#service-identifiers

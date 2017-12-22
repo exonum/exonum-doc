@@ -1,3 +1,6 @@
+---
+title: Service development tutorial
+---
 # Cryptocurrency Tutorial: How to Create Services
 
 In this demo we create a single-node blockchain network that implements
@@ -24,17 +27,17 @@ Add necessary dependencies to your `Cargo.toml`:
 ```toml
 [package]
 name = "cryptocurrency"
-version = "0.1.0"
+version = "0.3.0" # corresponds to version of Exonum
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
+exonum = "0.3.0"
 iron = "0.5.1"
 bodyparser = "0.7.0"
 router = "0.5.1"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-exonum = "0.1.0"
 ```
 
 We need to import crates with necessary types. Edit your `src/main.rs`:
@@ -48,18 +51,19 @@ extern crate router;
 extern crate bodyparser;
 extern crate iron;
 
-use exonum::blockchain::{self, Blockchain, Service, GenesisConfig,
+use exonum::blockchain::{Blockchain, Service, GenesisConfig,
                          ValidatorKeys, Transaction, ApiContext};
 use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
-                   ApiSender, NodeChannel};
+                   ApiSender};
 use exonum::messages::{RawTransaction, FromRaw, Message};
 use exonum::storage::{Fork, MemoryDB, MapIndex};
-use exonum::crypto::{PublicKey, Hash};
-use exonum::encoding::{self, Field};
+use exonum::crypto::{PublicKey, Hash, HexValue};
+use exonum::encoding;
 use exonum::api::{Api, ApiError};
 use iron::prelude::*;
 use iron::Handler;
 use router::Router;
+use serde::Deserialize;
 ```
 
 Define constants:
@@ -109,8 +113,8 @@ let blockchain = Blockchain::new(Box::new(db), services);
 
 We use `MemoryDB` to store our data in the code above. `MemoryDB` is an
 in-memory database implementation useful for development and testing purposes.
-There is LevelDB support as well that is recommendable for production
-applications.
+There is RocksDB support as well that is recommendable for
+production applications.
 
 A minimal blockchain is ready, but it is pretty much useless, because there is
 no way to interact with it. To fix this we need to create a node and provide an
@@ -194,7 +198,7 @@ let node_cfg = NodeConfig {
     services_configs: Default::default(),
 };
 
-let mut node = Node::new(blockchain, node_cfg);
+let node = Node::new(blockchain, node_cfg);
 node.run().unwrap();
 ```
 
@@ -220,28 +224,28 @@ encoding_struct! {
 }
 ```
 
-Macro `encoding_struct!` helps declare a [serializable](../architecture/serialization.md)
+Macro `encoding_struct!` helps declare a
+[serializable](../architecture/serialization.md)
 struct and determine bounds of its fields. We need to change wallet balance,
 so we add methods to the `Wallet` type:
 
 ```rust
 impl Wallet {
-    pub fn increase(&mut self, amount: u64) {
+    pub fn increase(self, amount: u64) -> Self {
         let balance = self.balance() + amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
+        Self::new(self.pub_key(), self.name(), balance)
     }
 
-    pub fn decrease(&mut self, amount: u64) {
+    pub fn decrease(self, amount: u64) -> Self {
         let balance = self.balance() - amount;
-        Field::write(&balance, &mut self.raw, 40, 48);
+        Self::new(self.pub_key(), self.name(), balance)
     }
 }
 ```
 
 We have added two methods: one to increase the wallet balance and another one
-to decrease it. We used `Field::write` because the data in the structs processed
-by `encoding_struct` is stored as a binary blob and we need to overwrite it
-in-place.
+to decrease it. These methods are *immutable*; they consume the old instance
+of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
@@ -272,8 +276,7 @@ which is the first argument to the `MapIndex::new` call:
 ```rust
 impl<'a> CurrencySchema<'a> {
     pub fn wallets(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
-        let prefix = blockchain::gen_prefix(SERVICE_ID, 0, &());
-        MapIndex::new(prefix, self.view)
+        MapIndex::new("cryptocurrency.wallets", self.view)
     }
 
     // Utility method to quickly get a separate wallet from the storage
@@ -399,11 +402,11 @@ impl Transaction for TxTransfer {
         let mut schema = CurrencySchema { view };
         let sender = schema.wallet(self.from());
         let receiver = schema.wallet(self.to());
-        if let (Some(mut sender), Some(mut receiver)) = (sender, receiver) {
+        if let (Some(sender), Some(receiver)) = (sender, receiver) {
             let amount = self.amount();
             if sender.balance() >= amount {
-                sender.decrease(amount);
-                receiver.increase(amount);
+                let sender = sender.decrease(amount);
+                let receiver = receiver.increase(amount);
                 println!("Transfer between wallets: {:?} => {:?}",
                          sender,
                          receiver);
@@ -416,82 +419,188 @@ impl Transaction for TxTransfer {
 }
 ```
 
+In order for transactions to be properly displayed [in the blockchain explorer][explorer],
+we also should redefine the [`info()` method][tx-info]. The implementation is the
+same for both transactions and looks like this:
+
+```rust
+impl Transaction for TxCreateWallet {
+    // `verify()` and `execute()` code...
+
+    fn info(&self) -> serde_json::Value {
+        serde_json::to_value(&self)
+            .expect("Cannot serialize transaction to JSON")
+    }
+}
+```
+
 ## Implement API
 
-Finally, we need to implement the node API.
+Finally, we need to implement the node API with the help of [Iron framework][iron].
 With this aim we declare a struct which implements the `Api` trait.
-The struct will contain a channel, i.e., a connection to the blockchain node
+The struct will contain a channel, i.e. a connection to the blockchain node
 instance.
+Besides the channel, the API struct will contain a blockchain instance;
+it will be needed to implement
+[read requests](../architecture/services.md#read-requests).
 
 ```rust
 #[derive(Clone)]
 struct CryptocurrencyApi {
-    channel: ApiSender<NodeChannel>,
+    channel: ApiSender,
+    blockchain: Blockchain,
 }
 ```
 
-To simplify request processing we add a `TransactionRequest` enum
-which joins both types of our transactions.
-We also implement the `Into<Box<Transaction>>` trait for this enum
-to make sure deserialized `TransactionRequest`s fit into the node channel.
+### API for Transactions
+
+The core processing logic is essentially the same for both types of transactions:
+
+1. Convert JSON input into a `Transaction`
+2. Send the transaction to the channel, so that it will be broadcasted over the
+  blockchain network and included into the block.
+3. Synchronously respond with a hash of the transaction
+
+This logic can be encapsulated in a parameterized method in `CryptocurrencyApi`:
 
 ```rust
-#[serde(untagged)]
-#[derive(Clone, Serialize, Deserialize)]
-enum TransactionRequest {
-    CreateWallet(TxCreateWallet),
-    Transfer(TxTransfer),
-}
-
-impl Into<Box<Transaction>> for TransactionRequest {
-    fn into(self) -> Box<Transaction> {
-        match self {
-            TransactionRequest::CreateWallet(trans) => Box::new(trans),
-            TransactionRequest::Transfer(trans) => Box::new(trans),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize)]
 struct TransactionResponse {
     tx_hash: Hash,
 }
+
+impl CryptocurrencyApi {
+    fn post_transaction<T>(&self, req: &mut Request) -> IronResult<Response>
+    where
+        T: Transaction + Clone + for<'de> Deserialize<'de>,
+    {
+        match req.get::<bodyparser::Struct<T>>() {
+            Ok(Some(transaction)) => {
+                let transaction: Box<Transaction> = Box::new(transaction);
+                let tx_hash = transaction.hash();
+                self.channel.send(transaction).map_err(ApiError::from)?;
+                let json = TransactionResponse { tx_hash };
+                self.ok_response(&serde_json::to_value(&json).unwrap())
+            }
+            Ok(None) => Err(ApiError::IncorrectRequest(
+                "Empty request body".into(),
+            ))?,
+            Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
+        }
+    }
+}
 ```
 
-To join our handler with the HTTP handler of the web-server we need to implement
-the `wire` method. This method takes the reference to a router.
-In the method below we add
-one handler to convert JSON input into a `Transaction`.
-The handler responds with a hash of the transaction. It also
-sends the transaction to the channel, so that it will be broadcasted over the
-blockchain network and included into the block.
+Type parameter `T` (the transaction type) determines
+the output type for JSON parsing, which is performed with the help
+of the [`bodyparser`][bodyparser] plugin for Iron.
+
+Notice that the `post_transaction()` method has an idiomatic signature
+`fn(&self, &mut Request) -> IronResult<Response>`,
+making it close to Iron’s [`Handler`][iron-handler]. This is to be
+expected; the method *is* a handler for processing transaction-related requests.
+
+### API for Read Requests
+
+We want to implement 2 read requests:
+
+- Return the information about all wallets in the system;
+- Return the information about a specific wallet identified by the public key.
+
+To accomplish this, we define a couple of corresponding methods in
+`CryptocurrencyApi`
+that use its `blockchain` field to read information from the blockchain storage.
+
+```rust
+impl CryptocurrencyApi {
+    fn get_wallet(&self, req: &mut Request) -> IronResult<Response> {
+        let path = req.url.path();
+        let wallet_key = path.last().unwrap();
+        let public_key = PublicKey::from_hex(wallet_key)
+            .map_err(ApiError::FromHex)?;
+
+        let wallet = {
+            let mut view = self.blockchain.fork();
+            let mut schema = CurrencySchema { view: &mut view };
+            schema.wallet(&public_key)
+        };
+
+        if let Some(wallet) = wallet {
+            self.ok_response(&serde_json::to_value(wallet).unwrap())
+        } else {
+            self.not_found_response(
+                &serde_json::to_value("Wallet not found").unwrap(),
+            )
+        }
+    }
+
+    fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
+        let mut view = self.blockchain.fork();
+        let mut schema = CurrencySchema { view: &mut view };
+        let idx = schema.wallets();
+        let wallets: Vec<Wallet> = idx.values().collect();
+        self.ok_response(&serde_json::to_value(&wallets).unwrap())
+    }
+}
+```
+
+As with the transaction endpoint, the methods have an idiomatic signature
+`fn(&self, &mut Request) -> IronResult<Response>`.
+
+!!! warning
+    An attentive reader may notice that we use the `fork()` method to get
+    information from the blockchain storage.
+    `Fork`s provide *read-write* access, not exactly what
+    you want to use for *read-only* access to the storage in production
+    (instead, you may want to use `Snapshot`s).
+    We use `Fork`s only to keep the tutorial reasonably short. If we used
+    `Snapshot`s,
+    we would have to make `CurrencySchema` generic and implement it both for
+    `Fork` (which would be used in transactions) and `Snapshot` (which would
+    be used in read requests).
+
+### Wire API
+
+Finally, we need to tie request processing logic to
+specific endpoints. We do this in the `CryptocurrencyApi::wire()`
+method:
 
 ```rust
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
-        let tx_handler = move |req: &mut Request| -> IronResult<Response> {
-            match req.get::<bodyparser::Struct<TransactionRequest>>() {
-                Ok(Some(tx)) => {
-                    let tx: Box<Transaction> = tx.into();
-                    let tx_hash = tx.hash();
-                    self_.channel.send(tx)
-                                 .map_err(|e| ApiError::Events(e))?;
-                    let json = TransactionResponse { tx_hash };
-                    self_.ok_response(&serde_json::to_value(&json).unwrap())
-                }
-                Ok(None) => Err(ApiError::IncorrectRequest(
-                    "Empty request body".into()))?,
-                Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
-            }
+        let post_create_wallet = move |req: &mut Request| {
+            self_.post_transaction::<TxCreateWallet>(req)
         };
+        let self_ = self.clone();
+        let post_transfer = move |req: &mut Request| {
+            self_.post_transaction::<TxTransfer>(req)
+        };
+        let self_ = self.clone();
+        let get_wallets = move |req: &mut Request| self_.get_wallets(req);
+        let self_ = self.clone();
+        let get_wallet = move |req: &mut Request| self_.get_wallet(req);
 
-        // Bind the transaction handler to a specific route.
-        let route_post = "/v1/wallets/transaction";
-        router.post(&route_post, tx_handler, "transaction");
+        // Bind handlers to specific routes.
+        router.post("/v1/wallets", post_create_wallet, "post_create_wallet");
+        router.post("/v1/wallets/transfer", post_transfer, "post_transfer");
+        router.get("/v1/wallets", get_wallets, "get_wallets");
+        router.get("/v1/wallet/:pub_key", get_wallet, "get_wallet");
     }
 }
 ```
+
+We create a [closure][rust-closure] for each endpoint, converting handlers
+that we have defined, with a type signature
+`fn(&CryptocurrencyApi, &mut Request) -> IronResult<Response>`,
+to ones that Iron supports – `Fn(&mut Request) -> IronResult<Response>`.
+This can be accomplished by [currying][curry-fn], that is,
+cloning `CryptocurrencyApi` and moving it into each closure.
+For this to work, observe that cloning a `Blockchain` does not create
+a new blockchain from scratch,
+but rather produces a reference to the same blockchain instance.
+(That is, `Blockchain` is essentially a smart pointer type similar to [`Arc`][arc]
+or [`Ref`][ref].)
 
 ## Define Service
 
@@ -550,6 +659,7 @@ impl Service for CurrencyService {
         let mut router = Router::new();
         let api = CryptocurrencyApi {
             channel: ctx.node_channel().clone(),
+            blockchain: ctx.blockchain().clone(),
         };
         api.wire(&mut router);
         Some(Box::new(router))
@@ -710,5 +820,63 @@ Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
                                    name: "Janie Roe", balance: 110 }
 ```
 
+### Read Requests
+
+Let’s check that the defined read endpoints indeed work.
+
+#### Info on All Wallets
+
+```sh
+curl http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+```
+
+This request expectedly returns information on both wallets in the system:
+
+```json
+[
+  {
+    "balance": "90",
+    "name": "Johnny Doe",
+    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+  },
+  {
+    "balance": "110",
+    "name": "Janie Roe",
+    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819"
+  }
+]
+```
+
+#### Info on Specific Wallet
+
+The second read endpoint also works:
+
+```sh
+curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet/\
+03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+```
+
+The response is:
+
+```json
+{
+  "balance": "90",
+  "name": "Johnny Doe",
+  "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+}
+```
+
+## Conclusion
+
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them.
+
+[explorer]: ../advanced/node-management.md#transaction
+[tx-info]: ../architecture/transactions.md#info
+[iron]: http://ironframework.io/
+[bodyparser]: https://docs.rs/bodyparser/0.8.0/bodyparser/
+[iron-handler]: https://docs.rs/iron/0.6.0/iron/middleware/trait.Handler.html
+[rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
+[curry-fn]: https://en.wikipedia.org/wiki/Currying
+[arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
+[ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html

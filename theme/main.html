@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
-{% block content %}
-  <a class="edit-on-github" href="{{ config.extra.github_edit_url }}{{ page.input_path | replace('\\', '/') }}" title="Edit page source on GitHub"><span class="md-icon">edit</span>Edit on GitHub</a>
-  {{- super() }}
+{% block htmltitle %}
+  {% if page and page.meta.title %}
+    <title>{{ page.meta.title }} - {{ config.site_name }}</title>
+  {% else %}
+    {{- super() }}
+  {% endif %}
 {% endblock %}
 
 {%- block site_meta %}
@@ -18,11 +21,14 @@
 {%- endblock %}
 
 {% block extrahead %}
-  {% set title = page.meta.title | first |
-    default(page.title + ' - ' + config.site_name
+  {% if page and page.meta.title %}
+    {% set title = page.meta.title + ' - ' + config.site_name %}
+  {% else %}
+    {% set title = page.title + ' - ' + config.site_name
       if not page.is_homepage
       else config.site_name
-    ) %}
+    %}
+  {% endif %}
   {% set description = page.meta.description | join(' ')
     | default(page.content.partition('</h1>')[2].partition('</p>')[0] | striptags, True)
     | default(config.site_description, True)
@@ -35,6 +41,7 @@
   <meta name="og:description" content="{{ description }}">
   <meta name="og:type" content="article">
   <meta name="og:image" content="{{ config.site_url }}{{ config.extra.og_image }}">
+  <meta name="og:image:secure_url" content="{{ config.site_url }}{{ config.extra.og_image }}">
   <meta name="twitter:card" content="summary">
   {% set twitter_site = config.extra.social
     | selectattr('type', 'equalto', 'twitter')
@@ -43,4 +50,9 @@
   <meta name="twitter:title" content="{{ title }}">
   <meta name="twitter:description" content="{{ description }}">
   {% endif %}
+{% endblock %}
+
+{#- Patches the "Edit this page" link to reference a proper GitHub repository #}
+{% block content %}
+  {{- super() | replace(page.edit_url, page.edit_url | replace('exonum/doc', 'exonum-doc')) }}
 {% endblock %}
