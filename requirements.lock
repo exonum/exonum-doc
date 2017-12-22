@@ -1,18 +1,18 @@
 # Main requirements
-Jinja2==2.9.6
-mkdocs==0.16.3
+Jinja2==2.10
+mkdocs==0.17.2
 Pygments==2.2.0
 pygments-github-lexers==0.0.5
-mkdocs-material==1.9.0
+mkdocs-material==2.2.5
 ## The following requirements were added by pip freeze:
 backports-abc==0.5
-certifi==2017.7.27.1
+certifi==2017.11.5
 click==6.7
 livereload==2.5.1
-Markdown==2.6.9
+Markdown==2.6.10
 MarkupSafe==1.0
-pymdown-extensions==4.0
+pymdown-extensions==4.7
 PyYAML==3.12
 singledispatch==3.4.0.3
-six==1.10.0
+six==1.11.0
 tornado==4.5.2
