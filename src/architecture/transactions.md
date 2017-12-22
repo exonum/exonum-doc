@@ -219,7 +219,7 @@ The `info` method returns useful information (from the service developer’s poi
 of view) about the transaction in JSON format.
 The method has no access to the blockchain state, same as `verify`.
 `info()` is used within the core of Exonum framework
-[in the blockchain explorer](../advanced/node-management#transaction).
+[in the blockchain explorer](../advanced/node-management.md#transaction).
 
 !!! tip
     In most cases, you may implement `info()` to return JSON serialization
