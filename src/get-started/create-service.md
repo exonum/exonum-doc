@@ -89,13 +89,15 @@ const INIT_BALANCE: u64 = 100;
 
 ## Declare Persistent Data
 
-We should declare what kind of data we want to store in the blockchain.
+We should declare what kind of data the service will store in the blockchain.
+In our case we need to declare a single type – *wallet*.
+Inside the wallet we want to store:
 
-For our case we need to declare a type to store the information about
-the wallet and its balance. Inside the wallet we want to store the public key
-to validate requests from the owner of the wallet. We want to store the name of
-the owner for convenience reasons. Also, we need to keep the current balance of
-the wallet. Summing it all up, `Wallet` datatype will look like:
+- **Public key** to validate requests from the owner of the wallet
+- **Name of the owner** (purely for convenience reasons)
+- **Current balance** of the wallet
+
+Summing it all up, the `Wallet` datatype will look like:
 
 ```rust
 encoding_struct! {
@@ -134,10 +136,10 @@ of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
-Schema is a structured view of the key-value storage implemented by `MemoryDB`.
-To access the storage, however, we will not use `MemoryDB` directly, but
-rather a `Fork`. `Fork` is a mutable snapshot of the database, where the changes
-can be easily rolled back; that is why it is used when dealing with transactions
+Schema is a structured view of the key-value storage used by Exonum blockchains.
+To access the storage, however, we will not use the storage directly, but
+rather a `Fork`. `Fork` is a mutable snapshot of the storage, where the changes
+can be easily rolled back; it is used when dealing with transactions
 and blocks in the blockchain.
 
 ```rust
@@ -493,7 +495,7 @@ Service is a group of templated transactions (we have defined them before). It
 has a name and a unique id to determine the service inside the blockchain.
 
 ```rust
-struct CurrencyService;
+pub struct CurrencyService;
 ```
 
 To turn `CurrencyService` into a blockchain service,
