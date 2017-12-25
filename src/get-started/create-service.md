@@ -3,44 +3,50 @@ title: Service development tutorial
 ---
 # Cryptocurrency Tutorial: How to Create Services
 
-In this demo we create a single-node blockchain network that implements
-a minimalistic cryptocurrency. The network accepts two types of transactions:
+In this demo we create an Exonum service that implements
+a minimalistic cryptocurrency, and a single-node blockchain network processing
+requests to this service. The service accepts two types of transactions:
 creates a wallet with a default balance and transfers money between wallets.
 
 You can view and download the full source code of this demo
 [here](https://github.com/exonum/cryptocurrency).
 
-## Create Node
+## Create Rust Project
 
 Exonum is written in Rust and you have to install the stable Rust
 compiler to build this demo. If you do not have the environment set up, follow
 [the installation guide](./install.md).
 
-Let’s create minimal crate with `exonum` dependency.
+Let’s create minimal crate with the **exonum** crate as a dependency.
 
 ```sh
-cargo new --bin cryptocurrency
+cargo new cryptocurrency
 ```
 
-Add necessary dependencies to your `Cargo.toml`:
+Add necessary dependencies to `Cargo.toml` in the project directory:
 
 ```toml
 [package]
-name = "cryptocurrency"
-version = "0.3.0" # corresponds to version of Exonum
+name = "exonum_cryptocurrency"
+# Tutorial version corresponds to the compatible version of Exonum core library
+version = "0.4.0"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "0.3.0"
-iron = "0.5.1"
-bodyparser = "0.7.0"
-router = "0.5.1"
+exonum = "0.4.0"
+iron = "0.6.0"
+bodyparser = "0.8.0"
+router = "0.6.0"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 ```
 
-We need to import crates with necessary types. Edit your `src/main.rs`:
+## Imports
+
+Rust crates have the [`src/lib.rs`][lib.rs] file as the default entry point.
+In our case, this is where we are going to place the service code.
+Let’s start from importing crates with necessary types:
 
 ```rust
 extern crate serde;
@@ -66,7 +72,9 @@ use router::Router;
 use serde::Deserialize;
 ```
 
-Define constants:
+## Constants
+
+Let’s define some constants we will use later on:
 
 ```rust
 // Service identifier
