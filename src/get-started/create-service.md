@@ -87,129 +87,6 @@ const TX_TRANSFER_ID: u16 = 2;
 const INIT_BALANCE: u64 = 100;
 ```
 
-Declare `main` function:
-
-```rust
-fn main() {
-    exonum::helpers::init_logger().unwrap();
-}
-```
-
-In the code above we have set up a logger that will output information on Exonum
-node activity into the console.
-
-You can try to run the blockchain at this point with
-
-```sh
-cargo run
-```
-
-### Initialize Blockchain
-
-Exonum contains `Blockchain` type.
-To create a blockchain we should create a database instance and declare a list
-of [provided services](../architecture/services.md). As we have not implemented
-a service yet, we keep the list empty.
-
-Put this code after logger initialization into `main` function body:
-
-```rust
-let db = MemoryDB::new();
-let services: Vec<Box<Service>> = vec![ ];
-let blockchain = Blockchain::new(Box::new(db), services);
-```
-
-We use `MemoryDB` to store our data in the code above. `MemoryDB` is an
-in-memory database implementation useful for development and testing purposes.
-There is RocksDB support as well that is recommendable for
-production applications.
-
-A minimal blockchain is ready, but it is pretty much useless, because there is
-no way to interact with it. To fix this we need to create a node and provide an
-API to interact with the blockchain.
-
-### Create Keys
-
-Every node needs public and private keys. Keys are unique to every node
-and are used to identify it within the network. We will create temporary keys
-using `exonum::crypto::gen_keypair()` function, but for ordinary use you should
-load the keys from the node configuration file. The node needs two pairs of
-keys, actually: one for interaction with other nodes while reaching consensus
-and another one for service needs.
-
-```rust
-let (consensus_public_key, consensus_secret_key) =
-    exonum::crypto::gen_keypair();
-let (service_public_key, service_secret_key) =
-    exonum::crypto::gen_keypair();
-```
-
-### Configure Node
-
-For launching a node a blockchain instance and node configuration are required.
-[Node configuration](../architecture/configuration.md) consists of two
-parts:
-
-- Local configuration which includes:
-
-    - Node configuration (e.g., IP settings and other configuration parts)
-    - API configuration (e.g., settings of REST API)
-
-- Global configuration or genesis configuration (all parameters
-  that need to be the same for all the nodes in the network)
-
-Genesis configuration contains a list of public keys of
-[validators](../glossary.md#validator), i.e., nodes that can vote for block
-acceptance. Our demo blockchain network has only one validator (our node).
-Fill this list with the public keys we have just generated:
-
-```rust
-let validator_keys = ValidatorKeys {
-    consensus_key: consensus_public_key,
-    service_key: service_public_key,
-};
-let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
-```
-
-Let’s configure REST API to open the node for external web requests.
-Our node will expose API on port 8000 of every network interface.
-
-```rust
-let api_address = "0.0.0.0:8000".parse().unwrap();
-let api_cfg = NodeApiConfig {
-    public_api_address: Some(api_address),
-    ..Default::default()
-};
-```
-
-We also configure our node to listen to peer-to-peer connections on port 2000
-for all network interfaces. This port is used for interactions among full nodes
-in the Exonum network.
-
-```rust
-let peer_address = "0.0.0.0:2000".parse().unwrap();
-
-// Complete node configuration
-let node_cfg = NodeConfig {
-    listen_address: peer_address,
-    peers: vec![],
-    service_public_key,
-    service_secret_key,
-    consensus_public_key,
-    consensus_secret_key,
-    genesis,
-    external_address: None,
-    network: Default::default(),
-    whitelist: Default::default(),
-    api: api_cfg,
-    mempool: Default::default(),
-    services_configs: Default::default(),
-};
-
-let node = Node::new(blockchain, node_cfg);
-node.run().unwrap();
-```
-
 ## Declare Persistent Data
 
 We should declare what kind of data we want to store in the blockchain.
@@ -678,24 +555,125 @@ impl Service for CurrencyService {
 `CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
 `Api::wire` method to connect this `Api` instance to the `Router`.
 
-## Run Service
+## Create Demo Blockchain
 
-We have implemented all the pieces of a minimalistic blockchain. Now,
-add `CryptocyrrencyService` to services list of the blockchain and run the demo:
+The service is ready. You can verify that the library code compiles by running
+`cargo build` in the shell. However, we do not have a means to process requests
+to the service. To fix this, let us create a minimalistic blockchain network
+with one node and a single service we’ve just finished creating.
+
+The code we are going to write is logically separate from the service itself.
+The service library could be connected to blockchains together with other services,
+while the demo blockchain is a specific example of its usage. For this reason,
+we will position the blockchain code as an [*example*][cargo-example] and
+place it into [`examples/demo.rs`][demo.rs].
+
+### Configure Node
+
+For launching a blockchain node, we need to specify its configuration.
+We will create this configuration in a separate `node_config` function:
 
 ```rust
-let services: Vec<Box<Service>> = vec![
-    Box::new(CurrencyService),
-];
+fn node_config() -> NodeConfig {
+    // Code goes here
+}
 ```
 
-To compile and run the final code enter:
+[Node configuration](../architecture/configuration.md) consists of two
+parts:
 
-```sh
-cargo run
+- Local configuration which includes:
+
+    - Node configuration (e.g., IP settings and other configuration parts)
+    - API configuration (e.g., settings of REST API)
+
+- Global configuration or genesis configuration (all parameters
+  that need to be the same for all the nodes in the network)
+
+Genesis configuration contains a list of public keys of
+[validators](../glossary.md#validator), i.e., nodes that can vote for block
+acceptance. Our demo blockchain network has only one validator (our node).
+Fill this list with the public keys we generate randomly:
+
+```rust
+let (consensus_public_key, consensus_secret_key) =
+    exonum::crypto::gen_keypair();
+let (service_public_key, service_secret_key) =
+    exonum::crypto::gen_keypair();
+
+let validator_keys = ValidatorKeys {
+    consensus_key: consensus_public_key,
+    service_key: service_public_key,
+};
+let genesis = GenesisConfig::new(vec![validator_keys].into_iter());
 ```
 
-This will build the code and start the compiled binary.
+!!! note
+    In real applications, keys would be stored in the configuration file so
+    that the node can be safely restarted.
+
+Let’s configure REST API to open the node for external web requests.
+Our node will expose API on port 8000 of every network interface.
+
+```rust
+let api_address = "0.0.0.0:8000".parse().unwrap();
+let api_cfg = NodeApiConfig {
+    public_api_address: Some(api_address),
+    ..Default::default()
+};
+```
+
+We also configure our node to listen to peer-to-peer connections on port 2000
+for all network interfaces. This port is used for interactions among full nodes
+in the Exonum network.
+
+```rust
+let peer_address = "0.0.0.0:2000".parse().unwrap();
+
+// Return this value from `node_config` function
+NodeConfig {
+    listen_address: peer_address,
+    peers: vec![],
+    service_public_key,
+    service_secret_key,
+    consensus_public_key,
+    consensus_secret_key,
+    genesis,
+    external_address: None,
+    network: Default::default(),
+    whitelist: Default::default(),
+    api: api_cfg,
+    mempool: Default::default(),
+    services_configs: Default::default(),
+}
+```
+
+### Run Node
+
+Finally, we need to implement the entry point to our demo network – `main` function:
+
+```rust
+fn main() {
+    exonum::helpers::init_logger().unwrap();
+    let node = Node::new(
+        Box::new(MemoryDB::new()),
+        vec![Box::new(CurrencyService)],
+        node_config(),
+    );
+    node.run().unwrap();
+}
+```
+
+That is, we:
+
+1. Initialize logging in the Exonum core library
+2. Create a node with in-memory database (`MemoryDB`), a single service (`CurrencyService`),
+  and the configuration we have specified earlier
+3. Run the created node
+
+The demo can now be executed with the `cargo run --example demo` command.
+
+## Interact With Demo
 
 ### Send Transactions via REST API
 
