@@ -868,3 +868,6 @@ with two wallets and transferred some money between them.
 [curry-fn]: https://en.wikipedia.org/wiki/Currying
 [arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
 [ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
+[cargo-example]: http://doc.crates.io/manifest.html#examples
+[lib.rs]: https://github.com/exonum/cryptocurrency/blob/master/src/lib.rs
+[demo.rs]: https://github.com/exonum/cryptocurrency/blob/master/examples/demo.rs
