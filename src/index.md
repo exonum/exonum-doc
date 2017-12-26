@@ -9,14 +9,14 @@ that is, blockchains with the known set of blockchain infrastructure providers.
 Exonum uses [the Rust programming language][rust] to achieve utmost execution safety;
 [service-oriented architecture][wiki:soa] to provide extensibility, flexibility,
 and modularity; and client-side verification based on [cryptographic commitments][wiki:commitment]
-(Merkle and Merkle Patricia trees) to ensure the transparency of the system
+(Merkle and Merkle Patricia trees) to ensure transparency of the system
 and client security.
 
 ## Get Started
 
 ### Installation
 
-[Exonum][core] is a open-source Rust library providing core functionality
+[Exonum][core] is an open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
 You may refer to [the installation guide](get-started/install.md) in order to install
 the library together with its prerequisites.

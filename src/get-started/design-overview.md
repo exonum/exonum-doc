@@ -24,7 +24,7 @@ an atomic patch that should be applied to the key-value storage.
 Transactions are authenticated with the help of public-key digital signatures.
 Transactions need to be verified and ordered before they are considered
 accepted / committed. Ordering is performed by
-[the consensus algorithm](#consensus); the algorithm is also responsible that
+[the consensus algorithm](#consensus); the algorithm also ensures that
 only successfully verified transactions are committed.
 
 Transactions are templated; each transaction template has a set of variable
@@ -44,7 +44,7 @@ All data in the Exonum blockchain is divided into two parts:
   applied to the data storage
 
 As transactions include operations on the key-value storage such as creating
-new value, or updating already saved values, the actual data storage state
+a new value, or updating already saved values, the actual data storage state
 can be restored completely from the transaction log.
 When a new node in the Exonum network appears, it loads
 already generated blocks and applies their transactions to the data
@@ -71,7 +71,7 @@ Exonum blocks consist of the following parts:
   they execute every transaction in the given order and apply changes to
   their data storages. Every transaction type is executed by the
   appropriate Exonum service
-- The hash of a new data storage state. The state itself is not
+- The hash of the new data storage state. The state itself is not
   included; however, transactions are applied deterministically and
   unequivocally. The agreement on the hash of data storage is a part of
   the Exonum consensus algorithm, so the hash is guaranteed to coincide

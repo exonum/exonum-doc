@@ -11,7 +11,7 @@ In the terms of data management, blockchains provide [OLTP][wiki:oltp] capabilit
 a blockchain processes transactions (which are quite similar to [transactions][wiki:tx]
 in ordinary database management systems) and changes the stored values correspondingly.
 
-Compared to commonplace OLTP solutions, the use of blockchain brings several distinctive
+Compared to commonplace OLTP solutions, use of blockchain brings several distinctive
 advantages.
 
 ### Distribution
@@ -25,7 +25,7 @@ blockchains are resistant against much wider range of attacks:
   isolated from the rest of the network, or even completely compromised (say, by
   a hacker)
 - Blockchains can be deployed in a decentralized network, where there is no single
-  administrator managing all nodes. This significantly reduces risks of data corruption
+  administrator managing all the nodes. This significantly reduces risks of data corruption
   and the bias in the system (e.g., preferential treatment of some participants)
 
 ### Reliable Audit Trail
@@ -147,8 +147,8 @@ There are 3 types of service endpoints:
 
 - **Transactions** correspond to `PUT` or `POST` requests in REST
 - **Read requests** correspond to `GET` requests in REST
-- **Private APIs** represent administrative and maintenance endpoints, generally
-  are not accessible to the outside world
+- **Private APIs** represent administrative and maintenance endpoints,
+  generally not accessible to the outside world
 
 #### Persistence
 
@@ -167,7 +167,7 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 
 Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
 to synchronize data among the nodes in the network.
-The Exonum network would continue operating even if up to 1/3 validators are hacked,
+The Exonum network would continue to operate even if up to 1/3 of validators are hacked,
 compromised or switched off. Hence, there is no single point of failure
 in the network; the whole process of transaction processing is fully decentralized.
 
