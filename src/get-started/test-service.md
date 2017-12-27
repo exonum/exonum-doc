@@ -57,7 +57,7 @@ The testkit allows to access service endpoints with the help
 of the [`TestKitApi`][TestKitApi] struct. However, calls to `TestKitApi`
 may be overly verbose and prone to errors for practical purposes,
 as the struct does not know type signatures of the endpoints
-of a specific service. To improve usability,
+of a specific service. To improve usability
 let’s create a *wrapper* around `TestKitApi` with the wrapper’s methods corresponding
 to service endpoints:
 
@@ -122,18 +122,18 @@ HTTP status), `get_err` acts in the opposite way, panicking if the response
 ## Creating Test Network
 
 To perform testing, we first need to create a network emulation – the eponymous
-`TestKit`. `TestKit` provides a point of view of a single full node (a validator
-or an auditor) in an imaginary Exonum blockchain network.
+`TestKit`. `TestKit` allows to recreate behavior of a single full node
+(a validator or an auditor) in an imaginary Exonum blockchain network.
 
 !!! note
-    Unlike real Exonum nodes, testkit does not actually start a web server in order
-    to process requests. Instead, they are processed synchronously,
+    Unlike real Exonum nodes, the testkit does not actually start a web server
+    in order to process requests. Instead, requests are processed synchronously,
     in the same process as the test code itself. For example, a call
     to the `get_wallet` method in `CryptocurrencyApi`
     will directly invoke [the handler](create-service.md#api-for-read-requests)
     we have defined for the respective read request.
 
-Because `TestKit` will be used by all tests, it is natural to move its constructor
+Since `TestKit` will be used by all tests, it is natural to move its constructor
 to a separate function:
 
 ```rust
@@ -171,7 +171,7 @@ fn test_create_wallet() {
     let (tx, _) = api.create_wallet("Alice");
     testkit.create_block();
 
-    // Check that the user indeed is persisted by the service
+    // Check that the wallet is indeed persisted by the service
     let wallet = api.get_wallet(tx.pub_key());
     assert_eq!(wallet.pub_key(), tx.pub_key());
     assert_eq!(wallet.name(), tx.name());
@@ -180,6 +180,7 @@ fn test_create_wallet() {
 ```
 
 Per Rust conventions, the test is implemented as a zero-argument function
+without the returned value and
 with a `#[test]` annotation. This function will be invoked during testing;
 if it does not panic, the test is considered passed.
 
@@ -290,8 +291,9 @@ of transactions, even those that would be hard (but not impossible) to reproduce
 in the real network.
 
 Let’s test a case when Alice sends a transaction to Bob while the Bob’s wallet
-is not committed. The test is quite similar to the previous one; one difference
-is the first `create_block` call is replaced with
+is not committed. The test is quite similar to the previous one, with the exception
+how the created transactions are placed into blocks.
+The first `create_block` call is replaced with
 
 ```rust
 testkit.create_block_with_tx_hashes(&[tx_alice.hash()]);
@@ -333,7 +335,7 @@ the same pattern that was used in the tests discussed above:
 - Use read requests to check that the changes are as expected
 
 !!! tip
-    In some cases, it makes sense to replace the last stage with verifying data
+    In some cases it makes sense to replace the last stage with verifying data
     in the blockchain storage directly. This can be done by obtaining
     a [`snapshot`][TestKit-snapshot] from the testkit and then instantiating
     a service schema (such as `CurrencySchema` in the demo service) with it.
