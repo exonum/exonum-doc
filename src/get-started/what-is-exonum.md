@@ -25,8 +25,9 @@ blockchains are resistant against much wider range of attacks:
   isolated from the rest of the network, or even completely compromised (say, by
   a hacker)
 - Blockchains can be deployed in a decentralized network, where there is no single
-  administrator managing all the nodes. This significantly reduces risks of data corruption
-  and the bias in the system (e.g., preferential treatment of some participants)
+  administrator managing all the nodes. This significantly reduces risks of data
+  corruption and the bias in the system (e.g., preferential treatment of some
+  participants)
 
 ### Reliable Audit Trail
 
@@ -167,9 +168,10 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 
 Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
 to synchronize data among the nodes in the network.
-The Exonum network would continue to operate even if up to 1/3 of validators are hacked,
-compromised or switched off. Hence, there is no single point of failure
-in the network; the whole process of transaction processing is fully decentralized.
+The Exonum network would continue to operate even if up to 1/3 of validators are
+hacked, compromised or switched off. Hence, there is no single point of failure
+in the network; the whole process of transaction processing is fully
+decentralized.
 
 ### Light Clients
 
