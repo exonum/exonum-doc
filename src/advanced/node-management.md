@@ -168,6 +168,33 @@ JSON object with the following fields:
 }
 ```
 
+### Healthcheck
+
+```none
+GET {system_base_path}/healthcheck
+```
+
+Returns a boolean representing if the node is connected to other peers.
+
+#### Parameters
+
+None.
+
+#### Response
+
+JSON object with the following fields:
+
+- **connectivity**: bool  
+  Is the node connected to other peers?
+
+#### Response example
+
+```JSON
+{
+  "connectivity": true
+}
+```
+
 ### Transaction
 
 ```none
