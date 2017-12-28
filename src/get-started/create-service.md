@@ -419,21 +419,6 @@ impl Transaction for TxTransfer {
 }
 ```
 
-In order for transactions to be properly displayed [in the blockchain explorer][explorer],
-we also should redefine the [`info()` method][tx-info]. The implementation is the
-same for both transactions and looks like this:
-
-```rust
-impl Transaction for TxCreateWallet {
-    // `verify()` and `execute()` code...
-
-    fn info(&self) -> serde_json::Value {
-        serde_json::to_value(&self)
-            .expect("Cannot serialize transaction to JSON")
-    }
-}
-```
-
 ## Implement API
 
 Finally, we need to implement the node API with the help of [Iron framework][iron].
