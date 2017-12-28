@@ -176,13 +176,6 @@ GET {system_base_path}/transactions/{transaction_hash}
 
 Searches for a transaction, either committed or uncommitted, by the hash.
 
-!!! warning "Quirky behavior"
-    As of Exonum 0.2, the returned information about a transaction is only
-    accurate if the transaction type redefines the default [`info()`][info-method]
-    implementation, for example, to return JSON serialization of the transaction.
-    If `info()` is *not* redefined, the
-    endpoint will always return `null` as the transaction information.
-
 #### Parameters
 
 - **transaction_hash**: Hash  
@@ -616,4 +609,3 @@ descending order according to their heights.
 
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
-[info-method]: ../architecture/transactions.md#info
