@@ -155,7 +155,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **size**: integer  
   Amount of unconfirmed transactions
@@ -174,7 +174,7 @@ JSON object with the following fields:
 GET {system_base_path}/healthcheck
 ```
 
-Returns a boolean representing if the node is connected to other peers.
+Returns a boolean value representing if the node is connected to other peers.
 
 #### Parameters
 
@@ -182,10 +182,10 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **connectivity**: bool  
-  Is the node connected to other peers?
+  Indicates whether the node is connected to the other peers.
 
 #### Response example
 
@@ -372,7 +372,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **incoming_connections**: Array<PeerAddress\>  
   List of addresses of peers connected to this node
@@ -435,7 +435,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **network_id**: integer  
   Network ID. Is not used currently
@@ -482,7 +482,7 @@ Returns the content for a block of a specific height.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **block**: BlockHeader  
   The header of the specified block
