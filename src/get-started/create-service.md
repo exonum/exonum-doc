@@ -715,7 +715,7 @@ Use `curl` command to send this transaction to the node by HTTP:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
 ```
 
 This transaction creates the first wallet associated with user Johnny Doe.
@@ -756,7 +756,7 @@ Send it with `curl` to the node:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
 ```
 
 It returns the hash of the second transaction:
@@ -800,7 +800,7 @@ Send it to the node with:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transaction
+    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transfer
 ```
 
 This request returns the transaction hash:
