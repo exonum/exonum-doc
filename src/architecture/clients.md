@@ -1,10 +1,11 @@
 # Lightweight Clients
 
-To improve system auditability, Exonum includes a [**light
-client**](https://github.com/exonum/exonum-client). Light client is a
-JavaScript library with a number of helper functions available for use by
-frontend developers. These helper functions are used to
-verify blockchain responses on the client side using cryptographic proofs.
+To improve system auditability, Exonum includes a JavaScript library
+called [light client][github:light-client].
+This library with a number of helper functions available for use by developers.
+These helper functions are used to
+sign transactions before sending from client side to blockchain
+and verify blockchain responses on the client side using cryptographic proofs.
 
 The client functions are divided into the following submodules:
 
@@ -38,12 +39,15 @@ There are two typical use cases for the light client:
 In this and next section all functions indicated in *italics* are the functions
 implemented in Exonum light client.
 
-1. Frontend triggered by an event (for example, a button click handler)
-  decides to create a new transaction
-2. The transaction data is stored in JSON format. Then the data is
-  *converted to the Exonum binary format* and *digitally signed*
-3. The generated transaction (JSON data + digital signature) is sent to the
-  a full node via an HTTP POST request
+![Send data to the blockchain](../images/send-data.png)
+
+1. Frontend triggered by an event (for example, a button click handler) decides to create a new transaction.
+  The transaction data is stored in JSON format.
+  Then the data is *converted to the Exonum binary format* and *digitally signed* using the light client.
+2. Frontend receives a transaction digital signature from the light client.
+3. The generated transaction (JSON data + digital signature) is sent to the a full node via an HTTP POST request.
+4. Frontend receives a transaction hash or another type of notification
+  when the transaction is successfully added to the block
 
 !!! note
     Serialization during signing is a necessary step, since all
@@ -59,6 +63,8 @@ implemented in Exonum light client.
 
 ## Sending Requests
 
+![Request data from the blockchain](../images/request-data.png)
+
 1. The client forms an HTTP GET request and sends it to a full node in the Exonum
   blockchain network
 2. The node forms a response to the request and the corresponding
@@ -68,16 +74,36 @@ implemented in Exonum light client.
   that links the response to the block header.
 3. The client, on receiving the response from the blockchain, *verifies the structure*
   and *validates cryptographic proofs* for the response.
-4. The verification procedure includes *checking whether a returned response
+  The verification procedure includes *checking whether a returned response
   is stale*. This is accomplished by calculating the median of timestamps recorded
   in `Precommit`s and comparing it against the local time of the client.
   If the median time in `Precommit`s is too far in the past, the response
   is considered stale, and its verification fails.
-5. The result of checks is shown in the user interface
+4. The result of checks is shown in the user interface
 
 !!! note
     In the case user authentication is needed (for example, for data
     access management), requests can be *digitally signed*.
+
+An example of a cryptographic proof:
+
+![Cryptographic proof](../images/proof.png)
+
+In this schema, the data is in the Merkle tree (or its variants) with the rest of the data of the corresponding type.
+
+The root hash of this Merkle tree is called **state hash**,
+which means that it is a hash of all data in the blockchain.
+This hash is written in the block, which is signed by the validators.
+
+To prove the existence of data in the blockchain, it is enough to first check the Merkle tree,
+and then check the block with precommits.
+
+If there are several different types of data in the blockchain, the state hash is calculated in another way.
+Generally, only data of the same type is stored in the Merkle tree (or its variants).
+Thus, the number of Merkle trees in the system is equal to the number of data types.
+All existing Merkle trees are grouping into the Merkle tree (or its variants),
+in the leaves of which lie the root hashes of the Merkle trees.
+The root hash of the grouping Merkle tree is the state hash of the blockchain.
 
 ## Motivation
 
@@ -165,6 +191,7 @@ Despite the complexity of the development, **the presence of
 light clients in a blockchain-based system is the only practical way to
 largely remove the necessity of trust to third parties**.
 
+[github:light-client]: https://github.com/exonum/exonum-client
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 [mt-index]: storage.md#prooflistindex
