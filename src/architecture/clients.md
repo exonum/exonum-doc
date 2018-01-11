@@ -25,8 +25,8 @@ The client functions are divided into the following submodules:
     A hash of the entire blockchain state is a part of each block
     (see [data storage](storage.md)). This hash is formed using Merkle
     and Merkle Patricia indexes. Thus, using functions for proof verification,
-    one can verify the commitment of any blockchain data in a block. The block itself
-    can be verified using blockchain integrity verification.
+    one can verify the commitment of any blockchain data in a block. The block
+    itself can be verified using blockchain integrity verification.
 
 There are two typical use cases for the light client:
 
@@ -41,45 +41,55 @@ implemented in Exonum light client.
 
 ![Send data to the blockchain](../images/send-data.png)
 
-1. Frontend triggered by an event (for example, a button click handler) decides to create a new transaction.
-  The transaction data is stored in JSON format.
-  Then the data is *converted to the Exonum binary format* and *digitally signed* using the light client.
-2. Frontend receives a transaction digital signature from the light client.
-3. The generated transaction (JSON data + digital signature) is sent to the a full node via an HTTP POST request.
-4. Frontend receives a transaction hash or another type of notification
-  when the transaction is successfully added to the block
+1. Frontend application triggered by an event (for example, a button click
+  handler) decides to create a new transaction. The transaction data is stored
+  in JSON format.
+  Then the data is *converted to the Exonum binary format* and
+  *digitally signed* using the light client library.
+2. Frontend application receives a digital signature from
+  the light client library.
+3. The generated transaction (JSON data + the digital signature) is sent
+  to the a full node via an HTTP POST request.
+4. Frontend application receives a notification (e.g., the transaction hash)
+  as a response to the HTTP POST request
 
 !!! note
     Serialization during signing is a necessary step, since all
     data (including transactions) is stored in Exonum in a [custom binary
     format](serialization.md). This is done for several reasons:
 
-    - The binary format is unambiguous, while the same data can have multiple JSON
-      representations (which would lead to different hashes of logically
+    - The binary format is unambiguous, while the same data can have multiple
+      JSON representations (which would lead to different hashes of logically
       the same data)
     - The data stored in the binary format consumes less disk space
-    - Access to a field in a binary format can be implemented using fast pointer
-      arithmetic; the same operation for JSON data would require multiple reads
+    - Access to a field in a binary format can be implemented using fast
+      pointer arithmetic; the same operation for JSON data would require
+      multiple reads
 
 ## Sending Requests
 
 ![Request data from the blockchain](../images/request-data.png)
 
-1. The client forms an HTTP GET request and sends it to a full node in the Exonum
-  blockchain network
+1. The client forms an HTTP GET request and sends it
+  to a full node in the Exonum blockchain network.
 2. The node forms a response to the request and the corresponding
-  cryptographic proof and sends both back to the client. The cryptographic proof
-  includes a block header together with [`Precommit` messages](consensus.md#precommit)
-  that certify its validity, and one or more [Merkle paths](../glossary.md#merkle-proof)
+  cryptographic proof and sends both back to the client.
+  The cryptographic proof includes a block header together with
+  [`Precommit` messages](consensus.md#precommit)
+  that certify its validity, and one or more
+  [Merkle paths](../glossary.md#merkle-proof)
   that links the response to the block header.
-3. The client, on receiving the response from the blockchain, *verifies the structure*
-  and *validates cryptographic proofs* for the response.
+3. The client, on receiving the response from the blockchain,
+  *verifies the structure* and *validates cryptographic proofs*
+  for the response.
   The verification procedure includes *checking whether a returned response
-  is stale*. This is accomplished by calculating the median of timestamps recorded
-  in `Precommit`s and comparing it against the local time of the client.
+  is stale*. This is accomplished by calculating the median of timestamps
+  recorded in `Precommit`s and comparing it against the local time
+  of the client.
   If the median time in `Precommit`s is too far in the past, the response
   is considered stale, and its verification fails.
-4. The result of checks is shown in the user interface
+4. The result of checks and the data retrieved from the full node is shown
+  in the user interface
 
 !!! note
     In the case user authentication is needed (for example, for data
@@ -89,21 +99,12 @@ An example of a cryptographic proof:
 
 ![Cryptographic proof](../images/proof.png)
 
-In this schema, the data is in the Merkle tree (or its variants) with the rest of the data of the corresponding type.
-
-The root hash of this Merkle tree is called **state hash**,
-which means that it is a hash of all data in the blockchain.
-This hash is written in the block, which is signed by the validators.
-
-To prove the existence of data in the blockchain, it is enough to first check the Merkle tree,
-and then check the block with precommits.
-
-If there are several different types of data in the blockchain, the state hash is calculated in another way.
-Generally, only data of the same type is stored in the Merkle tree (or its variants).
-Thus, the number of Merkle trees in the system is equal to the number of data types.
-All existing Merkle trees are grouping into the Merkle tree (or its variants),
-in the leaves of which lie the root hashes of the Merkle trees.
-The root hash of the grouping Merkle tree is the state hash of the blockchain.
+In this figure, the data has a [serializable](serialization.md) datatype
+known to the frontend application.
+It is tied to [the blockchain state](../glossary.md#blockchain-state)
+via one or more [Merkle trees](../glossary.md#merkle-tree) or their variants.
+The hash digest of the blockchain state is a part of the block signed
+by the blockchain validators.
 
 ## Motivation
 
@@ -135,8 +136,8 @@ nodes" is to introduce *light clients*, also known as
 *lightweight clients*, *thin clients* or just *clients*. For the Bitcoin
 blockchain, these clients are also known as [SPV (simple payment verification)
 clients](https://en.bitcoin.it/wiki/Thin_Client_Security). Light clients are
-programs able to replicate and verify a small portion of information stored in the
-blockchain. Usually clients verify information relevant to a specific
+programs able to replicate and verify a small portion of information stored
+in the blockchain. Usually clients verify information relevant to a specific
 user (for example, the history of his transactions). This verification is
 possible due to the use of specific data containers in a blockchain:
 [Merkle][mt-index] and
@@ -148,8 +149,8 @@ Advantages of this approach are:
   all data returned by a blockchain in response to queries is performed by the
   user himself on his machine
 - Constant (albeit partial) audit of the system is possible without requiring
-  computational resources comparable to validators in terms of performance. Only
-  the relevant data is audited
+  computational resources comparable to validators in terms of performance.
+  Only the relevant data is audited
 - To start or resume the audit of the system, no synchronization period is
   required
 
@@ -166,10 +167,10 @@ auditor nodes verify a blockchain as a whole.
 Light client security could be compared to [TLS][wiki:tls] security checks
 embedded into web browsers. It is not a direct substitute to auditing performed
 by auditor nodes, but it provides a measurable degree of security against
-[MitM attacks][wiki:mitm] and maliciously acting nodes that the client may communicate
-with. At the same time, if light clients cover all blockchain transactions,
-their *collective* security can become comparable to the security provided by the
-auditor nodes.
+[MitM attacks][wiki:mitm] and maliciously acting nodes that the client
+may communicate with. At the same time, if light clients cover
+all blockchain transactions, their *collective* security can become comparable
+to the security provided by the auditor nodes.
 
 The presence of light clients in a blockchain-based system leads to certain
 difficulties during development:
@@ -178,9 +179,9 @@ difficulties during development:
   the format of cryptographic proofs (in fact, blockchain data model)
 - Any changes in blockchain data model should be accompanied with relevant
   changes in the logic of proof verification performed by light clients
-- Since the light client substantially expands an access to Exonum REST endpoints
-  with cryptography, it may be necessary to create multiple light clients and
-  continuously support their codebase
+- Since the light client substantially expands an access to Exonum REST
+  endpoints with cryptography, it may be necessary to create multiple
+  light clients and continuously support their codebase
 
 !!! note
     The first two problems above can be overcome with the aid of data
