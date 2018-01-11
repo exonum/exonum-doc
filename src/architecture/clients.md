@@ -1,11 +1,10 @@
 # Lightweight Clients
 
-To improve system auditability, Exonum includes a JavaScript library
-called [light client][github:light-client].
-This library with a number of helper functions available for use by developers.
-These helper functions are used to
-sign transactions before sending from client side to blockchain
-and verify blockchain responses on the client side using cryptographic proofs.
+To improve system auditability, Exonum includes a [**light
+client**](https://github.com/exonum/exonum-client). Light client is a
+JavaScript library with a number of helper functions available for use by
+frontend developers. These helper functions are used to
+verify blockchain responses on the client side using cryptographic proofs.
 
 The client functions are divided into the following submodules:
 
