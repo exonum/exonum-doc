@@ -38,17 +38,16 @@ There are two typical use cases for the light client:
 In this and next section all functions indicated in *italics* are the functions
 implemented in Exonum light client.
 
-![Send data to the blockchain](../images/send-data.png)
+![Sending data to the blockchain](../images/send-data.png)
 
-1. Frontend application triggered by an event (for example, a button click
-  handler) decides to create a new transaction. The transaction data is stored
-  in JSON format.
+1. On triggering frontend application (for example, by a button click handler)
+  a new transaction is created. The transaction data is stored in JSON format.
   Then the data is *converted to the Exonum binary format* and
   *digitally signed* using the light client library.
 2. Frontend application receives a digital signature from
   the light client library.
 3. The generated transaction (JSON data + the digital signature) is sent
-  to the a full node via an HTTP POST request.
+  to a full node via an HTTP POST request.
 4. Frontend application receives a notification (e.g., the transaction hash)
   as a response to the HTTP POST request
 
@@ -67,7 +66,7 @@ implemented in Exonum light client.
 
 ## Sending Requests
 
-![Request data from the blockchain](../images/request-data.png)
+![Requesting data from the blockchain](../images/request-data.png)
 
 1. The client forms an HTTP GET request and sends it
   to a full node in the Exonum blockchain network.
@@ -77,10 +76,10 @@ implemented in Exonum light client.
   [`Precommit` messages](consensus.md#precommit)
   that certify its validity, and one or more
   [Merkle paths](../glossary.md#merkle-proof)
-  that links the response to the block header.
-3. The client, on receiving the response from the blockchain,
+  that link the response to the block header.
+3. On receiving the response from the blockchain, the client
   *verifies the structure* and *validates cryptographic proofs*
-  for the response.
+  of the response.
   The verification procedure includes *checking whether a returned response
   is stale*. This is accomplished by calculating the median of timestamps
   recorded in `Precommit`s and comparing it against the local time
@@ -91,10 +90,10 @@ implemented in Exonum light client.
   in the user interface
 
 !!! note
-    In the case user authentication is needed (for example, for data
+    In case user authentication is needed (for example, for data
     access management), requests can be *digitally signed*.
 
-An example of a cryptographic proof:
+An example of the cryptographic proof:
 
 ![Cryptographic proof](../images/proof.png)
 
@@ -176,7 +175,7 @@ difficulties during development:
 
 - Backend developers should agree with client developers on API requests and
   the format of cryptographic proofs (in fact, blockchain data model)
-- Any changes in blockchain data model should be accompanied with relevant
+- Any changes in blockchain data model should be accompanied by relevant
   changes in the logic of proof verification performed by light clients
 - Since the light client substantially expands an access to Exonum REST
   endpoints with cryptography, it may be necessary to create multiple
@@ -191,7 +190,6 @@ Despite the complexity of the development, **the presence of
 light clients in a blockchain-based system is the only practical way to
 largely remove the necessity of trust to third parties**.
 
-[github:light-client]: https://github.com/exonum/exonum-client
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 [mt-index]: storage.md#prooflistindex
