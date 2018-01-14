@@ -250,16 +250,14 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 ```Rust
 encoding_struct! {
     struct Pair {
-        const SIZE = 8;
-        field first: u32 [00 => 04]
-        field second: u32 [04 => 08]
+        first: u32,
+        second: u32,
     }
 }
 
 encoding_struct! {
     struct Pairs {
-        const SIZE = 8;
-        field inner: Vec<Pair> [00 => 08]
+        inner: Vec<Pair>,
     }
 }
 ```
@@ -274,8 +272,8 @@ message! {
     struct MessagePairs {
         const TYPE = 42;
         const ID   = 5;
-        const SIZE = 8;
-        field inner: Vec<Pair> [00 => 08]
+
+        inner: Vec<Pair>,
     }
 }
 ```
@@ -409,10 +407,9 @@ message! {
     struct MessageTwoIntegers {
         const TYPE = MY_NEW_MESSAGE_ID;
         const ID   = MY_SERVICE_ID;
-        const SIZE = 16;
 
-        field first: u64 [0 => 8]
-        field second: u64 [8 => 16]
+        first: u64,
+        second: u64,
     }
 }
 ```
@@ -446,11 +443,9 @@ To serialize the structure, one may use macros like this:
 ```Rust
 encoding_struct! {
     struct Wallet {
-        const SIZE = 48;
-
-        field pub_key:            &PublicKey  [00 => 32]
-        field owner:              &str        [32 => 40]
-        field balance:            u64         [40 => 48]
+        pub_key: &PublicKey,
+        owner: &str,
+        balance: u64,
     }
 }
 
