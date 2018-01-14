@@ -180,6 +180,34 @@ little endian.
 `0x01` for true, `0x00` for false. A message with other value stored in place
 of `bool` will not pass validation. Size: 1 byte.
 
+### Floating Point Types
+
+`f32`, `f64`  
+Correspond to floating point types in Rust. The types are stored in little endian
+per `binary32` and `binary64` formats of the IEEE 754 standard. Infinities,
+not-a-number (NaN) values and the negative zero are not supported; they cannot
+be serialized or deserialized.
+
+!!! note
+    The support of serialization of floating point types is hidden behind
+    the `float_serialize` [feature gate][cargo_features] and is disabled by default.
+    To enable the feature, specify the `exonum` dependency in the `Cargo.toml` file
+    of your project as
+
+    ```toml
+    [dependencies]
+    # Other dependencies...
+    exonum = { version = "0.5.0", features = [ "float_serialize" ] }
+    ```
+
+    (The version of the Exonum library may differ.)
+
+!!! warning
+    The use of floating-point arithmetic may lead to hard-to-trace errors and
+    loss of consensus among the nodes in the blockchain due to non-deterministic
+    character of some floating-point operations. Consider using fixed-point
+    arithmetic whenever possible.
+
 ## Aggregate Types
 
 ### Byte Buffers
@@ -422,7 +450,6 @@ having type `u64`.
 The current version does not support the serialization of the following types,
 but it is planned to be implemented in future:
 
-- Floating point types: `f32`, `f64`
 - [Enums][rust_enums]
 
 ## Example
@@ -497,3 +524,4 @@ Serialized representation of `my_wallet`:
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust]: http://rust-lang.org/
+[cargo_features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
