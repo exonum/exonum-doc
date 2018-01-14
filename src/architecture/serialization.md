@@ -185,7 +185,8 @@ of `bool` will not pass validation. Size: 1 byte.
 `f32`, `f64`  
 Correspond to floating point types in Rust. The types are stored in little endian
 per `binary32` and `binary64` formats of the IEEE 754 standard. Infinities,
-not-a-number (NaN) values and the negative zero are not supported; they cannot
+not-a-number (NaN) values, [denormalized values][subnormal_fp]
+and the negative zero are not supported; they cannot
 be serialized or deserialized.
 
 !!! note
@@ -525,3 +526,4 @@ Serialized representation of `my_wallet`:
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust]: http://rust-lang.org/
 [cargo_features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
+[subnormal_fp]: https://en.wikipedia.org/wiki/Denormal_number
