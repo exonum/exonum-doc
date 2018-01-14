@@ -121,6 +121,24 @@ API configuration parameters.
   Listen address for public API endpoints
 - **private_api_address**  
   Listen address for private API endpoints
+- **allow_origin**  
+  Sets up the [CORS][cors] headers for public API endpoints. The parameter
+  can take any of the three forms:
+
+    - `"*"` enables requests from all origins
+    - [Origin string][origin-header] (e.g., `"http://example.com"`)
+      enables requests from a single specific origin
+    - An array of origin strings (e.g., `["http://a.example.com", "http://b.example.com"]`)
+      enables requests from any of the specified origins
+
+!!! note
+    If the `allow_origin` parameter is not specified, CORS headers are not added
+    to any requests, which can lead to requests from external origins
+    being improperly processed by user agents with the CORS support
+    (such as web browsers). However, you can easily avoid this by passing the
+    public API of an Exonum node through the web server
+    delivering web assets  (for example, Nginx). In this case, the requests to API
+    would be same-origin, so CORS restrictions would not apply.
 
 #### [whitelist]
 
@@ -166,3 +184,5 @@ to keep the system operational.
 [toml]: https://en.wikipedia.org/wiki/TOML
 [github_config_file]: https://github.com/exonum/exonum/blob/v0.1/exonum/tests/testdata/config/config02.toml
 [rfc2126]: https://tools.ietf.org/html/rfc2126
+[cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+[origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
