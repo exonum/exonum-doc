@@ -475,11 +475,11 @@ Serialized representation of `my_wallet`:
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
-`0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
-`32  => 36`  | 48    | `30 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
-`36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
-`40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
-`48 => 54` | Andrew| `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
+0..32  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
+32..36  | 48    | `30 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
+36..40  | 6     | `06 00 00 00`            | Little endian stored segment size |
+40..48 | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
+48..54 | Andrew | `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
 
 [message_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/spec.rs
 [encoding_struct_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/encoding/spec.rs
