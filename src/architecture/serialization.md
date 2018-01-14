@@ -448,19 +448,16 @@ encoding_struct! {
         balance: u64,
     }
 }
-
-// `encoding_struct` macro defines a constructor (`new`) and field access methods
-// (`pub_key`, `owner`, `balance`) automatically.
+// `encoding_struct` macro defines a constructor (`new`)
+// and field access methods (`pub_key`, `owner`, `balance`) automatically.
 
 let pub_key_str = "99ace6c721db293b0ed5b487e6d6111f\
                    22a8c55d2a1b7606b6fa6e6c29671aa1";
+let pub_key = PublicKey::from_hex(pub_key_str).unwrap();
+let my_wallet = Wallet::new(&pub_key, "Andrew", 1234);
 
-let pub_key_hex = HexValue::from_hex(pub_key_str).unwrap();
-let my_wallet = Wallet::new(&pub_key_hex, "Andrew", 1234);
-
-// check structure content
-
-assert_eq!(my_wallet.pub_key().to_hex(), pub_key_str);
+// Check structure content
+assert_eq!(my_wallet.pub_key().to_string(), *pub_key_str);
 assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
@@ -469,10 +466,8 @@ let expected_buffer_str = pub_key_str.to_owned() + // Public key
                           "06000000" +             // Segment size
                           "d204000000000000" +     // Balance
                           "416e64726577";          // Name
-
-let expected_buffer: Vec<u8> = HexValue::from_hex(&expected_buffer_str)
-                                       .unwrap();
-
+let expected_buffer = Vec::<u8>::from_hex(&expected_buffer_str)
+    .unwrap();
 assert_eq!(my_wallet.serialize(), expected_buffer);
 ```
 
