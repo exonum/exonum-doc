@@ -126,8 +126,8 @@ according to the transaction specification in the service.
 
 ## Interface
 
-Transaction interface defines 3 methods: [`verify`](#verify),
-[`execute`](#execute) and [`info`](#info).
+Transaction interface defines 2 methods: [`verify`](#verify) and
+[`execute`](#execute).
 
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
@@ -208,36 +208,6 @@ of the validators.
     [services cannot directly access each other’s endpoints](services.md#limitations).
     In this model, preliminary
     checks are the most robust way to organize transaction execution.
-
-### Info
-
-```rust
-fn info(&self) -> ::serde_json::Value
-```
-
-The `info` method returns useful information (from the service developer’s point
-of view) about the transaction in JSON format.
-The method has no access to the blockchain state, same as `verify`.
-`info()` is used within the core of Exonum framework
-[in the blockchain explorer](../advanced/node-management#transaction).
-
-!!! tip
-    In most cases, you may implement `info()` to return JSON serialization
-    of the transaction:
-
-    ```rust
-    impl Transaction for YourTransactionType {
-        // other methods
-
-        fn info(&self) -> serde_json::Value {
-            serde_json::to_value(self).expect("Cannot serialize transaction to JSON")
-        }
-    }
-    ```
-
-    JSON serialization is automatically implemented for all transactions
-    defined with the `message!` macro, so no additional coding is required
-    for them.
 
 ## Lifecycle
 
