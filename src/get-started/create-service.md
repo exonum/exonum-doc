@@ -39,7 +39,6 @@ bodyparser = "0.8.0"
 router = "0.6.0"
 serde = "1.0"
 serde_json = "1.0"
-serde_derive = "1.0"
 ```
 
 ## Imports
@@ -50,20 +49,18 @@ Let’s start from importing crates with necessary types:
 
 ```rust
 extern crate serde;
-extern crate serde_json;
-#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate serde_json;
 #[macro_use] extern crate exonum;
 extern crate router;
 extern crate bodyparser;
 extern crate iron;
 
-use exonum::blockchain::{Blockchain, Service, GenesisConfig,
-                         ValidatorKeys, Transaction, ApiContext};
-use exonum::node::{Node, NodeConfig, NodeApiConfig, TransactionSend,
-                   ApiSender};
-use exonum::messages::{RawTransaction, FromRaw, Message};
-use exonum::storage::{Fork, MemoryDB, MapIndex};
-use exonum::crypto::{PublicKey, Hash, HexValue};
+use exonum::blockchain::{Blockchain, Service, Transaction, ApiContext};
+use exonum::encoding::serialize::FromHex;
+use exonum::node::{TransactionSend, ApiSender};
+use exonum::messages::{RawTransaction, Message};
+use exonum::storage::{Fork, MapIndex, Snapshot};
+use exonum::crypto::PublicKey;
 use exonum::encoding;
 use exonum::api::{Api, ApiError};
 use iron::prelude::*;
@@ -138,13 +135,18 @@ of the wallet and produce a new instance with the modified `balance` field.
 
 Schema is a structured view of the key-value storage used by Exonum blockchains.
 To access the storage, however, we will not use the storage directly, but
-rather a `Fork`. `Fork` is a mutable snapshot of the storage, where the changes
-can be easily rolled back; it is used when dealing with transactions
-and blocks in the blockchain.
+rather `Snapshot`s and `Fork`s. `Snapshot` represents an immutable view
+of the storage, and `Fork` is a mutable one, where the changes
+can be easily rolled back. `Snapshot` is used
+in [read requests](../architecture/services.md#read-requests), and `Fork`
+in transaction processing.
+
+As the schema should work with both types of storage views, we declare it as
+a generic wrapper:
 
 ```rust
-pub struct CurrencySchema<'a> {
-    view: &'a mut Fork,
+pub struct CurrencySchema<T> {
+    view: T,
 }
 ```
 
@@ -155,20 +157,40 @@ a map abstraction.
 Keys of the index will correspond to public keys of the wallets.
 Index values will be serialized `Wallet` structs.
 
-`Fork` provides random access to every piece of data inside the database.
+`Snapshot` provides random access to every piece of data inside the database.
 To isolate the wallets map into a separate entity,
 we add a unique prefix to it,
 which is the first argument to the `MapIndex::new` call:
 
 ```rust
-impl<'a> CurrencySchema<'a> {
-    pub fn wallets(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
-        MapIndex::new("cryptocurrency.wallets", self.view)
+impl<T: AsRef<Snapshot>> CurrencySchema<T> {
+    pub fn new(view: T) -> Self {
+        CurrencySchema { view }
+    }
+
+    pub fn wallets(&self) -> MapIndex<&Snapshot, PublicKey, Wallet> {
+        MapIndex::new("cryptocurrency.wallets", self.view.as_ref())
     }
 
     // Utility method to quickly get a separate wallet from the storage
-    pub fn wallet(&mut self, pub_key: &PublicKey) -> Option<Wallet> {
+    pub fn wallet(&self, pub_key: &PublicKey) -> Option<Wallet> {
         self.wallets().get(pub_key)
+    }
+}
+```
+
+Here, we have declared a constructor and two getter methods for the schema
+wrapping any type that allows to access it as a `Snapshot` reference
+(that is, implements the [`AsRef`][std-asref] trait from the standard library).
+`Fork` implements this trait, which means that we can construct a `CurrencySchema`
+instance above a `Fork`, and use `wallets` and `wallet` getters for it.
+
+For `Fork`-based schema, we declare an additional method to write to the storage:
+
+```rust
+impl<'a> CurrencySchema<&'a mut Fork> {
+    pub fn wallets_mut(&mut self) -> MapIndex<&mut Fork, PublicKey, Wallet> {
+        MapIndex::new("cryptocurrency.wallets", &mut self.view)
     }
 }
 ```
@@ -255,19 +277,22 @@ impl Transaction for TxCreateWallet {
     }
 
     fn execute(&self, view: &mut Fork) {
-        let mut schema = CurrencySchema { view };
+        let mut schema = CurrencySchema::new(view);
         if schema.wallet(self.pub_key()).is_none() {
-            let wallet = Wallet::new(self.pub_key(),
-                                     self.name(),
-                                     INIT_BALANCE);
+            let wallet = Wallet::new(
+                self.pub_key(),
+                self.name(),
+                INIT_BALANCE);
             println!("Create the wallet: {:?}", wallet);
-            schema.wallets().put(self.pub_key(), wallet)
+            schema.wallets_mut().put(self.pub_key(), wallet);
         }
     }
 }
 ```
 
-This transaction also sets the wallet balance to 100.
+This transaction also sets the wallet balance to 100. Note how we use
+both “immutable” `wallet` and “mutable” `wallets_mut` methods of the schema
+within `execute`.
 
 `TxTransfer` transaction gets two wallets for both sides of the transfer
 transaction. If they are found, we check the balance of the sender. If
@@ -295,9 +320,9 @@ impl Transaction for TxTransfer {
                 let sender = sender.decrease(amount);
                 let receiver = receiver.increase(amount);
                 println!("Transfer between wallets: {:?} => {:?}",
-                         sender,
-                         receiver);
-                let mut wallets = schema.wallets();
+                    sender,
+                    receiver);
+                let mut wallets = schema.wallets_mut();
                 wallets.put(self.from(), sender);
                 wallets.put(self.to(), receiver);
             }
@@ -351,11 +376,6 @@ The core processing logic is essentially the same for both types of transactions
 This logic can be encapsulated in a parameterized method in `CryptocurrencyApi`:
 
 ```rust
-#[derive(Serialize, Deserialize)]
-struct TransactionResponse {
-    tx_hash: Hash,
-}
-
 impl CryptocurrencyApi {
     fn post_transaction<T>(&self, req: &mut Request) -> IronResult<Response>
     where
@@ -366,8 +386,9 @@ impl CryptocurrencyApi {
                 let transaction: Box<Transaction> = Box::new(transaction);
                 let tx_hash = transaction.hash();
                 self.channel.send(transaction).map_err(ApiError::from)?;
-                let json = TransactionResponse { tx_hash };
-                self.ok_response(&serde_json::to_value(&json).unwrap())
+                self.ok_response(&json!({
+                    "tx_hash": tx_hash
+                }))
             }
             Ok(None) => Err(ApiError::IncorrectRequest(
                 "Empty request body".into(),
@@ -407,8 +428,8 @@ impl CryptocurrencyApi {
             .map_err(ApiError::FromHex)?;
 
         let wallet = {
-            let mut view = self.blockchain.fork();
-            let mut schema = CurrencySchema { view: &mut view };
+            let snapshot = self.blockchain.snapshot();
+            let schema = CurrencySchema::new(snapshot);
             schema.wallet(&public_key)
         };
 
@@ -422,8 +443,8 @@ impl CryptocurrencyApi {
     }
 
     fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
-        let mut view = self.blockchain.fork();
-        let mut schema = CurrencySchema { view: &mut view };
+        let snapshot = self.blockchain.snapshot();
+        let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
         let wallets: Vec<Wallet> = idx.values().collect();
         self.ok_response(&serde_json::to_value(&wallets).unwrap())
@@ -433,18 +454,6 @@ impl CryptocurrencyApi {
 
 As with the transaction endpoint, the methods have an idiomatic signature
 `fn(&self, &mut Request) -> IronResult<Response>`.
-
-!!! warning
-    An attentive reader may notice that we use the `fork()` method to get
-    information from the blockchain storage.
-    `Fork`s provide *read-write* access, not exactly what
-    you want to use for *read-only* access to the storage in production
-    (instead, you may want to use `Snapshot`s).
-    We use `Fork`s only to keep the tutorial reasonably short. If we used
-    `Snapshot`s,
-    we would have to make `CurrencySchema` generic and implement it both for
-    `Fork` (which would be used in transactions) and `Snapshot` (which would
-    be used in read requests).
 
 ### Wire API
 
@@ -871,3 +880,4 @@ with two wallets and transferred some money between them.
 [cargo-example]: http://doc.crates.io/manifest.html#examples
 [lib.rs]: https://github.com/exonum/cryptocurrency/blob/master/src/lib.rs
 [demo.rs]: https://github.com/exonum/cryptocurrency/blob/master/examples/demo.rs
+[std-asref]: https://doc.rust-lang.org/std/convert/trait.AsRef.html
