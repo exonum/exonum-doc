@@ -104,7 +104,7 @@ config][stored_configuration] serialization. It has the following fields:
   Consensus-specific configuration parameters.
 - **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
-- **consensus.propose_timeout**: integer  
+- **consensus.timeout_adjuster.timeout**: integer  
   Proposal timeout (ms) after the new height beginning.
 - **consensus.round_timeout**: integer  
   Interval (ms) between rounds.
@@ -236,7 +236,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
@@ -265,7 +265,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
