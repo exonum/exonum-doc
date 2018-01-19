@@ -104,6 +104,10 @@ config][stored_configuration] serialization. It has the following fields:
   Consensus-specific configuration parameters.
 - **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
+- **consensus.timeout_adjuster**: Object  
+  [Settings][ta-config] for the proposal timeout adjuster.
+- **consensus.timeout_adjuster.type**: `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
+  Timeout adjuster type.
 - **consensus.timeout_adjuster.timeout**: integer  
   Proposal timeout (ms) after the new height beginning.
 - **consensus.round_timeout**: integer  
@@ -114,6 +118,8 @@ config][stored_configuration] serialization. It has the following fields:
   Maximum number of transactions per block.
 - **services**: Object  
   Service-specific configuration parameters.
+
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
 
 #### Propose
 
