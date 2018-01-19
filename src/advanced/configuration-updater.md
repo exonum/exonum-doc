@@ -106,7 +106,8 @@ config][stored_configuration] serialization. It has the following fields:
   Peer exchange timeout (in ms).
 - **consensus.timeout_adjuster**: Object  
   [Settings][ta-config] for the proposal timeout adjuster.
-- **consensus.timeout_adjuster.type**: `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
+- **consensus.timeout_adjuster.type**:  
+  `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
   Timeout adjuster type.
 - **consensus.timeout_adjuster.timeout**: integer  
   Proposal timeout (ms) after the new height beginning.
