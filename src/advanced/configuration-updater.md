@@ -120,7 +120,6 @@ config][stored_configuration] serialization. It has the following fields:
   Service-specific configuration parameters.
 
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
-
 #### Propose
 
 `Propose` is a JSON object corresponding to the [Exonum
