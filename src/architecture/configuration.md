@@ -69,15 +69,15 @@ two parts:
 - **peers_timeout**  
   Peers exchange timeout (in ms)
 - **timeout_adjuster**:  
-  [Settings][ta-config] for the proposal timeout adjuster.
+  [Settings][ta-config] for the proposal timeout adjuster
 - **round_timeout**  
   Timeout interval (ms) between rounds
 - **status_timeout**  
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
   Maximum number of transactions per block
-  
-  [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
+
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
 
 ### Local Parameters
 
