@@ -4,9 +4,7 @@ The [Exonum core project][exonum] and [other public Exonum repositories][exonum-
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
-
-!!! note
-    This contribution guide is partially derived from [the Bitcoin contribution guide][btc-contrib].
+It is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
 !!! summary "TL;DR"
     Use pull requests, use [git commit message conventions][git:messages],
