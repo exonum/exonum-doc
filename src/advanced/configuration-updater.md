@@ -120,7 +120,6 @@ config][stored_configuration] serialization. It has the following fields:
 - **services**: Object  
   Service-specific configuration parameters.
 
-[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
 #### Propose
 
 `Propose` is a JSON object corresponding to the [Exonum
@@ -418,3 +417,4 @@ JSON object with the following fields:
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [config_service_source]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
