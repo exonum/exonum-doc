@@ -11,7 +11,7 @@ shows how to accomplish this task with the help of [the testkit library](../adva
 
 Recall that an Exonum service is typically packaged as a Rust crate. Correspondingly,
 service testing could naturally be performed with the help of [integration tests][integration-testing],
-in which the service is treated like a black box. In the case of the cryptocurrency
+in which the service is treated like a black or gray box. In the case of the cryptocurrency
 service, which we created in the previous tutorial, it would be natural to test
 how the service reacts to overcharges, transfers from or to the unknown wallet,
 transfers to self, and other scenarios which may work not as expected.
@@ -25,33 +25,224 @@ we need to add the following lines to the project’s `Cargo.toml`:
 exonum-testkit = "0.1.0"
 ```
 
-Then, let’s create [`tests/api.rs`][tests-api.rs], a file which will
-contain the tests.
+## Testing Kinds
 
-## Imports
+There are two major kinds of testing enabled by **exonum-testkit**:
+
+- [Transaction logic testing](#testing-transaction-logic) treats the service
+  as a *gray* box. It uses the service schema to read information from
+  the storage, and executes transactions by sending them directly to the Rust API
+  of the testkit. This allows for fine-grained testing focused on business logic
+  of the service.
+- [API testing](#testing-api) treats the service as a *black* box, using
+  its HTTP APIs to process transactions and read requests. A good idea
+  is to use this kind of testing to verify API-specific code.
+
+In both cases, tests generally follow the same pattern:
+
+- Initialize the testkit
+- Introduce changes to the blockchain via transactions
+- Use the service schema or read requests to check that the changes are as expected
+
+We cover both kinds of testing in separate sections below.
+
+## Testing Transaction Logic
+
+Let’s create [`tests/tx_logic.rs`][tests-tx_logic.rs], a file which will
+contain the tests for transaction business logic.
+
+### Imports
 
 The created file is executed separately from the service code, meaning that we
 need to import the service crate along with **exonum** and **exonum-testkit**:
 
 ```rust
-extern crate cryptocurrency;
 extern crate exonum;
-extern crate exonum_testkit;
+extern crate exonum_cryptocurrency as cryptocurrency;
+#[macro_use] extern crate exonum_testkit;
 ```
 
 Just like with the service itself, we then import types we will use:
 
 ```rust
-use exonum::crypto::{self, PublicKey, SecretKey};
-use exonum::messages::Message;
-use exonum_testkit::{ApiKind, TestKit, TestKitApi, TestKitBuilder};
-
+use exonum::blockchain::Transaction;
+use exonum::crypto;
+use exonum_testkit::{TestKit, TestKitBuilder};
 // Import datatypes used in tests from the crate where the service is defined.
-use cryptocurrency::{TxCreateWallet, TxTransfer, TransactionResponse,
-                     Wallet, CurrencyService};
+use cryptocurrency::{CurrencySchema, CurrencyService, TxCreateWallet,
+                     TxTransfer, Wallet};
 ```
 
-## API Wrapper
+### Creating Test Network
+
+To perform testing, we first need to create a network emulation – the eponymous
+`TestKit`. `TestKit` allows to recreate behavior of a single full node
+(a validator or an auditor) in an imaginary Exonum blockchain network.
+
+!!! note
+    Unlike real Exonum nodes, the testkit does not actually start a web server
+    in order to process requests from external clients.
+    Instead, transactions and read requests are processed synchronously,
+    in the same process as the test code itself. For example, once
+    a new block is created with a `TxCreateWallet` transaction, it is
+    executed [as defined by the service](create-service.md#transaction-execution).
+
+Since `TestKit` will be used by all tests, it is natural to move its constructor
+to a separate function:
+
+```rust
+fn init_testkit() -> TestKit {
+    TestKitBuilder::validator()
+        .with_service(CurrencyService)
+        .create()
+}
+```
+
+That is, we create a network emulation, in which there is a single validator node,
+and a single `CurrencyService`. `TestKit` supports
+testing several services at once, as well as more complex network configurations,
+but this functionality is not needed in our case.
+
+### Wallet Creation
+
+> **Test:** `test_create_wallet`
+
+Our first test is very simple: we want to create a single wallet with the help
+of the corresponding API call and make sure that the wallet is actually
+persisted by the blockchain.
+
+```rust
+#[test]
+fn test_create_wallet() {
+    let mut testkit = init_testkit();
+    let (pubkey, key) = crypto::gen_keypair();
+    testkit.create_block_with_transactions(txvec![
+        TxCreateWallet::new(&pubkey, "Alice", &key),
+    ]);
+    let wallet = {
+        let snapshot = testkit.snapshot();
+        CurrencySchema::new(&snapshot).wallet(&pubkey).expect(
+            "No wallet persisted",
+        )
+    };
+    assert_eq!(*wallet.pub_key(), pubkey);
+    assert_eq!(wallet.name(), "Alice");
+    assert_eq!(wallet.balance(), 100);
+}
+```
+
+Per Rust conventions, the test is implemented as a zero-argument function
+without the returned value and
+with a `#[test]` annotation. This function will be invoked during testing;
+if it does not panic, the test is considered passed.
+
+We use one of `create_block*` methods defined by `TestKit` to send a transaction
+to the testkit node and create a block with it (and only it). Then, we use
+the service schema to check that the transaction has led to
+the expected changes in the storage.
+
+To run the test, execute `cargo test` in the shell:
+
+```none
+$ cargo test
+# (Some output skipped)
+running 1 test
+test test_create_wallet ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+
+If we remove or comment out the `create_block*` call, the test
+will expectedly fail because the wallet is no longer created:
+
+```none
+running 1 test
+test test_create_wallet ... FAILED
+
+failures:
+
+---- test_create_wallet stdout ----
+  thread 'test_create_wallet' panicked at 'No wallet persisted'
+```
+
+### Successful Transfer
+
+> **Test:** `test_transfer`
+
+Let’s test a transfer between two wallets. First, we need to create the testkit
+and the wallets:
+
+```rust
+let mut testkit = init_testkit();
+let (alice_pubkey, alice_key) = crypto::gen_keypair();
+let (bob_pubkey, bob_key) = crypto::gen_keypair();
+testkit.create_block_with_transactions(txvec![
+    TxCreateWallet::new(&alice_pubkey, "Alice", &alice_key),
+    TxCreateWallet::new(&bob_pubkey, "Bob", &bob_key),
+    TxTransfer::new(
+        &alice_pubkey, // sender
+        &bob_pubkey, // receiver
+        10, // amount
+        0, // seed
+        &alice_key, // private key used to sign the transaction
+    ),
+]);
+```
+
+Check that wallets are committed to the blockchain and have expected balances:
+
+```rust
+let wallets = {
+    let snapshot = testkit.snapshot();
+    let schema = CurrencySchema::new(&snapshot);
+    (schema.wallet(&alice_pubkey), schema.wallet(&bob_pubkey))
+};
+if let (Some(alice_wallet), Some(bob_wallet)) = wallets {
+    assert_eq!(alice_wallet.balance(), 90);
+    assert_eq!(bob_wallet.balance(), 110);
+} else {
+    panic!("Wallets not persisted");
+}
+```
+
+### Transfer to Non-Existing Wallet
+
+> **Test:** `test_transfer_to_nonexisting_wallet`
+
+Unlike in real Exonum network, you can control which transactions the testkit
+will include into the next block. This allows to test different orderings
+of transactions, even those that would be hard (but not impossible) to reproduce
+in the real network.
+
+Let’s test a case when Alice sends a transaction to Bob while the Bob’s wallet
+is not committed. The test is quite similar to the previous one, with the exception
+how the created transactions are placed into a block.
+Namely, the `create_block_with_transactions` call is replaced with
+
+```rust
+testkit.create_block_with_transactions(txvec![
+    TxCreateWallet::new(&alice_pubkey, "Alice", &alice_key),
+    TxTransfer::new(&alice_pubkey, &bob_pubkey, 10, 0, &alice_key),
+    TxCreateWallet::new(&bob_pubkey, "Bob", &bob_key),
+]);
+```
+
+That is, although Bob's wallet is created, this occurs after the transfer is executed.
+
+We should check that Alice did not send her tokens to nowhere:
+
+```rust
+assert_eq!(alice_wallet.balance(), 100);
+assert_eq!(bob_wallet.balance(), 100);
+```
+
+## Testing API
+
+API-focused tests are placed in a separate file, [`tests/api.rs`][tests-api.rs].
+It is structurally similar to the integration test file we have considered
+previously (including tests), so we will concentrate on differences only.
+
+### API Wrapper
 
 The testkit allows to access service endpoints with the help
 of the [`TestKitApi`][TestKitApi] struct. However, calls to `TestKitApi`
@@ -81,7 +272,10 @@ impl CryptocurrencyApi {
 }
 ```
 
-Inside, all these methods call the `inner` API instance; for example, `get_wallet`
+`create_wallet` returns a secret key along with the created transaction
+because it may be needed to sign other transactions authorized by the wallet owner.
+
+Inside, all wrapper methods call the `inner` API instance; for example, `get_wallet`
 is implemented as
 
 ```rust
@@ -119,234 +313,53 @@ While `get` will panic if returned response is erroneous (that is, has non-20x
 HTTP status), `get_err` acts in the opposite way, panicking if the response
 *does not* have a 40x status.
 
-## Creating Test Network
+### Creating Blocks
 
-To perform testing, we first need to create a network emulation – the eponymous
-`TestKit`. `TestKit` allows to recreate behavior of a single full node
-(a validator or an auditor) in an imaginary Exonum blockchain network.
+While it is possible to send transactions via HTTP API, they are not automatically
+committed to the blockchain; they are only put to the pool of candidates
+for inclusion into future blocks. To fully process transactions, one needs to use
+`create_block*` methods, which we have used in the business logic tests.
 
-!!! note
-    Unlike real Exonum nodes, the testkit does not actually start a web server
-    in order to process requests. Instead, requests are processed synchronously,
-    in the same process as the test code itself. For example, a call
-    to the `get_wallet` method in `CryptocurrencyApi`
-    will directly invoke [the handler](create-service.md#api-for-read-requests)
-    we have defined for the respective read request.
-
-Since `TestKit` will be used by all tests, it is natural to move its constructor
-to a separate function:
-
-```rust
-fn create_testkit() -> (TestKit, CryptocurrencyApi) {
-    let testkit = TestKitBuilder::validator()
-        .with_service(CurrencyService)
-        .create();
-    let api = CryptocurrencyApi { inner: testkit.api() };
-    (testkit, api)
-}
-```
-
-That is, we create a network emulation, in which there is a single validator node,
-and a single `CurrencyService`. `TestKit` supports
-testing several services at once, as well as more complex network configurations,
-but this functionality is not needed in our case.
-After the testkit is created, we extract its API, wrap it,
-and return the resulting tuple.
-
-## Tests
-
-### Wallet Creation
-
-> **Test:** `test_create_wallet`
-
-Our first test is very simple: we want to create a single wallet with the help
-of the corresponding API call and make sure that the wallet is actually
-persisted by the blockchain.
-
-```rust
-#[test]
-fn test_create_wallet() {
-    let (mut testkit, api) = create_testkit();
-    // Create and send a transaction via API
-    let (tx, _) = api.create_wallet("Alice");
-    testkit.create_block();
-
-    // Check that the wallet is indeed persisted by the service
-    let wallet = api.get_wallet(tx.pub_key());
-    assert_eq!(wallet.pub_key(), tx.pub_key());
-    assert_eq!(wallet.name(), tx.name());
-    assert_eq!(wallet.balance(), 100);
-}
-```
-
-Per Rust conventions, the test is implemented as a zero-argument function
-without the returned value and
-with a `#[test]` annotation. This function will be invoked during testing;
-if it does not panic, the test is considered passed.
-
-Note that we call `create_block` after sending a transaction via HTTP API. This
-is because the API call itself does not change the blockchain; it only puts
-the transaction to the pool of candidates for inclusion into future blocks.
-The `create_block` method creates a block with all transactions from this pool,
-which is just what we need.
-
-To run the test, execute `cargo test` in the shell:
-
-```none
-$ cargo test
-# (Some output skipped)
-running 1 test
-test test_create_wallet ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
-```
-
-If we remove or comment out the `create_block` call, the test will fail:
-
-```none
-running 1 test
-test test_create_wallet ... FAILED
-
-failures:
-
----- test_create_wallet stdout ----
-  thread 'test_create_wallet' panicked at 'Unexpected response status: NotFound'
-```
-
-This is because the `api.get_wallet` call in the test requests information about
-a wallet not present in the blockchain storage. According to
-[the handler logic](create-service.md#api-for-read-requests) for `get_wallet`,
-this results in a response with the 404 status, which causes
-the testkit API to panic – it did not expect the error!
-
-### Successful Transfer
-
-> **Test:** `test_transfer`
-
-Let’s test a transfer between two wallets. First, we need to create the testkit
-and the wallets:
+As an example, the `test_create_wallet` variation for HTTP API testing is as follows:
 
 ```rust
 let (mut testkit, api) = create_testkit();
+let (tx, _) = api.create_wallet("Alice");
+testkit.create_block();
+let wallet = api.get_wallet(tx.pub_key());
+assert_eq!(wallet.pub_key(), tx.pub_key());
+assert_eq!(wallet.name(), tx.name());
+assert_eq!(wallet.balance(), 100);
+```
+
+Note that we call `create_block` after sending a transaction via HTTP API.
+The `create_block` method creates a block with all uncommitted transactions,
+which is just what we need.
+
+For an example of more fine-grained control, consider the test transferring
+tokens from a non-existing wallet:
+
+> **Test:** `test_transfer_from_nonexisting_wallet`
+
+```rust
 let (tx_alice, key_alice) = api.create_wallet("Alice");
 let (tx_bob, _) = api.create_wallet("Bob");
-testkit.create_block();
+testkit.create_block_with_tx_hashes(&[tx_bob.hash()]);
+api.assert_no_wallet(tx_alice.pub_key());
 ```
 
-Check that wallets are committed to the blockchain:
-
-```rust
-let wallet = api.get_wallet(tx_alice.pub_key());
-assert_eq!(wallet.balance(), 100);
-let wallet = api.get_wallet(tx_bob.pub_key());
-assert_eq!(wallet.balance(), 100);
-```
-
-Then, we create a transaction from Alice to Bob and add it to the new block
-on the blockchain:
-
-```rust
-let tx = TxTransfer::new(
-    tx_alice.pub_key(),
-    tx_bob.pub_key(),
-    10, // transferred amount
-    0, // seed
-    &key_alice,
-);
-api.transfer(&tx);
-testkit.create_block();
-```
-
-Note that we have used Alice’s secret key `key_alice` to sign the transfer transaction.
-(This is the reason why the `create_wallet` method in the API wrapper returns
-a secret key along with the created transaction.)
-
-Finally, we verify that Alice’s and Bob’s balances have changed correspondingly:
-
-```rust
-let wallet = api.get_wallet(tx_alice.pub_key());
-assert_eq!(wallet.balance(), 90);
-let wallet = api.get_wallet(tx_bob.pub_key());
-assert_eq!(wallet.balance(), 110);
-```
-
-!!! tip
-    Try to remove either of `create_block` invocations in the test. The test should
-    obviously fail if the second invocation is removed, as the transfer is
-    no longer committed. There is a good chance it will still fail if only the first
-    invocation is removed (along with the initial verification of wallets’ balances).
-    Why? The second `create_block` call should commit all three transactions, right?
-    Well, it does, but the ordering of these transactions is non-deterministic
-    (just like in real Exonum nodes). Thus, with a bad luck one of `TxCreateWallet`
-    transactions may be executed *after* the transfer, in which case the transfer
-    will fail.
-
-### Transfer to Non-Existing Wallet
-
-> **Test:** `test_transfer_to_nonexisting_wallet`
-
-Unlike in real Exonum network, you can control which transactions the testkit
-will include into the next block. This allows to test different orderings
-of transactions, even those that would be hard (but not impossible) to reproduce
-in the real network.
-
-Let’s test a case when Alice sends a transaction to Bob while the Bob’s wallet
-is not committed. The test is quite similar to the previous one, with the exception
-how the created transactions are placed into blocks.
-The first `create_block` call is replaced with
-
-```rust
-testkit.create_block_with_tx_hashes(&[tx_alice.hash()]);
-```
-
-While `create_block` includes all pooled transactions into a new block, the new method
-is more fine-grained; it includes only transactions with the given hash digests.
-Thus, after the call the Alice’s transaction is processed and the Bob’s one is not.
-Correspondingly, we should replace the initial balance verification
-for Bob’s wallet with the check that his wallet does not exist:
-
-```rust
-api.assert_no_wallet(tx_bob.pub_key());
-```
-
-We also need to replace the second `create_block` call:
-
-```rust
-testkit.create_block_with_tx_hashes(&[tx.hash()]);
-```
-
-That is, we create a block with the transfer transaction only, while Bob’s
-`TxCreateWallet` is still left hanging.
-
-Finally, we check that Alice did not send her tokens to nowhere:
-
-```rust
-let wallet = api.get_wallet(tx_alice.pub_key());
-assert_eq!(wallet.balance(), 100);
-```
-
-### Other Tests
-
-[The test suite][tests-api.rs] also contains other tests, but they generally follow
-the same pattern that was used in the tests discussed above:
-
-- Initialize the testkit
-- Introduce changes to the blockchain via transactions
-- Use read requests to check that the changes are as expected
-
-!!! tip
-    In some cases it makes sense to replace the last stage with verifying data
-    in the blockchain storage directly. This can be done by obtaining
-    a [`snapshot`][TestKit-snapshot] from the testkit and then instantiating
-    a service schema (such as `CurrencySchema` in the demo service) with it.
+This code results in the testkit not committing Alice’s transaction,
+so Alice’s wallet does not exist when a transfer occurs later.
 
 ## Conclusion
 
 Testing is arguably just as important in software development as coding, especially
 in typical blockchain applications. The testkit framework allows to streamline
-the testing process for Exonum services.
+the testing process for Exonum services, allowing to test both business logic
+and HTTP API.
 
 [integration-testing]: http://doc.crates.io/manifest.html#integration-tests
+[tests-tx_logic.rs]: https://github.com/exonum/cryptocurrency/blob/master/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/cryptocurrency/blob/master/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKitApi.html
 [TestKit-snapshot]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKit.html#method.snapshot
