@@ -155,7 +155,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **size**: integer  
   Amount of unconfirmed transactions
@@ -168,6 +168,33 @@ JSON object with the following fields:
 }
 ```
 
+### Healthcheck
+
+```none
+GET {system_base_path}/healthcheck
+```
+
+Returns a boolean value representing if the node is connected to other peers.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON object with the following fields:
+
+- **connectivity**: bool  
+  Indicates whether the node is connected to the other peers.
+
+#### Response example
+
+```JSON
+{
+  "connectivity": true
+}
+```
+
 ### Transaction
 
 ```none
@@ -175,13 +202,6 @@ GET {system_base_path}/transactions/{transaction_hash}
 ```
 
 Searches for a transaction, either committed or uncommitted, by the hash.
-
-!!! warning "Quirky behavior"
-    As of Exonum 0.2, the returned information about a transaction is only
-    accurate if the transaction type redefines the default [`info()`][info-method]
-    implementation, for example, to return JSON serialization of the transaction.
-    If `info()` is *not* redefined, the
-    endpoint will always return `null` as the transaction information.
 
 #### Parameters
 
@@ -345,7 +365,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **incoming_connections**: Array<PeerAddress\>  
   List of addresses of peers connected to this node
@@ -408,7 +428,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **network_id**: integer  
   Network ID. Is not used currently
@@ -455,7 +475,7 @@ Returns the content for a block of a specific height.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **block**: BlockHeader  
   The header of the specified block
@@ -616,4 +636,3 @@ descending order according to their heights.
 
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
-[info-method]: ../architecture/transactions.md#info

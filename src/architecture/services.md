@@ -364,9 +364,7 @@ only it is a string instead of an integer.
 ### State Hash
 
 ```rust
-fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash> {
-    Vec::new()
-}
+fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash>;
 ```
 
 The `state_hash` method returns a list of hashes for all
@@ -377,13 +375,14 @@ hashes of tables defined by all services into a single Merklized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
 and is recorded as such in blocks and [`Precommit` messages](consensus.md).
 
-The default trait implementation returns an empty list. This corresponds to
-the case when a service does not have any Merklized tables.
+In the case when a service does not have any Merklized tables, it should
+return an empty list.
 
 !!! note
     The keys of the meta-map are defined as pairs `(service_id, table_id)`,
     where `service_id` is a 2-byte [service identifier](#service-identifiers)
-    and `table_id` is a 2-byte identifier of a table within the service.
+    and `table_id` is a 2-byte index of a table within the vector returned
+    by the `state_hash` method.
     Keys are then hashed in order to provide
     a more even key distribution, which results in a more balanced
     Merkle Patricia tree.
