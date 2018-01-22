@@ -77,7 +77,6 @@ two parts:
 - **txs_block_limit**  
   Maximum number of transactions per block
 
-[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
 ### Local Parameters
 
 - **external_address**  
@@ -187,3 +186,4 @@ to keep the system operational.
 [rfc2126]: https://tools.ietf.org/html/rfc2126
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
