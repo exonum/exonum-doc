@@ -110,7 +110,8 @@ config][stored_configuration] serialization. It has the following fields:
   `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
   Timeout adjuster type.
 - **consensus.timeout_adjuster.timeout**: integer  
-  Proposal timeout (ms) after the new height beginning.
+  Proposal timeout (ms) after the new height beginning.  
+  Used with the `"Constant"` adjuster.
 - **consensus.round_timeout**: integer  
   Interval (ms) between rounds.
 - **consensus.status_timeout**: integer  
