@@ -58,7 +58,11 @@ these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
-Workability is not guaranteed yet.
+Exonum is a little behind supporting Windows OS compared to Linux and MacOS.
+In many Windows setups, Exonum will work just fine, but there are known problems
+with its compilation in certain configurations. If you have encountered a problem
+with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
+or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
 
 ## Rust Toolchain
 
@@ -69,7 +73,10 @@ by using the [rustup](https://www.rustup.rs) program:
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 ```
 
-The toolchain includes the Rust compiler (`rustc`) and several utilities,
+For Windows, download and run `rustup-init.exe` from [the rustup website](https://www.rustup.rs/)
+instead.
+
+The Rust toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
 
 !!! note
