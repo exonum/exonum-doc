@@ -48,6 +48,11 @@ Issues are commonly tagged by their relevance,
 topic and milestone, which should provide some insight into most topical
 issues relevant to your expertise.
 
+Another option with low entry barrier is contributing to Exonum documentation,
+which is also [open-sourced](https://github.com/exonum/exonum-doc).
+You can jump to the source of a particular documentation page by clicking
+a pencil icon at the top of the page.
+
 !!! tip
     Besides GitHub, Exonum issues and solutions are discussed on [gitter][gitter]
     and [Reddit][reddit].
