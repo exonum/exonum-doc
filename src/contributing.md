@@ -78,10 +78,6 @@ for example `refs #1234`, or `fixes #4321`.
 Using the `fixes` or `closes` keywords will cause the corresponding issue
 to be closed when the pull request is merged.
 
-!!! tip
-    Please refer to the [Git manual](https://git-scm.com/doc) for more information
-    about Git.
-
 ### Testing PRs Locally
 
 Every Exonum repository features test suite(s) and continuous integration (CI)
