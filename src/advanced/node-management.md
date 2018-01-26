@@ -428,6 +428,10 @@ All explorer API endpoints share the same base path, denoted
 All explorer endpoints are public. `enable_blockchain_explorer` local
 configuration parameter allows to turn explorer endpoints on/off.
 
+!!! note "Example"
+    Minimalist example of [blockchain explorer][blockchain_explorer]
+    for monitoring blocks and transactions in Exonum blockchain.
+
 ### Transaction
 
 ```none
@@ -768,3 +772,4 @@ equal than `start` and less than `end`.
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
 [blockchain-state]: ../glossary.md#blockchain-state
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
+[blockchain_explorer]: https://github.com/exonum/blockchain-explorer
