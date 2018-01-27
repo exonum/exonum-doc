@@ -29,11 +29,11 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 [package]
 name = "exonum_cryptocurrency"
 # Tutorial version corresponds to the compatible version of Exonum core library
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "0.4.0"
+exonum = "0.5.0"
 iron = "0.6.0"
 bodyparser = "0.8.0"
 router = "0.6.0"
@@ -60,7 +60,7 @@ use exonum::encoding::serialize::FromHex;
 use exonum::node::{TransactionSend, ApiSender};
 use exonum::messages::{RawTransaction, Message};
 use exonum::storage::{Fork, MapIndex, Snapshot};
-use exonum::crypto::PublicKey;
+use exonum::crypto::{Hash, PublicKey};
 use exonum::encoding;
 use exonum::api::{Api, ApiError};
 use iron::prelude::*;
@@ -99,11 +99,9 @@ Summing it all up, the `Wallet` datatype will look like:
 ```rust
 encoding_struct! {
     struct Wallet {
-        const SIZE = 48;
-
-        field pub_key:            &PublicKey  [00 => 32]
-        field name:               &str        [32 => 40]
-        field balance:            u64         [40 => 48]
+        pub_key: &PublicKey,
+        name: &str,
+        balance: u64,
     }
 }
 ```
@@ -223,10 +221,9 @@ message! {
     struct TxCreateWallet {
         const TYPE = SERVICE_ID;
         const ID = TX_CREATE_WALLET_ID;
-        const SIZE = 40;
 
-        field pub_key:     &PublicKey  [00 => 32]
-        field name:        &str        [32 => 40]
+        pub_key: &PublicKey,
+        name: &str,
     }
 }
 ```
@@ -240,12 +237,11 @@ message! {
     struct TxTransfer {
         const TYPE = SERVICE_ID;
         const ID = TX_TRANSFER_ID;
-        const SIZE = 80;
 
-        field from:        &PublicKey  [00 => 32]
-        field to:          &PublicKey  [32 => 64]
-        field amount:      u64         [64 => 72]
-        field seed:        u64         [72 => 80]
+        from: &PublicKey,
+        to: &PublicKey,
+        amount: u64,
+        seed: u64,
     }
 }
 ```
@@ -511,6 +507,13 @@ coming to the node. To choose the right deserializer, we can use
 `message_type()` to get the unique identifier of the message we declared before.
 If the incoming transaction is built successfully, we put it into a `Box<_>`.
 
+The `state_hash` method is used to calculate the hash of
+[the blockchain state](../glossary.md#blockchain-state). The method
+[should return](../architecture/services.md#state-hash) a vector of hashes of the
+[Merkelized service tables](../glossary.md#merklized-indices).
+As the wallets table is not Merkelized,
+the returned value should be an empty vector, `vec![]`.
+
 The remaining method, `public_api_handler`, creates a REST `Handler` to process
 web requests to the node. We will use it to receive transactions via REST API
 using the logic we defined in `CryptocurrencyApi` earlier.
@@ -534,6 +537,10 @@ impl Service for CurrencyService {
             },
         };
         Ok(trans)
+    }
+
+    fn state_hash(&self, _: &Snapshot) -> Vec<Hash> {
+        vec![]
     }
 
     fn public_api_handler(&self, ctx: &ApiContext) -> Option<Box<Handler>> {
