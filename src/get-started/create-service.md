@@ -11,6 +11,11 @@ creates a wallet with a default balance and transfers money between wallets.
 You can view and download the full source code of this demo
 [here](https://github.com/exonum/cryptocurrency).
 
+For didactic purposes, the
+demo is simplified compared to a real-life application; it does not feature
+a client part and does not use [Merkelized data collections](../architecture/storage.md#merklized-indices).
+A tutorial adding these features is coming soon.
+
 ## Create Rust Project
 
 Exonum is written in Rust and you have to install the stable Rust
@@ -511,8 +516,8 @@ The `state_hash` method is used to calculate the hash of
 [the blockchain state](../glossary.md#blockchain-state). The method
 [should return](../architecture/services.md#state-hash) a vector of hashes of the
 [Merkelized service tables](../glossary.md#merklized-indices).
-As the wallets table is not Merkelized,
-the returned value should be an empty vector, `vec![]`.
+As the wallets table is not Merkelized (a simplifying assumption discussed at the
+beginning of the tutorial), the returned value should be an empty vector, `vec![]`.
 
 The remaining method, `public_api_handler`, creates a REST `Handler` to process
 web requests to the node. We will use it to receive transactions via REST API
