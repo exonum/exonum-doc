@@ -13,7 +13,7 @@ You can view and download the full source code of this tutorial
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
-a client part and does not use [Merkelized data collections](../architecture/storage.md#merklized-indices).
+the client part and does not use [Merkelized data collections](../architecture/storage.md#merklized-indices).
 A tutorial adding these features is coming soon.
 
 ## Create Rust Project
@@ -136,7 +136,8 @@ of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
-Schema is a structured view of the key-value storage used by Exonum blockchains.
+Schema is a structured view of [the key-value storage](../architecture/storage.md)
+used in Exonum.
 To access the storage, however, we will not use the storage directly, but
 rather `Snapshot`s and `Fork`s. `Snapshot` represents an immutable view
 of the storage, and `Fork` is a mutable one, where the changes
@@ -186,7 +187,7 @@ Here, we have declared a constructor and two getter methods for the schema
 wrapping any type that allows to access it as a `Snapshot` reference
 (that is, implements the [`AsRef`][std-asref] trait from the standard library).
 `Fork` implements this trait, which means that we can construct a `CurrencySchema`
-instance above a `Fork`, and use `wallets` and `wallet` getters for it.
+instance above the `Fork`, and use `wallets` and `wallet` getters for it.
 
 For `Fork`-based schema, we declare an additional method to write to the storage:
 
@@ -566,12 +567,13 @@ impl Service for CurrencyService {
 ## Create Demo Blockchain
 
 The service is ready. You can verify that the library code compiles by running
-`cargo build` in the shell. However, we do not have a means to process requests
+`cargo build` in the shell. However, we do not have means to process requests
 to the service. To fix this, let us create a minimalistic blockchain network
 with one node and a single service we’ve just finished creating.
 
 The code we are going to write is logically separate from the service itself.
-The service library could be connected to blockchains together with other services,
+The service library could be connected to an Exonum-powered blockchain
+together with other services,
 while the demo blockchain is a specific example of its usage. For this reason,
 we will position the blockchain code as an [*example*][cargo-example] and
 place it into [`examples/demo.rs`][demo.rs].
