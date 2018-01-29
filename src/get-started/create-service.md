@@ -3,23 +3,23 @@ title: Service development tutorial
 ---
 # Cryptocurrency Tutorial: How to Create Services
 
-In this demo we create an Exonum service that implements
+In this tutorial we create an Exonum service that implements
 a minimalistic cryptocurrency, and a single-node blockchain network processing
 requests to this service. The service accepts two types of transactions:
 creates a wallet with a default balance and transfers money between wallets.
 
-You can view and download the full source code of this demo
+You can view and download the full source code of this tutorial
 [here](https://github.com/exonum/cryptocurrency).
 
 For didactic purposes, the
-demo is simplified compared to a real-life application; it does not feature
+tutorial is simplified compared to a real-life application; it does not feature
 a client part and does not use [Merkelized data collections](../architecture/storage.md#merklized-indices).
 A tutorial adding these features is coming soon.
 
 ## Create Rust Project
 
 Exonum is written in Rust and you have to install the stable Rust
-compiler to build this demo. If you do not have the environment set up, follow
+compiler to build this tutorial. If you do not have the environment set up, follow
 [the installation guide](./install.md).
 
 Let’s create minimal crate with the **exonum** crate as a dependency.
@@ -203,7 +203,7 @@ impl<'a> CurrencySchema<&'a mut Fork> {
 [Transaction](../architecture/transactions.md) is a kind of message which
 performs atomic actions on the blockchain state.
 
-For our cryptocurrency demonstration we need two transaction types:
+For our cryptocurrency tutorial we need two transaction types:
 
 - Create a new wallet and add some money to it
 - Transfer money between two different wallets
@@ -679,13 +679,13 @@ That is, we:
   and the configuration we have specified earlier
 3. Run the created node
 
-The demo can now be executed with the `cargo run --example demo` command.
+The demo blockchain can now be executed with the `cargo run --example demo` command.
 
-## Interact With Demo
+## Interact With Blockchain
 
 ### Send Transactions via REST API
 
-Let’s send some transactions to our demo.
+Let’s send some transactions to our demo blockchain.
 
 #### Create the First Wallet
 
