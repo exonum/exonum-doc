@@ -36,9 +36,9 @@ There are two major kinds of testing enabled by **exonum-testkit**:
   of the service.
 - [API testing](#testing-api) treats the service as a *black* box, using
   its HTTP APIs to process transactions and read requests. A good idea
-  is to use this kind of testing to verify API-specific code.
+  is to use this kind of testing to verify the API-specific code.
 
-In both cases, tests generally follow the same pattern:
+In both cases tests generally follow the same pattern:
 
 - Initialize the testkit
 - Introduce changes to the blockchain via transactions
@@ -216,7 +216,7 @@ in the real network.
 
 Let’s test a case when Alice sends a transaction to Bob while the Bob’s wallet
 is not committed. The test is quite similar to the previous one, with the exception
-how the created transactions are placed into a block.
+how the created transactions are placed into the block.
 Namely, the `create_block_with_transactions` call is replaced with
 
 ```rust
@@ -290,8 +290,8 @@ fn get_wallet(&self, pubkey: &PublicKey) -> Wallet {
 That is, the method performs an HTTP GET request with the URL address corresponding
 to a service [with the specified name](../architecture/services.md#service-identifiers)
 and a `v1/wallet/…` path within the service API. When we created the service,
-we [have defined](create-service.md#wire-api) that invoking such a request
-returns information about a specific wallet.
+we [defined](create-service.md#wire-api) that invoking such a request
+would return information about a specific wallet.
 
 ### Waiting for Errors
 
@@ -349,7 +349,7 @@ api.assert_no_wallet(tx_alice.pub_key());
 ```
 
 This code results in the testkit not committing Alice’s transaction,
-so Alice’s wallet does not exist when a transfer occurs later.
+so Alice’s wallet does not exist when the transfer occurs later.
 
 ## Conclusion
 
