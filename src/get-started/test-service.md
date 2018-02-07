@@ -22,7 +22,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.1.0"
+exonum-testkit = "0.5.0"
 ```
 
 ## Testing Kinds
