@@ -14,12 +14,15 @@ to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.1.0"
+exonum-testkit = "0.5.0"
 ```
 
 !!! note
     The newest version of the testkit crate may differ from the one specified above.
     To find out the newest version, you may look at [the repository page on crates.io][exonum-testkit].
+    Each release of the testkit crate is compatible with the specific version
+    of the core Exonum library; the minor version of the testkit coincides
+    with the minor version of the Exonum library it supports.
 
 ## Simple usage
 
