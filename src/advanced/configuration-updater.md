@@ -104,8 +104,14 @@ config][stored_configuration] serialization. It has the following fields:
   Consensus-specific configuration parameters.
 - **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
-- **consensus.propose_timeout**: integer  
-  Proposal timeout (ms) after the new height beginning.
+- **consensus.timeout_adjuster**: Object  
+  [Settings][ta-config] for the proposal timeout adjuster.
+- **consensus.timeout_adjuster.type**:  
+  `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
+  Timeout adjuster type.
+- **consensus.timeout_adjuster.timeout**: integer  
+  Proposal timeout (ms) after the new height beginning.  
+  Used with the `"Constant"` adjuster.
 - **consensus.round_timeout**: integer  
   Interval (ms) between rounds.
 - **consensus.status_timeout**: integer  
@@ -236,7 +242,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
@@ -265,7 +271,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
@@ -412,3 +418,4 @@ JSON object with the following fields:
 [response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [config_service_source]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html

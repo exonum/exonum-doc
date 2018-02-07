@@ -4,9 +4,7 @@ The [Exonum core project][exonum] and [other public Exonum repositories][exonum-
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
-
-!!! note
-    This contribution guide is partially derived from [the Bitcoin contribution guide][btc-contrib].
+It is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
 !!! summary "TL;DR"
     Use pull requests, use [git commit message conventions][git:messages],
@@ -48,6 +46,11 @@ Issues are commonly tagged by their relevance,
 topic and milestone, which should provide some insight into most topical
 issues relevant to your expertise.
 
+Another option with low entry barrier is contributing to Exonum documentation,
+which is also [open-sourced](https://github.com/exonum/exonum-doc).
+You can jump to the source of a particular documentation page by clicking
+a pencil icon at the top of the page.
+
 !!! tip
     Besides GitHub, Exonum issues and solutions are discussed on [gitter][gitter]
     and [Reddit][reddit].
@@ -77,10 +80,6 @@ If a particular commit references another issue or PR, please add the reference,
 for example `refs #1234`, or `fixes #4321`.
 Using the `fixes` or `closes` keywords will cause the corresponding issue
 to be closed when the pull request is merged.
-
-!!! tip
-    Please refer to the [Git manual](https://git-scm.com/doc) for more information
-    about Git.
 
 ### Testing PRs Locally
 

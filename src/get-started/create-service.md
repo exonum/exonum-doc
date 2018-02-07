@@ -865,7 +865,8 @@ The response is:
 ## Conclusion
 
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
-with two wallets and transferred some money between them.
+with two wallets and transferred some money between them. Next,
+[we are going to test it](test-service.md).
 
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info

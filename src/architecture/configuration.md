@@ -68,8 +68,8 @@ two parts:
 
 - **peers_timeout**  
   Peers exchange timeout (in ms)
-- **propose_timeout**  
-  Proposal timeout (ms) upon beginning of a new height
+- **timeout_adjuster**  
+  [Settings][ta-config] for the proposal timeout adjuster
 - **round_timeout**  
   Timeout interval (ms) between rounds
 - **status_timeout**  
@@ -186,3 +186,4 @@ to keep the system operational.
 [rfc2126]: https://tools.ietf.org/html/rfc2126
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
