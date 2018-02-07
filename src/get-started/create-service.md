@@ -3,7 +3,7 @@ title: Service development tutorial
 ---
 # Cryptocurrency Tutorial: How to Create Services
 
-In this demo we create a single-node blockchain network that implements
+In this tutorial we create a single-node blockchain network that implements
 a minimalistic cryptocurrency. The network accepts two types of transactions:
 creates a wallet with a default balance and transfers money between wallets.
 
@@ -854,7 +854,8 @@ The response is:
 ## Conclusion
 
 Hurray! 🎉 You have created the first fully functional Exonum blockchain
-with two wallets and transferred some money between them.
+with two wallets and transferred some money between them. Next,
+[we are going to test it](test-service.md).
 
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
