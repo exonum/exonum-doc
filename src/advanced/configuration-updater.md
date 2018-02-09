@@ -129,7 +129,7 @@ config][config_propose] serialization. It has the following fields:
 - **votes_history_hash**: Hash  
   Hash of the proposed configuration.
 - **num_validators**: integer  
-  Number of available validators.
+  Number of validators that can vote for the proposal.
 
 ## Read Requests
 
