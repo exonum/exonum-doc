@@ -134,8 +134,8 @@ config][config_propose] serialization. It has the following fields:
   String containing JSON serialization of proposed configuration.
 - **votes_history_hash**: Hash  
   Hash of the proposed configuration.
-- **num_votes**: integer  
-  Number of votes for the proposed configuration.
+- **num_validators**: integer  
+  Number of validators that can vote for the proposal.
 
 ## Read Requests
 
