@@ -413,9 +413,9 @@ JSON object with the following fields:
   Hash of the corresponding `TxConfigVote` transaction.
 
 [stored_configuration]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/config.rs
-[config_propose]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
-[http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
-[response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
+[config_propose]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
+[http_api]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/testnet-api-tutorial.md#global-variable-service-http-api
+[response_samples]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/response-samples.md
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[config_service_source]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
+[config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
