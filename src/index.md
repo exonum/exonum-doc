@@ -73,4 +73,4 @@ what features are coming soon.
 [client]: https://github.com/exonum/exonum-client
 [tutorial]: https://github.com/exonum/cryptocurrency
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
-[config]: https://github.com/exonum/exonum-configuration
+[config]: https://github.com/exonum/exonum/tree/master/services/configuration
