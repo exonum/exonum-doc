@@ -635,4 +635,4 @@ descending order according to their heights.
 ```
 
 [closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
+[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
