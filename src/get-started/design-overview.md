@@ -8,6 +8,10 @@ This page describes the core design decisions of the Exonum framework:
 [services](#modularity-and-services),
 and [cryptography used in Exonum](#cryptography).
 
+!!! tip
+    The [architecture guide][arch-guide] in the Exonum core repository contains
+    a more technical outlook on the Exonum architecture.
+
 ## Transaction Processing
 
 !!! tip
@@ -464,6 +468,7 @@ for signing anchoring transactions in Bitcoin.
     between consensus and administrative keys will be generalized to support
     various administrative settings.
 
+[arch-guide]: https://github.com/exonum/exonum/blob/master/ARCHITECTURE.md
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
 [rocks-db]: http://rocksdb.org/
