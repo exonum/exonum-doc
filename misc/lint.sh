@@ -55,6 +55,10 @@ lint_links () {
   kill_server
 }
 
+spellcheck () {
+  $ROOT_DIR/node_modules/.bin/cspell --config=$CFG_DIR/cspell.json "$ROOT_DIR/src/**/*.md"
+}
+
 case "$1" in
   kill )
     kill_server;;
@@ -64,10 +68,13 @@ case "$1" in
     lint_html;;
   links )
     lint_links;;
+  cspell )
+    spellcheck;;
   all )
     lint_md;
     lint_html;
-    lint_links;;
+    lint_links;
+    spellcheck;;
   * )
     echo "Unknown option: $1";
     exit 1;;
