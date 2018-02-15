@@ -13,7 +13,7 @@ You can view and download the full source code of this tutorial
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
-the client part and does not use [Merkelized data collections](../architecture/storage.md#merklized-indices).
+the client part and does not use [Merkelized data collections](../architecture/storage.md#merkelized-indices).
 A tutorial adding these features is coming soon.
 
 ## Create Rust Project
@@ -516,7 +516,7 @@ If the incoming transaction is built successfully, we put it into a `Box<_>`.
 The `state_hash` method is used to calculate the hash of
 [the blockchain state](../glossary.md#blockchain-state). The method
 [should return](../architecture/services.md#state-hash) a vector of hashes of the
-[Merkelized service tables](../glossary.md#merklized-indices).
+[Merkelized service tables](../glossary.md#merkelized-indices).
 As the wallets table is not Merkelized (a simplifying assumption discussed at the
 beginning of the tutorial), the returned value should be an empty vector, `vec![]`.
 
