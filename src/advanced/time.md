@@ -1,73 +1,68 @@
-# Exonum-time tutorial
+# Time Oracle
 
-Exonum-time is a time oracle service for [Exonum blockchain framework](https://exonum.com/).
+[**exonum-time**][exonum-time] is a time oracle service for Exonum.
 This service allows to determine time,
 import it from the external world to the blockchain
 and keep its current value in the blockchain.
 
-* [The Problem](#the-problem)
-* [Rationale](#rationale)
-  * [Integration with Consensus](#integration-with-consensus)
-  * [Time Oracle Service](#time-oracle-service)
-* [Assumptions](#assumptions)
-* [Implementation of the Time Oracle Service](#implementation-of-the-time-oracle-service)
-* [REST API](#rest-api)
-
 ## The Problem
 
-Implementing the business logic of practical solutions requires that
-one should be able to access the calendar time.
-Said time should meet the following criteria:
+Implementing the business logic of many practical blockchain solutions requires
+that one should be able to access the calendar time.
+The time can be obtained by executing certain logic on the blockchain.
+This logic should meet the following criteria:
 
-* **Reliability**. The time value must be tolerant to the malicious behavior
+- **Using validators**. As Exonum is used to power permissioned blockchain,
+  it is natural to assume that the inputs to business logic determining time
+  are supplied by validators. This assumption could be generalized to support
+  abstract semi-trusted identifiable entities, but for the sake of clarity,
+  the future discussion will center specifically on the case where the time
+  is determined by the validator nodes.
+- **Reliability**. The time value must be tolerant to the malicious behavior
   of validator nodes.
-
-* **Agreement**. The time must be the same on all the nodes to ensure that
+- **Agreement**. The time must be the same on all the nodes to ensure that
   transactions are executed in a deterministic manner. This means that the time
-  should be written in the Exonum blockchain storage. Thus, the "current" time
-  will be changing similarly on all nodes during execution of transactions,
+  should be written in the Exonum blockchain storage. Thus, the “current” time
+  will be changing in the same way on all nodes during execution of transactions,
   including during nodes update.
-
-* **Sufficient accuracy**. The specified time should be fairly accurate.
-  In practice, an acceptable deviation is a few seconds (up to a minute).
-
-* **Monotony**. The time value should only increase. A pragmatic requirement,
+- **Sufficient accuracy**. The specified time should be fairly accurate.
+  In practice, an acceptable deviation is a few seconds.
+- **Monotony**. The time value should only increase. A pragmatic requirement,
   which simplifies use of time when implementing the business logic.
 
-Thus, due to the sufficient accuracy requirement the service cannot use median
-time-past from Bitcoin. Indeed, the time in Bitcoin headers is updated every 10
-or more minutes and can, in principle, differ by hours from the real time.
+## Preliminaries
 
-## Rationale
-
-Two approaches were considered for obtaining reliable time in Exonum:
-_integration with consensus_ and _a time oracle service_.
+Two possible approaches satisfying the above criteria are
+[integration with consensus](#integration-with-consensus)
+and [a time oracle service](#time-oracle-service).
 
 ### Integration with Consensus
 
-The validator includes its local time in each _Precommit_ message.
-At the next height the leader includes _+2/3 Precommits_ of the previous block
-into the _Propose_. The time median of these _Precommits_ is recorded into
-the header of the block obtained based on this _Propose_.
+!!! tip
+    Consult the [consensus description](../architecture/consensus.md) for
+    explanation of `Propose` and `Precommit` messages, and the “+2/3” notation.
 
-#### Advantages of Integration with Consensus
+The validator includes its local time in each `Precommit` message.
+At the next height the leader includes +2/3 `Precommit`s of the previous block
+into the `Propose`. The time median of these `Precommit`s is recorded into
+the header of the block obtained based on this `Propose`.
 
-* The time value is indicated directly in the header of each block making it
+#### Advantages
+
+- The time value is indicated directly in the header of each block making it
   more accessible.
-
-* Time is forcibly updated in the course of consensus operation:
+- Time is forcibly updated in the course of consensus operation:
   it is impossible to sabotage update of time without stopping consensus.
+- Blockchain is not clogged by transactions associated with time determination.
 
-* Blockchain is not clogged by the time oracle transactions.
+#### Disadvantages
 
-#### Disadvantages of Integration with Consensus
-
-* The consensus code becomes more complex. (Time is included into the consensus
-  logic while anchoring and configuration are not.)
-
-* Time is updated with each block. In the case of a large delay in
-  block acceptance, all the transactions therein will be executed with
-  the same time value.
+- The consensus code becomes more complex. (Time is included into the consensus
+  logic while [anchoring](bitcoin-anchoring.md) and
+  [configuration](configuration-updater.md) are not.)
+- Time updates are tied to creation of `Precommit` messages. In the case
+  of a large delay in block acceptance, all the transactions therein will
+  be executed with the same outdated time value.
 
 ### Time Oracle Service
 
@@ -77,96 +72,94 @@ an index with the most current time indicated separately by each validator.
 Said time median is stored in a separate index, considered the actual time
 and is updated after each transaction from any of the validators.
 
-#### Advantages of the Time Oracle Service
+#### Advantages
 
-* The logic for time update is placed in a separate plug-in service
+- The logic for time update is placed in a separate plug-in service
   (modularity).
-
-* In case of a long delay in block acceptance, the time will be updated along
+- In case of a long delay in block acceptance, the time will be updated along
   with the delayed block execution while executing its transactions.
-  Said time will be accurate enough with regard to the time of the transaction
-  entry into the pool.
+  The time will be accurate enough with regard to the time of the transaction
+  entry into the mempool.
 
-#### Disadvantages of the Time Oracle Service
+#### Disadvantages
 
-* The time value is indicated as an index in the Exonum storage, hence,
-  receipt thereof by the client requires additional cryptographic checks.
-
-* Each Exonum block will contain time oracle transactions
+- The time value is stored in the Exonum storage; hence,
+  a receipt thereof by lightweight clients requires additional
+  cryptographic checks.
+- Exonum blocks are burdened with time oracle transactions
   (usually one for each validator).
 
-**It was decided that the time oracle should be implemented as
-a separate service to develop it separately from the core and
-not complicate the consensus code.**
+### Choosing Approach
+
+Given the pros and cons above, **exonum-time** uses the time oracle approach
+as more flexible.
 
 ## Assumptions
 
-**Both solutions assume that the local time on all validator nodes is reliable.**
+The local time on all validator nodes is assumed to be reliable.
+To obtain local reliable time validators can apply external solutions like [tlsdate][tlsdate],
+[roughtime][roughtime], etc.
+
 If the local time on the validator machine is incorrect,
-**such node is considered Byzantine**. Therefore, both solutions require use of
-a reliable time source locally on each validator machine. The solutions
-considered here provide only an agreed time on the basis of a reliable local
-time of the validator nodes, taking into account possible malicious behavior
-of up to 1/3 Byzantine nodes.
+such node is considered Byzantine. As it is the case with the consensus algorithm,
+the algorithm can tolerate up to 1/3 Byzantine nodes.
 
-To obtain local, reliable time external solutions like [tlsdate][],
-[roughtime][], gps-clock, etc. can be applied.
+## Specification
 
-## Implementation of the Time Oracle Service
+### Schema
 
-**The data schema** of such a service consists of two indices:
+The data schema of the **exonum-time** service consists of two indices:
 
-* `time: Entry<SystemTime>` - is the consolidated time we target at.
+- **time**  
+  Consolidated time output by the service, which can be used by other business
+  logic on the blockchain.
+- **validators_time**  
+  Merkelized index with the last known local timestamps for all validator nodes.
+  The values in the index are used to update `time` and could be useful
+  for monitoring, diagnostics and the like.
 
-* `validators_time: ProofMapIndex<PublicKey, SystemTime>` - the last known
-  local time of the validator nodes.
+### Transactions
 
-The service implements only one transaction consisting of the actual
-time of the validator and signed with its key. The logic of such transaction
-execution is as follows:
+The service implements a single transaction type, allowing a validator to
+output its current time, authenticated by the validator’s digital signature.
 
-1. It is checked that `PublicKey` belongs to the validator.
+The logic of transaction execution is as follows:
 
-2. The time specified in the transaction is greater than time of said validator
-   specified in the storage (transactions potentially can be executed in
-   the order reverse to their creation order,
-   but the time must change monotonously).
-
-3. The time for this validator is updated in the storage.
-
-4. All values ​​from the `validators_time` index are fetched.
-
-5. All non-validator nodes are filtered off by the public keys
-   (since the validators list can change, the index may contain time values
-   ​​for non-valid validators).
-
-6. The number of the remaining values must be equal or greater than `2f + 1`
-   (where `f = (n - 1) / 3` - the maximum number of Byzantine validators).
-
-7. The resulting list is sorted down from the largest value to the lowest one.
-
-8. `f + 1` time in the resulting list is taken.
-
-9. If the time from `8.` is larger than `time`, the value in the storage
-   is replaced with the resulting value.
+1. Check that the transaction signer is one of the validators. If not, quit.
+2. Check that the time specified in the transaction is greater than timestamp
+  of the submitting validator specified in the storage. If not, quit.
+3. Update validator’s time in the `validators_time` index.
+4. If the number of the timestamps in the index belonging to the current validators
+   is at least `2f + 1`, where `f = (n - 1) / 3` is the maximum number
+   of Byzantine validators, then perform the following steps; else quit.
+5. Sort the timestamps by the current validators in the decreasing order
+  (most recent time first).
+7. Take the time with the (1-based) index `f + 1` from the resulting sorted list.
+9. If the taken time `t` is larger than the previous consolidated time,
+  replace the consolidated time with `t`.
 
 Thus, the consolidated time can be updated after each transaction with
-the actual time from any validator node, taking into account the possibility
-of change in the validators list, ensuring monotony of such time flow and
-being tolerant to the malicious behavior of the Byzantine nodes.
+the actual time from any validator node. The procedure takes into account
+possible changes in the validators list, ensures monotony of `time`, and
+is tolerant to the malicious behavior of validator nodes.
 
+## Proof of Correctness
+
+Denote `T` the list of current validators’ timestamps sorted in the decreasing order,
+as specified on step 5 of the algorithm above.
 It is clear that in a system with no more than `f` Byzantine nodes,
-any time in the `[f + 1, 2f + 1]` interval is:
+any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval is:
 
-* either the time of an honest node
+- The time of an honest node, or
+- The time between the timestamps of two honest nodes
+  (and therefore such a time can be considered reliable).
 
-* or the time in the interval between the timestamps of two honest nodes
-  (and therefore such a time can be considered reliable)
-
-For practical reasons, we always choose the `f + 1` timestamp,
+For practical reasons, we always choose the timestamp with index `f + 1`,
 since this value is reliable and at the same time the most recent one.
 
-Potentially, the validator nodes can generate and send a transaction to update
+## Discussion
+
+The validator nodes can potentially generate and send a transaction to update
 the time any moment, however, in the current implementation the nodes send
 the transaction after commit of each block.
 
@@ -177,25 +170,29 @@ will strictly grow monotonously.
 
 ## REST API
 
-The service has one endpoint per Public API and Private API:
+The service exposes the following API endpoints for the public API:
 
-* [Get current time](#current-time)
-* [Get current validators times](#current-validators-times)
-* [Get all validators times](#all-validators-times)
+- [Get the current consolidated time](#current-time)
+
+The following endpoints are exposed for private API:
+
+- [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
+- [Dump timestamps for all validators](#timestamps-of-all-validators)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
 
-**Tip.** See [Service][services] for a description of types
-of endpoints in the service.
+!!! warning
+    As of version 0.5.0, the **exonum-time** service does not provide cryptographic
+    proofs of authenticity for returned values.
 
-### Current time
+### Current Time
 
-```None
+```none
 GET {base_path}/current_time
 ```
 
-Returns consolidated time.
+Returns the current consolidated time.
 
 #### Parameters
 
@@ -205,7 +202,7 @@ None.
 
 Example of JSON response:
 
-```None
+```json
 {
   "nanos_since_epoch": 15555000,
   "secs_since_epoch": 1516106164
@@ -214,9 +211,9 @@ Example of JSON response:
 
 `null` is returned if there is no consolidated time.
 
-### Current validators times
+### Timestamps of Current Validators
 
-```None
+```none
 GET {base_path}/validators_times
 ```
 
@@ -230,7 +227,7 @@ None.
 
 Example of JSON response:
 
-```None
+```json
 [
   {
     "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
@@ -240,22 +237,15 @@ Example of JSON response:
     }
   },
   {
-    "public_key": "f6753f4b130ce098b1322a6aac6accf2d5770946c6db273eab092197a5320717",
-    "time": {
-      "nanos_since_epoch": 581130000,
-      "secs_since_epoch": 1514209665
-    }
-  },
-  {
     "public_key": "52baa9d4c4029b925cedf1a1515c874a68e9133102d0823a6de88eb9c6694a59",
     "time": null
   }
 ]
 ```
 
-### All validators times
+### Timestamps of all validators
 
-```None
+```none
 GET {base_path}/validators_times/all
 ```
 
@@ -270,7 +260,7 @@ None.
 
 Example of JSON response:
 
-```None
+```json
 [
   {
     "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
@@ -289,6 +279,6 @@ Example of JSON response:
 ]
 ```
 
+[exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
-[services]: https://github.com/exonum/exonum-doc/blob/master/src/architecture/services.md

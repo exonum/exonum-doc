@@ -80,7 +80,7 @@ pages:
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
     # Time service
-    - 'Time service': 'advanced/time.md'
+    - 'Time oracle': 'advanced/time.md'
     # Merkle index overview
     - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':
