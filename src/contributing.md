@@ -225,7 +225,7 @@ easy to review and uncontroversial. In all cases, refactoring PRs must not chang
 the behavior of code within the pull request (bugs must be preserved as is).
 
 Project maintainers aim for a quick turnaround on refactoring pull requests,
-so where possible keep them short, uncomplex and easy to verify.
+so where possible keep them short, non-complex and easy to verify.
 
 ## Decision Making Process
 

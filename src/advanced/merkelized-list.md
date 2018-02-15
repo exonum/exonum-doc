@@ -1,5 +1,7 @@
 # Merkelized List
 
+<!-- cspell:ignore proofnode -->
+
 [**Merkelized list**](../architecture/storage.md#prooflistindex) is a version
 of a typed list that supports compact proofs of existence for its elements using
 Merkle trees. Merkelized lists in Exonum are designed as classic binary Merkle trees
@@ -103,7 +105,7 @@ containing `6` values `v0...v5`.
 ### Hashing Rules
 
 Let `T(height, index)` be a value at tree node for element `index` at height
-`height`. Elements `T(0, index)` contain serialized values of the undelying list
+`height`. Elements `T(0, index)` contain serialized values of the underlying list
 according to [the Exonum binary serialization spec](../architecture/serialization.md).
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
 rules.
@@ -145,7 +147,7 @@ T(height > 1, index) = hash(T(height - 1, index * 2)).
 `Proofnode` is a recursively defined structure that's designed to provide
 evidence to client that a certain set of values is contained in a contiguous
 range of indices. One could use several `Proofnode`s to get proof for
-discontiguous set of indexes.
+non-contiguous set of indexes.
 
 For a given range of indices `[start_index, end_index)` the proof
 has a binary-tree-like structure, which contains values of elements from
@@ -246,6 +248,8 @@ This proof corresponds to the following JSON representation:
 ```
 
 ## See Also
+
+<!-- cspell:ignore cryptology,Szydlo -->
 
 1. Merkle, R. C. — A Digital Signature Based on a Conventional Encryption
   Function // Advances in Cryptology — CRYPTO '87. Lecture Notes in Computer

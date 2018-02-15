@@ -1,5 +1,7 @@
 # Exonum Serialization Format
 
+<!-- cspell:ignore cap'n -->
+
 **Binary serialization format** is used in Exonum for communication
 among full nodes, cryptographic operations on [light clients](../architecture/clients.md)
 and storage of data. The format design provides several important properties,

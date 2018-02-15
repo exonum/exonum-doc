@@ -91,7 +91,7 @@ We already started the implementation of Java binding.
 
 ## Interface Description
 
-Exonums 0.1 requires that a service developer manually specify a number of
+Exonum 0.1 requires that a service developer manually specify a number of
 parameters (service ID, transaction IDs, binary offsets of data in
 [transactions](architecture/transactions.md)). This specification may be unclear
 and leads to a number of potential problems.

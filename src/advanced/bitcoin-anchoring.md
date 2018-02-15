@@ -1,5 +1,7 @@
 # Anchoring service
 
+<!-- cspell:ignore bitcoind,blockhash,lects,satoshis,txid,utxo,utxos -->
+
 The anchoring service is developed to increase product security and
 provide non-repudiation for Exonum applications. Service periodically publishes
 Exonum blockchain block hash to the bitcoin blockchain, so that it is
@@ -190,7 +192,7 @@ chain](#recovering-broken-anchoring)).
 - Starting from this block `#H`, every validator monitors list of
   current LECTs. As soon as there is a common LECT (that is defined by
   `+2/3` validators), **anchoring transaction proposal** (the anchoring
-  transaction without validators' sigs) is completely defined and is
+  transaction without validators' signatures) is completely defined and is
   agreed upon by `+2/3` validators.
 - After common LECT appears, every validator builds the anchoring
   transaction and sign it's every input.
