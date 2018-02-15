@@ -6,6 +6,9 @@ towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
 It is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
+See a [guide in the core Exonum repository][tech-guide] for more technical details
+how to contribute.
+
 !!! summary "TL;DR"
     Use pull requests, use [git commit message conventions][git:messages],
     test your contributions, listen to peer reviews, and you should be fine.
@@ -306,6 +309,7 @@ Any work contributed where you are not the original author
 must contain its license header with the original author(s) and source.
 
 [btc-contrib]: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
+[tech-guide]: https://github.com/exonum/exonum/blob/master/CONTRIBUTING.md
 [exonum]: http://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [gh:pr]: https://help.github.com/articles/about-pull-requests/
