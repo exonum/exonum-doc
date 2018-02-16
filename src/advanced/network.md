@@ -5,7 +5,7 @@ connected via peer-to-peer connections, and
 [light clients](../glossary.md#light-client).
 Full nodes communicate with each other
 using [Exonum binary serialization format](../glossary.md#binary-serialization)
-over TCP, and clients interact with full nodes via a REST service interface.
+over TCP, and clients interact with full nodes via REST service interface.
 
 ## Network Structure
 

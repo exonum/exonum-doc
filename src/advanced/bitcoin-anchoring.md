@@ -75,7 +75,7 @@ it to the bitcoin blockchain.
 
 ### Transaction malleability
 
-Validators' signatures are openly written in Exonum blockchain; more
+Validators signatures are openly written in Exonum blockchain; more
 than `M` signatures can be published (and it is common situation). There
 is a special algorithm selecting `M` signatures deterministically. If
 all validators are legitimate, certain transaction is built
@@ -103,11 +103,11 @@ the latest one; this transaction should be spend in the new anchoring
 transaction in its opinion. Such transaction is called Latest Expected
 Correct Transaction (LECT). LECT of all validators are published in the
 Exonum blockchain. While creating a new anchoring transaction, the
-validators' supermajority select common LECT and spend its change output.
+supermajority of validators select a common LECT and spend its change output.
 
 Every validator refresh its LECT with a [custom
 schedule](#lect-updating-interval). To get new LECT, the validator uses
-[bitcoin node's](#bitcoind-node) API. New LECT must have the following
+API of a [bitcoin node](#bitcoind-node). New LECT must have the following
 properties:
 
 - It is valid anchoring transaction for the current Exonum blockchain
@@ -192,10 +192,10 @@ chain](#recovering-broken-anchoring)).
 - Starting from this block `#H`, every validator monitors list of
   current LECTs. As soon as there is a common LECT (that is defined by
   `+2/3` validators), **anchoring transaction proposal** (the anchoring
-  transaction without validators' signatures) is completely defined and is
+  transaction without validators signatures) is completely defined and is
   agreed upon by `+2/3` validators.
 - After common LECT appears, every validator builds the anchoring
-  transaction and sign it's every input.
+  transaction and sign its every input.
 - The signatures are publicized at the Exonum blockchain
 - Based on the signatures, _any_ Exonum node can create anchoring
   transaction and broadcast it to the Bitcoin network. In particular, all
@@ -253,7 +253,7 @@ for every Exonum block.
 #### LECT updating interval
 
 The frequency (in number of Exonum blocks) between checking the Bitcoin
-blockchain to update the node's LECT.
+blockchain to update the LECT of the node.
 
 ### Global settings
 
@@ -293,12 +293,12 @@ should be generated that sends money to the current anchoring address.
 Such transaction should be manually written to the global settings.
 
 The funding UTXO should get enough confirmations before being used.
-However, the network do not check number of confirmations for the
-provided funding transaction; it is on administrators' duty.
+However, the network does not check number of confirmations for the
+provided funding transaction; it is administrators’ duty.
 
 ## Changing validators list
 
-The list of validators' anchoring keys may be changed by a multiple
+The list of anchoring keys of validators may be changed by a multiple
 reasons:
 
 - periodic key rotation

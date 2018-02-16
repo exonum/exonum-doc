@@ -146,7 +146,7 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
 
 ### Merkelized Indices
 
-Merkelized indices represent a list and map with additional
+Merkelized indices represent a list and a map with additional
 features. Such indices can create the proofs of existence or absence for
 stored data items.
 
