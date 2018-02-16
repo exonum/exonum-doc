@@ -109,7 +109,7 @@ specification. Such technique is similar to
 Declarative service description can be added to a blockchain using specific
 transaction. It should include:
 
-- [Data schema](architecture/services.md#data-schema) (a set of indexes,
+- [Data schema](architecture/services.md#data-schema) (a set of indices,
   related to a service)
 - A list of [transactions](architecture/services.md#transactions)
 - API description (both [public](architecture/services.md#read-requests) and
@@ -126,7 +126,7 @@ Besides, it also enables several important features. Here are two of them.
 
 - **Server-side code generation**. Having service description, one can generate
   the major part of the boilerplate server code. This refers to the definition of
-  all necessary service functions, indexes hierarchy, usage of the relevant
+  all necessary service functions, indices hierarchy, usage of the relevant
   function arguments and so on. Code generation will substantially ease
   developers’ work, leaving him only the implementation of service business
   logic.

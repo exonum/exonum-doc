@@ -16,14 +16,14 @@ The client functions are divided into the following submodules:
 - **Proofs**. Functions for checking cryptographic proofs that
   are returned by the blockchain, such as the functions for
   checking the proofs for [Merkle][mt-index]
-  and [Merkle Patricia][mpt-index] indexes
+  and [Merkle Patricia][mpt-index] indices
 - **Blockchain integrity checks**. Function for checking the
   validity of a block (its compliance with [consensus algorithm](consensus.md))
 
 !!! note
     A hash of the entire blockchain state is a part of each block
     (see [data storage](storage.md)). This hash is formed using Merkle
-    and Merkle Patricia indexes. Thus, using functions for proof verification,
+    and Merkle Patricia indices. Thus, using functions for proof verification,
     one can verify the commitment of any blockchain data in a block. The block
     itself can be verified using blockchain integrity verification.
 
@@ -138,8 +138,7 @@ programs able to replicate and verify a small portion of information stored
 in the blockchain. Usually clients verify information relevant to a specific
 user (for example, the history of his transactions). This verification is
 possible due to the use of specific data containers in a blockchain:
-[Merkle][mt-index] and
-[Merkle Patricia][mpt-index] indexes.
+[Merkle][mt-index] and [Merkle Patricia][mpt-index] indices.
 
 Advantages of this approach are:
 

@@ -147,7 +147,7 @@ T(height > 1, index) = hash(T(height - 1, index * 2)).
 `Proofnode` is a recursively defined structure that's designed to provide
 evidence to client that a certain set of values is contained in a contiguous
 range of indices. One could use several `Proofnode`s to get proof for
-non-contiguous set of indexes.
+non-contiguous set of indices.
 
 For a given range of indices `[start_index, end_index)` the proof
 has a binary-tree-like structure, which contains values of elements from
