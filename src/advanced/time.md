@@ -69,8 +69,8 @@ the header of the block obtained based on this `Propose`.
 Each validator at a specific time sends a transaction indicating its local time
 (usually immediately after the commit of each block). Exonum storage contains
 an index with the most current time indicated separately by each validator.
-Said time median is stored in a separate index, considered the actual time
-and is updated after each transaction from any of the validators.
+A median of these index values is stored separately; it is considered the
+actual time and is updated after each transaction from any of the validators.
 
 #### Advantages
 
@@ -84,15 +84,15 @@ and is updated after each transaction from any of the validators.
 #### Disadvantages
 
 - The time value is stored in the Exonum storage; hence,
-  a receipt thereof by lightweight clients requires additional
-  cryptographic checks.
+  verifying its authenticity requires additional
+  cryptographic checks from lightweight clients.
 - Exonum blocks are burdened with time oracle transactions
   (usually one for each validator).
 
 ### Choosing Approach
 
 Given the pros and cons above, **exonum-time** uses the time oracle approach
-as more flexible.
+as a more flexible one.
 
 ## Assumptions
 
@@ -101,8 +101,9 @@ To obtain local reliable time validators can apply external solutions like [tlsd
 [roughtime][roughtime], etc.
 
 If the local time on the validator machine is incorrect,
-such node is considered Byzantine. As it is the case with the consensus algorithm,
-the algorithm can tolerate up to 1/3 Byzantine nodes.
+such node is considered Byzantine. Just in the same way as the consensus algorithm,
+the algorithm used by the time oracle can tolerate up to a third of Byzantine
+validators.
 
 ## Specification
 
@@ -114,7 +115,7 @@ The data schema of the **exonum-time** service consists of two indices:
   Consolidated time output by the service, which can be used by other business
   logic on the blockchain.
 - **validators_time**  
-  Merkelized index with the last known local timestamps for all validator nodes.
+  Merkelized index with the latest known local timestamps for all validator nodes.
   The values in the index are used to update `time` and could be useful
   for monitoring, diagnostics and the like.
 
@@ -145,8 +146,8 @@ is tolerant to the malicious behavior of validator nodes.
 
 ## Proof of Correctness
 
-Denote `T` the list of current validators’ timestamps sorted in the decreasing order,
-as specified on step 5 of the algorithm above.
+Let `T` denote the list of current validators’ timestamps sorted
+in the decreasing order, as specified on step 5 of the algorithm above.
 It is clear that in a system with no more than `f` Byzantine nodes,
 any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval is:
 
@@ -159,9 +160,9 @@ since this value is reliable and at the same time the most recent one.
 
 ## Discussion
 
-The validator nodes can potentially generate and send a transaction to update
+The validator nodes can potentially generate and send transactions to update
 the time any moment, however, in the current implementation the nodes send
-the transaction after commit of each block.
+the transactions after commit of each block.
 
 At the time when a new blockchain is launched, the consolidated time is unknown
 until the transactions from at least `2f + 1` validator nodes are processed.
