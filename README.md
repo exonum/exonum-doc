@@ -24,7 +24,9 @@ or [other](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 ## Contributing
 
 In order to contribute, fork this repository, make some changes, and then submit
-them as a pull request. Simple!
+them as a pull request. Simple! Note that the repository uses
+[`master` / `develop` branching][git-branching] to allow for continuous deployment
+on the exonum.com website.
 
 Notice that the repository uses a set of [linters][wiki:lint] to check possible
 problems with the contributed documents:
@@ -124,3 +126,4 @@ See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 [linkchecker]: https://github.com/wummel/linkchecker
 [mkdocs-meta]: https://pythonhosted.org/Markdown/extensions/meta_data.html
 [jekyll]: http://jekyllrb.com/
+[git-branching]: http://nvie.com/posts/a-successful-git-branching-model/
