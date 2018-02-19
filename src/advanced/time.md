@@ -137,8 +137,8 @@ The logic of transaction execution is as follows:
    of Byzantine validators, then perform the following steps; else quit.
 5. Sort the timestamps by the current validators in the decreasing order
   (most recent time first).
-7. Take the time with the (1-based) index `f + 1` from the resulting sorted list.
-9. If the taken time `t` is larger than the previous consolidated time,
+6. Take the time with the (1-based) index `f + 1` from the resulting sorted list.
+7. If the taken time `t` is larger than the previous consolidated time,
   replace the consolidated time with `t`.
 
 Thus, the consolidated time can be updated after each transaction with
