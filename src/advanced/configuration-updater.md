@@ -122,6 +122,12 @@ config][stored_configuration] serialization. It has the following fields:
   Maximum number of transactions per block.
 - **services**: Object  
   Service-specific configuration parameters.
+  
+!!! note
+    **consensus.round_timeout** integer must be strictly larger
+	than **consensus.timeout_adjuster.timeout** integer, otherwise,
+	the consensus algorithm will stop working correctly
+	(a new block will never be accepted).
 
 #### Propose
 
