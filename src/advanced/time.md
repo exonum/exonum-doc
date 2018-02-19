@@ -71,7 +71,7 @@ the header of the block obtained based on this `Propose`.
 Each validator at a specific time sends a transaction indicating its local time
 (usually immediately after the commit of each block). Exonum storage contains
 an index with the most current time indicated separately by each validator.
-A median of these index values is stored separately; it is considered the
+A median of these values is stored separately; it is considered the
 actual time and is updated after each transaction from any of the validators.
 
 #### Advantages
