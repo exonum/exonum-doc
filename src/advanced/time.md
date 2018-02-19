@@ -32,70 +32,6 @@ This logic should meet the following criteria:
 - **Monotony**. The time value should only increase. A pragmatic requirement,
   which simplifies use of time when implementing the business logic.
 
-## Preliminaries
-
-Two possible approaches satisfying the above criteria are
-[integration with consensus](#integration-with-consensus)
-and [a time oracle service](#time-oracle-service).
-
-### Integration with Consensus
-
-!!! tip
-    Consult the [consensus description](../architecture/consensus.md) for
-    explanation of `Propose` and `Precommit` messages, and the “+2/3” notation.
-
-The validator includes its local time in each `Precommit` message.
-At the next height the leader includes +2/3 `Precommit`s of the previous block
-into the `Propose`. The time median of these `Precommit`s is recorded into
-the header of the block obtained based on this `Propose`.
-
-#### Advantages
-
-- The time value is indicated directly in the header of each block making it
-  more accessible.
-- Time is forcibly updated in the course of consensus operation:
-  it is impossible to sabotage update of time without stopping consensus.
-- Blockchain is not clogged by transactions associated with time determination.
-
-#### Disadvantages
-
-- The consensus code becomes more complex. (Time is included into the consensus
-  logic while [anchoring](bitcoin-anchoring.md) and
-  [configuration](configuration-updater.md) are not.)
-- Time updates are tied to creation of `Precommit` messages. In the case
-  of a large delay in block acceptance, all the transactions therein will
-  be executed with the same outdated time value.
-
-### Time Oracle Service
-
-Each validator at a specific time sends a transaction indicating its local time
-(usually immediately after the commit of each block). Exonum storage contains
-an index with the most current time indicated separately by each validator.
-A median of these values is stored separately; it is considered the
-actual time and is updated after each transaction from any of the validators.
-
-#### Advantages
-
-- The logic for time update is placed in a separate plug-in service
-  (modularity).
-- In case of a long delay in block acceptance, the time will be updated along
-  with the delayed block execution while executing its transactions.
-  The time will be accurate enough with regard to the time of the transaction
-  entry into the mempool.
-
-#### Disadvantages
-
-- The time value is stored in the Exonum storage; hence,
-  verifying its authenticity requires additional
-  cryptographic checks from lightweight clients.
-- Exonum blocks are burdened with time oracle transactions
-  (usually one for each validator).
-
-### Choosing Approach
-
-Given the pros and cons above, **exonum-time** uses the time oracle approach
-as a more flexible one.
-
 ## Assumptions
 
 The local time on all validator nodes is assumed to be reliable.
@@ -106,6 +42,16 @@ If the local time on the validator machine is incorrect,
 such node is considered Byzantine. Just in the same way as the consensus algorithm,
 the algorithm used by the time oracle can tolerate up to a third of Byzantine
 validators.
+
+## General Idea
+
+Each validator at a specific time sends a transaction indicating its local time
+(usually immediately after the commit of each block). The time service maintains
+an index with the most current time indicated separately by each validator.
+A 1/3 percentile of these values (ordered by decreasing time) is stored separately;
+it is considered the actual time and is updated after each transaction
+from any of the validators. As we show [further](#proof-of-correctness),
+this time can be considered reliable given the assumptions above.
 
 ## Specification
 
@@ -159,17 +105,6 @@ any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval is:
 
 For practical reasons, we always choose the timestamp with index `f + 1`,
 since this value is reliable and at the same time the most recent one.
-
-## Discussion
-
-The validator nodes can potentially generate and send transactions to update
-the time any moment, however, in the current implementation the nodes send
-the transactions after commit of each block.
-
-At the time when a new blockchain is launched, the consolidated time is unknown
-until the transactions from at least `2f + 1` validator nodes are processed.
-Further in the course of blockchain operation this time
-will strictly grow monotonously.
 
 ## REST API
 
@@ -281,6 +216,56 @@ Example of JSON response:
   }
 ]
 ```
+
+## Discussion
+
+### Transaction Generation
+
+The validator nodes can potentially generate and send transactions to update
+the time any moment, however, in the current implementation the nodes send
+the transactions after commit of each block.
+
+### Oracle Initialization
+
+At the time when a new blockchain is launched, the consolidated time is unknown
+until the transactions from at least `2f + 1` validator nodes are processed.
+Further in the course of blockchain operation this time
+will strictly grow monotonously.
+
+### Possible Alternatives
+
+!!! tip
+    Consult the [consensus description](../architecture/consensus.md) for
+    explanation of `Propose` and `Precommit` messages, and the “+2/3” notation.
+
+A possible alternative to implementing a time oracle as a service would be to
+integrate it into the consensus algorithm. This would work as follows:
+The validator includes its local time in each `Precommit` message.
+At the next height the leader includes +2/3 `Precommit`s of the previous block
+into the `Propose`. The time median of these `Precommit`s is recorded into
+the header of the block obtained based on this `Propose`.
+
+Advantages:
+
+- The time value would be indicated directly in the header of each block
+  making it more accessible.
+- Time would be forcibly updated in the course of consensus operation:
+  it is impossible to sabotage update of time without stopping consensus.
+- Blockchain would not be clogged by transactions associated with time determination.
+
+Disadvantages:
+
+- The consensus code would become more complex. (Time would be included
+  into the consensus logic while [anchoring](bitcoin-anchoring.md) and
+  [configuration](configuration-updater.md) are not.)
+- Time updates would be tied to creation of `Precommit` messages. In the case
+  of a large delay in block acceptance, all the transactions therein would
+  be executed with the same outdated time value.
+
+In our opinion implementing the time oracle as a service is preferable to
+the tight integration with consensus: it is more flexible and manageable,
+and could be generalized to the agreement between arbitrary collectively trusted
+entities, which may behave maliciously.
 
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
