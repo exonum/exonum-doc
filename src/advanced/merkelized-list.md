@@ -1,5 +1,7 @@
 # Merkelized List
 
+<!-- cspell:ignore proofnode -->
+
 [**Merkelized list**](../architecture/storage.md#prooflistindex) is a version
 of a typed list that supports compact proofs of existence for its elements using
 Merkle trees. Merkelized lists in Exonum are designed as classic binary Merkle trees
@@ -22,7 +24,7 @@ a generalization of hash lists and chains. Merkle trees include both benefits of
 In the blockchain as in various other distributed and [peer-to-peer][wiki:p2p]
 systems, data verification is very important because the same data
 exists in multiple locations. Thus, if a piece of data is changed in one
-location, it's important that the same data changes are processed everywhere
+location, it is important that the same data changes are processed everywhere
 in the same way.
 
 It is time consuming and computationally expensive to check the
@@ -30,7 +32,7 @@ entirety of each part whenever a system wants to verify data. This is why
 Merkle trees are used. Basically, the use of Merkle trees limits
 the amount of data being sent over a network as much as possible.
 Instead of sending an entire file
-over the network, it's possible just send a hash of the file to see if it matches.
+over the network, it is possible just send a hash of the file to see if it matches.
 
 Currently, the main uses of Merkle trees are in peer-to-peer networks such
 as [Tor][tor] and [Bitcoin][bitcoin]. The usage of Merkle tree for blockchains
@@ -70,7 +72,7 @@ parameters as a key for each element: `height` and `index`.
   number of elements in the underlying list).
 3. Hash of a tree leaf is stored in `(height = 1, index)`.
   It corresponds to the tree leaf stored in `(height = 0, index)`.
-4. Some of the rightmost intermediate nodes may have a single child; it's not
+4. Some of the rightmost intermediate nodes may have a single child; it is not
   required that the obtained tree is full binary. Appending an element to the
   list corresponds to writing it to the cell `(0, list.len())` and updating
   `O(log list.len())` nodes of the tree with `height > 0`.
@@ -103,7 +105,7 @@ containing `6` values `v0...v5`.
 ### Hashing Rules
 
 Let `T(height, index)` be a value at tree node for element `index` at height
-`height`. Elements `T(0, index)` contain serialized values of the undelying list
+`height`. Elements `T(0, index)` contain serialized values of the underlying list
 according to [the Exonum binary serialization spec](../architecture/serialization.md).
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
 rules.
@@ -142,15 +144,15 @@ T(height > 1, index) = hash(T(height - 1, index * 2)).
 
 ### General Description
 
-`Proofnode` is a recursively defined structure that's designed to provide
-evidence to client that a certain set of values is contained in a contiguous
-range of indices. One could use several `Proofnode`s to get proof for
-discontiguous set of indexes.
+`Proofnode` is a recursively defined structure that is designed to provide
+evidence to the client that a certain set of values is contained in a contiguous
+range of indices. One could use several `Proofnode`s to get a proof for
+a non-contiguous set of indices.
 
 For a given range of indices `[start_index, end_index)` the proof
 has a binary-tree-like structure, which contains values of elements from
 the leaves with requested indices and hashes of all neighbor tree nodes
-on the way up to the root of tree (excluding the root itself). `Proofnode` doesn't
+on the way up to the root of tree (excluding the root itself). `Proofnode` does not
 contain the indices themselves, as they can be deduced from the structure
 form.
 
@@ -247,8 +249,10 @@ This proof corresponds to the following JSON representation:
 
 ## See Also
 
+<!-- cspell:ignore cryptology,Szydlo -->
+
 1. Merkle, R. C. — A Digital Signature Based on a Conventional Encryption
-  Function // Advances in Cryptology — CRYPTO '87. Lecture Notes in Computer
+  Function // Advances in Cryptology — CRYPTO ’87. Lecture Notes in Computer
   Science, Vol. 293, pp. 369-378, 1988.
 2. Szydlo, M. — Merkle Tree Traversal in Log Space and Time // Lecture Notes in
   Computer Science, Vol. 3027, pp. 541-554, 2004.

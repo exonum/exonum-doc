@@ -1,7 +1,9 @@
 # Node management
 
+<!-- cspell:ignore nanos -->
+
 Exonum nodes can be controlled using RPC implemented via REST API. Managing
-endpoints are handled by Exonum сore and are mainly purposed to receive
+endpoints are handled by Exonum core and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
 
@@ -12,7 +14,7 @@ configuration.
 
 ## Types
 
-As per [Google Closure Compiler][closurec] conventions,
+As per [Google Closure Compiler][closure] conventions,
 `?` before the type denotes a nullable type, and `=` after the type denotes
 an optional type.
 
@@ -634,5 +636,5 @@ descending order according to their heights.
 ]
 ```
 
-[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs

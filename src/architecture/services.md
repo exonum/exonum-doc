@@ -76,7 +76,7 @@ in the blockchain as a part of the transaction log. As the name implies,
 transactions are [atomic][wiki:atomicity]; they are deterministically ordered
 and are executed in the same way on all nodes.
 
-In the terms of RESTful services, transactions correspond to `POST` and `PUT`
+In the terms of REST services, transactions correspond to `POST` and `PUT`
 HTTP methods. Transactions are asynchronous in the sense that a transaction
 author
 is not given an immediate response as to the result of the transaction.
@@ -156,9 +156,9 @@ key-value storage directly. The built-in collections supported by Exonum are
 maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists
 (`ListIndex`).
 
-Exonum also provides helpers for *merklizing* data collections, i.e.,
+Exonum also provides helpers for *merkelizing* data collections, i.e.,
 making it possible to efficiently compute proofs for read requests that involve
-the items of the collection. Merklized versions of maps and lists are
+the items of the collection. Merkelized versions of maps and lists are
 `ProofMapIndex` and `ProofListIndex`, respectively.
 
 Naturally, the items of collections (and keys in the case of maps) need to be
@@ -281,7 +281,7 @@ Here is a list of things to figure out when developing an Exonum service:
   [the cryptocurrency tutorial](../get-started/create-service.md)
   for more details.)
 - What persistent data will be returned to external clients? (You might want
-  to use merklized data collections for this data and create corresponding
+  to use Merkelized data collections for this data and create corresponding
   read request endpoints.)
 - Are there any maintenance tasks needed for the service? Do the tasks need
   to be invoked automatically, or authorized by system administrators?
@@ -368,14 +368,14 @@ fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash>;
 ```
 
 The `state_hash` method returns a list of hashes for all
-Merklized tables defined by the service. Hashes are calculated based on the
+Merkelized tables defined by the service. Hashes are calculated based on the
 current blockchain state `snapshot`.
 The core uses this list to aggregate
-hashes of tables defined by all services into a single Merklized meta-map.
+hashes of tables defined by all services into a single Merkelized meta-map.
 The hash of this meta-map is considered the hash of the entire blockchain state
 and is recorded as such in blocks and [`Precommit` messages](consensus.md).
 
-In the case when a service does not have any Merklized tables, it should
+In the case when a service does not have any Merkelized tables, it should
 return an empty list.
 
 !!! note

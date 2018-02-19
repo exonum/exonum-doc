@@ -34,10 +34,11 @@ problems with the contributed documents:
 - [html5validator][html5validator] is used for checking problems with the
   generated HTML pages
 - [linkchecker][linkchecker] is used to find missing links
+- [cspell][cspell] is used for spellchecking
 
 You can set up these tools locally (see the `install` step in [the Travis config](.travis.yml)
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
-`links`, or `all` arguments.
+`links`, `cspell`, or `all` arguments.
 
 ### Page Meta
 
@@ -87,8 +88,14 @@ To install linters, use
 pip install -r dev-requirements.txt
 ```
 
-`markdownlint` needs to be installed separately, as it is written in Ruby and uses
-`gem` as the package manager.
+`markdownlint` and `cspell` need to be installed separately. Both these tools
+utilize Npm package manager, so you can install them using
+
+```
+npm install
+```
+
+(you will need Node 8+ installed).
 
 ### Viewing Documents Locally
 
@@ -118,9 +125,10 @@ under the Apache License (version 2.0).
 See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 
 [wiki:lint]: https://en.wikipedia.org/wiki/Lint_(software)
-[mdl]: https://github.com/mivok/markdownlint
-[mdl-rules]: https://github.com/mivok/markdownlint/blob/master/docs/RULES.md
+[mdl]: https://github.com/DavidAnson/markdownlint
+[mdl-rules]: https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md
 [html5validator]: https://github.com/svenkreiss/html5validator
 [linkchecker]: https://github.com/wummel/linkchecker
 [mkdocs-meta]: https://pythonhosted.org/Markdown/extensions/meta_data.html
 [jekyll]: http://jekyllrb.com/
+[cspell]: https://github.com/Jason3S/cspell

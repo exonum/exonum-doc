@@ -84,7 +84,7 @@ To put it *very* simply, rounds proceed as follows:
    A prevote means that the validator has been able to parse the proposal
    and has all transactions specified in it
 3. After the validator has collected enough prevotes from a supermajority
-   of other validators, it applies transactions specified in the prevoted
+   of other validators, it applies transactions specified in the voted
    proposal,
    and broadcasts a *precommit* message. This message contains the result of
    the proposal execution in the form of [a new state hash](storage.md).

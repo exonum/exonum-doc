@@ -4,6 +4,7 @@ language: python # for mkdocs
 python:
   - 2.7
 cache:
+  node: true
   directories:
     - $HOME/.cache/pip
 branches:
@@ -21,8 +22,8 @@ before_install:
     fi
 install:
   - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
-  # Markdown linter
-  - gem install mdl --bindir ~/.local/bin
+  - nvm install 8 && nvm use 8
+  - npm install
   # Dirty hack for what seems like a bug in linkchecker
   - |
     find "$VIRTUAL_ENV" -regex '.*/linkcheck/__init__.py' -print0 | \
@@ -30,13 +31,13 @@ install:
   - python -m mkdocs --version
   - linkchecker --version
   - html5validator --version
-  - ~/.local/bin/mdl --version
 
 script:
   - python -m mkdocs build
   - bash ./misc/lint.sh md
   - bash ./misc/lint.sh html
   - bash ./misc/lint.sh links
+  - bash ./misc/lint.sh cspell
 
 after_script:
   # Kill mkdocs server if it's still running
