@@ -84,7 +84,7 @@ easily convey the compliance to transaction processing rules for external partie
 ### Transparency
 
 The Exonum framework codifies the ever-increasing role of transparency in the
-modern world. Exonum provides a rich toolset to define the correct system operation,
+modern world. Exonum provides a rich set of tools to define the correct system operation,
 and allows external parties (e.g., regulators, auditors and end clients of the system)
 to continuously verify the system operation against these definitions.
 
@@ -138,7 +138,7 @@ in enterprise platforms; they have the same principal components.
 
 #### Endpoints
 
-A service has a set of endpoints (realized as RESTful APIs) using which
+A service has a set of endpoints (realized as REST APIs) using which
 the service can communicate with the outside world. The Exonum framework acts
 as middleware, dispatching requests among services and abstracting the intricacies
 of data (de)serialization, access control, and other typical middleware tasks
@@ -155,12 +155,12 @@ There are 3 types of service endpoints:
 
 Exonum provides means for services to persist their data as scalars, or as
 data collections (maps and lists). The Exonum data storage engine provides
-powerful abstractions for *Merklized* collections. In such a collection,
+powerful abstractions for *Merkelized* collections. In such a collection,
 any element can be supplied with an unforgeable cryptographic proof
 that it belongs to the collection (without disclosing any other elements
 of the collection).
 
-With the help of Merklized collections, a service can provide strict proofs
+With the help of Merkelized collections, a service can provide strict proofs
 of data authenticity in response to read requests. This requires minimal involvement
 from the service developers – all heavy lifting is performed by the Exonum core.
 

@@ -8,5 +8,9 @@
 !.editorconfig
 *.iml
 
+# Node files
+node_modules/
+npm-debug.log
+
 # Generated docs
 site/

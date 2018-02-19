@@ -79,6 +79,8 @@ pages:
     - 'Configuration updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
+    # Time service
+    - 'Time oracle': 'advanced/time.md'
     # Merkle index overview
     - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':

@@ -3,6 +3,8 @@ title: Installation guide
 ---
 # Installation Guide
 
+<!-- cspell:ignore ppas -->
+
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing

@@ -1,5 +1,7 @@
 # System Configuration
 
+<!-- cspell:ignore nodelay -->
+
 **System configuration** is a set of parameters that determine the network
 access parameters of a node and behavior of the node while operating in the
 network.
@@ -103,7 +105,7 @@ two parts:
 - **max_outgoing_connections**  
   Maximum number of outgoing connections
 - **tcp_nodelay**  
-  Activation of the NODELAY algorithm from the TCP stack (see [RFC2126][rfc2126])
+  Activation of the `NODELAY` algorithm from the TCP stack (see [RFC2126][rfc2126])
 - **tcp_reconnect_timeout**  
   Timeout interval (ms) before the first reconnect attempt
 - **tcp_reconnect_timeout_max**  
@@ -170,7 +172,7 @@ service. The service ensures that the configuration updates are synchronized
 among nodes in the network. Changing global parameters by editing the
 configuration file is inadmissible as this may cause improper behavior of
 the node. Modifying global parameters by the configuration file editing is
-admittable only before the genesis block is created.
+admissible only before the genesis block is created.
 
 Local parameters may be changed by editing the configuration file and restarting
 the node to apply changes. In certain cases additional actions may be required
