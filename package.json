@@ -1,0 +1,26 @@
+{
+  "name": "exonum-doc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "JS dependencies for Exonum docs",
+  "dependencies": {},
+  "devDependencies": {
+    "cspell": "^2.1.1",
+    "markdownlint-cli": "^0.7.1"
+  },
+  "scripts": {
+    "cspell": "cspell --config=misc/cspell.json src/**/*.md",
+    "md": "markdownlint --config=misc/markdownlint.json src/**/*.md",
+    "test": "./misc/lint.sh all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exonum/exonum-doc.git"
+  },
+  "author": "Exonum Team <exonum@bitfury.com>",
+  "license": "CC-BY-NC-SA-4.0",
+  "bugs": {
+    "url": "https://github.com/exonum/exonum-doc/issues"
+  },
+  "homepage": "https://github.com/exonum/exonum-doc#readme"
+}

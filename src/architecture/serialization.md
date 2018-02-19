@@ -1,5 +1,7 @@
 # Exonum Serialization Format
 
+<!-- cspell:ignore cap'n -->
+
 **Binary serialization format** is used in Exonum for communication
 among full nodes, cryptographic operations on [light clients](../architecture/clients.md)
 and storage of data. The format design provides several important properties,
@@ -312,7 +314,7 @@ message! {
 A slice is a data structure consisting of an arbitrary number of same type elements.
 A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
-increasing their indexes.
+increasing their indices.
 
 Slices like structures have header and body. Each element takes 8 bytes in the
 header for a corresponding segment pointer. If slice consists of fixed-length

@@ -1,5 +1,7 @@
 # Design Overview
 
+<!-- cspell:ignore postgre -->
+
 This page describes the core design decisions of the Exonum framework:
 [transaction processing](#transaction-processing),
 [network structure](#network-structure),
@@ -7,6 +9,10 @@ This page describes the core design decisions of the Exonum framework:
 [data storage organization](#data-storage),
 [services](#modularity-and-services),
 and [cryptography used in Exonum](#cryptography).
+
+!!! tip
+    The [architecture guide][arch-guide] in the Exonum core repository contains
+    a more technical outlook on the Exonum architecture.
 
 ## Transaction Processing
 
@@ -295,7 +301,7 @@ Exonum services interact with the external world with the help of *endpoints*.
 A service may define 3 types of endpoints:
 
 - **Transactions** correspond to `POST`/`PUT` methods for
-  RESTful web services. They transform the blockchain state. All transactions
+  REST web services. They transform the blockchain state. All transactions
   within the blockchain are completely ordered as described above,
   and the result of their execution is agreed among the full nodes in the
   blockchain network
@@ -334,7 +340,8 @@ Endpoints defined by services fulfill the same role as smart contracts
 in other blockchain platforms. They define business logic of the blockchain,
 allow to retrieve data from the blockchain, and can be reused across
 different projects. Partial analogies for this execution model are
-endpoints of RESTful web services and stored procedures for DBMSs.
+endpoints of REST web services and stored procedures for database management
+systems.
 
 The key points differentiating Exonum smart contracts from other models
 used in blockchains are as follows:
@@ -464,6 +471,7 @@ for signing anchoring transactions in Bitcoin.
     between consensus and administrative keys will be generalized to support
     various administrative settings.
 
+[arch-guide]: https://github.com/exonum/exonum/blob/master/ARCHITECTURE.md
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
 [rocks-db]: http://rocksdb.org/

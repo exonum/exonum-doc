@@ -1,5 +1,7 @@
 # Configuration Update Service
 
+<!-- cspell:ignore postvote -->
+
 **Configuration update service** allows modifying [the global configuration](../architecture/configuration.md)
 by the means of *proposing* a new configuration and *voting* for proposed configurations
 among the validators.
@@ -76,7 +78,7 @@ equal to `/api/services/configuration/v1`.
 
 ### Types
 
-As per [Google Closure Compiler][closurec] conventions,
+As per [Google Closure Compiler][closure] conventions,
 `?` before the type denotes a nullable type, and `=` after the type denotes
 an optional type.
 
@@ -416,6 +418,6 @@ JSON object with the following fields:
 [config_propose]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [http_api]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/response-samples.md
-[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html

@@ -36,7 +36,7 @@ iterators use key ordering of the underlying key-value storage to determine
 the iteration order.
 Namely, keys are lexicographically ordered over their binary serializations;
 this ordering coincides with that used in
-[RoсksDB](#low-level-storage).
+[RocksDB](#low-level-storage).
 
 ### BaseIndex
 
@@ -144,9 +144,9 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
   elements, while the `ValueSetIndex` orders elements arbitrarily due to hash
   function properties.
 
-### Merklized Indices
+### Merkelized Indices
 
-Merklized indices represent a list and map with additional
+Merkelized indices represent a list and a map with additional
 features. Such indices can create the proofs of existence or absence for
 stored data items.
 
@@ -159,7 +159,7 @@ contents.
 #### ProofListIndex
 
 [`ProofListIndex`][proof-list-index] implements a Merkle
-tree, which is a Merklized version of an
+tree, which is a Merkelized version of an
 array list. It implements the same methods as `ListIndex`, and adds an
 additional feature: based on Merkle trees, `ProofListIndex` allows efficiently
 creating compact proofs of existence for the list items.
@@ -183,7 +183,7 @@ The following additional procedures are implemented:
 
 #### ProofMapIndex
 
-[`ProofMapIndex`][proof-map-index] is a Merklized version of a map
+[`ProofMapIndex`][proof-map-index] is a Merkelized version of a map
 based on Merkle Patricia tree.
 It implements the same methods as the `MapIndex`, adding the ability to
 create proofs of existence for its key-value pairs, or proofs of absence

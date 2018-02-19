@@ -91,16 +91,14 @@ We already started the implementation of Java binding.
 
 ## Interface Description
 
-Exonums 0.1 requires that a service developer manually specify a number of
+Exonum requires that a service developer should manually specify a number of
 parameters (service ID, transaction IDs, binary offsets of data in
 [transactions](architecture/transactions.md)). This specification may be unclear
 and leads to a number of potential problems.
 
 !!! note "Example"
     One can easily imagine a problem caused by two different services having
-    the same ID. Such code will
-    [panic](https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/mod.rs#L60)
-    during the execution.
+    the same ID. Such code will panic during the execution.
 
 As a solution of this issue a declarative format is considered for service
 specification. Such technique is similar to
@@ -109,7 +107,7 @@ specification. Such technique is similar to
 Declarative service description can be added to a blockchain using specific
 transaction. It should include:
 
-- [Data schema](architecture/services.md#data-schema) (a set of indexes,
+- [Data schema](architecture/services.md#data-schema) (a set of indices,
   related to a service)
 - A list of [transactions](architecture/services.md#transactions)
 - API description (both [public](architecture/services.md#read-requests) and
@@ -118,15 +116,14 @@ transaction. It should include:
 !!! note
     The main part of the service, which cannot be stated (at least in a
     simple way) within the declarative description, is transactions application
-    to a database (see [`execute`
-    method](architecture/transactions.md#execute)).
+    to a database (see [`execute` method](architecture/transactions.md#execute)).
 
 Declarative description is a feature that helps developer make less mistakes.
 Besides, it also enables several important features. Here are two of them.
 
 - **Server-side code generation**. Having service description, one can generate
   the major part of the boilerplate server code. This refers to the definition of
-  all necessary service functions, indexes hierarchy, usage of the relevant
+  all necessary service functions, indices hierarchy, usage of the relevant
   function arguments and so on. Code generation will substantially ease
   developers’ work, leaving him only the implementation of service business
   logic.
@@ -143,14 +140,14 @@ Besides, it also enables several important features. Here are two of them.
 
 ## Service Isolation
 
-An essential part of Exonum services is [Data
-schema](architecture/services.md#data-schema). It represents the data, which
+An essential part of Exonum services is [Data schema](architecture/services.md#data-schema).
+It represents the data, which
 is directly related to service. In current version of Exonum there’s no data
 access control within storage. On one hand, this brings the ability of service
 interaction: service A can change the data, which is described in the data
-schema of service B. This approach is similar to [inter-process
-communication](https://en.wikipedia.org/wiki/Inter-process_communication) using
-[shared memory](https://en.wikipedia.org/wiki/Shared_memory).
+schema of service B. This approach is similar
+to [inter-process communication](https://en.wikipedia.org/wiki/Inter-process_communication)
+using [shared memory](https://en.wikipedia.org/wiki/Shared_memory).
 
 !!! note "Example"
     The key rotation in
@@ -171,8 +168,8 @@ execution on the middleware level (on the level of Exonum core).
 
 ## Transactions Improvements
 
-As mentioned in [services
-description](architecture/services.md#transaction-interface), transactions are
+As mentioned in [services description](architecture/services.md#transaction-interface),
+transactions are
 separate entities rather than datatypes. This directly leads to the ability to
 incorporate within transaction object additional logic. As a first step we
 consider implementing the ability to determine **transaction ordering**
@@ -183,8 +180,8 @@ interface. This logic comes hand-by-hand with *transaction finalization*.
     In current Exonum implementation transactions are finalized only by
     recording into blockchain (even if transaction execution does not lead to
     changes in storage). This potentially results in problems with the size
-    of data storage, but gives protection against [replay
-    attacks](https://en.wikipedia.org/wiki/Replay_attack).
+    of data storage, but gives protection against
+    [replay attacks](https://en.wikipedia.org/wiki/Replay_attack).
 
 ## Networking Improvements
 
