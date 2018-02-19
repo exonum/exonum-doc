@@ -125,9 +125,9 @@ config][stored_configuration] serialization. It has the following fields:
   
 !!! note
     **consensus.round_timeout** integer must be strictly larger
-	than **consensus.timeout_adjuster.timeout** integer, otherwise,
-	the consensus algorithm will stop working correctly
-	(a new block will never be accepted).
+    than **consensus.timeout_adjuster.timeout** integer, otherwise,
+    the consensus algorithm will stop working correctly
+    (a new block will never be accepted).
 
 #### Propose
 
