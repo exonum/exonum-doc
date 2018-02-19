@@ -1,5 +1,7 @@
 # Time Oracle
 
+<!-- cspell:ignore tlsdate,roughtime -->
+
 [**exonum-time**][exonum-time] is a time oracle service for Exonum.
 This service allows to determine time,
 import it from the external world to the blockchain
