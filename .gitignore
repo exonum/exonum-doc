@@ -1,5 +1,6 @@
 # Generic rules
 .*
+!.github/
 !.gitignore
 !.travis.yml
 
