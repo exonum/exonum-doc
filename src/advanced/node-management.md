@@ -454,6 +454,30 @@ A JSON object with the following fields:
 }
 ```
 
+### Shutdown
+
+```none
+POST {system_base_path}/shutdown
+```
+
+Gracefully terminates the node.
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl http://127.0.0.1:7780/api/system/v1/shutdown
+```
+
+#### Response
+
+```none
+"Ok"
+```
+
 ## Explorer API endpoints
 
 All explorer API endpoints share the same base path, denoted
