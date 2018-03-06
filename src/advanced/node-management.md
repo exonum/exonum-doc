@@ -415,6 +415,52 @@ A JSON object with the following fields:
 }
 ```
 
+### Consensus Enabled Info
+
+```none
+GET {system_base_path}/consensus_enabled
+```
+
+Returns a boolean value representing if the node participates in consensus.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON boolean.
+
+#### Response Example
+
+```JSON
+true
+```
+
+### Enabled/Disable Consensus Interaction
+
+```none
+POST {system_base_path}/consensus_enabled
+```
+
+Switches consensus interaction of the node on or off.
+
+#### Parameters
+
+- **enabled**: `bool`
+
+#### Example
+
+```None
+curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0.0.1:7780/api/system/v1/consensus_enabled
+```
+
+#### Response
+
+```None
+"Ok"
+```
+
 ### Network info
 
 ```none
