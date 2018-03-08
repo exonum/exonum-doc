@@ -62,14 +62,9 @@ a pencil icon at the top of the page.
 
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
 and diffs should be easy to read. For this reason do not mix any formatting fixes
-or code moves with actual code changes.
-
-Commit messages should be verbose by default consisting of a short subject line
-(50 chars max), a blank line and detailed explanatory text as separate paragraph(s);
-unless the title alone is self-explanatory (like “Correct typo in init.rs”)
-then a single title line is sufficient.
-Commit messages should be helpful to people reading your code in the future,
-so explain the reasoning for your decisions.
+or code moves with actual code changes. However, we merge pull requests using the
+"squash and merge" strategy, so commit messages are only important for the review
+stage.
 
 !!! tip
     Further explanation about commit message conventions is available [here][git:messages].
