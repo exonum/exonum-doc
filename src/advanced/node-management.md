@@ -460,7 +460,9 @@ A JSON object with the following fields:
 POST {system_base_path}/shutdown
 ```
 
-Gracefully terminates the node.
+After receiving a shutdown message, the node stops processing
+transactions, participating in consensus and terminates after
+all messages in the event queue are processed.
 
 #### Parameters
 
