@@ -63,7 +63,7 @@ a pencil icon at the top of the page.
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
 and diffs should be easy to read. For this reason do not mix any formatting fixes
 or code moves with actual code changes. However, we merge pull requests using the
-"squash and merge" strategy, so commit messages are only important for the review
+“squash-and-merge” strategy, so commit messages are only important for the review
 stage.
 
 !!! tip
