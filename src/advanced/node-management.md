@@ -469,7 +469,7 @@ None.
 #### Example
 
 ```none
-curl http://127.0.0.1:7780/api/system/v1/shutdown
+curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
 ```
 
 #### Response
