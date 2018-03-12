@@ -454,6 +454,32 @@ A JSON object with the following fields:
 }
 ```
 
+### Shutdown
+
+```none
+POST {system_base_path}/shutdown
+```
+
+After receiving a shutdown message, the node stops processing
+transactions, participating in consensus and terminates after
+all messages in the event queue are processed.
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
+```
+
+#### Response
+
+```none
+"Ok"
+```
+
 ## Explorer API endpoints
 
 All explorer API endpoints share the same base path, denoted
