@@ -47,7 +47,7 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
-apt-get install build-essential libsodium-dev \
+apt-get install build-essential libsodium-dev libsnappy-dev \
     librocksdb-dev pkg-config
 ```
 
@@ -65,6 +65,24 @@ In many Windows setups, Exonum will work just fine, but there are known problems
 with its compilation in certain configurations. If you have encountered a problem
 with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
 or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
+
+## Adding environment variables
+
+This variables needed for linking with the `rocksdb` and `snappy` libraries.
+
+### macOS
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/local/lib
+export SNAPPY_LIB_DIR=/usr/local/lib
+```
+
+### Linux
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+```
 
 ## Rust Toolchain
 
@@ -136,7 +154,6 @@ guide on how to develop applications on top of the Exonum framework.
 [leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
-[openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
