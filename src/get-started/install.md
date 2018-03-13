@@ -26,10 +26,6 @@ Exonum depends on the following third-party system libraries:
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-!!! note
-    Before version 0.3, Exonum supported [LevelDB][leveldb] as an alternative
-    storage engine. In [0.3 release][rel0.3.0], the support for LevelDB was dropped.
-
 You can find instructions how to install dependencies in various environments
 below.
 
@@ -68,9 +64,9 @@ or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
 
 ## Adding environment variables
 
-This variables needed for linking with the `rocksdb` and `snappy` libraries.
+These variables are needed for linking with the `rocksdb` and `snappy` libraries.
 
-### macOS
+### MacOS
 
 ```shell
 export ROCKSDB_LIB_DIR=/usr/local/lib
