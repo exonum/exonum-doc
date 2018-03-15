@@ -64,7 +64,10 @@ or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
 
 ## Adding environment variables
 
-These variables are needed for linking with the `rocksdb` and `snappy` libraries.
+If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
+you may setup `ROCKSDB_LIB_DIR` and/or `SNAPPY_LIB_DIR` environment variable
+to point to a directory with these libraries.
+This will significantly reduce compile time.
 
 ### MacOS
 
