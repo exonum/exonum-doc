@@ -26,10 +26,6 @@ Exonum depends on the following third-party system libraries:
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-!!! note
-    Before version 0.3, Exonum supported [LevelDB][leveldb] as an alternative
-    storage engine. In [0.3 release][rel0.3.0], the support for LevelDB was dropped.
-
 You can find instructions how to install dependencies in various environments
 below.
 
@@ -47,7 +43,7 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
-apt-get install build-essential libsodium-dev \
+apt-get install build-essential libsodium-dev libsnappy-dev \
     librocksdb-dev pkg-config
 ```
 
@@ -65,6 +61,27 @@ In many Windows setups, Exonum will work just fine, but there are known problems
 with its compilation in certain configurations. If you have encountered a problem
 with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
 or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
+
+## Adding environment variables
+
+If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
+you may setup `ROCKSDB_LIB_DIR` and/or `SNAPPY_LIB_DIR` environment variable
+to point to a directory with these libraries.
+This will significantly reduce compile time.
+
+### MacOS
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/local/lib
+export SNAPPY_LIB_DIR=/usr/local/lib
+```
+
+### Linux
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+```
 
 ## Rust Toolchain
 
@@ -136,7 +153,6 @@ guide on how to develop applications on top of the Exonum framework.
 [leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
-[openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
