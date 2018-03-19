@@ -334,6 +334,12 @@ GET {system_base_path}/user_agent
 
 None.
 
+#### Example
+
+```none
+curl http://127.0.0.1:7780/api/system/v1/user_agent
+```
+
 #### Response
 
 Returns string containing information about Exonum, Rust and OS version.
