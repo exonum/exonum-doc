@@ -324,6 +324,32 @@ Response is a JSON object with the following fields:
 }
 ```
 
+### User agent info
+
+```None
+GET {system_base_path}/user_agent
+```
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl http://127.0.0.1:7780/api/system/v1/user_agent
+```
+
+#### Response
+
+Returns string containing information about Exonum, Rust and OS version.
+
+#### Response example
+
+```None
+"exonum 0.6.0/rustc 1.26.0-nightly (2789b067d 2018-03-06)\n\n/Mac OS10.13.3"
+```
+
 ## Private endpoints
 
 ### Add new peer
