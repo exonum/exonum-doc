@@ -6,12 +6,12 @@ The anchoring service is developed to increase product security and
 provide non-repudiation for Exonum applications. This service periodically publishes the
 Exonum blockchain block hash to the Bitcoin blockchain, so that it is
 publicly auditable by anyone having access to the Exonum blockchain. Even in
-the case of validators collusion transaction history cannot be
-falsified; discrepancy between actual Exonum blockchain state and the
-one written to the Bitcoin blockchain would be found instantly.
+the case of validators' collusion, transaction history cannot be
+falsified. The discrepancy between the actual Exonum blockchain state and the
+one written to the Bitcoin blockchain will be found instantly.
 
 !!! note
-    This page describe mostly how the service do work. There is a
+    This page mostly describes how the service functions. There is a
     separate page, describing how the service should be [configured and
     deployed][anchoring-deploy]. The source code is located [on
     GitHub][github-anchoring].
