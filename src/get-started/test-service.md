@@ -10,7 +10,7 @@ shows how to accomplish this task with the help of [the testkit library](../adva
 ## Preparing for Integration Testing
 
 Recall that an Exonum service is typically packaged as a Rust crate. Correspondingly,
-service testing could naturally be performed with the help of [integration tests][integration-testing],
+service testing could be performed with the help of [integration tests][integration-testing],
 in which the service is treated like a black or gray box. In the case of the cryptocurrency
 service, which we created in the previous tutorial, it would be natural to test
 how the service reacts to overcharges, transfers from or to the unknown wallet,
@@ -132,7 +132,7 @@ fn test_create_wallet() {
 ```
 
 Per Rust conventions, the test is implemented as a zero-argument function
-without the returned value and
+without a returned value and
 with a `#[test]` annotation. This function will be invoked during testing;
 if it does not panic, the test is considered passed.
 
@@ -209,13 +209,13 @@ if let (Some(alice_wallet), Some(bob_wallet)) = wallets {
 
 > **Test:** `test_transfer_to_nonexisting_wallet`
 
-Unlike in real Exonum network, you can control which transactions the testkit
-will include into the next block. This allows to test different orderings
+Unlike in a real Exonum network, you can control which transactions the testkit
+will include into the next block. This allows testing different orderings
 of transactions, even those that would be hard (but not impossible) to reproduce
-in the real network.
+in a real network.
 
-Let’s test a case when Alice sends a transaction to Bob while the Bob’s wallet
-is not committed. The test is quite similar to the previous one, with the exception
+Let’s test a case when Alice sends a transaction to Bob while Bob’s wallet
+is not committed. The test is quite similar to the previous one, with the exception of
 how the created transactions are placed into the block.
 Namely, the `create_block_with_transactions` call is replaced with
 
@@ -336,7 +336,7 @@ Note that we call `create_block` after sending a transaction via HTTP API.
 The `create_block` method creates a block with all uncommitted transactions,
 which is just what we need.
 
-For an example of more fine-grained control, consider the test transferring
+For an example of more fine-grained control, consider the test for transferring
 tokens from a non-existing wallet:
 
 > **Test:** `test_transfer_from_nonexisting_wallet`
@@ -354,8 +354,8 @@ so Alice’s wallet does not exist when the transfer occurs later.
 ## Conclusion
 
 Testing is arguably just as important in software development as coding, especially
-in typical blockchain applications. The testkit framework allows to streamline
-the testing process for Exonum services, allowing to test both business logic
+in typical blockchain applications. The testkit framework allows streamlining
+the testing process for Exonum services and testing both business logic
 and HTTP API.
 
 [integration-testing]: http://doc.crates.io/manifest.html#integration-tests

@@ -3,9 +3,9 @@
 <!-- cspell:ignore tlsdate,roughtime -->
 
 [**exonum-time**][exonum-time] is a time oracle service for Exonum.
-This service allows to determine time,
-import it from the external world to the blockchain
-and keep its current value in the blockchain.
+This service allows determining time,
+importing it from the external world to the blockchain
+and keeping its current value in the blockchain.
 
 ## The Problem
 
@@ -14,28 +14,27 @@ that one should be able to access the calendar time.
 The time can be obtained by executing certain logic on the blockchain.
 This logic should meet the following criteria:
 
-- **Using validators**. As Exonum is used to power permissioned blockchain,
+- **Using validators**. As Exonum is used to power permissioned blockchains,
   it is natural to assume that the inputs to business logic determining time
   are supplied by validators. This assumption could be generalized to support
   abstract semi-trusted identifiable entities, but for the sake of clarity,
-  the future discussion will center specifically on the case where the time
+  this article will center specifically on the case where time
   is determined by the validator nodes.
 - **Reliability**. The time value must be tolerant to the malicious behavior
   of validator nodes.
 - **Agreement**. The time must be the same on all the nodes to ensure that
   transactions are executed in a deterministic manner. This means that the time
   should be written in the Exonum blockchain storage. Thus, the “current” time
-  will be changing in the same way on all nodes during execution of transactions,
-  including during nodes update.
+  will be changing in the same way on all nodes during the execution of transactions,
+  including during the nodes update.
 - **Sufficient accuracy**. The specified time should be fairly accurate.
   In practice, an acceptable deviation is a few seconds.
-- **Monotony**. The time value should only increase. A pragmatic requirement,
-  which simplifies use of time when implementing the business logic.
+- **Monotony**. The time value should only increase. This pragmatic requirement simplifies the use of time when implementing the business logic.
 
 ## Assumptions
 
 The local time on all validator nodes is assumed to be reliable.
-To obtain local reliable time validators can apply external solutions like [tlsdate][tlsdate],
+To obtain the local reliable time, validators can apply external solutions like [tlsdate][tlsdate],
 [roughtime][roughtime], etc.
 
 If the local time on the validator machine is incorrect,
@@ -49,7 +48,7 @@ Each validator at a specific time sends a transaction indicating its local time
 (usually immediately after the commit of each block). The time service maintains
 an index with the most current time indicated separately by each validator.
 A 1/3 percentile of these values (ordered by decreasing time) is stored separately;
-it is considered the actual time and is updated after each transaction
+this percentile is considered the actual time and is updated after each transaction
 from any of the validators. As we show [further](#proof-of-correctness),
 this time can be considered reliable given the assumptions above.
 
@@ -75,10 +74,9 @@ output its current time, authenticated by the validator’s digital signature.
 The logic of transaction execution is as follows:
 
 1. Check that the transaction signer is one of the validators. If not, quit.
-2. Check that the time specified in the transaction is greater than timestamp
-  of the submitting validator specified in the storage. If not, quit.
+2. Check that the time indicated in the transaction is greater than the submitting validator's timestamp specified in the storage. If not, quit.
 3. Update validator’s time in the `validators_time` index.
-4. If the number of the timestamps in the index belonging to the current validators
+4. If the number of timestamps in the index belonging to the current validators
    is at least `2f + 1`, where `f = (n - 1) / 3` is the maximum number
    of Byzantine validators, then perform the following steps; else quit.
 5. Sort the timestamps by the current validators in the decreasing order
@@ -88,23 +86,22 @@ The logic of transaction execution is as follows:
   replace the consolidated time with `t`.
 
 Thus, the consolidated time can be updated after each transaction with
-the actual time from any validator node. The procedure takes into account
+the actual time from any validator node. The procedure takes into account the
 possible changes in the validators list, ensures monotony of `time`, and
 is tolerant to the malicious behavior of validator nodes.
 
 ## Proof of Correctness
 
 Let `T` denote the list of current validators’ timestamps sorted
-in the decreasing order, as specified on step 5 of the algorithm above.
+in the decreasing order, as specified in step 5 of the algorithm above.
 It is clear that in a system with no more than `f` Byzantine nodes,
 any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval is:
 
 - The time of an honest node, or
-- The time between the timestamps of two honest nodes
-  (and therefore such a time can be considered reliable).
+- The time between the timestamps of two honest nodes. Therefore, such a time can be considered reliable.
 
 For practical reasons, we always choose the timestamp with index `f + 1`,
-since this value is reliable and at the same time the most recent one.
+since this value is reliable and, at the same time, the most recent one.
 
 ## REST API
 
@@ -222,14 +219,14 @@ Example of JSON response:
 ### Transaction Generation
 
 The validator nodes can potentially generate and send transactions to update
-the time any moment, however, in the current implementation the nodes send
-the transactions after commit of each block.
+the time any moment, however, in the current implementation, nodes send
+transactions after the commit of each block.
 
 ### Oracle Initialization
 
 At the time when a new blockchain is launched, the consolidated time is unknown
 until the transactions from at least `2f + 1` validator nodes are processed.
-Further in the course of blockchain operation this time
+Further, in the course of blockchain operation, this time
 will strictly grow monotonously.
 
 ### Possible Alternatives
@@ -250,7 +247,7 @@ Advantages:
 - The time value would be indicated directly in the header of each block
   making it more accessible.
 - Time would be forcibly updated in the course of consensus operation:
-  it is impossible to sabotage update of time without stopping consensus.
+  it is impossible to sabotage the update of time without stopping the consensus.
 - Blockchain would not be clogged by transactions associated with time determination.
 
 Disadvantages:
@@ -258,12 +255,12 @@ Disadvantages:
 - The consensus code would become more complex. (Time would be included
   into the consensus logic while [anchoring](bitcoin-anchoring.md) and
   [configuration](configuration-updater.md) are not.)
-- Time updates would be tied to creation of `Precommit` messages. In the case
+- Time updates would be tied to the creation of `Precommit` messages. In the case
   of a large delay in block acceptance, all the transactions therein would
   be executed with the same outdated time value.
 
-In our opinion implementing the time oracle as a service is preferable to
-the tight integration with consensus: it is more flexible and manageable,
+In our opinion, implementing the time oracle as a service is preferable to
+the tight integration with consensus. This approach is more flexible and manageable,
 and could be generalized to the agreement between arbitrary collectively trusted
 entities, which may behave maliciously.
 

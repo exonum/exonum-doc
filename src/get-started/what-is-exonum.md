@@ -1,24 +1,24 @@
 # What Is Exonum
 
-Exonum is a blockchain framework that allows to build secure permissioned blockchain
+Exonum is a blockchain framework that allows building secure permissioned blockchain
 applications. Like all software, Exonum comes with its own set of features and capabilities.
-This page outlines in which cases Exonum could be useful and points out the
+This page outlines the cases in which Exonum could be useful and points out the
 main differences between Exonum and other distributed ledger solutions.
 
 ## Why Blockchain
 
-In the terms of data management, blockchains provide [OLTP][wiki:oltp] capabilities;
-a blockchain processes transactions (which are quite similar to [transactions][wiki:tx]
-in ordinary database management systems) and changes the stored values correspondingly.
+In terms of data management, blockchains provide [OLTP][wiki:oltp] capabilities.
+A blockchain processes transactions, which are quite similar to [transactions][wiki:tx]
+in ordinary database management systems, and changes the stored values correspondingly.
 
-Compared to commonplace OLTP solutions, use of blockchain brings several distinctive
+Compared to commonplace OLTP solutions, the use of blockchain brings several distinctive
 advantages.
 
 ### Distribution
 
 Like distributed databases, such as Cassandra, MongoDB or MySQL Cluster, blockchains
 are replicated on multiple nodes. However, compared to ordinary distributed DBs,
-blockchains are resistant against much wider range of attacks:
+blockchains are resistant against a much wider range of attacks:
 
 - Blockchains are resistant against failures of any single node (or even multiple
   nodes at the same time). The threat model includes nodes being switched off,
@@ -35,7 +35,7 @@ A core component of a blockchain is a tamper-resistant transaction log.
 (Tamper-resistance here means that the log entries cannot be modified retroactively.)
 Blockchains use [the same methods][wiki:linked-ts] to ensure the immutability
 of the log as [evidence records][rfc-er] used by [certificate authorities][wiki:ca]
-and in other security-critical applications.
+and other security-critical applications.
 
 The reliable audit trail is needed in many regulated industries (e.g., finance
 and public registries), but it could be useful in other areas as well. The immutability
@@ -116,22 +116,21 @@ which guarantees the highest degree of memory safety.
     help enforce access restrictions. For example, if a variable is passed
     to an external component in a non-mutable reference, it **cannot** be changed
     no matter what the component does. Strict static typing and absence of null pointers
-    in Rust helps preventing undefined behavior and memory access violations.
+    in Rust help to prevent undefined behavior and memory access violations.
 
 ### Performance
 
 Exonum is geared towards peak throughput of thousands of transactions per second
-(tps). During test benchmarks, Exonum handles up to 7,000 tps, with a clearing delay
-(the interval between transaction generation and its inclusion into a block)
-2.5 sec.
+(tps). During test benchmarks, Exonum handles up to 7,000 tps, with a 2.5 sec. clearing delay
+(the interval between transaction generation and its inclusion into a block).
 
 ## Main Components
 
 ### Services
 
-[Services](../architecture/services.md) allow to specify the business logic for
-Exonum applications. It is the main extension point of the framework
-playing the same role as smart contracts in some other blockchains.
+[Services](../architecture/services.md) allow specifying the business logic for
+Exonum applications. It is the main extension point of the framework, which
+plays the same role as smart contracts in some other blockchains.
 
 Developing Exonum services is similar to service development in Web or
 in enterprise platforms; they have the same principal components.
@@ -168,7 +167,7 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 
 Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
 to synchronize data among the nodes in the network.
-The Exonum network would continue to operate even if up to 1/3 of validators are
+The Exonum network will continue to operate even if up to 1/3 of validators are
 hacked, compromised or switched off. Hence, there is no single point of failure
 in the network; the whole process of transaction processing is fully
 decentralized.
@@ -177,7 +176,7 @@ decentralized.
 
 Exonum supports [light clients](../architecture/clients.md),
 network nodes that replicate only a very small part of the blockchain,
-which the client is interested in. Light clients allow to provide access to blockchain
+which the client is interested in. Light clients allow providing access to a blockchain
 through web or mobile apps. A light client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
@@ -196,7 +195,7 @@ among the blockchain maintainers.
 ### Bitcoin Anchoring
 
 Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)
-to achieve the most complete security for light clients. The anchoring service
+to achieve the highest level of security for light clients. The anchoring service
 periodically publishes a hash digest of the entire blockchain state
 to the Bitcoin Blockchain. This makes it impossible to revise the transaction
 history or to supply different clients with differing versions of the blockchain,

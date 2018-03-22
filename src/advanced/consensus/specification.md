@@ -6,10 +6,10 @@ title: Consensus specification
 This article contains the specification of [the consensus algorithm](../../glossary.md#consensus)
 in Exonum.
 
-Consensus algorithm in Exonum is a process of reaching an agreement about order
+Consensus algorithm in Exonum is the process of reaching an agreement about the order
 of [transactions](../../glossary.md#transaction) and the result of their
 execution in the presence of [Byzantine faults][wiki_bft] and [partially
-synchronous][partial_synchrony] network. During the consensus algorithm
+synchronous][partial_synchrony] network. During the consensus algorithm,
 nodes exchange [consensus messages](../../glossary.md#consensus-message)
 authenticated with public-key crypto. These messages are processed via [a
 message queue](#message-processing) and determine [transitions among
@@ -51,11 +51,11 @@ necessary, the nodes [can request unknown transactions from other nodes](request
 
 ### Proof-of-Lock
 
-A set of +2/3 `Prevote` messages for the same proposal from the nodes at current
+A set of +2/3 `Prevote` messages for the same proposal from the nodes at the current
 round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes store PoL as
 a part of the node state. The node can have no more than one stored PoL.
 
-A PoL is greater than recorded one (has a higher priority), in cases:
+A PoL is greater than the recorded one (has a higher priority), in cases:
 
 - There is no PoL recorded
 - The recorded PoL corresponds to a proposal with a smaller round
@@ -262,7 +262,7 @@ are placed in a separate queue (`queued`).
 
 **Arguments:** `prevote`.
 
-- Add `prevote` to the list of known `Prevote` messages for its proposal in
+- Add `prevote` to the list of known `Prevote` messages for the given proposal in
   `prevote.round`.
 - If:
 
@@ -286,13 +286,13 @@ are placed in a separate queue (`queued`).
 
     - the node has formed +2/3 `Precommit`s for the same round, `propose_hash`
       and `state_hash`
-    - the node knows a `propose` referenced by `propose_hash`
+    - the node knows the `propose` referenced by `propose_hash`
     - the node knows all the transactions in this `propose`
 
 - Then:
 
     - Execute the proposal, if it has not yet been executed.
-    - Check that the node’s `state_hash` coincides with the `state_hash` of the
+    - Check that the node’s `state_hash` coincides with the `state_hash`
       in the `Precommit`s. If not, stop working and signal about
       an unrecoverable error.
     - Proceed to [Commit](#commit) for this block.
@@ -327,8 +327,8 @@ are placed in a separate queue (`queued`).
   diverges from that in the `Block` message, stop working and signal about
   an unrecoverable error.
 
-- Add the block to the blockchain and move to a new height. Set to `0` the value
-  of the variable `locked_round` at the new height.
+- Add the block to the blockchain and move to a new height. Set the value
+  of the variable `locked_round` at the new height to `0` .
 
 - [Request missing information based on the message](requests.md#receiving-block).
 
@@ -341,7 +341,7 @@ are placed in a separate queue (`queued`).
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
-- If the node has a saved PoL, send a `Prevote` for `locked_propose` in a new round,
+- If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new round,
   and proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
   (after the expiration of `propose_timeout`, if the node has just moved to a new

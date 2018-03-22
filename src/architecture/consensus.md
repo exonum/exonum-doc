@@ -15,7 +15,7 @@ to it and other consensus algorithms for blockchains.
 ## Assumptions
 
 The Exonum consensus algorithm assumes that the consensus participants
-can be identified. Thus, the algorithm fits for permissioned blockchains,
+can be identified. Thus, the algorithm fits permissioned blockchains,
 which Exonum is oriented towards, rather than permissionless ones.
 
 Not all the nodes in the blockchain network may be actively involved in
@@ -79,10 +79,10 @@ To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
    for the next block and broadcasts it across the network. The logic of
-   selecting the leader node is described in a separate algorithm
+   selecting the leader node is described in a separate algorithm.
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
    A prevote means that the validator has been able to parse the proposal
-   and has all transactions specified in it
+   and has all transactions specified in it.
 3. After the validator has collected enough prevotes from a supermajority
    of other validators, it applies transactions specified in the voted
    proposal,
@@ -90,7 +90,7 @@ To put it *very* simply, rounds proceed as follows:
    the proposal execution in the form of [a new state hash](storage.md).
    The precommit expresses that the sender is ready to commit the corresponding
    proposed block to the blockchain, but needs to see what other validators
-   have to say on the matter just to be sure
+   have to say on the matter just to be sure.
 4. Finally, if the validator has collected a supermajority of precommits with
    the same state hash for the same proposal, the proposed block is committed
    to the blockchain.
@@ -141,7 +141,7 @@ that led to the lock from the locked validator, if they do not have them locally
     problems.
     Then validators B and C can request each other’s prevotes from validator A.
 
-Locks can be changed: if A locked on a propose and during next round all other
+Locks can be changed: if A locked on a proposal and during next round all other
 validators locked on the next proposal, A would update its lock eventually.
 
 ### Requests
@@ -172,7 +172,7 @@ The order of states in the proposed algorithm is as follows:
 Commit -> (Round)+ -> Commit -> ...
 ```
 
-On the timeline, these states look like this (for one of the
+On the timeline, these states look the following way (for one of the
 validator nodes):
 
 ```none
@@ -280,7 +280,7 @@ that has already been done and increase in the timeout would lead to
 additional delays in accepting the block proposal.
 
 In contrast to the case discussed in the previous paragraph, the absence of a
-fixed round ends in Exonum allows to accept the proposal with a minimum
+fixed round end in Exonum allows the system to accept the proposal with a minimum
 necessary delay.
 
 ### Work Split
