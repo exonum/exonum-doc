@@ -249,44 +249,43 @@ A JSON object with the following fields:
   corresponding values of type `OutgoingConnectionInfo` contain info about
   public keys and current connection status of peers.
 
-#### Response example
-
-```JSON
-{
-  "incoming_connections": [
-    "127.0.0.1:58635",
-    "127.0.0.1:58656"
-  ],
-  "outgoing_connections": {
-    "127.0.0.1:6334": {
-      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
-      "state": {
-        "type": "Active"
-      }
-    },
-    "127.0.0.1:6335": {
-      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
-      "state": {
-        "delay": 4000,
-        "type": "Reconnect"
-      }
-    },
-    "127.0.0.1:6336": {
-      "public_key": null,
-      "state": {
-        "type": "Active"
-      }
-    },
-    "127.0.0.1:6337": {
-      "public_key": null,
-      "state": {
-        "delay": 4000,
-        "type": "Reconnect"
+??? example "Response Example"
+    ```json
+    {
+      "incoming_connections": [
+        "127.0.0.1:58635",
+        "127.0.0.1:58656"
+      ],
+      "outgoing_connections": {
+        "127.0.0.1:6334": {
+          "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+          "state": {
+            "type": "Active"
+          }
+        },
+        "127.0.0.1:6335": {
+          "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+          "state": {
+            "delay": 4000,
+            "type": "Reconnect"
+          }
+        },
+        "127.0.0.1:6336": {
+          "public_key": null,
+          "state": {
+            "type": "Active"
+          }
+        },
+        "127.0.0.1:6337": {
+          "public_key": null,
+          "state": {
+            "delay": 4000,
+            "type": "Reconnect"
+          }
+        }
       }
     }
-  }
-}
-```
+    ```
 
 ### Network info
 
@@ -510,78 +509,77 @@ A JSON object with the following fields:
 - **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into the block
 
-#### Response example
-
-```JSON
-{
-  "block": {
-    "height": "20",
-    "prev_hash": "a6d3d838e4edc29bd977eba3885a4ef30a020d166ac0e9c51737ae97b8fb3bce",
-    "proposer_id": 2,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 0,
-    "tx_hash": "0000000000000000000000000000000000000000000000000000000000000000"
-  },
-  "precommits": [
+??? example "Response Example"
+    ```json
     {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+      "block": {
         "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 807015000,
-          "secs": "1499869987"
-        },
-        "validator": 2
+        "prev_hash": "a6d3d838e4edc29bd977eba3885a4ef30a020d166ac0e9c51737ae97b8fb3bce",
+        "proposer_id": 2,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 0,
+        "tx_hash": "0000000000000000000000000000000000000000000000000000000000000000"
       },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
-    },
-    {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-        "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 806850000,
-          "secs": "1499869987"
+      "precommits": [
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 807015000,
+              "secs": "1499869987"
+            },
+            "validator": 2
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
         },
-        "validator": 3
-      },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
-    },
-    {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-        "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 7842000,
-          "secs": "1499869988"
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 806850000,
+              "secs": "1499869987"
+            },
+            "validator": 3
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
         },
-        "validator": 0
-      },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 7842000,
+              "secs": "1499869988"
+            },
+            "validator": 0
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+        }
+      ],
+      "txs": []
     }
-  ],
-  "txs": []
-}
-```
+    ```
 
 ### Blocks in range
 
@@ -608,57 +606,56 @@ Returns the headers of the consecutive `count` blocks up to the `latest` height.
 The JSON array of the `BlockHeader` objects. Blocks in the array are sorted in
 descending order according to their heights.
 
-#### Response example
-
-```JSON
-[
-  {
-    "height": "18",
-    "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
-    "proposer_id": 3,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 426,
-    "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
-  },
-  {
-    "height": "14",
-    "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
-    "proposer_id": 3,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 1000,
-    "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
-  },
-  {
-    "height": "10",
-    "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
-    "proposer_id": 3,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 1000,
-    "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
-  },
-  {
-    "height": "6",
-    "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
-    "proposer_id": 3,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 1000,
-    "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
-  },
-  {
-    "height": "2",
-    "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
-    "proposer_id": 3,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 1000,
-    "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
-  }
-]
-```
+??? example "Response Example"
+    ```json
+    [
+      {
+        "height": "18",
+        "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
+        "proposer_id": 3,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 426,
+        "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
+      },
+      {
+        "height": "14",
+        "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
+        "proposer_id": 3,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 1000,
+        "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
+      },
+      {
+        "height": "10",
+        "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
+        "proposer_id": 3,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 1000,
+        "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
+      },
+      {
+        "height": "6",
+        "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
+        "proposer_id": 3,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 1000,
+        "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
+      },
+      {
+        "height": "2",
+        "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
+        "proposer_id": 3,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 1000,
+        "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+      }
+    ]
+    ```
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
