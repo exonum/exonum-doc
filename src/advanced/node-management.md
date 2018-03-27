@@ -411,6 +411,23 @@ Response is a JSON object with the following fields:
   to the `tx_hash` of the containing block
 - **type**: `"committed"`  
   Always equals to `committed`
+- **status**: Object  
+  [Transaction execution](../architecture/transactions.md#execute) status
+- **status.type**: `"success"` | `"error"` | `"panic"`  
+  Execution status kind:
+
+    - `"success"` denotes a successfully completed transaction
+    - `"error"` denotes a transaction that has returned an error (for example,
+      because of transaction parameters not satisfying context-dependent checks)
+    - `"panic"` denotes a transaction that has raised a runtime exception
+      (for example, attempted to divide by zero)
+
+- **status.code**: integer  
+  Error code supplied by the service developer. Only present for erroneous
+  transactions. Has service-specific meaning
+- **status.description**: string=  
+  Optional human-readable error description. Only relevant for erroneous and
+  panicking transactions
 
 ??? example "Response Example"
     ```json
@@ -463,6 +480,9 @@ Response is a JSON object with the following fields:
           "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
         }
       },
+      "status": {
+        "type": "success"
+      }
     }
     ```
 
