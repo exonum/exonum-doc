@@ -9,7 +9,7 @@ node [local configuration](../architecture/configuration.md#local-parameters).
 
 Endpoints are divided into two types: private and public endpoints. Each
 endpoint type is hosted at a separate address, which is specified in the
-[`node.api` section](../architecture/configuration.md#nodeapi) of the local
+[`api` section](../architecture/configuration.md#api) of the local
 configuration.
 
 ## Types
@@ -125,7 +125,7 @@ address formatted as 4 octets separated by points.
 ### SerializedTransaction
 
 `SerializedTransaction` is a JSON object corresponding to
-[transaction serialization format](../architecture/transactions.md#serialization)
+[transaction serialization format](../architecture/serialization.md#message-serialization).
 
 ### TransactionLocation
 
