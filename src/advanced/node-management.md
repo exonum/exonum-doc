@@ -197,6 +197,32 @@ A JSON object with the following fields:
 }
 ```
 
+### User agent info
+
+```None
+GET {system_base_path}/user_agent
+```
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl http://127.0.0.1:7780/api/system/v1/user_agent
+```
+
+#### Response
+
+Returns string containing information about Exonum, Rust and OS version.
+
+#### Response example
+
+```None
+"exonum 0.6.0/rustc 1.26.0-nightly (2789b067d 2018-03-06)\n\n/Mac OS10.13.3"
+```
+
 ## Private endpoints
 
 ### Add new peer
@@ -287,6 +313,52 @@ A JSON object with the following fields:
     }
     ```
 
+### Consensus Enabled Info
+
+```none
+GET {system_base_path}/consensus_enabled
+```
+
+Returns a boolean value representing if the node participates in consensus.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON boolean.
+
+#### Response Example
+
+```JSON
+true
+```
+
+### Enabled/Disable Consensus Interaction
+
+```none
+POST {system_base_path}/consensus_enabled
+```
+
+Switches consensus interaction of the node on or off.
+
+#### Parameters
+
+- **enabled**: `bool`
+
+#### Example
+
+```None
+curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0.0.1:7780/api/system/v1/consensus_enabled
+```
+
+#### Response
+
+```None
+"Ok"
+```
+
 ### Network info
 
 ```none
@@ -324,6 +396,32 @@ A JSON object with the following fields:
     }
   ]
 }
+```
+
+### Shutdown
+
+```none
+POST {system_base_path}/shutdown
+```
+
+After receiving a shutdown message, the node stops processing
+transactions, participating in consensus and terminates after
+all messages in the event queue are processed.
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
+```
+
+#### Response
+
+```none
+"Ok"
 ```
 
 ## Explorer API endpoints
