@@ -24,18 +24,18 @@ an optional type.
 
 ### Bool
 
-`bool` type denotes a simple boolean `true/false` value.
+`bool` type denotes a boolean value: `true` or `false`.
 
 ### Hash, PublicKey, Signature
 
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
-appropriate length. `Hash` and `PublicKey` consist of 32 bytes.
-`Signature` consists of 64 bytes.
+appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex digits).
+`Signature` is 64 bytes (that is, 128 hex digits).
 
 ### PeerAddress
 
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
-address formatted as 4 octets separated by points.
+address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ### OutgoingConnectionState
 
@@ -460,10 +460,13 @@ Response is a JSON object with one required field:
       transactions)
     - `unknown`: unknown transaction
 
+The object may also contain other fields, which depend on `type` and are
+outlined below.
+
 ##### Unknown Transaction
 
 Response JSON contains only `type` field. Its value is `unknown`. Additionally,
-returns HTTP status `404`.
+the HTTP status of the response is set to 404.
 
 ??? example "Response Example"
     ```json
