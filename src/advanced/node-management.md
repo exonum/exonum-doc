@@ -197,133 +197,6 @@ A JSON object with the following fields:
 }
 ```
 
-### Transaction
-
-```none
-GET {system_base_path}/transactions/{transaction_hash}
-```
-
-Searches for a transaction, either committed or uncommitted, by the hash.
-
-#### Parameters
-
-- **transaction_hash**: Hash  
-  The hash of the transaction to be searched
-
-#### Response
-
-Returns a transaction from the pool of unconfirmed transactions if it is not
-committed yet, otherwise, returns a transaction from the blockchain.
-
-Response is a JSON object with one required field:
-
-- **type**: string  
-  Transaction type, can be:
-
-    - `Committed`: committed transaction (in blockchain)
-    - `MemPool`: uncommitted transaction (in the pool of unconfirmed
-    transactions)
-    - `Unknown`: unknown transaction
-
-##### Unknown Transaction Response Example
-
-Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
-returns HTTP status `404`.
-
-```JSON
-{
-  "type": "Unknown"
-}
-```
-
-##### Known Uncommitted Transaction Response Example
-
-Response JSON has same fields as `SerializedTransaction` plus `type` field with
-value equal to `MemPool`:
-
-```JSON
-{
-  "body": {
-    "amount": "152",
-    "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-    "seed": "2953135335240383704",
-    "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
-  },
-  "message_id": 128,
-  "network_id": 0,
-  "protocol_version": 0,
-  "service_id": 128,
-  "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00",
-  "type": "MemPool"
-}
-```
-
-##### Known Committed Transaction Response Example
-
-Response is a JSON object with the following fields:
-
-- **content**: SerializedTransaction  
-  Transaction with the specified hash
-- **location**: TransactionLocation  
-  Transaction position in the blockchain
-- **proof_to_block_merkle_root**: MerkleRoot  
-  Merkle root proving transaction existence
-- **type**: string  
-  Is `Committed` for the committed transaction
-
-```JSON
-{
-  "content": {
-    "body": {
-      "amount": "152",
-      "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-      "seed": "2953135335240383704",
-      "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
-    },
-    "message_id": 128,
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 128,
-    "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
-  },
-  "location": {
-    "block_height": "18",
-    "position_in_block": "261"
-  },
-  "proof_to_block_merkle_root": {
-    "left": "07e641264ac4646495c54a379a5943bf88785bcf30a0b4c13f47d1e2e62b343d",
-    "right": {
-      "left": {
-        "left": {
-          "left": {
-            "left": {
-              "left": {
-                "left": "78044db9c2713a11c2fe7bb66f27665b6ca0ecbb9e61e09381534d449c4c24c4",
-                "right": {
-                  "left": {
-                    "left": "f62e6a4d8b9c2c0cfb31ea599e08e6e3fe2337169ce07008d91390958e0613d4",
-                    "right": {
-                      "val": "f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf"
-                    }
-                  },
-                  "right": "daee36b5b7c24a831a62539d534c56e4f234a83ce83876fee48193d8eefabfb2"
-                }
-              },
-              "right": "df8bb7e697e6eb7828975b67f64a77af06379435f4330f0cb0b7a21d18b616db"
-            },
-            "right": "59ab567cf0d1c09c5050680ea4ed4650238023666b0e5d90855d82dc83d1f982"
-          },
-          "right": "cf5fa45701ba6ae795da58a504eb1608075d7bbedf05c8f6f448aad4dbd03968"
-        },
-        "right": "eb583ba724a3b371c243f1268dfca2929c704fe0546875e5dfeb90860ac3533f"
-      },
-      "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
-    }
-  },
-  "type": "Committed"
-}
-```
-
 ### User agent info
 
 ```None
@@ -732,6 +605,133 @@ descending order according to their heights.
     "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
   }
 ]
+```
+
+### Transaction
+
+```none
+GET {explorer_base_path}/transactions/{transaction_hash}
+```
+
+Searches for a transaction, either committed or uncommitted, by the hash.
+
+#### Parameters
+
+- **transaction_hash**: Hash  
+  The hash of the transaction to be searched
+
+#### Response
+
+Returns a transaction from the pool of unconfirmed transactions if it is not
+committed yet, otherwise, returns a transaction from the blockchain.
+
+Response is a JSON object with one required field:
+
+- **type**: string  
+  Transaction type, can be:
+
+    - `Committed`: committed transaction (in blockchain)
+    - `MemPool`: uncommitted transaction (in the pool of unconfirmed
+    transactions)
+    - `Unknown`: unknown transaction
+
+##### Unknown Transaction Response Example
+
+Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
+returns HTTP status `404`.
+
+```JSON
+{
+  "type": "Unknown"
+}
+```
+
+##### Known Uncommitted Transaction Response Example
+
+Response JSON has same fields as `SerializedTransaction` plus `type` field with
+value equal to `MemPool`:
+
+```JSON
+{
+  "body": {
+    "amount": "152",
+    "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
+    "seed": "2953135335240383704",
+    "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
+  },
+  "message_id": 128,
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 128,
+  "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00",
+  "type": "MemPool"
+}
+```
+
+##### Known Committed Transaction Response Example
+
+Response is a JSON object with the following fields:
+
+- **content**: SerializedTransaction  
+  Transaction with the specified hash
+- **location**: TransactionLocation  
+  Transaction position in the blockchain
+- **proof_to_block_merkle_root**: MerkleRoot  
+  Merkle root proving transaction existence
+- **type**: string  
+  Is `Committed` for the committed transaction
+
+```JSON
+{
+  "content": {
+    "body": {
+      "amount": "152",
+      "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
+      "seed": "2953135335240383704",
+      "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
+    },
+    "message_id": 128,
+    "network_id": 0,
+    "protocol_version": 0,
+    "service_id": 128,
+    "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
+  },
+  "location": {
+    "block_height": "18",
+    "position_in_block": "261"
+  },
+  "proof_to_block_merkle_root": {
+    "left": "07e641264ac4646495c54a379a5943bf88785bcf30a0b4c13f47d1e2e62b343d",
+    "right": {
+      "left": {
+        "left": {
+          "left": {
+            "left": {
+              "left": {
+                "left": "78044db9c2713a11c2fe7bb66f27665b6ca0ecbb9e61e09381534d449c4c24c4",
+                "right": {
+                  "left": {
+                    "left": "f62e6a4d8b9c2c0cfb31ea599e08e6e3fe2337169ce07008d91390958e0613d4",
+                    "right": {
+                      "val": "f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf"
+                    }
+                  },
+                  "right": "daee36b5b7c24a831a62539d534c56e4f234a83ce83876fee48193d8eefabfb2"
+                }
+              },
+              "right": "df8bb7e697e6eb7828975b67f64a77af06379435f4330f0cb0b7a21d18b616db"
+            },
+            "right": "59ab567cf0d1c09c5050680ea4ed4650238023666b0e5d90855d82dc83d1f982"
+          },
+          "right": "cf5fa45701ba6ae795da58a504eb1608075d7bbedf05c8f6f448aad4dbd03968"
+        },
+        "right": "eb583ba724a3b371c243f1268dfca2929c704fe0546875e5dfeb90860ac3533f"
+      },
+      "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
+    }
+  },
+  "type": "Committed"
+}
 ```
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
