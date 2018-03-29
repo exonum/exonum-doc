@@ -222,7 +222,7 @@ used together with some form of timestamping to provide
     consistency
     of the whole system.
 
-[Blockchains](#blockchain) are a particular kind of distributed ledgers with
+[Blockchains](#blockchain) are a particular kind of distributed ledgers with a
 focus
 on auditability and accountability of the [system maintainers](#maintainer).
 
@@ -284,7 +284,7 @@ and/or has access to. Light clients can communicate with
 [full nodes](#full-node)
 to [retrieve information from the blockchain](#read-request)
 and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
-allows to minimize the trust factor during this communication and protect the client
+allows minimizing the trust factor during this communication and protecting the client
 against
 a range of attacks.
 
@@ -449,8 +449,8 @@ in any Exonum blockchain.
 
 Externally, a service is essentially a collection of
 [endpoints](#service-endpoint)
-that allow to manipulate data in [the blockchain state](#blockchain-state)
-and retrieve it, possibly with [proofs](#merkle-proof). Internally, a service
+that allow manipulating data in [the blockchain state](#blockchain-state)
+and retrieving it, possibly with [proofs](#merkle-proof). Internally, a service
 may define various entities, including [table](#table) schema,
 [configurable parameters](#configuration), etc.
 
@@ -462,8 +462,8 @@ may define various entities, including [table](#table) schema,
 A point of communication with [a service](#service). There are three kinds of
 endpoints:
 
-- [Transactions](#transaction) allow to atomically change the blockchain state;
-- [Read requests](#read-request) allow to read data from the blockchain state,
+- [Transactions](#transaction) allow atomically changing the blockchain state;
+- [Read requests](#read-request) allow reading data from the blockchain state,
   usually together with [a proof](#merkle-proof);
 - [Private APIs](#private-api) allow configuring the service locally.
 

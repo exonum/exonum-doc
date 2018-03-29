@@ -1,7 +1,7 @@
 # Consensus in Exonum
 
 Generally, a [consensus algorithm][wiki:consensus] is a process of
-obtaining an agreed result by a group of participants. In Exonum the
+obtaining an agreed result by a group of participants. In Exonum, the
 consensus algorithm is used to agree on the list of transactions
 in blocks added to the blockchain. The other goal of the algorithm is to ensure
 that the results of the transaction execution are interpreted in the same way
@@ -28,7 +28,7 @@ The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus
 algorithm
 assumes the worst; it operates under the assumption that any individual node
-or even a group of nodes in the blockchain network can crash or can be
+or even a group of nodes in the blockchain network can crash or be
 compromised
 by a resourceful adversary (say, a hacker or a corrupt administrator). This
 threat model is known in computer science as [Byzantine faults][wiki:bft];
@@ -42,7 +42,7 @@ usual assumptions:
   i.e., their computation performances do not differ much
 - The network is partially synchronous, too. That is, all messages are delivered
   in the finite time which, however, is unknown in advance
-- Each validator has an access to a local **stopwatch** to determine time
+- Each validator has access to a local **stopwatch** to determine time
   intervals.
   On the other hand, there is no global synchronized time in the system
 - Validators can be identified with the public-key cryptography;
@@ -133,11 +133,11 @@ for the proposal on which it is locked. When a new round starts,
 the locked validator immediately sends a prevote indicating
 that it is locked on a certain proposal. Other validators may request prevotes
 that led to the lock from the locked validator, if they do not have them locally
-(these proposals are known as *proof of lock*).
+(these prevotes are known as *proof of lock*).
 
 !!! note "Example"
     Validator A gets prevotes from validators B and C,
-    and they do not get prevotes from each other because of the connection
+    and they do not get prevotes from each other because of connection
     problems.
     Then validators B and C can request each other’s prevotes from validator A.
 
@@ -229,7 +229,7 @@ has a correctly formed `Propose` and all the transactions specified in it.
 #### Precommit
 
 `Precommit` is a message expressing readiness to include a certain proposal
-as the next block into blockchain. `Precommit` is broadcast to all validators.
+as the next block into the blockchain. `Precommit` is broadcast to all validators.
 
 #### Status
 
@@ -294,15 +294,15 @@ Delayed transactions processing reduces the negative impact of malicious nodes
 on the system throughput and latency. Indeed, it splits transactions processing
 among the stages of the algorithm:
 
-- On the prevote stage validators only ensure that a list of transactions
+- On the prevote stage, validators only ensure that a list of transactions
   included in the proposal is correct (the validator checks that all the
   transactions in
   the `Propose` are already stored by this node. Correctness of a transaction
   is verified when the transaction is received; nodes do not store incorrect
   transactions.)
-- On the precommit stage validators apply the transactions to the current
+- On the precommit stage, validators apply the transactions to the current
   blockchain state
-- On the commit stage validators ensure that they achieved the same state
+- On the commit stage, validators ensure that they achieved the same state
   after applying the transactions in the proposal
 
 If a Byzantine validator sends out proposals with a different transactions order
@@ -313,7 +313,7 @@ A different transactions order will be detected when comparing the
 in the prevote messages from other validators and the `propose_hash` received
 in the proposal message.
 
-Thus, split of work helps reduce the negative impact of Byzantine nodes
+Thus, the split of work helps reduce the negative impact of Byzantine nodes
 on the overall system performance.
 
 ### Requests Algorithm

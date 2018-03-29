@@ -71,8 +71,8 @@ and a more controllable environment.
 
 Controllability of Exonum *does not* mean that the control of maintainers
 is unrestricted; there are well-defined rules of transaction processing that even
-all the network maintainers together cannot bend. Indeed, Exonum allows to
-easily convey the compliance to transaction processing rules for external parties
+all the network maintainers together cannot bend. Indeed, Exonum allows
+easily conveying the compliance to transaction processing rules for external parties
 (be it the regulator, auditors, or users of a platform).
 
 !!! note "Example"
@@ -129,8 +129,8 @@ Exonum is geared towards peak throughput of thousands of transactions per second
 ### Services
 
 [Services](../architecture/services.md) allow specifying the business logic for
-Exonum applications. It is the main extension point of the framework, which
-plays the same role as smart contracts in some other blockchains.
+Exonum applications. They are the main extension points of the framework, which
+play the same role as smart contracts in some other blockchains.
 
 Developing Exonum services is similar to service development in Web or
 in enterprise platforms; they have the same principal components.

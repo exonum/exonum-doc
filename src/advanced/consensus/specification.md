@@ -98,7 +98,7 @@ message processing.
   Current round (1-based).
 
 - `locked_propose`  
-  `Propose` on which node is locked. May be undefined.
+  `Propose` on which the node is locked. May be undefined.
 
 - `state_hash`  
   Hash of the blockchain state.
@@ -114,7 +114,7 @@ The consensus algorithm uses the following types of messages:
 Only a part of their fields is described here. See
 [source code][message_source] for more details.
 
-The following fields are present for all messages:
+The following fields are present in all messages:
 
 - `validator_id`  
   Index of a validator in the `validators` list in the global configuration.
@@ -138,7 +138,7 @@ The following fields are present for all messages:
 - `locked_round`  
   Round in which the author of the message [has locked](../../architecture/consensus.md#locks)
   on the proposal which is referenced by the message.
-  If the author is not locked on a propose, the `locked_round` field is 0.
+  If the author is not locked on a proposal, the `locked_round` field is 0.
 
 !!! note
     A node that is locked on a proposal must send prevotes only
@@ -238,7 +238,7 @@ are placed in a separate queue (`queued`).
   its type.
 
 !!! note
-    Consensus messages can lead to sending *request(s)* based on information
+    Consensus messages can lead to sending *request(s)* based on the information
     in the message. Requests are used to obtain information unknown to the node,
     but known to its peers. This part of message processing is described in the
     [*Requests*](requests.md) article and is only marginally touched upon here.

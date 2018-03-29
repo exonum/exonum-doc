@@ -42,7 +42,7 @@ takes a more technical approach and gives in-depth description of the Exonum des
 
 ### Services & Clients
 
-The following 2 topics provide valuable insights how to develop with Exonum:
+The following 2 topics provide valuable insights on how to develop with Exonum:
 
 - [*Services*](architecture/services.md) are the main building block
   of the Exonum architecture

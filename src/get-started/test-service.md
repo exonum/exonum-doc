@@ -62,7 +62,7 @@ extern crate exonum_cryptocurrency as cryptocurrency;
 #[macro_use] extern crate exonum_testkit;
 ```
 
-Just like with the service itself, we then import types we will use:
+Just like with the service itself, we then import the types we will use:
 
 ```rust
 use exonum::blockchain::Transaction;
@@ -76,7 +76,7 @@ use cryptocurrency::{CurrencySchema, CurrencyService, TxCreateWallet,
 ### Creating Test Network
 
 To perform testing, we first need to create a network emulation – the eponymous
-`TestKit`. `TestKit` allows to recreate behavior of a single full node
+`TestKit`. `TestKit` allows recreating behavior of a single full node
 (a validator or an auditor) in an imaginary Exonum blockchain network.
 
 !!! note
@@ -244,11 +244,11 @@ previously (including tests), so we will concentrate on differences only.
 
 ### API Wrapper
 
-The testkit allows to access service endpoints with the help
+The testkit allows accessing service endpoints with the help
 of the [`TestKitApi`][TestKitApi] struct. However, calls to `TestKitApi`
 may be overly verbose and prone to errors for practical purposes,
-as the struct does not know type signatures of the endpoints
-of a specific service. To improve usability
+as the struct does not know the type signatures of the endpoints
+of a specific service. To improve usability,
 let’s create a *wrapper* around `TestKitApi` with the wrapper’s methods corresponding
 to service endpoints:
 
@@ -309,7 +309,7 @@ fn assert_no_wallet(&self, pubkey: &PublicKey) {
 ```
 
 Note that this method uses the `TestKitApi::get_err` method instead of `TestKitApi::get`.
-While `get` will panic if returned response is erroneous (that is, has non-20x
+While `get` will panic if the returned response is erroneous (that is, has non-20x
 HTTP status), `get_err` acts in the opposite way, panicking if the response
 *does not* have a 40x status.
 

@@ -113,7 +113,7 @@ encoding_struct! {
 
 Macro `encoding_struct!` helps declare a
 [serializable](../architecture/serialization.md)
-struct and determine bounds of its fields. We need to change wallet balance,
+struct and determine bounds of its fields. We need to change the wallet balance,
 so we add methods to the `Wallet` type:
 
 ```rust
@@ -215,7 +215,7 @@ Declaration of any transaction should contain:
 - Unique (within the service) message identifier
 - Size of the fixed part of the message
 
-Exonum will use these constants for (de)serialization of the messages.
+Exonum will use these constants for (de)serialization of messages.
 
 ### Creating New Wallet
 
@@ -265,7 +265,7 @@ This trait includes the `verify` method to verify the integrity of the
 transaction, and the `execute` method which contains logic applied to the
 storage when a transaction is executed.
 
-In our case `verify` for both transaction types will check the transaction
+In our case, `verify` for both transaction types will check the transaction
 signature. `execute` method gets the reference to the `Fork` of the storage, so
 we wrap it with our `CurrencySchema` to access our data layout.
 
@@ -567,7 +567,7 @@ impl Service for CurrencyService {
 ## Create Demo Blockchain
 
 The service is ready. You can verify that the library code compiles by running
-`cargo build` in the shell. However, we do not have means to process requests
+`cargo build` in the shell. However, we do not have the means of processing requests
 to the service. To fix this, let us create a minimalistic blockchain network
 with one node and a single service we’ve just finished creating.
 
@@ -807,7 +807,7 @@ This request returns the transaction hash:
 }
 ```
 
-The node outputs to the console information about this transfer:
+The node outputs to the console the information about this transfer:
 
 ```none
 Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
