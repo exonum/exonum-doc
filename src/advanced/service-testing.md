@@ -1,155 +1,272 @@
-# Sandbox Testing
+# Service Testing
 
-Sandbox is a package that simulates the rest of the network for a node.
-The sandbox is used to test [services](../architecture/services.md),
-[the consensus algorithm](consensus/specification.md),
-and [service endpoints](../glossary.md#service-endpoint).
+You can test Exonum services with the help of the [**exonum-testkit**][exonum-testkit]
+crate. The crate allows to test transaction execution and APIs in the synchronous
+environment (that is, without consensus algorithm and network operation involved).
+Tests are executed in the same system process as the service code itself, allowing
+to more easily debug service business logic (for example, panics).
 
-Using sandbox one can send a message to the node and expect some response from it
-which is then checked against the reference response. The sandbox can be used to
-test the consensus algorithm (by sending consensus messages to the node and
-verifying its response) and the operation of the services (by committing
-transactions to the blockchain and verifying the service response). Similarly,
-tests of the public REST API can be performed.
+## Installation
 
-## Sandbox Interface
+In most cases you want to install `exonum-testkit` as a [development dependency][dev-dep],
+so it would be compiled for tests only. For this, add the dependency
+to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
-A sandbox instance can be created with `sandbox_with_services` method, which
-allows to specify a list of services for testing.
-
-Sandbox provides network emulation capabilities:
-
-- `recv`  
-  Simulates receiving a message by the node.
-
-- `send`  
-  Checks if a message has been sent by the node.
-
-- `broadcast`  
-  Checks if the node has broadcasted the message of a particular content
-  (e.g. a transaction).
-
-Sandbox also allows to emulate block acceptance and time:
-
-- `add_time`  
-  Emulates the situation upon expiration of the specified time period (as a
-  `std::time::Duration`struct). Is used for timeouts testing.
-
-- `add_one_height_with_transactions`  
-  Allows committing a transaction.
-
-Finally, sandbox provides utility methods:
-
-- `a`  
-  Gets socket address of the validator with the specified number.
-
-- `p`  
-  Gets public key of the validator with the specified number.
-
-- `s`  
-  Gets private key of the validator with the specified number.
-
-## Consensus Algorithm Testing
-
-Testing the consensus algorithm implies checking compliance of the node
-behavior with the algorithm specification. The following components of the
-consensus algorithm are tested:
-
-- [Consensus messages processing](consensus/specification.md#message-processing)
-- Node behavior at each [stage of the consensus algorithm](consensus/specification.md#consensus-algorithm-stages)
-- Timeouts processing:
-
-    - [round timeout](consensus/specification.md#round-timeout-processing)
-    - [status timeout](consensus/specification.md#status-timeout-processing)
-    - [request timeout](consensus/requests.md#request-timeout)
-    - [peers timeout](consensus/requests.md#peers-timeout)
-
-- [Sending requests](consensus/requests.md#sending-requests) and
-  [processing of the requests](consensus/requests.md#requests-processing)
-
-- Acting as a [round leader](../architecture/consensus.md#strawman-version)
-
-!!! tip
-    See [source code](https://github.com/exonum/exonum/blob/master/sandbox/tests/consensus.rs)
-    for more details on how sandbox is used for testing the consensus algorithm.
+```toml
+[dev-dependencies]
+exonum-testkit = "0.5.0"
+```
 
 !!! note
-    The validator numbers correspond to the validator keys in the
-    [`validators` list](../architecture/configuration.md#genesis) specified in
-    the global configuration.
+    The newest version of the testkit crate may differ from the one specified above.
+    To find out the newest version, you may look at [the repository page on crates.io][exonum-testkit].
+    Each release of the testkit crate is compatible with the specific version
+    of the core Exonum library; the minor version of the testkit coincides
+    with the minor version of the Exonum library it supports.
 
-The example below shows how sandbox could be used to check `Connect` message
-exchange.
+## Simple usage
+
+### Transactions testing
+
+The primary goal of this kind of tests is to check the business logic of your service,
+encapsulated in the [`execute` method][Transaction.execute] of transactions.
+
+For writing your first test create `tests` directory according to the cargo
+[integration testing manual][integration-tests].
+After that, create file `tests/transactions.rs` with the content similar
+to the one written below.
 
 ```rust
+extern crate exonum;
+extern crate exonum_testkit;
+extern crate my_service;
+
+use my_service::{MyService, MyTransaction, MySchema};
+use exonum_testkit::TestKitBuilder;
+
 #[test]
-fn test_sandbox_recv_and_send() {
-    let s = sandbox_with_services(vec![Box::new(ConfigUpdateService::new())]);
-    let (public, secret) = gen_keypair();
-
-    // Simulate receiving "Connect" message by the node
-    s.recv(Connect::new(&public, s.a(2), s.time(), &secret));
-
-    // Check if the node has sent the "Connect" message
-    s.send(s.a(2), Connect::new(&s.p(0), s.a(0), s.time(), s.s(0)));
+fn test_my_tx() {
+    // Create simple testkit network.
+    let mut testkit = TestKitBuilder::validator()
+        .with_service(MyService::new())
+        .create();
+    // Create transaction.
+    let tx = MyTransaction::new(...);
+    // Commit it into blockchain.
+    testkit.create_block_with_transactions(txvec![tx]);
+    // Check the expected result.
+    let snapshot = testkit.snapshot();
+    let schema = MySchema::new(&snapshot);
+    assert!(schema.is_my_data_checked());
 }
 ```
 
-## Service Testing
-
-To test a certain set of the services, one should pass the services list to the
-sandbox constructor:
+Make sure that you have full coverage of the business logic in the `execute` method
+of your transactions. If you just want to check the `verify` logic in the transaction,
+you can do it without testkit in a simple way:
 
 ```rust
-let s = sandbox_with_services(vec![Box::new(TimestampingService::new()),
-                                   Box::new(ConfigUpdateService::new())]);
+let tx = MyTransaction::new(...);
+assert!(tx.verify());
 ```
 
-A service should be tested by committing the service transaction and observing
-subsequent changes in the blockchain and the storage state.
-
-!!! note
-    Transaction constructors are service-specific.
-
-!!! tip
-    See source code for more details on how sandbox is used for testing
-    [the configuration update service](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/lib.rs)
-    and [the anchoring service](https://github.com/exonum/exonum-btc-anchoring/tree/master/sandbox_tests/tests).
-
-## Service Endpoints Testing
-
-!!! note
-    Each service should provide its own interface for sandbox testing of the
-    service endpoints.
-
-The example below shows how sandbox could be used to check `actual_config`
-endpoint of the configuration update service.
+Testkit also allows to check different orderings of transactions, including transactions
+for multiple services. This could allow to more efficiently test margin cases
+that are quite difficult (but not impossible) to produce in the real network.
 
 ```rust
-#[test]
-fn test_get_actual_config() {
-    let _ = init_logger();
+let mut testkit = TestKitBuilder::validator()
+    .with_service(MyService::new())
+    .with_service(OtherService::new())
+    .create();
+// Create transactions.
+let tx1 = MyTransaction::new(...);
+let tx2 = OtherTransaction::new(...);
+// Commit them into the blockchain.
+testkit.create_block_with_transactions(txvec![tx1, tx2]);
+// Check the expected result.
+```
 
-    // Create sandbox for testing configuration update service endpoints
-    let api_sandbox = ConfigurationApiSandbox::new();
+### API testing
 
-    // Read current configuration
-    let sand_cfg = api_sandbox.sandbox.cfg();
-    let expected_body = ApiResponseConfigHashInfo {
-        hash: sand_cfg.hash(),
-        config: sand_cfg,
-    };
+The basic workflow for testing API endpoints of an Exonum service
+with the testkit is as follows:
 
-    // Read current configuration via REST API
-    let resp_actual_config = api_sandbox.get_actual_config().unwrap();
-    let actual_body = response_body(resp_actual_config);
+1. Define the `MyServiceApi` trait for the `TestKitApi` structure that covers
+  the whole API of your service.
+2. Implement functions that use some transactions as test data to fill the storage.
+3. Create the tests that check all of your endpoints.
 
-    // Compare current configuration with GET response
-    assert_eq!(actual_body, serde_json::to_value(expected_body).unwrap());
+```rust
+// API trait definition.
+trait MyServiceApi {
+    fn get_public_data(&self) -> PublicDataResponse;
+    fn get_private_data(&self) -> PrivateDataResponse;
+    fn post_private_data(&self, data: &PrivateData)
+        -> PostPrivateDataResponse;
 }
+
+impl MyServiceApi for TestKitApi {
+    fn get_public_data(&self) -> PublicDataResponse {
+        self.get(
+            ApiKind::Service("my_service"),
+            "/v1/first_endpoint",
+        )
+    }
+
+    fn get_private_data(&self) -> PrivateDataResponse {
+        self.get_private(
+            ApiKind::Service("my_service"),
+            "/v1/second_endpoint",
+        )
+    }
+
+    fn post_private_data(&self, data: &PrivateData)
+        -> PostPrivateDataResponse
+    {
+        self.post(
+            ApiKind::Service("my_service"),
+            "v1/third_endpoint",
+            data,
+        )
+    }
+}
+
+#[test]
+fn my_api_test() {
+    let mut testkit = TestKitBuilder::validator()
+        .with_service(MyService::new())
+        .create();
+    fill_storage_with_data(&mut testkit);
+    // Check API responses
+    let api = testkit.api();
+    assert_eq!(
+        api.get_public_data(),
+        ApiResponsePublicData::new(...),
+    );
+    ...
+}
+
+// Other tests...
+```
+
+In some situations, it can be useful to see the content of requests and
+corresponding responses. `exonum-testkit` provides simple logging
+implementation for this purpose.
+You can use `RUST_LOG` environment variable to enable logs:
+
+```sh
+RUST_LOG=exonum_testkit=trace cargo test
+```
+
+## Advanced Usage
+
+The testkit allows to test more complex behaviors of Exonum services,
+such as getting data from external sources and reconfiguring the service.
+
+### Oracles Testing
+
+The *oracle* is a service which can produce transactions
+with external data after commit of the block.
+[The Bitcoin anchoring service](bitcoin-anchoring.md) is an example of an oracle.
+Just like a real Exonum node, the testkit maintains a pool of unconfirmed transactions
+(aka the *mempool*). Thus, transactions created by the oracle service
+during the [`handle_commit`][Service.handle_commit] execution
+will be stored in `TestKit` memory pool and can be verified accordingly.
+
+```rust
+// Create testkit with the service which creates transaction
+// with the height of the latest committed block after commit.
+let mut testkit = TestKitBuilder::validator()
+    .with_service(HandleCommitService)
+    .create();
+
+// Call the `handle_commit` event.
+testkit.create_block();
+
+// Check that `handle_commit` has been invoked
+// at the correct height.
+let tx = TxAfterCommit::new_with_signature(
+    Height(1),
+    &Signature::zero(),
+);
+assert!(testkit.mempool().contains_key(&tx.hash()));
 ```
 
 !!! tip
-    See [source code](https://github.com/exonum/exonum-configuration/blob/master/sandbox_tests/src/api_tests.rs)
-    for more details on how sandbox is used for testing the configuration update
-    service endpoints.
+    In order to invoke a `handle_commit` event, you need to create a block
+    with one of the `create_block*` methods of the testkit.
+
+If the oracle has to fetch any data from external world, you need to create
+a mock object that would generate said external data to accomplish testing.
+
+```rust
+// Provide a mock object for the service.
+let mut cruel_world = ExternalApiMock::new();
+let mut testkit = TestKitBuilder::validator()
+    .with_service(
+        MyOracleService::with_client(cruel_world.client()),
+    )
+    .create();
+
+// Expect a request from the service.
+cruel_world.expect_api_call(ApiCallInfo { ... })
+    .with_response_ok(ApiResponse { ... });
+
+// Call the `handle_commit` event.
+testkit.create_block();
+let expected_tx = MyOracleTx::new(...);
+
+// Check that the expected transaction is in the memory pool.
+assert!(testkit.mempool().contains_key(&expected_tx.hash()));
+```
+
+### Configuration Changes Testing
+
+If an Exonum service has its own [configuration][service-config],
+you may need to test the response to a configuration change.
+To do this with the testkit, you can create a configuration change proposal
+and then commit it.
+
+```rust
+let mut testkit = TestKitBuilder::validator()
+    .with_service(MyOracleService::new())
+    .create();
+
+// Create a configuration change proposal.
+let proposal = {
+    let mut cfg = testkit.configuration_change_proposal();
+    cfg.set_actual_from(cfg_change_height);
+    cfg.set_service_config(
+        "my_service",
+        MyServiceCfg { ... },
+    );
+    cfg
+};
+let stored = proposal.stored_configuration().clone();
+testkit.commit_configuration_change(proposal);
+
+// Check that there is no following configuration scheduled
+// before a block is created, and the proposal is committed.
+use exonum::blockchain::Schema;
+assert_eq!(
+    Schema::new(&testkit.snapshot())
+        .following_configuration(),
+    None
+);
+testkit.create_block();
+// Check that the following configuration is now scheduled.
+assert_eq!(
+    Schema::new(&testkit.snapshot())
+        .following_configuration(),
+    Some(stored)
+);
+```
+
+[exonum-testkit]: https://crates.io/crates/exonum-testkit
+[dev-dep]: http://doc.crates.io/specifying-dependencies.html#development-dependencies
+[Transaction.execute]: ../architecture/transactions.md#execute
+[integration-tests]: https://doc.rust-lang.org/book/second-edition/ch11-03-test-organization.html#integration-tests
+[exonum-btc-anchoring]: https://github.com/exonum/exonum-btc-anchoring
+[Service.handle_commit]: ../architecture/services.md#commit-handler
+[service-config]: ../architecture/services.md#configuration

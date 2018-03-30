@@ -4,9 +4,10 @@ The [Exonum core project][exonum] and [other public Exonum repositories][exonum-
 operate an open contributor model where anyone is welcome to contribute
 towards development in the form of peer review, testing and patches.
 This document explains the practical process and guidelines for contributing.
+It is partially derived from [the Bitcoin contribution guide][btc-contrib].
 
-!!! note
-    This contribution guide is partially derived from [the Bitcoin contribution guide][btc-contrib].
+See a [guide in the core Exonum repository][tech-guide] for more technical details
+how to contribute.
 
 !!! summary "TL;DR"
     Use pull requests, use [git commit message conventions][git:messages],
@@ -48,6 +49,11 @@ Issues are commonly tagged by their relevance,
 topic and milestone, which should provide some insight into most topical
 issues relevant to your expertise.
 
+Another option with low entry barrier is contributing to Exonum documentation,
+which is also [open-sourced](https://github.com/exonum/exonum-doc).
+You can jump to the source of a particular documentation page by clicking
+a pencil icon at the top of the page.
+
 !!! tip
     Besides GitHub, Exonum issues and solutions are discussed on [gitter][gitter]
     and [Reddit][reddit].
@@ -56,14 +62,9 @@ issues relevant to your expertise.
 
 In general [commits should be atomic](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
 and diffs should be easy to read. For this reason do not mix any formatting fixes
-or code moves with actual code changes.
-
-Commit messages should be verbose by default consisting of a short subject line
-(50 chars max), a blank line and detailed explanatory text as separate paragraph(s);
-unless the title alone is self-explanatory (like “Correct typo in init.rs”)
-then a single title line is sufficient.
-Commit messages should be helpful to people reading your code in the future,
-so explain the reasoning for your decisions.
+or code moves with actual code changes. However, we merge pull requests using the
+“squash-and-merge” strategy, so commit messages are only important for the review
+stage.
 
 !!! tip
     Further explanation about commit message conventions is available [here][git:messages].
@@ -77,10 +78,6 @@ If a particular commit references another issue or PR, please add the reference,
 for example `refs #1234`, or `fixes #4321`.
 Using the `fixes` or `closes` keywords will cause the corresponding issue
 to be closed when the pull request is merged.
-
-!!! tip
-    Please refer to the [Git manual](https://git-scm.com/doc) for more information
-    about Git.
 
 ### Testing PRs Locally
 
@@ -226,7 +223,7 @@ easy to review and uncontroversial. In all cases, refactoring PRs must not chang
 the behavior of code within the pull request (bugs must be preserved as is).
 
 Project maintainers aim for a quick turnaround on refactoring pull requests,
-so where possible keep them short, uncomplex and easy to verify.
+so where possible keep them short, non-complex and easy to verify.
 
 ## Decision Making Process
 
@@ -307,6 +304,7 @@ Any work contributed where you are not the original author
 must contain its license header with the original author(s) and source.
 
 [btc-contrib]: https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md
+[tech-guide]: https://github.com/exonum/exonum/blob/master/CONTRIBUTING.md
 [exonum]: http://github.com/exonum/exonum/
 [exonum-org]: http://github.com/exonum/
 [gh:pr]: https://help.github.com/articles/about-pull-requests/

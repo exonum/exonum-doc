@@ -1,5 +1,7 @@
 # Configuration Update Service
 
+<!-- cspell:ignore postvote -->
+
 **Configuration update service** allows modifying [the global configuration](../architecture/configuration.md)
 by the means of *proposing* a new configuration and *voting* for proposed configurations
 among the validators.
@@ -76,7 +78,7 @@ equal to `/api/services/configuration/v1`.
 
 ### Types
 
-As per [Google Closure Compiler][closurec] conventions,
+As per [Google Closure Compiler][closure] conventions,
 `?` before the type denotes a nullable type, and `=` after the type denotes
 an optional type.
 
@@ -104,8 +106,14 @@ config][stored_configuration] serialization. It has the following fields:
   Consensus-specific configuration parameters.
 - **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
-- **consensus.propose_timeout**: integer  
-  Proposal timeout (ms) after the new height beginning.
+- **consensus.timeout_adjuster**: Object  
+  [Settings][ta-config] for the proposal timeout adjuster.
+- **consensus.timeout_adjuster.type**:  
+  `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
+  Timeout adjuster type.
+- **consensus.timeout_adjuster.timeout**: integer  
+  Proposal timeout (ms) after the new height beginning.  
+  Used with the `"Constant"` adjuster.
 - **consensus.round_timeout**: integer  
   Interval (ms) between rounds.
 - **consensus.status_timeout**: integer  
@@ -114,6 +122,12 @@ config][stored_configuration] serialization. It has the following fields:
   Maximum number of transactions per block.
 - **services**: Object  
   Service-specific configuration parameters.
+  
+!!! note
+    **consensus.round_timeout** integer must be strictly larger
+    (recommended at least 2x) than **consensus.timeout_adjuster.timeout**
+    integer. Otherwise, the consensus algorithm will stop working correctly
+    (a new block will never be accepted).
 
 #### Propose
 
@@ -128,8 +142,8 @@ config][config_propose] serialization. It has the following fields:
   String containing JSON serialization of proposed configuration.
 - **votes_history_hash**: Hash  
   Hash of the proposed configuration.
-- **num_votes**: integer  
-  Number of votes for the proposed configuration.
+- **num_validators**: integer  
+  Number of validators that can vote for the proposal.
 
 ## Read Requests
 
@@ -236,7 +250,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
@@ -265,7 +279,7 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_config_hash**: Hash=  
+- **previous_cfg_hash**: Hash=  
   If present, filters configurations by the specified previous configuration hash.
 - **actual_from**: integer=  
   If present, filters configurations by the specified minimum for the height
@@ -407,8 +421,9 @@ JSON object with the following fields:
   Hash of the corresponding `TxConfigVote` transaction.
 
 [stored_configuration]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/config.rs
-[config_propose]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
-[http_api]: https://github.com/exonum/exonum-configuration/blob/master/doc/testnet-api-tutorial.md#global-variable-service-http-api
-[response_samples]: https://github.com/exonum/exonum-configuration/blob/master/doc/response-samples.md
-[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[config_service_source]: https://github.com/exonum/exonum-configuration/blob/master/src/lib.rs
+[config_propose]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
+[http_api]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/testnet-api-tutorial.md#global-variable-service-http-api
+[response_samples]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/response-samples.md
+[closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
+[ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html

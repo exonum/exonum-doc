@@ -1,3 +1,6 @@
+---
+title: Consensus specification
+---
 # Consensus Algorithm Specification
 
 This article contains the specification of [the consensus algorithm](../../glossary.md#consensus)

@@ -1,26 +1,28 @@
 site_name: Exonum Documentation
 docs_dir: src
-theme: material
-theme_dir: theme
+theme:
+  name: material
+  favicon: 'assets/images/favicon.ico'
+  logo: 'assets/images/logo.svg" alt="Exonum Logo'
+  custom_dir: theme
+  palette:
+    primary: 'light green'
+    accent: 'lime'
+
 extra_css:
   - assets/stylesheets/extra.css
 repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
+edit_uri: 'doc/blob/master/src'
 
-site_url: 'http://exonum.com/doc/'
-site_author: 'BitFury Group'
+site_url: 'https://exonum.com/doc'
+site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
-site_favicon: 'images/favicon.ico'
 
-copyright: © 2017 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2018 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
-  og_image: 'images/logo-square.jpg'
-  logo: 'images/logo.svg" alt="Exonum Logo'
-  github_edit_url: https://github.com/exonum/exonum-doc/edit/master/src/
-  palette:
-    primary: 'light green'
-    accent: 'lime'
+  og_image: 'assets/images/logo-docs.png'
   social:
     - type: 'github'
       link: 'https://github.com/exonum'
@@ -49,6 +51,8 @@ pages:
     - 'Install': 'get-started/install.md'
     # Writing one's first Exonum service
     - 'Create service': 'get-started/create-service.md'
+    # Testing one's first Exonum service
+    - 'Test service': 'get-started/test-service.md'
   - 'Architecture':
     # Includes guidelines for services
     - 'Services': 'architecture/services.md'
@@ -75,6 +79,8 @@ pages:
     - 'Configuration updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
     - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
+    # Time service
+    - 'Time oracle': 'advanced/time.md'
     # Merkle index overview
     - 'Merkelized list': 'advanced/merkelized-list.md'
     - 'Consensus':

@@ -1,7 +1,9 @@
 # Node management
 
+<!-- cspell:ignore nanos -->
+
 Exonum nodes can be controlled using RPC implemented via REST API. Managing
-endpoints are handled by Exonum сore and are mainly purposed to receive
+endpoints are handled by Exonum core and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
 
@@ -12,7 +14,7 @@ configuration.
 
 ## Types
 
-As per [Google Closure Compiler][closurec] conventions,
+As per [Google Closure Compiler][closure] conventions,
 `?` before the type denotes a nullable type, and `=` after the type denotes
 an optional type.
 
@@ -155,7 +157,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **size**: integer  
   Amount of unconfirmed transactions
@@ -168,6 +170,33 @@ JSON object with the following fields:
 }
 ```
 
+### Healthcheck
+
+```none
+GET {system_base_path}/healthcheck
+```
+
+Returns a boolean value representing if the node is connected to other peers.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON object with the following fields:
+
+- **connectivity**: bool  
+  Indicates whether the node is connected to the other peers.
+
+#### Response example
+
+```JSON
+{
+  "connectivity": true
+}
+```
+
 ### Transaction
 
 ```none
@@ -175,13 +204,6 @@ GET {system_base_path}/transactions/{transaction_hash}
 ```
 
 Searches for a transaction, either committed or uncommitted, by the hash.
-
-!!! warning "Quirky behavior"
-    As of Exonum 0.2, the returned information about a transaction is only
-    accurate if the transaction type redefines the default [`info()`][info-method]
-    implementation, for example, to return JSON serialization of the transaction.
-    If `info()` is *not* redefined, the
-    endpoint will always return `null` as the transaction information.
 
 #### Parameters
 
@@ -302,6 +324,32 @@ Response is a JSON object with the following fields:
 }
 ```
 
+### User agent info
+
+```None
+GET {system_base_path}/user_agent
+```
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl http://127.0.0.1:7780/api/system/v1/user_agent
+```
+
+#### Response
+
+Returns string containing information about Exonum, Rust and OS version.
+
+#### Response example
+
+```None
+"exonum 0.6.0/rustc 1.26.0-nightly (2789b067d 2018-03-06)\n\n/Mac OS10.13.3"
+```
+
 ## Private endpoints
 
 ### Add new peer
@@ -345,7 +393,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **incoming_connections**: Array<PeerAddress\>  
   List of addresses of peers connected to this node
@@ -393,6 +441,52 @@ JSON object with the following fields:
 }
 ```
 
+### Consensus Enabled Info
+
+```none
+GET {system_base_path}/consensus_enabled
+```
+
+Returns a boolean value representing if the node participates in consensus.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON boolean.
+
+#### Response Example
+
+```JSON
+true
+```
+
+### Enabled/Disable Consensus Interaction
+
+```none
+POST {system_base_path}/consensus_enabled
+```
+
+Switches consensus interaction of the node on or off.
+
+#### Parameters
+
+- **enabled**: `bool`
+
+#### Example
+
+```None
+curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0.0.1:7780/api/system/v1/consensus_enabled
+```
+
+#### Response
+
+```None
+"Ok"
+```
+
 ### Network info
 
 ```none
@@ -408,7 +502,7 @@ None.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **network_id**: integer  
   Network ID. Is not used currently
@@ -430,6 +524,32 @@ JSON object with the following fields:
     }
   ]
 }
+```
+
+### Shutdown
+
+```none
+POST {system_base_path}/shutdown
+```
+
+After receiving a shutdown message, the node stops processing
+transactions, participating in consensus and terminates after
+all messages in the event queue are processed.
+
+#### Parameters
+
+None.
+
+#### Example
+
+```none
+curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
+```
+
+#### Response
+
+```none
+"Ok"
 ```
 
 ## Explorer API endpoints
@@ -455,7 +575,7 @@ Returns the content for a block of a specific height.
 
 #### Response
 
-JSON object with the following fields:
+A JSON object with the following fields:
 
 - **block**: BlockHeader  
   The header of the specified block
@@ -638,6 +758,5 @@ and response
 That is, to collect `5` non-empty blocks from the tail of the blockchain,
 range from `100` to `2` has been traversed.
 
-[closurec]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockhain_explorer.rs
-[info-method]: ../architecture/transactions.md#info
+[closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs

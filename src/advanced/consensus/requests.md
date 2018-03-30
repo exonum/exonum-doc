@@ -1,4 +1,9 @@
+---
+title: Requests in consensus algorithm
+---
 # Requests in Consensus Algorithm
+
+<!-- cspell:ignore requestor’s -->
 
 **Requests** are used to obtain unknown information from nodes that signal the
 presence of such information via consensus messages (for example, via a message
@@ -60,7 +65,7 @@ Byzantine. The receiving node saves this information in
 `Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
 and take 32 bytes.
 
-`u32` and `u64` are nonnegative integers of appropriate size (4 and 8 bytes).
+`u32` and `u64` are non-negative integers of appropriate size (4 and 8 bytes).
 
 `BitVec` is a bit vector containing as many bits as there are validators in
 the system.
@@ -70,7 +75,7 @@ the system.
 Requests a `Propose` message from a node. It has the following fields:
 
 - **from**: PublicKey  
-  Requestor's public key.
+  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
@@ -83,7 +88,7 @@ Requests a `Propose` message from a node. It has the following fields:
 Requests transactions from a node. It has the following fields:
 
 - **from**: PublicKey  
-  Requestor's public key.
+  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **txs**: Array<Hash\>  
@@ -95,7 +100,7 @@ Requests `Prevote` messages from a node. It
 has the following fields:
 
 - **from**: PublicKey  
-  Requestor's public key.
+  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
@@ -117,7 +122,7 @@ has the following fields:
 Requests a committed block from a node. It has the following fields:
 
 - **from**: PublicKey  
-  Requestor's public key.
+  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 - **height**: u64  
@@ -131,7 +136,7 @@ defined in [the global configuration][config#global-parameters].
 It has the following fields:
 
 - **from**: PublicKey  
-  Requestor's public key.
+  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 
@@ -170,7 +175,7 @@ cancel the corresponding `TransactionsRequest`.
   sent earlier.
 
 All events below are applicable only if the height of the message is the same as
-the validator's height.
+the validator’s height.
 
 ### Receiving `Propose`
 

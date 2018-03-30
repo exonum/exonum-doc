@@ -1,11 +1,16 @@
 # Generic rules
 .*
+!.github/
 !.gitignore
 !.travis.yml
 
 # IDE files
 !.editorconfig
 *.iml
+
+# Node files
+node_modules/
+npm-debug.log
 
 # Generated docs
 site/

@@ -5,7 +5,7 @@ connected via peer-to-peer connections, and
 [light clients](../glossary.md#light-client).
 Full nodes communicate with each other
 using [Exonum binary serialization format](../glossary.md#binary-serialization)
-over TCP, and clients interact with full nodes via a RESTful service interface.
+over TCP, and clients interact with full nodes via REST service interface.
 
 ## Network Structure
 
@@ -119,7 +119,7 @@ Transactions from light clients are authenticated with the help of
 signatures, which are the part of JSON serialization of transactions. Read
 requests are generally not authenticated.
 
-Full nodes use [Iron framework](http://ironframework.io/) to implement RESTful
+Full nodes use [Iron framework](http://ironframework.io/) to implement REST
 HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration.
@@ -136,7 +136,7 @@ to be unique within a specific Exonum blockchain.
 !!! note
     There is no unified format for naming endpoints (e.g., passing parameters
     for GET endpoints via path components and/or query parameters).
-    Thus, services need to use best practices for RESTful services.
+    Thus, services need to use best practices for REST services.
 
 !!! note "Example"
     The [configuration update service](configuration-updater.md) defines the

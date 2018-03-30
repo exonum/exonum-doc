@@ -1,5 +1,7 @@
 # Exonum Serialization Format
 
+<!-- cspell:ignore cap'n -->
+
 **Binary serialization format** is used in Exonum for communication
 among full nodes, cryptographic operations on [light clients](../architecture/clients.md)
 and storage of data. The format design provides several important properties,
@@ -180,6 +182,35 @@ little endian.
 `0x01` for true, `0x00` for false. A message with other value stored in place
 of `bool` will not pass validation. Size: 1 byte.
 
+### Floating Point Types
+
+`f32`, `f64`  
+Correspond to floating point types in Rust. The types are stored in little endian
+per `binary32` and `binary64` formats of the IEEE 754 standard. Infinities,
+not-a-number (NaN) values, [denormalized values][subnormal_fp]
+and the negative zero are not supported; they cannot
+be serialized or deserialized.
+
+!!! note
+    Support of serialization of floating point types is hidden behind
+    the `float_serialize` [feature gate][cargo_features] and is disabled by default.
+    To enable the feature, specify the `exonum` dependency in the `Cargo.toml` file
+    of your project as
+
+    ```toml
+    [dependencies]
+    # Other dependencies...
+    exonum = { version = "0.5.0", features = [ "float_serialize" ] }
+    ```
+
+    (The version of the Exonum library may differ.)
+
+!!! warning
+    Use of floating-point arithmetic may lead to hard-to-trace errors and
+    loss of consensus among the nodes in the blockchain due to non-deterministic
+    character of some floating-point operations. Consider using fixed-point
+    arithmetic whenever possible.
+
 ## Aggregate Types
 
 ### Byte Buffers
@@ -250,16 +281,14 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 ```Rust
 encoding_struct! {
     struct Pair {
-        const SIZE = 8;
-        field first: u32 [00 => 04]
-        field second: u32 [04 => 08]
+        first: u32,
+        second: u32,
     }
 }
 
 encoding_struct! {
     struct Pairs {
-        const SIZE = 8;
-        field inner: Vec<Pair> [00 => 08]
+        inner: Vec<Pair>,
     }
 }
 ```
@@ -274,8 +303,8 @@ message! {
     struct MessagePairs {
         const TYPE = 42;
         const ID   = 5;
-        const SIZE = 8;
-        field inner: Vec<Pair> [00 => 08]
+
+        inner: Vec<Pair>,
     }
 }
 ```
@@ -285,7 +314,7 @@ message! {
 A slice is a data structure consisting of an arbitrary number of same type elements.
 A slice is stored so that the position of each element can be computed from its
 index. Slice elements are located in memory without gaps in the order of
-increasing their indexes.
+increasing their indices.
 
 Slices like structures have header and body. Each element takes 8 bytes in the
 header for a corresponding segment pointer. If slice consists of fixed-length
@@ -409,10 +438,9 @@ message! {
     struct MessageTwoIntegers {
         const TYPE = MY_NEW_MESSAGE_ID;
         const ID   = MY_SERVICE_ID;
-        const SIZE = 16;
 
-        field first: u64 [0 => 8]
-        field second: u64 [8 => 16]
+        first: u64,
+        second: u64,
     }
 }
 ```
@@ -425,7 +453,6 @@ having type `u64`.
 The current version does not support the serialization of the following types,
 but it is planned to be implemented in future:
 
-- Floating point types: `f32`, `f64`
 - [Enums][rust_enums]
 
 ## Example
@@ -446,26 +473,21 @@ To serialize the structure, one may use macros like this:
 ```Rust
 encoding_struct! {
     struct Wallet {
-        const SIZE = 48;
-
-        field pub_key:            &PublicKey  [00 => 32]
-        field owner:              &str        [32 => 40]
-        field balance:            u64         [40 => 48]
+        pub_key: &PublicKey,
+        owner: &str,
+        balance: u64,
     }
 }
-
-// `encoding_struct` macro defines a constructor (`new`) and field access methods
-// (`pub_key`, `owner`, `balance`) automatically.
+// `encoding_struct` macro defines a constructor (`new`)
+// and field access methods (`pub_key`, `owner`, `balance`) automatically.
 
 let pub_key_str = "99ace6c721db293b0ed5b487e6d6111f\
                    22a8c55d2a1b7606b6fa6e6c29671aa1";
+let pub_key = PublicKey::from_hex(pub_key_str).unwrap();
+let my_wallet = Wallet::new(&pub_key, "Andrew", 1234);
 
-let pub_key_hex = HexValue::from_hex(pub_key_str).unwrap();
-let my_wallet = Wallet::new(&pub_key_hex, "Andrew", 1234);
-
-// check structure content
-
-assert_eq!(my_wallet.pub_key().to_hex(), pub_key_str);
+// Check structure content
+assert_eq!(my_wallet.pub_key().to_string(), *pub_key_str);
 assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
@@ -474,10 +496,8 @@ let expected_buffer_str = pub_key_str.to_owned() + // Public key
                           "06000000" +             // Segment size
                           "d204000000000000" +     // Balance
                           "416e64726577";          // Name
-
-let expected_buffer: Vec<u8> = HexValue::from_hex(&expected_buffer_str)
-                                       .unwrap();
-
+let expected_buffer = Vec::<u8>::from_hex(&expected_buffer_str)
+    .unwrap();
 assert_eq!(my_wallet.serialize(), expected_buffer);
 ```
 
@@ -485,11 +505,11 @@ Serialized representation of `my_wallet`:
 
 | Position | Stored data  | Hexadecimal form | Comment |
 |:--------|:------:|:---------------------|:--------------------------------------------------|
-`0 => 32`  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
-`32  => 36`  | 48    | `30 00 00 00`            | Little endian stored segment pointer, refer to position in data where real string is located |
-`36  => 40`  | 6     | `06 00 00 00`            | Little endian stored segment size |
-`40  => 48` | 1234   | `d2 04 00 00 00 00 00 00`| Number in little endian |
-`48 => 54` | Andrew| `41 6e 64 72 65 77`       | Text bytes in UTF-8 encoding |
+0..32  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
+32..36  | 48    | `30 00 00 00`            | A little endian segment pointer that refers to the string position in the serialization buffer |
+36..40  | 6     | `06 00 00 00`            | A little endian segment size |
+40..48 | 1234   | `d2 04 00 00 00 00 00 00` | A number in little endian format |
+48..54 | Andrew | `41 6e 64 72 65 77`       | UTF-8 string converted into a byte array |
 
 [message_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/spec.rs
 [encoding_struct_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/encoding/spec.rs
@@ -507,3 +527,5 @@ Serialized representation of `my_wallet`:
 [cryptocurrency]: https://github.com/exonum/cryptocurrency
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust]: http://rust-lang.org/
+[cargo_features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
+[subnormal_fp]: https://en.wikipedia.org/wiki/Denormal_number

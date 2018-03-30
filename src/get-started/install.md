@@ -1,4 +1,9 @@
+---
+title: Installation guide
+---
 # Installation Guide
+
+<!-- cspell:ignore ppas -->
 
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
@@ -21,10 +26,6 @@ Exonum depends on the following third-party system libraries:
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
 
-!!! note
-    Before version 0.3, Exonum supported [LevelDB][leveldb] as an alternative
-    storage engine. In [0.3 release][rel0.3.0], the support for LevelDB was dropped.
-
 You can find instructions how to install dependencies in various environments
 below.
 
@@ -42,7 +43,7 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
-apt-get install build-essential libsodium-dev \
+apt-get install build-essential libsodium-dev libsnappy-dev \
     librocksdb-dev pkg-config
 ```
 
@@ -55,7 +56,32 @@ these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
-Workability is not guaranteed yet.
+Exonum is a little behind supporting Windows OS compared to Linux and MacOS.
+In many Windows setups, Exonum will work just fine, but there are known problems
+with its compilation in certain configurations. If you have encountered a problem
+with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
+or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
+
+## Adding environment variables
+
+If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
+you may setup `ROCKSDB_LIB_DIR` and/or `SNAPPY_LIB_DIR` environment variable
+to point to a directory with these libraries.
+This will significantly reduce compile time.
+
+### MacOS
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/local/lib
+export SNAPPY_LIB_DIR=/usr/local/lib
+```
+
+### Linux
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+```
 
 ## Rust Toolchain
 
@@ -66,8 +92,22 @@ by using the [rustup](https://www.rustup.rs) program:
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 ```
 
-The toolchain includes the Rust compiler (`rustc`) and several utilities,
+For Windows, download and run `rustup-init.exe` from [the rustup website](https://www.rustup.rs/)
+instead.
+
+The Rust toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
+
+!!! note
+    Exonum is guaranteed to be compatible with
+    the latest stable Rust toolchain, which can be obtained as specified above.
+    Other recent toolchains may work too; see
+    [the Exonum main repository readme][readme] to find out
+    a precise range of supported Rust versions.
+    Older toolchains (for example, those that come with Linux
+    distributions) might cause Exonum compilation to fail, as Exonum uses
+    some new language features. Please use rustup to install a compatible toolchain
+    in this case.
 
 ## Compiling Exonum
 
@@ -107,12 +147,12 @@ is tested on Node 4+.
 guide on how to develop applications on top of the Exonum framework.
 
 [exonum]: https://github.com/exonum/exonum/
+[readme]: https://github.com/exonum/exonum/#readme
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
 [libsodium]: https://download.libsodium.org/doc/
-[openssl]: http://openssl.org/
 [homebrew]: https://brew.sh/
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client

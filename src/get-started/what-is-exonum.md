@@ -11,7 +11,7 @@ In the terms of data management, blockchains provide [OLTP][wiki:oltp] capabilit
 a blockchain processes transactions (which are quite similar to [transactions][wiki:tx]
 in ordinary database management systems) and changes the stored values correspondingly.
 
-Compared to commonplace OLTP solutions, the use of blockchain brings several distinctive
+Compared to commonplace OLTP solutions, use of blockchain brings several distinctive
 advantages.
 
 ### Distribution
@@ -25,8 +25,9 @@ blockchains are resistant against much wider range of attacks:
   isolated from the rest of the network, or even completely compromised (say, by
   a hacker)
 - Blockchains can be deployed in a decentralized network, where there is no single
-  administrator managing all nodes. This significantly reduces risks of data corruption
-  and the bias in the system (e.g., preferential treatment of some participants)
+  administrator managing all the nodes. This significantly reduces risks of data
+  corruption and the bias in the system (e.g., preferential treatment of some
+  participants)
 
 ### Reliable Audit Trail
 
@@ -83,7 +84,7 @@ easily convey the compliance to transaction processing rules for external partie
 ### Transparency
 
 The Exonum framework codifies the ever-increasing role of transparency in the
-modern world. Exonum provides a rich toolset to define the correct system operation,
+modern world. Exonum provides a rich set of tools to define the correct system operation,
 and allows external parties (e.g., regulators, auditors and end clients of the system)
 to continuously verify the system operation against these definitions.
 
@@ -137,7 +138,7 @@ in enterprise platforms; they have the same principal components.
 
 #### Endpoints
 
-A service has a set of endpoints (realized as RESTful APIs) using which
+A service has a set of endpoints (realized as REST APIs) using which
 the service can communicate with the outside world. The Exonum framework acts
 as middleware, dispatching requests among services and abstracting the intricacies
 of data (de)serialization, access control, and other typical middleware tasks
@@ -147,19 +148,19 @@ There are 3 types of service endpoints:
 
 - **Transactions** correspond to `PUT` or `POST` requests in REST
 - **Read requests** correspond to `GET` requests in REST
-- **Private APIs** represent administrative and maintenance endpoints, generally
-  are not accessible to the outside world
+- **Private APIs** represent administrative and maintenance endpoints,
+  generally not accessible to the outside world
 
 #### Persistence
 
 Exonum provides means for services to persist their data as scalars, or as
 data collections (maps and lists). The Exonum data storage engine provides
-powerful abstractions for *Merklized* collections. In such a collection,
+powerful abstractions for *Merkelized* collections. In such a collection,
 any element can be supplied with an unforgeable cryptographic proof
 that it belongs to the collection (without disclosing any other elements
 of the collection).
 
-With the help of Merklized collections, a service can provide strict proofs
+With the help of Merkelized collections, a service can provide strict proofs
 of data authenticity in response to read requests. This requires minimal involvement
 from the service developers – all heavy lifting is performed by the Exonum core.
 
@@ -167,9 +168,10 @@ from the service developers – all heavy lifting is performed by the Exonum cor
 
 Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
 to synchronize data among the nodes in the network.
-The Exonum network would continue operating even if up to 1/3 validators are hacked,
-compromised or switched off. Hence, there is no single point of failure
-in the network; the whole process of transaction processing is fully decentralized.
+The Exonum network would continue to operate even if up to 1/3 of validators are
+hacked, compromised or switched off. Hence, there is no single point of failure
+in the network; the whole process of transaction processing is fully
+decentralized.
 
 ### Light Clients
 

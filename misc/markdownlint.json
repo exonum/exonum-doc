@@ -1,0 +1,8 @@
+{
+  "default": true,
+  "no-duplicate-header": false,
+  "line-length": { "tables": false },
+  "ol-prefix": { "style": "ordered" },
+  "no-trailing-spaces": { "br_spaces": 2 },
+  "ul-indent": { "indent": 4 }
+}

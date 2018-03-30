@@ -9,14 +9,14 @@ that is, blockchains with the known set of blockchain infrastructure providers.
 Exonum uses [the Rust programming language][rust] to achieve utmost execution safety;
 [service-oriented architecture][wiki:soa] to provide extensibility, flexibility,
 and modularity; and client-side verification based on [cryptographic commitments][wiki:commitment]
-(Merkle and Merkle Patricia trees) to ensure the transparency of the system
+(Merkle and Merkle Patricia trees) to ensure transparency of the system
 and client security.
 
 ## Get Started
 
 ### Installation
 
-[Exonum][core] is a open-source Rust library providing core functionality
+[Exonum][core] is an open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
 You may refer to [the installation guide](get-started/install.md) in order to install
 the library together with its prerequisites.
@@ -51,8 +51,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 !!! tip
     See [the anchoring][anchoring] and [configuration update][config] services
-    for the examples of real-world Exonum services, and [the cryptocurrency tutorial][tutorial]
-    for an example how to use the light client library.
+    for the examples of real-world Exonum services.
 
 ### Specifications
 
@@ -72,6 +71,6 @@ what features are coming soon.
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/cryptocurrency-advanced
+[tutorial]: https://github.com/exonum/cryptocurrency
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
-[config]: https://github.com/exonum/exonum-configuration
+[config]: https://github.com/exonum/exonum/tree/master/services/configuration
