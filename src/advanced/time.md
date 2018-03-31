@@ -16,13 +16,13 @@ This logic should meet the following criteria:
 
 - **Using validators**. As Exonum is used to power permissioned blockchains,
   it is natural to assume that the inputs to business logic determining time
-  are supplied by validators. This assumption could be generalized to support
+  should be supplied by validators. This assumption could be generalized to support
   abstract semi-trusted identifiable entities, but for the sake of clarity,
   this article will center specifically on the case where time
   is determined by the validator nodes.
 - **Reliability**. The time value must be tolerant to the malicious behavior
   of validator nodes.
-- **Agreement**. The time must be the same on all the nodes to ensure that
+- **Agreement**. Time must be the same on all the nodes to ensure that
   transactions are executed in a deterministic manner. This means that the time
   should be written in the Exonum blockchain storage. Thus, the “current” time
   will be changing in the same way on all nodes during the execution of transactions,
@@ -46,7 +46,7 @@ validators.
 
 Each validator at a specific time sends a transaction indicating its local time
 (usually immediately after the commit of each block). The time service maintains
-an index with the most current time indicated separately by each validator.
+an index with the most current time values indicated separately by each validator.
 A 1/3 percentile of these values (ordered by decreasing time) is stored separately;
 this percentile is considered the actual time and is updated after each transaction
 from any of the validators. As we show [further](#proof-of-correctness),
@@ -105,14 +105,14 @@ since this value is reliable and, at the same time, the most recent one.
 
 ## REST API
 
-The service exposes the following API endpoints for the public API:
+The service exposes the following API endpoint for the public API:
 
 - [Get the current consolidated time](#current-time)
 
-The following endpoints are exposed for private API:
+The following endpoints are exposed for the private API:
 
 - [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
-- [Dump timestamps for all validators](#timestamps-of-all-validators)
+- [Dump timestamps of all validators](#timestamps-of-all-validators)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
@@ -238,7 +238,7 @@ will strictly grow monotonously.
 A possible alternative to implementing a time oracle as a service would be to
 integrate it into the consensus algorithm. This would work as follows:
 The validator includes its local time in each `Precommit` message.
-At the next height the leader includes +2/3 `Precommit`s of the previous block
+At the next height, the leader includes +2/3 `Precommit`s of the previous block
 into the `Propose`. The time median of these `Precommit`s is recorded into
 the header of the block obtained based on this `Propose`.
 
@@ -247,7 +247,7 @@ Advantages:
 - The time value would be indicated directly in the header of each block
   making it more accessible.
 - Time would be forcibly updated in the course of consensus operation:
-  it is impossible to sabotage the update of time without stopping the consensus.
+  it would be impossible to sabotage the update of time without stopping the consensus.
 - Blockchain would not be clogged by transactions associated with time determination.
 
 Disadvantages:
