@@ -9,7 +9,7 @@ requests to this service. The service accepts two types of transactions:
 creates a wallet with a default balance and transfers money between wallets.
 
 You can view and download the full source code of this tutorial
-[here](https://github.com/exonum/cryptocurrency).
+[here][cryptocurrency].
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
@@ -868,6 +868,7 @@ Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them. Next,
 [we are going to test it](test-service.md).
 
+[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
 [iron]: http://ironframework.io/
@@ -878,6 +879,6 @@ with two wallets and transferred some money between them. Next,
 [arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
 [ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
 [cargo-example]: http://doc.crates.io/manifest.html#examples
-[lib.rs]: https://github.com/exonum/cryptocurrency/blob/master/src/lib.rs
-[demo.rs]: https://github.com/exonum/cryptocurrency/blob/master/examples/demo.rs
+[lib.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/lib.rs
+[demo.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/examples/demo.rs
 [std-asref]: https://doc.rust-lang.org/std/convert/trait.AsRef.html
