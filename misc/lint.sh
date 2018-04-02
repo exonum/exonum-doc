@@ -41,6 +41,7 @@ lint_html () {
   html5validator --root "$SITE_DIR" --show-warnings --ignore-re \
     'Illegal character in query: "\|" is not allowed' \
     '"(autocorrect|autocapitalize)" not allowed on element "input"' \
+    '"autocomplete" is only allowed when the input type is' \
     '"align" attribute on the "(td|th)" element is obsolete' \
     'Document uses.* Unicode Private Use Area';
 }
