@@ -524,7 +524,7 @@ Serialized representation of `my_wallet`:
 [utf8]: https://en.wikipedia.org/wiki/UTF-8
 [rust_structs]: https://doc.rust-lang.org/book/first-edition/structs.html
 [rust_enums]: https://doc.rust-lang.org/book/first-edition/enums.html
-[cryptocurrency]: https://github.com/exonum/cryptocurrency
+[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust]: http://rust-lang.org/
 [cargo_features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
