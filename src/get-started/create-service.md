@@ -404,7 +404,8 @@ We want to implement 2 read requests:
 
 To accomplish this, we define a couple of corresponding methods in
 `CryptocurrencyApi`
-that use its `blockchain` field to read information from the blockchain storage.
+that use its `blockchain` field to read information from the blockchain
+ storage.
 
 ```rust
 impl CryptocurrencyApi {
@@ -444,7 +445,8 @@ As with the transaction endpoint, the methods have an idiomatic signature
 
 ### Wire API
 
-As the final step of the API implementation, we need to tie request processing logic to
+As the final step of the API implementation, we need to tie request
+processing logic to
 specific endpoints. We do this in the `CryptocurrencyApi::wire()`
 method:
 

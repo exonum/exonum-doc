@@ -3,10 +3,10 @@
 <!-- cspell:ignore bitcoind,blockhash,lects,satoshis,txid,utxo,utxos -->
 
 The anchoring service is developed to increase product security and
-provide non-repudiation for Exonum applications. This service periodically publishes the
-Exonum blockchain block hash to the Bitcoin blockchain, so that it is
-publicly auditable by anyone having access to the Exonum blockchain. Even in
-the case of validators' collusion, transaction history cannot be
+provide non-repudiation for Exonum applications. This service periodically
+publishes the Exonum blockchain block hash to the Bitcoin blockchain, so that
+it is publicly auditable by anyone having access to the Exonum blockchain.
+Even in the case of validators collusion, transaction history cannot be
 falsified. The discrepancy between the actual Exonum blockchain state and the
 one written to the Bitcoin blockchain will be found instantly.
 
@@ -40,24 +40,24 @@ to the next anchoring transaction.
 ```
 
 Sometimes additional inputs called [funding UTXO](#funding-utxo) are
-used. Such inputs are necessary to refill the balance of the anchoring chain that
-is spent on transaction fees.
+used. Such inputs are necessary to refill the balance of the anchoring chain
+that is spent on transaction fees.
 
 ## Anchoring transactions
 
 ### Multisig address as decentralization method
 
-Decentralization during the anchoring process is built over the internal Bitcoin
-multisignature address architecture.
+Decentralization during the anchoring process is built over the internal
+Bitcoin multisignature address architecture.
 
 When an Exonum network should be anchored, every validator builds an
-anchoring transaction using the [deterministic
+anchoring transaction using a [deterministic
 algorithm](#creating-anchoring-transaction).
 Its results are guaranteed to match for every honest validator. This
 anchoring transaction spends one or more UTXOs from the current anchoring
-multisig address. Every validator can sign this transaction without regard for other
-validators, as it is allowed by Bitcoin. All signatures are published
-into the Exonum blockchain.
+multisig address. Every validator can sign this transaction without regard for
+other validators, as it is allowed by Bitcoin. All signatures are
+published into the Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
 anchoring validators (`N <= 15` because of Bitcoin restrictions) and `M`
@@ -82,13 +82,13 @@ all validators are legitimate, certain transactions are built
 unequivocally.
 
 However, any Byzantine node can step out from the deterministic algorithm and
-use another signature list for the anchoring transaction. This node may create a
-transaction with the same anchored hash (the same data-output) but another
+use another signature list for the anchoring transaction. This node may create
+a transaction with the same anchored hash (the same data-output) but another
 tx-id, and broadcast it to the Bitcoin network. Such non-standard
 transactions present a problem: a new anchoring transaction may be built
-even if the previous one has not been included yet in any Bitcoin block. However,
-there is a chance that this previous transaction or one of its ancestors
-was mutated by a malicious validator as described above, and the
+even if the previous one has not been included yet in any Bitcoin block.
+However, there is a chance that this previous transaction or one of its
+ancestors was mutated by a malicious validator as described above, and the
 mutated transaction has been committed to the Bitcoin blockchain. This
 would make the previous transaction ineligible for inclusion into the
 Bitcoin blockchain.
@@ -192,7 +192,7 @@ chain](#recovering-broken-anchoring)).
 - Starting from this block `#H`, every validator monitors the list of
   current LECTs. As soon as there is a common LECT (that is defined by
   `+2/3` validators), **anchoring transaction proposal** (the anchoring
-  transaction without validators' signatures) is completely defined and is
+  transaction without validators signatures) is completely defined and is
   agreed upon by `+2/3` validators.
 - After the common LECT appears, every validator builds the anchoring
   transaction and signs its every input.
@@ -222,7 +222,7 @@ parameters](../architecture/configuration.md) to be set.
 #### Bitcoind node
 
 The service uses a third-party Bitcoin node to communicate with the
-Bitcoin blockchain network. As for Exonum v 0.1, [Bitcoin
+Bitcoin blockchain network. Currently, [Bitcoin
 Core][bitcoind] is supported only.
 
 The following settings need to be specified to access the bitcoind node:
@@ -301,7 +301,7 @@ The list of anchoring keys of validators may be changed for several
 reasons:
 
 - periodic key rotation
-- changing the validators’ list: add/replace/remove some validators
+- changing the validators list: add/replace/remove some validators
 
 Both procedures require disabling the old anchoring keys and adding the new ones. Additionally, as the anchoring Bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. The pub-keys list
@@ -323,11 +323,8 @@ service](configuration-updater.md). The following properties should be taken int
 
 ### Transitional transaction
 
-Anchoring pubkeys define the new Anchoring BTC-address. In order to prolong
-an anchoring chain, a new anchoring transaction should spend the previous
-anchoring address UTXO and send it to the new anchoring address. This
-transaction should be committed to the blockchain **before** the list of
-validators is changed. Thus the anchoring process is suspended.
+Anchoring pubkeys define the new Anchoring BTC-address. In order to
+prolong an anchoring chain, a new anchoring transaction should spend the previous anchoring address UTXO and send it to the new anchoring address. This transaction should be committed to the blockchain **before** the list of validators is changed. Thus the anchoring process is suspended.
 
 - The anchoring service waits until a common LECT is committed to the Bitcoin
   blockchain.

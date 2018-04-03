@@ -16,41 +16,43 @@ This logic should meet the following criteria:
 
 - **Using validators**. As Exonum is used to power permissioned blockchains,
   it is natural to assume that the inputs to business logic determining time
-  should be supplied by validators. This assumption could be generalized to support
-  abstract semi-trusted identifiable entities, but for the sake of clarity,
-  this article will center specifically on the case where time
+  should be supplied by validators. This assumption could be generalized to
+  support abstract semi-trusted identifiable entities, but for the sake of
+  clarity, this article will center specifically on the case where time
   is determined by the validator nodes.
 - **Reliability**. The time value must be tolerant to the malicious behavior
   of validator nodes.
 - **Agreement**. Time must be the same on all the nodes to ensure that
   transactions are executed in a deterministic manner. This means that the time
   should be written in the Exonum blockchain storage. Thus, the “current” time
-  will be changing in the same way on all nodes during the execution of transactions,
-  including during the nodes update.
+  will be changing in the same way on all nodes during the execution of
+  transactions, including during the nodes update.
 - **Sufficient accuracy**. The specified time should be fairly accurate.
   In practice, an acceptable deviation is a few seconds.
-- **Monotony**. The time value should only increase. This pragmatic requirement simplifies the use of time when implementing the business logic.
+- **Monotony**. The time value should only increase. This pragmatic requirement
+simplifies the use of time when implementing the business logic.
 
 ## Assumptions
 
 The local time on all validator nodes is assumed to be reliable.
-To obtain the local reliable time, validators can apply external solutions like [tlsdate][tlsdate],
-[roughtime][roughtime], etc.
+To obtain the local reliable time, validators can apply external solutions like
+[tlsdate][tlsdate], [roughtime][roughtime], etc.
 
 If the local time on the validator machine is incorrect,
-such node is considered Byzantine. Just in the same way as the consensus algorithm,
-the algorithm used by the time oracle can tolerate up to a third of Byzantine
-validators.
+such node is considered Byzantine. Just in the same way as the consensus
+algorithm, the algorithm used by the time oracle can tolerate up to a third of
+Byzantine validators.
 
 ## General Idea
 
 Each validator at a specific time sends a transaction indicating its local time
-(usually immediately after the commit of each block). The time service maintains
-an index with the most current time values indicated separately by each validator.
-A 1/3 percentile of these values (ordered by decreasing time) is stored separately;
-this percentile is considered the actual time and is updated after each transaction
-from any of the validators. As we show [further](#proof-of-correctness),
-this time can be considered reliable given the assumptions above.
+(usually immediately after the commit of each block). The time service
+maintains an index with the most current time values indicated separately by
+each validator. A 1/3 percentile of these values (ordered by decreasing time)
+is stored separately; this percentile is considered the actual time and is
+updated after each transaction from any of the validators. As we show
+[further](#proof-of-correctness), this time can be considered reliable given
+the assumptions above.
 
 ## Specification
 
@@ -62,8 +64,8 @@ The data schema of the **exonum-time** service consists of two indices:
   Consolidated time output by the service, which can be used by other business
   logic on the blockchain.
 - **validators_time**  
-  Merkelized index with the latest known local timestamps for all validator nodes.
-  The values in the index are used to update `time` and could be useful
+  Merkelized index with the latest known local timestamps for all validator
+  nodes. The values in the index are used to update `time` and could be useful
   for monitoring, diagnostics and the like.
 
 ### Transactions
@@ -74,14 +76,16 @@ output its current time, authenticated by the validator’s digital signature.
 The logic of transaction execution is as follows:
 
 1. Check that the transaction signer is one of the validators. If not, quit.
-2. Check that the time indicated in the transaction is greater than the submitting validator's timestamp specified in the storage. If not, quit.
+2. Check that the time indicated in the transaction is greater than the
+   submitting validator's timestamp specified in the storage. If not, quit.
 3. Update validator’s time in the `validators_time` index.
 4. If the number of timestamps in the index belonging to the current validators
    is at least `2f + 1`, where `f = (n - 1) / 3` is the maximum number
    of Byzantine validators, then perform the following steps; else quit.
 5. Sort the timestamps by the current validators in the decreasing order
   (most recent time first).
-6. Take the time with the (1-based) index `f + 1` from the resulting sorted list.
+6. Take the time with the (1-based) index `f + 1` from the resulting sorted
+   list.
 7. If the taken time `t` is larger than the previous consolidated time,
   replace the consolidated time with `t`.
 
@@ -92,13 +96,15 @@ is tolerant to the malicious behavior of validator nodes.
 
 ## Proof of Correctness
 
-Let `T` denote the list of current validators’ timestamps sorted
+Let `T` denote the list of current validators timestamps sorted
 in the decreasing order, as specified in step 5 of the algorithm above.
 It is clear that in a system with no more than `f` Byzantine nodes,
-any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval is:
+any time from `T` with the (1-based) index in the `[f + 1, 2f + 1]` interval
+is:
 
 - The time of an honest node, or
-- The time between the timestamps of two honest nodes. Therefore, such a time can be considered reliable.
+- The time between the timestamps of two honest nodes. Therefore, such a time
+  can be considered reliable.
 
 For practical reasons, we always choose the timestamp with index `f + 1`,
 since this value is reliable and, at the same time, the most recent one.
@@ -118,8 +124,8 @@ All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
 
 !!! warning
-    As of version 0.5.0, the **exonum-time** service does not provide cryptographic
-    proofs of authenticity for returned values.
+    As of version 0.5.0, the **exonum-time** service does not provide
+    cryptographic proofs of authenticity for returned values.
 
 ### Current Time
 
@@ -247,22 +253,24 @@ Advantages:
 - The time value would be indicated directly in the header of each block
   making it more accessible.
 - Time would be forcibly updated in the course of consensus operation:
-  it would be impossible to sabotage the update of time without stopping the consensus.
-- Blockchain would not be clogged by transactions associated with time determination.
+  it would be impossible to sabotage the update of time without stopping the
+  consensus.
+- Blockchain would not be clogged by transactions associated with time
+  determination.
 
 Disadvantages:
 
 - The consensus code would become more complex. (Time would be included
   into the consensus logic while [anchoring](bitcoin-anchoring.md) and
   [configuration](configuration-updater.md) are not.)
-- Time updates would be tied to the creation of `Precommit` messages. In the case
-  of a large delay in block acceptance, all the transactions therein would
+- Time updates would be tied to the creation of `Precommit` messages. In the
+  case of a large delay in block acceptance, all the transactions therein would
   be executed with the same outdated time value.
 
 In our opinion, implementing the time oracle as a service is preferable to
-the tight integration with consensus. This approach is more flexible and manageable,
-and could be generalized to the agreement between arbitrary collectively trusted
-entities, which may behave maliciously.
+the tight integration with consensus. This approach is more flexible and
+manageable, and could be generalized to the agreement between arbitrary
+collectively trusted entities, which may behave maliciously.
 
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate

@@ -1,7 +1,7 @@
 # Consensus in Exonum
 
 Generally, a [consensus algorithm][wiki:consensus] is a process of
-obtaining an agreed result by a group of participants. In Exonum, the
+obtaining an agreed result by a group of participants. In Exonum the
 consensus algorithm is used to agree on the list of transactions
 in blocks added to the blockchain. The other goal of the algorithm is to ensure
 that the results of the transaction execution are interpreted in the same way
@@ -22,7 +22,8 @@ Not all the nodes in the blockchain network may be actively involved in
 the consensus algorithm. Rather, there is a special role for active consensus
 participants – *validators* or *validator nodes*.
 For example, in a [consortium blockchain][public_and_private_blockchains]
-validators could be controlled by the companies participating in the consortium.
+validators could be controlled by the companies participating in the
+consortium.
 
 The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus
@@ -40,7 +41,8 @@ usual assumptions:
 
 - Validator nodes are assumed to be [partially synchronous][partial_synchrony],
   i.e., their computation performances do not differ much
-- The network is partially synchronous, too. That is, all messages are delivered
+- The network is partially synchronous, too. That is, all messages are
+ delivered
   in the finite time which, however, is unknown in advance
 - Each validator has access to a local **stopwatch** to determine time
   intervals.
@@ -119,7 +121,8 @@ More precisely, the algorithm is required to maintain *safety* and *liveness*:
 
 - Safety means that once a single honest validator has committed a block, no
   other honest validator will ever commit any other block at the same height
-- Liveness means that honest validators keep committing blocks from time to time
+- Liveness means that honest validators keep committing blocks from time to
+  time
 
 #### Locks
 
@@ -132,8 +135,8 @@ that proposal. The locked validator does not vote for any other proposal except
 for the proposal on which it is locked. When a new round starts,
 the locked validator immediately sends a prevote indicating
 that it is locked on a certain proposal. Other validators may request prevotes
-that led to the lock from the locked validator, if they do not have them locally
-(these prevotes are known as *proof of lock*).
+that led to the lock from the locked validator, if they do not have them
+locally (these prevotes are known as *proof of lock*).
 
 !!! note "Example"
     Validator A gets prevotes from validators B and C,
@@ -154,10 +157,9 @@ and which has been discovered during the previous communication with the peer.
 
 !!! note "Example"
     A request is sent if a node receives a consensus message from
-    a height greater than the local height. The peer is supposed to respond with
-    a message that contains transactions in an accepted block, together with a
-    proof
-    that the block is indeed accepted (i.e., precommits of +2/3 validators).
+    a height greater than the local height. The peer is supposed to respond
+    with a message that contains transactions in an accepted block, together
+    with a proof that the block is indeed accepted (i.e., precommits of +2/3 validators).
 
 There are requests for all consensus messages: proposals, prevotes, and
 precommits.
@@ -229,7 +231,8 @@ has a correctly formed `Propose` and all the transactions specified in it.
 #### Precommit
 
 `Precommit` is a message expressing readiness to include a certain proposal
-as the next block into the blockchain. `Precommit` is broadcast to all validators.
+as the next block into the blockchain. `Precommit` is broadcast to all
+validators.
 
 #### Status
 
@@ -275,13 +278,13 @@ of the round. Then in the next round the entire process of nominating a
 proposal and voting for it must begin again. The timeout of the
 next round should be increased so that the block could be accepted during the
 new
-round timeout with a poor network connectivity. The need to repeat anew the work
-that has already been done and increase in the timeout would lead to
+round timeout with a poor network connectivity. The need to repeat anew the
+work that has already been done and increase in the timeout would lead to
 additional delays in accepting the block proposal.
 
 In contrast to the case discussed in the previous paragraph, the absence of a
-fixed round end in Exonum allows the system to accept the proposal with a minimum
-necessary delay.
+fixed round end in Exonum allows the system to accept the proposal with a
+minimum necessary delay.
 
 ### Work Split
 
@@ -305,9 +308,9 @@ among the stages of the algorithm:
 - On the commit stage, validators ensure that they achieved the same state
   after applying the transactions in the proposal
 
-If a Byzantine validator sends out proposals with a different transactions order
-to different validators, the validators do not need to spend time checking
-the order and applying the transactions on the prevote stage.
+If a Byzantine validator sends out proposals with a different transactions
+order to different validators, the validators do not need to spend time
+checking the order and applying the transactions on the prevote stage.
 A different transactions order will be detected when comparing the
 `propose_hash` received
 in the prevote messages from other validators and the `propose_hash` received
