@@ -688,7 +688,8 @@ A JSON object with the following fields:
 GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}
 ```
 
-Returns the headers of the consecutive `count` blocks up to the `latest` height.
+Returns the explored range and the corresponding headers. The range specifies the
+smallest and largest heights traversed to collect at most `count` blocks.
 
 #### Parameters
 
@@ -704,59 +705,82 @@ Returns the headers of the consecutive `count` blocks up to the `latest` height.
 
 #### Response
 
-The JSON array of the `BlockHeader` objects. Blocks in the array are sorted in
-descending order according to their heights.
+The JSON object of the explored block range `range` and the array `blocks` of
+the `BlockHeader` objects. The range specifies the largest and the smallest
+heights of blocks that have been traversed to collect at most `count` blocks.
+The largest height `to` equals to `latest` if provided or to the height of
+the latest block in the blockchain, the smallest height `from` takes values
+in `0..latest - count + 1`. Blocks in the array are sorted in descending order
+according to their heights. Height of any block in the array is greater or
+equal than `from` and less or equal than `to`.
 
 ??? example "Response Example"
-    ```json
-    [
-      {
-        "height": "18",
-        "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
-        "proposer_id": 3,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 426,
-        "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
-      },
-      {
-        "height": "14",
-        "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
-        "proposer_id": 3,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 1000,
-        "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
-      },
-      {
-        "height": "10",
-        "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
-        "proposer_id": 3,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 1000,
-        "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
-      },
-      {
-        "height": "6",
-        "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
-        "proposer_id": 3,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 1000,
-        "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
-      },
-      {
-        "height": "2",
-        "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
-        "proposer_id": 3,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 1000,
-        "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
-      }
-    ]
+    Assume the following request
+
+    ```none
+    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true
     ```
+
+    and response
+
+    ```JSON
+    {
+      "range": {
+        "from": 100,
+        "to": 2
+      },
+      "blocks": [
+        {
+          "height": "18",
+          "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 426,
+          "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
+        },
+        {
+          "height": "14",
+          "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
+        },
+        {
+          "height": "10",
+          "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
+        },
+        {
+          "height": "6",
+          "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
+        },
+        {
+          "height": "2",
+          "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+        }
+      ]
+    }
+    ```
+
+    That is, to collect `5` non-empty blocks from the tail of the blockchain,
+    range from `100` to `2` has been traversed.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
