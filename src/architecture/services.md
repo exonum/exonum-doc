@@ -329,7 +329,7 @@ a service developer.
 
 ```rust
 fn service_id(&self) -> u16;
-fn service_name(&self) -> &'static str;
+fn service_name(&self) -> &str;
 ```
 
 `service_id` returns a 2-byte service identifier, which needs to be unique

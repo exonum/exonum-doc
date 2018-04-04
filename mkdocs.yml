@@ -15,7 +15,7 @@ repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 edit_uri: 'doc/blob/master/src'
 
-site_url: 'https://exonum.com/doc/'
+site_url: 'https://exonum.com/doc'
 site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 
