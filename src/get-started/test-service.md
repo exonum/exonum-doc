@@ -364,7 +364,7 @@ the testing process for Exonum services, allowing to test both business logic
 and HTTP API.
 
 [integration-testing]: http://doc.crates.io/manifest.html#integration-tests
-[tests-tx_logic.rs]: https://github.com/exonum/cryptocurrency/blob/master/tests/tx_logic.rs
-[tests-api.rs]: https://github.com/exonum/cryptocurrency/blob/master/tests/api.rs
+[tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
+[tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKitApi.html
 [TestKit-snapshot]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKit.html#method.snapshot
