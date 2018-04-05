@@ -10,6 +10,8 @@ creates a wallet with a default balance and transfers money between wallets.
 
 You can view and download the full source code of this tutorial
 [here](https://github.com/exonum/cryptocurrency).
+There the code is divided into separate modules
+that correspond to the areas of responsibility.
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
@@ -34,16 +36,18 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 [package]
 name = "exonum_cryptocurrency"
 # Tutorial version corresponds to the compatible version of Exonum core library
-version = "0.5.0"
+version = "0.0.0"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "0.5.0"
+exonum = "0.6.0"
 iron = "0.6.0"
 bodyparser = "0.8.0"
 router = "0.6.0"
-serde = "1.0"
-serde_json = "1.0"
+serde = "1.0.0"
+serde_json = "1.0.0"
+serde_derive = "1.0.0"
+failure = "0.1.1"
 ```
 
 ## Imports
@@ -53,25 +57,32 @@ In our case, this is where we are going to place the service code.
 Let’s start from importing crates with necessary types:
 
 ```rust
-extern crate serde;
-#[macro_use] extern crate serde_json;
-#[macro_use] extern crate exonum;
-extern crate router;
 extern crate bodyparser;
+#[macro_use]
+extern crate exonum;
+#[macro_use]
+extern crate failure;
 extern crate iron;
+extern crate router;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
 
-use exonum::blockchain::{Blockchain, Service, Transaction, ApiContext};
-use exonum::encoding::serialize::FromHex;
-use exonum::node::{TransactionSend, ApiSender};
-use exonum::messages::{RawTransaction, Message};
-use exonum::storage::{Fork, MapIndex, Snapshot};
+use exonum::api::{Api, ApiError};
+use exonum::blockchain::{ApiContext, Blockchain, ExecutionError, ExecutionResult, Service, Transaction, TransactionSet};
 use exonum::crypto::{Hash, PublicKey};
 use exonum::encoding;
-use exonum::api::{Api, ApiError};
-use iron::prelude::*;
+use exonum::encoding::serialize::FromHex;
+use exonum::messages::{Message, RawTransaction};
+use exonum::node::{ApiSender, TransactionSend};
+use exonum::storage::{Fork, MapIndex, Snapshot};
+use iron::headers::ContentType;
 use iron::Handler;
+use iron::modifiers::Header;
+use iron::prelude::*;
+use iron::status::Status;
 use router::Router;
-use serde::Deserialize;
 ```
 
 ## Constants
@@ -81,10 +92,6 @@ Let’s define some constants we will use later on:
 ```rust
 // Service identifier
 const SERVICE_ID: u16 = 1;
-// Identifier for wallet creation transaction type
-const TX_CREATE_WALLET_ID: u16 = 1;
-// Identifier for coins transfer transaction type
-const TX_TRANSFER_ID: u16 = 2;
 // Starting balance of a newly created wallet
 const INIT_BALANCE: u64 = 100;
 ```
@@ -209,53 +216,88 @@ For our cryptocurrency tutorial we need two transaction types:
 - Create a new wallet and add some money to it
 - Transfer money between two different wallets
 
-Declaration of any transaction should contain:
-
-- Service identifier
-- Unique (within the service) message identifier
-- Size of the fixed part of the message
-
-Exonum will use these constants for (de)serialization of the messages.
-
-### Creating New Wallet
-
-A Transaction to create a new wallet should contain the public key of the wallet
-and the name of the user who created this wallet:
+Service transactions are defined through `transactions!` macro
+that automatically assigns transaction IDs based on the declaration order:
 
 ```rust
-message! {
-    struct TxCreateWallet {
-        const TYPE = SERVICE_ID;
-        const ID = TX_CREATE_WALLET_ID;
+transactions! {
+    // Transaction group.
+    pub CurrencyTransactions {
+        const SERVICE_ID = SERVICE_ID;
 
-        pub_key: &PublicKey,
-        name: &str,
+        // Transaction type for creating a new wallet.
+        struct TxCreateWallet {
+            pub_key: &PublicKey,
+            name: &str,
+        }
+
+        // Transaction type for transferring tokens between two wallets.
+        struct TxTransfer {
+            from: &PublicKey,
+            to: &PublicKey,
+            amount: u64,
+            seed: u64,
+        }
     }
 }
 ```
 
-### Transferring Coins
+The transaction to create a new wallet (`TxCreateWallet`) contains
+the public key of the wallet and the name of the user who created this wallet.
 
-Transaction to transfer coins between different wallets is declared as follows:
-
-```rust
-message! {
-    struct TxTransfer {
-        const TYPE = SERVICE_ID;
-        const ID = TX_TRANSFER_ID;
-
-        from: &PublicKey,
-        to: &PublicKey,
-        amount: u64,
-        seed: u64,
-    }
-}
-```
-
-The transaction involves two public keys: for the sender’s wallet (`from`) and
+The transaction to transfer coins between different wallets (`TxTransfer`)
+involves two public keys: for the sender’s wallet (`from`) and
 for the receiver’s one (`to`). It also contains the amount of money to move
 between them. We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
+
+### Contracts errors
+
+The execution of the transaction may be unsuccessful for some reason.
+
+For example, the transaction `TxCreateWallet` will not be executed
+if the wallet with such public key already exists.
+
+There are also three reasons why the transaction `TxTransfer` can not be executed:
+
+- There is no sender with a given public key
+- There is no recipient with a given public key
+- There sender has insufficient currency amount
+
+Let's define the codes of the above errors:
+
+```rust
+#[derive(Debug, Fail)]
+#[repr(u8)]
+pub enum Error {
+    // Wallet already exists.
+    // Can be emitted by `TxCreateWallet`.
+    #[fail(display = "Wallet already exists")]
+    WalletAlreadyExists = 0,
+
+    // Sender doesn't exist.
+    // Can be emitted by `TxTransfer`.
+    #[fail(display = "Sender doesn't exist")]
+    SenderNotFound = 1,
+
+    // Receiver doesn't exist.
+    // Can be emitted by `TxTransfer`.
+    #[fail(display = "Receiver doesn't exist")]
+    ReceiverNotFound = 2,
+
+    // Insufficient currency amount.
+    // Can be emitted by `TxTransfer`.
+    #[fail(display = "Insufficient currency amount")]
+    InsufficientCurrencyAmount = 3,
+}
+
+impl From<Error> for ExecutionError {
+    fn from(value: Error) -> ExecutionError {
+        let description = format!("{}", value);
+        ExecutionError::with_description(value as u8, description)
+    }
+}
+```
 
 ### Transaction Execution
 
@@ -278,15 +320,15 @@ impl Transaction for TxCreateWallet {
         self.verify_signature(self.pub_key())
     }
 
-    fn execute(&self, view: &mut Fork) {
+    fn execute(&self, view: &mut Fork) -> ExecutionResult {
         let mut schema = CurrencySchema::new(view);
         if schema.wallet(self.pub_key()).is_none() {
-            let wallet = Wallet::new(
-                self.pub_key(),
-                self.name(),
-                INIT_BALANCE);
+            let wallet = Wallet::new(self.pub_key(), self.name(), INIT_BALANCE);
             println!("Create the wallet: {:?}", wallet);
             schema.wallets_mut().put(self.pub_key(), wallet);
+            Ok(())
+        } else {
+                Err(Error::WalletAlreadyExists)?
         }
     }
 }
@@ -312,22 +354,30 @@ impl Transaction for TxTransfer {
              self.verify_signature(self.from())
     }
 
-    fn execute(&self, view: &mut Fork) {
-        let mut schema = CurrencySchema { view };
-        let sender = schema.wallet(self.from());
-        let receiver = schema.wallet(self.to());
-        if let (Some(sender), Some(receiver)) = (sender, receiver) {
-            let amount = self.amount();
-            if sender.balance() >= amount {
-                let sender = sender.decrease(amount);
-                let receiver = receiver.increase(amount);
-                println!("Transfer between wallets: {:?} => {:?}",
-                    sender,
-                    receiver);
-                let mut wallets = schema.wallets_mut();
-                wallets.put(self.from(), sender);
-                wallets.put(self.to(), receiver);
-            }
+    fn execute(&self, view: &mut Fork) -> ExecutionResult {
+        let mut schema = CurrencySchema::new(view);
+
+        let sender = match schema.wallet(self.from()) {
+            Some(val) => val,
+            None => Err(Error::SenderNotFound)?,
+        };
+
+        let receiver = match schema.wallet(self.to()) {
+            Some(val) => val,
+            None => Err(Error::ReceiverNotFound)?,
+        };
+
+        let amount = self.amount();
+        if sender.balance() >= amount {
+            let sender = sender.decrease(amount);
+            let receiver = receiver.increase(amount);
+            println!("Transfer between wallets: {:?} => {:?}", sender, receiver);
+            let mut wallets = schema.wallets_mut();
+            wallets.put(self.from(), sender);
+            wallets.put(self.to(), receiver);
+            Ok(())
+        } else {
+            Err(Error::InsufficientCurrencyAmount)?
         }
     }
 }
@@ -351,6 +401,16 @@ struct CryptocurrencyApi {
 }
 ```
 
+It is also necessary to create a structure that will be returned by the REST API:
+
+```rust
+#[derive(Serialize, Deserialize)]
+pub struct TransactionResponse {
+    // Hash of the transaction.
+    pub tx_hash: Hash,
+}
+```
+
 ### API for Transactions
 
 The core processing logic is essentially the same for both types of transactions:
@@ -364,31 +424,21 @@ This logic can be encapsulated in a parameterized method in `CryptocurrencyApi`:
 
 ```rust
 impl CryptocurrencyApi {
-    fn post_transaction<T>(&self, req: &mut Request) -> IronResult<Response>
-    where
-        T: Transaction + Clone + for<'de> Deserialize<'de>,
-    {
-        match req.get::<bodyparser::Struct<T>>() {
+    fn post_transaction(&self, req: &mut Request) -> IronResult<Response> {
+        match req.get::<bodyparser::Struct<CurrencyTransactions>>() {
             Ok(Some(transaction)) => {
-                let transaction: Box<Transaction> = Box::new(transaction);
+                let transaction: Box<Transaction> = transaction.into();
                 let tx_hash = transaction.hash();
                 self.channel.send(transaction).map_err(ApiError::from)?;
-                self.ok_response(&json!({
-                    "tx_hash": tx_hash
-                }))
+                let json = TransactionResponse { tx_hash };
+                self.ok_response(&serde_json::to_value(&json).unwrap())
             }
-            Ok(None) => Err(ApiError::IncorrectRequest(
-                "Empty request body".into(),
-            ))?,
-            Err(e) => Err(ApiError::IncorrectRequest(Box::new(e)))?,
+            Ok(None) => Err(ApiError::BadRequest("Empty request body".into()))?,
+            Err(e) => Err(ApiError::BadRequest(e.to_string()))?,
         }
     }
 }
 ```
-
-Type parameter `T` (the transaction type) determines
-the output type for JSON parsing, which is performed with the help
-of the [`bodyparser`][bodyparser] plugin for Iron.
 
 Notice that the `post_transaction()` method has an idiomatic signature
 `fn(&self, &mut Request) -> IronResult<Response>`,
@@ -411,29 +461,33 @@ impl CryptocurrencyApi {
     fn get_wallet(&self, req: &mut Request) -> IronResult<Response> {
         let path = req.url.path();
         let wallet_key = path.last().unwrap();
-        let public_key = PublicKey::from_hex(wallet_key)
-            .map_err(ApiError::FromHex)?;
-
-        let wallet = {
-            let snapshot = self.blockchain.snapshot();
-            let schema = CurrencySchema::new(snapshot);
-            schema.wallet(&public_key)
-        };
-
-        if let Some(wallet) = wallet {
-            self.ok_response(&serde_json::to_value(wallet).unwrap())
-        } else {
-            self.not_found_response(
-                &serde_json::to_value("Wallet not found").unwrap(),
-            )
-        }
-    }
+        let public_key = PublicKey::from_hex(wallet_key).map_err(|e| {
+            IronError::new(
+                e,
+                (
+                    Status::BadRequest,
+                    Header(ContentType::json()),
+                    "\"Invalid request param: `pub_key`\"",
+                        ),
+                    )
+                })?;
+    
+                let snapshot = self.blockchain.snapshot();
+                let schema = CurrencySchema::new(snapshot);
+    
+                if let Some(wallet) = schema.wallet(&public_key) {
+                    self.ok_response(&serde_json::to_value(wallet).unwrap())
+                } else {
+                    self.not_found_response(&serde_json::to_value("Wallet not found").unwrap())
+                }
+            }
 
     fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
         let snapshot = self.blockchain.snapshot();
         let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
         let wallets: Vec<Wallet> = idx.values().collect();
+
         self.ok_response(&serde_json::to_value(&wallets).unwrap())
     }
 }
@@ -452,18 +506,14 @@ method:
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
-        let post_create_wallet = move |req: &mut Request| {
-            self_.post_transaction::<TxCreateWallet>(req)
-        };
+        let post_create_wallet = move |req: &mut Request| self_.post_transaction(req);
         let self_ = self.clone();
-        let post_transfer = move |req: &mut Request| {
-            self_.post_transaction::<TxTransfer>(req)
-        };
+        let post_transfer = move |req: &mut Request| self_.post_transaction(req);
         let self_ = self.clone();
         let get_wallets = move |req: &mut Request| self_.get_wallets(req);
         let self_ = self.clone();
         let get_wallet = move |req: &mut Request| self_.get_wallet(req);
-
+    
         // Bind handlers to specific routes.
         router.post("/v1/wallets", post_create_wallet, "post_create_wallet");
         router.post("/v1/wallets/transfer", post_transfer, "post_transfer");
@@ -509,8 +559,7 @@ The two methods of the `Service` trait are simple:
    (i.e., the `SERVICE_ID` constant)
 
 The `tx_from_raw` method is used to deserialize transactions
-coming to the node. To choose the right deserializer, we can use
-`message_type()` to get the unique identifier of the message we declared before.
+coming to the node.
 If the incoming transaction is built successfully, we put it into a `Box<_>`.
 
 The `state_hash` method is used to calculate the hash of
@@ -530,19 +579,9 @@ impl Service for CurrencyService {
 
     fn service_id(&self) -> u16 { SERVICE_ID }
 
-    fn tx_from_raw(&self, raw: RawTransaction)
-        -> Result<Box<Transaction>, encoding::Error> {
-
-        let trans: Box<Transaction> = match raw.message_type() {
-            TX_TRANSFER_ID => Box::new(TxTransfer::from_raw(raw)?),
-            TX_CREATE_WALLET_ID => Box::new(TxCreateWallet::from_raw(raw)?),
-            _ => {
-                return Err(encoding::Error::IncorrectMessageType {
-                    message_type: raw.message_type()
-                });
-            },
-        };
-        Ok(trans)
+    fn tx_from_raw(&self, raw: RawTransaction) -> Result<Box<Transaction>, encoding::Error> {
+        let tx = CurrencyTransactions::tx_from_raw(raw)?;
+        Ok(tx.into())
     }
 
     fn state_hash(&self, _: &Snapshot) -> Vec<Hash> {
@@ -666,7 +705,7 @@ Finally, we need to implement the entry point to our demo network – `main` fun
 fn main() {
     exonum::helpers::init_logger().unwrap();
     let node = Node::new(
-        Box::new(MemoryDB::new()),
+        MemoryDB::new(),
         vec![Box::new(CurrencyService)],
         node_config(),
     );
