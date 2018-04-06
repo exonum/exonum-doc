@@ -156,7 +156,7 @@ included into the blockchain.
 ### Execute
 
 ```rust
-fn execute(&self, view: &mut Fork);
+fn execute(&self, view: &mut Fork) -> ExecutionResult;
 ```
 
 The `execute` method takes the current blockchain state and can modify it (but can
@@ -182,32 +182,19 @@ storage [under certain conditions](consensus.md).
     number of coins). Logging helps to ensure that
     the account state is verifiable by light clients.
 
+The `execute` method can signal that a transaction should be aborted
+by returning an error. The error contains a transaction-specific error code
+(an unsigned 1-byte integer), and an optional string description. If `execute`
+returns an error, all changes made in the blockchain state by the transaction
+are discarded; instead, the error code and description are saved to the blockchain.
+
 If the `execute` method of a transaction raises an unhandled exception (panics
-in the Rust terms), the changes made by the transactions are discarded,
-but the transaction itself is still considered committed. Such erroneous transactions
-can be included into the blockchain provided they panic for at least 2/3
-of the validators.
+in the Rust terms), the changes made by the transactions are similarly discarded.
 
-!!! note
-    Rust commonly uses [`Result`s][rust-result] to handle errors,
-    so using `panic` just to roll back
-    transaction execution (e.g., if blockchain state-specific checks fail)
-    may be considered poor coding style.
-
-!!! warning
-    As of Exonum 0.1, it is the sole responsibility of a service developer to
-    ensure that transactions logically failing during the `execute` stage
-    do not change the blockchain state.
-    (An example of such a transaction is a `TxTransfer` in the cryptocurrency service
-    that attempts to transfer more coins than the sender has.)
-    Correspondingly, when programming `execute`, you should perform state-related
-    checks *before* any changes to the state and return early if these checks fail.
-
-    Preliminary checks may seem unusual compared to other blockchains,
-    but they fit well with the computational model of Exonum 0.1, in which
-    [services cannot directly access each other’s endpoints](services.md#limitations).
-    In this model, preliminary
-    checks are the most robust way to organize transaction execution.
+Erroneous and panicking transactions are still considered committed.
+Such transactions can be and are included into the blockchain provided they
+lead to the same result (panic or return an identical error code)
+for at least 2/3 of the validators.
 
 ## Lifecycle
 
