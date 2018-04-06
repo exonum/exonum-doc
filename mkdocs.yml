@@ -38,6 +38,7 @@ markdown_extensions:
   - admonition
   - meta
   - pymdownx.superfences
+  - pymdownx.details
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
