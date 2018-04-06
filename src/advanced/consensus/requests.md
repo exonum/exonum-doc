@@ -113,9 +113,9 @@ has the following fields:
   Hash of the proposal for which information is requested.
 - **validators**: BitVec  
   Each bit of this field indicates the need to send a `Prevote` message from
-  the corresponding validator (if the bit value is 1, `Prevote` is requested; otherwise,
-  `Prevote` is not needed). Indexing of the `validator` bits corresponds to
-  indexing of the validator public keys in the
+  the corresponding validator (if the bit value is 1, `Prevote` is requested;
+    otherwise, `Prevote` is not needed). Indexing of the `validator` bits c
+    orresponds to indexing the validator public keys in the
   [actual configuration][config#genesis].
 
 ### `BlockRequest`
@@ -155,7 +155,7 @@ the identifier
 of the requested data (hash for `Propose` and `Transactions`, round and hash  
 for `Prevotes`, height for `Block`). When the requested information is
 obtained, the node deletes the `RequestState` for the corresponding request
-(cancels request).
+(cancels the request).
 
 A node sets a timeout for each sent request. The timeout is
 implemented as a message to this node itself. This message is queued and
@@ -231,7 +231,8 @@ Cancel all requests.
 ### Request Timeout
 
 - Delete the node, to which the request was sent, from the list of
-  [nodes that should have the requested data](#learning-from-consensus-messages).  This list is a part of the `RequestState` structure.
+[nodes that should have the requested data](#learning-from-consensus-messages).  
+  This list is a part of the `RequestState` structure.
 - If the list of nodes having the data to be requested is empty, cancel the
   request.
 - Otherwise, make one more request attempt to another node from the list of

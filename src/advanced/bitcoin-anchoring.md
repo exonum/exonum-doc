@@ -1,4 +1,4 @@
-# Anchoring service
+# Anchoring Service
 
 <!-- cspell:ignore bitcoind,blockhash,lects,satoshis,txid,utxo,utxos -->
 
@@ -16,7 +16,7 @@ one written to the Bitcoin blockchain will be found instantly.
     deployed][anchoring-deploy]. The source code is located [on
     GitHub][github-anchoring].
 
-## General idea
+## General Idea
 
 The service writes the hash of the latest Exonum block to the permanent
 read-only persistent storage available to everyone. This block is called
@@ -44,9 +44,9 @@ Sometimes additional inputs called [funding UTXO](#funding-utxo) are
 used. Such inputs are necessary to refill the balance of the anchoring chain
 that is spent on transaction fees.
 
-## Anchoring transactions
+## Anchoring Transactions
 
-### Multisig address as decentralization method
+### Multisig Address as Decentralization Method
 
 Decentralization during the anchoring process is built over the internal
 Bitcoin multisignature address architecture.
@@ -74,7 +74,7 @@ After the necessary amount of signatures is published, any participant
 node can create a correct and signed anchoring transaction and broadcast
 it to the Bitcoin blockchain.
 
-### Transaction malleability
+### Transaction Malleability
 
 Validators signatures are openly written in the Exonum blockchain; more
 than `M` signatures can be published (it is a common case). There
@@ -130,7 +130,7 @@ Exonum uses a [`bitcoind` client](#bitcoind-node), and only one of the
 transactions that meet the requirements can be considered valid by the
 bitcoind-node.
 
-### Anchoring Transaction Proposal detailed structure
+### Anchoring Transaction Proposal Detailed Structure
 
 An anchoring transaction proposal is constructed as follows:
 
@@ -151,7 +151,7 @@ An anchoring transaction proposal is constructed as follows:
   anchoring address [should be changed](#changing-validators-list).
   Otherwise, the current address is used.
 
-### Data chunks
+### Data Chunks
 
 The data output consists of the following parts:
 
@@ -171,13 +171,13 @@ of the Bitcoin Script.
 In total, the anchoring transaction payload usually takes 48 bytes
 and enlarges to 80 bytes when recovering is needed.
 
-#### Anchored hash data chunk
+#### Anchored Hash Data Chunk
 
 - 8-byte zero-based unsigned height of the anchored block (i.e., the
   height of the genesis block is `0`) which is used for efficient lookups.
 - 32-byte block hash
 
-#### Recovery data chunk
+#### Recovery Data Chunk
 
 The data of the recovery chunk is a 32-byte Bitcoin
 transaction hash. This hash shows that the current anchoring chain is
@@ -189,7 +189,7 @@ anchoring transaction only if the previous anchoring chain failed
 (as described in [Recovering the previous
 chain](#recovering-broken-anchoring)).
 
-### Creating anchoring transaction
+### Creating Anchoring Transaction
 
 - Say `H` is the block height of the block that should be anchored
 - Starting from this block `#H`, every validator monitors the list of
@@ -204,7 +204,7 @@ chain](#recovering-broken-anchoring)).
   transaction and broadcast it to the Bitcoin network. In particular, it is
   broadcasted by all the validators who have agreed upon the selected LECT.
 
-#### Skipping anchoring
+#### Skipping Anchoring
 
 If Exonum should perform anchoring, but there is no LECT agreed upon by`+2/3`
 validators, then anchoring does not take place. The anchoring service waits
@@ -215,14 +215,14 @@ that needs to be anchored. For example, the Exonum blockchain is at height
 appears at height `#12345`, block `#12000` is anchored, though there
 will be no anchor for block `#11000`.
 
-## Setup and configuration
+## Setup and Configuration
 
 Anchoring requires additional [global and local configuration
 parameters](../architecture/configuration.md) to be set.
 
-### Local configuration
+### Local Configuration
 
-#### Bitcoind node
+#### Bitcoind Node
 
 The service uses a third-party Bitcoin node to communicate with the
 Bitcoin blockchain network. Currently, [Bitcoin
@@ -239,13 +239,13 @@ The following settings need to be specified to access the bitcoind node:
     validator; otherwise, the single bitcoind node is a
     centralization point and presents a weakness in the anchoring process.
 
-#### Bitcoin private keys
+#### Bitcoin Private Keys
 
 Every validator should possess its own secp256k1 EC keypair in order to
 participate in the anchoring process. The private key should be strongly
 secured.
 
-#### Observer interval
+#### Observer Interval
 
 Observer interval defines an interval between Exonum blocks when a node
 should refresh its view of the anchoring chain. If the observer interval is not
@@ -254,27 +254,27 @@ defined, nodes do not track the anchoring chain at all.
 Tracking is needed to get the [nearest anchoring transaction](#nearest-lect)
 for every Exonum block.
 
-#### LECT updating interval
+#### LECT Updating Interval
 
 The frequency (in number of Exonum blocks) of checking the Bitcoin
 blockchain to update the LECT of the node.
 
-### Global configuration
+### Global Configuration
 
-#### Bitcoin public keys
+#### Bitcoin Public Keys
 
 As written earlier, every validator should store its own [private
 key](#bitcoin-private-keys). Corresponding public keys are stored in the
 global configuration.
 
-#### Transaction fees
+#### Transaction Fees
 
 Transaction fee represents a value in satoshis that is set as a fee for
 every anchoring transaction. It is recommended to set a 2x-3x times bigger
 transaction fee than the average market fee, to ensure that the anchoring
 transaction does not hang if the Bitcoin network is spammed.
 
-#### Anchoring schedule
+#### Anchoring Schedule
 
 This parameter defines how often anchoring should be executed. It
 defines the distance between anchored block heights on the Exonum blockchain.
@@ -300,7 +300,7 @@ The funding UTXO should get enough confirmations before being used.
 However, the network does not check the number of confirmations for the
 provided funding transaction; it is the administrators’ duty.
 
-## Changing validators list
+## Changing Validators List
 
 The list of anchoring keys of validators may be changed for several
 reasons:
@@ -313,7 +313,8 @@ Additionally, as the anchoring Bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. The pub-keys list
 is stored in the global configuration; it can be updated by out-of-band
 means, for example, using [Configuration Update
-service](configuration-updater.md). The following properties should be taken into account:
+service](configuration-updater.md). The following properties should be taken
+ into account:
 
 1. New configuration is spread over nodes. It is still not active.
 2. New configuration has an additional parameter that indicates the height when
@@ -329,7 +330,7 @@ service](configuration-updater.md). The following properties should be taken int
      applying is big enough. It should be defined in accordance
     with the necessary number of confirmations for the latest LECT.
 
-### Transitional transaction
+### Transitional Transaction
 
 Anchoring pubkeys define the new Anchoring BTC-address. In order to
 prolong the anchoring chain, a new anchoring transaction should spend the
@@ -359,7 +360,7 @@ To ensure that the anchoring chain is not broken during
 a change of the pubkeys list, the value of a new configuration activation
 height should be big enough.
 
-## Recovering broken anchoring
+## Recovering Broken Anchoring
 
 After the anchoring chain is broken, administrators must generate a new
 funding transaction to the new anchoring address and add it to the
@@ -384,7 +385,7 @@ equal to `/api/services/btc_anchoring/v1`.
     See [*Services*](../architecture/services.md) for a description of the
     types of endpoints in services.
 
-### Actual address
+### Actual Address
 
 ```None
 GET {base_path}/address/actual
@@ -400,7 +401,7 @@ None.
 
 The string with a value of the anchoring address in the Base58Check format.
 
-### Next address
+### Next Address
 
 ```None
 GET {base_path}/address/following
@@ -418,7 +419,7 @@ None.
 
 The string with a value of the anchoring address in the Base58Check format.
 
-### Actual common LECT
+### Actual Common LECT
 
 ```None
 GET {base_path}/actual_lect
@@ -453,7 +454,7 @@ Example of JSON response:
 - **txid**: the hash for the anchoring Bitcoin transaction, which is
   considered to be the LECT
 
-### Actual LECT for specific validator
+### Actual LECT for Specific Validator
 
 ```None
 GET {base_path}/actual_lect/{id}

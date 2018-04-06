@@ -3,11 +3,11 @@ title: Consensus specification
 ---
 # Consensus Algorithm Specification
 
-This article contains the specification of [the consensus algorithm](../../glossary.md#consensus)
-in Exonum.
+This article contains the specification of
+[the consensus algorithm](../../glossary.md#consensus) in Exonum.
 
-Consensus algorithm in Exonum is the process of reaching an agreement about the order
-of [transactions](../../glossary.md#transaction) and the result of their
+Consensus algorithm in Exonum is the process of reaching an agreement about the
+order of [transactions](../../glossary.md#transaction) and the result of their
 execution in the presence of [Byzantine faults][wiki_bft] and [partially
 synchronous][partial_synchrony] network. During the consensus algorithm,
 nodes exchange [consensus messages](../../glossary.md#consensus-message)
@@ -25,7 +25,8 @@ for all honest nodes in the network.
 
 ## Definitions
 
-The definitions from the [general description of consensus algorithm](../../architecture/consensus.md)
+The definitions from the
+[general description of consensus algorithm](../../architecture/consensus.md)
 are used. In particular, +2/3 means more than two thirds of the validators,
 and -1/3 means less than one third.
 
@@ -47,13 +48,15 @@ Rounds are not synchronized among nodes.
 Each node has a set of transactions that have not yet been added to the
 blockchain. This set is called _pool of unconfirmed transactions_. In general,
 the pools of unconfirmed transactions are different for different nodes. If
-necessary, the nodes [can request unknown transactions from other nodes](requests.md).
+necessary, the nodes
+[can request unknown transactions from other nodes](requests.md).
 
 ### Proof-of-Lock
 
-A set of +2/3 `Prevote` messages for the same proposal from the nodes at the current
-round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes store PoL as
-a part of the node state. The node can have no more than one stored PoL.
+A set of +2/3 `Prevote` messages for the same proposal from the nodes at the
+current round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes
+store PoL as a part of the node state. The node can have no more than one
+stored PoL.
 
 A PoL is greater than the recorded one (has a higher priority), in cases:
 
@@ -136,7 +139,8 @@ The following fields are present in all messages:
 `Prevote` messages have the following additional fields:
 
 - `locked_round`  
-  Round in which the author of the message [has locked](../../architecture/consensus.md#locks)
+  Round in which the author of the message
+  [has locked](../../architecture/consensus.md#locks)
   on the proposal which is referenced by the message.
   If the author is not locked on a proposal, the `locked_round` field is 0.
 
@@ -184,20 +188,22 @@ The steps performed at each stage are described [below](#stage-processing).
 
 ## Message Processing
 
-Nodes use a message queue based on [the Tokio library][tokio-lib] for message processing.
-Incoming requests and consensus messages are placed in the queue when they are
-received. The same queue is used for processing timeouts. Timeouts are
-implemented as messages looped to the node itself.
+Nodes use a message queue based on [the Tokio library][tokio-lib] for message
+processing. Incoming requests and consensus messages are placed in the queue
+when they are received. The same queue is used for processing timeouts. Timeouts
+ are implemented as messages looped to the node itself.
 
-Messages from the next height (i.e., `current_height` + 1) or from a future round
-are placed in a separate queue (`queued`).
+Messages from the next height (i.e., `current_height` + 1) or from a future
+round are placed in a separate queue (`queued`).
 
 ### Deserialization
 
-- Check the message against the [serialization format](../../architecture/serialization.md).
+- Check the message against the
+  [serialization format](../../architecture/serialization.md).
 - If any problems during deserialization are detected, ignore
   the message as something that a node can not correctly interpret.
-- If verification is successful, proceed to [Consensus messages processing](#consensus-messages-processing)
+- If verification is successful, proceed to
+  [Consensus messages processing](#consensus-messages-processing)
   or [Transaction processing](#transaction-processing), depending
   on whether the message is a transaction.
 
@@ -229,8 +235,8 @@ are placed in a separate queue (`queued`).
 - If the message refers to the current height and any round not higher than the
   current one, then:
 
-    - Check that the `validator_id` specified in the message is less than the total
-    number of validators.
+    - Check that the `validator_id` specified in the message is less than the
+    total number of validators.
     - Check the message signature against the public key of the validator with
     index `validator_id`.
 
@@ -256,14 +262,15 @@ are placed in a separate queue (`queued`).
   hashes in the table of committed transactions is checked).
 - Add the proposal to the `proposes` hash map.
 - [Request missing information based on the message](requests.md#receiving-propose).
-- If all transactions in the proposal are known, go to [Full proposal](#full-proposal).
+- If all transactions in the proposal are known, go to
+  [Full proposal](#full-proposal).
 
 ### Prevote
 
 **Arguments:** `prevote`.
 
-- Add `prevote` to the list of known `Prevote` messages for the given proposal in
-  `prevote.round`.
+- Add `prevote` to the list of known `Prevote` messages for the given proposal
+in `prevote.round`.
 - If:
 
     - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`
@@ -292,7 +299,7 @@ are placed in a separate queue (`queued`).
 - Then:
 
     - Execute the proposal, if it has not yet been executed.
-    - Check that the node’s `state_hash` coincides with the `state_hash`
+    - Check that `state_hash` of the node coincides with the `state_hash`
       in the `Precommit`s. If not, stop working and signal about
       an unrecoverable error.
     - Proceed to [Commit](#commit) for this block.
@@ -320,8 +327,8 @@ are placed in a separate queue (`queued`).
       must be sufficient to reach consensus.
     - All `Precommit` messages must be correct.
 
-- If the checks are successful, then check all transactions in the block for correctness.
-  If some transactions are incorrect, stop working and signal about
+- If the checks are successful, then check all transactions in the block for
+  correctness. If some transactions are incorrect, stop working and signal about
   an unrecoverable error.
 - Execute all transactions. If the hash of the blockchain state after the execution
   diverges from that in the `Block` message, stop working and signal about
@@ -341,8 +348,9 @@ are placed in a separate queue (`queued`).
 - Add a timeout (its length is specified by `round_timeout`) for the next round.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
-- If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new round,
-  and proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
+- If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new
+  round, and proceed to
+  [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
 - Else, if the node is the leader, form and send `Propose` and `Prevote` messages
   (after the expiration of `propose_timeout`, if the node has just moved to a new
   height).
@@ -351,7 +359,8 @@ are placed in a separate queue (`queued`).
 
 - If the node’s height has not increased since the timeout was set, then broadcast
   a `Status` message to all peers.
-- Add a timeout for the next `Status` broadcast (its length is specified by `status_timeout`).
+- Add a timeout for the next `Status` broadcast (its length is specified by
+  `status_timeout`).
 
 ## Stage Processing
 
@@ -383,9 +392,9 @@ are placed in a separate queue (`queued`).
 
 **Arguments:** shared `propose_hash` and `round` of the collected +2/3 `Prevote`s.
 
-- If the node’s `locked_round` is less than `prevote.round` and the hash of the locked
-  `Propose` message is the same as `propose_hash` in the collected `Prevote`s,
-  then proceed to [Lock](#lock) for this `Propose` message.
+- If the node’s `locked_round` is less than `prevote.round` and the hash of the
+  locked `Propose` message is the same as `propose_hash` in the collected
+  `Prevote`s, then proceed to [Lock](#lock) for this `Propose` message.
 
 ### Lock
 

@@ -30,7 +30,7 @@ This logic should meet the following criteria:
 - **Sufficient accuracy**. The specified time should be fairly accurate.
   In practice, an acceptable deviation is a few seconds.
 - **Monotony**. The time value should only increase. This pragmatic requirement
-simplifies the use of time when implementing the business logic.
+  simplifies the use of time when implementing the business logic.
 
 ## Assumptions
 
@@ -71,14 +71,14 @@ The data schema of the **exonum-time** service consists of two indices:
 ### Transactions
 
 The service implements a single transaction type, allowing a validator to
-output its current time, authenticated by the validator’s digital signature.
+output its current time, authenticated by the validator digital signature.
 
 The logic of transaction execution is as follows:
 
 1. Check that the transaction signer is one of the validators. If not, quit.
 2. Check that the time indicated in the transaction is greater than the
-   submitting validator's timestamp specified in the storage. If not, quit.
-3. Update validator’s time in the `validators_time` index.
+   submitting validator timestamp specified in the storage. If not, quit.
+3. Update validator time in the `validators_time` index.
 4. If the number of timestamps in the index belonging to the current validators
    is at least `2f + 1`, where `f = (n - 1) / 3` is the maximum number
    of Byzantine validators, then perform the following steps; else quit.
@@ -184,7 +184,7 @@ Example of JSON response:
 ]
 ```
 
-### Timestamps of all validators
+### Timestamps of All Validators
 
 ```none
 GET {base_path}/validators_times/all
