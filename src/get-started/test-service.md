@@ -305,7 +305,7 @@ fn assert_no_wallet(&self, pubkey: &PublicKey) {
         ApiKind::Service("cryptocurrency"),
         &format!("v1/wallet/{}", pubkey.to_string()),
     );
-    
+
     assert_matches!(
         err,
         ApiError::NotFound(ref body) if body == "Wallet not found"

@@ -10,8 +10,6 @@ creates a wallet with a default balance and transfers money between wallets.
 
 You can view and download the full source code of this tutorial
 [here][cryptocurrency].
-There the code is divided into separate modules
-that correspond to the areas of responsibility.
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
@@ -70,7 +68,9 @@ extern crate serde_derive;
 extern crate serde_json;
 
 use exonum::api::{Api, ApiError};
-use exonum::blockchain::{ApiContext, Blockchain, ExecutionError, ExecutionResult, Service, Transaction, TransactionSet};
+use exonum::blockchain::{ApiContext, Blockchain, ExecutionError,
+                         ExecutionResult, Service, Transaction,
+                         TransactionSet};
 use exonum::crypto::{Hash, PublicKey};
 use exonum::encoding;
 use exonum::encoding::serialize::FromHex;
@@ -251,46 +251,38 @@ for the receiver’s one (`to`). It also contains the amount of money to move
 between them. We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
 
-### Contracts errors
+### Contracts Errors
 
 The execution of the transaction may be unsuccessful for some reason.
-
 For example, the transaction `TxCreateWallet` will not be executed
 if the wallet with such public key already exists.
-
-There are also three reasons why the transaction `TxTransfer` can not be executed:
+There are also three reasons why the transaction `TxTransfer` cannot be executed:
 
 - There is no sender with a given public key
 - There is no recipient with a given public key
-- There sender has insufficient currency amount
+- The sender has insufficient currency amount
 
-Let's define the codes of the above errors:
+Let’s define the codes of the above errors:
 
 ```rust
 #[derive(Debug, Fail)]
 #[repr(u8)]
 pub enum Error {
-    // Wallet already exists.
-    // Can be emitted by `TxCreateWallet`.
     #[fail(display = "Wallet already exists")]
     WalletAlreadyExists = 0,
 
-    // Sender doesn't exist.
-    // Can be emitted by `TxTransfer`.
     #[fail(display = "Sender doesn't exist")]
     SenderNotFound = 1,
 
-    // Receiver doesn't exist.
-    // Can be emitted by `TxTransfer`.
     #[fail(display = "Receiver doesn't exist")]
     ReceiverNotFound = 2,
 
-    // Insufficient currency amount.
-    // Can be emitted by `TxTransfer`.
     #[fail(display = "Insufficient currency amount")]
     InsufficientCurrencyAmount = 3,
 }
 
+// Conversion between service-specific errors and the standard error type
+// that can be emitted by transactions.
 impl From<Error> for ExecutionError {
     fn from(value: Error) -> ExecutionError {
         let description = format!("{}", value);
@@ -328,7 +320,7 @@ impl Transaction for TxCreateWallet {
             schema.wallets_mut().put(self.pub_key(), wallet);
             Ok(())
         } else {
-                Err(Error::WalletAlreadyExists)?
+            Err(Error::WalletAlreadyExists)?
         }
     }
 }
@@ -471,10 +463,10 @@ impl CryptocurrencyApi {
                         ),
                     )
                 })?;
-    
+
                 let snapshot = self.blockchain.snapshot();
                 let schema = CurrencySchema::new(snapshot);
-    
+
                 if let Some(wallet) = schema.wallet(&public_key) {
                     self.ok_response(&serde_json::to_value(wallet).unwrap())
                 } else {
@@ -513,7 +505,7 @@ impl Api for CryptocurrencyApi {
         let get_wallets = move |req: &mut Request| self_.get_wallets(req);
         let self_ = self.clone();
         let get_wallet = move |req: &mut Request| self_.get_wallet(req);
-    
+
         // Bind handlers to specific routes.
         router.post("/v1/wallets", post_create_wallet, "post_create_wallet");
         router.post("/v1/wallets/transfer", post_transfer, "post_transfer");
@@ -579,7 +571,9 @@ impl Service for CurrencyService {
 
     fn service_id(&self) -> u16 { SERVICE_ID }
 
-    fn tx_from_raw(&self, raw: RawTransaction) -> Result<Box<Transaction>, encoding::Error> {
+    fn tx_from_raw(&self, raw: RawTransaction) ->
+        Result<Box<Transaction>, encoding::Error>
+    {
         let tx = CurrencyTransactions::tx_from_raw(raw)?;
         Ok(tx.into())
     }
