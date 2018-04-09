@@ -270,7 +270,7 @@ round are placed in a separate queue (`queued`).
 **Arguments:** `prevote`.
 
 - Add `prevote` to the list of known `Prevote` messages for the given proposal
-in `prevote.round`.
+  in `prevote.round`.
 - If:
 
     - the node has formed +2/3 `Prevote` messages for the same round and `propose_hash`
