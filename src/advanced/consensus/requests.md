@@ -231,7 +231,7 @@ Cancel all requests.
 ### Request Timeout
 
 - Delete the node, to which the request was sent, from the list of
-  [nodes that should have the requested data](#learning-from-consensus-messages).  
+  [nodes that should have the requested data][#learning].  
   This list is a part of the `RequestState` structure.
 - If the list of nodes having the data to be requested is empty, cancel the
   request.
@@ -280,3 +280,4 @@ Send all the saved `Connect` messages from peers to the requestor.
 [config#genesis]: ../../architecture/configuration.md#genesis
 [config#global-parameters]: ../../architecture/configuration.md#global-parameters
 [config#local-parameters]: ../../architecture/configuration.md#local-parameters
+[#learning]: #learning-from-consensus-messages
