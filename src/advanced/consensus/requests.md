@@ -114,8 +114,8 @@ has the following fields:
 - **validators**: BitVec  
   Each bit of this field indicates the need to send a `Prevote` message from
   the corresponding validator (if the bit value is 1, `Prevote` is requested;
-    otherwise, `Prevote` is not needed). Indexing of the `validator` bits c
-    orresponds to indexing the validator public keys in the
+  otherwise, `Prevote` is not needed). Indexing of the `validator` bits
+  corresponds to indexing the validator public keys in the
   [actual configuration][config#genesis].
 
 ### `BlockRequest`
@@ -231,7 +231,7 @@ Cancel all requests.
 ### Request Timeout
 
 - Delete the node, to which the request was sent, from the list of
-[nodes that should have the requested data](#learning-from-consensus-messages).  
+  [nodes that should have the requested data](#learning-from-consensus-messages).  
   This list is a part of the `RequestState` structure.
 - If the list of nodes having the data to be requested is empty, cancel the
   request.
