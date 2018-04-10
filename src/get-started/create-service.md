@@ -33,7 +33,6 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 ```toml
 [package]
 name = "exonum_cryptocurrency"
-# Tutorial version corresponds to the compatible version of Exonum core library
 version = "0.0.0"
 authors = ["Your Name <your@email.com>"]
 
@@ -54,6 +53,7 @@ Rust crates have the [`src/lib.rs`][lib.rs] file as the default entry point.
 In our case, this is where we are going to place the service code.
 Let’s start from importing crates with necessary types:
 
+??? note "Imports"
 ```rust
 extern crate bodyparser;
 #[macro_use]
@@ -251,7 +251,7 @@ for the receiver’s one (`to`). It also contains the amount of money to move
 between them. We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
 
-### Contracts Errors
+### Reporting Errors
 
 The execution of the transaction may be unsuccessful for some reason.
 For example, the transaction `TxCreateWallet` will not be executed
@@ -393,7 +393,9 @@ struct CryptocurrencyApi {
 }
 ```
 
-It is also necessary to create a structure that will be returned by the REST API:
+### API for Transactions
+
+Define a type for transaction response:
 
 ```rust
 #[derive(Serialize, Deserialize)]
@@ -402,8 +404,6 @@ pub struct TransactionResponse {
     pub tx_hash: Hash,
 }
 ```
-
-### API for Transactions
 
 The core processing logic is essentially the same for both types of transactions:
 
@@ -460,19 +460,19 @@ impl CryptocurrencyApi {
                     Status::BadRequest,
                     Header(ContentType::json()),
                     "\"Invalid request param: `pub_key`\"",
-                        ),
-                    )
-                })?;
-
-                let snapshot = self.blockchain.snapshot();
-                let schema = CurrencySchema::new(snapshot);
-
-                if let Some(wallet) = schema.wallet(&public_key) {
-                    self.ok_response(&serde_json::to_value(wallet).unwrap())
-                } else {
-                    self.not_found_response(&serde_json::to_value("Wallet not found").unwrap())
-                }
-            }
+                ),
+            )
+        })?;
+    
+        let snapshot = self.blockchain.snapshot();
+        let schema = CurrencySchema::new(snapshot);
+    
+        if let Some(wallet) = schema.wallet(&public_key) {
+            self.ok_response(&serde_json::to_value(wallet).unwrap())
+        } else {
+            self.not_found_response(&serde_json::to_value("Wallet not found").unwrap())
+        }
+    }
 
     fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
         let snapshot = self.blockchain.snapshot();
