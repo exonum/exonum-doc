@@ -66,7 +66,6 @@ Let’s start with importing crates with necessary types:
     #[macro_use]
     extern crate serde_derive;
     extern crate serde_json;
-
     use exonum::api::{Api, ApiError};
     use exonum::blockchain::{ApiContext, Blockchain, ExecutionError,
                              ExecutionResult, Service, Transaction,
@@ -395,16 +394,6 @@ struct CryptocurrencyApi {
 
 ### API for Transactions
 
-Define a type for transaction response:
-
-```rust
-#[derive(Serialize, Deserialize)]
-pub struct TransactionResponse {
-    // Hash of the transaction.
-    pub tx_hash: Hash,
-}
-```
-
 The core processing logic is essentially the same for both types of transactions:
 
 1. Convert JSON input into a `Transaction`
@@ -412,9 +401,15 @@ The core processing logic is essentially the same for both types of transactions
   blockchain network and included into the block.
 3. Synchronously respond with a hash of the transaction
 
-This logic can be encapsulated in a parameterized method in `CryptocurrencyApi`:
+This logic can be encapsulated in a method in `CryptocurrencyApi`:
 
 ```rust
+#[derive(Serialize, Deserialize)]
+pub struct TransactionResponse {
+    // Hash of the transaction.
+    pub tx_hash: Hash,
+}
+
 impl CryptocurrencyApi {
     fn post_transaction(&self, req: &mut Request) -> IronResult<Response> {
         match req.get::<bodyparser::Struct<CurrencyTransactions>>() {
@@ -471,7 +466,9 @@ impl CryptocurrencyApi {
         if let Some(wallet) = schema.wallet(&public_key) {
             self.ok_response(&serde_json::to_value(wallet).unwrap())
         } else {
-            self.not_found_response(&serde_json::to_value("Wallet not found").unwrap())
+            self.not_found_response(
+                &serde_json::to_value("Wallet not found").unwrap()
+            )
         }
     }
 
@@ -500,9 +497,11 @@ method:
 impl Api for CryptocurrencyApi {
     fn wire(&self, router: &mut Router) {
         let self_ = self.clone();
-        let post_create_wallet = move |req: &mut Request| self_.post_transaction(req);
+        let post_create_wallet =
+            move |req: &mut Request| self_.post_transaction(req);
         let self_ = self.clone();
-        let post_transfer = move |req: &mut Request| self_.post_transaction(req);
+        let post_transfer =
+            move |req: &mut Request| self_.post_transaction(req);
         let self_ = self.clone();
         let get_wallets = move |req: &mut Request| self_.get_wallets(req);
         let self_ = self.clone();
@@ -731,14 +730,13 @@ Create `create-wallet-1.json` file and insert the following code into it:
 ```json
 {
   "body": {
-    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-    "name": "Johnny Doe"
+    "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85",
+    "name": "Alice"
   },
-  "network_id": 0,
   "protocol_version": 0,
   "service_id": 1,
-  "message_id": 1,
-  "signature": "ad5efdb52e48309df9aa582e67372bb3ae67828c5eaa1a7a5e387597174055d315eaa7879912d0509acf17f06a23b7f13f242017b354f682d85930fa28240402"
+  "message_id": 0,
+  "signature":"9f684227f1de663775848b3db656bca685e085391e2b00b0e115679fd45443ef58a5abeb555ab3d5f7a3cd27955a2079e5fd486743f36515c8e5bea07992100b"
 }
 ```
 
@@ -749,20 +747,20 @@ curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
     http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
 ```
 
-This transaction creates the first wallet associated with user Johnny Doe.
+This transaction creates the first wallet associated with user Alice.
 The transaction endpoint returns the hash of the transaction:
 
 ```json
 {
-  "tx_hash": "44c6c2c58eaab71f8d627d75ca72f244289bc84586a7fb42186a676b2ec4626b"
+  "tx_hash": "099d455ab563505cad55b7c6ec02e8a52bca86b0c4446d9879af70f5ceca5dd8
 }
 ```
 
 The node will show in the log that the first wallet has been created:
 
 ```none
-Create the wallet: Wallet { pub_key: PublicKey(3E657AE),
-                            name: "Johnny Doe", balance: 100 }
+Create the wallet: Wallet { pub_key: PublicKey(6CE29B2D),
+                            name: "Alice", balance: 100 }
 ```
 
 #### Create the Second Wallet
@@ -772,14 +770,13 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 ```json
 {
   "body": {
-    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-    "name": "Janie Roe"
+    "pub_key":"ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
+    "name": "Bob"
   },
-  "network_id": 0,
   "protocol_version": 0,
   "service_id": 1,
-  "message_id": 1,
-  "signature": "05f51eb13cfaaebc97b27e340048f35f40c7bb6e3ae4c47728dee9908a10636add57700dfce1bcd686dc36fae4fa930d1318fb76a0d5c410b998be1949382209"
+  "message_id": 0,
+  "signature":"059f0a281ab63e00839310db8ba680ca550c9f6e3ccc9463dc7a8a82342f70bdbdc8237f6af9d20bbcd3ad5547c3f24d2dc80fcd9c954e087a80742f995e160c"
 }
 ```
 
@@ -794,15 +791,15 @@ It returns the hash of the second transaction:
 
 ```json
 {
-  "tx_hash": "8714e90607afc05f43b82c475c883a484eecf2193df97b243b0d8630812863fd"
+  "tx_hash": "2fb289b9928f5a75acf261cc1e61fd654fcb63bf285688f0fc8e59f44dede048"
 }
 ```
 
 The node will show in the log that the second wallet has been created:
 
 ```none
-Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
-                            name: "Janie Roe", balance: 100 }
+Create the wallet: Wallet { pub_key: PublicKey(AE6A1C4E),
+                            name: "Bob", balance: 100 }
 ```
 
 #### Transfer Between Wallets
@@ -813,20 +810,19 @@ Create `transfer-funds.json` and add the following code to this file:
 ```json
 {
   "body": {
-    "from": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472",
-    "to": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819",
-    "amount": "10",
-    "seed": "12623766328194547469"
+    "from": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85",
+    "to": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
+    "amount": "15",
+    "seed": "0"
   },
-  "network_id": 0,
   "protocol_version": 0,
   "service_id": 1,
-  "message_id": 2,
-  "signature": "2c5e9eee1b526299770b3677ffd0d727f693ee181540e1914f5a84801dfd410967fce4c22eda621701c2b9c676ed62bc48df9c973462a8514ffb32bec202f103"
+  "message_id": 1,
+  "signature":"2c234680adaa67f1e6573895f1557230ea5373b0972f8aa714611f78931c4bae49680580d41ac806977a7a4f9556781018f1061c9be4adcaabc3760c5a92a70b"
 }
 ```
 
-This transaction transfers 10 coins from the first wallet to the second.
+This transaction transfers 15 coins from the first wallet to the second.
 Send it to the node with:
 
 ```sh
@@ -838,17 +834,17 @@ This request returns the transaction hash:
 
 ```json
 {
-  "tx_hash": "e63b28caa07adffb6e2453390a59509a1469e66698c75b4cfb2f0ae7a6887fdc"
+  "tx_hash": "4d6de957f58c894db2dca577d4fdd0da1249a8dff1df5eb69d23458e43320ee2"
 }
 ```
 
 The node outputs to the console the information about this transfer:
 
 ```none
-Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
-                                   name: "Johnny Doe", balance: 90 }
-                       => Wallet { pub_key: PublicKey(D1E87747),
-                                   name: "Janie Roe", balance: 110 }
+Transfer between wallets: Wallet { pub_key: PublicKey(6CE29B2D),
+                                   name: "Alice", balance: 85 }
+                       => Wallet { pub_key: PublicKey(AE6A1C4E),
+                                   name: "Bob", balance: 115 }
 ```
 
 ### Read Requests
@@ -866,14 +862,14 @@ This request expectedly returns information on both wallets in the system:
 ```json
 [
   {
-    "balance": "90",
-    "name": "Johnny Doe",
-    "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+    "balance": "85",
+    "name": "Alice",
+    "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
   },
   {
-    "balance": "110",
-    "name": "Janie Roe",
-    "pub_key": "d1e877472a4585d515b13f52ae7bfded1ccea511816d7772cb17e1ab20830819"
+    "balance": "115",
+    "name": "Bob",
+    "pub_key": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2"
   }
 ]
 ```
@@ -884,16 +880,16 @@ The second read endpoint also works:
 
 ```sh
 curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet/\
-03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
 ```
 
 The response is:
 
 ```json
 {
-  "balance": "90",
-  "name": "Johnny Doe",
-  "pub_key": "03e657ae71e51be60a45b4bd20bcf79ff52f0c037ae6da0540a0e0066132b472"
+  "balance": "85",
+  "name": "Alice",
+  "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
 }
 ```
 
