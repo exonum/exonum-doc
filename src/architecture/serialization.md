@@ -19,7 +19,7 @@ created already "serialized" and Exonum works directly with the serialized data
 
 Full nodes can both [serialize messages](#message-serialization) for sending and
 deserialize messages when they are received. All the information that passes in
-the network between nodes turns into messages (the [`message!` macro][message_macro]).
+the network between nodes turns into messages (the [`transactions!` macro][transactions_macro]).
 Data received as a message is validated against [serialization rules](#serialization-principles).
 
 ### Communication with Light Clients
@@ -278,7 +278,7 @@ in the correspondence with [the validation rules](#segment-validation-rules).
 
 `encoding_struct!` macro allows to compose existing structures:
 
-```Rust
+```rust
 encoding_struct! {
     struct Pair {
         first: u32,
@@ -298,13 +298,14 @@ Here `Pair` is used as a base type in `Pairs` declaration.
 Analogously, fields derived from structures defined with `encoding_struct!`
 macro can be used within messages:
 
-```Rust
-message! {
-    struct MessagePairs {
-        const TYPE = 42;
-        const ID   = 5;
+```rust
+transactions! {
+    Transactions {
+        const SERVICE_ID = 777;
 
-        inner: Vec<Pair>,
+        struct MessagePairs {
+            inner: Vec<Pair>,
+        }
     }
 }
 ```
@@ -416,7 +417,7 @@ The length of the entire message serialization (including its header and signatu
 ### Body
 
 Serialized [structure](#structures) (including its header and body) described on
-`message!` macro call.
+`transactions!` macro call.
 
 ### Signature
 
@@ -427,19 +428,19 @@ i.e., the last 64 bytes of the serialization).
 **Binary presentation:** Ed25519 signature (64 bytes).  
 **JSON presentation:** hex string.
 
-### Example of `message!` Usage
+### Example of `transactions!` Usage
 
-```Rust
+```rust
 const MY_SERVICE_ID: u16 = 777;
-const MY_NEW_MESSAGE_ID: u16 = 1;
 
-message! {
-    struct MessageTwoIntegers {
-        const TYPE = MY_NEW_MESSAGE_ID;
-        const ID   = MY_SERVICE_ID;
+transactions! {
+    Transactions {
+        const SERVICE_ID = MY_SERVICE_ID;
 
-        first: u64,
-        second: u64,
+        struct MessageTwoIntegers {
+            first: u64,
+            second: u64,
+        }
     }
 }
 ```
@@ -469,7 +470,13 @@ Consider the structure with three fields:
 
 To serialize the structure, one may use macros like this:
 
-```Rust
+```rust
+#[macro_use] extern crate exonum;
+extern crate hex;
+use exonum::crypto::PublicKey;
+use exonum::storage::StorageValue;
+use hex::FromHex;
+
 encoding_struct! {
     struct Wallet {
         pub_key: &PublicKey,
@@ -482,11 +489,11 @@ encoding_struct! {
 
 let pub_key_str = "99ace6c721db293b0ed5b487e6d6111f\
                    22a8c55d2a1b7606b6fa6e6c29671aa1";
-let pub_key = PublicKey::from_hex(pub_key_str).unwrap();
+let pub_key: PublicKey = pub_key_str.parse().unwrap();
 let my_wallet = Wallet::new(&pub_key, "Andrew", 1234);
 
 // Check structure content
-assert_eq!(my_wallet.pub_key().to_string(), *pub_key_str);
+assert_eq!(*my_wallet.pub_key(), pub_key);
 assert_eq!(my_wallet.owner(), "Andrew");
 assert_eq!(my_wallet.balance(), 1234);
 
@@ -497,7 +504,7 @@ let expected_buffer_str = pub_key_str.to_owned() + // Public key
                           "416e64726577";          // Name
 let expected_buffer = Vec::<u8>::from_hex(&expected_buffer_str)
     .unwrap();
-assert_eq!(my_wallet.serialize(), expected_buffer);
+assert_eq!(my_wallet.into_bytes(), expected_buffer);
 ```
 
 Serialized representation of `my_wallet`:
@@ -510,8 +517,8 @@ Serialized representation of `my_wallet`:
 40..48 | 1234   | `d2 04 00 00 00 00 00 00` | A number in little endian format |
 48..54 | Andrew | `41 6e 64 72 65 77`       | UTF-8 string converted into a byte array |
 
-[message_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/spec.rs
-[encoding_struct_macro]: https://github.com/exonum/exonum/blob/master/exonum/src/encoding/spec.rs
+[transactions_macro]: https://docs.rs/exonum/*/exonum/macro.transactions.html
+[encoding_struct_macro]: https://docs.rs/exonum/*/exonum/macro.encoding_struct.html
 [zero_copy]: https://en.wikipedia.org/wiki/Zero-copy
 [asn_der]: https://en.wikipedia.org/wiki/X.690#DER_encoding
 [wiki_protobuf]: https://en.wikipedia.org/wiki/Protocol_Buffers
