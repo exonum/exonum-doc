@@ -408,8 +408,7 @@ used to look up the implementation of [the transaction interface](transactions.m
 
 ### Payload length
 
-The length of the message body after the header. Does not include the
-signature length.
+The length of the entire message serialization (including its header and signature).
 
 **Binary presentation:** `u32` (unsigned 4-byte integer).  
 **JSON presentation:** (not serialized).
