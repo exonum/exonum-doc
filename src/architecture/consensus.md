@@ -15,20 +15,21 @@ to it and other consensus algorithms for blockchains.
 ## Assumptions
 
 The Exonum consensus algorithm assumes that the consensus participants
-can be identified. Thus, the algorithm fits for permissioned blockchains,
+can be identified. Thus, the algorithm fits permissioned blockchains,
 which Exonum is oriented towards, rather than permissionless ones.
 
 Not all the nodes in the blockchain network may be actively involved in
 the consensus algorithm. Rather, there is a special role for active consensus
 participants – *validators* or *validator nodes*.
 For example, in a [consortium blockchain][public_and_private_blockchains]
-validators could be controlled by the companies participating in the consortium.
+validators could be controlled by the companies participating in the
+consortium.
 
 The consensus algorithm must operate in the presence of faults, i.e., when
 participants in the network may behave abnormally. The Exonum consensus
 algorithm
 assumes the worst; it operates under the assumption that any individual node
-or even a group of nodes in the blockchain network can crash or can be
+or even a group of nodes in the blockchain network can crash or be
 compromised
 by a resourceful adversary (say, a hacker or a corrupt administrator). This
 threat model is known in computer science as [Byzantine faults][wiki:bft];
@@ -40,9 +41,10 @@ usual assumptions:
 
 - Validator nodes are assumed to be [partially synchronous][partial_synchrony],
   i.e., their computation performances do not differ much
-- The network is partially synchronous, too. That is, all messages are delivered
+- The network is partially synchronous, too. That is, all messages are
+ delivered
   in the finite time which, however, is unknown in advance
-- Each validator has an access to a local **stopwatch** to determine time
+- Each validator has access to a local **stopwatch** to determine time
   intervals.
   On the other hand, there is no global synchronized time in the system
 - Validators can be identified with the public-key cryptography;
@@ -79,10 +81,10 @@ To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
    for the next block and broadcasts it across the network. The logic of
-   selecting the leader node is described in a separate algorithm
+   selecting the leader node is described in a separate algorithm.
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
    A prevote means that the validator has been able to parse the proposal
-   and has all transactions specified in it
+   and has all transactions specified in it.
 3. After the validator has collected enough prevotes from a supermajority
    of other validators, it applies transactions specified in the voted
    proposal,
@@ -90,7 +92,7 @@ To put it *very* simply, rounds proceed as follows:
    the proposal execution in the form of [a new state hash](storage.md).
    The precommit expresses that the sender is ready to commit the corresponding
    proposed block to the blockchain, but needs to see what other validators
-   have to say on the matter just to be sure
+   have to say on the matter just to be sure.
 4. Finally, if the validator has collected a supermajority of precommits with
    the same state hash for the same proposal, the proposed block is committed
    to the blockchain.
@@ -119,7 +121,8 @@ More precisely, the algorithm is required to maintain *safety* and *liveness*:
 
 - Safety means that once a single honest validator has committed a block, no
   other honest validator will ever commit any other block at the same height
-- Liveness means that honest validators keep committing blocks from time to time
+- Liveness means that honest validators keep committing blocks from time to
+  time
 
 #### Locks
 
@@ -132,16 +135,16 @@ that proposal. The locked validator does not vote for any other proposal except
 for the proposal on which it is locked. When a new round starts,
 the locked validator immediately sends a prevote indicating
 that it is locked on a certain proposal. Other validators may request prevotes
-that led to the lock from the locked validator, if they do not have them locally
-(these proposals are known as *proof of lock*).
+that led to the lock from the locked validator, if they do not have them
+locally (these prevotes are known as *proof of lock*).
 
 !!! note "Example"
     Validator A gets prevotes from validators B and C,
-    and they do not get prevotes from each other because of the connection
+    and they do not get prevotes from each other because of connection
     problems.
     Then validators B and C can request each other’s prevotes from validator A.
 
-Locks can be changed: if A locked on a propose and during next round all other
+Locks can be changed: if A locked on a proposal and during next round all other
 validators locked on the next proposal, A would update its lock eventually.
 
 ### Requests
@@ -154,10 +157,9 @@ and which has been discovered during the previous communication with the peer.
 
 !!! note "Example"
     A request is sent if a node receives a consensus message from
-    a height greater than the local height. The peer is supposed to respond with
-    a message that contains transactions in an accepted block, together with a
-    proof
-    that the block is indeed accepted (i.e., precommits of +2/3 validators).
+    a height greater than the local height. The peer is supposed to respond
+    with a message that contains transactions in an accepted block, together
+    with a proof that the block is indeed accepted (i.e., precommits of +2/3 validators).
 
 There are requests for all consensus messages: proposals, prevotes, and
 precommits.
@@ -172,7 +174,7 @@ The order of states in the proposed algorithm is as follows:
 Commit -> (Round)+ -> Commit -> ...
 ```
 
-On the timeline, these states look like this (for one of the
+On the timeline, these states look the following way (for one of the
 validator nodes):
 
 ```none
@@ -229,7 +231,8 @@ has a correctly formed `Propose` and all the transactions specified in it.
 #### Precommit
 
 `Precommit` is a message expressing readiness to include a certain proposal
-as the next block into blockchain. `Precommit` is broadcast to all validators.
+as the next block into the blockchain. `Precommit` is broadcast to all
+validators.
 
 #### Status
 
@@ -275,13 +278,13 @@ of the round. Then in the next round the entire process of nominating a
 proposal and voting for it must begin again. The timeout of the
 next round should be increased so that the block could be accepted during the
 new
-round timeout with a poor network connectivity. The need to repeat anew the work
-that has already been done and increase in the timeout would lead to
+round timeout with a poor network connectivity. The need to repeat anew the
+work that has already been done and increase in the timeout would lead to
 additional delays in accepting the block proposal.
 
 In contrast to the case discussed in the previous paragraph, the absence of a
-fixed round ends in Exonum allows to accept the proposal with a minimum
-necessary delay.
+fixed round end in Exonum allows the system to accept the proposal with a
+minimum necessary delay.
 
 ### Work Split
 
@@ -294,26 +297,26 @@ Delayed transactions processing reduces the negative impact of malicious nodes
 on the system throughput and latency. Indeed, it splits transactions processing
 among the stages of the algorithm:
 
-- On the prevote stage validators only ensure that a list of transactions
+- On the prevote stage, validators only ensure that a list of transactions
   included in the proposal is correct (the validator checks that all the
   transactions in
   the `Propose` are already stored by this node. Correctness of a transaction
   is verified when the transaction is received; nodes do not store incorrect
   transactions.)
-- On the precommit stage validators apply the transactions to the current
+- On the precommit stage, validators apply the transactions to the current
   blockchain state
-- On the commit stage validators ensure that they achieved the same state
+- On the commit stage, validators ensure that they achieved the same state
   after applying the transactions in the proposal
 
-If a Byzantine validator sends out proposals with a different transactions order
-to different validators, the validators do not need to spend time checking
-the order and applying the transactions on the prevote stage.
+If a Byzantine validator sends out proposals with a different transactions
+order to different validators, the validators do not need to spend time
+checking the order and applying the transactions on the prevote stage.
 A different transactions order will be detected when comparing the
 `propose_hash` received
 in the prevote messages from other validators and the `propose_hash` received
 in the proposal message.
 
-Thus, split of work helps reduce the negative impact of Byzantine nodes
+Thus, the split of work helps reduce the negative impact of Byzantine nodes
 on the overall system performance.
 
 ### Requests Algorithm

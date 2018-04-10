@@ -42,7 +42,7 @@ takes a more technical approach and gives in-depth description of the Exonum des
 
 ### Services & Clients
 
-The following 2 topics provide valuable insights how to develop with Exonum:
+The following 2 topics provide valuable insights on how to develop with Exonum:
 
 - [*Services*](architecture/services.md) are the main building block
   of the Exonum architecture
@@ -55,7 +55,7 @@ The following 2 topics provide valuable insights how to develop with Exonum:
 
 ### Specifications
 
-Exonum documentation contains in-depth discussions for numerous other aspects
+Exonum documentation contains in-depth discussions on numerous other aspects
 of the framework, such as [binary serialization](architecture/serialization.md),
 [storage](architecture/storage.md) and [networking](advanced/network.md).
 

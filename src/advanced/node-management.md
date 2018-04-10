@@ -9,7 +9,7 @@ node [local configuration](../architecture/configuration.md#local-parameters).
 
 Endpoints are divided into two types: private and public endpoints. Each
 endpoint type is hosted at a separate address, which is specified in the
-[`node.api` section](../architecture/configuration.md#nodeapi) of the local
+[`api` section](../architecture/configuration.md#api) of the local
 configuration.
 
 ## Types
@@ -24,18 +24,18 @@ an optional type.
 
 ### Bool
 
-`bool` type denotes a simple boolean `true/false` value.
+`bool` type denotes a boolean value: `true` or `false`.
 
 ### Hash, PublicKey, Signature
 
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
-appropriate length. `Hash` and `PublicKey` consist of 32 bytes.
-`Signature` consists of 64 bytes.
+appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex digits).
+`Signature` is 64 bytes (that is, 128 hex digits).
 
 ### PeerAddress
 
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
-address formatted as 4 octets separated by points.
+address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ### OutgoingConnectionState
 
@@ -125,7 +125,7 @@ address formatted as 4 octets separated by points.
 ### SerializedTransaction
 
 `SerializedTransaction` is a JSON object corresponding to
-[transaction serialization format](../architecture/transactions.md#serialization)
+[transaction serialization format](../architecture/serialization.md#message-serialization).
 
 ### TransactionLocation
 
@@ -194,133 +194,6 @@ A JSON object with the following fields:
 ```JSON
 {
   "connectivity": true
-}
-```
-
-### Transaction
-
-```none
-GET {system_base_path}/transactions/{transaction_hash}
-```
-
-Searches for a transaction, either committed or uncommitted, by the hash.
-
-#### Parameters
-
-- **transaction_hash**: Hash  
-  The hash of the transaction to be searched
-
-#### Response
-
-Returns a transaction from the pool of unconfirmed transactions if it is not
-committed yet, otherwise, returns a transaction from the blockchain.
-
-Response is a JSON object with one required field:
-
-- **type**: string  
-  Transaction type, can be:
-
-    - `Committed`: committed transaction (in blockchain)
-    - `MemPool`: uncommitted transaction (in the pool of unconfirmed
-    transactions)
-    - `Unknown`: unknown transaction
-
-##### Unknown Transaction Response Example
-
-Response JSON contains only `type` field. Its value is `Unknown`. Additionally,
-returns HTTP status `404`.
-
-```JSON
-{
-  "type": "Unknown"
-}
-```
-
-##### Known Uncommitted Transaction Response Example
-
-Response JSON has same fields as `SerializedTransaction` plus `type` field with
-value equal to `MemPool`:
-
-```JSON
-{
-  "body": {
-    "amount": "152",
-    "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-    "seed": "2953135335240383704",
-    "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
-  },
-  "message_id": 128,
-  "network_id": 0,
-  "protocol_version": 0,
-  "service_id": 128,
-  "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00",
-  "type": "MemPool"
-}
-```
-
-##### Known Committed Transaction Response Example
-
-Response is a JSON object with the following fields:
-
-- **content**: SerializedTransaction  
-  Transaction with the specified hash
-- **location**: TransactionLocation  
-  Transaction position in the blockchain
-- **proof_to_block_merkle_root**: MerkleRoot  
-  Merkle root proving transaction existence
-- **type**: string  
-  Is `Committed` for the committed transaction
-
-```JSON
-{
-  "content": {
-    "body": {
-      "amount": "152",
-      "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-      "seed": "2953135335240383704",
-      "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
-    },
-    "message_id": 128,
-    "network_id": 0,
-    "protocol_version": 0,
-    "service_id": 128,
-    "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
-  },
-  "location": {
-    "block_height": "18",
-    "position_in_block": "261"
-  },
-  "proof_to_block_merkle_root": {
-    "left": "07e641264ac4646495c54a379a5943bf88785bcf30a0b4c13f47d1e2e62b343d",
-    "right": {
-      "left": {
-        "left": {
-          "left": {
-            "left": {
-              "left": {
-                "left": "78044db9c2713a11c2fe7bb66f27665b6ca0ecbb9e61e09381534d449c4c24c4",
-                "right": {
-                  "left": {
-                    "left": "f62e6a4d8b9c2c0cfb31ea599e08e6e3fe2337169ce07008d91390958e0613d4",
-                    "right": {
-                      "val": "f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf"
-                    }
-                  },
-                  "right": "daee36b5b7c24a831a62539d534c56e4f234a83ce83876fee48193d8eefabfb2"
-                }
-              },
-              "right": "df8bb7e697e6eb7828975b67f64a77af06379435f4330f0cb0b7a21d18b616db"
-            },
-            "right": "59ab567cf0d1c09c5050680ea4ed4650238023666b0e5d90855d82dc83d1f982"
-          },
-          "right": "cf5fa45701ba6ae795da58a504eb1608075d7bbedf05c8f6f448aad4dbd03968"
-        },
-        "right": "eb583ba724a3b371c243f1268dfca2929c704fe0546875e5dfeb90860ac3533f"
-      },
-      "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
-    }
-  },
-  "type": "Committed"
 }
 ```
 
@@ -402,44 +275,43 @@ A JSON object with the following fields:
   corresponding values of type `OutgoingConnectionInfo` contain info about
   public keys and current connection status of peers.
 
-#### Response example
-
-```JSON
-{
-  "incoming_connections": [
-    "127.0.0.1:58635",
-    "127.0.0.1:58656"
-  ],
-  "outgoing_connections": {
-    "127.0.0.1:6334": {
-      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
-      "state": {
-        "type": "Active"
-      }
-    },
-    "127.0.0.1:6335": {
-      "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
-      "state": {
-        "delay": 4000,
-        "type": "Reconnect"
-      }
-    },
-    "127.0.0.1:6336": {
-      "public_key": null,
-      "state": {
-        "type": "Active"
-      }
-    },
-    "127.0.0.1:6337": {
-      "public_key": null,
-      "state": {
-        "delay": 4000,
-        "type": "Reconnect"
+??? example "Response Example"
+    ```json
+    {
+      "incoming_connections": [
+        "127.0.0.1:58635",
+        "127.0.0.1:58656"
+      ],
+      "outgoing_connections": {
+        "127.0.0.1:6334": {
+          "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+          "state": {
+            "type": "Active"
+          }
+        },
+        "127.0.0.1:6335": {
+          "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
+          "state": {
+            "delay": 4000,
+            "type": "Reconnect"
+          }
+        },
+        "127.0.0.1:6336": {
+          "public_key": null,
+          "state": {
+            "type": "Active"
+          }
+        },
+        "127.0.0.1:6337": {
+          "public_key": null,
+          "state": {
+            "delay": 4000,
+            "type": "Reconnect"
+          }
+        }
       }
     }
-  }
-}
-```
+    ```
 
 ### Consensus Enabled Info
 
@@ -560,6 +432,160 @@ All explorer API endpoints share the same base path, denoted
 All explorer endpoints are public. `enable_blockchain_explorer` local
 configuration parameter allows to turn explorer endpoints on/off.
 
+### Transaction
+
+```none
+GET {explorer_base_path}/transactions/{transaction_hash}
+```
+
+Searches for a transaction, either committed or uncommitted, by the hash.
+
+#### Parameters
+
+- **transaction_hash**: Hash  
+  The hash of the transaction to be searched
+
+#### Response
+
+Returns a transaction from the pool of unconfirmed transactions if it is not
+committed yet, otherwise, returns a transaction from the blockchain.
+
+Response is a JSON object with one required field:
+
+- **type**: string  
+  Transaction type, can be:
+
+    - `committed`: committed transaction (in blockchain)
+    - `in-pool`: uncommitted transaction (in the pool of unconfirmed
+      transactions)
+    - `unknown`: unknown transaction
+
+The object may also contain other fields, which depend on `type` and are
+outlined below.
+
+##### Unknown Transaction
+
+Response JSON contains only `type` field. Its value is `unknown`. Additionally,
+the HTTP status of the response is set to 404.
+
+??? example "Response Example"
+    ```json
+    {
+      "type": "unknown"
+    }
+    ```
+
+##### Known Uncommitted Transaction
+
+Response JSON has same fields as [`SerializedTransaction`](#serializedtransaction)
+plus `type` field with value equal to `"in-pool"`.
+
+??? example "Response Example"
+    ```json
+    {
+      "type": "in-pool",
+      "body": {
+        "amount": "152",
+        "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
+        "seed": "2953135335240383704",
+        "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
+      },
+      "network_id": 0,
+      "protocol_version": 0,
+      "service_id": 128,
+      "message_id": 128,
+      "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
+    }
+    ```
+
+##### Known Committed Transaction
+
+Response is a JSON object with the following fields:
+
+- **content**: SerializedTransaction  
+  Transaction with the specified hash
+- **location**: TransactionLocation  
+  Transaction position in the blockchain
+- **location_proof**: ListProof  
+  [Merkle proof](merkelized-list.md#merkle-tree-proofs) tying transaction
+  to the `tx_hash` of the containing block
+- **type**: `"committed"`  
+  Always equals to `committed`
+- **status**: Object  
+  [Transaction execution](../architecture/transactions.md#execute) status
+- **status.type**: `"success"` | `"error"` | `"panic"`  
+  Execution status kind:
+
+    - `"success"` denotes a successfully completed transaction
+    - `"error"` denotes a transaction that has returned an error (for example,
+      because of transaction parameters not satisfying context-dependent checks)
+    - `"panic"` denotes a transaction that has raised a runtime exception
+      (for example, attempted to divide by zero)
+
+- **status.code**: integer  
+  Error code supplied by the service developer. Only present for erroneous
+  transactions. Has service-specific meaning
+- **status.description**: string=  
+  Optional human-readable error description. Only relevant for erroneous and
+  panicking transactions
+
+??? example "Response Example"
+    ```json
+    {
+      "type": "committed",
+      "content": {
+        "body": {
+          "amount": "152",
+          "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
+          "seed": "2953135335240383704",
+          "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
+        },
+        "network_id": 0,
+        "protocol_version": 0,
+        "service_id": 128,
+        "message_id": 128,
+        "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
+      },
+      "location": {
+        "block_height": "18",
+        "position_in_block": "261"
+      },
+      "location_proof": {
+        "left": "07e641264ac4646495c54a379a5943bf88785bcf30a0b4c13f47d1e2e62b343d",
+        "right": {
+          "left": {
+            "left": {
+              "left": {
+                "left": {
+                  "left": {
+                    "left": "78044db9c2713a11c2fe7bb66f27665b6ca0ecbb9e61e09381534d449c4c24c4",
+                    "right": {
+                      "left": {
+                        "left": "f62e6a4d8b9c2c0cfb31ea599e08e6e3fe2337169ce07008d91390958e0613d4",
+                        "right": {
+                          "val": "f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf"
+                        }
+                      },
+                      "right": "daee36b5b7c24a831a62539d534c56e4f234a83ce83876fee48193d8eefabfb2"
+                    }
+                  },
+                  "right": "df8bb7e697e6eb7828975b67f64a77af06379435f4330f0cb0b7a21d18b616db"
+                },
+                "right": "59ab567cf0d1c09c5050680ea4ed4650238023666b0e5d90855d82dc83d1f982"
+              },
+              "right": "cf5fa45701ba6ae795da58a504eb1608075d7bbedf05c8f6f448aad4dbd03968"
+            },
+            "right": "eb583ba724a3b371c243f1268dfca2929c704fe0546875e5dfeb90860ac3533f"
+          },
+          "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
+        }
+      },
+      "status": {
+        "type": "success"
+      }
+    }
+    ```
+
 ### Block by height
 
 ```none
@@ -584,78 +610,77 @@ A JSON object with the following fields:
 - **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into the block
 
-#### Response example
-
-```JSON
-{
-  "block": {
-    "height": "20",
-    "prev_hash": "a6d3d838e4edc29bd977eba3885a4ef30a020d166ac0e9c51737ae97b8fb3bce",
-    "proposer_id": 2,
-    "schema_version": 0,
-    "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-    "tx_count": 0,
-    "tx_hash": "0000000000000000000000000000000000000000000000000000000000000000"
-  },
-  "precommits": [
+??? example "Response Example"
+    ```json
     {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+      "block": {
         "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 807015000,
-          "secs": "1499869987"
-        },
-        "validator": 2
+        "prev_hash": "a6d3d838e4edc29bd977eba3885a4ef30a020d166ac0e9c51737ae97b8fb3bce",
+        "proposer_id": 2,
+        "schema_version": 0,
+        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+        "tx_count": 0,
+        "tx_hash": "0000000000000000000000000000000000000000000000000000000000000000"
       },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
-    },
-    {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-        "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 806850000,
-          "secs": "1499869987"
+      "precommits": [
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 807015000,
+              "secs": "1499869987"
+            },
+            "validator": 2
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
         },
-        "validator": 3
-      },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
-    },
-    {
-      "body": {
-        "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-        "height": "20",
-        "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-        "round": 2,
-        "time": {
-          "nanos": 7842000,
-          "secs": "1499869988"
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 806850000,
+              "secs": "1499869987"
+            },
+            "validator": 3
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
         },
-        "validator": 0
-      },
-      "message_id": 4,
-      "network_id": 0,
-      "protocol_version": 0,
-      "service_id": 0,
-      "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+        {
+          "body": {
+            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
+            "height": "20",
+            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
+            "round": 2,
+            "time": {
+              "nanos": 7842000,
+              "secs": "1499869988"
+            },
+            "validator": 0
+          },
+          "message_id": 4,
+          "network_id": 0,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+        }
+      ],
+      "txs": []
     }
-  ],
-  "txs": []
-}
-```
+    ```
 
 ### Blocks in range
 
@@ -689,74 +714,73 @@ in `0..latest - count + 1`. Blocks in the array are sorted in descending order
 according to their heights. Height of any block in the array is greater or
 equal than `from` and less or equal than `to`.
 
-#### Response example
+??? example "Response Example"
+    Assume the following request
 
-Assume the following request
+    ```none
+    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true
+    ```
 
-```none
-GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true
-```
+    and response
 
-and response
-
-```JSON
-{
-  "range": {
-    "from": 100,
-    "to": 2
-  },
-  "blocks": [
+    ```JSON
     {
-      "height": "18",
-      "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
-      "proposer_id": 3,
-      "schema_version": 0,
-      "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-      "tx_count": 426,
-      "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
-    },
-    {
-      "height": "14",
-      "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
-      "proposer_id": 3,
-      "schema_version": 0,
-      "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-      "tx_count": 1000,
-      "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
-    },
-    {
-      "height": "10",
-      "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
-      "proposer_id": 3,
-      "schema_version": 0,
-      "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-      "tx_count": 1000,
-      "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
-    },
-    {
-      "height": "6",
-      "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
-      "proposer_id": 3,
-      "schema_version": 0,
-      "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-      "tx_count": 1000,
-      "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
-    },
-    {
-      "height": "2",
-      "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
-      "proposer_id": 3,
-      "schema_version": 0,
-      "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-      "tx_count": 1000,
-      "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+      "range": {
+        "from": 100,
+        "to": 2
+      },
+      "blocks": [
+        {
+          "height": "18",
+          "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 426,
+          "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
+        },
+        {
+          "height": "14",
+          "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
+        },
+        {
+          "height": "10",
+          "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
+        },
+        {
+          "height": "6",
+          "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
+        },
+        {
+          "height": "2",
+          "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
+          "proposer_id": 3,
+          "schema_version": 0,
+          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
+          "tx_count": 1000,
+          "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+        }
+      ]
     }
-  ]
-}
-```
+    ```
 
-That is, to collect `5` non-empty blocks from the tail of the blockchain,
-range from `100` to `2` has been traversed.
+    That is, to collect `5` non-empty blocks from the tail of the blockchain,
+    range from `100` to `2` has been traversed.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs

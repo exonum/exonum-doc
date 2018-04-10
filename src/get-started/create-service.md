@@ -22,7 +22,7 @@ Exonum is written in Rust and you have to install the stable Rust
 compiler to build this tutorial. If you do not have the environment set up, follow
 [the installation guide](./install.md).
 
-Let’s create minimal crate with the **exonum** crate as a dependency.
+Let’s create a minimal crate with the **exonum** crate as a dependency.
 
 ```sh
 cargo new cryptocurrency
@@ -51,39 +51,39 @@ failure = "0.1.1"
 
 Rust crates have the [`src/lib.rs`][lib.rs] file as the default entry point.
 In our case, this is where we are going to place the service code.
-Let’s start from importing crates with necessary types:
+Let’s start with importing crates with necessary types:
 
 ??? note "Imports"
-```rust
-extern crate bodyparser;
-#[macro_use]
-extern crate exonum;
-#[macro_use]
-extern crate failure;
-extern crate iron;
-extern crate router;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
+    ```rust
+    extern crate bodyparser;
+    #[macro_use]
+    extern crate exonum;
+    #[macro_use]
+    extern crate failure;
+    extern crate iron;
+    extern crate router;
+    extern crate serde;
+    #[macro_use]
+    extern crate serde_derive;
+    extern crate serde_json;
 
-use exonum::api::{Api, ApiError};
-use exonum::blockchain::{ApiContext, Blockchain, ExecutionError,
-                         ExecutionResult, Service, Transaction,
-                         TransactionSet};
-use exonum::crypto::{Hash, PublicKey};
-use exonum::encoding;
-use exonum::encoding::serialize::FromHex;
-use exonum::messages::{Message, RawTransaction};
-use exonum::node::{ApiSender, TransactionSend};
-use exonum::storage::{Fork, MapIndex, Snapshot};
-use iron::headers::ContentType;
-use iron::Handler;
-use iron::modifiers::Header;
-use iron::prelude::*;
-use iron::status::Status;
-use router::Router;
-```
+    use exonum::api::{Api, ApiError};
+    use exonum::blockchain::{ApiContext, Blockchain, ExecutionError,
+                             ExecutionResult, Service, Transaction,
+                             TransactionSet};
+    use exonum::crypto::{Hash, PublicKey};
+    use exonum::encoding;
+    use exonum::encoding::serialize::FromHex;
+    use exonum::messages::{Message, RawTransaction};
+    use exonum::node::{ApiSender, TransactionSend};
+    use exonum::storage::{Fork, MapIndex, Snapshot};
+    use iron::headers::ContentType;
+    use iron::Handler;
+    use iron::modifiers::Header;
+    use iron::prelude::*;
+    use iron::status::Status;
+    use router::Router;
+    ```
 
 ## Constants
 
@@ -120,7 +120,7 @@ encoding_struct! {
 
 Macro `encoding_struct!` helps declare a
 [serializable](../architecture/serialization.md)
-struct and determine bounds of its fields. We need to change wallet balance,
+struct and determine bounds of its fields. We need to change the wallet balance,
 so we add methods to the `Wallet` type:
 
 ```rust
@@ -191,7 +191,7 @@ impl<T: AsRef<Snapshot>> CurrencySchema<T> {
 ```
 
 Here, we have declared a constructor and two getter methods for the schema
-wrapping any type that allows to access it as a `Snapshot` reference
+wrapping any type that allows accessing it as a `Snapshot` reference
 (that is, implements the [`AsRef`][std-asref] trait from the standard library).
 `Fork` implements this trait, which means that we can construct a `CurrencySchema`
 instance above the `Fork`, and use `wallets` and `wallet` getters for it.
@@ -299,7 +299,7 @@ This trait includes the `verify` method to verify the integrity of the
 transaction, and the `execute` method which contains logic applied to the
 storage when a transaction is executed.
 
-In our case `verify` for both transaction types will check the transaction
+In our case, `verify` for both transaction types will check the transaction
 signature. `execute` method gets the reference to the `Fork` of the storage, so
 we wrap it with our `CurrencySchema` to access our data layout.
 
@@ -377,7 +377,7 @@ impl Transaction for TxTransfer {
 
 ## Implement API
 
-Finally, we need to implement the node API with the help of [Iron framework][iron].
+Next, we need to implement the node API with the help of [Iron framework][iron].
 With this aim we declare a struct which implements the `Api` trait.
 The struct will contain a channel, i.e. a connection to the blockchain node
 instance.
@@ -446,7 +446,8 @@ We want to implement 2 read requests:
 
 To accomplish this, we define a couple of corresponding methods in
 `CryptocurrencyApi`
-that use its `blockchain` field to read information from the blockchain storage.
+that use its `blockchain` field to read information from the blockchain
+ storage.
 
 ```rust
 impl CryptocurrencyApi {
@@ -463,10 +464,10 @@ impl CryptocurrencyApi {
                 ),
             )
         })?;
-    
+
         let snapshot = self.blockchain.snapshot();
         let schema = CurrencySchema::new(snapshot);
-    
+
         if let Some(wallet) = schema.wallet(&public_key) {
             self.ok_response(&serde_json::to_value(wallet).unwrap())
         } else {
@@ -490,7 +491,8 @@ As with the transaction endpoint, the methods have an idiomatic signature
 
 ### Wire API
 
-Finally, we need to tie request processing logic to
+As the final step of the API implementation, we need to tie request
+processing logic to
 specific endpoints. We do this in the `CryptocurrencyApi::wire()`
 method:
 
@@ -521,7 +523,7 @@ that we have defined, with a type signature
 to ones that Iron supports – `Fn(&mut Request) -> IronResult<Response>`.
 This can be accomplished by [currying][curry-fn], that is,
 cloning `CryptocurrencyApi` and moving it into each closure.
-For this to work, observe that cloning a `Blockchain` does not create
+For this to work, note that cloning a `Blockchain` does not create
 a new blockchain from scratch,
 but rather produces a reference to the same blockchain instance.
 (That is, `Blockchain` is essentially a smart pointer type similar to [`Arc`][arc]
@@ -537,7 +539,7 @@ pub struct CurrencyService;
 ```
 
 To turn `CurrencyService` into a blockchain service,
-we should implement the `Service` trait to it.
+we should implement the `Service` trait in it.
 
 !!! tip
     Read more on how to turn a type into a blockchain service in the
@@ -556,7 +558,7 @@ If the incoming transaction is built successfully, we put it into a `Box<_>`.
 
 The `state_hash` method is used to calculate the hash of
 [the blockchain state](../glossary.md#blockchain-state). The method
-[should return](../architecture/services.md#state-hash) a vector of hashes of the
+should return [a vector of hashes](../architecture/services.md#state-hash) of the
 [Merkelized service tables](../glossary.md#merkelized-indices).
 As the wallets table is not Merkelized (a simplifying assumption discussed at the
 beginning of the tutorial), the returned value should be an empty vector, `vec![]`.
@@ -600,7 +602,7 @@ impl Service for CurrencyService {
 ## Create Demo Blockchain
 
 The service is ready. You can verify that the library code compiles by running
-`cargo build` in the shell. However, we do not have means to process requests
+`cargo build` in the shell. However, we do not have the means of processing requests
 to the service. To fix this, let us create a minimalistic blockchain network
 with one node and a single service we’ve just finished creating.
 
@@ -724,7 +726,7 @@ Let’s send some transactions to our demo blockchain.
 
 #### Create the First Wallet
 
-Create `create-wallet-1.json` file and put there:
+Create `create-wallet-1.json` file and insert the following code into it:
 
 ```json
 {
@@ -740,7 +742,7 @@ Create `create-wallet-1.json` file and put there:
 }
 ```
 
-Use `curl` command to send this transaction to the node by HTTP:
+Use the `curl` command to send this transaction to the node by HTTP:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
@@ -806,7 +808,7 @@ Create the wallet: Wallet { pub_key: PublicKey(D1E87747),
 #### Transfer Between Wallets
 
 Now we have two wallets in the database and we can transfer money between them.
-Create `transfer-funds.json` and add to the file:
+Create `transfer-funds.json` and add the following code to this file:
 
 ```json
 {
@@ -840,7 +842,7 @@ This request returns the transaction hash:
 }
 ```
 
-The node outputs to the console information about this transfer:
+The node outputs to the console the information about this transfer:
 
 ```none
 Transfer between wallets: Wallet { pub_key: PublicKey(3E657AE),
