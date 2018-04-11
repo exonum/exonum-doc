@@ -113,8 +113,6 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   ID of the validator that created this `Precommit` message
 - **message_id**: integer  
   ID of the `Precommit` message. Equals `4`
-- **network_id**: integer  
-  Network ID. Is not used currently
 - **protocol_version**: integer  
   The major version of the Exonum serialization protocol. Currently, `0`
 - **service_id**: integer  
@@ -376,8 +374,6 @@ None.
 
 A JSON object with the following fields:
 
-- **network_id**: integer  
-  Network ID. Is not used currently
 - **protocol_version**: integer  
   The major version of the Exonum serialization protocol. Currently, `0`
 - **services**: Array<ServiceInfo\>  
@@ -387,7 +383,6 @@ A JSON object with the following fields:
 
 ```JSON
 {
-  "network_id": 0,
   "protocol_version": 0,
   "services": [
     {
@@ -490,7 +485,6 @@ plus `type` field with value equal to `"in-pool"`.
         "seed": "2953135335240383704",
         "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
       },
-      "network_id": 0,
       "protocol_version": 0,
       "service_id": 128,
       "message_id": 128,
@@ -540,7 +534,6 @@ Response is a JSON object with the following fields:
           "seed": "2953135335240383704",
           "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
         },
-        "network_id": 0,
         "protocol_version": 0,
         "service_id": 128,
         "message_id": 128,
@@ -636,7 +629,6 @@ A JSON object with the following fields:
             "validator": 2
           },
           "message_id": 4,
-          "network_id": 0,
           "protocol_version": 0,
           "service_id": 0,
           "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
@@ -654,7 +646,6 @@ A JSON object with the following fields:
             "validator": 3
           },
           "message_id": 4,
-          "network_id": 0,
           "protocol_version": 0,
           "service_id": 0,
           "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
@@ -672,7 +663,6 @@ A JSON object with the following fields:
             "validator": 0
           },
           "message_id": 4,
-          "network_id": 0,
           "protocol_version": 0,
           "service_id": 0,
           "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"

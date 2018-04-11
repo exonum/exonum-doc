@@ -346,7 +346,7 @@ transmitted through an Exonum network. There are 2 major kinds of messages:
 - **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
   changes and usually come from [external clients](../glossary.md#light-client)
 
-The message serialization consists of 3 main parts: header (includes `network_id`,
+The message serialization consists of 3 main parts: header (includes
 `protocol_version`, `service_id`, `message_id`, and `payload_length` fields),
 body, and signature.
 
@@ -354,7 +354,7 @@ Fields used in message serialization are listed below.
 
 | Field              | Binary format     | Binary offset | JSON       |
 |--------------------|:-----------------:|--------------:|:----------:|
-| `network_id`       | `u8`              | 0             | number     |
+| (padding)          | `u8`              | 0             | -          |
 | `protocol_version` | `u8`              | 1             | number     |
 | `service_id`       | `u16`             | 4..6          | number     |
 | `message_id`       | `u16`             | 2..4          | number     |
@@ -368,13 +368,9 @@ Fields used in message serialization are listed below.
     with the exception that Rust does not support negative offsets,
     which denote an offset relative to the end of the byte buffer.
 
-### Network ID
+### Padding
 
-This field will be used to send inter-blockchain messages in the future
-releases. Not used currently.
-
-**Binary presentation:** `u8` (unsigned 1-byte integer).  
-**JSON presentation:** number.
+The first byte of the message is used as padding. It must be equal to `0`.
 
 ### Protocol Version
 
