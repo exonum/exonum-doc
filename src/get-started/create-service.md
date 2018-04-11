@@ -736,7 +736,7 @@ Create `create-wallet-1.json` file and insert the following code into it:
   "protocol_version": 0,
   "service_id": 1,
   "message_id": 0,
-  "signature":"9f684227f1de663775848b3db656bca685e085391e2b00b0e115679fd45443ef58a5abeb555ab3d5f7a3cd27955a2079e5fd486743f36515c8e5bea07992100b"
+  "signature": "9f684227f1de663775848b3db656bca685e085391e2b00b0e115679fd45443ef58a5abeb555ab3d5f7a3cd27955a2079e5fd486743f36515c8e5bea07992100b"
 }
 ```
 
@@ -752,7 +752,7 @@ The transaction endpoint returns the hash of the transaction:
 
 ```json
 {
-  "tx_hash": "099d455ab563505cad55b7c6ec02e8a52bca86b0c4446d9879af70f5ceca5dd8
+  "tx_hash": "099d455ab563505cad55b7c6ec02e8a52bca86b0c4446d9879af70f5ceca5dd8"
 }
 ```
 
@@ -770,13 +770,13 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 ```json
 {
   "body": {
-    "pub_key":"ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
+    "pub_key": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
     "name": "Bob"
   },
   "protocol_version": 0,
   "service_id": 1,
   "message_id": 0,
-  "signature":"059f0a281ab63e00839310db8ba680ca550c9f6e3ccc9463dc7a8a82342f70bdbdc8237f6af9d20bbcd3ad5547c3f24d2dc80fcd9c954e087a80742f995e160c"
+  "signature": "059f0a281ab63e00839310db8ba680ca550c9f6e3ccc9463dc7a8a82342f70bdbdc8237f6af9d20bbcd3ad5547c3f24d2dc80fcd9c954e087a80742f995e160c"
 }
 ```
 
@@ -818,7 +818,7 @@ Create `transfer-funds.json` and add the following code to this file:
   "protocol_version": 0,
   "service_id": 1,
   "message_id": 1,
-  "signature":"2c234680adaa67f1e6573895f1557230ea5373b0972f8aa714611f78931c4bae49680580d41ac806977a7a4f9556781018f1061c9be4adcaabc3760c5a92a70b"
+  "signature": "2c234680adaa67f1e6573895f1557230ea5373b0972f8aa714611f78931c4bae49680580d41ac806977a7a4f9556781018f1061c9be4adcaabc3760c5a92a70b"
 }
 ```
 
