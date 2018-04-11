@@ -27,7 +27,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.5.0"
+exonum-testkit = "0.6.0"
 ```
 
 ## Testing Kinds
@@ -72,11 +72,12 @@ Just like with the service itself, we then import the types we will use:
 
 ```rust
 use exonum::blockchain::Transaction;
-use exonum::crypto;
+use exonum::crypto::{self, PublicKey, SecretKey};
 use exonum_testkit::{TestKit, TestKitBuilder};
 // Import datatypes used in tests from the crate where the service is defined.
-use cryptocurrency::{CurrencySchema, CurrencyService, TxCreateWallet,
-                     TxTransfer, Wallet};
+use cryptocurrency::schema::{CurrencySchema, Wallet};
+use cryptocurrency::transactions::{TxCreateWallet, TxTransfer};
+use cryptocurrency::service::CurrencyService;
 ```
 
 ### Creating Test Network
@@ -311,11 +312,15 @@ with a specified public key:
 
 ```rust
 fn assert_no_wallet(&self, pubkey: &PublicKey) {
-    let err: String = self.inner.get_err(
+    let err = self.inner.get_err(
         ApiKind::Service("cryptocurrency"),
         &format!("v1/wallet/{}", pubkey.to_string()),
     );
-    assert_eq!(err, "Wallet not found".to_string());
+
+    assert_matches!(
+        err,
+        ApiError::NotFound(ref body) if body == "Wallet not found"
+    );
 }
 ```
 
