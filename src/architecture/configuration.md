@@ -78,6 +78,8 @@ two parts:
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
   Maximum number of transactions per block
+- **max_message_len**
+  Maximum message length (in bytes)
 
 ### Local Parameters
 
