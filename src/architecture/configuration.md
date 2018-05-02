@@ -78,8 +78,11 @@ two parts:
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
   Maximum number of transactions per block
-- **max_message_len**
-  Maximum message length (in bytes)
+- **max_message_len**  
+  Maximum message length (in bytes). This parameter determines the maximum
+  size of both consensus messages and transactions. The default value of the
+  parameter is 1 MB (1024 * 1024 bytes). The range of possible values for this
+  parameter is between 1MB and 2^32 bytes.
 
 ### Local Parameters
 
