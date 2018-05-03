@@ -333,7 +333,7 @@ A JSON boolean.
 true
 ```
 
-### Enabled/Disable Consensus Interaction
+### Enable/Disable Consensus Interaction
 
 ```none
 POST {system_base_path}/consensus_enabled
