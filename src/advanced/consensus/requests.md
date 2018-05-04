@@ -115,7 +115,7 @@ has the following fields:
   Each bit of this field indicates the need to send a `Prevote` message from
   the corresponding validator (if the bit value is 1, `Prevote` is requested;
   otherwise, `Prevote` is not needed). Indexing of the `validator` bits
-  corresponds to indexing the validator public keys in the
+  corresponds to indexing of the validator public keys in the
   [actual configuration][config#genesis].
 
 ### `BlockRequest`
@@ -166,12 +166,12 @@ Cancelling a request means cancelling the corresponding timeout as well.
 
 ### Receiving Transaction
 
-If this is the last transaction required for a known `Propose`,
+If the received transaction is the last one required for a known `Propose`,
 cancel the corresponding `TransactionsRequest`.
 
 ### Receiving Consensus Message from a Bigger Height
 
-- Update info about the height of the blockchain on the corresponding node
+- Update info about the height of the blockchain on the corresponding node.
 - Send `BlockRequest` for the current height (height of the latest
   committed block + 1) to the message author, if such a request was not
   sent earlier.
@@ -181,13 +181,14 @@ as the validator’s height.
 
 ### Receiving `Propose`
 
-- If this `Propose` was requested, cancel the request. The list of
+- If this `Propose` has been requested, cancel the request. The list of
   [nodes that should have all transactions](#learning-from-consensus-messages)
   mentioned in the `Propose` message is copied from the `RequestState` before
   its deletion to request missing transactions, if necessary.
 - If certain transactions from the `Propose` are not known,
-  send `TransactionsRequest` to the author of `Propose`. Set the nodes in
-  `RequestState` for this request as calculated at the previous step.
+  send `TransactionsRequest` to the author of `Propose`. If the author of
+  `Propose` does not provide information on the missing transactions, send
+  `TransactionsRequest` to the remaining nodes in the `RequestState`. 
 
 ### Receiving `Prevote`
 
@@ -240,7 +241,7 @@ Cancel all requests.
 
 ## Requests Processing
 
-This algorithm determines the processing of different types of request messages
+This algorithm determines processing of different types of request messages
 received by a node.
 
 ### `ProposeRequest`
