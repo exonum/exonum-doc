@@ -107,6 +107,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   The hash of the current block (the `Precommit` message was created for)
 - **body.height**: integer  
   The height of the current block
+- **body.propose_hash**: Hash  
+  Hash of the corresponding Propose
 - **body.round**: integer  
   The round when the block proposal was created
 - **body.time**: Time  
