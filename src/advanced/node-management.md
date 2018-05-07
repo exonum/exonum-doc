@@ -82,7 +82,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 - **schema_version**: integer  
   Information schema version. Currently, `0`
 - **state_hash**: Hash  
-  Hash of the current [Exonum state][blockchain-state] after applying transactions in the block  
+  Hash of the current [Exonum state][blockchain-state] after applying transactions
+  in the block
 - **tx_count**: integer  
   Number of transactions included into the block
 - **tx_hash**: Hash  
@@ -778,4 +779,4 @@ equal than `from` and less or equal than `to`.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
-[blockchain-state]: https://exonum.com/doc/glossary/#blockchain-state 
+[blockchain-state]: https://exonum.com/doc/glossary/#blockchain-state
