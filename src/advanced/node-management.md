@@ -698,11 +698,11 @@ smallest and largest heights traversed to collect at most `count` blocks.
 The JSON object of the explored block range `range` and the array `blocks` of
 the `BlockHeader` objects. The range specifies the largest and the smallest
 heights of blocks that have been traversed to collect at most `count` blocks.
-The largest height `to` equals to `latest` if provided or to the height of
-the latest block in the blockchain, the smallest height `from` takes values
+The largest height `end` equals to `latest` if provided or to the height of
+the latest block in the blockchain, the smallest height `start` takes values
 in `0..latest - count + 1`. Blocks in the array are sorted in descending order
 according to their heights. Height of any block in the array is greater or
-equal than `from` and less or equal than `to`.
+equal than `start` and less or equal than `end`.
 
 ??? example "Response Example"
     Assume the following request
@@ -715,10 +715,6 @@ equal than `from` and less or equal than `to`.
 
     ```JSON
     {
-      "range": {
-        "from": 100,
-        "to": 2
-      },
       "blocks": [
         {
           "height": "18",
@@ -765,7 +761,11 @@ equal than `from` and less or equal than `to`.
           "tx_count": 1000,
           "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
         }
-      ]
+      ],
+      "range": {
+        "end": 100,
+        "start": 2
+      }
     }
     ```
 
