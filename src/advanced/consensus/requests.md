@@ -115,7 +115,7 @@ has the following fields:
   Each bit of this field indicates the need to send a `Prevote` message from
   the corresponding validator (if the bit value is 1, `Prevote` is requested;
   otherwise, `Prevote` is not needed). Indexing of the `validator` bits
-  corresponds to indexing of the validator public keys in the
+  corresponds to indexing of validator public keys in the
   [actual configuration][config#genesis].
 
 ### `BlockRequest`
@@ -188,7 +188,7 @@ as the validator’s height.
 - If certain transactions from the `Propose` are not known,
   send `TransactionsRequest` to the author of `Propose`. If the author of
   `Propose` does not provide information on the missing transactions, send
-  `TransactionsRequest` to the remaining nodes in the `RequestState`. 
+  `TransactionsRequest` to the remaining nodes in the `RequestState`.  
 
 ### Receiving `Prevote`
 
@@ -241,7 +241,7 @@ Cancel all requests.
 
 ## Requests Processing
 
-This algorithm determines processing of different types of request messages
+This algorithm determines the processing of different types of request messages
 received by a node.
 
 ### `ProposeRequest`

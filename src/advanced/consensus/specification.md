@@ -148,8 +148,8 @@ The following fields are present in all messages:
   If the author is not locked on any proposal, the `locked_round` field is 0.
 
 !!! note
-    A node that is locked on a proposal must send prevotes only
-    for the proposal it’s locked on. Thus, `locked_round` in prevotes sent
+    A node that is locked on a proposal must send `Prevote`s only
+    for the proposal it is locked on. Thus, `locked_round` in `Prevote`s sent
     by a node is always equal to `locked_round` from its state.
 
 `Prevote` and `Precommit` messages have the following additional fields:
@@ -177,7 +177,7 @@ by [incoming messages](#message-processing) and [timeouts](#timeout-processing).
 - [Full proposal](#full-proposal)  
   Occurs when the node gets complete info about some proposal and all the
   transactions from the proposal.
-- [Availability of +2/3 Prevotes](#availability-of-23-prevotes)  
+- [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes)  
   Occurs when the node collects +2/3 `Prevote` messages from the same round
   for the same known proposal.
 - [Lock](#lock)  
@@ -216,7 +216,7 @@ round are placed into a separate queue (`queued`).
 - If the transaction is already in the pool of unconfirmed transactions,
   ignore it.
 - Add the transaction to the pool of unconfirmed transactions.
-- For every known proposal `Propose` where this transaction is included:
+- For every known proposal `propose` where this transaction is included:
 
     - Exclude the hash of this transaction from the list of unknown transactions
       for the `Propose`.
@@ -263,7 +263,7 @@ round are placed into a separate queue (`queued`).
 - Check that the specified validator is the leader for the given round.
 - Check that the proposal does not contain previously committed transactions
   (`Propose` messages contain only hashes of transactions, so absence of
-  hashes in the table of the committed transactions is checked).
+  hashes in the table of committed transactions is checked).
 - Add the proposal to the `proposes` hash map.
 - [Request missing information based on the message](requests.md#receiving-propose).
 - If all transactions in the proposal are known, go to
@@ -273,17 +273,17 @@ round are placed into a separate queue (`queued`).
 
 **Arguments:** `prevote`.
 
-- Add `Prevote` to the list of known `Prevote` messages for the given proposal
+- Add `prevote` to the list of known `Prevote` messages for the given proposal
   in `prevote.round`.
 - If:
 
-    - the node has formed +2/3 `Prevote` messages for the same round and
+    - the node has formed +2/3 `prevote` messages for the same round and
     `propose_hash`
     - `locked_round < prevote.round`
-    - the node knows a `Propose` message referenced by this `Prevote`
+    - the node knows a `propose` message referenced by this `prevote`
     - the node knows all the transactions from the `Propose`
 
-- Then proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes)
+- Then proceed to [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes)
   for the referenced `Propose` message in `prevote.round`.
 
 - [Request missing information based on the message](requests.md#receiving-prevote).
@@ -292,22 +292,22 @@ round are placed into a separate queue (`queued`).
 
 **Arguments:** `precommit`.
 
-- Add the message to the list of known `precommit`s for `propose_hash` in this
+- Add the message to the list of known `Precommit`s for `propose_hash` in this
   round with the given `state_hash`.
 - If:
 
     - the node has formed +2/3 `precommit`s for the same round, `propose_hash`
       and `state_hash`
-    - the node knows the `propose` referenced by `propose_hash`
-    - the node knows all the transactions in this `propose`
+    - the node knows the `Propose` referenced by `propose_hash`
+    - the node knows all the transactions in this `Propose`
 
 - Then:
 
     - Execute the proposal, if it has not yet been executed.
     - Check that `state_hash` of the node coincides with the `state_hash`
-      in the `precommit`s. If not, stop working and signal about
+      in the `Precommit`s. If not, stop working and signal about
       an unrecoverable error.
-    - Proceed to [commit](#commit) for this block.
+    - Proceed to [Commit](#commit) for this block.
 
 - Else:
 
@@ -328,9 +328,9 @@ round are placed into a separate queue (`queued`).
     - The key in the `to` field must match the key of the node.
     - `block.prev_hash` must match the hash of the latest committed block.
     - The block height must be equal to the current height of the node.
-    - The number of `Precommit` messages from different validators
+    - The number of `precommit` messages from different validators
       must be sufficient to reach consensus.
-    - All `Precommit` messages must be correct.
+    - All `precommit` messages must be correct.
 
 - If the checks are successful, then check all transactions in the block for
   correctness. If some transactions are incorrect, stop working and signal about
@@ -356,7 +356,7 @@ round are placed into a separate queue (`queued`).
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new
   round, and proceed to
-  [Availability of +2/3 Prevotes](#availability-of-23-prevotes).
+  [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes).
 - Else, if the node is a leader, form and send `Propose` and `Prevote`
   messages (after expiration of `propose_timeout`, if the node has just
   moved to a new height).
@@ -374,29 +374,29 @@ round are placed into a separate queue (`queued`).
 
 **Arguments:** `propose`, all transactions in which are known.
 
-- If the node does not have a saved PoL, send a `Prevote` message in the round to
-  which the proposal belongs.
+- If the node does not have a saved PoL, send a `Prevote` message in the round
+  to which the proposal belongs.
 - For each round `r` in the interval
   `[max(locked_round + 1, propose.round), current_round]`:
 
-    - If the node has +2/3 `Prevote`s for `propose` in `r`, then
-    proceed to [Availability of +2/3 Prevotes](#availability-of-23-prevotes) for
-    `propose` in `r`.
+    - If the node has +2/3 `Prevote`s for `Propose` in `r`, then
+    proceed to [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes)
+    for `Propose` in `r`.
 
 - For each round `r` in the interval `[propose.round, current_round]`:
 
-    - If +2/3 `Precommit`s are available for `propose` in `r` and with
+    - If +2/3 `Precommit`s are available for `Propose` in `r` and with
       the same `state_hash`, then:
 
         - Execute the proposal, if it has not yet been executed.
         - Check that the node’s `state_hash` after applying transactions in
-          `propose`
+          `Propose`
           coincides with the `state_hash` in the aforementioned +2/3
           `Precommit`s.
           If not, stop working and signal about an unrecoverable error.
         - Proceed to [Commit](#commit) for this block.
 
-### Availability of +2/3 Prevotes
+### Availability of +2/3 `Prevote`s
 
 **Arguments:** shared `propose_hash` and `round` of the collected +2/3
 `Prevote`s.
@@ -430,13 +430,14 @@ and the `state_hash` resulting from the execution of all transactions in the
 proposal).
 
 - Add a block to the blockchain.
-- Push all the transactions from the block to the table of committed transactions.
+- Push all the transactions from the block to the table of committed
+  transactions.
 - Increment `current_height`.
 - Set the value of the variable `locked_round` to `0` at the new height.
 - Delete all transactions of the committed block from the pool of unconfirmed
   transactions.
-- If the node is the leader, form and send `Propose` and `Prevote` messages after
-  `propose_timeout` expiration.
+- If the node is the leader, form and send `Propose` and `Prevote` messages
+  after `propose_timeout` expiration.
 - Process all messages from the `queued` that have become relevant (their round
   and height coincide with the current ones).
 - Add a timeout for the next round.
@@ -444,7 +445,8 @@ proposal).
 ## Properties
 
 !!! note
-    Formal proof of the following properties is coming in a separate white paper.
+    Formal proof of the following properties is coming in a separate white
+    paper.
 
 If:
 
@@ -452,7 +454,8 @@ If:
   cannot be forged)
 - Network is partially synchronous (i.e., all messages are delivered in finite,
   but *a priori* unknown time)
-- Less than 1/3 of validators act Byzantine (i.e., in an arbitrary way, including
+- Less than 1/3 of validators act Byzantine (i.e., in an arbitrary way,
+  including
   being offline, having arbitrary hardware and/or software issues or being
   compromised, possibly in a coordinated effort to break the system)
 
