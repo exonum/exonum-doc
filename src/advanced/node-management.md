@@ -81,6 +81,9 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   ID of the validator that created an approved block proposal
 - **schema_version**: integer  
   Information schema version. Currently, `0`
+- **state_hash**: Hash  
+  Hash of the current [Exonum state][blockchain-state] after applying transactions
+  in the block
 - **tx_count**: integer  
   Number of transactions included into the block
 - **tx_hash**: Hash  
@@ -105,6 +108,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   The hash of the current block (the `Precommit` message was created for)
 - **body.height**: integer  
   The height of the current block
+- **body.propose_hash**: Hash  
+  Hash of the corresponding Propose
 - **body.round**: integer  
   The round when the block proposal was created
 - **body.time**: Time  
@@ -774,3 +779,4 @@ equal than `from` and less or equal than `to`.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
+[blockchain-state]: ../glossary.md#blockchain-state
