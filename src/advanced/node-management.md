@@ -241,7 +241,7 @@ will not be established.
 #### Example
 
 ```None
-curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peers
+curl --data '{ "ip": "127.0.0.1:8800" }' http://127.0.0.1:7780/api/system/v1/peers
 ```
 
 #### Response
