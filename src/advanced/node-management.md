@@ -81,6 +81,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   ID of the validator that created an approved block proposal
 - **schema_version**: integer  
   Information schema version. Currently, `0`
+- **state_hash**: Hash  
+  Hash of the current Exonum state after applying transactions in the block  
 - **tx_count**: integer  
   Number of transactions included into the block
 - **tx_hash**: Hash  
