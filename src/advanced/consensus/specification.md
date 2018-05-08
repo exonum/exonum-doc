@@ -219,9 +219,9 @@ round are placed into a separate queue (`queued`).
 - For every known proposal `propose` where this transaction is included:
 
     - Exclude the hash of this transaction from the list of unknown transactions
-      for the `Propose`.
+      for the `propose`.
     - If the number of unknown transactions for the proposal becomes zero,
-      proceed to [Full proposal](#full-proposal) state for `Propose`.
+      proceed to [Full proposal](#full-proposal) state for `propose`.
 
 ### Consensus Messages Processing
 
@@ -277,10 +277,10 @@ round are placed into a separate queue (`queued`).
   in `prevote.round`.
 - If:
 
-    - the node has formed +2/3 `prevote` messages for the same round and
+    - the node has formed +2/3 `Prevote` messages for the same round and
     `propose_hash`
     - `locked_round < prevote.round`
-    - the node knows a `propose` message referenced by this `prevote`
+    - the node knows a `Propose` message referenced by this `prevote`
     - the node knows all the transactions from the `Propose`
 
 - Then proceed to [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes)
@@ -296,7 +296,7 @@ round are placed into a separate queue (`queued`).
   round with the given `state_hash`.
 - If:
 
-    - the node has formed +2/3 `precommit`s for the same round, `propose_hash`
+    - the node has formed +2/3 `Precommit`s for the same round, `propose_hash`
       and `state_hash`
     - the node knows the `Propose` referenced by `propose_hash`
     - the node knows all the transactions in this `Propose`
@@ -328,9 +328,9 @@ round are placed into a separate queue (`queued`).
     - The key in the `to` field must match the key of the node.
     - `block.prev_hash` must match the hash of the latest committed block.
     - The block height must be equal to the current height of the node.
-    - The number of `precommit` messages from different validators
+    - The number of `Precommit` messages from different validators
       must be sufficient to reach consensus.
-    - All `precommit` messages must be correct.
+    - All `Precommit` messages must be correct.
 
 - If the checks are successful, then check all transactions in the block for
   correctness. If some transactions are incorrect, stop working and signal about
@@ -381,16 +381,16 @@ round are placed into a separate queue (`queued`).
 
     - If the node has +2/3 `Prevote`s for `Propose` in `r`, then
     proceed to [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes)
-    for `Propose` in `r`.
+    for `propose` in `r`.
 
 - For each round `r` in the interval `[propose.round, current_round]`:
 
-    - If +2/3 `Precommit`s are available for `Propose` in `r` and with
+    - If +2/3 `Precommit`s are available for `propose` in `r` and with
       the same `state_hash`, then:
 
         - Execute the proposal, if it has not yet been executed.
         - Check that the node’s `state_hash` after applying transactions in
-          `Propose`
+          `propose`
           coincides with the `state_hash` in the aforementioned +2/3
           `Precommit`s.
           If not, stop working and signal about an unrecoverable error.
