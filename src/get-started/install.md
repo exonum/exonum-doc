@@ -55,9 +55,10 @@ be present in the default package lists. In this case you may need to install
 these packages from third-party PPAs, or build them from sources.
 
 ### Windows
+
 Install the latest version of the following packages:
-* [Visual C++ Build Tools][build_tools]
-* [PowerShell][powershell]
+- [Visual C++ Build Tools][build_tools]
+- [PowerShell][powershell]
 
 If you have encountered a problem
 with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
