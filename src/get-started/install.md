@@ -57,6 +57,7 @@ these packages from third-party PPAs, or build them from sources.
 ### Windows
 
 Install the latest version of the following packages:
+
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
 
