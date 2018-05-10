@@ -55,10 +55,11 @@ be present in the default package lists. In this case you may need to install
 these packages from third-party PPAs, or build them from sources.
 
 ### Windows
+Install the latest version of the following packages:
+* [Visual C++ Build Tools][build_tools]
+* [PowerShell][powershell]
 
-Exonum is a little behind supporting Windows OS compared to Linux and MacOS.
-In many Windows setups, Exonum will work just fine, but there are known problems
-with its compilation in certain configurations. If you have encountered a problem
+If you have encountered a problem
 with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
 or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
 
@@ -164,3 +165,5 @@ guide on how to develop applications on top of the Exonum framework.
 [istanbul]: https://istanbul.js.org/
 [babel]: http://babeljs.io/
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
+[build_tools]: https://www.visualstudio.com/downloads/
+[powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
