@@ -61,10 +61,6 @@ Install the latest version of the following packages:
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
 
-If you have encountered a problem
-with installing Exonum on Windows, you may ask around on [Gitter](https://gitter.im/exonum/exonum)
-or file an issue on [GitHub](https://github.com/exonum/exonum/issues).
-
 ## Adding environment variables
 
 If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
