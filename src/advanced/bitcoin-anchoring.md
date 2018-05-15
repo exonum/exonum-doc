@@ -509,9 +509,9 @@ Requires [observer interval](#observer-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
 specific block. If the selected block has not been anchored yet or if the
-[observer interval](#observer-interval) is not set, or number of confirmations  
-of anchoring transaction is less than [utxo confirmations][anchoring-parameters]  
-parameter, returns `null`.
+[observer interval](#observer-interval) is not set,
+or number of confirmations of anchoring transaction is less than
+[utxo confirmations][anchoring-parameters] parameter, returns null.
 
 #### Parameters
 
