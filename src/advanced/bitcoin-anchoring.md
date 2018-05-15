@@ -508,10 +508,12 @@ GET {base_path}/nearest_lect/{height}
 Requires [observer interval](#observer-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
-specific block. If the selected block has not been anchored yet or if the
-[observer interval](#observer-interval) is not set,
-or if the number of confirmations of anchoring transaction is less than
-the [utxo confirmations][anchoring-parameters] parameter, returns null.
+specific block.   
+Returns null on any of the following conditions:
+- The selected block has not been anchored yet
+- The [observer interval](#observer-interval) is not set
+- The number of confirmations of anchoring transaction is less than
+the [UTXO confirmations][anchoring-parameters] parameter
 
 #### Parameters
 
