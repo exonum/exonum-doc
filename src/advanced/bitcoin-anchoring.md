@@ -509,7 +509,9 @@ Requires [observer interval](#observer-interval) to be set.
 
 Returns the content of the anchoring transaction which anchors the
 specific block. If the selected block has not been anchored yet or if the
-[observer interval](#observer-interval) is not set, returns `null`.
+[observer interval](#observer-interval) is not set, or number of confirmations 
+of anchoring transaction is less than [utxo confirmations][anchoring-parameters] parameter,
+returns `null`.
 
 #### Parameters
 
@@ -521,5 +523,6 @@ The string which has the value of a hex-encoded content of the nearest Bitcoin
 anchoring transaction.
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
+[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
