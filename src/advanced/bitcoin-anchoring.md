@@ -505,15 +505,14 @@ Example of JSON response:
 GET {base_path}/nearest_lect/{height}
 ```
 
-Requires [observer interval](#observer-interval) to be set.
-
 Returns the content of the anchoring transaction which anchors the
-specific block.   
-Returns null on any of the following conditions:
+specific block.
+Returns `null` on any of the following conditions:
+
 - The selected block has not been anchored yet
 - The [observer interval](#observer-interval) is not set
 - The number of confirmations of anchoring transaction is less than
-the [UTXO confirmations][anchoring-parameters] parameter
+  the [UTXO confirmations][anchoring-parameters] parameter
 
 #### Parameters
 
