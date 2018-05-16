@@ -505,11 +505,14 @@ Example of JSON response:
 GET {base_path}/nearest_lect/{height}
 ```
 
-Requires [observer interval](#observer-interval) to be set.
-
 Returns the content of the anchoring transaction which anchors the
-specific block. If the selected block has not been anchored yet or if the
-[observer interval](#observer-interval) is not set, returns `null`.
+specific block.
+Returns `null` on any of the following conditions:
+
+- The selected block has not been anchored yet
+- The [observer interval](#observer-interval) is not set
+- The number of confirmations of anchoring transaction is less than
+  the [UTXO confirmations][anchoring-parameters] parameter
 
 #### Parameters
 
@@ -521,5 +524,6 @@ The string which has the value of a hex-encoded content of the nearest Bitcoin
 anchoring transaction.
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
+[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
