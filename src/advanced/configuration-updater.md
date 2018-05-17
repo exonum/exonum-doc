@@ -63,6 +63,7 @@ Configuration update service specifies a set of public and private endpoints.
 
     - [Propose configuration](#configuration-proposal), [private API](#submit-configuration-proposal)
     - [Vote for configuration](#vote-for-proposal), [private API](#submit-vote-for-proposal)
+    - [Vote against configuration](#vote-against-proposal), [private API](#submit-vote-against-proposal)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
@@ -301,7 +302,7 @@ configuration proposals were committed as transactions to the Exonum blockchain.
 
 ### Configuration Proposal
 
-`TxConfigPropose` transaction is a new configuration proposal.
+`Propose` transaction is a new configuration proposal.
 
 #### Data Layout
 
@@ -318,7 +319,7 @@ specified in `from`.
 
 #### Execution
 
-A `TxConfigPropose` transaction is only successfully executed
+A `Propose` transaction is only successfully executed
 with a state change if all of the following conditions take place:
 
 - `cfg` is a valid stringified JSON object corresponding to the `ConfigBody`
@@ -333,11 +334,11 @@ with a state change if all of the following conditions take place:
   to the same configuration hash
 
 If all the checks pass, the execution results in modifying the `config_proposes`
-table. See [TxConfigPropose.execute][config_service_source] for details.
+table. See [Propose.execute][config_service_source] for details.
 
 ### Vote for Proposal
 
-`TxConfigVote` is a transaction that implements voting for a previously
+`Vote` is a transaction that implements voting for a previously
 proposed configuration.
 
 #### Data Layout
@@ -367,7 +368,41 @@ if all of the following conditions take place:
   submitted previously
 
 If all the checks pass, execution results in modifying the `votes_by_config_hash`
-table. See [TxConfigVote.execute][config_service_source] for details.
+table. See [Vote.execute][config_service_source] for details.
+
+### Vote against Proposal
+
+`VoteAgainst` is a transaction that implements voting against a previously
+proposed configuration.
+
+#### Data Layout
+
+- **cfg_hash**: Hash  
+  Hash of configuration to vote against.
+- **from**: PublicKey  
+  Public key of the transaction author.
+
+#### Verification
+
+Signature of the transaction is verified against the public key
+specified in `from`.
+
+#### Execution
+
+Vote transactions will only get submitted and executed with state change
+if all of the following conditions take place:
+
+- `cfg_hash` references a known proposed configuration `cfg`
+- A following configuration isn't present
+- The actual configuration contains the `from` public key in the array of
+  validator keys
+- `cfg.previous_cfg_hash` is equal to hash of the actual configuration
+- `cfg.actual_from` is greater than the current height
+- No vote for the same proposal from the same `from` has been
+  submitted previously
+
+If all the checks pass, execution results in modifying the `votes_by_config_hash`
+table. See [VoteAgainst.execute][config_service_source] for details.
 
 ## Private APIs
 
@@ -377,7 +412,7 @@ table. See [TxConfigVote.execute][config_service_source] for details.
 POST {base_path}/configs/postpropose
 ```
 
-Creates a [`TxConfigPropose` transaction](#configuration-proposal).
+Creates a [`Propose` transaction](#configuration-proposal).
 The `from` field of the transaction and its signature are computed
 automatically based on the identity of the node that processes the POST request:
 `from` is set to the node’s public key, and the signature is computed
@@ -396,7 +431,7 @@ JSON object with the following fields:
   Hash of the proposed configuration. Should be used as `config_hash_vote_for`
   parameter of [`postvote` requests](#submit-vote-for-proposal).
 - **tx_hash**: Hash  
-  Hash of the corresponding `TxConfigPropose` transaction.
+  Hash of the corresponding `Propose` transaction.
 
 ### Submit Vote for Proposal
 
@@ -404,7 +439,7 @@ JSON object with the following fields:
 POST {base_path}/configs/{config_hash_vote_for}/postvote
 ```
 
-Creates a [`TxConfigVote` transaction](#configuration-proposal).
+Creates a [`Vote` transaction](#configuration-proposal).
 As with the previous endpoint, the `from` field of the transaction
 and its signature are computed automatically.
 
@@ -418,7 +453,29 @@ and its signature are computed automatically.
 JSON object with the following fields:
 
 - **tx_hash**: Hash  
-  Hash of the corresponding `TxConfigVote` transaction.
+  Hash of the corresponding `Vote` transaction.
+
+### Submit Vote against Proposal
+
+```none
+POST {base_path}/configs/{config_hash_vote_for}/postagainst
+```
+
+Create a [`VoteAgainst` transaction](#configuration-proposal).
+As with the previous endpoint, the `from` field of the transaction
+and its signature are computed automatically.
+
+#### Parameters
+
+- **config_hash_vote_against**: Hash  
+  Hash of the configuration to vote against.
+
+#### Response
+
+JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `VoteAgainst` transaction.
 
 [stored_configuration]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/config.rs
 [config_propose]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
