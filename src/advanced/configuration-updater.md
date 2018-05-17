@@ -101,10 +101,16 @@ config][stored_configuration] serialization. It has the following fields:
   Hash of the previous active configuration.
 - **actual_from**: integer  
   The height from which the configuration became actual.
-- **validators**: Array<PublicKey\>  
+- **validator_keys**: Array<PublicKey\>  
   List of validators' public keys.
+- **majority_count**: integer  
+  Amount of votes required to commit a new configuration proposal.
+  By default the number of votes is calculated as
+  2/3 + 1 of total validators count.
 - **consensus**: Object  
   Consensus-specific configuration parameters.
+- **consensus.max_message_len**: integer  
+  Maximum message size.
 - **consensus.peers_timeout**: integer  
   Peer exchange timeout (in ms).
 - **consensus.timeout_adjuster**: Object  
