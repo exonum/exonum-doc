@@ -97,44 +97,22 @@ an optional type.
 `ConfigBody` is a JSON object corresponding to the [Exonum
 config][stored_configuration] serialization. It has the following fields:
 
-- **previous_cfg_hash**: Hash  
-  Hash of the previous active configuration.
 - **actual_from**: integer  
   The height from which the configuration became actual.
-- **validator_keys**: Array<PublicKey\>  
-  List of validators' public keys.
+- **consensus**: Object  
+  Consensus-specific configuration parameters.
 - **majority_count**: integer  
   Amount of votes required to commit a new configuration proposal.
   By default the number of votes is calculated as
   2/3 + 1 of total validators count.
-- **consensus**: Object  
-  Consensus-specific configuration parameters.
-- **consensus.max_message_len**: integer  
-  Maximum message size.
-- **consensus.peers_timeout**: integer  
-  Peer exchange timeout (in ms).
-- **consensus.timeout_adjuster**: Object  
-  [Settings][ta-config] for the proposal timeout adjuster.
-- **consensus.timeout_adjuster.type**:  
-  `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
-  Timeout adjuster type.
-- **consensus.timeout_adjuster.timeout**: integer  
-  Proposal timeout (ms) after the new height beginning.  
-  Used with the `"Constant"` adjuster.
-- **consensus.round_timeout**: integer  
-  Interval (ms) between rounds.
-- **consensus.status_timeout**: integer  
-  Period (ms) of sending a `Status` message.
-- **consensus.txs_block_limit**: integer  
-  Maximum number of transactions per block.
+- **previous_cfg_hash**: Hash  
+  Hash of the previous active configuration.
 - **services**: Object  
   Service-specific configuration parameters.
-  
-!!! note
-    **consensus.round_timeout** integer must be strictly larger
-    (recommended at least 2x) than **consensus.timeout_adjuster.timeout**
-    integer. Otherwise, the consensus algorithm will stop working correctly
-    (a new block will never be accepted).
+- **validator_keys**: Array<PublicKey\>  
+  List of validators' public keys.
+
+For more information about **consensus** field, see [genesis.consensus][genesis-consensus]
 
 #### Propose
 
@@ -339,8 +317,9 @@ with a state change if all of the following conditions take place:
 - There isn't a previously submitted configuration proposal, which evaluates
   to the same configuration hash
 
-If all the checks pass, the execution results in modifying the `config_proposes`
-table. See [Propose.execute][config_service_source] for details.
+If all the checks pass, the proposal is recorded as a candidate
+for the next configuration. The validators can then vote
+for or against the proposal. See [Propose.execute][config_service_source] for details.
 
 ### Vote for Proposal
 
@@ -373,8 +352,8 @@ if all of the following conditions take place:
 - No vote for the same proposal from the same `from` has been
   submitted previously
 
-If all the checks pass, execution results in modifying the `votes_by_config_hash`
-table. See [Vote.execute][config_service_source] for details.
+If all the checks pass, the validator vote for a previously proposed
+configuration. See [Vote.execute][config_service_source] for details.
 
 ### Vote against Proposal
 
@@ -407,8 +386,8 @@ if all of the following conditions take place:
 - No vote for the same proposal from the same `from` has been
   submitted previously
 
-If all the checks pass, execution results in modifying the `votes_by_config_hash`
-table. See [VoteAgainst.execute][config_service_source] for details.
+If all the checks pass, the validator vote against a previously proposed
+configuration. See [VoteAgainst.execute][config_service_source] for details.
 
 ## Private APIs
 
@@ -464,7 +443,7 @@ JSON object with the following fields:
 ### Submit Vote against Proposal
 
 ```none
-POST {base_path}/configs/{config_hash_vote_for}/postagainst
+POST {base_path}/configs/{config_hash_vote_against}/postagainst
 ```
 
 Create a [`VoteAgainst` transaction](#configuration-proposal).
@@ -490,3 +469,4 @@ JSON object with the following fields:
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
+[genesis-consensus]: ../architecture/configuration.md#genesisconsensus
