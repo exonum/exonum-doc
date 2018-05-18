@@ -147,6 +147,7 @@ Example of response:
 "2018-05-17T10:43:59.404962Z"
 ```
 
+The response is combined date and time in UTC as per [ISO 8601][ISO8601].
 `null` is returned if there is no consolidated time.
 
 ### Timestamps of Current Validators
@@ -178,6 +179,9 @@ Example of JSON response:
 ]
 ```
 
+The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
+`null` is returned if the validator time is unknown.
+
 ### Timestamps of All Validators
 
 ```none
@@ -207,6 +211,8 @@ Example of JSON response:
   }
 ]
 ```
+
+The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
 
 ## Discussion
 
@@ -263,3 +269,4 @@ collectively trusted entities, which may behave maliciously.
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
+[ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
