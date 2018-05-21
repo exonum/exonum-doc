@@ -100,7 +100,7 @@ config][stored_configuration] serialization. It has the following fields:
 - **actual_from**: integer  
   The height from which the configuration became actual.
 - **consensus**: Object  
-  Consensus-specific configuration parameters.
+  [Consensus-specific configuration parameters][genesis-consensus].
 - **majority_count**: integer  
   Amount of votes required to commit a new configuration proposal.
   By default the number of votes is calculated as
@@ -111,8 +111,6 @@ config][stored_configuration] serialization. It has the following fields:
   Service-specific configuration parameters.
 - **validator_keys**: Array<PublicKey\>  
   List of validators' public keys.
-
-For more information about **consensus** field, see [genesis.consensus][genesis-consensus]
 
 #### Propose
 
