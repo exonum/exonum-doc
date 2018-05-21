@@ -114,7 +114,7 @@ config][stored_configuration] serialization. It has the following fields:
 - **services**: Object  
   Service-specific configuration parameters.
 - **validator_keys**: Array<PublicKey\>  
-  List of validators' public keys.
+  List of validators’ public keys.
 
 #### Propose
 
@@ -124,7 +124,7 @@ config][config_propose] serialization. It has the following fields:
 - **tx_propose**: Object  
   Information about configuration and its author.
 - **tx_propose.from**: PublicKey  
-  Author's public key.
+  Author’s public key.
 - **tx_propose.cfg**: string  
   String containing JSON serialization of proposed configuration.
 - **votes_history_hash**: Hash  
@@ -313,10 +313,10 @@ with a state change if all of the following conditions take place:
 - `cfg.previous_cfg_hash` equals to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height of the blockchain,
   determined as the height of the latest committed block + 1
-- A following configuration isn't present
+- A following configuration isn’t present
 - The actual configuration contains the `from` public key in the array of
   validator keys
-- There isn't a previously submitted configuration proposal, which evaluates
+- There isn’t a previously submitted configuration proposal, which evaluates
   to the same configuration hash
 
 If all the checks pass, the proposal is recorded as a candidate
@@ -346,12 +346,12 @@ Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
-- A following configuration isn't present
+- A following configuration isn’t present
 - The actual configuration contains the `from` public key in the array of
   validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height
-- No vote for the same proposal from the same `from` has been
+- No vote on the same proposal from the same validator has been
   submitted previously
 
 If all the checks pass, the vote is recorded. If there is
@@ -381,12 +381,12 @@ Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
-- A following configuration isn't present
+- A following configuration isn’t present
 - The actual configuration contains the `from` public key in the array of
   validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height
-- No vote for the same proposal from the same `from` has been
+- No vote on the same proposal from the same validator has been
   submitted previously
 
 If all the checks pass, the vote is recorded.
