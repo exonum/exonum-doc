@@ -17,16 +17,20 @@ The global configuration may need to be modified for various reasons:
 
 Any validator node can propose a new configuration, by broadcasting a corresponding
 propose transaction to the network. The transaction includes a new configuration
-in the JSON format, along with two auxiliary fields:
+in the JSON format, along with three auxiliary fields:
 
 - `actual_from` is a non-negative integer height,
   upon reaching which the new configuration (if accepted) will activate.
 - `previous_cfg_hash` is the hash of the configuration that the proposal updates
+- `majority_count` is the minimum number of validators that need to approve of
+  the proposal
 
-Validators may vote for configuration proposals by submitting vote transactions
+Validators may vote for or against configuration proposals by submitting vote transactions
 to the network. Each validator can cast
-a single vote for any configuration proposal. If the proposal gets a supermajority
-of votes (more than 2/3 of the validators), then the proposal becomes locked in,
+a single vote either for or against any configuration proposal (but not both).
+If the proposal gets a supermajority of approving votes
+(more than 2/3 of the validators by default; can be varied with the help of `majority_count`),
+then the proposal becomes locked in,
 and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
@@ -317,7 +321,7 @@ with a state change if all of the following conditions take place:
 
 If all the checks pass, the proposal is recorded as a candidate
 for the next configuration. The validators can then vote
-for or against the proposal. See [Propose.execute][config_service_source] for details.
+for or against the proposal.
 
 ### Vote for Proposal
 
@@ -350,8 +354,9 @@ if all of the following conditions take place:
 - No vote for the same proposal from the same `from` has been
   submitted previously
 
-If all the checks pass, the validator vote for a previously proposed
-configuration. See [Vote.execute][config_service_source] for details.
+If all the checks pass, the vote is recorded. If there is
+a sufficient number of votes approving the configuration, it is scheduled to
+be accepted as specified in its proposal.
 
 ### Vote against Proposal
 
@@ -384,8 +389,7 @@ if all of the following conditions take place:
 - No vote for the same proposal from the same `from` has been
   submitted previously
 
-If all the checks pass, the validator vote against a previously proposed
-configuration. See [VoteAgainst.execute][config_service_source] for details.
+If all the checks pass, the vote is recorded.
 
 ## Private APIs
 
@@ -465,6 +469,5 @@ JSON object with the following fields:
 [http_api]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/response-samples.md
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
 [genesis-consensus]: ../architecture/configuration.md#genesisconsensus
