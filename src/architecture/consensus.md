@@ -1,335 +1,318 @@
-# Consensus in Exonum
+# Консенсус в Exonum
 
-Generally, a [consensus algorithm][wiki:consensus] is a process of
-obtaining an agreed result by a group of participants. In Exonum the
-consensus algorithm is used to agree on the list of transactions
-in blocks added to the blockchain. The other goal of the algorithm is to ensure
-that the results of the transaction execution are interpreted in the same way
-by all nodes in the blockchain network.
+Как правило, [алгоритм консенсуса][wiki:consensus] это процесс получения
+согласованного результата группой участников. В Exonum алгоритм консенсуса
+используется для согласования списка транзакций в блоках, добавленных в блокчейн.
+Другая цель алгоритма состоит в том, чтобы гарантировать, что результаты
+выполнения транзакций интерпретируются одинаково всеми узлами в сети блокчейн.
 
-The consensus algorithm in Exonum uses some ideas from
-the [algorithm proposed in Tendermint][tendermint_consensus], but has
-[several distinguishing characteristics](#distinguishing-features) as compared
-to it and other consensus algorithms for blockchains.
+Алгоритм консенсуса в Exonum использует некоторые идеи из алгоритма,
+[предложенного в Tendermint][tendermint_consensus], но имеет
+[несколько отличительных характеристик](#отличительные-особенности) по сравнению
+с ним и другими алгоритмами консенсуса для блокчейнов.
 
-## Assumptions
+## Предположения
 
-The Exonum consensus algorithm assumes that the consensus participants
-can be identified. Thus, the algorithm fits permissioned blockchains,
-which Exonum is oriented towards, rather than permissionless ones.
+Алгоритм консенсуса Exonum предполагает, что участники консенсуса могут быть
+идентифицированы. Таким образом, алгоритм подходит для приватных блокчейнов,
+на которые и ориентирован Exonum, а не для публичных блокчейнов.
 
-Not all the nodes in the blockchain network may be actively involved in
-the consensus algorithm. Rather, there is a special role for active consensus
-participants – *validators* or *validator nodes*.
-For example, in a [consortium blockchain][public_and_private_blockchains]
-validators could be controlled by the companies participating in the
-consortium.
+Не все узлы в сети блокчейн могут активно участвовать в алгоритме консенсуса.
+Для активных участников консенсуса есть особая роль *валидаторы* или *узлы валидаторы*.
+Например, в [блокчейн-консорциуме][public_and_private_blockchains]
+валидаторы могут контролироваться компаниями, участвующими в консорциуме.
 
-The consensus algorithm must operate in the presence of faults, i.e., when
-participants in the network may behave abnormally. The Exonum consensus
-algorithm
-assumes the worst; it operates under the assumption that any individual node
-or even a group of nodes in the blockchain network can crash or be
-compromised
-by a resourceful adversary (say, a hacker or a corrupt administrator). This
-threat model is known in computer science as [Byzantine faults][wiki:bft];
-correspondingly, the Exonum consensus algorithm is Byzantine fault tolerant
-(BFT).
+Алгоритм консенсуса должен работать при наличии сбоев, т.е. когда участники сети
+могут вести себя аномально. Алгоритм консенсуса Exonum предполагает худшее; он
+работает в предположении, что любой отдельный узел, или даже группа узлов в сети
+блокчейн, могут дать сбой или быть скомпрометированы находчивым противником
+(скажем, хакером или коррумпированным администратором). Эта модель угрозы известна
+в информатике как [задача византийских генералов][wiki:bft];
+соответственно, алгоритм консенсуса Exonum является алгоритмом византийского
+консенсуса.
 
-From the computer science perspective, the Exonum consensus algorithm takes
-usual assumptions:
+С точки зрения компьютерных наук, алгоритм консенсуса Exonum принимает обычные
+предположения:
 
-- Validator nodes are assumed to be [partially synchronous][partial_synchrony],
-  i.e., their computation performances do not differ much
-- The network is partially synchronous, too. That is, all messages are
- delivered
-  in the finite time which, however, is unknown in advance
-- Each validator has access to a local **stopwatch** to determine time
-  intervals.
-  On the other hand, there is no global synchronized time in the system
-- Validators can be identified with the public-key cryptography;
-  correspondingly, the communication among validators is authenticated
+- Узлы валидаторы считаются [частично синхронными][partial_synchrony],
+  то есть их вычислительные характеристики не сильно отличаются
+- Сеть также частично синхронна. То есть все сообщения доставляются за конечное
+  количество времени, которое, однако, неизвестно заранее
+- Каждый валидатор имеет доступ к локальному **секундомеру** для определения
+  временных интервалов. С другой стороны, в системе нет глобального
+  синхронизированного времени
+- Валидаторы могут быть идентифицированы с помощью криптосистемы с открытым ключом;
+  соответственно, связь между валидаторами аутентифицирована
 
-The same assumptions are used in [PBFT][pbft] (the most well-known BFT
-consensus) and its successors.
+Те же предположения используются в [PBFT][pbft] (наиболее известном алгоритме
+византийского консенсуса) и его преемниках.
 
-## Algorithm Overview
+## Обзор Алгоритма
 
-The process of reaching consensus on the next block (at the blockchain height
-`H`) consists of several **rounds**, numbered from 1\. The first round starts
-once the
-validator commits the block at height `H - 1`. The onsets of rounds are
-determined
-by a fixed timetable: rounds start after regular intervals. As there is no
-global time, rounds may start at different time for different validators.
+Процесс достижения консенсуса относительно следующего блока (на высоте блокчейна
+`H`) состоит из нескольких **раундов**, пронумерованных от 1\. Первый раунд
+начинается, как только валидатор принимает блок на высоте `H - 1`. Начало раунда
+определяется фиксированным расписанием: раунды начинаются через регулярные
+промежутки времени. Поскольку глобального времени нет, раунды могут начинаться
+в разное время для разных валидаторов.
 
-When the round number `R` comes, the previous rounds are not completed.
-That is, round `R` means that the validator can process messages
-related to a round with a number no greater than `R`.
-The current state of a validator can be described as a tuple `(H, R)`.
-The `R` part may differ among validators, but the height `H` is usually the
-same.
-If a specific validator is lagging (e.g., during its initial synchronization,
-or if it was switched off for some time), its height may be lower.
-In this case, the validator can request missing blocks from
-other validators and full nodes in order to quickly synchronize with the rest
-of the network.
+Когда наступает раунд номер `R`, предыдущие раунды не завершаются.
+То есть, раунд `R` означает, что валидатор может обрабатывать сообщения,
+относящиеся к раунду, с номером, не большим чем `R`.
+Текущее состояние валидатора может быть описано как кортеж `(H, R)`.
+`R` может отличаться среди валидаторов, но высота `H` обычно одна и та же.
+Если определенный валидатор отстает (например, во время его начальной
+синхронизации или если он был отключен на некоторое время), его высота может
+быть ниже. В этом случае валидатор может запросить отсутствующие блоки у других
+валидаторов и полных узлов, чтобы быстро синхронизироваться с остальными узлами
+сети.
 
-### Strawman Version
+### Упрощенное Описание
 
-To put it *very* simply, rounds proceed as follows:
+Если объяснять *очень* просто, раунды выполняются следующим образом:
 
-1. Each round has a *leader node*. The round leader offers a *proposal*
-   for the next block and broadcasts it across the network. The logic of
-   selecting the leader node is described in a separate algorithm.
-2. Validators may vote for the proposal by broadcasting a *prevote* message.
-   A prevote means that the validator has been able to parse the proposal
-   and has all transactions specified in it.
-3. After the validator has collected enough prevotes from a supermajority
-   of other validators, it applies transactions specified in the voted
-   proposal,
-   and broadcasts a *precommit* message. This message contains the result of
-   the proposal execution in the form of [a new state hash](storage.md).
-   The precommit expresses that the sender is ready to commit the corresponding
-   proposed block to the blockchain, but needs to see what other validators
-   have to say on the matter just to be sure.
-4. Finally, if the validator has collected a supermajority of precommits with
-   the same state hash for the same proposal, the proposed block is committed
-   to the blockchain.
+1. В каждом раунде есть *узел-лидер*. Лидер раунда выдвигает *предложение (proposal)* для
+   следующего блока и транслирует его в сети. Логика выбора узла-лидера описана
+   в отдельном алгоритме.
+2. Валидаторы могут голосовать за это предложение, транслируя сообщение типа *prevote*.
+   Это сообщение означает, что валидатор смог обработать предложение и все
+   транзакции, указанные в нем.
+3. После того, как валидатор собрал достаточное количество голосов от
+   квалифицированного большинства других валидаторов, он применяет транзакции,
+   указанные в предложении, и транслирует сообщение типа *precommit*. Это
+   сообщение содержит результат выполнения предложения в виде
+   [хеша нового состояния блокчейна](storage.md).
+   Сообщение типа *precommit* означает что отправитель готов принять
+   соответствующий предложенный блок в блокчейне, но, чтобы быть уверенным в этом
+   решении, ему нужно узнать что другие валидаторы думают по этому поводу.
+4. Наконец, если валидатор собрал сообщения типа *precommit* от квалифицированного
+   большинства с одним и тем же хешем состояния для одного и того же предложения,
+   предлагаемый блок принимается в блокчейн.
 
-### Non-Strawman Version
+### Детальное Описание
 
-!!! note
-    In the following description, +2/3 means more than two thirds of the
-    validators, and -1/3 means less than one third.
+!!! note "Примечание"
+    Далее в описании, +2/3 означает более двух третей валидаторов, а -1/3
+    означает менее одной трети.
 
-The algorithm above is overly simplified:
+Алгоритм описанный выше очень упрощен:
 
-- The validator may receive messages in any order because of network delays.
-  For example, the validator may receive a prevote or precommit for a block
-  proposal that the validator doesn’t know
-- There can be validators acting not according to the consensus algorithm.
-  Validators may be offline, or they can be corrupted by an adversary. To
-  formalize
-  this assumption, it is assumed that -1/3 validators at any moment of time may
-  be acting arbitrarily. Such validators are called *Byzantine* in computer
-  science; all other validators are *honest*
+- Валидатор может получать сообщения в любом порядке из-за сетевых задержек.
+  Например, валидатор может получить сообщение типа *precommit* или *prevote*
+  для предложения блока, которое не известно валидатору
+- Могут быть валидаторы, действующие вне алгоритма консенсуса.
+  Валидаторы могут быть отключены от сети, или повреждены противником. Чтобы
+  формализовать это предположение, предполагается, что -1/3 валидаторов в любой
+  момент времени могут действовать аномально. Такие валидаторы в информатике
+  называются *византийскими*; все другие валидаторы являются *честными*
 
-The 3-phase consensus (proposals, prevotes and precommits) described above
-is there to make the consensus algorithm operational under these conditions.
-More precisely, the algorithm is required to maintain *safety* and *liveness*:
+Трехэтапный консенсус (proposal, prevote и precommit)
+описанный выше, создан для того, чтобы алгоритм консенсуса работал в этих условиях.
+Точнее, алгоритм должен сохранять *безопасность* и *жизнеспособность*:
 
-- Safety means that once a single honest validator has committed a block, no
-  other honest validator will ever commit any other block at the same height
-- Liveness means that honest validators keep committing blocks from time to
-  time
+- Безопасность означает, что, как только один честный валидатор принял блок,
+  ни один другой честный валидатор никогда не примет какой-либо другой блок
+  на этой же высоте
+- Жизнеспособность означает, что честные валидаторы продолжают время от времени
+  принимать блоки
 
-#### Locks
+#### Замки
 
-Byzantine validators may send different messages to different validators.
-To maintain safety under these conditions, the Exonum consensus algorithm uses
-the concept of *locks*.
+Византийские валидаторы могут отправлять разные сообщения различным валидаторам.
+Для обеспечения безопасности в этих условиях, в алгоритме консенсуса Exonum
+используется понятие *замков*.
 
-A validator that has collected a +2/3 prevotes for some block proposal locks on
-that proposal. The locked validator does not vote for any other proposal except
-for the proposal on which it is locked. When a new round starts,
-the locked validator immediately sends a prevote indicating
-that it is locked on a certain proposal. Other validators may request prevotes
-that led to the lock from the locked validator, if they do not have them
-locally (these prevotes are known as *proof of lock*).
+Валидатор, который собрал +2/3 сообщений типа prevote за предложение блока,
+замыкается на этом предложении. Замкнутый валидатор не голосует за какое-либо
+другое предложение, кроме того, на котором он замкнулся. Когда начинается новый
+раунд, замкнутый валидатор немедленно отправляет сообщение типа prevote,
+указывающее, что он замкнулся на определенном предложении. Другие валидаторы
+могут запрашивать сообщения типа prevote, которые привели к замыканию валидатора,
+если они не имеют их локально (эти сообщения известны как
+*доказательство замыкания*).
 
-!!! note "Example"
-    Validator A gets prevotes from validators B and C,
-    and they do not get prevotes from each other because of connection
-    problems.
-    Then validators B and C can request each other’s prevotes from validator A.
+!!! note "Пример"
+    Валидатор A получает сообщения типа prevote от валидаторов B и C,
+    но они не получают этих сообщений друг от друга из-за проблем со связью.
+    Затем валидаторы B и C могут запросить сообщений друг друга у валидатора A.
 
-Locks can be changed: if A locked on a proposal and during next round all other
-validators locked on the next proposal, A would update its lock eventually.
+Замки могут меняться: если A замкнулся на предложении и в следующем раунде все
+остальные валидаторы замкнулись на следующем предложении, A в конечном итоге
+обновит свой замок.
 
-### Requests
+### Запросы
 
-As consensus messages may be lost or come out of order, the Exonum consensus
-uses the *requests* mechanism to obtain unknown information from other
-validators. A request is sent by a validator to its peer
-if the peer has information of interest, which is unknown to the validator,
-and which has been discovered during the previous communication with the peer.
+Поскольку сообщения могут быть потеряны или выйти из строя, консенсус Exonum
+использует механизм *запросов* для получения неизвестной информации от других
+валидаторов. Запрос отправляется валидатором другому узлу, если у этого узла
+имеется информация, представляющая интерес, которая неизвестна валидатору и
+была обнаружена во время предыдущей связи с этим узлом.
 
-!!! note "Example"
-    A request is sent if a node receives a consensus message from
-    a height greater than the local height. The peer is supposed to respond
-    with a message that contains transactions in an accepted block, together
-    with a proof that the block is indeed accepted (i.e., precommits of +2/3 validators).
+!!! note "Пример"
+    Запрос отправляется, если узел получает консенсусное сообщение с высоты,
+    большей чем его локальная высота. Предполагается, что другой узел ответит
+    сообщением, которое содержит транзакции в принятом блоке, а также
+    доказательство того, что блок действительно принят (т.е. сообщения типа
+    precommit от +2/3 валидаторов).
 
-There are requests for all consensus messages: proposals, prevotes, and
-precommits.
-As consensus messages are authenticated with digital signatures, they can be
-sent directly in response to requests.
+Есть запросы на все консенсусные сообщения: proposal, prevote и precommit.
+Поскольку консенсусные сообщения аутентифицируются с помощью цифровых подписей,
+они могут быть отправлены непосредственно в ответ на запросы.
 
-### Node States Overview
+### Обзор Состояний Узлов
 
-The order of states in the proposed algorithm is as follows:
+Порядок состояний в предлагаемом алгоритме выглядит следующим образом:
 
 ```none
-Commit -> (Round)+ -> Commit -> ...
+Принятие -> (Раунд)+ -> Принятие -> ...
 ```
 
-On the timeline, these states look the following way (for one of the
-validator nodes):
+На временной шкале эти состояния выглядят следующим образом (для одного из
+валидаторов):
 
 ```none
-Commit: |  H  |                       | H+1 |                        ...
-Round1: |     | R1                    |     | R1                     ...
-Round2: |          | R2               |          | R2                ...
-Round3: |               | R3          |               | R3           ...
-Round4: |                    | R4     |                    | R4      ...
+Принятие: |  H  |                       | H+1 |                        ...
+Раунд1:   |     | R1                    |     | R1                     ...
+Раунд2:   |          | R2               |          | R2                ...
+Раунд3:   |               | R3          |               | R3           ...
+Раунд4:   |                    | R4     |                    | R4      ...
 ...
------------------------------------------------------------------->  Time
+------------------------------------------------------------------>  Время
 ```
 
-Note that rounds have a fixed start time but they do not have a definite end
-time (they end when the next block is received). This differs from common
-behavior of partially synchronous consensus algorithms, in which rounds have
-a definite conclusion (i.e., messages generated during round `R`
-must be processed only during round `R`).
+Обратите внимание, что раунды имеют определенное время начала, но у них нет
+определенного конечного времени (они заканчиваются когда получен следующий блок).
 
-## Network Communication
+Это отличается от обычного поведения частично синхронных алгоритмов консенсуса,
+в которых раунды имеют определенное время окончания (т.е., сообщения,
+сгенерированы во время раунда `R`, должны обрабатываться только во время
+раунда `R`).
 
-!!! tip
-    See [source code][src-messages] for more technical details on
-    consensus messages.
+## Коммуникация в Сети
 
-### Messages
+### Сообщения
 
-The consensus algorithm makes use of several types of messages. All messages
-are authenticated with the help of public-key digital signatures, so that
-the sender of the message is unambiguously known and cannot be forged.
-Furthermore, use of digital signatures (instead of, say, [HMACs][wiki:hmac])
-ensures that messages can be freely retransmitted across the network.
-Moreover, this can be done by load balancers that have no idea whatsoever
-as to the content of messages.
+В алгоритме консенсуса используются несколько типов сообщений. Все
+сообщения аутентифицируются с помощью цифровых подписей с открытым
+ключом, так что отправитель сообщения однозначно известен и не может
+быть поддельным. Кроме того, использование цифровых подписей (вместо,
+например, [HMACs][wiki:hmac]) гарантирует, что сообщения могут быть
+свободно повторно переданы по сети. Более того, это можно сделать с
+помощью балансировщиков нагрузки, которые не имеют представления о
+содержании сообщений.
 
 #### Propose
 
-`Propose` message is a set of transactions proposed by the round leader
-for inclusion into the next block.
-Instead of whole transactions, `Propose` messages include only transactions
-hashes.
-A validator that received a `Propose` message can request missing transactions
-from its peers.
+Сообщения `Propose` - это набор транзакций, предложенный лидером раунда для
+включения в следующий блок. Вместо целых транзакций, сообщения `Propose`
+содержат только хеши транзакций. Валидатор, получивший сообщение `Propose`, может
+запросить отсутствующие транзакции у других узлов.
 
-If all validators behave correctly, `Propose` is sent only by the leader node
-of the round.
+Если все валидаторы ведут себя корректно, `Propose` отправляется только
+узлом-лидером раунда.
 
 #### Prevote
 
-`Prevote` is a vote for a `Propose` message. `Prevote` indicates that a
-validator
-has a correctly formed `Propose` and all the transactions specified in it.
-`Prevote` is broadcast to all validators.
+Сообщение `Prevote`- это голосование за сообщение `Propose`. `Prevote`
+указывает, что валидатор имеет правильно сформированное сообщение
+`Propose` и все транзакции, указанные в нем. `Prevote` транслируется всем
+валидаторам.
 
 #### Precommit
 
-`Precommit` is a message expressing readiness to include a certain proposal
-as the next block into the blockchain. `Precommit` is broadcast to all
-validators.
+Сообщение `Precommit` выражает готовность принять определенное предложение в
+качестве следующего блока в блокчейне. `Precommit` транслируется всем валидаторам.
 
 #### Status
 
-`Status` is an information message about the current height. It is sent with a
-periodicity written in the `status_timeout`
-[global configuration parameter](configuration.md).
+Сообщение `Status` - это информационное сообщение о текущей высоте. Оно
+отправляется с периодичностью, записанной в параметре `status_timeout`
+[глобальной конфигурации](configuration.md).
 
 #### BlockResponse
 
-A `BlockResponse` message contains a block (in the meaning of blockchain) and a
-set of `Precommit` messages that allowed that block to be accepted.
-`BlockResponse` messages are sent upon request.
+Сообщение `BlockResponse` содержит блок и набор сообщений `Precommit`, которые
+позволили принять этот блок. Сообщения `BlockResponse` отправляются по запросу.
 
-### Request Messages
+### Запросы Сообщений
 
-There are request messages for transactions, `Propose` and `Prevote` messages,
-and blocks. The generation and processing rules for these messages are fairly
-obvious.
+Существуют сообщения с запросами на транзакции, сообщения `Propose` и `Prevote`,
+а также блоки. Правила генерации и обработки этих сообщений довольно просты.
 
-!!! note "Example"
-    A `ProposeRequest` message is generated if a validator receives a consensus
-    message (`Prevote` or `Precommit`) that refers to the `Propose` message,
-    which
-    is unknown to the validator. A receiver of a `ProposeRequest` message sends
-    the requested `Propose` in response.
+!!! note "Пример"
+    Сообщение `ProposeRequest` генерируется, если валидатор получает консенсусное
+    сообщение (`Prevote` или `Precommit`) которое относится к сообщению
+    `Propose`, которое неизвестно валидатору. Узел, который получил сообщение
+    `ProposeRequest`, в ответ отправляет запрошенное сообщение `Propose`.
 
-## Distinguishing Features
+## Отличительные Особенности
 
-In comparison with other BFT algorithms, the consensus algorithm in Exonum has
-the following distinctive features.
+По сравнению с другими алгоритмами византийского консенсуса, алгоритм консенсуса
+Exonum имеет следующие отличительные особенности:
 
-### Unbounded Rounds
+### Неограниченные Раунды
 
-Rounds have a fixed start time but they do not have a definite end
-time (a round ends only when the next block is received).
-This helps decrease delays when the network connection among validators is
-unstable.
+Раунды имеют фиксированное время начала, но у них нет определенного времени
+окончания (раунд заканчивается только после принятия следующего блока).
+Это помогает уменьшить задержки, при нестабильном сетевом соединении между
+валидаторами.
 
-Assume that consensus messages from a certain round need to be processed within
-the round. If the state of the network deteriorates,
-the network might not manage to accept the proposal until the end
-of the round. Then in the next round the entire process of nominating a
-proposal and voting for it must begin again. The timeout of the
-next round should be increased so that the block could be accepted during the
-new
-round timeout with a poor network connectivity. The need to repeat anew the
-work that has already been done and increase in the timeout would lead to
-additional delays in accepting the block proposal.
+Предположим, что консенсусные сообщения из определенного раунда должны быть
+обработаны в рамках этого же раунда. Если состояние сети ухудшится, валидаторам,
+возможно, не удастся принять предложение до конца раунда. Тогда в следующем
+раунде весь процесс предложения блока и голосования за него должен начаться
+снова. Продолжительность следующего раунда должна быть увеличена, чтобы при
+плохом сетевом подключением, блок мог быть принят во время нового раунда.
+Необходимость повторения работы, которая уже была выполнена и
+увеличения длительности раунда, приведет к дополнительным задержкам в принятии
+нового блока.
 
-In contrast to the case discussed in the previous paragraph, the absence of a
-fixed round end in Exonum allows the system to accept the proposal with a
-minimum necessary delay.
+В отличие от случая, рассмотренного в предыдущем абзаце, отсутствие
+фиксированного времени окончания раунда в Exonum позволяет системе принять
+предложение блока с минимальной задержкой.
 
-### Work Split
+### Разделение Роботы
 
-`Propose` messages include only transactions hashes. (Transactions are included
-directly into `BlockResponse` messages.) Furthermore, transactions execution is
-delayed;
-transactions are applied only at the moment when a node locks on a `Propose`.
+Сообщения `Propose` включают только хеши транзакций. (Транзакции включены
+непосредственно в сообщения `BlockResponse`.) Кроме того, выполнение транзакций
+задерживается; транзакции применяются только в момент замыкания узла на
+сообщении `Propose`.
 
-Delayed transactions processing reduces the negative impact of malicious nodes
-on the system throughput and latency. Indeed, it splits transactions processing
-among the stages of the algorithm:
+Отложенная обработка транзакций снижает негативное влияние вредоносных узлов
+на пропускную способность и задержки в системы. Такой подход разделяет обработку
+транзакций между этапами алгоритма:
 
-- On the prevote stage, validators only ensure that a list of transactions
-  included in the proposal is correct (the validator checks that all the
-  transactions in
-  the `Propose` are already stored by this node. Correctness of a transaction
-  is verified when the transaction is received; nodes do not store incorrect
-  transactions.)
-- On the precommit stage, validators apply the transactions to the current
-  blockchain state
-- On the commit stage, validators ensure that they achieved the same state
-  after applying the transactions in the proposal
+- На этапе `Prevote`, валидаторы только проверяют, что список транзакций,
+  включенных в предложение, является правильным (валидатор проверяет, что все
+  транзакции в `Propose` ранее уже были сохранены этим узлом. Правильность
+  транзакции проверяется при получении транзакции; узлы не хранят неправильные
+  транзакции.)
+- На этапе `Precommit`, валидаторы применяют транзакции к текущему состоянию блокчейна
+- На этапе принятия нового блока, валидаторы проверяют, что они достигли одного
+  и того же состояния после применения транзакций с предложения
 
-If a Byzantine validator sends out proposals with a different transactions
-order to different validators, the validators do not need to spend time
-checking the order and applying the transactions on the prevote stage.
-A different transactions order will be detected when comparing the
-`propose_hash` received
-in the prevote messages from other validators and the `propose_hash` received
-in the proposal message.
+Если византийский валидатор отправляет разным валидаторам предложения с разным
+порядком транзакций, валидаторам не нужно тратить время на проверку порядка и
+применение транзакций на этапе `Propose`.
+Разный порядок транзакций будет обнаружен при попытке сопоставления
+`propose_hash` полученного в сообщениях `Prevote` от других валидаторов и
+`propose_hash` полученного в сообщении `Propose`.
 
-Thus, the split of work helps reduce the negative impact of Byzantine nodes
-on the overall system performance.
+Таким образом, разделение работы помогает снизить негативное влияние
+византийских узлов на общую производительность системы.
 
-### Requests Algorithm
+### Алгоритм Запросов
 
-Requests algorithm allows a validator to restore any consensus info from other
-validators. This has a positive effect on system liveness.
+Алгоритм запросов позволяет валидатору восстановить любую консенсусную
+информацию с помощью других валидаторов. Это оказывает положительное влияние
+на жизнеспособность системы.
 
-[partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
+[partial_ordering]: https://ru.wikipedia.org/wiki/Частично_упорядоченное_множество#Определение_и_примеры
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
 [public_and_private_blockchains]: https://blog.ethereum.org/2015/08/07/on-public-and-private-blockchains/
 [tendermint_consensus]: https://github.com/tendermint/tendermint/wiki/Byzantine-Consensus-Algorithm
 [wiki:consensus]: https://en.wikipedia.org/wiki/Consensus_(computer_science)
-[wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
+[wiki:bft]: https://ru.wikipedia.org/wiki/Задача_византийских_генералов
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
-[wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
+[wiki:hmac]: https://ru.wikipedia.org/wiki/HMAC
 [src-messages]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/protocol.rs
