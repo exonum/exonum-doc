@@ -1,193 +1,191 @@
-# Lightweight Clients
+# Легкие Клиенты
 
-To improve system auditability, Exonum includes a [**light
-client**](https://github.com/exonum/exonum-client). Light client is a
-JavaScript library with a number of helper functions available for use by
-frontend developers. These helper functions are used to
-verify blockchain responses on the client side using cryptographic proofs.
+Чтобы система лучше поддавалась проверке, Exonum включает в себя
+[**легкий клиент**](https://github.com/exonum/exonum-client). Легкий клиент -
+это JavaScript библиотека с рядом вспомогательных функций, доступных для
+использования фронтенд разработчиками. Эти вспомогательные функции используются
+для проверки ответов от блокчейна на стороне клиента с использованием
+криптографических доказательств.
 
-The client functions are divided into the following submodules:
+Функции клиента делятся на следующие подмодули:
 
-- **Data**. Functions for [serialization and deserialization of
-  data](serialization.md) from the JSON format to
-  Exonum binary format
-- **Cryptography**. Functions for calculating hashes, creating
-  and validating digital signatures
-- **Proofs**. Functions for checking cryptographic proofs that
-  are returned by the blockchain, such as the functions for
-  checking the proofs for [Merkle][mt-index]
-  and [Merkle Patricia][mpt-index] indices
-- **Blockchain integrity checks**. Function for checking the
-  validity of a block (its compliance with [consensus algorithm](consensus.md))
+- **Данные**. Функции для [сериализации и десериализации данных](serialization.md)
+  из формата JSON в двоичный формат Exonum
+- **Криптография**. Функции для вычисления хешей, создания и проверки цифровых
+  подписей
+- **Доказательства**. Функции для проверки криптографических доказательств,
+  возвращаемых блокчейном, такие, как функции проверки доказательств для индексов
+  [Merkle][mt-index] и [Merkle Patricia][mpt-index]
+- **Проверка целостности блокчейна**. Функция проверки достоверности блока
+  (его соответствие [алгоритму консенсуса](consensus.md))
 
-!!! note
-    A hash of the entire blockchain state is a part of each block
-    (see [data storage](storage.md)). This hash is formed using Merkle
-    and Merkle Patricia indices. Thus, using functions for proof verification,
-    one can verify the commitment of any blockchain data in a block. The block
-    itself can be verified using blockchain integrity verification.
+!!! note "Примечание"
+    Хеш всего состояния блокчейна является частью каждого блока (см.
+    [хранение данных](storage.md)). Этот хеш формируется с помощью индексов
+    Merkle и Merkle Patricia. Таким образом, используя функции проверки
+    доказательств, можно проверить наличие любых данных блокчейна в блоке.
+    Сам блок можно проверить с помощью проверки целостности блокчейна.
 
-There are two typical use cases for the light client:
+Для легкого клиента существуют два типичных варианта использования:
 
-- Forming and sending transactions to the Exonum blockchain network
-- Forming [requests](services.md#read-requests) to full nodes of the network
-  (normally, HTTP GET requests) and validation of the responses
+- Формирование и отправка транзакций в сеть блокчейна Exonum
+- Формирование [запросов](services.md#read-requests) к полным узлам сети
+  (обычно, HTTP GET запросы) и проверка ответов
 
-## Transaction Creation
+## Создание Транзакций
 
-In this and next section all functions indicated in *italics* are the functions
-implemented in Exonum light client.
+В этом и следующем разделе все функции, выделенные курсивом, являются
+функциями, реализованными в легком клиенте Exonum.
 
-![Sending data to the blockchain](../images/send-data.png)
+![Отправка данных в блокчейн](../images/send-data.png)
 
-1. On triggering frontend application (for example, by a button click handler)
-  a new transaction is created. The transaction data is stored in JSON format.
-  Then the data is *converted to the Exonum binary format* and
-  *digitally signed* using the light client library.
-2. Frontend application receives a digital signature from
-  the light client library.
-3. The generated transaction (JSON data + the digital signature) is sent
-  to a full node via an HTTP POST request.
-4. Frontend application receives a notification (e.g., the transaction hash)
-  as a response to the HTTP POST request
+1. При запуске фронтенд приложения (например, с помощью обработчика нажатия
+   кнопки) создается новая транзакция. Данные транзакции хранятся в формате JSON.
+   Затем данные *преобразуются в двоичный формат Exonum* и *подписываются цифровой
+   подписью* с использованием библиотеки легкого клиента.
+2. Фронтенд приложение получает цифровую подпись из библиотеки легкого клиента.
+3. Сгенерированная транзакция (данные JSON + цифровая подпись) отправляется на
+   полный узел по запросу HTTP POST.
+4. Фронтенд приложение получает уведомление (например, хеш транзакции) в ответ
+   на запрос HTTP POST.
 
-!!! note
-    Serialization during signing is a necessary step, since all
-    data (including transactions) is stored in Exonum in a [custom binary
-    format](serialization.md). This is done for several reasons:
+!!! note "Примечание"
+    Сериализация во время подписания является необходимым шагом, поскольку все
+    данные (включая транзакции) хранятся в Exonum в
+    [особом двоичном формате](serialization.md). Это делается по нескольким
+    причинам:
 
-    - The binary format is unambiguous, while the same data can have multiple
-      JSON representations (which would lead to different hashes of logically
-      the same data)
-    - The data stored in the binary format consumes less disk space
-    - Access to a field in a binary format can be implemented using fast
-      pointer arithmetic; the same operation for JSON data would require
-      multiple reads
+    - Двоичный формат недвусмыслен, тогда как одни и те же данные могут иметь
+      несколько представлений в JSON (что приведет к различным хешам логически
+      одних и тех же данных)
+    - Данные, хранящиеся в двоичном формате, занимают меньше места на диске
+    - Доступ к полю в двоичном формате может быть реализован с помощью быстрой
+      арифметики указателей; для такой же операции для данных в JSON потребуется
+      несколько считываний
 
-## Sending Requests
+## Отправка Запросов
 
-![Requesting data from the blockchain](../images/request-data.png)
+![Запрос данных из блокчейна](../images/request-data.png)
 
-1. The client forms an HTTP GET request and sends it
-  to a full node in the Exonum blockchain network.
-2. The node forms a response to the request and the corresponding
-  cryptographic proof and sends both back to the client.
-  The cryptographic proof includes a block header together with
-  [`Precommit` messages](consensus.md#precommit)
-  that certify its validity, and one or more
-  [Merkle paths](../glossary.md#merkle-proof)
-  that link the response to the block header.
-3. On receiving the response from the blockchain, the client
-  *verifies the structure* and *validates cryptographic proofs*
-  of the response.
-  The verification procedure includes *checking whether a returned response
-  is stale*. This is accomplished by calculating the median of timestamps
-  recorded in `Precommit`s and comparing it against the local time
-  of the client.
-  If the median time in `Precommit`s is too far in the past, the response
-  is considered stale, and its verification fails.
-4. The result of checks and the data retrieved from the full node is shown
-  in the user interface
+1. Клиент формирует HTTP GET запрос и отправляет его на полный узел в сети
+   блокчейна Exonum.
+2. Узел формирует ответ на запрос и соответствующее криптографическое
+   доказательство и отправляет его обратно клиенту.
+   Криптографическое доказательство включает заголовок блока вместе с
+   [сообщениями типа `Precommit`](consensus.md#precommit),
+   которые подтверждают его достоверность, и один или несколько
+   [путей Merkle](../glossary.md#merkle-proof),
+   которые связывают ответ с заголовком блока.
+3. После получения ответа от блокчейна, клиент
+   *проверяет структуру* и *проверяет криптографические доказательства*
+   ответа.
+   Процедура верификации включает *проверку того, является ли возвращаемый ответ
+   устаревшим*.  Это проверяется путем вычисления медианы временных меток,
+   записанных в сообщениях типа `Precommit`, и сравнения их с местным временем
+   клиента. Если среднее время в сообщениях типа `Precommit` слишком далеко в
+   прошлом, ответ считается устаревшим, и его проверка неудачна.
+4. Результат проверок и данные, полученные от полного узла, отображаются в
+   пользовательском интерфейсе.
 
-!!! note
-    In case user authentication is needed (for example, for data
-    access management), requests can be *digitally signed*.
+!!! note "Примечание"
+    В случае необходимости аутентификации пользователя (например, для
+    управления доступом к данным) запросы могут быть *подписаны цифровой
+    подписью*.
 
-An example of the cryptographic proof:
+Пример криптографического доказательства:
 
-![Cryptographic proof](../images/proof.png)
+![Криптографическое доказательство](../images/proof.png)
 
-In this figure, the data has a [serializable](serialization.md) datatype
-known to the frontend application.
-It is tied to [the blockchain state](../glossary.md#blockchain-state)
-via one or more [Merkle trees](../glossary.md#merkle-tree) or their variants.
-The hash digest of the blockchain state is a part of the block signed
-by the blockchain validators.
+На этом рисунке данные имеют [сериализуемый](serialization.md) тип данных,
+известный фронтенд приложению.
+Они привязаны к [состоянию блокчейна](../glossary.md#blockchain-state)
+через одно или несколько [деревьев хешей](../glossary.md#merkle-tree) или их варианты.
+Хеш состояния блокчейна является частью блока, подписанного валидаторами блокчейна.
 
-## Motivation
+## Предпосылки
 
-Blockchain, as a technology that expands the capabilities of distributed
-databases, implies the possibility of auditing or validating stored
-information. This audit can be done in several ways.
+Блокчейн, как технология, расширяющая возможности распределенных баз данных,
+подразумевает возможность аудита или проверки хранимой информации. Этот аудит
+может быть выполнен несколькими способами.
 
-In a system with full nodes (nodes that store the full copy of a blockchain),
-audit can be performed automatically during operation of such nodes. When a new
-block is received, a full node verifies its compliance with the
-consensus algorithm and the correctness of transaction execution. Such an
-**"audit by dedicated auditor nodes"** can be effective in case it is performed
-by external independent parties. However, it has a number of drawbacks:
+В системе с полными узлами (узлами, которые хранят полную копию блокчейна),
+аудит может выполняться автоматически во время работы таких узлов. Когда получен
+новый блок, полный узел проверяет его соответствие алгоритму консенсуса и
+правильность выполнения транзакций. Такой
+**"аудит выделенными узлами аудиторами"** может быть эффективным, если он
+выполняется внешними независимыми сторонами. Однако он имеет ряд недостатков:
 
-- To perform audit, one needs a full copy of a blockchain and
-  enough computational resources to stay in sync with the blockchain validators
-- This type of audit needs to be permanent to ensure the correctness of
-  system state
-- In order to start auditing, a full auditor node must reach the current height
-  of the blockchain. This could take long time, especially if
-  the blockchain has substantial transaction throughput
-- **An end user of the system is forced to trust pair "validators" +
-  "auditors"**, since he has no way to verify the correctness of blockchain
-  data. As a matter of fact, such blockchain is equal to distributed database
-  from the user's point of view.
+- Чтобы выполнять аудит, нужна полная копия блокчейна и достаточные
+  вычислительные ресурсы, для синхронизации с валидаторами блокчейна
+- Этот тип аудита должен быть постоянным, чтобы обеспечить правильность состояния
+  системы
+- Чтобы начать аудит, полный узел аудитор должен дойти до текущей высоты
+  блокчейна. Это может занять много времени, особенно если блокчейн имеет
+  значительную пропускную способность транзакций
+- **Конечный пользователь системы вынужден доверять паре «валидаторы» +
+  «аудиторы»**, так как у него нет возможности проверить правильность данных
+  блокчейна. По сути, с точки зрения пользователя, такой блокчейн равен
+  распределенной базе данных.
 
-One of the ways to address the drawbacks of "audit by dedicated auditor
-nodes" is to introduce *light clients*, also known as
-*lightweight clients*, *thin clients* or just *clients*. For the Bitcoin
-blockchain, these clients are also known as [SPV (simple payment verification)
-clients](https://en.bitcoin.it/wiki/Thin_Client_Security). Light clients are
-programs able to replicate and verify a small portion of information stored
-in the blockchain. Usually clients verify information relevant to a specific
-user (for example, the history of his transactions). This verification is
-possible due to the use of specific data containers in a blockchain:
-[Merkle][mt-index] and [Merkle Patricia][mpt-index] indices.
+Одним из способов устранения недостатков "аудита выделенными узлами аудиторами"
+является внедрение *легких клиентов*, также известных как *тонкие клиенты* или
+просто *клиенты*. В Биткойн блокчейне, эти клиенты также известны как клиенты
+[SPV (simple payment verification)](https://en.bitcoin.it/wiki/Thin_Client_Security).
+Легкие клиенты - это программы, способные копировать и проверять небольшую часть
+информации, хранящейся в блокчейне. Обычно клиенты проверяют информацию,
+относящуюся к конкретному пользователю (например, историю его транзакций). Эта
+проверка возможна благодаря использованию специфических контейнеров данных в
+блокчейне: индексов [Merkle][mt-index] и [Merkle Patricia][mpt-index].
 
-Advantages of this approach are:
+Преимуществами этого подхода являются:
 
-- **Decreased trust in third parties**: verification of
-  all data returned by a blockchain in response to queries is performed by the
-  user himself on his machine
-- Constant (albeit partial) audit of the system is possible without requiring
-  computational resources comparable to validators in terms of performance.
-  Only the relevant data is audited
-- To start or resume the audit of the system, no synchronization period is
-  required
+- **Снижение необходимости доверия третьим сторонам**: проверка всех данных,
+  возвращаемых блокчейном в ответ на запросы, выполняется самим пользователем
+  на его машине
+- Постоянный (хотя и частичный) аудит системы возможен без необходимости
+  использования вычислительных ресурсов, сопоставимых с ресурсами валидаторов с точки
+  зрения производительности. Проверяются только релевантные данные.
+- Чтобы начать или возобновить аудит системы, не требуется времени на синхронизацию
 
-!!! note
-    The user still needs to trust the light client developers if the client
-    has closed source. Alternatively, the user should perform an
-    audit of light client code to remove the necessity of trust to
-    third parties completely.
+!!! note "Примечание"
+    Пользователю все еще нужно доверять разработчикам легкого клиента, если
+    клиент имеет закрытый исходный код. Если же исходный код открыт, пользователь
+    должен выполнить аудит кода легкого клиента, чтобы полностью исключить
+    необходимость доверия третьим сторонам.
 
-The presence of light clients does not mean the absence of auditor nodes, since
-their tasks are different. Light clients verify particular user's data, while
-auditor nodes verify a blockchain as a whole.
+Наличие легких клиентов не означает отсутствие узлов аудиторов, поскольку их
+задачи различны. Легкие клиенты проверяют данные конкретного пользователя, в
+то время как узлы аудиторы проверяют блокчейн в целом.
 
-Light client security could be compared to [TLS][wiki:tls] security checks
-embedded into web browsers. It is not a direct substitute to auditing performed
-by auditor nodes, but it provides a measurable degree of security against
-[MitM attacks][wiki:mitm] and maliciously acting nodes that the client
-may communicate with. At the same time, if light clients cover
-all blockchain transactions, their *collective* security can become comparable
-to the security provided by the auditor nodes.
+Безопасность легких клиентов сравнима с проверками безопасности [TLS][wiki:tls],
+встроенными в веб-браузеры. Это не является прямой заменой аудиту, выполняемому
+узлами аудиторами, но обеспечивает измеримую степень защиты от
+[атак посредников][wiki:mitm] и злонамеренно действующих узлов, с которыми может
+взаимодействовать клиент. В то же время, если легкие клиенты охватывают все
+транзакции блокчейна, их *коллективная* безопасность может стать сопоставимой с
+безопасностью, предоставляемой узлами аудиторами.
 
-The presence of light clients in a blockchain-based system leads to certain
-difficulties during development:
+Наличие легких клиентов в блокчейн системе приводит к определенным трудностям в
+процессе разработки:
 
-- Backend developers should agree with client developers on API requests and
-  the format of cryptographic proofs (in fact, blockchain data model)
-- Any changes in blockchain data model should be accompanied by relevant
-  changes in the logic of proof verification performed by light clients
-- Since the light client substantially expands an access to Exonum REST
-  endpoints with cryptography, it may be necessary to create multiple
-  light clients and continuously support their codebase
+- Бэкэнд разработчики должны быть в согласии с разработчиками клиентов в
+  вопросах API запросов и форматов криптографических доказательств (фактически,
+  модели данных блокчейна)
+- Любые изменения в модели данных блокчейна должны сопровождаться
+  соответствующими изменениями в логике проверки доказательств, выполняемой
+  легкими клиентами
+- Поскольку легкий клиент существенно расширяет доступ к Exonum REST конечным
+  точкам с криптографией, может возникнуть необходимость создать несколько
+  легких клиентов и постоянно поддерживать базу их кода
 
-!!! note
-    The first two problems above can be overcome with the aid of data
-    schema, stated in a language independent format (see [the Exonum
-    roadmap](../roadmap.md)).
+!!! note "Примечание"
+    Первые две проблемы, описанные выше, могут быть решены с помощью схемы
+    данных, записанной в формате, независимом от языка (см.
+    [дорожную карту Exonum](../roadmap.md)).
 
-Despite the complexity of the development, **the presence of
-light clients in a blockchain-based system is the only practical way to
-largely remove the necessity of trust to third parties**.
+Несмотря на сложность разработки, **присутствие легких клиентов в блокчейн
+системе является единственным практичным способом в значительной степени
+избавиться от необходимости доверять третьим сторонам**.
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
