@@ -20,9 +20,9 @@ propose transaction to the network. The transaction includes a new configuration
 in the JSON format, along with three auxiliary fields:
 
 - `actual_from` is a non-negative integer height,
-  upon reaching which the new configuration (if accepted) will activate.
+  upon reaching which the new configuration (if accepted) will become active.
 - `previous_cfg_hash` is the hash of the configuration that the proposal updates
-- `majority_count` is the minimum number of validators that need to approve of
+- `majority_count` is the minimum number of validators that need to approve
   the proposal
 
 Validators may vote for or against configuration proposals by submitting vote transactions
@@ -114,7 +114,7 @@ config][stored_configuration] serialization. It has the following fields:
 - **services**: Object  
   Service-specific configuration parameters.
 - **validator_keys**: Array<PublicKey\>  
-  List of validators’ public keys.
+  List of public keys of the validators.
 
 #### Propose
 
@@ -313,10 +313,10 @@ with a state change if all of the following conditions take place:
 - `cfg.previous_cfg_hash` equals to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height of the blockchain,
   determined as the height of the latest committed block + 1
-- A following configuration isn’t present
+- There is no agreed-upon following configuration
 - The actual configuration contains the `from` public key in the array of
   validator keys
-- There isn’t a previously submitted configuration proposal, which evaluates
+- There is no previously submitted configuration proposal, which evaluates
   to the same configuration hash
 
 If all the checks pass, the proposal is recorded as a candidate
@@ -346,7 +346,7 @@ Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
-- A following configuration isn’t present
+- There is no agreed-upon following configuration
 - The actual configuration contains the `from` public key in the array of
   validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
@@ -366,7 +366,7 @@ proposed configuration.
 #### Data Layout
 
 - **cfg_hash**: Hash  
-  Hash of configuration to vote against.
+  Hash of the configuration to be voted against.
 - **from**: PublicKey  
   Public key of the transaction author.
 
@@ -381,7 +381,7 @@ Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
-- A following configuration isn’t present
+- There is no agreed-upon following configuration
 - The actual configuration contains the `from` public key in the array of
   validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
@@ -448,14 +448,14 @@ JSON object with the following fields:
 POST {base_path}/configs/{config_hash_vote_against}/postagainst
 ```
 
-Create a [`VoteAgainst` transaction](#configuration-proposal).
+Creates a [`VoteAgainst` transaction](#configuration-proposal).
 As with the previous endpoint, the `from` field of the transaction
 and its signature are computed automatically.
 
 #### Parameters
 
 - **config_hash_vote_against**: Hash  
-  Hash of the configuration to vote against.
+  Hash of the configuration to be voted against.
 
 #### Response
 
