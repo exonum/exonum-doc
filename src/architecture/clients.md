@@ -173,17 +173,13 @@ The presence of light clients in a blockchain-based system leads to certain
 difficulties during development:
 
 - Backend developers should agree with client developers on API requests and
-  the format of cryptographic proofs (in fact, blockchain data model)
-- Any changes in blockchain data model should be accompanied by relevant
+  the format of cryptographic proofs
+- Changes in blockchain data model should be accompanied by relevant
   changes in the logic of proof verification performed by light clients
-- Since the light client substantially expands an access to Exonum REST
-  endpoints with cryptography, it may be necessary to create multiple
-  light clients and continuously support their codebase
 
-!!! note
-    The first two problems above can be overcome with the aid of data
-    schema, stated in a language independent format (see [the Exonum
-    roadmap](../roadmap.md)).
+These problems above can be overcome with the aid of data
+schema stated in a language-independent format
+(see [the Exonum roadmap](../roadmap.md)).
 
 Despite the complexity of the development, **the presence of
 light clients in a blockchain-based system is the only practical way to
