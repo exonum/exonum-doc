@@ -141,15 +141,13 @@ None.
 
 #### Response
 
-Example of JSON response:
+Example of response:
 
-```json
-{
-  "nanos_since_epoch": 15555000,
-  "secs_since_epoch": 1516106164
-}
+```none
+"2018-05-17T10:43:59.404962Z"
 ```
 
+The response is combined date and time in UTC as per [ISO 8601][ISO8601].
 `null` is returned if there is no consolidated time.
 
 ### Timestamps of Current Validators
@@ -172,10 +170,7 @@ Example of JSON response:
 [
   {
     "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
-    "time": {
-      "nanos_since_epoch": 626107000,
-      "secs_since_epoch": 1516011501
-    }
+    "time": "2018-05-17T10:45:56.057753Z"
   },
   {
     "public_key": "52baa9d4c4029b925cedf1a1515c874a68e9133102d0823a6de88eb9c6694a59",
@@ -183,6 +178,9 @@ Example of JSON response:
   }
 ]
 ```
+
+The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
+`null` is returned if the validator time is unknown.
 
 ### Timestamps of All Validators
 
@@ -205,20 +203,16 @@ Example of JSON response:
 [
   {
     "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
-    "time": {
-      "nanos_since_epoch": 626107000,
-      "secs_since_epoch": 1516011501
-    }
+    "time": "2018-05-17T10:47:08.161549Z"
   },
   {
     "public_key": "f6753f4b130ce098b1322a6aac6accf2d5770946c6db273eab092197a5320717",
-    "time": {
-      "nanos_since_epoch": 581130000,
-      "secs_since_epoch": 1514209665
-    }
+    "time": "2018-05-17T10:47:08.161549Z"
   }
 ]
 ```
+
+The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
 
 ## Discussion
 
@@ -275,3 +269,4 @@ collectively trusted entities, which may behave maliciously.
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
+[ISO8601]: https://en.wikipedia.org/wiki/ISO_8601

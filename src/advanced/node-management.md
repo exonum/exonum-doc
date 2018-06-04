@@ -91,12 +91,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ### Time
 
-`Time` is a JSON object with the following fields:
-
-- **seconds**: integer  
-  The UNIX timestamp
-- **nanos**: integer  
-  Number of nanoseconds
+`Time` is a string that combined date and time in UTC as per [ISO 8601][ISO8601]
+(for example, `2018-05-17T10:45:56.057753Z`).
 
 ### Precommit
 
@@ -627,10 +623,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 807015000,
-              "secs": "1499869987"
-            },
+            "time": "2018-05-17T10:43:59.404962Z",
             "validator": 2
           },
           "message_id": 4,
@@ -644,10 +637,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 806850000,
-              "secs": "1499869987"
-            },
+            "time": "2018-05-17T10:49:09.161549Z",
             "validator": 3
           },
           "message_id": 4,
@@ -661,10 +651,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 7842000,
-              "secs": "1499869988"
-            },
+            "time": "2018-05-17T10:49:11.161549Z",
             "validator": 0
           },
           "message_id": 4,
@@ -780,3 +767,4 @@ equal than `start` and less than `end`.
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
 [blockchain-state]: ../glossary.md#blockchain-state
+[ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
