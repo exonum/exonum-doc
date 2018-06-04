@@ -114,7 +114,7 @@ In a system with full nodes (nodes that store the full copy of a blockchain),
 audit can be performed automatically during operation of such nodes. When a new
 block is received, a full node verifies its compliance with the
 consensus algorithm and the correctness of transaction execution. Such an
-**"audit by dedicated auditor nodes"** can be effective in case it is performed
+audit by dedicated auditor nodes can be effective in case it is performed
 by external independent parties. However, it has a number of drawbacks:
 
 - To perform audit, one needs a full copy of a blockchain and
@@ -124,13 +124,13 @@ by external independent parties. However, it has a number of drawbacks:
 - In order to start auditing, a full auditor node must reach the current height
   of the blockchain. This could take long time, especially if
   the blockchain has substantial transaction throughput
-- **An end user of the system is forced to trust pair "validators" +
-  "auditors"**, since he has no way to verify the correctness of blockchain
+- An end user of the system is forced to trust pair validators +
+  auditors, since he has no way to verify the correctness of blockchain
   data. As a matter of fact, such blockchain is equal to distributed database
-  from the user's point of view.
+  from the user’s point of view.
 
-One of the ways to address the drawbacks of "audit by dedicated auditor
-nodes" is to introduce *light clients*, also known as
+One of the ways to address the drawbacks of audit by dedicated auditor
+nodes is to introduce *light clients*, also known as
 *lightweight clients*, *thin clients* or just *clients*. For the Bitcoin
 blockchain, these clients are also known as [SPV (simple payment verification)
 clients](https://en.bitcoin.it/wiki/Thin_Client_Security). Light clients are
@@ -181,9 +181,9 @@ These problems above can be overcome with the aid of data
 schema stated in a language-independent format
 (see [the Exonum roadmap](../roadmap.md)).
 
-Despite the complexity of the development, **the presence of
+Despite the complexity of the development, the presence of
 light clients in a blockchain-based system is the only practical way to
-largely remove the necessity of trust to third parties**.
+largely remove the necessity of trust to third parties.
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
