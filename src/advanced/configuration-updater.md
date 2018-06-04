@@ -17,16 +17,20 @@ The global configuration may need to be modified for various reasons:
 
 Any validator node can propose a new configuration, by broadcasting a corresponding
 propose transaction to the network. The transaction includes a new configuration
-in the JSON format, along with two auxiliary fields:
+in the JSON format, along with three auxiliary fields:
 
 - `actual_from` is a non-negative integer height,
-  upon reaching which the new configuration (if accepted) will activate.
+  upon reaching which the new configuration (if accepted) will become active.
 - `previous_cfg_hash` is the hash of the configuration that the proposal updates
+- `majority_count` is the minimum number of validators that need to approve
+  the proposal
 
-Validators may vote for configuration proposals by submitting vote transactions
+Validators may vote for or against configuration proposals by submitting vote transactions
 to the network. Each validator can cast
-a single vote for any configuration proposal. If the proposal gets a supermajority
-of votes (more than 2/3 of the validators), then the proposal becomes locked in,
+a single vote either for or against any configuration proposal (but not both).
+If the proposal gets a supermajority of approving votes
+(more than 2/3 of the validators by default; can be varied with the help of `majority_count`),
+then the proposal becomes locked in,
 and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
@@ -63,6 +67,7 @@ Configuration update service specifies a set of public and private endpoints.
 
     - [Propose configuration](#configuration-proposal), [private API](#submit-configuration-proposal)
     - [Vote for configuration](#vote-for-proposal), [private API](#submit-vote-for-proposal)
+    - [Vote against configuration](#vote-against-proposal), [private API](#submit-vote-against-proposal)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
@@ -96,38 +101,20 @@ an optional type.
 `ConfigBody` is a JSON object corresponding to the [Exonum
 config][stored_configuration] serialization. It has the following fields:
 
-- **previous_cfg_hash**: Hash  
-  Hash of the previous active configuration.
 - **actual_from**: integer  
   The height from which the configuration became actual.
-- **validators**: Array<PublicKey\>  
-  List of validators' public keys.
 - **consensus**: Object  
-  Consensus-specific configuration parameters.
-- **consensus.peers_timeout**: integer  
-  Peer exchange timeout (in ms).
-- **consensus.timeout_adjuster**: Object  
-  [Settings][ta-config] for the proposal timeout adjuster.
-- **consensus.timeout_adjuster.type**:  
-  `"Constant"` | `"Dynamic"` | `"MovingAverage"`  
-  Timeout adjuster type.
-- **consensus.timeout_adjuster.timeout**: integer  
-  Proposal timeout (ms) after the new height beginning.  
-  Used with the `"Constant"` adjuster.
-- **consensus.round_timeout**: integer  
-  Interval (ms) between rounds.
-- **consensus.status_timeout**: integer  
-  Period (ms) of sending a `Status` message.
-- **consensus.txs_block_limit**: integer  
-  Maximum number of transactions per block.
+  [Consensus-specific configuration parameters][genesis-consensus].
+- **majority_count**: integer  
+  Amount of votes required to commit a new configuration proposal.
+  By default the number of votes is calculated as
+  2/3 + 1 of total validators count.
+- **previous_cfg_hash**: Hash  
+  Hash of the previous active configuration.
 - **services**: Object  
   Service-specific configuration parameters.
-  
-!!! note
-    **consensus.round_timeout** integer must be strictly larger
-    (recommended at least 2x) than **consensus.timeout_adjuster.timeout**
-    integer. Otherwise, the consensus algorithm will stop working correctly
-    (a new block will never be accepted).
+- **validator_keys**: Array<PublicKey\>  
+  List of public keys of the validators.
 
 #### Propose
 
@@ -137,7 +124,7 @@ config][config_propose] serialization. It has the following fields:
 - **tx_propose**: Object  
   Information about configuration and its author.
 - **tx_propose.from**: PublicKey  
-  Author's public key.
+  Author’s public key.
 - **tx_propose.cfg**: string  
   String containing JSON serialization of proposed configuration.
 - **votes_history_hash**: Hash  
@@ -301,7 +288,7 @@ configuration proposals were committed as transactions to the Exonum blockchain.
 
 ### Configuration Proposal
 
-`TxConfigPropose` transaction is a new configuration proposal.
+`Propose` transaction is a new configuration proposal.
 
 #### Data Layout
 
@@ -318,7 +305,7 @@ specified in `from`.
 
 #### Execution
 
-A `TxConfigPropose` transaction is only successfully executed
+A `Propose` transaction is only successfully executed
 with a state change if all of the following conditions take place:
 
 - `cfg` is a valid stringified JSON object corresponding to the `ConfigBody`
@@ -326,18 +313,19 @@ with a state change if all of the following conditions take place:
 - `cfg.previous_cfg_hash` equals to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height of the blockchain,
   determined as the height of the latest committed block + 1
-- A following configuration isn't present
+- There is no agreed-upon following configuration
 - The actual configuration contains the `from` public key in the array of
   validator keys
-- There isn't a previously submitted configuration proposal, which evaluates
+- There is no previously submitted configuration proposal, which evaluates
   to the same configuration hash
 
-If all the checks pass, the execution results in modifying the `config_proposes`
-table. See [TxConfigPropose.execute][config_service_source] for details.
+If all the checks pass, the proposal is recorded as a candidate
+for the next configuration. The validators can then vote
+for or against the proposal.
 
 ### Vote for Proposal
 
-`TxConfigVote` is a transaction that implements voting for a previously
+`Vote` is a transaction that implements voting for a previously
 proposed configuration.
 
 #### Data Layout
@@ -358,16 +346,50 @@ Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
-- A following configuration isn't present
+- There is no agreed-upon following configuration
 - The actual configuration contains the `from` public key in the array of
   validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height
-- No vote for the same proposal from the same `from` has been
+- No vote on the same proposal from the same validator has been
   submitted previously
 
-If all the checks pass, execution results in modifying the `votes_by_config_hash`
-table. See [TxConfigVote.execute][config_service_source] for details.
+If all the checks pass, the vote is recorded. If there is
+a sufficient number of votes approving the configuration, it is scheduled to
+be accepted as specified in its proposal.
+
+### Vote against Proposal
+
+`VoteAgainst` is a transaction that implements voting against a previously
+proposed configuration.
+
+#### Data Layout
+
+- **cfg_hash**: Hash  
+  Hash of the configuration to be voted against.
+- **from**: PublicKey  
+  Public key of the transaction author.
+
+#### Verification
+
+Signature of the transaction is verified against the public key
+specified in `from`.
+
+#### Execution
+
+Vote transactions will only get submitted and executed with state change
+if all of the following conditions take place:
+
+- `cfg_hash` references a known proposed configuration `cfg`
+- There is no agreed-upon following configuration
+- The actual configuration contains the `from` public key in the array of
+  validator keys
+- `cfg.previous_cfg_hash` is equal to hash of the actual configuration
+- `cfg.actual_from` is greater than the current height
+- No vote on the same proposal from the same validator has been
+  submitted previously
+
+If all the checks pass, the vote is recorded.
 
 ## Private APIs
 
@@ -377,7 +399,7 @@ table. See [TxConfigVote.execute][config_service_source] for details.
 POST {base_path}/configs/postpropose
 ```
 
-Creates a [`TxConfigPropose` transaction](#configuration-proposal).
+Creates a [`Propose` transaction](#configuration-proposal).
 The `from` field of the transaction and its signature are computed
 automatically based on the identity of the node that processes the POST request:
 `from` is set to the node’s public key, and the signature is computed
@@ -396,7 +418,7 @@ JSON object with the following fields:
   Hash of the proposed configuration. Should be used as `config_hash_vote_for`
   parameter of [`postvote` requests](#submit-vote-for-proposal).
 - **tx_hash**: Hash  
-  Hash of the corresponding `TxConfigPropose` transaction.
+  Hash of the corresponding `Propose` transaction.
 
 ### Submit Vote for Proposal
 
@@ -404,7 +426,7 @@ JSON object with the following fields:
 POST {base_path}/configs/{config_hash_vote_for}/postvote
 ```
 
-Creates a [`TxConfigVote` transaction](#configuration-proposal).
+Creates a [`Vote` transaction](#configuration-proposal).
 As with the previous endpoint, the `from` field of the transaction
 and its signature are computed automatically.
 
@@ -418,12 +440,34 @@ and its signature are computed automatically.
 JSON object with the following fields:
 
 - **tx_hash**: Hash  
-  Hash of the corresponding `TxConfigVote` transaction.
+  Hash of the corresponding `Vote` transaction.
+
+### Submit Vote against Proposal
+
+```none
+POST {base_path}/configs/{config_hash_vote_against}/postagainst
+```
+
+Creates a [`VoteAgainst` transaction](#configuration-proposal).
+As with the previous endpoint, the `from` field of the transaction
+and its signature are computed automatically.
+
+#### Parameters
+
+- **config_hash_vote_against**: Hash  
+  Hash of the configuration to be voted against.
+
+#### Response
+
+JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `VoteAgainst` transaction.
 
 [stored_configuration]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/config.rs
 [config_propose]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [http_api]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/testnet-api-tutorial.md#global-variable-service-http-api
 [response_samples]: https://github.com/exonum/exonum/blob/master/services/configuration/doc/response-samples.md
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[config_service_source]: https://github.com/exonum/exonum/blob/master/services/configuration/src/lib.rs
 [ta-config]: https://docs.rs/exonum/0.4.0/exonum/blockchain/config/enum.TimeoutAdjusterConfig.html
+[genesis-consensus]: ../architecture/configuration.md#genesisconsensus
