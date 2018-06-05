@@ -1,546 +1,484 @@
-# Glossary of Terms
+# Глоссарий
 
-Exonum documentation uses some specific terms to describe key Exonum
-concepts.
-Here, these terms are condensed to a single page.
+В документации Exonum используются определенные термины для описания ключевых
+понятий в Exonum. На данной странице собраны такие термины.
 
-!!! note
-    All terms here are defined with Exonum in mind. For
-    example, [*Transaction*](#transaction) describes how transactions work
-    in Exonum. Generally speaking, *transaction* may have many other
-    meanings, but they are not covered in this document.
+!!! note "Примечание"
+    Все термины здесь определены с учетом особенностей Exonum. Например, термин
+    [*Транзакция*](#транзакция) описывает, как транзакции работают в Exonum.
+    В сущности, транзакция может иметь много других значений, но они не
+    рассматриваются в этом документе.
 
-## Auditor
+## Администратор
 
-**Aka** auditing node
+Лицо, участвующее в создании [блоков](#блок) и установлении правил в блокчейне.
 
-A [full node](#full-node) in the blockchain network that does not participate
-in creating new [blocks](#block), but rather performs continuous audit of all
-transactions
-in the network. Auditors are identified by a [public key](#public-key)
-within the blockchain network.
-Unlike [validators](#validator),
-adding auditors does not create an overhead in transaction latency and
-throughput,
-so there can be hundreds of auditors in the same blockchain network.
+В [приватных блокчейнах](#приватный-блокчейн), администраторы известны, они
+указаны в протоколе блокчейна. Администраторы настраивают и управляют
+[узлами-валидаторами](#валидатор) в сети и согласовывают изменения в правилах
+обработки транзакций.
 
-!!! note "Example"
-    Consider an Exonum blockchain that implements public registry in a
-    particular
-    country. In this case, auditing nodes may belong to non-government agencies
-    which are interested in monitoring the operation of the registry.
+!!! note "Пример"
+    Рассмотрим блокчейн Exonum, который реализует публичный реестр в конкретной
+    стране. В этом случае администратор блокчейна это правительственное
+    учреждение или агентство, которому поручено вести публичные реестры согласно
+    закону.
 
-## Authenticated Consensus
+Напротив, в публичных блокчейнах (например, Биткоин) участники не указаны в
+протоколе блокчейна. Валидаторы в таких сетях обычно используют псевдонимы.
 
-The type of [consensus](#consensus), in which the participants are known in
-advance and are authenticated, usually with the help of public-key cryptography
-(such as [digital signatures](#digital-signature)).
-Exonum uses authenticated consensus algorithm slightly similar to [PBFT][pbft],
-in order to keep the system [decentralized](#decentralization)
-and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
+## Аудитор
 
-## Binary Serialization
+**Также** узел-аудитор
 
-Serialization of [data stored in the blockchain](#stored-datatype) and
-[messages](#message) into a platform-independent sequence of bytes
-according to the set of rules defined by the Exonum framework.
-Binary serialization is used in Exonum for cryptographic operations, such as
-computing
-[hashes](#hash) and [digital signing](#digital-signature).
-It is implemented both in [the core](#core)
-and in [the light client library](#light-client).
+[Полный узел](#полный-узел) в сети блокчейн, который не участвует в создании
+новых [блоков](#блок), а выполняет непрерывный аудит всех транзакций в сети.
+Аудиторы идентифицируются с помощью [публичного ключа](#публичный-ключ) в сети
+блокчейн. В отличие от [валидаторов](#валидатор),
+добавление аудиторов не приводит к задержкам в обработке транзакций и не снижает
+пропускную способность, поэтому в одной и той же сети блокчейн могут быть сотни
+аудиторов.
 
-Exonum serialization format is optimized to provide almost zero-cost
-deserialization in low-level programming environments (such as Rust).
+!!! note "Пример"
+    Рассмотрим блокчейн Exonum, который реализует публичный реестр в
+    определенной стране. В этом случае узлы-аудиторы могут принадлежать
+    неправительственным организациям, которые заинтересованы в мониторинге
+    работы реестра.
 
-!!! tip
-    See [*Serialization*](architecture/serialization.md) for more details.
+## Аутентифицированный консенсус
 
-## Block
+Тип [консенсуса](#консенсус), в котором участники заранее известны и
+аутентифицированы, обычно с помощью криптосистемы с публичным ключом (например,
+[цифровой подписью](#цифровая-подпись)). Exonum использует алгоритм
+аутентифицированного консенсуса, немного похожий на [PBFT][pbft], чтобы система
+была [децентрализованной](#децентрализация) и выдерживала атаки
+[византийских](#византийский-узел) [валидаторов](#валидатор).
 
-An ordered list of [transactions](#transaction) in a blockchain, together
-with the
-authentication by at least 2/3 of the [validators set](#validator), and some
-additional
-information (such as the [hash](#hash) of the previous block and the hash
-of [the blockchain state](#blockchain-state) after applying the transactions
-in the block). The compact block form, in which transactions are replaced
-by the root of their [Merkle tree](#merkle-tree),
-is used for communication with [light clients](#light-client).
+## Блок
 
-## Blockchain
+Упорядоченный список [транзакций](#транзакция) в блокчейне вместе с признанием
+от по меньшей мере 2/3 [валидаторов](#валидатор), и некоторой дополнительной
+информацией (такой, как [хеш](#хеш) предыдущего блока и хеш
+[состояния блокчейна](#состояние-блокчейна) после добавления транзакций в блок).
+Компактная форма блока, в которой транзакции заменяются корнем их
+[дерева Меркла](#дерево-меркла), используется для связи с
+[легкими клиентами](#легкий-клиент).
 
-A [distributed ledger](#distributed-ledger), which uses
-[hash linking][wiki:linked-ts]
-to achieve immutability of the transactions log, and other cryptographic
-tools to improve accountability. Transactions in a blockchain are grouped in
-[blocks](#block)
-to improve auditing by [light clients](#light-client).
+## Блокчейн
 
-Whereas the design goal
-of a distributed ledger is [decentralized](#decentralization) data management,
-one of the design goals of a blockchain is achieving accountability of the
-[blockchain maintainers](#maintainer) and auditability of the system by third
-parties
-(e.g., internal and external auditors, regulators and end users of the system).
+[Распределенный реестр](#распределенный-реестр), который использует систему
+[хешей][wiki:linked-ts] для достижения неизменности журнала транзакций, а также
+использует и другие криптографические инструменты для повышения подотчетности.
+Транзакции в блокчейне сгруппированы в [блоки](#блок), чтобы улучшить аудит с
+помощью [легких клиентов](#легкий-клиент).
 
-## Blockchain State
+В то время как целью распределенного реестра является [децентрализованное](#децентрализация) управлением данными, одной из целей блокчейна является достижение подотчетности
+[администраторов блокчейна](#администратор) и проверяемости системы третьими
+лицами (например, внутренними и внешними аудиторами, регуляторами и конечными
+пользователями системы).
 
-The persistent state maintained by each [full node](#full-node) in the
-blockchain
-network, to which [transactions](#transaction) are applied.
-[The consensus algorithm](#consensus) ensures that the blockchain state (not
-only
-the transactions log) is identical for all full nodes.
+## Валидатор
 
-In Exonum, the blockchain state is implemented as a key-value storage. It is
-persisted using [RocksDB][rocksdb]. The parts of the
-storage correspond to
-[tables](#table) used by [the core](#core) and [services](#service).
+[Полный узел](#полный-узел) в сети блокчейн с правом участия в
+[алгоритме консенсуса](#консенсус) для создания [блоков](#блок). В Exonum
+валидаторы идентифицируются с помощью
+[глобальной конфигурации](#глобальная-конфигурация), которая содержит публичные
+ключи всех валидаторов в сети. Набор валидаторов можно поменять, изменив
+глобальную конфигурацию. Обычно набор валидаторов достаточно мал и состоит из
+4-15 узлов.
 
-## Byzantine Node
+## Византийский узел
 
-A node in a distributed network that acts outside of behavior prescribed
-by [the consensus algorithm](#consensus) in the network. Byzantine behavior
-may be caused by a malicious intent, malfunctioning software/hardware, or
-network connectivity problems.
+Узел в распределенной сети, который действует вне [алгоритма консенсуса](#консенсус).
+Византийское поведение может быть вызвано вредоносными намерениями, сбоями в
+работе программного / аппаратного обеспечения или проблемами сетевого
+подключения.
 
-Consensus algorithms that are able to withstand Byzantine behavior are called
-Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by
-[PBFT][pbft].
-Exonum is able to tolerate up to 1/3 of [validators](#validator) acting
-Byzantine,
-which is the best possible number under the security model that Exonum uses.
+Алгоритмы консенсуса, способные противостоять византийскому поведению,
+называются византийскими. Exonum использует византийский алгоритм консенсуса,
+похожий на [PBFT][pbft]. Византийский алгоритм консенсуса Exonum способен
+выдерживать до 1/3 византийских [валидаторов](#валидатор), что является
+наилучшим показателем учитывая требования безопасности которые использует Exonum.
 
-## Configuration
+## Глобальная конфигурация
 
-A set of configurable parameters that determine the behavior of a
-[full node](#full-node).
-Configuration consists of 2 parts: [global configuration](#global-configuration)
-and [local configuration](#local-configuration). Certain configuration
-parameters
-are defined by [the core](#core), e.g., the maximum number of transactions
-in a [block](#block). [Services](#service) can define and manage additional
-configuration parameters too.
+Часть [конфигурации](#конфигурация), общая для всех [полных узлов](#полный-узел).
+Глобальная конфигурация является частью состояния [блокчейна](#состояние-блокчейна).
+[Ядро](#ядро) определяет несколько глобальных параметров конфигурации, которые в
+основном связаны с [консенсусом](#консенсус) и сетью (например, набор публичных
+ключей [валидаторов](#валидатор)).
 
-!!! tip
-    See [*Configuration*](architecture/configuration.md) for more details.
+## Двоичная сериализация
 
-## Consensus
+Сериализация [данных, хранящихся в блокчейне](#хранимый-тип-данных), и
+[сообщений](#сообщение) в независимую от платформы последовательность байтов в
+соответствии с набором правил, определенных фреймворком Exonum. Двоичная
+сериализация используется в Exonum для криптографических операций, таких как
+генерация [хешей](#хеш) и [цифровых подписей](#цифровая-подпись).
+Она реализован как в [ядре](#ядро), так и в [библиотеке легкого клиента](#легкий-клиент).
 
-**Aka** consensus algorithm
+Формат сериализации Exonum оптимизирован для обеспечения почти нулевых
+затрат на десериализацию в низкоуровневых средах программирования (таких, как
+Rust).
 
-A mechanism of reaching agreement among nodes in a network. In the
-[blockchain](#blockchain)
-context, consensus is required to withstand faults: nodes being non-responsive
-and/or outright trying to compromise the operation of the blockchain.
+!!! tip "Совет"
+    Подробнее см. [*Сериализация*](https://exonum.com/doc/architecture/serialization/).
 
-There are 2 main types of consensus:
+## Дерево Меркла
 
-- [Authenticated consensus](#authenticated-consensus), in which the
-  participating
-  nodes are known in advance. This is the type of consensus implemented in
-  Exonum;
-- Anonymous consensus, in which the consensus participants are not known in
-  advance.
-  This type of consensus is commonly used in cryptocurrencies (e.g., Bitcoin).
+**Также** дерево хешей
 
-## Consensus Message
+Структура данных на основе двоичного дерева, которая позволяет вычислять
+общий [хеш](#хеш) списка элементов таким образом, что любой
+конкретный элемент списка привязан к общему хешу через короткую ссылку. (Эта
+ссылка называется *путь Меркла* или [*доказательство Меркла*](#доказательство-Меркла)).
 
-A [message](#message) generated by a [full node](#full-node) as prescribed
-by [the consensus algorithm](#consensus). Validators exchange consensus
-messages to commit [transactions](#transaction) to the blockchain by creating
-new [blocks](#block).
+Exonum использует деревья Меркла и аналогичную структуру данных для карт (дерева
+Merkle [Patricia][wiki:p-tree]), чтобы собрать все
+[состояние блокчейна](#состояние-блокчейна) в единый *хеш состояния*, записанный
+в [блоках](#блок), и предоставить [доказательства](#доказательство-Меркла) для
+[легких клиентов](#легкий-клиент).
 
-Consensus messages include:
+!!! note "Примечание"
+    В криптографии дерево Меркла применяет [схему обязательств][wiki:commitment]
+    к списку элементов таким образом, что размер любого раскрытия сообщения
+    логарифмичен по отношению к количеству элементов в списке.
 
-- `Propose`, `Prevote` and `Precommit` messages that correspond to 3 phases
-  of [the consensus algorithm](#authenticated-consensus) used in Exonum;
-- Request messages used by full nodes to request missing data from peers;
-- `Block` message used to transmit an entire block of transactions to a lagging
-  full node;
-- Auxiliary messages, such as `Status` and `Connect`.
+## Децентрализация
 
-!!! tip
-    See [*Consensus*](architecture/consensus.md) and
-    [*Requests*](advanced/consensus/requests.md) for more details.
+Отсутствие единой точки отказа в системе. Например, отсутствие единого
+администратора, обладающего привилегиями которые позволяют выполнять самовольные
+действия.
 
-## Core
+## Доказательство Меркла
 
-In Exonum: the functionality present in any Exonum blockchain, regardless of
-the deployed [services](#service), encapsulated in the [**exonum**][exonum]
-repository.
+Криптографическое доказательство того, что определенные данные являются частью
+[криптографического обязательства][wiki:commitment], основанного на
+[деревьях Меркла](#дерево-меркла) или их вариантах. Доказательство Меркла
+позволяет компактно доказать, что определенные данные хранятся по указанному
+ключу в [состоянии блокчейна](#состояние блокчейна). В то же время доказательство
+не раскрывает другую информацию о состоянии и не требует репликации всех
+[транзакций](#транзакция) блокчейн сети.
 
-For example, the core includes a collection of system [tables](#table) (such as
-a set of all transactions ever committed to the blockchain).
+Доказательства Меркла используются в ответах Exonum на [запросы чтения](#запрос-на-чтение)
+от [легких клиентов](#легкий-клиент). Используя доказательства, клиент может
+проверить подлинность ответа без необходимости связываться с несколькими
+полными узлами или реплицировать все транзакции в блокчейне.
 
-## Decentralization
+## Запрос на чтение
 
-Absence of a single point of failure in the system. For example, absence of a
-single
-administrator having privileges to perform arbitrary actions.
+[Конечная точка сервиса](#конечная-точка-сервиса) которая может использоваться
+для извлечения данных из [состояния блокчейна](#состояние-блокчейна). Обычно
+данные возвращаются с [доказательством](#доказательство-меркла) того, что данные
+действительно являются частью состояния блокчейна и авторизованы большинством
+[валидаторов](#валидатор).
 
-## Digital Signature
+## Конечная точка сервиса
 
-**Aka** signature
+Точка связи с [сервисом](#сервис). Существует три вида конечных точек:
 
-A public-key digital signature in the [Ed25519][Ed25519] elliptic curve
-cryptosystem.
-The signature over a message proves that the signer knows
-a specific [private key](#private-key) corresponding to a publicly known
-[public key](#public-key). A signature can be verified
-against this public key and the signed message, thus providing message
-*authenticity*
-(i.e., the message comes from a specific source) and *integrity*
-(the message is not modified after being signed). Ed25519 signatures are
-universally
-verifiable, meaning that a verifier does not need to know any additional
-information
-to verify a signature.
+- [Транзакции](#транзакция) позволяют атомарно изменять состояние блокчейна.
+- [Запросы на чтение](#запрос-на-чтение) позволяют считывать данные из состояния
+  блокчейна, обычно вместе с [доказательством](#доказательство-меркла).
+- [Приватные API](#приватный-api) позволяют настраивать сервис локально.
 
-!!! summary "Implementation details"
-    Ed25519 digital signatures occupy 64 bytes in the binary form. Exonum
-    uses the [`sodiumoxide`][sodiumoxide] Rust crate (a [`libsodium`][libsodium]
-    binding for Rust) to create and verify digital signatures
-    on [full nodes](#full-node), and [TweetNaCl.js][tweetnacl] to perform
-    similar operations on [light clients](#light-client).
+Внешние объекты, такие как [легкие клиенты](#легкий-клиент) могут обращаться к
+конечным точкам через REST API. Конфигурация REST API указана в сервисе.
 
-## Distributed Ledger
+## Консенсус
 
-A distributed system that maintains a full [transactions](#transaction) log
-for all operations
-in the system, so that any piece of data in the system has a verifiable audit
-trail.
-All transactions are authenticated, usually via
-[public key cryptography][wiki:pkc]
-used together with some form of timestamping to provide
-[non-repudiation][wiki:non-rep].
+**Также** алгоритм консенсуса
 
-!!! note
-    In a generic distributed ledger, the audit trail may be dispersed across
-    the system participants. Thus, it may be difficult to argue about
-    consistency
-    of the whole system.
+Механизм достижения согласия между узлами в сети. В контексте [блокчейна](#блокчейн)
+консенсусу необходимо противостоять ошибкам: ситуациям когда узлы не реагируют и
+/ или прямо пытаются скомпрометировать работу блокчейна.
 
-[Blockchains](#blockchain) are a particular kind of distributed ledgers with a
-focus
-on auditability and accountability of the [system maintainers](#maintainer).
+Существует два основных типа консенсуса:
 
-## Full Node
+- [Аутентифицированный консенсус](#аутентифицированный-консенсус), в котором
+  участвующие узлы известны заранее. Это тип консенсуса, реализован в Exonum.
+- Анонимный консенсус, в котором участники консенсуса заранее не известны. Этот
+  тип консенсуса обычно используется в криптовалютах (например, Биткоин).
 
-**Aka** peer
+## Консенсусное сообщение
 
-A node in the blockchain network that replicates all transactions in the
-blockchain
-and thus has a local copy of the entire [blockchain state](#blockchain-state).
-There are 2 categories of full nodes in Exonum: [validators](#validator)
-and [auditors](#auditor).
+[Сообщение](#сообщений) которое генерируется [полным узлом](#полный-узел)
+согласно [алгоритму консенсуса](#консенсус). Валидаторы обмениваются
+консенсусными сообщениями для принятия [транзакций](#транзакция) в блокчейн
+путем создания новых [блоков](#блок).
 
-## Genesis Block
+Консенсусные сообщения включают:
 
-The very first [block](#block) in the blockchain. The genesis block does not
-link to the hash of the previous block in the blockchain; instead, this link
-is filled with a placeholder (32 bytes of zeros). The genesis block contains
-an initial [global configuration](#global-configuration) and no other
-transactions.
+- `Propose`, `Prevote` и `Precommit` сообщения, которые соответствуют 3
+  фазам [алгоритма консенсуса](#аутентифицированный-консенсус) используемого в
+  Exonum.
+- Запросы, которые используются полными узлами для запроса отсутствующих данных у
+  других узлов.
+- Сообщения `Block`, которые используются для передачи всего блока транзакций на
+  отстающий полный узел.
+- Вспомогательные сообщения, такие как `Status` и `Connect`.
 
-## Global Configuration
+!!! tip "Совет"
+    Дополнительную информацию см. в разделах [*Консенсус*](architecture/consensus.md)
+    и [*Запросы*](https://exonum.com/doc/advanced/consensus/requests/).
 
-Part of the [configuration](#configuration) common for all [
-full nodes](#full-node). The global configuration is a part of [the blockchain state](#blockchain-state).
-[The core](#core) defines several global configuration parameters,
-which are mostly related to [consensus](#consensus) and networking
-(e.g., a set of [validators](#validator) public keys).
+## Конфигурация
 
-## Hash
+Набор настраиваемых параметров, определяющих поведение [полного узла](#полный-узел).
+Конфигурация состоит из двух частей: [глобальной](#глобальная-конфигурация)
+и [локальной конфигураций](#локальная-конфигурация). Некоторые параметры конфигурации
+определяются [ядром](#ядро), например, максимальное количество транзакций в
+[блоке](#блок). [Сервисы](#сервис) также могут определять и управлять
+дополнительными параметрами конфигурации.
 
-**Aka** cryptographic hash
+!!! tip "Совет"
+    Дополнительную информацию см. в разделе [*Конфигурация*](https://exonum.com/doc/architecture/configuration/).
 
-[SHA-256][sha-256] [cryptographic hash][wiki:hash] digest of certain data.
-Exonum uses hashes as unique identifiers for [transactions](#transaction).
-Hashes are also used to create [Merkle trees](#merkle-tree) and their variants.
+## Легкий клиент
 
-!!! summary "Implementation details"
-    SHA-256 hashes occupy 32 bytes in the binary form. Exonum uses
+**Также** тонкий клиент
+
+Узел в сети блокчейн, который не реплицирует все транзакции в блокчейне, а
+только некоторую информацию, в которой клиент заинтересован и / или к которой
+имеет доступ. Легкие клиенты могут связываться с [полными узлами](#полный-узел)
+для [извлечения информации из блокчейна](#запрос-на-чтение)
+и создания [транзакций](#транзакция). [Механизм доказательств](#доказательство-меркла)
+позволяет минимизировать фактор доверия во время общения, и защитить клиент от
+целого ряда атак.
+
+## Локальная конфигурация
+
+Часть [конфигурации](#конфигурация) которая является локальной для каждого
+[полного узла](#полный-узел). Локальная конфигурация не является частью
+[состояния блокчейна](#состояние-блокчейна), вместо этого она хранится как
+локальный TOML файл, который считывается во время запуска узла. [Ядро](#ядро)
+определяет несколько локальных параметров конфигурации, таких как
+[приватный ключ](#приватный-ключ), используемый для подписания
+[консенсусных и сетевых сообщений](#консенсусное-сообщение), созданных узлом.
+
+## Первичный блок
+
+Самый первый [блок](#блок) в блокчейне. Первичный блок не связывается с хешем
+предыдущего блока в блокчейне, взамен эта связь заполняется дефолтным хешем
+(32 байта нулей). Первичный блок содержит начальную
+[глобальную конфигурацию](#глобальная-конфигурация) и больше никаких других
+транзакций.
+
+## Полный узел
+
+**Также** одноранговый узел
+
+Узел в сети блокчейн, который реплицирует все транзакции в блокчейне и,
+следовательно, имеет локальную копию всего [состояния блокчейна](#состояние-блокчейна).
+В Exonum есть 2 категории полных узлов: [валидаторы](#валидатор)
+и [аудиторы](#аудитор).
+
+## Приватный API
+
+[Конечная точка сервиса](#кончная-точка-сервиса) которая может использоваться
+для администрирования локального экземпляра сервиса. Например, приватный API
+может использоваться для изменения локальной конфигурации сервиса.
+
+## Приватный блокчейн
+
+Блокчейн, в котором [участники](#администратор) представляют собой ограниченный
+набор сущностей с установленными реальными личностями. Соответственно,
+[узлы-валидаторы](#валидатор) в приватном блокчейне немногочисленны и
+аутентифицируются с помощью криптосистемы с публичным ключом.
+
+Приватные блокчейны обычно используют вариации [аутентифицированного консенсуса](#аутентифицированный-консенсус).
+
+## Приватный ключ
+
+Приватный ключ согласно спецификации [Ed25519][ed25519]. Каждый приватный ключ
+соответствует определенному [публичному ключу](#публичный-ключ). Приватный
+ключ необходим для создания [цифровых подписей](#цифровая-подпись) [сообщений](#сообщение),
+которые впоследствии могут быть сверены с сообщением и соответствующим публичным
+ключом.
+
+!!! summary "Детали реализации"
+    Согласно [`libsodium`][libsodium], приватные ключи занимают 64 байта в
+    двоичной форме: 32 байта криптографического значения, используемого для
+    генерации ключа, и 32 байта предварительно рассчитанного соответствующего
+    публичного ключа. Последние 32 байта являются избыточными, но помогают
+    ускорить вычисления.
+
+## Публичный ключ
+
+Публичный ключ согласно спецификации [Ed25519][ed25519]. Публичные ключи
+используются для проверки [цифровых подписей](#цифровая-подпись) [сообщений](#сообщение).
+Публичный ключ может быть связан с реальной личностью. Например, публичные ключи,
+используемые в [консенсусе](#консенсус) привязаны к определенным [валидаторам](#валидатор),
+так как предполагается, что только определенный валидатор знает соответствующий
+[приватный ключ](#приватный-ключ).
+
+!!! summary "Детали реализации"
+    Согласно [`libsodium`][libsodium], публичные ключи занимают 32 байта в
+    двоичной форме.
+
+## Распределенный реестр
+
+Распределенная система, которая хранит полный журнал [транзакций](#транзакция)
+для всех операций в системе, так что любая часть данных в системе имеет
+проверяемый аудиторский след. Все транзакции аутентифицируются, как правило,
+с помощью [криптосистемы с публичным ключом][wiki:pkc]
+используемой вместе с некоторой формой временных печатей для обеспечения
+[отказоустойчивости][wiki:non-rep].
+
+!!! note "Примечание"
+    В общем распределенном реестре аудиторский след может быть разбросан по
+    всем участникам системы. Таким образом, может быть трудно проверить
+    согласованность всей системы.
+
+[Блокчейны](#блокчейн) являются особым видом распределенных реестров с упором
+на контролируемость и подотчетность [администраторов](#администратор).
+
+## Сервис
+
+Основная точка расширения фреймворка Exonum, аналогичная в своей сущности
+веб-службам. Сервисы определяют всю логику обработки [транзакций](#транзакция)
+в любом блокчейне Exonum.
+
+Внешне сервис представляет собой набор [конечных точек](#конечная-точка-сервиса)
+которые позволяют манипулировать данными [состояния блокчейна](#состояние-блокчейна)
+и извлекать их, возможно, вместе с [доказательствами](#доказательство-меркла).
+По сути, сервис может определять различные объекты, включая схему [таблиц](#таблица),
+[настраиваемые параметры](#конфигурация), и т.д.
+
+!!! tip "Совет"
+    Дополнительные сведения см. в разделе [*Сервисы*](architecture/services.md).
+
+## Сериализация
+
+Процесс преобразования структур данных Exonum в независимое от языка
+программирования представление. Exonum определяет правила (де)сериализации для
+[хранимых типов данных](#хранимый-тип-данных) и [сообщений](#сообщение).
+Каждый из них может быть преобразован из/в 2 представления:
+[двоичный](#двоичная-сериализация) и [JSON](#сериализация-json).
+
+## Сериализация JSON
+
+Сериализация [данных, хранящихся в блокчейне](#хранимый-тип-данных) и
+[сообщений](#сообщение) в JSON. Сериализация JSON используется в Exonum для
+[конечных точек сервисов](#конечная-точка-сервиса). Она реализована как в
+[ядре](#ядро), так и в [библиотеке легкого клиента](#легкий-клиент).
+
+## Сообщение
+
+Пописанные [цифровой подписью](#цифровая-подпись) данные, которые передаются
+через сеть Exonum. Существует два основных вида сообщений:
+
+- [Консенсусные сообщения](#консенсусное-сообщение) используются среди полных
+  узлов в ходе [алгоритма консенсуса](#консенсус).
+- [Транзакции](#транзакция) используются для изменения
+  [состояния блокчейна](#состояние-блокчейна) и обычно поступают от
+  [внешних клиентов](#легкий-клиент).
+
+## Состояние Блокчейна
+
+Постоянное состояние, которое хранится каждым [полным узлом](#полный-узел) в
+сети блокчейн, и к которому применяются [транзакции](#транзакция).
+[Алгоритм консенсуса](#консенсус) гарантирует, что состояние блокчейна (а не
+только журнала транзакций) идентично для всех полных узлов.
+
+В Exonum состояние блокчейна реализуется как хранилище типа ключ-значение.
+Оно сохраняется с помощью [RocksDB][rocksdb]. Части хранилища соответствуют
+[таблицам](#таблица) используемым [ядром](#ядро) и [сервисами](#сервис).
+
+## Таблица
+
+Структурированный набор данных (например, карта, набор или список), который
+обеспечивает высокоуровневую абстракцию поверх
+[состояния блокчейна](#состояние-блокчейна). Таблицы используются
+[сервисами](#сервис) для упрощения управления данными. Кроме того, некоторые
+типы таблиц позволяют эффективно вычислять
+[доказательства Меркла](#доказательство-меркла) для элементов таблицы.
+
+## Транзакция
+
+Атомарный патч примененный к [состоянию блокчейна](#состояние-блокчейна)
+который удовлетворяет критерии [ACID][wiki:acid]. Транзакции аутентифицируются
+с помощью [цифровых подписей с публичным ключом](#цифровая-подпись),
+т.е. авторство каждой транзакции известно и не может быть легко подменено.
+Транзакции могут быть сгенерированы различными объектами в сети блокчейн например
+[легкими клиентами](#легкий-клиент).
+
+Транзакции упорядочены и собираются в [блоки](#блок) в ходе
+[алгоритма консенсуса](#консенсус). Таким образом, транзакции применяются в
+том же порядке на всех [полных узлах](#полный-узел) в сети блокчейн.
+
+Транзакции в Exonum являются подтипом [конечных точек сервисов](#кончная-точка-сервиса).
+Все транзакции строятся по шаблонам и определяются внутри [сервисов](#сервис),
+аналогично [сохраненным процедурам][mysql-stored] в системах управления базами
+данных. Конечные точки транзакции обычно задают определенные правила проверки,
+такие как валидация цифровой подписи в транзакции. Если правила не выполняются
+для конкретной транзакции, она не изменяет состояние блокчейна, но все равно
+может быть записана в журнале транзакций.
+
+!!! tip "Совет"
+    Подробнее см. [*Транзакции*](architecture/transactions.md).
+
+## Хеш
+
+**Также** криптографический хеш
+
+[SHA-256][sha-256] [криптографический хеш][wiki:hash] определенных данных.
+Exonum использует хеши как уникальные идентификаторы [транзакций](#транзакция).
+Хеши также используются для создания [деревьев Меркла](#дерево-меркла) и их вариантов.
+
+!!! summary "Детали реализации"
+    Хеши SHA-256 занимают 32 байта в двоичной форме. Exonum использует
     [`sodiumoxide`][sodiumoxide]
-    to calculate hashes on [full nodes](#full-node) and [sha.js][sha.js] to do
-    the same on [light clients](#light-client).
+    для расчета хешей на [полных узлах](#полный-узел) и [sha.js][sha.js] для
+    аналогичных операций на [легких клиентах](#легкий-клиент).
 
-## JSON Serialization
+## Хранимый тип данных
 
-Serialization of [data stored in the blockchain](#stored-datatype) and
-[messages](#message) into JSON.
-JSON serialization is used in Exonum for [service endpoints](#service-endpoint).
-It is implemented both in [the core](#core)
-and in [the light client library](#light-client).
+Тип данных, который может храниться как значение в
+[Exonum в хранилище типа ключ-значение](#состояние-блокчейна). Хранимые типы
+данных используют логику [двоичной сериализации](#двоичная-сериализация) для
+преобразования данных в независимое от платформы представление.
 
-## Light Client
+!!! tip "Совет"
+    Подробнее см. в разделе [*Хранение*](https://exonum.com/doc/architecture/storage/).
 
-**Aka** lightweight client, thin client
+## Цифровая подпись
 
-A node in the blockchain network that does not replicate all transactions in
-the blockchain, but rather only a small subset that the client is interested in
-and/or has access to. Light clients can communicate with
-[full nodes](#full-node)
-to [retrieve information from the blockchain](#read-request)
-and initiate [transactions](#transaction). The [proofs mechanism](#merkle-proof)
-allows minimizing the trust factor during this communication and protecting
-the client against a range of attacks.
+**Также** подпись
 
-## Local Configuration
+Цифровая подпись с публичным ключом в эллиптической криптографии [Ed25519][Ed25519].
+Подпись сообщения доказывает, что подписавший знает конкретный
+[приватный ключ](#приватный-ключ), соответствующий общедоступному
+[публичному ключу](#публичный-ключ). Подпись может быть сверена с этим публичным
+ключом и подписанным сообщением, обеспечивая при этом *достоверность* сообщения
+(т. е. то что сообщение пришло от определенного источника) и *целостность*
+(сообщение не изменялось после подписания). Подписи Ed25519 универсальны, то
+есть, проверяющему не требуется знать какую-либо дополнительную информацию для
+проверки подписи.
 
-A part of [configuration](#configuration) local to every
-[full node](#full-node). The local configuration is not a part of
-[the blockchain state](#blockchain-state);
-instead, it is maintained as a local TOML file, which is read during the node
-startup.
-[The core](#core) defines several local configuration parameters,
-such as [the private key](#private-key) used to sign
-[consensus and network messages](#consensus-message) created by the node.
+!!! summary "Детали реализации"
+    Цифровые подписи Ed25519 занимают 64 байта в двоичной форме. Exonum использует
+    криптографическую Rust библиотеку [`sodiumoxide`][sodiumoxide] (обертка
+    [`libsodium`][libsodium] для Rust) для создания и проверки цифровых подписей
+    на [полных узлах](#полный-узел), а [TweetNaCl.js][tweetnacl] для выполнения
+    аналогичных операций на [легких клиентах](#легкий-клиент).
 
-## Maintainer
+## Ядро
 
-An entity participating in creating [blocks](#block) and setting the rules
-in a blockchain.
+В Exonum: функционал, присутствующий во всех блокчейнах Exonum, независимо от
+развернутых [сервисов](#сервис), инкапсулированных в репозиторий
+[**exonum**][exonum].
 
-In [permissioned blockchains](#permissioned-blockchain), maintainers
-have known real-world identities, which are reflected in the blockchain
-protocol.
-The maintainers set up and administer
-[validator nodes](#validator) in the network, and agree on the changes in
-the transaction processing rules.
-
-!!! note "Example"
-    Consider an Exonum blockchain that implements a public registry in a
-    particular
-    country. In this case, the maintainer of the blockchain is a government
-    agency
-    or agencies, which are tasked with maintaining public registries by law.
-
-In contrast, in permissionless blockchains (e.g., Bitcoin), maintainers are not
-reflected within the blockchain protocol. Validators in such networks are
-usually
-pseudonymous.
-
-## Merkle Proof
-
-A cryptographic proof that certain data is a part of
-[the cryptographic commitment][wiki:commitment]
-based on [Merkle trees](#merkle-tree) or their variants. A Merkle proof allows
-compactly proving that certain data is stored at the specified key
-in [the blockchain state](#blockchain-state).
-At the same time, the proof does not reveal
-other information about the state and does not require replication of all
-[transactions](#transaction)
-in the blockchain network.
-
-Merkle proofs are used in Exonum in the responses to
-[read requests](#read-request)
-by [light clients](#light-client). Using proofs, a client can verify the
-authenticity
-of a response without needing to communicate with multiple full nodes or
-replicating all transactions in the blockchain.
-
-## Merkle Tree
-
-**Aka** hash tree
-
-A data structure based on a binary tree that allows calculating an aggregate
-[hash](#hash)
-from a list of elements in such a way that any particular element of the list
-is tied to the overall hash via a short link.
-(This link is called a *Merkle path* or [*Merkle proof*](#merkle-proof).)
-
-Exonum uses Merkle trees and a similar data structure for maps
-(Merkle [Patricia tree][wiki:p-tree])
-to collect the entire [blockchain state](#blockchain-state) into a single
-*state hash* recorded in [blocks](#block),
-and to provide [proofs](#merkle-proof) to [light clients](#light-client).
-
-!!! note
-    In cryptographic terms, a Merkle tree applies a
-    [commitment scheme][wiki:commitment]
-    to the list of elements in such a way that the size of any opening of the
-    commitment
-    is logarithmic with respect to the number of elements in the list.
-
-## Message
-
-A [digitally signed](#digital-signature) piece of data transmitted
-through an Exonum network. There are 2 major kinds of messages:
-
-- [Consensus messages](#consensus-message) are used among full nodes in the
-  course
-  of [the consensus algorithm](#consensus);
-- [Transactions](#transaction) are used to invoke
-  [blockchain state](#blockchain-state)
-  changes and usually come from [external clients](#light-client).
-
-## Permissioned Blockchain
-
-A blockchain in which [maintainers](#maintainer) are a limited set of
-entities
-with established real-world identities. Accordingly,
-[validator nodes](#validator)
-in a permissioned blockchain
-are few in number and are authenticated with the help of public-key
-cryptography.
-
-Permissioned blockchains usually use variations of
-[authenticated consensus](#authenticated-consensus).
-
-## Private API
-
-A [service endpoint](#service-endpoint) that can be used to administer a local
-instance of the service. As an example, private API can be used to change the
-local configuration of a service.
-
-## Private Key
-
-Private key as per the [Ed25519][ed25519] specification. Each private key
-corresponds
-to a specific [public key](#public-key). The knowledge of a private key
-is necessary to create [digital signatures](#digital-signature) over
-[messages](#message),
-which could be later verified against the message and the corresponding public
-key.
-
-!!! summary "Implementation details"
-    As per [`libsodium`][libsodium], private keys occupy 64 bytes in the binary
-    form: 32 bytes for the cryptographic seed used to generate the key,
-    and 32 bytes for the pre-calculated corresponding public key. The latter
-    32 bytes are redundant, but help speed up computations.
-
-## Public Key
-
-A public key as per the [Ed25519][ed25519] specification. Public keys are used
-to verify [digital signatures](#digital-signature) over [messages](#message).
-A public key can be linked with a real-world identity. For example,
-public keys used in [consensus](#consensus) are tied to specific
-[validators](#validator),
-as only a specific validator is assumed to know
-the corresponding [private key](#private-key).
-
-!!! summary "Implementation details"
-    As per [`libsodium`][libsodium], public keys occupy 32 bytes in the binary
-    form.
-
-## Read Request
-
-A [service endpoint](#service-endpoint) that can be used to retrieve data from
-[the blockchain state](#blockchain-state). The data is usually returned with
-a [proof](#merkle-proof) that the data is indeed a part of the blockchain state
-and has been authorized by a supermajority of [validators](#validator).
-
-## Serialization
-
-A process of converting Exonum data structures to a language-independent
-representation.
-Exonum defines (de)serialization rules for [stored datatypes](#stored-datatype)
-and [messages](#message). Each of these can be converted from/to 2
-representations:
-[binary](#binary-serialization) and [JSON](#json-serialization).
-
-## Service
-
-The main extension point of the Exonum framework, similar in its design
-to a web service. Services define all [transaction](#transaction) processing
-logic
-in any Exonum blockchain.
-
-Externally, a service is essentially a collection of
-[endpoints](#service-endpoint)
-that allow manipulating data in [the blockchain state](#blockchain-state)
-and retrieving it, possibly with [proofs](#merkle-proof). Internally, a service
-may define various entities, including [table](#table) schema,
-[configurable parameters](#configuration), etc.
-
-!!! tip
-    See [*Services*](architecture/services.md) for more details.
-
-## Service Endpoint
-
-A point of communication with [a service](#service). There are three kinds of
-endpoints:
-
-- [Transactions](#transaction) allow atomically changing the blockchain state;
-- [Read requests](#read-request) allow reading data from the blockchain state,
-  usually together with [a proof](#merkle-proof);
-- [Private APIs](#private-api) allow configuring the service locally.
-
-External entities such as [light clients](#light-client) can access endpoints
-via REST API. The configuration for REST API is specified in the service.
-
-## Stored Datatype
-
-A datatype capable of being stored as a value in
-[the Exonum key-value storage](#blockchain-state).
-Stored datatypes use [binary serialization](#binary-serialization)
-logic to convert data to a platform-independent representation.
-
-!!! tip
-    See [*Storage*](architecture/storage.md) for more details.
-
-## Table
-
-A structured collection of data (e.g., a map, set or a list) that provides a
-high-level
-abstraction on top of [the blockchain state](#blockchain-state). Tables are
-used by [services](#service) to simplify data management. Additionally, some
-types of tables allow computing [Merkle proofs](#merkle-proof) efficiently for
-table items.
-
-## Transaction
-
-An atomic patch to [the blockchain state](#blockchain-state)
-satisfying [ACID][wiki:acid] criteria. Transactions are
-authenticated with the help of
-[public-key digital signatures](#digital-signature);
-i.e., the authorship
-of each transaction is known and cannot be easily repudiated. Transactions may
-be generated by various entities in the blockchain network, such as
-[light clients](#light-client).
-
-Transactions are ordered and grouped into [blocks](#block) in the course of
-[the consensus algorithm](#consensus). Thus, transactions are applied in the
-same
-order on all [full nodes](#full-node) in the blockchain network.
-
-In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
-All transactions are templated and defined within [services](#service),
-acting similarly to [stored procedures][mysql-stored] in database management
-systems.
-Transaction endpoints of a service usually specify certain verification rules,
-such
-as the validity of a digital signature in the transaction. If the rules do not
-hold
-for a particular transaction,
-it does not change the blockchain state, but may still be recorded in
-the transaction log.
-
-!!! tip
-    See [*Transactions*](architecture/transactions.md) for more details.
-
-## Validator
-
-A [full node](#full-node) in the blockchain network with the right to
-participate
-in [the consensus algorithm](#consensus) to create [blocks](#block). In Exonum,
-validators are identified with the help of
-[the global configuration](#global-configuration),
-which contains public keys of all validators in the network. The set of
-validators
-can be changed by changing the global configuration. Usually, the set of
-validators
-is reasonably small, consisting of 4–15 nodes.
+Например, ядро включает в себя набор системных [таблиц](#таблица) (например,
+набор всех транзакций, когда-либо совершенных в блокчейне).
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
-[wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
+[wiki:pkc]: https://ru.wikipedia.org/wiki/Криптосистема_с_открытым_ключом
 [wiki:non-rep]: https://en.wikipedia.org/wiki/Non-repudiation
-[wiki:acid]: https://en.wikipedia.org/wiki/ACID
+[wiki:acid]: https://ru.wikipedia.org/wiki/ACID
 [rocksdb]: http://rocksdb.org
 [exonum]: https://github.com/exonum/exonum/
-[wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
+[wiki:mt]: https://ru.wikipedia.org/wiki/Дерево_хешей
 [wiki:p-tree]: https://en.wikipedia.org/wiki/Radix_tree
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
@@ -549,6 +487,6 @@ is reasonably small, consisting of 4–15 nodes.
 [libsodium]: https://download.libsodium.org/doc/
 [tweetnacl]: https://github.com/dchest/tweetnacl-js
 [ed25519]: https://ed25519.cr.yp.to/
-[wiki:hash]: https://en.wikipedia.org/wiki/Cryptographic_hash_function
+[wiki:hash]: https://ru.wikipedia.org/wiki/Криптографическая_хеш-функция
 [sha-256]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 [sha.js]: https://www.npmjs.com/package/sha.js
