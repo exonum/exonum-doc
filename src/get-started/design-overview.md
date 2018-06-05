@@ -1,475 +1,420 @@
-# Design Overview
+# Обзор архитектуры
 
 <!-- cspell:ignore postgre -->
 
-This page describes the core design decisions of the Exonum framework:
-[transaction processing](#transaction-processing),
-[network structure](#network-structure),
-[consensus algorithm](#consensus),
-[data storage organization](#data-storage),
-[services](#modularity-and-services),
-and [cryptography used in Exonum](#cryptography).
+Данная страница описывает основные архитектурные решения инфраструктуры Exonum:
+[обработку транзакций](#обработка-транзакций),
+[структуру сети](#структура-сети),
+[алгоритм консенсуса](#консенсус),
+[организацию хранения данных](#хранение-данных),
+[сервисы](#модульность-и-сервисы),
+и [криптографию, используемую в Exonum](#криптография).
 
-!!! tip
-    The [architecture guide][arch-guide] in the Exonum core repository contains
-    a more technical outlook on the Exonum architecture.
+## Обработка транзакций
 
-## Transaction Processing
+Для внешнего приложения, блокчейн на Exonum представляет собой хранилище типа
+ключ-значение и [транзакционная система][wiki:oltp], управляющая
+этим хранилищем. Его основные функции - обработка транзакций, сохранение данных
+и ответы на запросы на чтение от внешних клиентов.
 
-!!! tip
-    See the [*Transactions*](../architecture/transactions.md) article
-    for more details.
+**Транзакция** - это основной объект, с которым работает Exonum. Транзакция
+представляет собой атомарный патч, который применяется к хранилищу. Транзакции
+аутентифицируются с помощью цифровых подписей с
+открытым ключом. Транзакции должны быть проверены и упорядочены до того, как
+они будут считаться принятыми / записанными. Упорядочивание выполняется по
+[алгоритму консенсуса](#консенсус). Алгоритм также гарантирует, что будут
+совершены только успешно проверенные транзакции.
 
-For an outer application, Exonum blockchain represents a key-value
-storage and an [online transaction processing][wiki:oltp] facility managing
-this storage. Its core functions are processing transactions, persisting data,
-and responding to read queries from external clients.
+Транзакции строятся по шаблонам (их может быть несколько). Каждый шаблон транзакции
+имеет набор переменных,
+которые влияют на выполнение транзакции и используются для сериализации
+транзакций для передачи по сети и сохранения. (Следовательно, транзакции можно
+сравнить с хранимыми процедурами в реляционных СУБД). Шаблоны транзакций и
+правила обработки для каждого шаблона определяются
+[сервисами](#модульность-и-сервисы). В частности, сервисы определяют правила
+проверки транзакций и способ применения транзакций к хранилищу.
 
-**Transactions** are the main entity Exonum works with. A transaction represents
-an atomic patch that should be applied to the key-value storage.
-Transactions are authenticated with the help of public-key digital signatures.
-Transactions need to be verified and ordered before they are considered
-accepted / committed. Ordering is performed by
-[the consensus algorithm](#consensus); the algorithm also ensures that
-only successfully verified transactions are committed.
+Все данные в блокчейне Exonum разделены на две части:
 
-Transactions are templated; each transaction template has a set of variable
-parameters,
-which influence the transaction execution and are used to serialize transactions
-for network transmission and persistence. (Hence, transactions could be
-compared to stored procedures in RDBMSs.)
-Transaction templates and the processing rules for each template
-are defined by [services](#modularity-and-services). In particular,
-services define verification rules for transactions and the way transactions
-are applied to the key-value storage.
+- **хранилище данных**, которое содержит данные, структурированные в таблицы;
+- **журнал транзакций**, т.е. полная история всех транзакций, когда-либо
+применявшихся к хранилищу данных.
 
-All data in the Exonum blockchain is divided into two parts:
+Поскольку транзакции включают операции с хранилищем, такие
+как создание нового значения или обновление уже сохраненных значений,
+актуальное состояние хранилища данных может быть полностью восстановлено из
+журнала транзакций. Когда в сети Exonum появляется новый узел, он скачивает
+уже сгенерированные блоки и применяет транзакции из этих блоков к хранилищу
+данных одну за другой. Такой подход позволяет видеть всю историю любого
+фрагмента данных и упрощает аудит.
 
-- **Data storage**, which contains data structured into tables
-- **Transaction log**, i.e., the complete history of all transactions ever
-  applied to the data storage
+Используя журнал транзакций, Exonum реализует
+[репликацию][wiki:state-machine-repl] для достижения отказоустойчивости.
+Это гарантирует согласование состояний хранилища данных между узлами сети.
+Такой же подход часто используют вне блокчейна, например, в базах данных MongoDB
+и PostgreSQL.
 
-As transactions include operations on the key-value storage such as creating
-a new value, or updating already saved values, the actual data storage state
-can be restored completely from the transaction log.
-When a new node in the Exonum network appears, it loads
-already generated blocks and applies their transactions to the data
-storage one by one. Such approach allows seeing the whole history of any
-data chunk and simplifies auditing.
+### Блоки
 
-By using a transaction log, Exonum implements
-[state machine replication][wiki:state-machine-repl]. It guarantees agreement
-of data
-storage states among nodes in the network. The same approach is often used by
-non-blockchain distributed DBs, such as MongoDB or PostgreSQL.
+Exonum собирает транзакции в **блоки**; весь блок одобряется атомарно. Если
+транзакция еще не была записана в какой-либо блок, она не считается принятой.
+После утверждения блока каждая транзакция в нем выполняется последовательно,
+и изменения применяются к хранилищу данных.
 
-### Blocks
+Блоки Exonum состоят из следующих частей:
 
-Exonum gathers transactions into **blocks**; the whole block is approved
-atomically. If a transaction has not been written to any block yet, it is
-not regarded as accepted. After a block is approved, every transaction in it is
-executed sequentially, with changes applied to the data storage.
+- хеш предыдущего блока Exonum;
+- список одобренных транзакций. Когда узлы выполняют блок, они выполняют каждую
+транзакцию в указанном порядке и применяют изменения к данным в хранилище.
+Разные типы транзакций выполняются различными сервисами;
+- хеш нового состояния хранилища данных. Само состояние хранилища в блок не
+включено, однако транзакции применяются детерминированно и с единственным возможным
+результатом. Хеш хранилища
+гарантированно совпадает для всех валидаторов, потому что его согласование
+встроено в алгоритм консенсуса Exonum.
 
-Exonum blocks consist of the following parts:
+Поскольку каждый блок включает хеш предыдущего блока, невозможно изменить один
+блок без соответствующих изменений в каждом из следующих блоков. Это
+гарантирует неизменяемость журнала транзакций: после совершения транзакции, она
+не может быть изменена или удалена из журнала задним числом. Точно так же
+невозможно вставить транзакцию в середину журнала.
 
-- The hash of the previous Exonum block
-- The list of the approved transactions. When the nodes execute the block,
-  they execute every transaction in the given order and apply changes to
-  their data storages. Every transaction type is executed by the
-  appropriate Exonum service
-- The hash of the new data storage state. The state itself is not
-  included; however, transactions are applied deterministically and
-  unequivocally. The agreement on the hash of data storage is a part of
-  the Exonum consensus algorithm, so the hash is guaranteed to coincide
-  for all validators
+!!! note "Примечание"
+    Согласование хеша хранилища данных не только означает, что полные узлы
+    выполняют транзакции в одном и том же порядке; они также должны выполнять
+    все транзакции одинаково. Это предотвращает сценарий, в котором результаты
+    выполнения отличаются среди узлов в сети (например, из-за
+    недетерминированных инструкций в коде выполнения транзакции), что может
+    привести к возникновению различных проблем.
 
-As every block includes the hash of the previous block,
-it is impossible to change one block
-without the appropriate changes to each of the following blocks.
-This ensures immutability of the transaction log; once a transaction is
-committed,
-it cannot be retroactively modified or evicted from the log. Similarly,
-it is impossible to insert a transaction in the middle of the log.
+## Структура сети
 
-!!! note
-    The agreement on the hash of the data storage means that not only
-    full nodes execute transactions in the same order; they also
-    must execute all transactions in exactly the same way. This protects against
-    a scenario where execution results differ for the nodes in the network
-    (e.g., because of non-deterministic instructions in the transaction
-    execution code), which may lead to all sorts of trouble.
+Сеть Exonum состоит из *полных узлов*, подключенных через одноранговые
+соединения, и *легких клиентов*.
 
-## Network Structure
+### Полные узлы
 
-!!! tip
-    See separate articles for more details: [*Network*](../advanced/network.md),
-    [*Clients*](../architecture/clients.md).
+**Полные узлы** копируют все содержимое блокчейна и соответствуют репликам в
+распределенных базах данных. Все полные узлы аутентифицируются с помощью
+криптосистемы с открытым ключом. Полные узлы подразделяются на 2 категории:
 
-The Exonum network consists of *full nodes* connected via peer-to-peer
-connections
-and *light clients*.
+- **Аудиторы** копируют всю информацию блокчейна. Они могут генерировать новые
+  транзакции, но не могут выбирать, какие транзакции должны быть включены в
+  блоки (т.е. не могут генерировать новые блоки).
+- **Валидаторы** обеспечивают жизнеспособность сети. Только валидаторы могут
+  генерировать новые блоки, используя
+  [алгоритм византийского консенсуса](#консенсус).
+  Валидаторы получают транзакции, проверяют их и включают в новый блок. Список
+  валидаторов ограничен администраторами сети и обычно должен состоять из 4-15
+  узлов.
 
-### Full Nodes
+### Легкие клиенты
 
-**Full nodes** replicate the entire contents of the blockchain
-and correspond to replicas in distributed databases.
-All the full nodes are authenticated with public-key cryptography.
-Full nodes are further subdivided into 2 categories:
+**Легкие клиенты** представляют клиентов в парадигме клиент-сервер. Они
+подключаются к полным узлам для извлечения нужной им информации из блокчейна
+и для отправки транзакций. Exonum предоставляет механизм «доказательств»,
+основанный на криптографических обязательствах через деревья Меркла. Этот
+механизм позволяет проверить, что ответ от полного узла был действительно
+одобрен большинством валидаторов.
 
-- **Auditors** replicate the entire content of the blockchain. They
-  can generate new transactions, but cannot choose which transactions
-  should be committed (i.e., cannot generate new blocks)
-- **Validators** provide the network liveness. Only validators can generate
-  new blocks by using a
-  [Byzantine fault tolerant consensus algorithm](#consensus).
-  Validators receive transactions, verify them, and include into a new block.
-  The list of the validators is restricted by network maintainers, and normally
-  should consist of 4–15 nodes
+## Консенсус
 
-### Light Clients
+Exonum использует собственную модификацию византийского консенсуса (похожего
+на PBFT), чтобы гарантировать, что в любой момент существует только одна
+согласованная версия блокчейна. Предполагается, что система децентрализована,
+т.е. любой узел может выйти из строя или быть скомпрометирован. Консенсус
+*аутентифицирован*, участники консенсуса (т.е. валидаторы) идентифицируются
+с помощью криптосистемы с открытым ключом.
 
-**Light clients** represent clients in the client-server paradigm; they connect
-to full nodes to retrieve information from the blockchain they are
-interested in and to send transactions. Exonum provides a “proofs
-mechanism”, based on cryptographic commitments via Merkle / Merkle Patricia
-trees. This mechanism allows verifying that a response from the full node
-has been really authorized by a supermajority of validators.
+Чтобы создать новый блок и проголосовать за него используется трехшаговый
+алгоритм.
 
-## Consensus
+- Алгоритм консенсуса делится на раунды, начало которых определяется каждым
+  валидатором на основе его собственного источника времени. Для каждого раунда существует
+  предопределенный валидатор-лидер, который определяется на основе числа раундов и
+  высоты цепочки. Лидер создает
+  *предложение блока (proposal)* и отправляет его другим валидаторам.
+- Другие валидаторы проверяют это предложение, и если оно правильное, голосуют
+  за него, передавая сообщения типа *prevote* другим валидаторам.
+- Если валидатор собирает сообщения типа *prevote* для одного и того же
+  предложения от абсолютного большенства валидаторов, он выполняет
+  транзакции в предложении, создает сообщение типа *precommit* с новым
+  состоянием хранилища данных и отправляет его валидаторам.
+- Наконец, если валидатор получает сообщения типа *precommit* от
+  абсолютного большинства валидаторов для одного и того же предложения,
+  предложение становится новым блоком и фиксируется в локальном хранилище
+  валидатора.
 
-!!! tip
-    See separate articles for more details:
-    [*Consensus*](../architecture/consensus.md),
-    [*Consensus spec*](../advanced/consensus/specification.md),
-    [*Requests*](../advanced/consensus/requests.md).
+!!! note "Примечание"
+    Блок может быть записан в блокчейн в разное время для разных валидаторов.
+    Алгоритм консенсуса гарантирует, что валидаторы не могут записать несколько
+    блоков на одной и той же высоте цепочки блокчейна (см.
+    [свойство безопасности](#безопасность-и-жизнеспособность)
+    ниже).
 
-Exonum uses a custom modification of Byzantine fault tolerant
-consensus (similar to PBFT) to guarantee that in any time there is one agreed
-version
-of the blockchain. It is assumed that the environment is decentralized,
-i.e., any node is allowed to fail or be compromised.
-Consensus is *authenticated*; consensus participants (i.e., validators)
-are identified with the help of public-key cryptography.
+Если валидатор не получает правильное предложение блока в текущем раунде,
+он в конечном итоге переходит к следующему раунду по истечении времени
+ожидания и готов рассматривать предложения от лидера в новом раунде.
 
-To generate a new block and vote upon it, a 3-phase approach is used.
+Алгоритм консенсуса поддерживает ситуации, когда до 1/3 валидаторов
+действуют злонамеренно, отключены или изолированы от сети. Это теоретический
+предел алгоритма, учитывая условия, в которых работает Exonum (частичная
+асинхронность между узлами из-за отсутствия времени в системе). Например,
+лидер может несвоевременно сгенерировать предложение или отправить различные
+предложения разным валидаторам. В конечном счете, все
+честно действующие валидаторы одобрят один и тот же новый блок.
 
-- The consensus algorithm is divided into rounds, the beginning of which is
-  determined
-  by each validator based on its local clock.
-  For every round, there is a predefined leader validator, which is determined
-  based on the round number, blockchain height and other information
-  from the blockchain state. The leader
-  creates a *block proposal* and sends it to other validators
-- Other validators check the proposal, and if it is correct, vote for
-  it by broadcasting *prevote* messages to the validators
-- If a validator collects prevote messages for the same proposal from a
-  supermajority
-  of validators, it executes transactions in the proposal, creates a *precommit*
-  message with the resulting data storage state and broadcasts it to the
-  validators
-- Finally, if a validator receives precommits from a supermajority of
-  validators
-  for the same proposal, the proposal becomes a new block and is committed to
-  the local storage of the validator
+Валидаторы могут быть изменены во время роботы блокчейна путем
+[обновления](#сервис-обновления-конфигурации)
+глобальной конфигурации блокчейна. Этот механизм можно использовать для замены
+ключей валидаторов, а также для добавления, замены или удаления узлов-валидаторов
+без необходимости перезапуска блокчейна.
 
-!!! note
-    A block can be committed at different times for different validators.
-    The consensus algorithm guarantees that validators cannot commit different
-    blocks at the same height (see [the safety property](#safety-and-liveness)
-    below).
+### Безопасность и жизнеспособность
 
-If a validator does not receive a correct block proposal in a particular round,
-it eventually moves to the next round by a timeout and is ready to
-review proposals from the leader in the new round.
+Технически алгоритм консенсуса, используемый в Exonum, гарантирует
+2 основных свойства:
 
-The consensus algorithm can withstand up to 1/3 of the validators acting
-maliciously,
-being switched off or isolated from the rest of the network.
-This is the best possible amount under the conditions in which the Exonum
-consensus operates (partial synchrony, which can be roughly summarized as
-the absence of reference time in the system). For example, a leader may not
-generate a proposal in time, or send different proposals to different
-validators;
-eventually, all honestly acting validators will agree on the same new block.
+- **Безопасность** означает, что, как только один корректный
+  валидатор зафиксирует блок, все остальные правильно действующие валидаторы в
+  конечном итоге зафиксируют этот же блок на той же высоте; другими словами,
+  блокчейн не может разделиться.
+- **Жизнеспособность** означает, что правильно действующие валидаторы
+  продолжают время от времени записывать блоки.
 
-Validators can be changed during the blockchain operation by
-[updating](#configuration-update-service)
-the global blockchain configuration. This mechanism can be used to rotate
-validators’ keys, and to add, replace or remove validator nodes without
-having to start a blockchain anew.
+Эти свойства формально доказаны для алгоритма консенсуса, действующего в
+частично синхронной сети, в условиях, при которых до 1/3 узлов валидаторов
+скомпрометированы или отключены. Если сеть является асинхронной (т.е.
+между валидаторами существует произвольно высокая задержка соединения),
+алгоритм гарантирует безопасность, но может потерять жизнеспособность.
+То же самое происходит в большинстве сценариев, в которых скомпрометировано
+более 1/3 (но менее 2/3) валидаторов.
 
-### Safety and Liveness
-
-Technically speaking, the consensus algorithm used in Exonum guarantees
-2 basic properties:
-
-- **Safety** means that once a single correctly operating validator
-  commits a block, all other correctly operating validators will eventually
-  commit
-  the same block at the same height; in other words, the blockchain cannot split
-- **Liveness** means that correctly operating validators continue committing
-  blocks
-  from time to time
-
-These properties are formally proven to hold for the consensus algorithm
-in a partially synchronous network with up to 1/3 of validator nodes
-being compromised or non-responsive. If the network is asynchronous (i.e.,
-there are arbitrary high connection latencies among validators), the algorithm
-guarantees safety, but may lose liveness. The same happens in most scenarios in
-which more than 1/3 (but less than 2/3) of the validators are compromised.
-
-## Data Storage
-
-!!! tip
-    See the [*Data Storage*](../architecture/storage.md) article
-    for more details.
+## Хранение данных
 
 ### RocksDB
 
-[RocksDB][rocks-db] is used to persist locally the data
-that transactions operate with. This storage engine provides high efficiency
-and minimal storage overhead.
+[RocksDB][rocks-db] используется для локального хранения данных, с которыми
+работают транзакции. Эта база данных обеспечивает высокую эффективность
+и минимальные затраты памяти.
 
-### Table Types
+### Типы таблиц
 
-Exonum supports several types of data tables, representing typed collections
-(lists, sets and maps):
+Exonum поддерживает несколько типов таблиц данных, представляющих собой
+типизированные коллекции (списки, множества и таблицы):
 
-- `ListIndex` implements an array list
-- `MapIndex` represents a map / key-value storage
-- [`ProofListIndex`](../architecture/storage.md#prooflistindex)
-  is an enhanced version of
-  array storage. It implements a balanced (but not necessarily full) binary
-  Merkle tree. Leaves of the tree keep the
-  actual array items, while the intermediate nodes keep the hashes from
-  concatenated
-  children data. `ProofListIndex` only allows to append the data or update the
-  already stored items
-- [`ProofMapIndex`](../architecture/storage.md#proofmapindex)
-  extends the
-  map. It is based on a Merkle Patricia tree, implemented as a binary tree.
-  Leaves of the tree keep the actual
-  values from the map. Intermediate nodes consist of the following four parts:
+- `ListIndex` реализует список.
+- `MapIndex` представляет собой ассоциативный массив / хранилище типа ключ-значение.
+- [`ProofListIndex`](https://exonum.com/doc/architecture/storage/#prooflistindex)
+  представляет собой расширенную версию списка. Он реализует
+  сбалансированное (но не обязательно полное) двоичное дерево Меркла. Листья
+  дерева сохраняют непосредственно элементы массива, в то время как промежуточные
+  вершины сохраняют хеши от объединенных данных дочерних вершин. `ProofListIndex`
+  позволяет только добавлять данные или обновлять уже сохраненные элементы.
+- [`ProofMapIndex`](https://exonum.com/doc/architecture/storage/#proofmapindex)
+  расширяет таблицу. Он основан на Merkle Patricia деревьях, реализованных
+  как двоичные деревья. Листья дерева сохраняют непосредственные значения из карты.
+  Промежуточные узлы состоят из следующих четырех частей:
 
-    - Hash of the left child value
-    - Hash of the right child value
-    - Key for the left child node
-    - Key for the right child node
+    - хеш левого дочернего значения;
+    - хеш правого дочернего значения;
+    - ключ для левого дочернего узла;
+    - ключ для правого дочернего узла.
 
-- `ValueSetIndex` and `KeySetIndex` both implement sets, and both
-  reduce them to
-  maps (as it is commonly done in programming languages). `ValueSetIndex`
-  maps hashes of the set items to the items themselves,
-  while `KeySetIndex` maps set items to `null`.
-  Thus, `KeySetIndex` is preferable when set items have relatively
-  short serialization and need to be iterated in a deterministic order.
-  `ValueSetIndex` is a better match for complex items or items that need to be
-  looked up by a hash.
+- `ValueSetIndex` и `KeySetIndex` реализуют множества, и оба сводят их к
+ассоциативным массивам (как это обычно делается в языках программирования). `ValueSetIndex`
+использует хеши элементов множества как ключи, а сами элементы - как значения,
+в то время как `KeySetIndex`
+использует сами элементы в качестве ключей, а вместо значений хранит `null`.
+Таким образом, `KeySetIndex`
+предпочтительнее, когда заданные элементы имеют относительно короткую
+сериализацию и требуется сохранять их порядок.
+`ValueSetIndex` лучше подходит для сложных элементов или элементов, которые
+можно искать с помощью хеша.
 
-Both `ListIndex` and `ProofListIndex` support updating by index and
-appending only. `MapIndex` and `ProofMapIndex` allow inserting,
-updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex` support
-adding and removing elements from the set. Finally, all collections support
-iterations over items (or keys, values, and key-value pairs in the case of
-  maps).
+И `ListIndex`, и `ProofListIndex` поддерживают обновление по индексу и позволяют
+только добавление данных. `MapIndex` и `ProofMapIndex` позволяют вносить,
+обновлять или удалять пары ключ-значение. `KeySetIndex` и `ValueSetIndex` позволяют
+добавлять и удалять элементы из множества. Наконец, все перечисленные коллекции поддерживают
+итерирование по элементам (или ключам, значениям и парам ключ-значение в случае карт).
 
-### Proofs
+### Доказательства
 
-`ProofListIndex` and `ProofMapIndex` allow efficiently
-creating a proof that specific values are saved under particular keys.
-To prove that, it is sufficient to return a list of hashes from
-the tree root to a particular cell (a Merkle path). Merkle Patricia
-tables also allow to generate proofs that there is no data in the
-database with a specific key.
+`ProofListIndex` и `ProofMapIndex` позволяют эффективно создавать
+доказательства того, что определенные значения сохраняются под определенными
+ключами. Чтобы доказать это, достаточно вернуть список хешей из корня дерева к
+определенной ячейке (путь Меркла). Таблицы Merkle Patricia также позволяют
+создавать доказательства того, что в базе данных нет данных с определенным
+ключом.
 
-When a full node communicates with a light client, proofs are returned together
-with the requested data. This allows to prove data authenticity efficiently.
+Когда полный узел связывается с легким клиентом, запрошенные данные могут быть
+возвращены с доказательствами их наличия или отсутствия. Это позволяет эффективно
+доказывать достоверность данных.
 
-## Modularity and Services
+## Модульность и сервисы
 
-!!! tip
-    See the [*Services*](../architecture/services.md) article
-    for more details.
+Помимо ядра, Exonum включает в себя возможность создания **сервисов**. В то
+время как ядро ​​отвечает за консенсус и играет роль промежуточного программного
+обеспечения для отправки и получения транзакций и блоков, сервисы реализуют
+всю бизнес-логику блокчейна и являются основной точкой расширения функционала
+Exonum.
 
-Besides the core, Exonum includes the framework for building **services**.
-While the core is responsible for consensus, and provides middleware
-functionality for sending and receiving transactions and blocks,
-services implement all business logic of the blockchain
-and are the main point to extend Exonum functionality.
+Сервисы Exonum взаимодействуют с внешним миром с помощью *конечных точек REST API*.
+Сервис может определять 3 типа конечных точек:
 
-Exonum services interact with the external world with the help of *endpoints*.
-A service may define 3 types of endpoints:
+- **Транзакции** соответствуют методам `POST / PUT` для REST-сервисов. Они
+  преобразуют состояние блокчейна. Все транзакции в блокчейне полностью
+  упорядочены, как описано выше, и результат их выполнения согласован между
+  полными узлами в сети блокчейн.
+- **Запросы на чтение** соответствуют методам GET для REST-сервисов. Они извлекают
+  информацию из блокчейна по возможности вместе с доказательствами. Запросы на
+  чтение выполняются локально, не являются глобально упорядоченными и не могут
+  изменять состояние блокчейна.
+- **Приватные конечные точки** предоставляют административный интерфейс
+  локальному экземпляру сервиса. Они могут использоваться для настройки
+  локальной конфигурации сервиса, например, для управления приватными ключами,
+  специфичными для сервисов. Приватные конечные точки выполняются локально, не
+  являются глобально упорядоченными и не могут напрямую изменять состояние
+  блокчейна (хотя они могут генерировать транзакции и добавлять их в сеть)
 
-- **Transactions** correspond to `POST`/`PUT` methods for
-  REST web services. They transform the blockchain state. All transactions
-  within the blockchain are completely ordered as described above,
-  and the result of their execution is agreed among the full nodes in the
-  blockchain network
-- **Read requests** correspond to `GET` methods for web services.
-  They
-  retrieve information from the blockchain, possibly together with proofs.
-  Read requests are executed locally, are not globally ordered,
-  and cannot modify the blockchain state
-- **Private endpoints** provide an administrative interface to
-  the local instance of the service. They could be used to adjust local service
-  configuration, e.g., manage secret keys specific to the service.
-  Private endpoints are executed locally, are not globally ordered, and
-  cannot modify the blockchain state directly (although they
-  can generate transactions and push them to the network)
+!!! note "Примечание"
+    Еще один тип конечных точек, *событие*,
+    [будет доступен в скором времени](https://exonum.com/doc/roadmap/).
+    События будут реализовывать [шаблон проектирования издатель-подписчик][wiki:pubsub],
+    позволяя легким клиентам и сервисам подписываться на события, которые
+    выпускаются сервисами.
 
-!!! note
-    Another type of endpoints, *events*, [is coming soon](../roadmap.md).
-    Events will implement the [pub/sub architecture pattern][wiki:pubsub],
-    allowing light clients and services to subscribe to events emitted by
-    services.
+Внешние приложения могут связываться с сервисными конечными точками через
+HTTP REST API, используя JSON в качестве формата сериализации. Exonum облегчает
+задания по промежуточной обработке задач для сервисов, таких как
+прослушивание HTTP-запросов, отправка входящих транзакций и запросов на чтение
+в соответствующий сервис, выполнение преобразования в JSON и обратно, и т. д.
 
-External applications may communicate with service endpoints
-via HTTP REST API, using JSON as the serialization format.
-Exonum facilitates middleware tasks for services, such as listening to HTTP
-requests,
-dispatching incoming transactions and read requests to an appropriate service,
-performing conversion to and from JSON, etc.
+Поскольку сервисы являются модулями Rust, их можно легко использовать повторно
+в проектах Exonum. Вы можете использовать сервисы с открытым исходным кодом,
+уже написанные сообществом, или создать свой собственный сервис и выложить его в
+открытый доступ.
 
-As services are Rust modules, they can be easily reused across Exonum
-projects. You may use open source services already written by the
-community, or open your service for other uses.
+### Смарт-контракты
 
-### Smart Contracting
+Конечные точки, определяемые сервисами, выполняют ту же роль, что и
+смарт-контракты в других блокчейн платформах. Они определяют бизнес-логику
+блокчейна, позволяют извлекать данные из блокчейна и могут быть повторно
+использованы в разных проектах. Частичные аналоги для этой модели выполнения -
+это конечные точки REST-сервисов и хранимые процедуры для систем управления
+базами данных.
 
-Endpoints defined by services fulfill the same role as smart contracts
-in other blockchain platforms. They define business logic of the blockchain,
-allow to retrieve data from the blockchain, and can be reused across
-different projects. Partial analogies for this execution model are
-endpoints of REST web services and stored procedures for database management
-systems.
+Следующие ключевые моменты отличают смарт-контракты Exonum от других моделей,
+используемых в блокчейнах:
 
-The key points differentiating Exonum smart contracts from other models
-used in blockchains are as follows:
+- **Ограниченная среда.** Exonum выполняет только предопределенные типы
+  запросов, не позволяя выполнять ненадежный код полученный от клиента. Это
+  приводит к более контролируемой среде и упрощает обеспечение безопасности
+  смарт-контрактов.
+- **Отсутствие изоляции.** Обработка запросов выполняется в том же контексте
+  выполнения, что и ядро ​​системы. Это выигрышно сказывается на
+  производительности, хотя и имеет определенные риски по отношению к
+  безопасности.
+- **Локальное состояние.** Сервисы Exonum могут определять локальное состояние,
+  которое относится к узлу, на котором работает сервис. Локальное состояние может
+  использоваться для управления секретной информацией (например, приватными
+  ключами). Локальное состояние может быть изменено через приватные конечные точки сервиса.
+  Используя локальное состояние, сервисы могут быть более активными,
+  чем их аналоги в других блокчейнах. Например,
+  [сервис анкоринга](#сервис-анкоринга)
+  использует локальное состояние для полной автоматизации подписания анкорящих
+  транзакций.
+- **Разделение обработки транзакций.** Проверка транзакций - это отдельный шаг
+  обработки транзакций. Он выполняется сразу после получения транзакции, прежде
+  чем применять транзакцию к состоянию блокчейна. Проверка может включать
+  проверку подлинности (например, проверку подписи транзакции), а также другие
+  структурные проверки содержимого транзакции. В то же время проверка транзакции
+  не имеет доступа к текущему состоянию блокчейна.
 
-- **Restricted environment.** Exonum executes only predefined
-  request types,
-  not allowing to execute untrusted code received from a client. This
-  results in a more controlled environment, and makes it easier to argue about
-  smart contract safety
-- **No isolation.** Request processing is performed
-  in the same execution context as the core of the system. This is beneficial
-  for performance, although has certain security risks
-- **Local state.** Exonum services may define a local state, which
-  is specific to the node on which the service is running. The local state
-  can be used to manage secret information (e.g., private keys). The local
-  state may be managed by private service endpoints. By utilizing
-  the local state, services can be more proactive than their counterparts
-  in other blockchains. For example, [the anchoring service](#anchoring-service)
-  uses the local state to fully automate anchoring transaction signing
-- **Split transaction processing.** Transaction verification is
-  a separate step
-  of transaction processing. It is performed immediately after receiving
-  the transaction, before applying the transaction to the blockchain state.
-  Verification
-  may include authentication checks (for example, verifying the transaction
-    signature),
-  as well as other structural checks over the transaction contents.
-  At the same time, transaction verification has no access to the current
-  blockchain state
+!!! note "Примечание"
+    Изоляция выполнения сервисов является высокоприоритетной задачей
+    в [планах развития Exonum](https://exonum.com/doc/roadmap/).
 
-!!! note
-    Service execution isolation is a high-priority task
-    on [the Exonum roadmap](../roadmap.md).
+### Существующие сервисы
 
-### Existing Services
+#### Сервис обновления конфигурации
 
-#### Configuration Update Service
+Хотя каждый узел имеет свой собственный файл конфигурации, некоторые настройки
+должны быть изменены для всех узлов одновременно. Данный сервис позволяет
+обновлять конфигурацию с помощью самого блокчейна.
 
-!!! tip
-    See the
-    [*Configuration Update Service*](../advanced/configuration-updater.md)
-    article for more details.
+Используя сервис обновления конфигурации, любой валидатор может предлагать
+новую конфигурацию, и другие валидаторы могут голосовать за нее. Для
+применения предлагаемых изменений требуется одобрение от абсолютного
+большинства валидаторов. Однако, принятие предложения не делает новую конфигурацию
+активной. Новая конфигурация включает параметр
+`actual_from` указывающий на высоту, при достижении которой активируется новая
+конфигурация.
 
-Although every node has its own configuration file, some settings should
-be changed for all nodes simultaneously. This service allows updating
-configuration through the blockchain itself.
+#### Сервис анкоринга
 
-Using the configuration update service, any validator may propose new
-configuration and other validators may vote for it. A proposal needs approval
-from a supermajority of the validators to become accepted;
-however, it is still inactive and
-current settings are still used. New configuration includes
-`actual_from` parameter pointing to the blockchain height, upon reaching
-which the new configuration activates.
+Сервис анкоринга записывает хеш текущего состояния блокчейна Exonum в блокчейн
+Биткоин через определенный интервал времени. Данные для анкоринга
+аутентифицируются квалифицированным большинством валидаторов с помощью
+инструментов цифровой подписи доступных в Биткоине.
 
-#### Anchoring Service
+Анкоринг повышает безопасность системы: даже если злоумышленник получит контроль
+над каждым валидатором или все валидаторы вступят в сговор, невозможно незаметно
+изменить журнал транзакций. После любого изменения,
+модифицированные задним числом хеши блоков будут отличаться от тех, которые
+записаны в Биткоин блокчейне. Чтобы задним числом изменить данные в блокчейне
+Exonum, злоумышленнику также необходимо будет скомпрометировать Биткоин
+блокчейн. Стоимость такой атаки будет измеряться в миллиардах долларов США.
 
-!!! tip
-    See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
-    article for more details.
+Кроме того, заанкоренные данные вместе с доказательствами поддаются проверке,
+даже если блокчейн Exonum по какой-то причине станет недоступен. Это
+свойство может быть использовано для получения бессрочных электронных чеков.
 
-The anchoring service writes the hash of the current Exonum blockchain state
-to the Bitcoin blockchain with a certain time interval. The anchored data is
-authenticated by a supermajority of validators using digital signature tools
-available in Bitcoin.
+## Криптография
 
-Anchoring increases security; even if a malefactor takes
-control over every validator or all validators collude,
-it’s impossible to change the transaction log unnoticeably. After any change,
-retroactively modified block hashes would differ from the one recorded on
-the Bitcoin blockchain.
-To change the data on the Exonum blockchain retroactively, an attacker would
-need
-to compromise the Bitcoin blockchain too. The cost of such an attack would
-measure in billions of US dollars.
+### Хеширование
 
-Additionally, the anchored data together with proofs remains
-verifiable even if the underlying Exonum blockchain would become inaccessible
-for some reason. This property could be used to provide durable electronic
-receipts.
+Exonum использует [SHA-256][wiki:sha256] для всех операций хеширования, включая
+создание транзакций и идентификаторов блоков, построения деревьев Меркла и
+хранения бинарных данных в хеш-таблицах.
 
-## Cryptography
+### Криптосистема с открытым ключом и управление ключами
 
-### Hashing
+Как транзакции, так и сообщения относящиеся к консенсусу аутентифицируются с
+помощью [цифровых подписей Ed25519][wiki:ed25519] реализованных с
+использованием [sodiumoxide][sodiumoxide] (оболочка [libsodium][libsodium] для
+Rust). В большинстве случаев транзакции создаются внешними объектами (такими
+как легкие клиенты). Предполагается, что они управляют
+соответствующими ключами подписи. Ключами также могут управлять сами полные
+узлы. В этом случае приватный ключ хранится в локальной конфигурации узла,
+не входит в блокчейн и уникален для конкретного узла. Оптимальная практика
+заключается в том, чтобы управлять такими ключами локально через приватные
+API соответствующего сервиса.
 
-Exonum uses [SHA-256][wiki:sha256] for all hash operations, including creating
-transaction and block identifiers, computing Merkle and Merkle Patricia trees,
-and mapping keys for Merkle Patricia trees to fixed-length byte buffers.
+Ядро Exonum определяет две пары ключей Ed25519 для полных узлов:
 
-### Public-key Cryptography and Key Management
+- **Ключ консенсуса** используется для подписания сообщений относящихся к
+  консенсусу (для валидаторов) и подписания сетевых сообщений (для валидаторов
+  и аудиторов).
+- **Административный ключ** имеется только у валидаторов и используется для
+  административных задач (таких, как голосование за обновления конфигурации).
 
-Both transactions and consensus messages are authenticated with the help
-of [Ed25519 digital signatures][wiki:ed25519] implemented using
-[sodiumoxide][sodiumoxide]
-(a [libsodium][libsodium] wrapper for Rust).
-In most cases, transactions are created by the external entities
-(such as light clients); these entities are assumed to manage the corresponding
-signing keys. Keys can also be managed by full nodes themselves. In this case,
-a private key is stored in the local configuration of the node, does not enter
-the blockchain and is specific to a particular node. It’s a good practice
-to manage such keys locally via private APIs of the corresponding service.
+Сервисы могут использовать дополнительные пары ключей, в том числе из других
+криптосистем. Например, сервис анкоринга определяет дополнительную пару ключей
+secp256k1 для подписания анкорящих транзакций в Биткоине.
 
-The Exonum core defines two pairs of Ed25519 keys for full nodes:
+!!! warning "Важно"
+    В настоящее время локальная конфигурация узла (которая включает в себя все
+    его приватные ключи, используемые как в консенсусе, так и в сервисах)
+    хранится в виде обычного текста. Этот недочет будет исправлен в ближайшее время.
 
-- **Consensus key** is used for signing consensus messages (for
-  validators) and
-  signing network messages (for validators and auditors)
-- **Administrative key** is specific to validators and is used for
-  administrative tasks (such as voting for configuration updates)
-
-Services may utilize additional key pairs, including from other cryptosystems.
-For example, the anchoring service defines an additional secp256k1 key pair
-for signing anchoring transactions in Bitcoin.
-
-!!! warning
-    Presently, the local configuration of the node (which includes all
-    its private keys, both used in consensus and by the services) is stored in
-    plaintext.
-    This is going to be fixed soon.
-
-!!! note
-    Presently, the administrative keys are hot (i.e., stored in the unencrypted
-    form during the node operation). In future releases, it will be possible
-    to manage them as externally stored cold keys (i.e., the node would not have
-    access to the administrative key at all). Additionally, the 1-to-1
-    correspondence
-    between consensus and administrative keys will be generalized to support
-    various administrative settings.
+!!! note "Примечание"
+    В настоящее время административные ключи являются горячими (т.е. хранятся
+    в незашифрованном виде во время выполнения операций узлом). В будущих версиях можно
+    будет управлять ими как внешними холодными ключами (то есть, у узла будет
+    отсутствовать доступ к административному ключу). Кроме того,
+    соответствие 1-к-1 между ключами консенсуса и административными ключами
+    будет обобщено для поддержки различных административных настроек.
 
 [arch-guide]: https://github.com/exonum/exonum/blob/master/ARCHITECTURE.md
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
