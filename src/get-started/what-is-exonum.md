@@ -1,233 +1,226 @@
-# What Is Exonum
+# Что такое Exonum
 
-Exonum is a blockchain framework that allows building secure permissioned
-blockchain applications. Like all software, Exonum comes with its own set of
-features and capabilities.
-This page outlines the cases in which Exonum could be useful and points out the
-main differences between Exonum and other distributed ledger solutions.
+Exonum - это блокчейн фреймворк, который позволяет создавать безопасные приватные
+блокчейн приложения. Как любое программное обеспечение, Exonum имеет свой
+собственный набор особенностей и возможностей. Данная страница описывает случаи,
+в которых Exonum может быть полезен, и указывает основные различия между Exonum
+и другими решениями для распределенных реестров.
 
-## Why Blockchain
+## Почему блокчейн
 
-In terms of data management, blockchains provide [OLTP][wiki:oltp]
-capabilities. A blockchain processes transactions, which are quite similar to
-[transactions][wiki:tx] in ordinary database management systems, and changes
-the stored values correspondingly.
+С точки зрения управления данными, блокчейны предоставляют возможности
+[транзакционной системы][wiki:oltp]. Блокчейн обрабатывает транзакции, которые
+очень похожи на [транзакции][wiki:tx] в обычных системах управления базами данных
+и соответственно изменяет сохраненные значения.
 
-Compared to commonplace OLTP solutions, the use of blockchain brings several
-distinctive advantages.
+По сравнению с обычными решениями транзакционных систем, использование блокчейна
+дает несколько преимуществ.
 
-### Distribution
+### Распределение
 
-Like distributed databases, such as Cassandra, MongoDB or MySQL Cluster,
-blockchains are replicated on multiple nodes. However, compared to ordinary
-distributed DBs, blockchains are resistant against a much wider range of
-attacks:
+Подобно распределенным базам данных, таким как Cassandra, MongoDB или MySQL
+Cluster, блокчейны реплицируются на нескольких узлах. Однако, по сравнению с
+обычными распределенными БД, блокчейны устойчивы к гораздо более широкому
+диапазону сбоев:
 
-- Blockchains are resistant against failures of any single node (or even
-  multiple nodes at the same time). The threat model includes nodes being
-  switched off, isolated from the rest of the network, or even completely
-  compromised (say, by a hacker)
-- Blockchains can be deployed in a decentralized network, where there is no
-  single administrator managing all the nodes. This significantly reduces risks
-  of data corruption and the bias in the system (e.g., preferential treatment
-  of some participants)
+- Блокчейны устойчивы к отказам одного узла (или даже нескольких узлов
+  одновременно). Модель угрозы включает в себя отключение узлов, изолирование
+  узлов от сети или ситуации, когда узел может быть полностью
+  скомпрометирован (например, хакером).
+- Блокчейны могут быть развернуты в децентрализованной сети, где нет единого
+  администратора, управляющего всеми узлами. Это значительно снижает риск
+  повреждения данных и предвзятости в системе (например, привилегированное
+  отношение к некоторым участникам).
 
-### Reliable Audit Trail
+### Надежный аудиторский след
 
-A core component of a blockchain is a tamper-resistant transaction log.
-(Tamper-resistance here means that the log entries cannot be modified
-retroactively.) Blockchains use [the same methods][wiki:linked-ts] to ensure
-the immutability of the log as [evidence records][rfc-er] used by
-[certificate authorities][wiki:ca] and other security-critical applications.
+Основным компонентом блокчейна является журнал транзакций, устойчивый к
+несанкционированному доступу. (Устойчивость к несанкционированному доступу
+означает, что записи журнала не могут быть изменены задним числом.) Блокчейны
+используют [те же методы][wiki:linked-ts], чтобы гарантировать
+неизменность журнала, как и [доказательные записи][rfc-er], используемые
+[органами сертификации][wiki:ca] и другими приложениями, в которых акцент
+делается на безопасность.
 
-The reliable audit trail is needed in many regulated industries (e.g., finance
-and public registries), but it could be useful in other areas as well. The
-immutability of the transaction log provides *provenance* for any data piece
-in the blockchain, allowing to reliably trace its history.
+Надежный аудиторский след необходим во многих регулируемых отраслях (например,
+в финансовых и публичных реестрах), но он также может быть полезен и в других
+областях. Неизменность журнала транзакций является *доказательством* подлинности
+любой части данных в блокчейне, что позволяет надежно отслеживать его историю.
 
-### Cryptography
+### Криптография
 
-Blockchain extensively uses cryptography in places where traditional systems
-rely on trust and informal relationships among participants of the system.
-The most prominent example of this is transaction authentication. Blockchains
-use [public-key cryptography][wiki:pkc] to ensure authenticity and integrity
-of transactions (instead of, say, password-based authentication). This
-corresponds to the best practices in security-critical industries and also
-ensures that the transaction log is completely verifiable.
+Блокчейн широко использует криптографию там, где традиционные системы полагаются
+на доверие и неформальные отношения между участниками системы. Наиболее значимым
+примером этого является аутентификация транзакций. Блокчейны используют
+[криптосистему с публичным ключом][wiki:pkc] для обеспечения подлинности и
+целостности транзакций (вместо, например, аутентификации на основе пароля). Это
+соответствует передовой практике в отраслях, где безопасность критически важна,
+а также гарантирует, что журнал транзакций полностью поддается проверке.
 
-## Exonum Design Goals
+## Задачи поставленные перед Exonum
 
-Exonum is a [framework][wiki:framework]; it's not a ready-made blockchain
-(like, say, Bitcoin). Instead, Exonum can be used to *create* blockchains,
-just like [MVC][wiki:mvc] frameworks (e.g., Django or Express)
-can be used to create web applications.
+Exonum - это [фреймворк][wiki:framework], а не готовый блокчейн (как, например,
+Биткоин). Вместо этого Exonum можно использовать для *создания* блокчейнов, так
+же как и фреймворки [MVC][wiki:mvc] (например, Django или Express) можно
+использовать для создания веб-приложений.
 
-### Permissioned Control
+### Контроль
 
-Exonum is geared towards *permissioned* blockchains. This means that only
-a limited list of nodes can commit transactions to the blockchain.
-Such approach is reasonable if there is a certain *maintainer* (or several
-maintainers) that should retain some control over the network (e.g., define and
-update transaction processing rules). Compared to permissionless blockchains
-(such as Bitcoin), Exonum applications are more local, but at the same time
-provide greater flexibility and a more controllable environment.
+Exonum ориентирован на *приватные* блокчейны. Это означает, что только
+ограниченный список узлов может записывать транзакции в блокчейн. Такой подход
+оправдан, если есть определенный *администратор системы*
+(или несколько таких администраторов), который должен сохранять некоторый
+контроль над сетью (например, определять и обновлять правила обработки
+транзакций). По сравнению с публичными блокчейнами (такими как Биткоин),
+приложения на Exonum являются более локальными, но в то же время обеспечивают
+большую гибкость и более управляемую среду.
 
-Controllability of Exonum *does not* mean that the control of maintainers
-is unrestricted; there are well-defined rules of transaction processing that
-even all the network maintainers together cannot bend. Indeed, Exonum allows
-easily conveying the compliance to transaction processing rules for external
-parties (be it the regulator, auditors, or users of a platform).
+Контролируемость Exonum *не* означает, что контроль поддерживающих систему
+участников неограничен; существуют четко определенные правила обработки
+транзакций, которые даже все участники сети вместе не смогут изменить. Exonum
+позволяет легко продемонстрировать соответствие правилам обработки
+транзакций третьим сторонам (будь то регуляторы, аудиторы или пользователи
+платформы).
 
-!!! note "Example"
-    In most reasonable blockchain setups, there is a requirement
-    for all transactions to be digitally signed. If the blockchain maintainers
-    do not have control over private keys in the system,
-    they cannot forge transactions in the name of the key owners.
 
-### Transparency
+!!! note "Пример"
+    В наиболее оправданных блокчейн настройках есть требование, чтобы все
+    транзакции были подписаны цифровой подписью. Если участники, поддерживающие
+    блокчейн, не имеют контроля над приватными ключами в системе, они не могут
+    подделывать транзакции от имени владельцев ключей.
 
-The Exonum framework codifies the ever-increasing role of transparency in the
-modern world. Exonum provides a rich set of tools to define the correct system
-operation, and allows external parties (e.g., regulators, auditors and end
-clients of the system) to continuously verify the system operation against
-these definitions.
+### Прозрачность
 
-!!! note "Example"
-    In a [sample cryptocurrency implementation](create-service.md),
-    users can monitor the state of their wallet in real time.
-    The state returned to a user by network nodes is supplied with an
-    unforgeable cryptographic proof.
+Фреймворк Exonum систематизирует всевозрастающую роль прозрачности в современном
+мире. Exonum предоставляет богатый набор инструментов для определения правильной
+работы системы и позволяет третьим сторонам (например, регуляторам, аудиторам и
+конечным клиентам) постоянно проверять прозрачность работы системы.
 
-### Flexibility
+### Гибкость
 
-One of the reasons for permissioned blockchain setup is a greater degree of
-flexibility.
-Exonum ensures flexibility by providing a rich environment for transaction
-execution.
+Одна из причин создания приватных блокчейнов - большая степень их гибкости.
+Exonum обеспечивает гибкость, предоставляя богатую среду для выполнения транзакций.
 
-!!! note "Example"
-    Document timestamping, cryptocurrency and property rights registries
-    are three vastly different domains in which the Exonum framework can be
-    used effectively.
+!!! note "Пример"
+    Временные метки документов, криптовалюты и реестры прав собственности - это
+    три совершенно разные области, в которых можно эффективно использовать
+    фреймворк Exonum.
 
-### Safety
+### Безопасность
 
-As several high-profile blockchain heists have shown, transaction processing
-on blockchains may be vulnerable to logic bombs and difficult-to-detect
-marginal cases. Exonum uses
-[the Rust programming language](https://www.rust-lang.org/),
-which guarantees the highest degree of memory safety.
+Как показали несколько сбоев высокопрофильных блокчейнов, обработка транзакций
+в блокчейне может быть уязвима к логическим бомбам и трудно обнаружаемым
+маргинальным случаям. Exonum использует
+[язык программирования Rust](https://www.rust-lang.org/),
+который гарантирует наивысшую степень безопасности доступа к памяти.
 
-!!! note "Example"
-    [Mutability][rust-mut], [references and borrowing][rust-ref] in Rust
-    help enforce access restrictions. For example, if a variable is passed
-    to an external component in a non-mutable reference, it **cannot** be
-    changed no matter what the component does. Strict static typing and absence
-    of null pointers in Rust help to prevent undefined behavior and memory
-    access violations.
+!!! note "Пример"
+    [Изменяемость][rust-mut], [ссылки и заимствования][rust-ref] в Rust помогают
+    применить ограничения доступа. Например, если переменная передается
+    внешнему компоненту в неизменяемой ссылке, она **не может** быть изменена
+    независимо от того, что делает этот компонент. Строгая статическая
+    типизация и отсутствие нулевых указателей в Rust помогают предотвратить
+    неопределенное поведение и нарушения доступа к памяти.
 
-### Performance
+### Производительность
 
-Exonum is geared towards peak throughput of thousands of transactions per
-second (tps). During test benchmarks, Exonum handles up to 7,000 tps, with a
-2.5 sec. clearing delay (the interval between transaction generation and its
-inclusion into a block).
+Exonum ориентирован на максимальную пропускную способность в тысячи транзакций
+в секунду. Во время тестов, Exonum обрабатывает до 7 000 транзакций в секунду,
+с задержкой в 2,5 сек. (интервал между созданием транзакции и ее включением в блок).
 
-## Main Components
+## Основные компоненты
 
-### Services
+### Сервисы
 
-[Services](../architecture/services.md) allow specifying the business logic for
-Exonum applications. They are the main extension points of the framework, which
-play the same role as smart contracts in some other blockchains.
+[Сервисы](../architecture/services.md) позволяют указать бизнес-логику для
+приложений Exonum. Они являются основными точками расширения фреймворка,
+которые играют ту же роль, что и смарт-контракты в некоторых других блокчейнах.
 
-Developing Exonum services is similar to service development in Web or
-in enterprise platforms; they have the same principal components.
+Разработка сервисов в Exonum аналогична разработке веб-сервисов или сервисов на
+корпоративных платформах – они имеют одни и те же основные компоненты.
 
-#### Endpoints
+#### Конечные точки
 
-A service has a set of endpoints (realized as REST APIs) using which
-the service can communicate with the outside world. The Exonum framework acts
-as middleware, dispatching requests among services and abstracting the
-intricacies of data (de)serialization, access control, and other typical
-middleware tasks away from service developers.
+Сервис имеет набор конечных точек (реализованных как REST API), с помощью
+которых сервис может взаимодействовать с внешним миром. Фреймворк Exonum
+действует как промежуточное программное обеспечение, отправляет запросы между
+сервисами и абстрагирует от разработчиков сервисов тонкости (де)сериализации
+данных, контроля доступа и других типичных задач.
 
-There are 3 types of service endpoints:
+Существует три типа конечных точек сервисов:
 
-- **Transactions** correspond to `PUT` or `POST` requests in REST
-- **Read requests** correspond to `GET` requests in REST
-- **Private APIs** represent administrative and maintenance endpoints,
-  generally not accessible to the outside world
+- **Транзакции** соответствуют запросам `PUT` или `POST` в REST.
+- **Запросы на чтение** соответствуют запросам `GET` в REST.
+- **Приватные API-интерфейсы** представляют собой административные и
+служебные конечные точки, обычно недоступные для внешнего мира.
 
-#### Persistence
+#### Устойчивость
 
-Exonum provides means for services to persist their data as scalars, or as
-data collections (maps and lists). The Exonum data storage engine provides
-powerful abstractions for *Merkelized* collections. In such a collection,
-any element can be supplied with an unforgeable cryptographic proof
-that it belongs to the collection (without disclosing any other elements
-of the collection).
+Exonum предоставляет средства для сервисов, чтобы хранить их данные в виде
+скаляров или как коллекции данных (словари и списки). Механизм хранения данных
+Exonum обеспечивает мощные абстракции для *деревьев Меркла*. В такой
+коллекции любой элемент может быть снабжен неизменяемым криптографическим
+доказательством того, что он принадлежит коллекции (без раскрытия каких-либо
+других элементов коллекции).
 
-With the help of Merkelized collections, a service can provide strict proofs
-of data authenticity in response to read requests. This requires minimal
-involvement from the service developers – all heavy lifting is performed by the
-Exonum core.
+С помощью деревьев Меркла сервис может предоставлять строгие доказательства
+достоверности данных в ответ на запросы на чтение. Это требует минимального
+участия разработчиков сервисов - вся основная работа выполняется ядром Exonum.
 
-### Byzantine Consensus
+### Византийский консенсус
 
-Exonum uses [a custom Byzantine fault tolerant consensus algorithm](../architecture/consensus.md)
-to synchronize data among the nodes in the network.
-The Exonum network will continue to operate even if up to 1/3 of validators are
-hacked, compromised or switched off. Hence, there is no single point of failure
-in the network; the whole process of transaction processing is fully
-decentralized.
+Exonum использует [собственный алгоритм византийского консенсуса](../architecture/consensus.md)
+для синхронизации данных между узлами сети. Сеть Exonum будет продолжать
+работать, даже если до 1/3 валидаторов взломаны, скомпрометированы или отключены.
+Следовательно, нет единой точки отказа в сети, весь процесс обработки
+транзакций полностью децентрализован.
 
-### Light Clients
+### Легкие клиенты
 
-Exonum supports [light clients](../architecture/clients.md),
-network nodes that replicate only a very small part of the blockchain,
-which the client is interested in. Light clients allow providing access to a
-blockchain through web or mobile apps. A light client communicates with one or
-more services on a full node with the help of [public APIs](#endpoints).
+Exonum поддерживает [легкие клиенты](../architecture/clients.md) – сетевые узлы,
+которые реплицируют только небольшую часть блокчейна, которая интересует
+пользователя. Легкие клиенты позволяют обеспечить доступ к блокчейну через веб-
+или мобильные приложения. Легкий клиент связывается с одним или
+несколькими сервисами на полном узле с помощью [публичного API](#конечные-точки).
 
-!!! note "Example"
-    [In the cryptocurrency tutorial](create-service.md),
-    a client corresponds to an owner of currency; it is only interested in
-    transactions that involve the owner.
+!!! note "Пример"
+    [В руководстве по созданию криптовалюты](https://exonum.com/doc/get-started/create-service/)
+    клиент представляет владельца валюты. Его интересуют только транзакции,
+    связанные с этим владельцем.
 
-Exonum pays much attention to the security of light clients. Light clients do
-not unconditionally trust the responses from full nodes, but rather verify them
-against formally encoded rules. The verification uses cryptographic techniques,
-such as [Merkle trees][wiki:mt] and [linked timestamping][wiki:linked-ts],
-to ensure that the full nodes cannot misguide the client, even if there is a
-collusion among the blockchain maintainers.
+Exonum уделяет большое внимание безопасности легких клиентов. Легкие клиенты не
+безоговорочно доверяют ответам от полных узлов, а проверяют их, используя
+формально закодированные правила. Проверка использует криптографические методы,
+такие как [деревья Меркла][wiki:mt] и [привязанные временные метки][wiki:linked-ts],
+чтобы гарантировать, что полные узлы не могут вернуть клиенту неверную информацию
+незаметно, даже если существует сговор между администраторами блокчейна.
 
-### Bitcoin Anchoring
+### Биткоин анкоринг
 
-Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)
-to achieve the highest level of security for light clients. The anchoring
-service periodically publishes a hash digest of the entire blockchain state
-to the Bitcoin Blockchain. This makes it impossible to revise the transaction
-history or to supply different clients with differing versions of the
-blockchain, even if all the blockchain maintainers collude. Moreover, anchoring
-is a fallback mechanism: even if the Exonum blockchain stops working, the
-authenticity of data stored in light clients could still be verified.
+Exonum предоставляет [сервис анкоринга](/advanced/bitcoin-anchoring.md)
+для достижения наивысшего уровня безопасности для легких клиентов. Сервис
+анкоринга периодически публикует хеш состояния всего блокчейна в блокчейн Биткоин.
+Это делает невозможным изменение истории транзакций или предоставление различным
+клиентам разных версий блокчейна, даже если все администраторы блокчейна
+вступают в сговор. Более того, анкоринг является резервным механизмом: даже
+если блокчейн Exonum перестает работать, аутентификация данных, хранящихся в
+легких клиентах, все еще может быть осуществлена.
 
-## What’s Next
+## Что дальше?
 
-- [Read about the Exonum design](design-overview.md)
-- [Build your first Exonum application](create-service.md)
-- [Find out about Exonum planned features and milestones](../roadmap.md)
-- [Learn how to contribute to Exonum development](../contributing.md)
+- [Узнайте больше об архитектуре Exonum](design-overview.md)
+- [Создайте свое первое приложение на Exonum](https://exonum.com/doc/get-started/create-service/)
+- [Узнайте о запланированных функциях и этапах развития Exonum](https://exonum.com/doc/roadmap/)
+- [Узнайте, как внести свой вклад в развитие Exonum](https://exonum.com/doc/contributing/)
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
-[wiki:ca]: https://en.wikipedia.org/wiki/Certificate_authority
+[wiki:ca]: https://ru.wikipedia.org/wiki/Центр_сертификации
 [rfc-er]: https://tools.ietf.org/html/rfc4998
-[wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography
-[wiki:framework]: https://en.wikipedia.org/wiki/Software_framework
-[wiki:mvc]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
-[wiki:mt]: https://en.wikipedia.org/wiki/Merkle_tree
-[wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
-[wiki:tx]: https://en.wikipedia.org/wiki/Database_transaction
+[wiki:pkc]: https://ru.wikipedia.org/wiki/Криптосистема_с_открытым_ключом
+[wiki:framework]: https://ru.wikipedia.org/wiki/Фреймворк
+[wiki:mvc]: https://ru.wikipedia.org/wiki/Model-View-Controller
+[wiki:mt]: https://ru.wikipedia.org/wiki/Дерево_хешей
+[wiki:oltp]: https://ru.wikipedia.org/wiki/OLTP
+[wiki:tx]: https://ru.wikipedia.org/wiki/Транзакция_(информатика)
 [rust-mut]: https://doc.rust-lang.org/book/mutability.html
 [rust-ref]: https://doc.rust-lang.org/book/references-and-borrowing.html
