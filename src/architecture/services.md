@@ -1,525 +1,344 @@
-# Services
+# Сервисы
 
-**Services** are the main extension point for the Exonum framework.
-By itself, Exonum provides building blocks for creating blockchains;
-it does not come with any concrete transaction processing rules.
-This is where services come into play.
-If you want to create an instance of the Exonum blockchain,
-services are *the* way to go.
+**Сервисы** являются основной точкой расширения для инфраструктуры Exonum.
+По сути Exonum предоставляет набор строительных элементов для создания
+блокчейна; он не содержит никаких конкретных правил обработки транзакций.
+Для этого как раз и нужны сервисы: используйте их для создания собственного
+блокчейна Exonum.
 
-## Overview
+## Обзор
 
-Like smart contracts in some other blockchain platforms, Exonum services
-encapsulate business logic of the blockchain application.
+Подобно смарт-контрактам на некоторых других блокчейн платформах, сервисы Exonum
+инкапсулируют бизнес-логику блокчейн приложения.
 
-- A service specifies **the rules of transaction processing**, namely, how
-  [transactions](transactions.md) influence the state of the service
-- The state transformed by transactions is **persisted** as a part of the
-  overall [blockchain key-value storage](storage.md)
-- A service may also allow [external clients](clients.md) to
-  **read the relevant data** from the blockchain state
+- Сервис определяет **правила обработки транзакций**, а именно то, как
+  [транзакции](transactions.md) влияют на состояние сервиса  
+- Состояние сервиса, преобразованное транзакциями, **сохраняется** как часть
+  общего [блокчейн хранилища](https://exonum.com/doc/architecture/storage/)
+- Сервис также может позволять [внешним клиентам](clients.md)
+  **считывать соответствующие данные** из текущего состояния блокчейна  
 
-Each service has a well-defined interface for communication with the external
-world – essentially, a set of endpoints – and the implementation of said
-interface.
-The implementation may read and write data from the blockchain state
-(usually using the schema helper for the underlying key-value storage
-in order to simplify data management) and can also access the local node
-configuration.
+Каждый сервис имеет четко определенный интерфейс для связи с внешним миром,
+который по сути представляет собой набор конечных точек, и реализацию
+упомянутого интерфейса. В таком виде сервисы могут считывать и записывать
+данные из состояния блокчейна (обычно для простоты управления данными
+реализуется схема, которая в свою очередь является интерфейсом для доступа к
+хранилищу), а также обращаться к локальной конфигурации узла.
 
-Services are executed on each validator and each auditing node of the
-blockchain network. The order of transaction processing and the resulting
-changes
-to the service state are a part of [the consensus algorithm](consensus.md).
-They are guaranteed to be the same for all nodes in the blockchain network.
+Сервисы выполняются каждым валидатором и аудитром в блокчейн сети. Порядок
+обработки транзакций и результирующие изменения состояния сервиса являются
+частью [алгоритма консенсуса](consensus.md). Они гарантированно будут
+одинаковыми для всех узлов в блокчейн сети.
 
-!!! tip
-    When developing a service, you should keep in mind that
-    calls to service endpoints must produce an identical result
-    on all nodes in the network given the same blockchain
-    state. If the call results differ, the consensus algorithm may stall,
-    or an audit of the blockchain by auditing nodes may fail.
+!!! note "Примечание"
+    В отличие от смарт-контрактов в некоторых блокчейнах, сервисы в Exonum не
+    изолированы внутри виртуальной машины или контейнера. Это делает сервисы
+    Exonum более эффективными и гибкими в своих возможностях, но в то же время
+    требует более тщательной программной реализации. Изоляция сервисов включена
+    в [дорожную карту](https://exonum.com/doc/roadmap/) Exonum.
 
-!!! note
-    Unlike smart contracts in certain blockchains, services in Exonum
-    are not isolated in a virtual machine environment and are not containerized.
-    This makes Exonum services more efficient and flexible in their
-    capabilities,
-    but at the same time requires more careful service programming. Service
-    isolation is on [the Exonum roadmap](../roadmap.md).
+## Интерфейс сервисов
 
-## Service Interface
+Для связи с внешними объектами сервисы используют три вида конечных точек:
 
-In order to communicate with external entities, services employ three kinds of
-endpoints:
+- [Транзакции](#транзакции)
+- [Запросы на чтение](#запросы-на-чтение) (совместно с транзакциями формируют
+  публичный API)
+- [Приватный API](#приватный-api)
 
-- [Transactions](#transactions)
-- [Read requests](#read-requests) (together with transactions, form public API)
-- [Private API](#private-api)
+Конечные точки сервиса автоматически группируются и координируются промежуточным
+слоем Exonum.
 
-Service endpoints are automatically aggregated and dispatched by the Exonum
-middleware layer.
+!!! note "Примечание"
+    Exonum использует [фреймворк Iron][iron] для определения конечных точек
+    сервиса, как публичных, так и приватных. Конечные точки публичного и
+    приватного API обслуживаются на разных сокетах, что позволяет задавать более
+    строгие правила брандмауэра для приватных API.
 
-!!! note
-    Exonum uses [the Iron framework][iron] to specify service endpoints,
-    both public and private. Public and private API endpoints are served on
-    different
-    sockets, which allows to specify stricter firewall rules for private APIs.
+### Транзакции
 
-### Transactions
+Транзакции поступают от объектов, внешних по отношению к блокчейну, например,
+от [легких клиентов](clients.md). Глобально, транзакция изменяет состояние
+блокчейна при условии, что она считается «правильной». Все транзакции
+записываются в блокчейн как часть журнала транзакций. Как следует из названия,
+транзакции [атомарны][wiki:atomicity]; они упорядочены строго определенным
+образом и выполняются одинаково на всех узлах.
 
-Transactions come from the entities external to the blockchain, e.g.,
-[light clients](clients.md). Generally speaking, a transaction modifies the
-blockchain
-state if the transaction is considered “correct”. All transactions are recorded
-in the blockchain as a part of the transaction log. As the name implies,
-transactions are [atomic][wiki:atomicity]; they are deterministically ordered
-and are executed in the same way on all nodes.
+В терминах REST служб транзакции соответствуют `POST` и `PUT`
+HTTP-методам. Транзакции являются асинхронными в том смысле, что автор
+транзакции не получает немедленного ответа относительно результата транзакции.
+Это невозможно ввиду особенностей работы алгоритма консенсуса в
+блокчейнах; транзакция попадает в блокчейн не сразу, а вместе с другими
+транзакциями в виде блока.
 
-In the terms of REST services, transactions correspond to `POST` and `PUT`
-HTTP methods. Transactions are asynchronous in the sense that a transaction
-author
-is not given an immediate response as to the result of the transaction.
-Indeed, this is impossible because of how consensus works in blockchains;
-a transaction is not included in the blockchain immediately, but rather bundled
-with other transactions in a block.
+!!! note "Пример"
+    Перевод средств - это классический пример транзакции в блокчейне.
+    Транзакция содержит поля, которые соответствуют публичным ключам
+    отправителя и получателя, а также сумме переданных средств. Кроме того,
+    транзакция содержит цифровую подпись,
+    созданную при помощи приватного ключа отправителя. Больше информации по
+    данному вопросу можно найти в [руководстве по созданию сервиса](https://exonum.com/doc/get-started/create-service.md)
 
-!!! note "Example"
-    Currency transfer is a classic example of a blockchain transaction.
-    The transaction contains the fields corresponding to the sender’s and
-    recipient’s
-    public keys, the amount of transferred funds and the digital signature
-    created by the sender’s private key. See
-    [the cryptocurrency tutorial](../get-started/create-service.md)
-    for more details.
+### Запросы на чтение
 
-### Read Requests
+Запросы на чтение являются аналогами постоянных методов в C++ или
+`GET` запросов в парадигме REST. Они не могут изменять состояние блокчейна
+и не записываются в блокчейн. В отличие от транзакций, запросы на чтение не
+являются частью алгоритма консенсуса; они обрабатываются локально тем узлом,
+который получил данный запрос.
 
-Read requests, or simply reads, are analogous to constant methods in C++ or
-`GET`
-requests in the REST paradigm. They cannot modify the blockchain state
-and are not recorded in the blockchain. Unlike transactions, reads are not a
-part
-of the consensus algorithm; they are processed locally by the node that
-received the request.
+Одной из отличительных особенностей фреймворка Exonum является то, что он
+обеспечивает богатый набор инструментов, позволяющий снабжать ответы на запросы
+на чтение криптографическими доказательствами. Доказательства позволяют легким
+клиентам свести к минимуму необходимость слепого доверия отвечающему узлу. По
+сути, полученный ответ настолько же достоверный, как и тот, который бы он
+получил, если бы опросил абсолютное большинство валидаторов блокчейна.
 
-One of distinguishing features of the Exonum framework is that it provides
-a rich set of tools to bundle responses to reads with cryptographic proofs.
-Proofs allow light clients
-to minimize their trust to the responding node. Essentially, a retrieved
-response
-is as secure as if the client queried a supermajority of blockchain validators.
+!!! summary "Примечание"
+    В терминах криптографии доказательство раскрывает [привязку][wiki:crypto-commit]
+    к данным в блокчейне, которая реализована в виде сохранения хеша состояния
+    сети в заголовке блока. Использование деревьев Меркла позволяет сделать
+    доказательства достаточно компактными, чтобы их могли обработать легкие
+    клиенты.
 
-!!! summary "Trivia"
-    In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
-    to data in the blockchain, where the commitment is stored in the block
-    header
-    in the form of a state hash. The use of Merkle trees and Merkle Patricia
-    trees
-    allows to make proofs compact enough to be processed by light clients.
+### Приватный API
 
-!!! note "Example"
-    Retrieving information on a particular wallet (e.g., the current
-    wallet balance) is implemented as a read request in the cryptocurrency
-    tutorial.
+В отличие от транзакций и запросов на чтение, вызовы приватного API обозначают
+взаимодействие сервиса не с внешними клиентами, а с администратором
+узла Exonum, на котором выполняется сервис. Приватный API не должен
+быть доступным из внешнего мира.
 
-### Private API
+Подобно запросам на чтение приватные API не могут изменять состояние блокчейна,
+однако они могут создавать транзакции и транслировать их в сеть.
 
-Unlike transactions and read requests, private API calls denote the interaction
-of the service not with external clients, but rather with the administrator
-of the Exonum node, on which the service is running. Private API should not
-be accessible from the outside world.
+!!! note "Пример"
+    В [сервисе обновления конфигурации](https://exonum.com/doc/configuration-updater.md)
+    приватный API используется для получения информации о текущей конфигурации
+    и для отправки предложений обновления конфигурации.
 
-Similar to read requests, private APIs cannot change the blockchain state;
-however, they can create transactions and broadcast them to the network.
+## Детали реализации
 
-!!! note "Example"
-    In [the configuration update service](../advanced/configuration-updater.md),
-    private API is used to obtain the information about the current
-    configuration
-    and update proposals.
+### Схема данных
 
-## Implementation Details
+Обычно сервис хранит какие-то данные. Например, тестовый
+сервис криптовалюты сохраняет балансы счетов, которые могут быть изменены
+посредством осуществления транзакций передачи средств и пополнения счета.
 
-### Data Schema
+Exonum сохраняет состояние блокчейна в глобальном хранилище типа ключ-значение,
+реализованном с помощью [RocksDB][rocksdb]. Каждый сервис должен определить
+набор типов данных (*таблицы*), в которых он будет хранить данные, относящиеся к
+нему; эти таблицы абстрагируют потребность сервиса напрямую взаимодействовать с
+хранилищем блокчейна. К встроенныем коллекциям данных, поддерживаемых Exonum
+относятся карты (`MapIndex`), множества (`ValueSetIndex`, `KeySetIndex`) и
+списки (`ListIndex`).
 
-Usually, a service needs to persist some data. For example, the sample
-cryptocurrency service persists account balances, which are changed by transfer
-and issuance transactions.
+Exonum также предоставляет вспомогательные механизмы для меркелизированных
+коллекций данных на основе *деревьев Меркла*, которые позволяют эффективно вычислять
+доказательства
+в ответ на запросы на чтение, относящиеся к отдельным элементам таких коллекций.
+Версиями карт и списков на основе деревьев Меркла являются `ProofMapIndex` и
+`ProofListIndex` соответственно.
 
-Exonum persists blockchain state in a global key-value storage implemented with
-[RocksDB][rocksdb]. Each service needs to define a
-set of data collections
-(*tables*), in which the service persists the service-specific data;
-these tables abstract away the need for the service to deal with the blockchain
-key-value storage directly. The built-in collections supported by Exonum are
-maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists
-(`ListIndex`).
+Естественным образом, элементы коллекций (и ключей в случае карт) должны быть
+сериализуемыми. Exonum обеспечивает простой и надежный
+[бинарный формат сериализации](https://exonum.com/doc/architecture/serialization/),
+и соответствующий набор инструментов для (де)сериализации и преобразования
+типов данных Exonum в JSON для обеспечения взаимодействия с легкими клиентами.
 
-Exonum also provides helpers for *merkelizing* data collections, i.e.,
-making it possible to efficiently compute proofs for read requests that involve
-the items of the collection. Merkelized versions of maps and lists are
-`ProofMapIndex` and `ProofListIndex`, respectively.
+### Конфигурация
 
-Naturally, the items of collections (and keys in the case of maps) need to be
-serializable. Exonum provides a simple and robust
-[binary serialization format](serialization.md),
-and the corresponding set of tools for (de)serialization and conversion of
-Exonum datatypes to JSON for communication with light clients.
+Сервисы могут использовать [конфигурацию](https://exonum.com/doc/architecture/configuration.md)
+для хранения параметров, которые будут получены конструктором сервиса во время
+[инициализации узла](#инициализация). Конфигурация состоит из двух частей:
+*глобальной конфигурации*, которая хранится в блокчейне, и
+*локальной конфигурации*, которая является индивидуальной для каждого отдельного
+узла.
 
-### Configuration
+#### Глобальная конфигурация
 
-Services may use [configuration](configuration.md)
-to store parameters that will be received by the service constructor during
-[node initialization](#initialization). Configuration consists of two parts:
-*global configuration*, which is stored on the blockchain, and
-*local configuration*,
-which is specific to each node instance.
+Глобальная конфигурация является общей для всех узлов в блокчейн сети.
+Примером параметра глобальной конфигурации является адрес анкоринга
+в [сервисе анкоринга](https://exonum.com/doc/advanced/bitcoin-anchoring.md).
+Адрес анкоринга является общим для всех узлов в блокчейн сети, его изменения
+должны быть отслеживаемыми и авторизованы определенными узлами.
 
-#### Global Configuration
+Глобальная конфигурация регулируется системными администраторами
+через [сервис обновления конфигурации](https://exonum.com/doc/advanced/configuration-updater.md).
+С точки зрения сервиса глобальная конфигурация является *подвижной*:
+она может быть изменена не затрагивая конечные точки сервиса.
+Сервис может просматривать текущую глобальную конфигурацию при помощи
+[специальных методов][core-schema.rs] API ядра.
 
-Global configuration is common for all nodes in the blockchain network.
-An example of a global configuration parameter is the anchoring address
-in [the anchoring service](../advanced/bitcoin-anchoring.md). The anchoring
-address
-is common for all nodes in the blockchain network, its changes should be
-auditable
-and authorized by specific nodes, etc.
+#### Локальная конфигурация
 
-Global configuration is managed by the system maintainers via
-[the configuration update service](../advanced/configuration-updater.md).
-From the point of view of a service, global configuration is *volatile*;
-it can be changed without touching service endpoints.
-A service may view the current global configuration via
-[dedicated methods][core-schema.rs]
-of the core API.
+Локальная конфигурация индивидуальна для каждого отдельного узла.
+Примером параметра локальной конфигурации является приватный ключ для
+анкоринга, который используется в [сервисе анкоринга](https://exonum.com/doc/advanced/bitcoin-anchoring.md).
+Естественным образом, узлы имеют разные приватные ключи. Их нельзя хранить
+в блокчейне из соображений безопасности.
 
-#### Local Configuration
+Локальная конфигурация может быть изменена путем редактирования файла локальной
+конфигурации узла. Единственный способ для сервиса в Exonum получить доступ к
+локальной конфигурации - это сохранить ее после того,
+как она была передана конструктору сервиса во время
+[инициализации сервиса](#инициализация).
 
-Local configuration is specific to each node instance.
-An example of a local configuration parameter is a private anchoring key
-used in [the anchoring service](../advanced/bitcoin-anchoring.md);
-naturally, nodes have different private keys and they cannot be put on the
-blockchain for security reasons.
+## Жизненный цикл
 
-Local configuration can be changed via editing the local configuration file
-of the node instance. As of Exonum 0.1, the only
-way for a service to read its local configuration is to retain it after it is
-passed
-to the service constructor during [service initialization](#initialization).
+Жизненный цикл сервиса вклчюает следующие важные события.
 
-## Lifecycle
+### Развертывание
 
-Service lifecycle contains the following remarkable events.
+В самом начале жизненного цикла сервис регистрируется
+в блокчейне. Во время развертывания сервис создает начальную
+конфигурацию и инициализирует свое постоянное хранилище.
 
-### Deployment
+!!! note "Примечание"
+    Начиная с версии Exonum 0.1, сервисы могут быть развернуты только во время
+    инициализации блокчейна (то есть до того, как блокчейн сеть начнет
+    создавать какие-либо блоки). В будущем сервисы будут развертываться
+    динамически как библиотеки.
 
-At the very beginning of the lifecycle, the service is registered
-with the blockchain. During deployment, the service creates an initial
-service configuration and initializes its persistent storage.
+### Инициализация
 
-!!! note
-    As of Exonum 0.1, services may be deployed only during the blockchain
-    initialization (i.e., before the blockchain network starts creating any
-    blocks).
-    In the future releases services will be able to be deployed dynamically as
-    shared libraries.
+При каждом запуске узла-валидатора или аудитора, он инициализирует все
+действущие сервисы. Инициализация передает локальную и глобальную
+конфигурацию блокчейна сервису, чтобы правильно инициализировать его
+состояние. При обновлении конфигурации сервисы автоматически перезапускаются.
 
-### Initialization
+### Обработка транзакций
 
-Each time a validating or auditing node is started, it initializes all
-deployed services. Initialization passes local and global blockchain
-configuration
-to the service, so it can properly initialize its state.
-If the configuration is updated, the services are automatically restarted.
+Сервис отвечает за проверку структурной целостности входящих
+транзакций и выполнение транзакций (т.е. применение их к состоянию блокчейна).
+Транзакции выполняются на этапе [precommit](consensus.md) алгоритма консенсуса
+(это касается только валидаторов), или когда узел получает блок.
 
-### Transaction Processing
+### Обработка событий
 
-A service is responsible for verifying the structural integrity of incoming
-transactions
-and executing transactions (i.e., applying them to the blockchain state).
-Transactions are executed during [the precommit stage](consensus.md)
-of the consensus (this concerns validators only) or when a node receives a
-block.
+Сервисы могут подписываться на события (например, принятие блока) и выполнять
+некоторую работу в обработчике событий. Обработчики событий не могут изменять
+состояние блокчейна, но могут быть использованы для различных задач, таких как
+ведение журнала событий, миграция данных, обновление локальных параметров
+и/или генерирование и транслирование транзакций в блокчейн сеть.
 
-### Event handling
+!!! note "Примечание"
+    Начиная с версии Exonum 0.1, единственным встроенным событием является
+    принятие блока. В будущем будут добавлены и другие события:
+    сервисы смогут определять и создавать события, а также сервисы и легкие
+    клиенты смогут подписываться на события, создаваемые сервисами.
 
-Services may subscribe to events (such as a block being committed) and perform
-some work in the event handler. The event handlers cannot modify the blockchain
-state, but can be used for various tasks such as logging, data migrations,
-updating local parameters, and/or generating and broadcasting transactions to
-the blockchain network.
+## Разработка сервиса
 
-!!! note
-    As of Exonum 0.1, the only built-in event is block commit. More events
-    will be added in the future, including possibility for services to define
-    and emit events and for services and light clients to subscribe to events
-    emitted by the services.
-
-## Service Development
-
-!!! note
-    As of Exonum 0.1, you can only code services in
+!!! note "Примечание"
+    Начиная с версии Exonum 0.1, сервисы могут быть написаны только на языке
     [Rust](http://rust-lang.org/).
-    Rust is probably the safest general-purpose programming language, but it is
-    not very easy to master. Java binding
-    [is a high-priority task](../roadmap.md).
+    Rust, вероятно, самый безопасный язык программирования общего назначения, но
+    он достаточно не прост в освоении. Поэтому на данный момент
+    [высокоприоритетной задачей](https://exonum.com/doc/roadmap/) является
+    интеграция Exonum с Java.
 
-Here is a list of things to figure out when developing an Exonum service:
+Ниже приведен список вопросов, на которые необходимо ответить прежде, чем
+приступать к разработке сервисами Exonum:
 
-- What types of actions will the service perform? What variable parameters
-  do these actions have? (Determines the endpoints the service will have.)
-- Who will authorize each of these actions? (You might want to use some kind
-  of [public key infrastructure][wiki:pki] for serious applications
-  in order to make the security of the blockchain fully decentralized.)
-- What data will the service persist? What are the main persisted entities?
-  How are these entities organized into data collections (maps
-  and append-only lists)?
-- Are there any foreign key relationships among stored entities? (Exonum data
-  model supports relationships among entities via hash links;
-  see organization of wallet history in
-  [the cryptocurrency tutorial](../get-started/create-service.md)
-  for more details.)
-- What persistent data will be returned to external clients? (You might want
-  to use Merkelized data collections for this data and create corresponding
-  read request endpoints.)
-- Are there any maintenance tasks needed for the service? Do the tasks need
-  to be invoked automatically, or authorized by system administrators?
-  (These tasks could be implemented in the commit event handler of the service,
-  or as private API endpoints.)
-- What parameters do maintenance tasks require? Are these parameters local
-  to each node that the service runs on, or do they need to be agreed
-  by the blockchain maintainers? (The answer determines whether a parameter
-  should be a part of the local configuration or stored in the blockchain.)
+- Какие действия будет выполнять сервис? Какие изменяемые параметры содержат эти
+  действия? (Данный ответ определяет конечные точки сервиса)
+- Кто будет авторизовать каждое из этих действий? (Возможно, вы захотите
+  использовать инфраструктуру открытых ключей для серьезных приложений, чтобы
+  обеспечить полную децентрализацию безопасности блокчейна)
+- Какие данные будет хранить сервис? Каковы основные их сущности? Как эти
+  сущности организованы в коллекции данных (карты и списки только с возможностью
+  добавления)?
+- Существуют ли отношения по внешнему ключу между хранимыми сущностями? (Модель
+  данных Exonum поддерживает отношения между сущностями через хэш-ссылки, более
+  подробную информацию см. в разделе по организации истории кошелька в
+  [руководстве по созданию сервиса криптовалюты](https://exonum.com/doc/get-started/create-service.md))
+- Какие перманентные данные будут возвращаться внешним клиентам? (Возможно, вы
+  захотите использовать меркелизованные коллекции данных для этих целей и
+  создать соответствующие конечные точки для запросов на чтение)
+- Существуют ли какие-либо задачи по поддержанию сервиса? Будут ли задачи
+  вызываться автоматически или с разрешения системных администраторов? (Эти
+  задачи могут быть реализованы в обработчике событий принятия блока в данном
+  сервисе или в виде конечных точек приватного API)
+- Какие параметры требуются для задач поддержания сервиса? Являются ли эти
+  параметры локальными для каждого узла, на котором работает сервис, или они
+  должны быть согласованы с админитраторами блокчейна? (Ответ определяет, должен
+  ли параметр быть частью локальной конфигурации или он может храниться в
+  блокчейне)
 
-!!! tip
-    [The cryptocurrency tutorial](../get-started/create-service.md)
-    provides a hands-on guide how to build an Exonum service that implements
-    a minimalistic crypto-token.
+!!! tip "Совет"
+    В [руководстве по созданию сервиса криптовалюты](https://exonum.com/doc/get-started/create-service.md)
+    представлена пошаговая инструкция по созданию сервиса Exonum, который
+    реализует минималистический крипто-токен.
 
-### Limitations
+### Ограничения
 
-As of Exonum 0.1, there are some temporary limitations on what you can do
-with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
-on when and how these limitations are going to be lifted.
+Начиная с версии Exonum 0.1, существуют некоторые временные ограничения на то,
+что вы можете реализовать c помощью сервисов Exonum. Пожалуйста, ознакомьтесь с
+[дорожной картой Exonum](https://exonum.com/doc/roadmap/) для получения
+информации о том, когда и как данные ограничения будут устранены.
 
-#### Interaction Among Services
+#### Взаимодействие между сервисами
 
-In Exonum 0.1, there is no unified API for services to
-access other services’ endpoints. As an example, a service cannot call a
-transaction
-defined in another service, and cannot read data from another service
-via its read endpoint.
+В Exonum нет единого API для сервисов, по которому они могли бы обращаться к
+конечным точкам других сервисов. Например, сервис не может вызвать транзакцию,
+определенную в другом сервисе, а также не может считывать данные из другого
+сервиса через его конечную точку для чтения.
 
-#### Authentication Middleware
+#### Средство аутентификации
 
-Unlike common web frameworks, Exonum 0.1 does not provide authentication
-middleware
-for service endpoints. Implementing authentication and authorization is thus
-the responsibility of a service developer.
+В отличие от большинства веб-фреймворков, Exonum не обеспечивает промежуточный
+слой для аутентификации конечных точек обслуживания. Таким образом, реализация
+аутентификации и авторизации является обязанностью разработчика сервиса.
 
-## Interface with Exonum Framework
+## Полезные советы
 
-Internally, services communicate with the Exonum framework via an interface
-established in the [`Service`][service.rs] trait.
-This trait defines the following methods that need to be implemented by
-a service developer.
+### Взаимодействие с внешним миром
 
-### Service Identifiers
+Сервисы могут обращаться к внешнему миру (считывать и делать записи в файлы из
+файловой системы, отправлять/получать данные из сети и т.д.), однако такое
+взаимодействие осуществляется только в коде за пределами консенсуса (т.е. в
+коде, который во время выполнения транзакций не исполняется). Подходящим местом
+для такого кода являются обработчики событий.
 
-```rust
-fn service_id(&self) -> u16;
-fn service_name(&self) -> &str;
-```
+!!! note "Пример"
+    [Реализация сервиса анкоринга](https://github.com/exonum/exonum-btc-anchoring)
+    использует обработчик событий принятия нового блока для связи с
+    сетью Биткоин блокчейна.
 
-`service_id` returns a 2-byte service identifier, which needs to be unique
-within a specific Exonum blockchain. `service_name` is similarly a unique
-identifier,
-only it is a string instead of an integer.
+### Сервисы vs смарт-контракты
 
-`service_id` is used:
+Сервисы «больше», чем смарт-контракты в Ethereum. Например, в Ethereum
+контракты с множественными подписями создаются для каждой конкретной
+конфигурации участников; в Exonum весь функционал множественных подписей
+может содержаться в одном сервисе. Это делает сервисы более удобными в
+обращении и улучшает производительность и управление контролем доступа.
 
-- To identify [transactions](transactions.md) handled by the service
-- Within the blockchain state. See [`state_hash`](#state-hash) below and
-  [*Storage*](storage.md)
+### Интерфейс транзакций
 
-`service_name` is used:
+Транзакции в Exonum являются отдельными сущностями, а не типами данных,
+потребляемыми методами сервисных объектов. Сначала это может показаться сложным,
+но это делает обработку транзакций более гибкой. Например, становится возможным
+(и есть планы по реализации данной идеи) добавить управление упорядочиванием
+транзакций, находящихся в пуле неподтвержденных транзакций, через дополнительный
+метод интерфейса транзакции.
 
-- In [the configuration](configuration.md). Service configuration
-  is stored in the overall configuration under the key `service_name`
-  in the `services_configs` variable
-- To compute API endpoints for the service. All service endpoints
-  are mounted on `/api/services/{service_name}`
-- In naming service [tables](../glossary.md#table). By convention, table names
-  should start with `service_name` followed by a period `.`
+### Особенности обработки транзакций
 
-!!! note "Example"
-    [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
-    defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the
-    service
-    are available on `/api/services/btc_anchoring/`, its configuration is
-    stored in the `services.btc_anchoring` section of the overall configuration,
-    and its tables have names starting with `"btc_anchoring."`.
+При программировании сервиса следует иметь в виду, что сервис может
+обрабатывать транзакции как в реальном времени, так и ретроспективно (например,
+в случае когда узел выполняет начальную синхронизацию блокчейна). Это еще одна
+причина не использовать источники данных, не относящиеся к блокчейну, в коде
+обработки транзакций - в последствии может быть трудно все время поддерживать их
+синхронизацию.
 
-### State Hash
-
-```rust
-fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash>;
-```
-
-The `state_hash` method returns a list of hashes for all
-Merkelized tables defined by the service. Hashes are calculated based on the
-current blockchain state `snapshot`.
-The core uses this list to aggregate
-hashes of tables defined by all services into a single Merkelized meta-map.
-The hash of this meta-map is considered the hash of the entire blockchain state
-and is recorded as such in blocks and [`Precommit` messages](consensus.md).
-
-In the case when a service does not have any Merkelized tables, it should
-return an empty list.
-
-!!! note
-    The keys of the meta-map are defined as pairs `(service_id, table_id)`,
-    where `service_id` is a 2-byte [service identifier](#service-identifiers)
-    and `table_id` is a 2-byte index of a table within the vector returned
-    by the `state_hash` method.
-    Keys are then hashed in order to provide
-    a more even key distribution, which results in a more balanced
-    Merkle Patricia tree.
-
-### Parse Raw Transaction
-
-```rust
-fn tx_from_raw(&self, raw: RawTransaction)
-               -> Result<Box<Transaction>, MessageError>;
-```
-
-The `tx_from_raw` method is used to parse raw transactions received from the
-network
-into specific transaction types handled by the service. The core calls this
-method
-for all incoming transactions at the beginning of transaction processing.
-The service, which `tx_from_raw` method
-will be called for a particular transaction, is chosen
-based on the `service_id` field in the transaction serialization.
-
-### Initialization Handler
-
-```rust
-use serde_json::Value;
-
-fn initialize(&self, fork: &mut Fork) -> Value {
-    Value::Null
-}
-```
-
-`initialize` returns an initial
-[global configuration](#global-configuration)
-of the service in the JSON format.
-This method is invoked for all deployed services during
-the blockchain initialization. A result of the method call for each service
-is recorded under [the string service identifier](#service-identifiers)
-in the configuration. The resulting initial configuration is augmented
-by non-service parameters (such as public keys of the validators) and is
-recorded in the genesis block.
-
-The default trait implementation returns `null` (i.e., no configuration).
-It must be redefined for services that have global configuration parameters.
-
-### Commit Handler
-
-```rust
-fn handle_commit(&self, context: &mut ServiceContext) { }
-```
-
-`handle_commit` is invoked for every deployed service each time a block
-is committed in the blockchain locally. This method is so far the only example
-of [event-based processing](#event-handling). The method receives the service
-context, which can be used to inspect the blockchain state, create transactions
-and push them in the queue for broadcasting, etc.
-
-!!! note
-    Keep in mind that `handle_commit` is sequentially invoked for each block
-    in the blockchain during an initial full node synchronization.
-
-### REST API Initialization
-
-```rust
-use iron::Handler;
-
-fn public_api_handler(&self, context: &ApiContext)
-                      -> Option<Box<Handler>> {
-    None
-}
-fn private_api_handler(&self, context: &ApiContext)
-                       -> Option<Box<Handler>> {
-    None
-}
-```
-
-`public_api_handler` and `private_api_handler` provide hooks for defining
-public and private API endpoints respectively using [Iron framework][iron].
-These methods receive an API context, which allows to read information from
-the blockchain, and to translate POST requests into Exonum transactions.
-
-The default trait implementation does not define any public or private
-endpoints.
-
-## Tips and Tricks
-
-### Communication with External World
-
-Services may access the external world (read and write files from the
-filesystem,
-send/receive data on the network, and so on), but should do it only
-in the non-consensus code (i.e., code that is not executed during transaction
-execution).
-A good place for such code is event handlers.
-
-!!! note "Example"
-    [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
-    uses the commit event handler extensively to communicate with the Bitcoin
-    Blockchain network.
-
-### Services vs Smart Contracts
-
-Services are “larger” than smart contracts in Ethereum. For example, in Ethereum
-multi-signature contracts are instantiated for each specific configuration of
-participants;
-in Exonum, all multi-signature functionality can be contained within a single
-service.
-This makes services more manageable and improves performance and access control
-management.
-
-### Transaction Interface
-
-Transactions in Exonum are separate entities, rather than datatypes consumed
-by the methods of the service object. This may seem complicated at first, but
-makes
-transaction handling more flexible. For example, it could be possible
-(and there are plans) to add management of transaction ordering in an
-unconfirmed
-transactions pool via an extra method of the transaction interface.
-
-### Transaction Processing Peculiarities
-
-When programming a service, you should keep in mind that the service can both
-process transactions in real time and retrospectively (for example, when a node
-performs an initial blockchain synchronization). This is another reason not to
-use non-blockchain data sources in the transaction processing code – it could
-be difficult to keep them synchronized at all times.
-
-Furthermore, keep in mind that services may run on both validators and auditing
-nodes.
-Hence, a good idea is to make all secret information used in the local
-configuration
-(e.g., private keys) optional; then, it is kept in mind that a node
-running the service might not know this information.
+Кроме того, имейте в виду, что сервисы могут работать как на узлах-валидаторах,
+так и на аудиторах. Следовательно, рекомендуется сделать всю секретную
+информацию, используемую в локальной конфигурации
+(например, приватные ключи) необязательной; в таком случае узел, на котором
+запущен сервис, может и не знать этой информации.
 
 [iron]: http://ironframework.io/
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
-[wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [rocksdb]: http://rocksdb.org
-[wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
