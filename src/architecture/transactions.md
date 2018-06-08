@@ -19,6 +19,12 @@ it is possible to determine which one comes first.
 Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
 
+!!! note
+    Presently, the order of inclusion of transactions into a proposal is
+    determined by the transaction hash. An honest validator takes transactions
+    with the smallest hashes when building a proposal. This behavior shouldn’t
+    be relied upon; it is likely to change in the future.
+
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
 among its parameters. Thus, authorization (verifying whether the transaction author
