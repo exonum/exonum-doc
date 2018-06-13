@@ -32,7 +32,9 @@ $ mvn archetype:generate \
 You can also use the interactive mode:
 
 ``` none
-$ mvn archetype:generate -DarchetypeGroupId=com.exonum.binding -DarchetypeArtifactId=exonum-java-binding-service-archetype
+$ mvn archetype:generate \
+          -DarchetypeGroupId=com.exonum.binding \
+          -DarchetypeArtifactId=exonum-java-binding-service-archetype
 ```
 
 The assembly description files for other systems can be created similarly to the
