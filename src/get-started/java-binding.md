@@ -10,7 +10,7 @@ system services and Java services runtime environment.
 
 Download the archive with the [latest version of the application](https://github.com/exonum/exonum-java-binding/releases).
 
-**TBD:** The following installation steps will be provided soon. 
+**TBD:**  The following installation steps will be provided soon.
 
 ## Java Services Development
 
@@ -19,7 +19,7 @@ Download the archive with the [latest version of the application](https://github
 The easiest way to create a Java service project is to use the generic template
 generator. After installing Maven 3, run the command:
 
-```
+``` none
 $ mvn archetype:generate \
           -DinteractiveMode=false \
           -DarchetypeGroupId=com.exonum.binding \
@@ -31,7 +31,7 @@ $ mvn archetype:generate \
 
 You can also use the interactive mode:
 
-```
+``` none
 $ mvn archetype:generate -DarchetypeGroupId=com.exonum.binding -DarchetypeArtifactId=exonum-java-binding-service-archetype
 ```
 
@@ -96,7 +96,7 @@ provides *serializers* for standard and some commonly used types, see
       var name = "balanceById";
       var balanceById = ProofMapIndexProxy.newInstance(name, fork, StandardSerializers.hash(),
           StandardSerializers.longs());
-      balanceById.put(id, newBalance);   
+      balanceById.put(id, newBalance);  
     }
     ```
 
@@ -210,7 +210,7 @@ ones, for example, Exonum time service, and external ones), Guice is used. Each
 service should define a module describing implementations of the framework
 interfaces - `com.exonum.binding.service.Service`,
 `com.exonum.binding.service.TransactionConverter` and other components
-implementions, if any.
+implementations, if any.
 
 !!! note "Minimalistic Example of Service Module"
     ```java
@@ -223,9 +223,10 @@ implementions, if any.
 
         // Define the TransactionConverter implementation.
         bind(TransactionConverter.class).to(CryptocurrencyTransactionConverter.class);
-  }
-}
-```
+      }
+    }
+    ```
+
 The full name of the module class must be submitted when the service launches.
 
 For more information on using Guice, see the [project wiki][Guice].
@@ -253,7 +254,7 @@ public class MySchemaIntegrationTest {
 The plug-in for running the tests should be configured to transmit
 `java.library.path` parameter to JVM:
 
-```
+``` none
 -Djava.library.path=<path-to-java-bindings-library>
 ```
 
@@ -325,9 +326,9 @@ to its state:
         // Use the Snapshot to test the schema/transaction
         // with a certain database state.
         // …
+        }
       }
-    }
-```
+      ```
 
 ##### Of Transactions
 
