@@ -155,7 +155,7 @@ algorithm supported by both the service client and the service itself.
       catch Error as e:
         log("Internal error:" + e)
         return internalServerError()
-  ```
+    ```
 
 #### Executable Transactions
 
