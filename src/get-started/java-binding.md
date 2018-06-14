@@ -108,7 +108,8 @@ to service collections you can implement a factory of service collections.
 
 *The state of the service in the blockchain* is determined by the list of
 root hashes of its Merkelized collections. Said root hashes, when aggregated
-with root hashes of other Merklized collections in the blockchain, form a single
+with root hashes of other Merkelized collections in the blockchain, form a
+single
 blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
 implements `com.exonum.binding.service.Schema` interface; when implementing
@@ -138,7 +139,7 @@ algorithm supported by both the service client and the service itself.
     `com.exonum.binding.cryptocurrency.ApiController#submitTransaction`.
 
 !!! note "Example of a Transaction Handler in Pseudo-code"
-    ```
+    ```none
     def handle_tx(request):
       var body = request.getBody()
       try:
@@ -332,9 +333,9 @@ changes made to `Fork` to the database state:
         // Use the Snapshot to test the schema/transaction
         // with a certain database state.
         // …
+      }
     }
-  }
-  ```
+    ```
 
 #### Transactions
 
