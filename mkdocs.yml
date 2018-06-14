@@ -42,19 +42,19 @@ markdown_extensions:
 pages:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
-  - 'Get started':
+  - 'Get Started':
     # What is Exonum 'as a box', from point of view of external developer
     - 'What is Exonum': 'get-started/what-is-exonum.md'
     # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
     # links to necessary documentation parts
-    - 'Design overview': 'get-started/design-overview.md'
+    - 'Design Overview': 'get-started/design-overview.md'
     # Installation guide
     - 'Install': 'get-started/install.md'
     # Writing one's first Exonum service
-    - 'Create service': 'get-started/create-service.md'
+    - 'Create Service': 'get-started/create-service.md'
     # Testing one's first Exonum service
-    - 'Test service': 'get-started/test-service.md'
-    - 'Exonum Java Binding User Guide': 'get-started/java-binding.md'
+    - 'Test Service': 'get-started/test-service.md'
+    - 'Java Binding User Guide': 'get-started/java-binding.md'
   - 'Architecture':
     # Includes guidelines for services
     - 'Services': 'architecture/services.md'
@@ -74,20 +74,20 @@ pages:
     # How the network module works: peer discovery, p2p connections
     - 'Network': 'advanced/network.md'
     # Managing node through managing API ("RPC")
-    - 'Node management': 'advanced/node-management.md'
+    - 'Node Management': 'advanced/node-management.md'
     # What is sandbox testing and simple example of one of sandbox tests
-    - 'Service testing': 'advanced/service-testing.md'
+    - 'Service Testing': 'advanced/service-testing.md'
     # Configuration change service documentation
-    - 'Configuration updater': 'advanced/configuration-updater.md'
+    - 'Configuration Updater': 'advanced/configuration-updater.md'
     # Anchoring service documentation
-    - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
+    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'
     # Time service
-    - 'Time oracle': 'advanced/time.md'
+    - 'Time Oracle': 'advanced/time.md'
     # Merkle index overview
-    - 'Merkelized list': 'advanced/merkelized-list.md'
+    - 'Merkelized List': 'advanced/merkelized-list.md'
     - 'Consensus':
       # Consensus specification
-      - 'Consensus specification': 'advanced/consensus/specification.md'
+      - 'Consensus Specification': 'advanced/consensus/specification.md'
       # Requests specification
       - 'Requests': 'advanced/consensus/requests.md'
   # Includes roadmap and features list
