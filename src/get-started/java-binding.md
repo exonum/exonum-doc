@@ -359,9 +359,9 @@ An example of API service tests can be found in
 
 Currently you have to build a native application to run a node with your Java service:
 
-- Install the system dependencies and [build](https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build)
-the application.
-- Follow the instructions in the [application guide][app-tutorial] to configure and start an Exonum node with your service.
+- Install the system dependencies and [build][how-to-build] the application.
+- Follow the instructions in the [application guide][app-tutorial] to configure 
+  and start an Exonum node with your service.
 
 ## Known Limitations
 
@@ -385,10 +385,11 @@ the application.
 - [Rust instruction](create-service.md)
 - [Java Binding App tutorial][app-tutorial]
 
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
 [transactions]: ../architecture/transactions.md
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
