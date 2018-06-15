@@ -1,41 +1,36 @@
----
-title: Exonum Java Binding User Guide
----
-# Exonum Java Binding User Guide
+# Java Binding User Guide
 
-Exonum Java Binding App is an application that includes the Exonum framework
+**Java Binding App** is an application that includes the Exonum framework
 and Java services runtime environment.
 
-## Java Services Development
-
-### Creating Project
+## Creating Project
 
 The easiest way to create a Java service project is to use a template project
 generator. After installing Maven 3, run the command:
 
 ``` none
 $ mvn archetype:generate \
-        -DinteractiveMode=false \
-        -DarchetypeGroupId=com.exonum.binding \
-        -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-        -DgroupId=com.example.myservice \
-        -DartifactId=my-service \
-        -Dversion=1.0
+    -DinteractiveMode=false \
+    -DarchetypeGroupId=com.exonum.binding \
+    -DarchetypeArtifactId=exonum-java-binding-service-archetype \
+    -DgroupId=com.example.myservice \
+    -DartifactId=my-service \
+    -Dversion=1.0
 ```
 
 You can also use the interactive mode:
 
 ``` none
 $ mvn archetype:generate \
-          -DarchetypeGroupId=com.exonum.binding \
-          -DarchetypeArtifactId=exonum-java-binding-service-archetype
+    -DarchetypeGroupId=com.exonum.binding \
+    -DarchetypeArtifactId=exonum-java-binding-service-archetype
 ```
 
 The build definition files for other build systems (e.g., Gradle) can be created
 similarly to the
 template. For more information see an [example][build-description].
 
-#### System Dependencies
+### System Dependencies
 
 System dependencies, such as `exonum-java-binding-core` and
 `exonum-java-binding-proofs`, are shipped together with the Exonum App, so when
@@ -43,7 +38,7 @@ defining them in `pom.xml` you should use the
 [`provided`](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope)
 scope.
 
-### Service Development
+## Service Development
 
 The service abstraction serves to extend the framework and implement the
 business logic of an application. The service defines the schema of the stored
@@ -57,12 +52,12 @@ In Java, the abstraction of a service is represented by
 `com.exonum.binding.service.Service` interface. Implementations can use the
 abstract class `com.exonum.binding.service.AbstractService`.
 
-### Service Schema Description
+### Schema Description
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
-collections is arranged in two ways - ordinary collections and [Merkelized
-collections](https://exonum.com/doc/architecture/storage/#merkelized-indices);
+collections is arranged in two ways – ordinary collections and [Merkelized
+collections](../architecture/storage.md#merkelized-indices);
 the latter allow
 providing cryptographic evidence of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
@@ -70,7 +65,7 @@ certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.
 
 For the detailed description of all Exonum collection types see the
-corresponding [documentation section](../architecture/storage/#table-types). In
+corresponding [documentation section](../architecture/storage.md#table-types). In
 Java, implementations of collections are located in
 `com.exonum.binding.storage.indices` package. Said package documentation
 describes their use.
@@ -79,11 +74,11 @@ describes their use.
     `SparseListIndex` is not yet supported in Java. Let us know if it may be
     useful for you!
 
-Collections work with a database view - either `Snapshot`, which is read-only
+Collections work with a database view – either `Snapshot`, which is read-only
 and represents the database state as of the latest committed block;
 or `Fork`, which is mutable and allows performing modifying operations. The
 database view is provided by the framework: `Snapshot` can be
-requested at any time, while `Fork` - only when the transaction is executed. The
+requested at any time, while `Fork` – only when the transaction is executed. The
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
@@ -113,16 +108,16 @@ single
 blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
 implements `com.exonum.binding.service.Schema` interface; when implementing
-`Service` directly - in the service itself.
+`Service` directly – in the service itself.
 
-### Service Transactions Description
+### Transactions Description
 
 Exonum transactions allow you to perform modifying atomic operations with the
 storage. Transactions are executed sequentially, in the order determined by the
 consensus of the nodes in the network.
 
-For more details about transactions in Exonum - their properties and processing
-rules - see the corresponding section of our [documentation][transactions].
+For more details about transactions in Exonum – their properties and processing
+rules – see the corresponding section of our [documentation][transactions].
 
 #### Messages
 
@@ -172,8 +167,8 @@ An executable transaction is an instance of a class implementing
 `com.exonum.binding.messages.Transaction` interface and defining transaction
 business logic. The interface implementations must define the
 transaction authentication rule (usually, the digital signature verification of
-the message) - `isValid` method; and the execution rule for the
-transaction - `execute` method.
+the message) – `isValid` method; and the execution rule for the
+transaction – `execute` method.
 
 Ed25519 is a standard cryptographic system for digital signature of Exonum
 messages. It is available through
@@ -187,10 +182,10 @@ implementations.
 
 `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes `Fork`
-as an argument - a view that allows performing modifying operations. A service
+as an argument – a view that allows performing modifying operations. A service
 schema object can be used to access data collections of this service.
 
-### Description of the External Service API
+### External Service API
 
 The external service API is used for the interaction between the service and the
 external
@@ -214,7 +209,7 @@ Exonum uses [Guice](https://github.com/google/guice) to describe the
 dependencies of the service components (both system-specific
 ones, for example, Exonum time service, and external ones). Each
 service should define a module describing implementations of the framework
-interfaces - `com.exonum.binding.service.Service`,
+interfaces – `com.exonum.binding.service.Service`,
 `com.exonum.binding.service.TransactionConverter` and implementations of other
 components, if any.
 
@@ -238,9 +233,9 @@ during configuration of an Exonum App that will run the service.
 
 For more information on using Guice, see the [project wiki][Guice].
 
-### Testing
+## Testing
 
-#### Schema and Operations with the Storage
+### Schema and Operations with Storage
 
 To test the schema and operations with the storage, Exonum provides a
 database that stores the values in the RAM -
@@ -337,19 +332,19 @@ changes made to `Fork` to the database state:
     }
     ```
 
-#### Transactions
+### Transactions
 
 To test transactions execution, you can use `MemoryDb`, as in the previous
 section.
 
-#### Read Requests
+### Read Requests
 
 To test read requests for service data, you can use a fake that implements
 `Node` interface and uses `MemoryDb` to create `Snapshot`:
 `com.exonum.binding.service.NodeFake`. The `MemoryDb` contents can be filled in
 by executing `MemoryDb#merge(Fork)` operation as in the section above.
 
-#### API
+### API
 
 To test API implemented with Vertx tools, use the tools described in the
 [project documentation](https://vertx.io/docs/vertx-unit/java/#_introduction)
@@ -360,30 +355,30 @@ client.
 An example of API service tests can be found in
 `com.exonum.binding.cryptocurrency.ApiControllerTest`.
 
-### Known Limitations
+## Known Limitations
 
 - Serialization is determined by a user, so Java services are not compatible
   with JS light client.
 - Core collections necessary to form a complete cryptographic proof for user
   service data (collections and their elements) are available only in a "raw"
-  form - without deserialization of the content, which makes their use somewhat
+  form – without deserialization of the content, which makes their use somewhat
   difficult.
-- Not all system Rust services are available ([configuration](https://exonum.com/doc/advanced/configuration-updater/),
-  [time oracle](https://exonum.com/doc/advanced/time/) and
-  [anchoring service](https://exonum.com/doc/get-started/design-overview/#anchoring-service)
+- Not all system Rust services are available ([configuration](../advanced/configuration-updater.md),
+  [time oracle](../advanced/time.md) and
+  [anchoring service](../advanced/bitcoin-anchoring.md)
   will be integrated into EJB App soon).
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
 - The application supports only one Java service. Support of multiple Java
   services is coming in the near future.
 
-### See Also
+## See Also
 
-- [Rust instruction](https://exonum.com/doc/get-started/create-service/)
+- [Rust instruction](create-service.md)
 
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
-[Exonum-services]: https://exonum.com/doc/architecture/services/
+[Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
-[transactions]: https://exonum.com/doc/architecture/transactions/
+[transactions]: ../architecture/transactions.md
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
