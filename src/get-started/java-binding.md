@@ -355,6 +355,14 @@ client.
 An example of API service tests can be found in
 `com.exonum.binding.cryptocurrency.ApiControllerTest`.
 
+## How to Run a Service
+
+Currently you have to build a native application to run a node with your Java service:
+
+- Install the system dependencies and [build](https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build)
+the application.
+- Follow the instructions in the [application guide][app-tutorial] to configure and start an Exonum node with your service.
+
 ## Known Limitations
 
 - Serialization is determined by a user, so Java services are not compatible
