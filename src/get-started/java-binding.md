@@ -41,8 +41,8 @@ with the service from outside of the system. See more information on the
 software model of services in the [corresponding section][Exonum-services].
 
 In Java, the abstraction of a service is represented by
-`com.exonum.binding.service.Service` interface. Implementations can use the
-abstract class `com.exonum.binding.service.AbstractService`.
+[`Service`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/service/Service.html) interface. Implementations can use the
+abstract class [`AbstractService`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/service/AbstractService.html).
 
 ### Schema Description
 
@@ -59,7 +59,7 @@ influenced only by the Merkelized collections.
 For the detailed description of all Exonum collection types see the
 corresponding [documentation section](../architecture/storage.md#table-types).
 In Java, implementations of collections are located in
-`com.exonum.binding.storage.indices` package. Said package documentation
+[`com.exonum.binding.storage.indices`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/storage/indices/package-summary.html) package. Said package documentation
 describes their use.
 
 !!! note
@@ -75,9 +75,9 @@ lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
 Exonum stores elements in the collections as byte arrays. Therefore, a user
-must implement serialization of values ​​stored in the collection. Java Binding
+must implement serialization of values stored in the collection. Java Binding
 provides *serializers* for standard and some commonly used types, see
-`com.exonum.binding.storage.serialization.StandardSerializers` for details.
+[`StandardSerializers`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html) for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
@@ -86,7 +86,7 @@ provides *serializers* for standard and some commonly used types, see
       var balanceById = ProofMapIndexProxy.newInstance(name, fork,
           StandardSerializers.hash(),
           StandardSerializers.longs());
-      balanceById.put(id, newBalance);  
+      balanceById.put(id, newBalance);
     }
     ```
 
@@ -99,7 +99,7 @@ with root hashes of other Merkelized collections in the blockchain, form a
 single
 blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
-implements `com.exonum.binding.service.Schema` interface; when implementing
+implements [`Schema`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/service/Schema.html) interface; when implementing
 `Service` directly – in the service itself.
 
 ### Transactions Description
@@ -123,7 +123,7 @@ algorithm supported by both the service client and the service itself.
     mechanism will be standardized and moved to the core.
     An example of a pseudo-code transaction handler is shown below. For an
     implementation example, see
-    `com.exonum.binding.cryptocurrency.ApiController#submitTransaction`.
+    [`ApiController#submitTransaction`](https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java) in the cryptocurrency demo.
 
 !!! note "Example of a Transaction Handler in Pseudo-code"
     ```none
@@ -147,7 +147,7 @@ algorithm supported by both the service client and the service itself.
 #### Executable Transactions
 
 To correctly process a transaction, it must be transformed into an
-*executable transaction* (see `TransactionConverter` or
+*executable transaction* (see [`TransactionConverter`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/service/TransactionConverter.html) or
 `Service#convertTransaction` method) and transmitted to the framework using
 `Node#submitTransaction` method. The framework verifies it, and if the
 transactions is correct,
@@ -156,7 +156,7 @@ transaction message, convert it into an executable transaction, also using the
 service transaction converter.
 
 An executable transaction is an instance of a class implementing
-`com.exonum.binding.messages.Transaction` interface and defining transaction
+[`Transaction`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/messages/Transaction.html) interface and defining transaction
 business logic. The interface implementations must define the
 transaction authentication rule (usually, the digital signature verification of
 the message) – `isValid` method; and the execution rule for the
@@ -201,8 +201,7 @@ Exonum uses [Guice](https://github.com/google/guice) to describe the
 dependencies of the service components (both system-specific
 ones, for example, Exonum time service, and external ones). Each
 service should define a module describing implementations of the framework
-interfaces – `com.exonum.binding.service.Service`,
-`com.exonum.binding.service.TransactionConverter` and implementations of other
+interfaces – `Service`, `TransactionConverter` and implementations of other
 components, if any.
 
 !!! note "Minimalistic Example of Service Module"
@@ -231,9 +230,9 @@ For more information on using Guice, see the [project wiki][Guice].
 
 To test the schema and operations with the storage, Exonum provides a
 database that stores the values in the RAM -
-`com.exonum.binding.storage.database.MemoryDb`. Before using it in integration
-tests, it is necessary to load a library with the implementation of native
-methods:
+[`MemoryDb`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/storage/database/MemoryDb.html).
+Before using it in integration tests, it is necessary to load
+a library with the implementation of native methods:
 
 ```java
 public class MySchemaIntegrationTest {
@@ -333,8 +332,9 @@ section.
 
 To test read requests for service data, you can use a fake that implements
 `Node` interface and uses `MemoryDb` to create `Snapshot`:
-`com.exonum.binding.service.NodeFake`. The `MemoryDb` contents can be filled in
-by executing `MemoryDb#merge(Fork)` operation as in the section above.
+[`NodeFake`](https://exonum.com/docs/api/java-binding-core/0.1/com/exonum/binding/service/NodeFake.html).
+The `MemoryDb` contents can be filled in by executing `MemoryDb#merge(Fork)`
+operation as in the section above.
 
 ### API
 
@@ -345,7 +345,7 @@ You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
 client.
 
 An example of API service tests can be found in
-`com.exonum.binding.cryptocurrency.ApiControllerTest`.
+[`ApiControllerTest`](https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java).
 
 ## How to Run a Service
 
