@@ -30,14 +30,6 @@ The build definition files for other build systems (e.g., Gradle) can be created
 similarly to the
 template. For more information see an [example][build-description].
 
-### System Dependencies
-
-System dependencies, such as `exonum-java-binding-core` and
-`exonum-java-binding-proofs`, are shipped together with the Exonum App, so when
-defining them in `pom.xml` you should use the
-[`provided`](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope)
-scope.
-
 ## Service Development
 
 The service abstraction serves to extend the framework and implement the
@@ -65,8 +57,8 @@ certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.
 
 For the detailed description of all Exonum collection types see the
-corresponding [documentation section](../architecture/storage.md#table-types). In
-Java, implementations of collections are located in
+corresponding [documentation section](../architecture/storage.md#table-types).
+In Java, implementations of collections are located in
 `com.exonum.binding.storage.indices` package. Said package documentation
 describes their use.
 
@@ -357,7 +349,8 @@ An example of API service tests can be found in
 
 ## How to Run a Service
 
-Currently you have to build a native application to run a node with your Java service:
+Currently you have to build a native application to run a node with your Java
+service:
 
 - Install the system dependencies and [build][how-to-build] the application.
 - Follow the instructions in the [application guide][app-tutorial] to configure
