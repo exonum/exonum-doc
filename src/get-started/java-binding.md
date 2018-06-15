@@ -41,15 +41,15 @@ with the service from outside of the system. See more information on the
 software model of services in the [corresponding section][Exonum-services].
 
 In Java, the abstraction of a service is represented by
-[`Service`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Service.html) interface. Implementations can use the
-abstract class [`AbstractService`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/AbstractService.html).
+[`Service`][service] interface. Implementations can use the
+abstract class [`AbstractService`][abstractservice].
 
 ### Schema Description
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
-collections is arranged in two ways – ordinary collections and [Merkelized
-collections](../architecture/storage.md#merkelized-indices);
+collections is arranged in two ways – ordinary collections and
+[Merkelized collections](../architecture/storage.md#merkelized-indices);
 the latter allow
 providing cryptographic evidence of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
@@ -59,7 +59,7 @@ influenced only by the Merkelized collections.
 For the detailed description of all Exonum collection types see the
 corresponding [documentation section](../architecture/storage.md#table-types).
 In Java, implementations of collections are located in
-[`com.exonum.binding.storage.indices`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/indices/package-summary.html) package. Said package documentation
+[`com.exonum.binding.storage.indices`][storage-indices] package. Said package documentation
 describes their use.
 
 !!! note
@@ -77,7 +77,7 @@ are passed to.
 Exonum stores elements in the collections as byte arrays. Therefore, a user
 must implement serialization of values stored in the collection. Java Binding
 provides *serializers* for standard and some commonly used types, see
-[`StandardSerializers`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html) for details.
+[`StandardSerializers`][standardserializers] for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
@@ -99,7 +99,7 @@ with root hashes of other Merkelized collections in the blockchain, form a
 single
 blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
-implements [`Schema`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Schema.html) interface; when implementing
+implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
 
 ### Transactions Description
@@ -123,7 +123,7 @@ algorithm supported by both the service client and the service itself.
     mechanism will be standardized and moved to the core.
     An example of a pseudo-code transaction handler is shown below. For an
     implementation example, see
-    [`ApiController#submitTransaction`](https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java) in the cryptocurrency demo.
+    [`ApiController#submitTransaction`][submittransaction] in the cryptocurrency demo.
 
 !!! note "Example of a Transaction Handler in Pseudo-code"
     ```none
@@ -147,7 +147,8 @@ algorithm supported by both the service client and the service itself.
 #### Executable Transactions
 
 To correctly process a transaction, it must be transformed into an
-*executable transaction* (see [`TransactionConverter`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/TransactionConverter.html) or
+*executable transaction* (see
+[`TransactionConverter`][transactionconvererter] or
 `Service#convertTransaction` method) and transmitted to the framework using
 `Node#submitTransaction` method. The framework verifies it, and if the
 transactions is correct,
@@ -156,7 +157,7 @@ transaction message, convert it into an executable transaction, also using the
 service transaction converter.
 
 An executable transaction is an instance of a class implementing
-[`Transaction`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/messages/Transaction.html) interface and defining transaction
+[`Transaction`][transaction] interface and defining transaction
 business logic. The interface implementations must define the
 transaction authentication rule (usually, the digital signature verification of
 the message) – `isValid` method; and the execution rule for the
@@ -230,7 +231,7 @@ For more information on using Guice, see the [project wiki][Guice].
 
 To test the schema and operations with the storage, Exonum provides a
 database that stores the values in the RAM -
-[`MemoryDb`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/database/MemoryDb.html).
+[`MemoryDb`][Memorydb].
 Before using it in integration tests, it is necessary to load
 a library with the implementation of native methods:
 
@@ -332,7 +333,7 @@ section.
 
 To test read requests for service data, you can use a fake that implements
 `Node` interface and uses `MemoryDb` to create `Snapshot`:
-[`NodeFake`](https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/NodeFake.html).
+[`NodeFake`][nodefake].
 The `MemoryDb` contents can be filled in by executing `MemoryDb#merge(Fork)`
 operation as in the section above.
 
@@ -345,7 +346,7 @@ You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
 client.
 
 An example of API service tests can be found in
-[`ApiControllerTest`](https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java).
+[`ApiControllerTest`][apicontrollertest].
 
 ## How to Run a Service
 
@@ -378,11 +379,22 @@ service:
 - [Rust instruction](create-service.md)
 - [Java Binding App tutorial][app-tutorial]
 
+[abstractservice]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/AbstractService.html
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
+[Memorydb]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/database/MemoryDb.html
+[nodefake]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/NodeFake.html
+[schema]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Schema.html
+[service]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Service.html
+[standardserializers]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html
+[storage-indices]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/indices/package-summary.html
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[transaction]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/messages/Transaction.html
 [transactions]: ../architecture/transactions.md
+[transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/TransactionConverter.html
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
