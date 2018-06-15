@@ -123,7 +123,8 @@ algorithm supported by both the service client and the service itself.
     mechanism will be standardized and moved to the core.
     An example of a pseudo-code transaction handler is shown below. For an
     implementation example, see
-    [`ApiController#submitTransaction`][submittransaction] in the cryptocurrency demo.
+    [`ApiController#submitTransaction`][submittransaction] in the cryptocurrency
+    demo.
 
 !!! note "Example of a Transaction Handler in Pseudo-code"
     ```none
