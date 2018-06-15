@@ -375,6 +375,7 @@ An example of API service tests can be found in
 ## See Also
 
 - [Rust instruction](create-service.md)
+- [Java Binding App tutorial][app-tutorial]
 
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -382,3 +383,4 @@ An example of API service tests can be found in
 [transactions]: ../architecture/transactions.md
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
