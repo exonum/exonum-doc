@@ -360,7 +360,7 @@ An example of API service tests can be found in
 Currently you have to build a native application to run a node with your Java service:
 
 - Install the system dependencies and [build][how-to-build] the application.
-- Follow the instructions in the [application guide][app-tutorial] to configure 
+- Follow the instructions in the [application guide][app-tutorial] to configure
   and start an Exonum node with your service.
 
 ## Known Limitations
