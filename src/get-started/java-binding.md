@@ -6,7 +6,7 @@ and Java services runtime environment.
 ## Creating Project
 
 The easiest way to create a Java service project is to use a template project
-generator. After installing Maven 3, run the command:
+generator. After [installing Maven 3][maven-install], run the command:
 
 ``` none
 $ mvn archetype:generate \
@@ -26,8 +26,8 @@ $ mvn archetype:generate \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype
 ```
 
-The build definition files for other build systems (e.g., Gradle) can be created
-similarly to the
+The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
+can be created similarly to the
 template. For more information see an [example][build-description].
 
 ## Service Development
@@ -59,7 +59,7 @@ influenced only by the Merkelized collections.
 For the detailed description of all Exonum collection types see the
 corresponding [documentation section](../architecture/storage.md#table-types).
 In Java, implementations of collections are located in
-[`com.exonum.binding.storage.indices`][storage-indices] package. Said package documentation
+[a separate package][storage-indices]. Said package documentation
 describes their use.
 
 !!! note
@@ -166,7 +166,7 @@ transaction – `execute` method.
 
 Ed25519 is a standard cryptographic system for digital signature of Exonum
 messages. It is available through
-`com.exonum.binding.crypto.CryptoFunctions#ed25519` method.
+[`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 
 The implementation of `Transaction#isValid` transaction authentication method
 must be a pure function, i.e. for the given transaction to return the same
@@ -188,7 +188,7 @@ transactions to the network, read requests for blockchain data with the
 provision of corresponding cryptographic proof, etc. Exonum provides an embedded
 web framework for implementing the REST-interface of the service.
 
-`com.exonum.binding.service.Service#createPublicApiHandlers` method is used to
+[`Service#createPublicApiHandlers`][createpublicapi] method is used to
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
@@ -341,8 +341,7 @@ operation as in the section above.
 ### API
 
 To test API implemented with Vertx tools, use the tools described in the
-[project documentation](https://vertx.io/docs/vertx-unit/java/#_introduction)
-
+[project documentation](https://vertx.io/docs/vertx-unit/java/#_introduction).
 You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
 client.
 
@@ -391,7 +390,7 @@ service:
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Service.html
-[standardserializers]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html
+[standardserializers]: https://exonum.com/doc/api/java-proofs/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/messages/Transaction.html
@@ -399,3 +398,6 @@ service:
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/TransactionConverter.html
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
+[maven-install]: https://maven.apache.org/install.html
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/crypto/CryptoFunctions.html#ed25519--
+[createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
