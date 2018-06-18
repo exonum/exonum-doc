@@ -20,10 +20,14 @@ Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
 
 !!! note
-    Presently, the order of inclusion of transactions into a proposal is
-    determined by the transaction hash. An honest validator takes transactions
-    with the smallest hashes when building a proposal. This behavior shouldn’t
-    be relied upon; it is likely to change in the future.
+    Presently, the order of transaction issuance at the client side does not correspond to
+    the order of their processing (transactions could end up in different blocks, for example).
+    To avoid this situation it is necessary to adhere to the common pattern: send the next
+    transaction only after the previous one was processed. By the way, this behavior is
+    already implemented in [light client library](https://github.com/exonum/exonum-client)
+    and described in
+    [Send multiple transaction](https://github.com/exonum/exonum-client#send-multiple-transactions)
+    section.
 
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
