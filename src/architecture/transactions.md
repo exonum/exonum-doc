@@ -23,7 +23,7 @@ in the same order transactions are placed into the blockchain.
     Presently, the order of transaction issuance at the client side does not
     correspond to the order of their processing (transactions could end up in
     different blocks, for example). To avoid this situation it is necessary to
-    adhere to the common pattern: send the next transaction only after 
+    adhere to the common pattern: send the next transaction only after
     the previous one was processed. By the way, this behavior is already
     implemented in [light client library](https://github.com/exonum/exonum-client)
     and described in
