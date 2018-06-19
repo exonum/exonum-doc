@@ -10,3 +10,6 @@
 .md-typeset .admonition .md-typeset__table {
   padding: 0;
 }
+.md-footer-nav {
+  display: none;
+}

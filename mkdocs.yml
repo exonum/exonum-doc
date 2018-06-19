@@ -1,4 +1,4 @@
-site_name: Exonum Documentation
+site_name: Документация
 docs_dir: src
 theme:
   name: material
@@ -15,7 +15,7 @@ repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 edit_uri: 'doc/blob/master/src'
 
-site_url: 'https://exonum.com/doc'
+site_url: 'http://35.196.80.152:9999/doc'
 site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 
@@ -41,56 +41,25 @@ markdown_extensions:
   - pymdownx.details
 pages:
   # Short description of Exonum, documentation and how to use it
-  - 'Home': 'index.md'
-  - 'Get started':
+  - 'Что такое Exonum': 'index.md'
+  - 'Общие сведения':
     # What is Exonum 'as a box', from point of view of external developer
-    - 'What is Exonum': 'get-started/what-is-exonum.md'
+    - 'Основные возможности': 'get-started/what-is-exonum.md'
     # How does Exonum look from the inside: nodes, validators, clients, blocks, consensus, genesis block;
     # links to necessary documentation parts
-    - 'Design overview': 'get-started/design-overview.md'
-    # Installation guide
-    - 'Install': 'get-started/install.md'
-    # Writing one's first Exonum service
-    - 'Create service': 'get-started/create-service.md'
-    # Testing one's first Exonum service
-    - 'Test service': 'get-started/test-service.md'
-  - 'Architecture':
+    - 'Обзор архитектуры': 'get-started/design-overview.md'
+  - 'Архитектура':
     # Includes guidelines for services
-    - 'Services': 'architecture/services.md'
+    - 'Сервисы': 'architecture/services.md'
     # What is transaction? (purity, sequential consistency, non-replayability, signatures)
-    - 'Transactions': 'architecture/transactions.md'
+    - 'Транзакции': 'architecture/transactions.md'
     # How to make Public API communication (both server and client side)
-    - 'Clients': 'architecture/clients.md'
-    # Local configuration - how to roughly configure a node (make it ready to run)
-    - 'Configuration': 'architecture/configuration.md'
-    # Includes blockchain, genesis block, indexes, proofs, etc.
-    - 'Storage': 'architecture/storage.md'
-    # How the data is serialised and deserialised to be transfered through the network
-    - 'Serialization': 'architecture/serialization.md'
+    - 'Легкие клиенты': 'architecture/clients.md'
     # Consensus overview
-    - 'Consensus': 'architecture/consensus.md'
-  - 'Advanced':
-    # How the network module works: peer discovery, p2p connections
-    - 'Network': 'advanced/network.md'
-    # Managing node through managing API ("RPC")
-    - 'Node management': 'advanced/node-management.md'
-    # What is sandbox testing and simple example of one of sandbox tests
-    - 'Service testing': 'advanced/service-testing.md'
-    # Configuration change service documentation
-    - 'Configuration updater': 'advanced/configuration-updater.md'
+    - 'Консенсус': 'architecture/consensus.md'
+  - 'Сервисы':
     # Anchoring service documentation
-    - 'Bitcoin anchoring': 'advanced/bitcoin-anchoring.md'
+    - 'Анкоринг': 'advanced/bitcoin-anchoring.md'
     # Time service
-    - 'Time oracle': 'advanced/time.md'
-    # Merkle index overview
-    - 'Merkelized list': 'advanced/merkelized-list.md'
-    - 'Consensus':
-      # Consensus specification
-      - 'Consensus specification': 'advanced/consensus/specification.md'
-      # Requests specification
-      - 'Requests': 'advanced/consensus/requests.md'
-  # Includes roadmap and features list
-  - 'Roadmap': 'roadmap.md'
-  # How to contribute to Exonum repositories
-  - 'Contributing': 'contributing.md'
-  - 'Glossary': 'glossary.md'
+    - 'Оракул времени': 'advanced/time.md'
+  - 'Глоссарий': 'glossary.md'
