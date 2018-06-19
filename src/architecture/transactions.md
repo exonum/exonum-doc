@@ -20,15 +20,12 @@ Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
 
 !!! note
-    Presently, the order of transaction issuance at the client side does not
-    correspond to the order of their processing (transactions could end up in
-    different blocks, for example). To avoid this situation it is necessary to
-    adhere to the common pattern: send the next transaction only after
-    the previous one was processed. By the way, this behavior is already
-    implemented in [light client library](https://github.com/exonum/exonum-client)
-    and described in
-    [Send multiple transaction](https://github.com/exonum/exonum-client#send-multiple-transactions)
-    section.
+    The order of transaction issuance at the client side does not necessarily
+    correspond to the order of their processing. To maintain the logical order
+    of processing, it is useful to
+    adhere to the following pattern: send the next transaction only after
+    the previous one was processed. This behavior is already
+    implemented in the [light client library](https://github.com/exonum/exonum-client#send-multiple-transactions).
 
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
