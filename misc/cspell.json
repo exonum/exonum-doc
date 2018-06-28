@@ -122,6 +122,7 @@
     "/\\[.+?\\]:\\s+\\S+/"
   ],
   "ignorePaths": [
-    "./src/es.md"
+    "./src/es.md",
+    "./src/jp.md"
   ]
 }
