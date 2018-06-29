@@ -434,7 +434,7 @@ configuration parameter allows to turn explorer endpoints on/off.
 ### Transaction
 
 ```none
-GET {explorer_base_path}/transactions/{transaction_hash}
+GET {explorer_base_path}/transactions?hash={transaction_hash}
 ```
 
 Searches for a transaction, either committed or uncommitted, by the hash.
@@ -586,7 +586,7 @@ Response is a JSON object with the following fields:
 ### Block by height
 
 ```none
-GET {explorer_base_path}/blocks/{height}
+GET {explorer_base_path}/block?height={height}
 ```
 
 Returns the content for a block of a specific height.
