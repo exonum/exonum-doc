@@ -237,18 +237,21 @@ will not be established.
 
 #### Parameters
 
-- **ip**: PeerAddress
+- **address**: PeerAddress
+- **public_key**: PublicKey
 
 #### Example
 
 ```None
-curl --data '{ "ip": "127.0.0.1:8800" }' http://127.0.0.1:7780/api/system/v1/peers
+curl -H "Content-Type: application/json" \
+  --data '{ "address": "127.0.0.1:8800", "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a" }' \
+  http://127.0.0.1:8081/api/system/v1/peers
 ```
 
 #### Response
 
-```None
-"Ok"
+```json
+null
 ```
 
 ### Peers info
@@ -354,8 +357,8 @@ curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0
 
 #### Response
 
-```None
-"Ok"
+```json
+null
 ```
 
 ### Network info
@@ -406,18 +409,18 @@ all messages in the event queue are processed.
 
 #### Parameters
 
-None.
+null
 
 #### Example
 
 ```none
-curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
+curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api/system/v1/shutdown
 ```
 
 #### Response
 
-```none
-"Ok"
+```json
+null
 ```
 
 ## Explorer API endpoints
