@@ -55,19 +55,16 @@ Let’s start with importing crates with necessary types:
 
 ??? note "Imports"
     ```rust
-    extern crate bodyparser;
     #[macro_use]
     extern crate exonum;
     #[macro_use]
     extern crate failure;
-    extern crate iron;
-    extern crate router;
     extern crate serde;
     #[macro_use]
     extern crate serde_derive;
     extern crate serde_json;
-    use exonum::api::{Api, ApiError};
-    use exonum::blockchain::{ApiContext, Blockchain, ExecutionError,
+    use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
+    use exonum::blockchain::{Blockchain, ExecutionError,
                              ExecutionResult, Service, Transaction,
                              TransactionSet};
     use exonum::crypto::{Hash, PublicKey};
@@ -76,12 +73,6 @@ Let’s start with importing crates with necessary types:
     use exonum::messages::{Message, RawTransaction};
     use exonum::node::{ApiSender, TransactionSend};
     use exonum::storage::{Fork, MapIndex, Snapshot};
-    use iron::headers::ContentType;
-    use iron::Handler;
-    use iron::modifiers::Header;
-    use iron::prelude::*;
-    use iron::status::Status;
-    use router::Router;
     ```
 
 ## Constants
@@ -376,20 +367,19 @@ impl Transaction for TxTransfer {
 
 ## Implement API
 
-Next, we need to implement the node API with the help of [Iron framework][iron].
-With this aim we declare a struct which implements the `Api` trait.
-The struct will contain a channel, i.e. a connection to the blockchain node
+Next, we need to implement the node API with the help of [Actix-web framework][actix-web].
+With this aim we declare a blank struct with set of methods with the following signature:
+```rust
+fn my_method(state: &ServiceApiState, query: MyQueryParam) -> api::Result<MyResponseParam>
+```
+The `state` contains a channel, i.e. a connection to the blockchain node
 instance.
-Besides the channel, the API struct will contain a blockchain instance;
-it will be needed to implement
+Besides the channel, it is also contains a blockchain instance;
+this will be needed to implement
 [read requests](../architecture/services.md#read-requests).
 
 ```rust
-#[derive(Clone)]
-struct CryptocurrencyApi {
-    channel: ApiSender,
-    blockchain: Blockchain,
-}
+struct CryptocurrencyApi;
 ```
 
 ### API for Transactions
@@ -411,26 +401,14 @@ pub struct TransactionResponse {
 }
 
 impl CryptocurrencyApi {
-    fn post_transaction(&self, req: &mut Request) -> IronResult<Response> {
-        match req.get::<bodyparser::Struct<CurrencyTransactions>>() {
-            Ok(Some(transaction)) => {
-                let transaction: Box<Transaction> = transaction.into();
-                let tx_hash = transaction.hash();
-                self.channel.send(transaction).map_err(ApiError::from)?;
-                let json = TransactionResponse { tx_hash };
-                self.ok_response(&serde_json::to_value(&json).unwrap())
-            }
-            Ok(None) => Err(ApiError::BadRequest("Empty request body".into()))?,
-            Err(e) => Err(ApiError::BadRequest(e.to_string()))?,
-        }
+    fn post_transaction(state: &ServiceApiState, query: CurrencyTransactions) -> api::Result<TransactionResponse> {
+        let transaction: Box<Transaction> = query.into();
+        let tx_hash = transaction.hash();
+        state.sender().send(transaction)?;
+        Ok(TransactionResponse { tx_hash })
     }
 }
 ```
-
-Notice that the `post_transaction()` method has an idiomatic signature
-`fn(&self, &mut Request) -> IronResult<Response>`,
-making it close to Iron’s [`Handler`][iron-handler]. This is to be
-expected; the method *is* a handler for processing transaction-related requests.
 
 ### API for Read Requests
 
@@ -440,93 +418,61 @@ We want to implement 2 read requests:
 - Return the information about a specific wallet identified by the public key.
 
 To accomplish this, we define a couple of corresponding methods in
-`CryptocurrencyApi`
-that use its `blockchain` field to read information from the blockchain
- storage.
+`CryptocurrencyApi` that use `state` to read information from the blockchain storage.
+For parsing a public key of specific wallet we define a helper structure.
 
 ```rust
+
+#[derive(Deserialize)]
+/// The structure describes the query parameters for the `get_wallet` endpoint.
+struct WalletQuery {
+    /// Public key of the queried wallet.
+    pub_key: PublicKey,
+}
+
 impl CryptocurrencyApi {
-    fn get_wallet(&self, req: &mut Request) -> IronResult<Response> {
-        let path = req.url.path();
-        let wallet_key = path.last().unwrap();
-        let public_key = PublicKey::from_hex(wallet_key).map_err(|e| {
-            IronError::new(
-                e,
-                (
-                    Status::BadRequest,
-                    Header(ContentType::json()),
-                    "\"Invalid request param: `pub_key`\"",
-                ),
-            )
-        })?;
-
-        let snapshot = self.blockchain.snapshot();
+    /// Endpoint for getting a single wallet.
+    fn get_wallet(state: &ServiceApiState, query: WalletQuery) -> api::Result<Wallet> {
+        let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
-
-        if let Some(wallet) = schema.wallet(&public_key) {
-            self.ok_response(&serde_json::to_value(wallet).unwrap())
-        } else {
-            self.not_found_response(
-                &serde_json::to_value("Wallet not found").unwrap()
-            )
-        }
+        schema
+            .wallet(&query.pub_key)
+            .ok_or_else(|| api::Error::NotFound("Wallet not found".to_owned()))
     }
 
-    fn get_wallets(&self, _: &mut Request) -> IronResult<Response> {
-        let snapshot = self.blockchain.snapshot();
+    /// Endpoint for dumping all wallets from the storage.
+    fn get_wallets(state: &ServiceApiState, _query: ()) -> api::Result<Vec<Wallet>> {
+        let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
-        let wallets: Vec<Wallet> = idx.values().collect();
-
-        self.ok_response(&serde_json::to_value(&wallets).unwrap())
+        let wallets = idx.values().collect();
+        Ok(wallets)
     }
 }
 ```
 
 As with the transaction endpoint, the methods have an idiomatic signature
-`fn(&self, &mut Request) -> IronResult<Response>`.
+`fn(&ServiceApiState, MyQueryParam) -> api::Result<MyResponseParam>`.
 
 ### Wire API
 
 As the final step of the API implementation, we need to tie request
-processing logic to
-specific endpoints. We do this in the `CryptocurrencyApi::wire()`
-method:
+processing logic to specific endpoints.
+We do this in the `CryptocurrencyApi::wire()` method:
 
 ```rust
-impl Api for CryptocurrencyApi {
-    fn wire(&self, router: &mut Router) {
-        let self_ = self.clone();
-        let post_create_wallet =
-            move |req: &mut Request| self_.post_transaction(req);
-        let self_ = self.clone();
-        let post_transfer =
-            move |req: &mut Request| self_.post_transaction(req);
-        let self_ = self.clone();
-        let get_wallets = move |req: &mut Request| self_.get_wallets(req);
-        let self_ = self.clone();
-        let get_wallet = move |req: &mut Request| self_.get_wallet(req);
-
-        // Bind handlers to specific routes.
-        router.post("/v1/wallets", post_create_wallet, "post_create_wallet");
-        router.post("/v1/wallets/transfer", post_transfer, "post_transfer");
-        router.get("/v1/wallets", get_wallets, "get_wallets");
-        router.get("/v1/wallet/:pub_key", get_wallet, "get_wallet");
+impl CryptocurrencyApi {
+    fn wire(builder: &mut ServiceApiBuilder) {
+        // Binds handlers to specific routes.
+        builder
+            .public_scope()
+            .endpoint("v1/wallet", Self::get_wallet)
+            .endpoint("v1/wallets", Self::get_wallets)
+            .endpoint_mut("v1/wallets", Self::post_transaction)
+            .endpoint_mut("v1/wallets/transfer", Self::post_transaction);
     }
 }
 ```
-
-We create a [closure][rust-closure] for each endpoint, converting handlers
-that we have defined, with a type signature
-`fn(&CryptocurrencyApi, &mut Request) -> IronResult<Response>`,
-to ones that Iron supports – `Fn(&mut Request) -> IronResult<Response>`.
-This can be accomplished by [currying][curry-fn], that is,
-cloning `CryptocurrencyApi` and moving it into each closure.
-For this to work, note that cloning a `Blockchain` does not create
-a new blockchain from scratch,
-but rather produces a reference to the same blockchain instance.
-(That is, `Blockchain` is essentially a smart pointer type similar to [`Arc`][arc]
-or [`Ref`][ref].)
 
 ## Define Service
 
@@ -562,8 +508,7 @@ should return [a vector of hashes](../architecture/services.md#state-hash) of th
 As the wallets table is not Merkelized (a simplifying assumption discussed at the
 beginning of the tutorial), the returned value should be an empty vector, `vec![]`.
 
-The remaining method, `public_api_handler`, creates a REST `Handler` to process
-web requests to the node. We will use it to receive transactions via REST API
+The remaining method, `wire_api`, binds APIs defined by service. We will use it to receive transactions via REST API
 using the logic we defined in `CryptocurrencyApi` earlier.
 
 ```rust
@@ -583,20 +528,14 @@ impl Service for CurrencyService {
         vec![]
     }
 
-    fn public_api_handler(&self, ctx: &ApiContext) -> Option<Box<Handler>> {
-        let mut router = Router::new();
-        let api = CryptocurrencyApi {
-            channel: ctx.node_channel().clone(),
-            blockchain: ctx.blockchain().clone(),
-        };
-        api.wire(&mut router);
-        Some(Box::new(router))
+    fn wire_api(&self, builder: &mut ServiceApiBuilder) {
+        CryptocurrencyApi::wire(builder)
     }
 }
 ```
 
-`CryptocurrencyApi` type implements `Api` trait of Exonum and we can use
-`Api::wire` method to connect this `Api` instance to the `Router`.
+`CryptocurrencyApi` has `wire` method and we can use it to connect
+this API instance to the `ServiceApiBuilder`.
 
 ## Create Demo Blockchain
 
@@ -879,8 +818,8 @@ This request expectedly returns information on both wallets in the system:
 The second read endpoint also works:
 
 ```sh
-curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet/\
-6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
+curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet?\
+pub_key=6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
 ```
 
 The response is:
