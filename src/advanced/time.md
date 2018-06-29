@@ -48,9 +48,10 @@ Byzantine validators.
 Each validator at a specific time sends a transaction indicating its local time
 (usually immediately after the commit of each block). The time service
 maintains an index with the most current time values indicated separately by
-each validator. A 1/3 percentile of these values (ordered by decreasing time)
-is stored separately; this percentile is considered the actual time and is
-updated after each transaction from any of the validators. As we show
+each validator. This index is updated after each transaction from any of the
+validators. A 1/3 percentile of these values (ordered by decreasing time) is
+then picked out from the index; this percentile is considered the actual time
+and is applied to determine the exact service time. As we show
 [further](#proof-of-correctness), this time can be considered reliable given
 the assumptions above.
 
