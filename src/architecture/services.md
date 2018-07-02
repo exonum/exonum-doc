@@ -447,19 +447,13 @@ and push them in the queue for broadcasting, etc.
 ```rust
 use exonum::api::ServiceApiBuilder;
 
-fn public_api_handler(&self, context: &ApiContext)
-                      -> Option<Box<Handler>> {
-    None
-}
-fn private_api_handler(&self, context: &ApiContext)
-                       -> Option<Box<Handler>> {
-    None
+fn wire_api(&self, builder: &mut ServiceApiBuilder) {
+
 }
 ```
 
-`wire_api` provide hooks for defining public and private API endpoints
-respectively using [`actix-web`][actix-web].
-These methods receive an `ServiceApiBuilder`, which allows binding our
+`wire_api` provides hooks for defining public and private API endpoints of the service.
+This method receive an `ServiceApiBuilder`, which allows binding our
 own handlers to REST API.
 
 The default trait implementation does not define any public or private

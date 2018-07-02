@@ -364,7 +364,7 @@ impl Transaction for TxTransfer {
 
 ## Implement API
 
-Next, we need to implement the node API with the help of [Actix-web framework][actix-web].
+Next, we need to implement the node API.
 With this aim we declare a blank struct that includes a set of methods with the
 following signature:
 ```rust
@@ -372,7 +372,7 @@ fn my_method(state: &ServiceApiState, query: MyQueryParam) -> api::Result<MyResp
 ```
 The `state` contains a channel, i.e. a connection to the blockchain node
 instance.
-Besides the channel, it is also contains a blockchain instance, which will be needed
+Besides the channel, it also contains a blockchain instance, which will be needed
 to implement [read requests](../architecture/services.md#read-requests).
 
 ```rust

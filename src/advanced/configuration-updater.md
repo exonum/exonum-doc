@@ -187,7 +187,7 @@ Looks up configuration (including proposals) by the hash.
 
 #### Parameters
 
-- **hash**: Hash=
+- **hash**: Hash
   Hash of configuration to look up.
 
 #### Response
@@ -212,7 +212,7 @@ Looks up votes for a configuration proposal by the configuration hash.
 
 #### Parameters
 
-- **hash**: Hash=  
+- **hash**: Hash
   Hash of configuration to look up
 
 #### Response
@@ -237,9 +237,9 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_cfg_hash**: Hash=  
+- **previous_cfg_hash**: Hash
   If present, filters configurations by the specified previous configuration hash.
-- **actual_from**: integer=  
+- **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration became actual.
 
@@ -266,9 +266,9 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_cfg_hash**: Hash=  
+- **previous_cfg_hash**: Hash
   If present, filters configurations by the specified previous configuration hash.
-- **actual_from**: integer=  
+- **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration will become actual.
 
@@ -433,7 +433,7 @@ and its signature are computed automatically.
 #### Parameters
 
 - **hash**: Hash  
-  Hash of the configuration to vote for.
+  Body of the request; hash of the configuration to vote for.
 
 #### Response
 
@@ -455,7 +455,7 @@ and its signature are computed automatically.
 #### Parameters
 
 - **hash**: Hash  
-  Hash of the configuration to be voted against.
+  Body of the request; hash of the configuration to be voted against.
 
 #### Response
 

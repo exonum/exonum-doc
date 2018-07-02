@@ -409,7 +409,7 @@ all messages in the event queue are processed.
 
 #### Parameters
 
-null
+None.
 
 #### Example
 
