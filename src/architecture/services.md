@@ -459,8 +459,8 @@ fn private_api_handler(&self, context: &ApiContext)
 
 `wire_api` provide hooks for defining public and private API endpoints
 respectively using [`actix-web`][actix-web].
-These methods receive an `ServiceApiBuilder`, which allows bind 
-our own handlers to REST API.
+These methods receive an `ServiceApiBuilder`, which allows binding our
+own handlers to REST API.
 
 The default trait implementation does not define any public or private
 endpoints.

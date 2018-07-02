@@ -365,15 +365,15 @@ impl Transaction for TxTransfer {
 ## Implement API
 
 Next, we need to implement the node API with the help of [Actix-web framework][actix-web].
-With this aim we declare a blank struct with set of methods with the following signature:
+With this aim we declare a blank struct that includes a set of methods with the
+following signature:
 ```rust
 fn my_method(state: &ServiceApiState, query: MyQueryParam) -> api::Result<MyResponseParam>
 ```
 The `state` contains a channel, i.e. a connection to the blockchain node
 instance.
-Besides the channel, it is also contains a blockchain instance;
-this will be needed to implement
-[read requests](../architecture/services.md#read-requests).
+Besides the channel, it is also contains a blockchain instance, which will be needed
+to implement [read requests](../architecture/services.md#read-requests).
 
 ```rust
 struct CryptocurrencyApi;
@@ -416,7 +416,7 @@ We want to implement 2 read requests:
 
 To accomplish this, we define a couple of corresponding methods in
 `CryptocurrencyApi` that use `state` to read information from the blockchain storage.
-For parsing a public key of specific wallet we define a helper structure.
+For parsing a public key of a specific wallet we define a helper structure.
 
 ```rust
 
@@ -505,8 +505,9 @@ should return [a vector of hashes](../architecture/services.md#state-hash) of th
 As the wallets table is not Merkelized (a simplifying assumption discussed at the
 beginning of the tutorial), the returned value should be an empty vector, `vec![]`.
 
-The remaining method, `wire_api`, binds APIs defined by service. We will use it to receive transactions via REST API
-using the logic we defined in `CryptocurrencyApi` earlier.
+The remaining method, `wire_api`, binds APIs defined by the service.
+We will use it to receive transactions via REST API using the logic we defined
+in `CryptocurrencyApi` earlier.
 
 ```rust
 impl Service for CurrencyService {
