@@ -244,7 +244,11 @@ will not be established.
 
 ```None
 curl -H "Content-Type: application/json" \
-  --data '{ "address": "127.0.0.1:8800", "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a" }' \
+  --data '{ \
+    "address": "127.0.0.1:8800", \
+    "public_key": \
+      \"dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a" \
+  }' \
   http://127.0.0.1:8081/api/system/v1/peers
 ```
 

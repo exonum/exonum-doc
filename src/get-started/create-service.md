@@ -367,9 +367,11 @@ impl Transaction for TxTransfer {
 Next, we need to implement the node API.
 With this aim we declare a blank struct that includes a set of methods with the
 following signature:
+
 ```rust
 fn my_method(state: &ServiceApiState, query: MyQueryParam) -> api::Result<MyResponseParam>
 ```
+
 The `state` contains a channel, i.e. a connection to the blockchain node
 instance.
 Besides the channel, it also contains a blockchain instance, which will be needed
@@ -398,7 +400,8 @@ pub struct TransactionResponse {
 }
 
 impl CryptocurrencyApi {
-    fn post_transaction(state: &ServiceApiState, query: CurrencyTransactions) -> api::Result<TransactionResponse> {
+    fn post_transaction(state: &ServiceApiState, query: CurrencyTransactions)
+     -> api::Result<TransactionResponse> {
         let transaction: Box<Transaction> = query.into();
         let tx_hash = transaction.hash();
         state.sender().send(transaction)?;
@@ -429,7 +432,8 @@ struct WalletQuery {
 
 impl CryptocurrencyApi {
     /// Endpoint for getting a single wallet.
-    fn get_wallet(state: &ServiceApiState, query: WalletQuery) -> api::Result<Wallet> {
+    fn get_wallet(state: &ServiceApiState, query: WalletQuery)
+     -> api::Result<Wallet> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         schema
@@ -438,7 +442,8 @@ impl CryptocurrencyApi {
     }
 
     /// Endpoint for dumping all wallets from the storage.
-    fn get_wallets(state: &ServiceApiState, _query: ()) -> api::Result<Vec<Wallet>> {
+    fn get_wallets(state: &ServiceApiState, _query: ())
+     -> api::Result<Vec<Wallet>> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
