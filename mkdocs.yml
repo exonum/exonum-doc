@@ -95,5 +95,20 @@ pages:
   # How to contribute to Exonum repositories
   - 'Contributing': 'contributing.md'
   - 'Glossary': 'glossary.md'
+  # Translations
   - 'Español': 'es.md'
   - '日本語': 'jp.md'
+  - 'Русский':
+    - 'Документация Exonum': 'ru/index.md'
+    - 'Общие сведения':
+      - 'Основные возможности': 'ru/get-started/what-is-exonum.md'
+      - 'Обзор архитектуры': 'ru/get-started/design-overview.md'
+    - 'Архитектура':
+      - 'Сервисы': 'ru/architecture/services.md'
+      - 'Транзакции': 'ru/architecture/transactions.md'
+      - 'Легкие клиенты': 'ru/architecture/clients.md'
+      - 'Консенсус': 'ru/architecture/consensus.md'
+    - 'Сервисы':
+      - 'Анкоринг': 'ru/advanced/bitcoin-anchoring.md'
+      - 'Оракул времени': 'ru/advanced/time.md'
+    - 'Глоссарий': 'ru/glossary.md'
