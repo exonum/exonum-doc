@@ -37,7 +37,7 @@ version = "0.0.0"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "0.6.0"
+exonum = "0.9.0"
 serde = "1.0.0"
 serde_json = "1.0.0"
 serde_derive = "1.0.0"
