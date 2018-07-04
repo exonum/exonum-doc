@@ -123,6 +123,7 @@
   ],
   "ignorePaths": [
     "./src/es.md",
-    "./src/jp.md"
+    "./src/jp.md",
+    "./src/ru/**"
   ]
 }
