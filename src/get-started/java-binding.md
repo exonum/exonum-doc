@@ -365,7 +365,7 @@ service:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
-- [Time oracle](..advanced/time.md) service is not available,
+- [Time oracle](../advanced/time.md) service is not available,
   but will be integrated into EJB App soon.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
