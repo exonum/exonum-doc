@@ -429,17 +429,17 @@ It must be redefined for services that have global configuration parameters.
 ### Commit Handler
 
 ```rust
-fn handle_commit(&self, context: &mut ServiceContext) { }
+fn after_commit(&self, context: &mut ServiceContext) { }
 ```
 
-`handle_commit` is invoked for every deployed service each time a block
+`after_commit` is invoked for every deployed service each time a block
 is committed in the blockchain locally. This method is so far the only example
 of [event-based processing](#event-handling). The method receives the service
 context, which can be used to inspect the blockchain state, create transactions
 and push them in the queue for broadcasting, etc.
 
 !!! note
-    Keep in mind that `handle_commit` is sequentially invoked for each block
+    Keep in mind that `after_commit` is sequentially invoked for each block
     in the blockchain during an initial full node synchronization.
 
 ### REST API Initialization

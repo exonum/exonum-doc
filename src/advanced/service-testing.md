@@ -171,7 +171,7 @@ with external data after commit of the block.
 [The Bitcoin anchoring service](bitcoin-anchoring.md) is an example of an oracle.
 Just like a real Exonum node, the testkit maintains a pool of unconfirmed transactions
 (aka the *mempool*). Thus, transactions created by the oracle service
-during the [`handle_commit`][Service.handle_commit] execution
+during the [`after_commit`][Service.after_commit] execution
 will be stored in `TestKit` memory pool and can be verified accordingly.
 
 ```rust
@@ -181,10 +181,10 @@ let mut testkit = TestKitBuilder::validator()
     .with_service(HandleCommitService)
     .create();
 
-// Call the `handle_commit` event.
+// Call the `after_commit` event.
 testkit.create_block();
 
-// Check that `handle_commit` has been invoked
+// Check that `after_commit` has been invoked
 // at the correct height.
 let tx = TxAfterCommit::new_with_signature(
     Height(1),
@@ -194,7 +194,7 @@ assert!(testkit.mempool().contains_key(&tx.hash()));
 ```
 
 !!! tip
-    In order to invoke a `handle_commit` event, you need to create a block
+    In order to invoke a `after_commit` event, you need to create a block
     with one of the `create_block*` methods of the testkit.
 
 If the oracle has to fetch any data from external world, you need to create
@@ -213,7 +213,7 @@ let mut testkit = TestKitBuilder::validator()
 cruel_world.expect_api_call(ApiCallInfo { ... })
     .with_response_ok(ApiResponse { ... });
 
-// Call the `handle_commit` event.
+// Call the `after_commit` event.
 testkit.create_block();
 let expected_tx = MyOracleTx::new(...);
 
@@ -268,5 +268,5 @@ assert_eq!(
 [Transaction.execute]: ../architecture/transactions.md#execute
 [integration-tests]: https://doc.rust-lang.org/book/second-edition/ch11-03-test-organization.html#integration-tests
 [exonum-btc-anchoring]: https://github.com/exonum/exonum-btc-anchoring
-[Service.handle_commit]: ../architecture/services.md#commit-handler
+[Service.after_commit]: ../architecture/services.md#commit-handler
 [service-config]: ../architecture/services.md#configuration

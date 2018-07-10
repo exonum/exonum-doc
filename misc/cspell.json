@@ -32,8 +32,10 @@
     "Ethereum",
     "Exonum",
     "gitter",
+    "Guice",
     "healthcheck",
     "HMACs",
+    "junit",
     "keypair",
     "leveldb",
     "LGTM",
@@ -64,6 +66,7 @@
     "protobuf",
     "pubkey",
     "pubkeys",
+    "qaservice",
     "RDBMS",
     "RDBMSs",
     "reconfiguring",
@@ -79,6 +82,7 @@
     "serde",
     "serializable",
     "serialization",
+    "serializers",
     "sodiumoxide",
     "strawman",
     "struct",
@@ -104,6 +108,7 @@
     "validator",
     "validator’s",
     "validators",
+    "Vertx",
     "whitelisted",
     "whitelisting"
   ],
@@ -115,5 +120,9 @@
     "/\\]\\(.+?\\)/",
     "/\\]\\[.+?\\]/",
     "/\\[.+?\\]:\\s+\\S+/"
+  ],
+  "ignorePaths": [
+    "./src/es.md",
+    "./src/jp.md"
   ]
 }

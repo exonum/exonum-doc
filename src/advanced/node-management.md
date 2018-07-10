@@ -28,18 +28,18 @@ an optional type.
 | `PublicKey`                                            | Hexadecimal string 32 bytes (that is, 64 hex digits) in length.                                                                              |
 | `Signature`                                            | Hexadecimal string 64 bytes (that is, 126 hex digits) in length.                                                                             |
 | `PeerAddress`                                          | A string containing address in `IP:port` format. `IP` is an IPv4 address formatted as 4 octets separated by dots (for example, `10.10.0.1`). |
-| `Time`                                                 | A string that combined date and time in UTC as per [ISO 8601][ISO8601] (for example, `2018-05-17T10:45:56.057753Z`).                         |
+| `Time`                                                 | A string that combines date and time in UTC as per [ISO 8601][ISO8601] (for example, `2018-05-17T10:45:56.057753Z`).                         |
 
 ### JSON Objects
 
 | Type &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 |:------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `OutgoingConnectionState`                                                                             | **type**: string – connection type, can be: <br> &emsp;`Active` for established connections <br> &emsp;`Reconnect` for yet unestablished connections <br> **delay**: integer – interval between reconnect attempts (ms), present only if `type` is `Reconnect`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `OutgoingConnectionState`                                                                             | **type**: string – connection type, can be: <br> &emsp;`Active` for established connections <br> &emsp;`Reconnect` for yet unestablished connections <br> **delay**: integer= – interval between reconnect attempts (ms), present only if `type` is `Reconnect`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `OutgoingConnectionInfo`                                                                              | **public_key**: ?PublicKey – the public key of the peer or `null` if the public key is unknown <br> **state**: OutgoingConnectionState – current connection state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `ServiceInfo`                                                                                         | **id**: integer – unique service identifier <br> **name**: string – unique string service identifier                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `BlockHeader`                                                                                         | **height**: integer – the height of the block <br> **prev_hash**: Hash – the hash of the previous block <br> **proposer_id**: integer – ID of the validator that created an approved block proposal <br> **schema_version**: integer – information schema version. Currently, `0. <br> **state_hash**: Hash – hash of the current [Exonum state][blockchain-state] after applying transactions in the block <br> **tx_count**: integer – number of transactions included into the block <br> **tx_hash**: Hash – the root hash of the transactions Merkle tree                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `Precommit`                                                                                           | Message, serialized according to [message serialization rules](../architecture/serialization.md#message-serialization). <br><br> **body**: Object – the content of the `Precommit` message <br> **body.block_hash**: Hash – the hash of the current block (for which the `Precommit` message was created) <br> **body.height**: integer – the height of the current block <br> **body.propose_hash**: Hash – hash of the corresponding Propose <br> **body.round**: integer – the round when the block proposal was created <br> **body.time**: Time – UTC time of the validator that created the block proposal <br> **body.validator**: integer – ID of the validator that created this `Precommit` message <br> **message_id**: integer – ID of the `Precommit` message. Equals `4`. <br> **protocol_version**: integer – the major version of the Exonum serialization protocol. Currently, `0`. <br> **service_id**: integer – unique service identifier. Equals `0`. <br> **signature**: Signature – `Precommit` message creator's signature |
-| `SerializedTransaction`                                                                               | JSON object corresponding to [transaction serialization format](../architecture/serialization.md#message-serialization). |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `SerializedTransaction`                                                                               | JSON object corresponding to the [transaction serialization format](../architecture/serialization.md#message-serialization). |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `TransactionLocation`                                                                                 | **block_height**: integer – the height of the block including this transaction <br> **position_in_block**: integer – position of the transaction in the block                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## System API endpoints
@@ -110,7 +110,7 @@ equal to `/api/system/v1`.
 | create | ```POST {system_base_path}/peers```                                                                                 | Adds a new Exonum node to the list of peers for the current node. The latter will attempt to connect to the new node asynchronously. If the public key of the new node is not in the whitelist, the connection between said nodes will not be established. <br> **Parameters:** <br> &emsp;**ip**: PeerAddress |
 
 ??? example "Request example"
-    ```curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peers```
+    ```curl --data '{ "ip": "127.0.0.1:8800" }' http://127.0.0.1:7780/api/system/v1/peers```
 
 ??? example "Response"
     **Response example**
@@ -428,10 +428,7 @@ configuration parameter allows to turn explorer endpoints on/off.
                 "height": "20",
                 "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
                 "round": 2,
-                "time": {
-                  "nanos": 807015000,
-                  "secs": "1499869987"
-                },
+                "time": "2018-05-17T10:43:59.404962Z",
                 "validator": 2
               },
               "message_id": 4,
@@ -445,10 +442,7 @@ configuration parameter allows to turn explorer endpoints on/off.
                 "height": "20",
                 "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
                 "round": 2,
-                "time": {
-                  "nanos": 806850000,
-                  "secs": "1499869987"
-                },
+                "time": "2018-05-17T10:49:09.161549Z",
                 "validator": 3
               },
               "message_id": 4,
@@ -462,10 +456,7 @@ configuration parameter allows to turn explorer endpoints on/off.
                 "height": "20",
                 "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
                 "round": 2,
-                "time": {
-                  "nanos": 7842000,
-                  "secs": "1499869988"
-                },
+                "time": "2018-05-17T10:49:11.161549Z",
                 "validator": 0
               },
               "message_id": 4,
@@ -489,11 +480,11 @@ configuration parameter allows to turn explorer endpoints on/off.
     The JSON object of the explored block range `range` and the array `blocks` of
     the `BlockHeader` objects. The range specifies the largest and the smallest
     heights of blocks that have been traversed to collect at most `count` blocks.
-    The largest height `to` equals to `latest` if provided or to the height of
-    the latest block in the blockchain, the smallest height `from` takes values
+    The largest height `end` equals to `latest` if provided or to the height of
+    the latest block in the blockchain, the smallest height `start` takes values
     in `0..latest - count + 1`. Blocks in the array are sorted in descending order
     according to their heights. Height of any block in the array is greater or
-    equal than `from` and less or equal than `to`.
+    equal than `start` and less than `end`.
 
     Assume the following request
 
@@ -564,3 +555,5 @@ configuration parameter allows to turn explorer endpoints on/off.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
+[blockchain-state]: ../glossary.md#blockchain-state
+[ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
