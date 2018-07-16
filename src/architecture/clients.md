@@ -134,11 +134,12 @@
 является внедрение *легких клиентов*, также известных как *тонкие клиенты* или
 просто *клиенты*. В Биткоин блокчейне, эти клиенты также известны как клиенты
 [SPV (simple payment verification)](https://en.bitcoin.it/wiki/Thin_Client_Security).
-Легкие клиенты &mdash; это программы, способные копировать и проверять небольшую часть
-информации, хранящейся в блокчейне. Обычно клиенты проверяют информацию,
-относящуюся к конкретному пользователю (например, историю его транзакций). Эта
-проверка возможна благодаря использованию специфических контейнеров данных в
-блокчейне: индексов [Merkle][mt-index] и [Merkle Patricia][mpt-index].
+Легкие клиенты &mdash; это программы, способные копировать и проверять
+небольшую часть информации, хранящейся в блокчейне. Обычно клиенты проверяют
+информацию, относящуюся к конкретному пользователю (например, историю его
+транзакций). Эта проверка возможна благодаря использованию специфических
+контейнеров данных в блокчейне: индексов [Merkle][mt-index]
+и [Merkle Patricia][mpt-index].
 
 Преимуществами этого подхода являются:
 
@@ -192,5 +193,5 @@
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
-[mt-index]: storage.md#prooflistindex
-[mpt-index]: storage.md#proofmapindex
+[mt-index]: https://exonum.com/doc/architecture/storage#prooflistindex
+[mpt-index]: https://exonum.com/doc/architecture/storage#proofmapindex

@@ -15,11 +15,11 @@ repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 edit_uri: 'doc/blob/master/src'
 
-site_url: 'http://35.196.80.152:9999/doc'
+site_url: 'https://exonum.com/ru/doc'
 site_author: 'Exonum Team'
-site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
+site_description: Exonum — это фреймворк для создания блокчейн-проектов.
 
-copyright: © 2018 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2018 Exonum Team. Доступно под лицензией <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a>
 
 extra:
   og_image: 'assets/images/logo-docs.png'
@@ -30,6 +30,8 @@ extra:
       link: 'https://www.facebook.com/Exonum'
     - type: 'twitter'
       link: 'https://twitter.com/BitFuryGroup'
+  search:
+    language: 'en, ru'
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'

@@ -5,11 +5,9 @@
   "description": "JS dependencies for Exonum docs",
   "dependencies": {},
   "devDependencies": {
-    "cspell": "^2.1.1",
     "markdownlint-cli": "^0.7.1"
   },
   "scripts": {
-    "cspell": "cspell --config=misc/cspell.json src/**/*.md",
     "md": "markdownlint --config=misc/markdownlint.json src/**/*.md",
     "test": "./misc/lint.sh all"
   },
