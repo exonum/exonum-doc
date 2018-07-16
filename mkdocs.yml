@@ -30,6 +30,8 @@ extra:
       link: 'https://www.facebook.com/Exonum'
     - type: 'twitter'
       link: 'https://twitter.com/BitFuryGroup'
+  search:
+    language: 'en, ru'
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'

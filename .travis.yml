@@ -38,7 +38,6 @@ script:
   - bash ./misc/lint.sh md
   - bash ./misc/lint.sh html
   - bash ./misc/lint.sh links
-  - bash ./misc/lint.sh cspell
 
 after_script:
   # Kill mkdocs server if it's still running

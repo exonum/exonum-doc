@@ -36,11 +36,10 @@ problems with the contributed documents:
 - [html5validator][html5validator] is used for checking problems with the
   generated HTML pages
 - [linkchecker][linkchecker] is used to find missing links
-- [cspell][cspell] is used for spellchecking
 
 You can set up these tools locally (see the `install` step in [the Travis config](.travis.yml)
 for more details) and run them using the `./misc/lint.sh` script with `md`, `html`,
-`links`, `cspell`, or `all` arguments.
+`links`, or `all` arguments.
 
 ### Page Meta
 
@@ -90,7 +89,7 @@ To install linters, use
 pip install -r dev-requirements.txt
 ```
 
-`markdownlint` and `cspell` need to be installed separately. Both these tools
+`markdownlint` need to be installed separately. Both these tools
 utilize Npm package manager, so you can install them using
 
 ```
@@ -134,4 +133,3 @@ See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 [mkdocs-meta]: https://pythonhosted.org/Markdown/extensions/meta_data.html
 [jekyll]: http://jekyllrb.com/
 [git-branching]: http://nvie.com/posts/a-successful-git-branching-model/
-[cspell]: https://github.com/Jason3S/cspell
