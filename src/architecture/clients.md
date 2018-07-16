@@ -193,5 +193,5 @@
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
-[mt-index]: storage.md#prooflistindex
-[mpt-index]: storage.md#proofmapindex
+[mt-index]: https://exonum.com/doc/architecture/storage#prooflistindex
+[mpt-index]: https://exonum.com/doc/architecture/storage#proofmapindex
