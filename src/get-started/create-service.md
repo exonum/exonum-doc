@@ -369,7 +369,7 @@ With this aim we declare a blank struct that includes a set of methods with the
 following signature:
 
 ```rust
-fn my_method(state: &ServiceApiState, query: MyQueryParam) -> api::Result<MyResponseParam>
+fn my_method(state: &ServiceApiState, query: MyQuery) -> api::Result<MyResponse>
 ```
 
 The `state` contains a channel, i.e. a connection to the blockchain node
@@ -422,7 +422,6 @@ To accomplish this, we define a couple of corresponding methods in
 For parsing a public key of a specific wallet we define a helper structure.
 
 ```rust
-
 #[derive(Deserialize)]
 /// The structure describes the query parameters for the `get_wallet` endpoint.
 struct WalletQuery {
@@ -468,8 +467,11 @@ impl CryptocurrencyApi {
         // Binds handlers to specific routes.
         builder
             .public_scope()
+            // Read only endpoints uses `GET` method.
             .endpoint("v1/wallet", Self::get_wallet)
             .endpoint("v1/wallets", Self::get_wallets)
+            // But for methods that can modify service state you should use
+            // `endpoint_mut` that uses `POST` method.
             .endpoint_mut("v1/wallets", Self::post_transaction)
             .endpoint_mut("v1/wallets/transfer", Self::post_transaction);
     }
@@ -844,8 +846,6 @@ with two wallets and transferred some money between them. Next,
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
-[actix-web]: https://actix.rs
-[bodyparser]: https://docs.rs/bodyparser/0.8.0/bodyparser/
 [rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
 [curry-fn]: https://en.wikipedia.org/wiki/Currying
 [arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html

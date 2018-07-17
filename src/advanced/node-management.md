@@ -238,7 +238,9 @@ will not be established.
 #### Parameters
 
 - **address**: PeerAddress
+  IP address of the node which our node have to connect.
 - **public_key**: PublicKey
+  Public key of the other node.
 
 #### Example
 

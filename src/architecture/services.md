@@ -453,8 +453,8 @@ fn wire_api(&self, builder: &mut ServiceApiBuilder) {
 ```
 
 `wire_api` provides hooks for defining public and private API endpoints of the service.
-This method receive an `ServiceApiBuilder`, which allows binding our
-own handlers to REST API.
+This method receives a `ServiceApiBuilder`, which allows binding custom handlers to
+REST API.
 
 The default trait implementation does not define any public or private
 endpoints.
