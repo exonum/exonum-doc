@@ -457,7 +457,7 @@ Example of JSON response:
 ### Actual LECT for Specific Validator
 
 ```None
-GET {base_path}/actual_lect/{id}
+GET {base_path}/actual_lect?validator_id={id}
 ```
 
 Returns the actual LECT for the specified validator, along with the
@@ -502,7 +502,7 @@ Example of JSON response:
 ### Nearest LECT
 
 ```None
-GET {base_path}/nearest_lect/{height}
+GET {base_path}/nearest_lect?height={height}
 ```
 
 Returns the content of the anchoring transaction which anchors the
