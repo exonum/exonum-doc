@@ -13,6 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
+    -DarchetypeVersion=0.1.2 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
