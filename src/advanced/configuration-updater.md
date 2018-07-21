@@ -180,14 +180,14 @@ JSON object with the following fields:
 ### Configuration by Hash
 
 ```none
-GET {base_path}/configs/{config_hash}
+GET {base_path}/configs?hash={config_hash}
 ```
 
 Looks up configuration (including proposals) by the hash.
 
 #### Parameters
 
-- **config_hash**: Hash  
+- **hash**: Hash
   Hash of configuration to look up.
 
 #### Response
@@ -205,14 +205,14 @@ JSON object with the following fields:
 ### Votes for Configuration
 
 ```none
-GET {base_path}/configs/{config_hash}/votes
+GET {base_path}/configs/votes?hash={config_hash}
 ```
 
 Looks up votes for a configuration proposal by the configuration hash.
 
 #### Parameters
 
-- **config_hash**: Hash  
+- **hash**: Hash
   Hash of configuration to look up
 
 #### Response
@@ -237,9 +237,9 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_cfg_hash**: Hash=  
+- **previous_cfg_hash**: Hash
   If present, filters configurations by the specified previous configuration hash.
-- **actual_from**: integer=  
+- **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration became actual.
 
@@ -266,9 +266,9 @@ the activation height and/or the previous configuration hash.
 
 #### Query Parameters
 
-- **previous_cfg_hash**: Hash=  
+- **previous_cfg_hash**: Hash
   If present, filters configurations by the specified previous configuration hash.
-- **actual_from**: integer=  
+- **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration will become actual.
 
@@ -415,7 +415,7 @@ based on the corresponding private key stored in [the local configuration](../ar
 JSON object with the following fields:
 
 - **cfg_hash**: Hash  
-  Hash of the proposed configuration. Should be used as `config_hash_vote_for`
+  Hash of the proposed configuration. Should be used as `hash`
   parameter of [`postvote` requests](#submit-vote-for-proposal).
 - **tx_hash**: Hash  
   Hash of the corresponding `Propose` transaction.
@@ -423,7 +423,7 @@ JSON object with the following fields:
 ### Submit Vote for Proposal
 
 ```none
-POST {base_path}/configs/{config_hash_vote_for}/postvote
+POST {base_path}/configs/postvote
 ```
 
 Creates a [`Vote` transaction](#configuration-proposal).
@@ -432,8 +432,8 @@ and its signature are computed automatically.
 
 #### Parameters
 
-- **config_hash_vote_for**: Hash  
-  Hash of the configuration to vote for.
+- **hash**: Hash  
+  Body of the request; hash of the configuration to vote for.
 
 #### Response
 
@@ -445,7 +445,7 @@ JSON object with the following fields:
 ### Submit Vote against Proposal
 
 ```none
-POST {base_path}/configs/{config_hash_vote_against}/postagainst
+POST {base_path}/configs/postagainst
 ```
 
 Creates a [`VoteAgainst` transaction](#configuration-proposal).
@@ -454,8 +454,8 @@ and its signature are computed automatically.
 
 #### Parameters
 
-- **config_hash_vote_against**: Hash  
-  Hash of the configuration to be voted against.
+- **hash**: Hash  
+  Body of the request; hash of the configuration to be voted against.
 
 #### Response
 

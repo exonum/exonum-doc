@@ -108,27 +108,24 @@ trait MyServiceApi {
 
 impl MyServiceApi for TestKitApi {
     fn get_public_data(&self) -> PublicDataResponse {
-        self.get(
-            ApiKind::Service("my_service"),
-            "/v1/first_endpoint",
-        )
+        self.public(ApiKind::Service("my_service"))
+            .get("/v1/first_endpoint")
+            .unwrap()
     }
 
     fn get_private_data(&self) -> PrivateDataResponse {
-        self.get_private(
-            ApiKind::Service("my_service"),
-            "/v1/second_endpoint",
-        )
+        self.private(ApiKind::Service("my_service"))
+            .get("/v1/second_endpoint")
+            .unwrap()
     }
 
     fn post_private_data(&self, data: &PrivateData)
         -> PostPrivateDataResponse
     {
-        self.post(
-            ApiKind::Service("my_service"),
-            "v1/third_endpoint",
-            data,
-        )
+        self.private(ApiKind::Service("my_service"))
+            .query(data)
+            .post("v1/third_endpoint")
+            .unwrap()
     }
 }
 

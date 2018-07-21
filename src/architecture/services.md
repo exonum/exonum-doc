@@ -61,7 +61,7 @@ Service endpoints are automatically aggregated and dispatched by the Exonum
 middleware layer.
 
 !!! note
-    Exonum uses [the Iron framework][iron] to specify service endpoints,
+    Exonum uses [the `actix-web` framework][actix-web] to specify service endpoints,
     both public and private. Public and private API endpoints are served on
     different
     sockets, which allows to specify stricter firewall rules for private APIs.
@@ -445,22 +445,16 @@ and push them in the queue for broadcasting, etc.
 ### REST API Initialization
 
 ```rust
-use iron::Handler;
+use exonum::api::ServiceApiBuilder;
 
-fn public_api_handler(&self, context: &ApiContext)
-                      -> Option<Box<Handler>> {
-    None
-}
-fn private_api_handler(&self, context: &ApiContext)
-                       -> Option<Box<Handler>> {
-    None
+fn wire_api(&self, builder: &mut ServiceApiBuilder) {
+
 }
 ```
 
-`public_api_handler` and `private_api_handler` provide hooks for defining
-public and private API endpoints respectively using [Iron framework][iron].
-These methods receive an API context, which allows to read information from
-the blockchain, and to translate POST requests into Exonum transactions.
+`wire_api` provides hooks for defining public and private API endpoints
+of the service. This method receives a `ServiceApiBuilder`, which allows
+binding custom handlers to REST API.
 
 The default trait implementation does not define any public or private
 endpoints.
@@ -516,7 +510,7 @@ configuration
 (e.g., private keys) optional; then, it is kept in mind that a node
 running the service might not know this information.
 
-[iron]: http://ironframework.io/
+[actix-web]: https://actix.rs/
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [rocksdb]: http://rocksdb.org
