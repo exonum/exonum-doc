@@ -453,7 +453,7 @@ impl CryptocurrencyApi {
 ```
 
 As with the transaction endpoint, the methods have an idiomatic signature
-`fn(&ServiceApiState, MyQueryParam) -> api::Result<MyResponseParam>`.
+`fn(&ServiceApiState, MyQuery) -> api::Result<MyResponse>`.
 
 ### Wire API
 
