@@ -366,10 +366,8 @@ service:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
-- Not all system Rust services are available ([configuration](../advanced/configuration-updater.md),
-  [time oracle](../advanced/time.md) and
-  [anchoring service](../advanced/bitcoin-anchoring.md)
-  will be integrated into EJB App soon).
+- [Time oracle](../advanced/time.md) service is not available,
+  but will be integrated into EJB App soon.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
 - The application supports only one Java service. Support of multiple Java
