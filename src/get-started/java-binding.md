@@ -381,7 +381,7 @@ service:
 - [Java Binding App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -393,7 +393,7 @@ service:
 [service]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/Service.html
 [standardserializers]: https://exonum.com/doc/api/java-proofs/0.1/com/exonum/binding/storage/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/storage/indices/package-summary.html
-[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/messages/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.1/com/exonum/binding/service/TransactionConverter.html
