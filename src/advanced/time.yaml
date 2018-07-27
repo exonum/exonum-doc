@@ -28,15 +28,15 @@ paths:
       responses:
         200:
           description: >
-            The response is combined date and time in UTC
-            as per [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+            JSON string with current consolidated time.
+
             `null` is returned if there is no consolidated time.
           content:
             application/json:
               schema:
-                type: string
-                nullable: true
-                example: "2018-05-17T10:43:59.404962Z"
+                allOf:
+                  - $ref: "#/components/schemas/Time"
+                  - nullable: true
 
   /validators_times:
     get:
@@ -47,9 +47,9 @@ paths:
       responses:
         200:
           description: >
-            The time field is combined date and time in UTC
-            as per [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-            `null` is returned if the validator time is unknown.
+            JSON array with validators and their corresponding timestamps.
+
+            `time` field may be `null` if validator time is unknown.
           content:
             application/json:
               schema:
@@ -58,11 +58,13 @@ paths:
                   type: object
                   properties:
                     public_key:
-                      type: string
-                      description: Public key of the validator.
+                      allOf:
+                        - $ref: "#/components/schemas/Hash"
+                        - description: Public key of the validator.
                     time:
-                      type: string
-                      nullable: true
+                      allOf:
+                        - $ref: "#/components/schemas/Time"
+                        - nullable: true
                 example:
                   - public_key: "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd"
                     time: "2018-05-17T10:45:56.057753Z"
@@ -78,8 +80,7 @@ paths:
       responses:
         200:
           description: >
-            The time field is combined date and time in UTC
-            as per [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+            JSON array with validators and their corresponding timestamps.
           content:
             application/json:
               schema:
@@ -88,12 +89,32 @@ paths:
                   type: object
                   properties:
                     public_key:
-                      type: string
-                      description: Public key of the validator.
+                      allOf:
+                        - $ref: "#/components/schemas/Hash"
+                        - description: Public key of the validator.
                     time:
-                      type: string
+                      $ref: "#/components/schemas/Time"
                 example:
                   - public_key: "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd"
                     time: "2018-05-17T10:47:08.161549Z"
                   - public_key: "f6753f4b130ce098b1322a6aac6accf2d5770946c6db273eab092197a5320717"
                     time: "2018-05-17T10:47:08.161549Z"
+
+components:
+  schemas:
+    Hash:
+      type: string
+      example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+      description: >
+        Hexadecimal string representing a hash (64 hex digits).
+    Signature:
+      type: string
+      example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+      description: >
+        Hexadecimal string representing a signature (128 hex digits).
+    Time:
+      type: string
+      example: "2018-05-17T10:45:56.057753Z"
+      description: >
+        A string which combines date and time in UTC
+        as per [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).

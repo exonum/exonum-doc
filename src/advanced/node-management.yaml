@@ -128,14 +128,13 @@ paths:
               type: object
               properties:
                 address:
-                  type: string
-                  description: >
-                    IP address and port of the peer to add.
+                  allOf:
+                    - $ref: "#/components/schemas/PeerAddress"
+                    - description: IP address and port of the peer to add.
                 public_key:
-                  type: string
-                  description: >
-                    Public key of the peer to add.
-                    A string of 64 hex digits.
+                  allOf:
+                    - $ref: "#/components/schemas/PublicKey"
+                    - description: Public key of the peer to add.
               example:
                 address: "127.0.0.1:6334"
                 public_key: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
@@ -314,13 +313,24 @@ components:
       description: >
         PeerAddress is a string containing address in `IP:port` format.
         IP is IPv4 address formatted as 4 octets separated by dots.
+    Hash:
+      type: string
+      example: "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76"
+      description: >
+        Hexadecimal string representing a hash (64 hex digits).
+    PublicKey:
+      type: string
+      example: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+      description: >
+        Hexadecimal string representing a public key (64 hex digits).
     OutgoingConnectionInfo:
       type: object
       properties:
         public_key:
-          type: string
-          nullable: true
-          description: The public key of the peer or `null` if the public key is unknown.
+          allOf:
+            - $ref: "#/components/schemas/PublicKey"
+            - nullable: true
+              description: The public key of the peer or `null` if the public key is unknown.
         state:
           $ref: "#/components/schemas/OutgoingConnectionState"
     OutgoingConnectionState:

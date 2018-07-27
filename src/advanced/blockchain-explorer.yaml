@@ -251,8 +251,18 @@ components:
       type: string
       example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
       description: >
-        Hexadecimal representation of a hash.
-        Hash takes 32 bytes, the string contains 64 hex digits.
+        Hexadecimal string representing a hash (64 hex digits).
+    Signature:
+      type: string
+      example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+      description: >
+        Hexadecimal string representing a signature (128 hex digits).
+    Time:
+      type: string
+      example: "2018-05-17T10:45:56.057753Z"
+      description: >
+        A string which combines date and time in UTC
+        as per [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
     TransactionType:
       type: string
       description: >
@@ -436,10 +446,9 @@ components:
           type: object
           description: Body of the transaction.
         signature:
-          type: string
-          description: >
-            Signature of the transaction message.
-            Signatures are represented as strings of 128 hex digits.
+          allOf:
+            - $ref: "#/components/schemas/Signature"
+            - description: Signature of the transaction message.
     BlockHeader:
       type: object
       description: Description of a block in blockchain.
@@ -448,10 +457,9 @@ components:
           type: integer
           description: The height of the block.
         prev_hash:
-          type: string
-          description: >
-            The hash of the previous block.
-            Hashes are represented as strings of 64 hex digits.
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: Hash of the previous block.
         proposer_id:
           type: integer
           description: ID of the validator that created an approved block proposal.
@@ -459,18 +467,19 @@ components:
           type: integer
           description: Information schema version. Currently, `0`.
         state_hash:
-          type: string
-          description: >
-            Hash of the current
-            [Exonum state](https://exonum.com/doc/glossary/#blockchain-state)
-            after applying transactions in the block.
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: >
+                Hash of the current
+                [Exonum state](https://exonum.com/doc/glossary/#blockchain-state)
+                after applying transactions in the block.
         tx_count:
           type: integer
           description: Number of transactions included into the block.
         tx_hash:
-          type: string
-          description: >
-            The root hash of the transactions Merkle tree.
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: Root hash of the transactions Merkle tree.
     Precommit:
       type: object
       description: >
@@ -481,26 +490,26 @@ components:
           description: The content of the `Precommit` message.
           properties:
             block_hash:
-              type: string
-              description: >
-                The hash of the current block (the `Precommit` message was created for).
-                Hashes are represented as strings of 64 hex digits.
+              allOf:
+                - $ref: "#/components/schemas/Hash"
+                - description: >
+                    The hash of the current block (the `Precommit` message was created for).
             height:
               type: integer
               description: The height of the current block.
             propose_hash:
-              type: string
-              description: >
-                Hash of the corresponding `Propose`.
+              allOf:
+                - $ref: "#/components/schemas/Hash"
+                - description: >
+                    Hash of the corresponding `Propose`.
             round:
               type: integer
               description: The round when the block proposal was created.
             time:
-              type: string
-              example: "2018-05-17T10:45:56.057753Z"
-              description: >
-                UTC time of the validator that created the block proposal.
-                A string combining date and time in UTC as per ISO 8601.
+              allOf:
+                - $ref: "#/components/schemas/Time"
+                - description: >
+                    UTC time of the validator that created the block proposal.
             validator:
               type: integer
               description: ID of the validator that created this `Precommit` message.
@@ -514,7 +523,6 @@ components:
           type: integer
           description: Unique service identifier. Equals 0.
         signature:
-          type: string
-          description: >
-            `Precommit` message creator's signature.
-            Signatures are represented as strings of 128 hex digits.
+          allOf:
+            - $ref: "#/components/schemas/Signature"
+            - description: Signature of the `Precommit` message creator.

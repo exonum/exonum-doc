@@ -32,8 +32,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
-                example: "<TODO>"
+                $ref: "#/components/schemas/BtcAddress"
 
   /address/following:
     get:
@@ -49,9 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
-                nullable: true
-                example: "<TODO>"
+                $ref: "#/components/schemas/BtcAddress"
 
   /actual_lect:
     get:
@@ -98,10 +95,11 @@ paths:
                 type: object
                 properties:
                   hash:
-                    type: string
-                    description: >
-                      Hash of Exonum transaction
-                      where the specified validator published this LECT.
+                    allOf:
+                      - $ref: "#/components/schemas/Hash"
+                      - description: >
+                          Hash of Exonum transaction
+                          where the specified validator published this LECT.
                   content:
                     $ref: "#/components/schemas/AnchoringInfo"
                 example:
@@ -183,6 +181,16 @@ paths:
 
 components:
   schemas:
+    Hash:
+      type: string
+      example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+      description: >
+        Hexadecimal string representing a hash (64 hex digits).
+    BtcAddress:
+      type: string
+      example: "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
+      description: >
+        Bitcoin anchoring address in Base58Check format.
     AnchoringInfoNullable:
       allOf:
         - $ref: "#/components/schemas/AnchoringInfo"
@@ -191,27 +199,30 @@ components:
       type: object
       properties:
         txid:
-          type: string
-          description: >
-            Hash for the anchoring Bitcoin transaction
-            which is considered to be the LECT.
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: >
+                Hash for the anchoring Bitcoin transaction
+                which is considered to be the LECT.
         payload:
           type: object
           nullable: true
           properties:
             block_hash:
-              type: string
-              description: Hash of the anchored Exonum block.
+              allOf:
+                - $ref: "#/components/schemas/Hash"
+                - description: Hash of the anchored Exonum block.
             block_height:
               type: integer
               description: Height of the anchored Exonum block.
             prev_tx_chain:
-              type: string
-              nullable: true
-              description: >
-                Hash of the last transaction in the previous chain
-                of anchoring transactions if it has been broken.
-                Otherwise, `null`.
+              allOf:
+                - $ref: "#/components/schemas/Hash"
+                - nullable: true
+                  description: >
+                    Hash of the last transaction in the previous chain
+                    of anchoring transactions if it has been broken.
+                    Otherwise, `null`.
       example:
         txid: "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
         payload:
