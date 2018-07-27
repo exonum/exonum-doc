@@ -50,6 +50,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnknownTransaction"
+
   /block:
     get:
       tags: [Read Requests]
@@ -129,6 +130,7 @@ paths:
                       service_id: 0
                       signature: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
                   txs: []
+
   /blocks:
     get:
       tags: [Read Requests]
@@ -253,10 +255,13 @@ components:
         Hash takes 32 bytes, the string contains 64 hex digits.
     TransactionType:
       type: string
-      description: |
+      description: >
         Transaction type, can be:
+
         - **committed:** committed transaction (in blockchain)
+
         - **in-pool:** uncommitted transaction (in the pool of unconfirmed transactions)
+
         - **unknown:** unknown transaction
       enum:
       - committed

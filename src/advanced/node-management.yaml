@@ -40,6 +40,7 @@ paths:
                 properties:
                   size:
                     type: integer
+
   /healthcheck:
     get:
       tags: [Read Requests]
@@ -95,6 +96,7 @@ paths:
                 example:
                   consensus_status: Active
                   connectivity: NotConnected
+
   /user_agent:
     get:
       tags: [Read Requests]
@@ -107,6 +109,7 @@ paths:
               schema:
                 type: string
                 example: "exonum 0.9.0/rustc 1.27.2 (58cc626de 2018-07-18)\n\n/Mac OS10.12.6"
+
   /peers:
     post:
       tags: [Private API]
@@ -136,7 +139,6 @@ paths:
               example:
                 address: "127.0.0.1:6334"
                 public_key: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
-
       responses:
         200:
           description: >
@@ -200,6 +202,7 @@ paths:
                       state:
                         delay: 4000
                         type: Reconnect
+
   /consensus_enabled:
     get:
       tags: [Private API]
@@ -240,6 +243,7 @@ paths:
                 type: object
                 nullable: true
                 example: null
+
   /network:
     get:
       tags: [Private API]
@@ -273,6 +277,7 @@ paths:
                   services:
                     - id: 128
                       name: "cryptocurrency"
+
   /shutdown:
     post:
       tags: [Private API]
@@ -324,9 +329,11 @@ components:
       properties:
         type:
           type: string
-          description: |
+          description: >
             Connection type, can be one of:
+
             - `Active` for established connections
+
             - `Reconnect` for yet unestablished connections
           enum:
             - Active
