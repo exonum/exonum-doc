@@ -18,15 +18,15 @@ servers:
 - url: http://example.com/api/system/v1
 
 tags:
-- name: Public endpoints
-  description: Accessible by any remote node or host.
-- name: Private endpoints
-  description: Accessible only locally on the node.
+- name: Read Requests
+  description: Public read-only API available to everybody.
+- name: Private API
+  description: Maintenance API for Exonum node administrators.
 
 paths:
   /mempool:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get number of unconfirmed transactions
       description: >
         Returns the number of transactions in the node pool of unconfirmed transactions.
@@ -42,7 +42,7 @@ paths:
                     type: integer
   /healthcheck:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Healthcheck
       description: >
         Returns a boolean value representing if the node is connected to other peers.
@@ -97,7 +97,7 @@ paths:
                   connectivity: NotConnected
   /user_agent:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get User Agent information
       responses:
         200:
@@ -109,7 +109,7 @@ paths:
                 example: "exonum 0.9.0/rustc 1.27.2 (58cc626de 2018-07-18)\n\n/Mac OS10.12.6"
   /peers:
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Add a new peer
       description: >
         Adds new Exonum node to the list of peers for the current node.
@@ -151,7 +151,7 @@ paths:
                 nullable: true
                 example: null
     get:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Get list of peers
       description: >
         Get the list of current peers.
@@ -202,7 +202,7 @@ paths:
                         type: Reconnect
   /consensus_enabled:
     get:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Check if consensus is enabled
       description: >
         Returns a boolean value representing if the node participates in consensus.
@@ -215,7 +215,7 @@ paths:
                 type: boolean
                 example: true
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Enable/disable consensus interaction
       description: >
         Switches consensus interaction of the node on or off.
@@ -242,7 +242,7 @@ paths:
                 example: null
   /network:
     get:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Get network information
       description: >
         Get information about the serialization protocol
@@ -275,7 +275,7 @@ paths:
                       name: "cryptocurrency"
   /shutdown:
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Shutdown node
       description: >
         After receiving a shutdown message, the node stops processing transactions,

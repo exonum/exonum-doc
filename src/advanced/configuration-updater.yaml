@@ -22,16 +22,15 @@ servers:
 - url: http://example.com/api/services/configuration/v1
 
 tags:
-- name: Public endpoints
-  description: Accessible by any remote node or host.
-
-- name: Private endpoints
-  description: <TODO>
+- name: Read Requests
+  description: Public read-only API available to everybody.
+- name: Private API
+  description: Maintenance API for Exonum node administrators.
 
 paths:
   /configs/actual:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get actual configuration
       description: >
         Looks up the actual global configuration.
@@ -46,7 +45,7 @@ paths:
 
   /configs/following:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get following configuration
       description: >
         Looks up the locked-in following configuration which hasn’t taken effect yet.
@@ -64,7 +63,7 @@ paths:
 
   /configs:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get configuration by hash
       description: >
         Looks up configuration (including proposals) by the hash.
@@ -86,7 +85,7 @@ paths:
 
   /configs/votes:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get votes for configuration
       description: >
         Looks up votes for a configuration proposal by the configuration hash.
@@ -117,7 +116,7 @@ paths:
 
   /configs/committed:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get committed configurations
       description: >
         Looks up all committed configurations,
@@ -141,7 +140,7 @@ paths:
 
   /configs/proposed:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get proposed configurations
       description: >
         Looks up all proposed configurations,
@@ -165,7 +164,7 @@ paths:
 
   /configs/postpropose:
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Submit configuration proposal
       description: >
         Creates a `Propose` transaction.
@@ -202,7 +201,7 @@ paths:
 
   /config/postvote:
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Submit vote for proposal
       description: >
         Creates a `Vote` transaction.
@@ -235,7 +234,7 @@ paths:
 
   /config/postagainst:
     post:
-      tags: [Private endpoints]
+      tags: [Private API]
       summary: Submit vote against proposal
       description: >
         Creates a `VoteAgainst` transaction.

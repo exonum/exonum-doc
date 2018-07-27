@@ -11,13 +11,13 @@ servers:
 - url: http://example.com/api/explorer/v1
 
 tags:
-- name: Public endpoints
-  description: Accessible by any remote node or host.
+- name: Read Requests
+  description: Public read-only API available to everybody.
 
 paths:
   /transactions:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get transaction by hash
       description: >
         Searches for a transaction, either committed or uncommitted, by the hash.
@@ -52,7 +52,7 @@ paths:
                 $ref: "#/components/schemas/UnknownTransaction"
   /block:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get block by height
       description: >
         Returns the content for a block of a specific height.
@@ -131,7 +131,7 @@ paths:
                   txs: []
   /blocks:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get blocks in range
       description: >
         Returns the explored range and the corresponding headers.

@@ -15,13 +15,13 @@ servers:
 - url: http://example.com/api/services/btc_anchoring/v1
 
 tags:
-- name: Public endpoints
-  description: Accessible by any remote node or host.
+- name: Read Requests
+  description: Public read-only API available to everybody.
 
 paths:
   /address/actual:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get actual anchoring address
       description: >
         Returns the current anchoring BTC-address.
@@ -37,7 +37,7 @@ paths:
 
   /address/following:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get next anchoring address
       description: >
         If the change of the validators list is scheduled, returns the next anchoring address.
@@ -55,7 +55,7 @@ paths:
 
   /actual_lect:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get actual common LECT
       description: >
         Returns the [LECT](https://exonum.com/doc/advanced/bitcoin-anchoring/#lect)
@@ -72,7 +72,7 @@ paths:
 
   /actual_lect/validator:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get actual LECT for specific validator
       description: >
         Returns the actual [LECT](https://exonum.com/doc/advanced/bitcoin-anchoring/#lect)
@@ -123,7 +123,7 @@ paths:
 
   /nearest_lect:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get nearest LECT for a block
       description: >
         Returns the content of the anchoring transaction which anchors the specific block.
@@ -158,7 +158,7 @@ paths:
 
   /block_header_proof:
     get:
-      tags: [Public endpoints]
+      tags: [Read Requests]
       summary: Get cryptographic proof for a block
       description: >
         Provides cryptographic proofs for Exonum blocks
