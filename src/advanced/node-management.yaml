@@ -148,9 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                nullable: true
-                example: null
+                $ref: "#/components/schemas/NullObject"
     get:
       tags: [Private API]
       summary: Get list of peers
@@ -239,9 +237,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                nullable: true
-                example: null
+                $ref: "#/components/schemas/NullObject"
 
   /network:
     get:
@@ -292,21 +288,21 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              nullable: true
-              example: null
+              $ref: "#/components/schemas/NullObject"
       responses:
         200:
           description: Successfully initiated node shutdown.
           content:
             application/json:
               schema:
-                type: object
-                nullable: true
-                example: null
+                $ref: "#/components/schemas/NullObject"
 
 components:
   schemas:
+    NullObject:
+      type: object
+      nullable: true
+      example: null
     PeerAddress:
       type: string
       example: "198.51.100.4:8080"
