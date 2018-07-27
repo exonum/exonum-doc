@@ -304,6 +304,7 @@ components:
       nullable: true
       example: null
     PeerAddress:
+      # TODO: in 0.10.0 this will support hostnames and IPv6 addresses
       type: string
       example: "198.51.100.4:8080"
       description: >

@@ -234,6 +234,7 @@ components:
       description: >
         A proof of existence for an anchored or a non-anchored Exonum block at the given height.
       properties:
+        # TODO: describe BlockProof, MapProof, ListProof in schema
         latest_authorized_block:
           type: object
           description: >
