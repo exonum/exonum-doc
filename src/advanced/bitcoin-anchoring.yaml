@@ -1,0 +1,238 @@
+openapi: 3.0.0
+info:
+  title: Anchoring Service
+  version: 0.9.0
+  description: >
+    The anchoring service is developed to increase product security
+    and provide non-repudiation for Exonum applications.
+    This service periodically publishes the Exonum blockchain block hash to the Bitcoin blockchain,
+    so that it is publicly auditable by anyone having access to the Exonum blockchain.
+    Even in the case of validators collusion, transaction history cannot be falsified.
+    The discrepancy between the actual Exonum blockchain state
+    and the one written to the Bitcoin blockchain will be found instantly.
+
+servers:
+- url: http://example.com/api/services/btc_anchoring/v1
+
+tags:
+- name: Public endpoints
+  description: Accessible by any remote node or host.
+
+paths:
+  /address/actual:
+    get:
+      tags: [Public endpoints]
+      summary: Get actual anchoring address
+      description: >
+        Returns the current anchoring BTC-address.
+      responses:
+        200:
+          description: >
+            The string with a value of the anchoring address in the Base58Check format.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "<TODO>"
+
+  /address/following:
+    get:
+      tags: [Public endpoints]
+      summary: Get next anchoring address
+      description: >
+        If the change of the validators list is scheduled, returns the next anchoring address.
+        Otherwise, returns `null`.
+      responses:
+        200:
+          description: >
+            The string with a value of the anchoring address in the Base58Check format.
+          content:
+            application/json:
+              schema:
+                type: string
+                nullable: true
+                example: "<TODO>"
+
+  /actual_lect:
+    get:
+      tags: [Public endpoints]
+      summary: Get actual common LECT
+      description: >
+        Returns the [LECT](https://exonum.com/doc/advanced/bitcoin-anchoring/#lect)
+        that is agreed upon by the supermajority of validators now, if such exists.
+        Otherwise, returns `null`.
+      responses:
+        200:
+          description: >
+            JSON object with anchoring information or `null`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnchoringInfoNullable"
+
+  /actual_lect/validator:
+    get:
+      tags: [Public endpoints]
+      summary: Get actual LECT for specific validator
+      description: >
+        Returns the actual [LECT](https://exonum.com/doc/advanced/bitcoin-anchoring/#lect)
+        for the specified validator,
+        along with the hash of the Exonum transaction published in this LECT.
+
+        If the specified validator `id` is greater or equal to the total validators amount
+        then an error is returned.
+      parameters:
+        - in: query
+          name: id
+          required: true
+          description: Identifier of the validator to query for.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: >
+            JSON object descibing actual LECT as viewed by the specified validator.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hash:
+                    type: string
+                    description: >
+                      Hash of Exonum transaction
+                      where the specified validator published this LECT.
+                  content:
+                    $ref: "#/components/schemas/AnchoringInfo"
+                example:
+                  hash: "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784"
+                  content:
+                    txid: "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+                    payload:
+                      block_hash: "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a"
+                      block_height: 0
+                      prev_tx_chain: null
+        400:
+          description: >
+            Invalid validator `id`.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Unknown validator id=100"
+
+  /nearest_lect:
+    get:
+      tags: [Public endpoints]
+      summary: Get nearest LECT for a block
+      description: >
+        Returns the content of the anchoring transaction which anchors the specific block.
+
+        Returns `null` on any of the following conditions:
+
+        - The selected block has not been anchored yet.
+
+        - The [observer interval](https://exonum.com/doc/advanced/bitcoin-anchoring/#observer-interval)
+          is not set.
+
+        - The number of confirmations of anchoring transaction is less than
+          the [UTXO confirmations](https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters)
+          parameter.
+      parameters:
+        - in: query
+          name: height
+          required: true
+          description: Exonum block height.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: >
+            A string with hex-encoded content of the nearest Bitcoin anchoring transaction.
+          content:
+            application/json:
+              schema:
+                type: string
+                nullable: true
+                example: "0100000001997ae2a654ddb2432ea2fece72bc71d3dbd371703a0479592efae21bf6b7d5100100000000ffffffff01e00f9700000000001976a9142a495afa8b8147ec2f01713b18693cb0a85743b288ac00000000"
+
+  /block_header_proof:
+    get:
+      tags: [Public endpoints]
+      summary: Get cryptographic proof for a block
+      description: >
+        Provides cryptographic proofs for Exonum blocks
+        including those anchored to Bitcoin blockchain.
+        The proof is an apparent evidence of availability
+        of a certain Exonum block in the blockchain.
+      parameters:
+        - in: query
+          name: height
+          required: true
+          description: Exonum block height.
+          schema:
+            type: integer
+      responses:
+        200:
+          description: >
+            A proof of existence for an anchored or a non-anchored Exonum block at the given height.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnchoredBlockHeaderProof"
+
+components:
+  schemas:
+    AnchoringInfoNullable:
+      allOf:
+        - $ref: "#/components/schemas/AnchoringInfo"
+        - nullable: true
+    AnchoringInfo:
+      type: object
+      properties:
+        txid:
+          type: string
+          description: >
+            Hash for the anchoring Bitcoin transaction
+            which is considered to be the LECT.
+        payload:
+          type: object
+          nullable: true
+          properties:
+            block_hash:
+              type: string
+              description: Hash of the anchored Exonum block.
+            block_height:
+              type: integer
+              description: Height of the anchored Exonum block.
+            prev_tx_chain:
+              type: string
+              nullable: true
+              description: >
+                Hash of the last transaction in the previous chain
+                of anchoring transactions if it has been broken.
+                Otherwise, `null`.
+      example:
+        txid: "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+        payload:
+          block_hash: "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a"
+          block_height: 0
+          prev_tx_chain: null
+    AnchoredBlockHeaderProof:
+      type: object
+      description: >
+        A proof of existence for an anchored or a non-anchored Exonum block at the given height.
+      properties:
+        latest_authorized_block:
+          type: object
+          description: >
+            `BlockProof` object proving the existence of
+            the latest authorized block in Exonum blockchain.
+        to_table:
+          type: object
+          description: >
+            `MapProof` object for the whole database table.
+        to_block_header:
+          type: object
+          description: >
+            `ListProof` object for requested header in this table.
