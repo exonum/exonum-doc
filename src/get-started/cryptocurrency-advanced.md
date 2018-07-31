@@ -13,12 +13,13 @@ network of 4 nodes may be set up performing
 the same steps on separate machines.
 
 The service allows the following operations:
- - creating a wallet
- - replenishing the wallet balance
- - transferring money between wallets
- - obtaining [cryptographic proofs](https://exonum.com/doc/architecture/storage/#merkelized-indices)
-   of executed transactions
- - reviewing wallets history.
+
+    - creating a wallet
+    - replenishing the wallet balance
+    - transferring money between wallets
+    - obtaining [cryptographic proofs](https://exonum.com/doc/architecture/storage/#merkelized-indices)
+      of executed transactions
+    - reviewing wallets history.
 
 You can view and download the full source code of this tutorial
 [here](https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced).
@@ -35,7 +36,7 @@ and the latest version of
 
 Create a crate with the **exonum** crate as a dependency.
 
-```
+```sh
 cargo new cryptocurrency-advanced
 ```
 
@@ -756,6 +757,7 @@ pub fn wire(builder: &mut ServiceApiBuilder) {
 We have now described all the structural parts of our demo. The last step is to
 introduce the `main` function that will
 launch our service. It does this in the following manner:
+
 - imports our demo library described in `lib.rs` file together with
   configuration service and `exonum` crate; and
 - creates nodes with two services – configuration service and our
