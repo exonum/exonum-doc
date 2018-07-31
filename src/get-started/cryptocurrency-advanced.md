@@ -397,7 +397,7 @@ code together with its verbal description.
 We use transactions! macro to define the service transactions.
 
 In this tutorial, however, we unite the transactions under the
-`WalletTransations` group as they all refer to the same
+`WalletTransaсtions` group as they all refer to the same
 structure. Although this is the only transactions group in our demo, the idea
 might be of use in cases where a larger
 number of different groups of transactions is applied.
@@ -789,7 +789,7 @@ is configured, please, consult our service
 [Read Me](https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced).
 
 Note, that for the commands to work you need to use the name of your service
-instead of “exonum-cryptocurrency-advaced”
+instead of “exonum-cryptocurrency-advanced”
 indicated in the Read Me or just use `cargo run` command instead of your crate
 name.
 
