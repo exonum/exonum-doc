@@ -14,12 +14,12 @@ the same steps on separate machines.
 
 The service allows the following operations:
 
-    - creating a wallet
-    - replenishing the wallet balance
-    - transferring money between wallets
-    - obtaining [cryptographic proofs](https://exonum.com/doc/architecture/storage/#merkelized-indices)
-      of executed transactions
-    - reviewing wallets history.
+  - creating a wallet
+  - replenishing the wallet balance
+  - transferring money between wallets
+  - obtaining [cryptographic proofs](https://exonum.com/doc/architecture/storage/#merkelized-indices)
+    of executed transactions
+  - reviewing wallets history.
 
 You can view and download the full source code of this tutorial
 [here](https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced).
