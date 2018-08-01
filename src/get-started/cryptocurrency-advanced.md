@@ -42,7 +42,7 @@ cargo new cryptocurrency-advanced
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
 
-```
+```toml
 [dependencies]
 exonum = "0.9.0"
 exonum-configuration = "0.9.0"
@@ -114,7 +114,10 @@ impl Service for CurrencyService {
     }
 
     // Interface to create transactions from raw data.
-    fn tx_from_raw(&self, raw: RawTransaction) -> Result<Box<dyn Transaction>, EncodingError> {
+    fn tx_from_raw(
+      &self,
+      raw: RawTransaction
+    ) -> Result<Box<dyn Transaction>, EncodingError> {
         WalletTransactions::tx_from_raw(raw).map(Into::into)
     }
 
@@ -251,8 +254,15 @@ where
     }
 
     /// Returns history of the wallet with the given public key.
-    pub fn wallet_history(&self, public_key: &PublicKey) -> ProofListIndex<&T, Hash> {
-        ProofListIndex::new_in_family("cryptocurrency.wallet_history", public_key, &self.view)
+    pub fn wallet_history(
+      &self,
+      public_key: &PublicKey
+    ) -> ProofListIndex<&T, Hash> {
+        ProofListIndex::new_in_family(
+          "cryptocurrency.wallet_history",
+          public_key,
+          &self.view
+        )
     }
 
     /// Returns wallet for the given public key.
@@ -284,7 +294,9 @@ wallets:
 /// Implementation of mutable methods.
 impl<'a> CurrencySchema<&'a mut Fork> {
     /// Returns mutable `MerklePatriciaTable` with wallets.
-    pub fn wallets_mut(&mut self) -> ProofMapIndex<&mut Fork, PublicKey, Wallet> {
+    pub fn wallets_mut(
+      &mut self
+    ) -> ProofMapIndex<&mut Fork, PublicKey, Wallet> {
         ProofMapIndex::new("cryptocurrency.wallets", &mut self.view)
     }
 
@@ -293,13 +305,22 @@ impl<'a> CurrencySchema<&'a mut Fork> {
         &mut self,
         public_key: &PublicKey,
     ) -> ProofListIndex<&mut Fork, Hash> {
-        ProofListIndex::new_in_family("cryptocurrency.wallet_history", public_key, &mut self.view)
+        ProofListIndex::new_in_family(
+          "cryptocurrency.wallet_history",
+          public_key,
+          &mut self.view
+        )
     }
 
     /// Increases balance of the wallet and appends new record to its history.
     ///
     /// Panics if there is no wallet with the given public key.
-    pub fn increase_wallet_balance(&mut self, wallet: Wallet, amount: u64, transaction: &Hash) {
+    pub fn increase_wallet_balance(
+      &mut self,
+      wallet: Wallet,
+      amount: u64,
+      transaction: &Hash
+    ) {
         let wallet = {
             let mut history = self.wallet_history_mut(wallet.pub_key());
             history.push(*transaction);
@@ -313,7 +334,12 @@ impl<'a> CurrencySchema<&'a mut Fork> {
     /// Decreases balance of the wallet and appends new record to its history.
     ///
     /// Panics if there is no wallet with given public key.
-    pub fn decrease_wallet_balance(&mut self, wallet: Wallet, amount: u64, transaction: &Hash) {
+    pub fn decrease_wallet_balance(
+      &mut self,
+      wallet: Wallet,
+      amount: u64,
+      transaction: &Hash
+    ) {
         let wallet = {
             let mut history = self.wallet_history_mut(wallet.pub_key());
             history.push(*transaction);
@@ -325,7 +351,12 @@ impl<'a> CurrencySchema<&'a mut Fork> {
     }
 
     /// Creates new wallet and appends first record to its history.
-    pub fn create_wallet(&mut self, key: &PublicKey, name: &str, transaction: &Hash) {
+    pub fn create_wallet(
+      &mut self,
+      key: &PublicKey,
+      name: &str,
+      transaction: &Hash
+    ) {
         let wallet = {
             let mut history = self.wallet_history_mut(key);
             history.push(*transaction);
@@ -636,7 +667,10 @@ relevant section above:
 
 ```rust
 impl CryptocurrencyApi {
-    pub fn wallet_info(state: &ServiceApiState, query: WalletQuery) -> api::Result<WalletInfo> {
+    pub fn wallet_info(
+      state: &ServiceApiState,
+      query: WalletQuery
+    ) -> api::Result<WalletInfo> {
         let snapshot = state.snapshot();
         let general_schema = blockchain::Schema::new(&snapshot);
         let currency_schema = CurrencySchema::new(&snapshot);
