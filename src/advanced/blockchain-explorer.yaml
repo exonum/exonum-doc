@@ -489,9 +489,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/ValidatorId"
             - description: ID of the validator that created an approved block proposal.
-        schema_version:
-          type: integer
-          description: Information schema version. Currently, `0`.
         state_hash:
           allOf:
             - $ref: "#/components/schemas/Hash"
