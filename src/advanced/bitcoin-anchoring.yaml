@@ -48,7 +48,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BtcAddress"
+                allOf:
+                  - $ref: "#/components/schemas/BtcAddress"
+                  - nullable: true
 
   /actual_lect:
     get:
@@ -65,7 +67,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnchoringInfoNullable"
+                allOf:
+                  - $ref: "#/components/schemas/AnchoringInfo"
+                  - nullable: true
 
   /actual_lect/validator:
     get:
@@ -191,10 +195,6 @@ components:
       example: "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
       description: >
         Bitcoin anchoring address in Base58Check format.
-    AnchoringInfoNullable:
-      allOf:
-        - $ref: "#/components/schemas/AnchoringInfo"
-        - nullable: true
     AnchoringInfo:
       type: object
       properties:
