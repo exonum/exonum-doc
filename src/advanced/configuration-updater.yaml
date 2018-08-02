@@ -284,6 +284,16 @@ components:
       example: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
       description: >
         Hexadecimal string representing a public key (64 hex digits).
+    Height:
+      type: integer
+      description: Exonum block height.
+      minimum: 0
+      maximum: 18446744073709551615
+    Milliseconds:
+      type: integer
+      description: Time duration in milliseconds.
+      minimum: 0
+      maximum: 18446744073709551615
     StoredConfiguration:
       type: object
       description: StoredConfiguration
@@ -297,9 +307,10 @@ components:
                 For the configuration in the genesis block
                 `hash` is just an array of zeros.
         actual_from:
-          type: integer
-          description: >
-            The height starting from which this configuration becomes actual.
+          allOf:
+            - $ref: "#/components/schemas/Height"
+            - description: >
+                The height starting from which this configuration becomes actual.
         validator_keys:
           type: array
           description: >
@@ -323,33 +334,46 @@ components:
             Consensus algorithm parameters.
           properties:
             round_timeout:
-              type: integer
-              description: Interval between rounds (milliseconds).
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Interval between rounds (milliseconds).
             status_timeout:
-              type: integer
-              description: Period of sending a Status message (milliseconds).
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Period of sending a Status message (milliseconds).
             peers_timeout:
-              type: integer
-              description: Peer exchange timeout (milliseconds).
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Peer exchange timeout (milliseconds).
             txs_block_limit:
               type: integer
+              minimum: 0
+              maximum: 4294967295
               description: Maximum number of transactions per block.
             max_message_len:
               type: integer
+              minimum: 1048576
+              maximum: 4294967295
               description: >
                 Maximum message length (in bytes).
                 The range of possible values for this parameter is between 1MB and 2^32-1 bytes.
             min_propose_timeout:
-              type: integer
-              description: Minimal propose timeout (milliseconds).
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Minimal propose timeout (milliseconds).
             max_propose_timeout:
-              type: integer
-              description: Maximal propose timeout (milliseconds).
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Maximal propose timeout (milliseconds).
             propose_timeout_threshold:
               type: integer
+              minimum: 0
+              maximum: 4294967295
               description: Amount of transactions in pool to start use `min_propose_timeout`.
         majority_count:
           type: integer
+          minimum: 0
+          maximum: 65535
           nullable: true
           description: >
             Number of votes required to commit the new configuration.
@@ -453,6 +477,8 @@ components:
             - description: Merkle root of all votes for the proposal.
         num_validators:
           type: integer
+          minimum: 0
+          maximum: 18446744073709551615
           description: Number of eligible voting validators.
 
   parameters:
@@ -474,4 +500,4 @@ components:
         If present, filters configurations by the specified minimum for the height
         from which the configuration became actual.
       schema:
-        type: integer
+        $ref: "#/components/schemas/Height"

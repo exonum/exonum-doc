@@ -63,8 +63,7 @@ paths:
         required: true
         description: The height of the desired block.
         schema:
-          type: integer
-          example: 20
+          $ref: "#/components/schemas/Height"
       responses:
         200:
           description: >
@@ -149,6 +148,7 @@ paths:
         schema:
           type: integer
           example: 5
+          minimum: 0
       - in: query
         name: skip_empty_blocks
         description: >
@@ -166,8 +166,10 @@ paths:
           starting from the `latest` and at least up to the `latest - count + 1`.
           The default value is the height of the latest block in the blockchain.
         schema:
-          type: integer
-          example: 300
+          allOf:
+            - $ref: "#/components/schemas/Height"
+            - example: 300
+            - nullable: true
       responses:
         200:
           description: >
@@ -201,9 +203,9 @@ paths:
                     type: object
                     properties:
                       start:
-                        type: integer
+                        $ref: "#/components/schemas/Height"
                       end:
-                        type: integer
+                        $ref: "#/components/schemas/Height"
                 example:
                   blocks:
                     - height: 18
@@ -259,6 +261,11 @@ components:
       example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
       description: >
         Hexadecimal string representing a signature (128 hex digits).
+    Height:
+      type: integer
+      description: Exonum block height.
+      minimum: 0
+      maximum: 18446744073709551615
     Time:
       type: string
       format: date-time
@@ -305,6 +312,8 @@ components:
           - panic
         code:
           type: integer
+          minimum: 0
+          maximum: 255
           description: >
             Error code supplied by the service developer.
             Only present for erroneous transactions.
@@ -319,11 +328,14 @@ components:
       description: Transaction position in the blockchain.
       properties:
         block_height:
-          type: integer
-          description: The height of the block including this transaction.
+          allOf:
+            - $ref: "#/components/schemas/Height"
+            - description: The height of the block including this transaction.
         position_in_block:
           type: integer
           description: Position of the transaction in the block.
+          minimum: 0
+          maximum: 18446744073709551615
     UnknownTransaction:
       type: object
       properties:
@@ -432,18 +444,29 @@ components:
         - type: object
           properties:
             val: {}
+    ValidatorId:
+      type: integer
+      minimum: 0
+      maximum: 65535
+      description: Validators identifier.
     SerializedTransaction:
       type: object
       description: Transaction with the specified hash.
       properties:
         protocol_version:
           type: integer
+          minimum: 0
+          maximum: 255
           description: The major version of the Exonum serialization protocol. Currently, 0.
         service_id:
           type: integer
+          minimum: 0
+          maximum: 65535
           description: Unique service identifier.
         message_id:
           type: integer
+          minimum: 0
+          maximum: 65535
           description: ID of the transaction message.
         body:
           type: object
@@ -457,15 +480,15 @@ components:
       description: Description of a block in blockchain.
       properties:
         height:
-          type: integer
-          description: The height of the block.
+          $ref: "#/components/schemas/Height"
         prev_hash:
           allOf:
             - $ref: "#/components/schemas/Hash"
             - description: Hash of the previous block.
         proposer_id:
-          type: integer
-          description: ID of the validator that created an approved block proposal.
+          allOf:
+            - $ref: "#/components/schemas/ValidatorId"
+            - description: ID of the validator that created an approved block proposal.
         schema_version:
           type: integer
           description: Information schema version. Currently, `0`.
@@ -478,6 +501,8 @@ components:
                 after applying transactions in the block.
         tx_count:
           type: integer
+          minimum: 0
+          maximum: 4294967295
           description: Number of transactions included into the block.
         tx_hash:
           allOf:
@@ -498,8 +523,9 @@ components:
                 - description: >
                     The hash of the current block (the `Precommit` message was created for).
             height:
-              type: integer
-              description: The height of the current block.
+              allOf:
+                - $ref: "#/components/schemas/Height"
+                - description: The height of the current block.
             propose_hash:
               allOf:
                 - $ref: "#/components/schemas/Hash"
@@ -507,6 +533,8 @@ components:
                     Hash of the corresponding `Propose`.
             round:
               type: integer
+              minimum: 0
+              maximum: 4294967295
               description: The round when the block proposal was created.
             time:
               allOf:
@@ -514,16 +542,23 @@ components:
                 - description: >
                     UTC time of the validator that created the block proposal.
             validator:
-              type: integer
-              description: ID of the validator that created this `Precommit` message.
+              allOf:
+                - $ref: "#/components/schemas/ValidatorId"
+                - description: ID of the validator that created this `Precommit` message.
         message_id:
           type: integer
+          minimum: 0
+          maximum: 65535
           description: ID of the `Precommit` message. Equals 4.
         protocol_version:
           type: integer
+          minimum: 0
+          maximum: 255
           description: The major version of the Exonum serialization protocol. Currently, 0.
         service_id:
           type: integer
+          minimum: 0
+          maximum: 65535
           description: Unique service identifier. Equals 0.
         signature:
           allOf:

@@ -89,6 +89,8 @@ paths:
           description: Identifier of the validator to query for.
           schema:
             type: integer
+            minimum: 0
+            maximum: 4294967295
       responses:
         200:
           description: >
@@ -144,9 +146,8 @@ paths:
         - in: query
           name: height
           required: true
-          description: Exonum block height.
           schema:
-            type: integer
+            $ref: "#/components/schemas/Height"
       responses:
         200:
           description: >
@@ -156,6 +157,7 @@ paths:
               schema:
                 type: string
                 nullable: true
+                format: "^[0-9a-f]+$"
                 example: "0100000001997ae2a654ddb2432ea2fece72bc71d3dbd371703a0479592efae21bf6b7d5100100000000ffffffff01e00f9700000000001976a9142a495afa8b8147ec2f01713b18693cb0a85743b288ac00000000"
 
   /block_header_proof:
@@ -171,9 +173,8 @@ paths:
         - in: query
           name: height
           required: true
-          description: Exonum block height.
           schema:
-            type: integer
+            $ref: "#/components/schemas/Height"
       responses:
         200:
           description: >
@@ -191,6 +192,11 @@ components:
       example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
       description: >
         Hexadecimal string representing a hash (64 hex digits).
+    Height:
+      type: integer
+      description: Exonum block height.
+      minimum: 0
+      maximum: 18446744073709551615
     BtcAddress:
       type: string
       pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{33}$"
@@ -215,8 +221,9 @@ components:
                 - $ref: "#/components/schemas/Hash"
                 - description: Hash of the anchored Exonum block.
             block_height:
-              type: integer
-              description: Height of the anchored Exonum block.
+              allOf:
+                - $ref: "#/components/schemas/Height"
+                - description: Height of the anchored Exonum block.
             prev_tx_chain:
               allOf:
                 - $ref: "#/components/schemas/Hash"

@@ -40,6 +40,7 @@ paths:
                 properties:
                   size:
                     type: integer
+                    minimum: 0
 
   /healthcheck:
     get:
@@ -89,6 +90,7 @@ paths:
                     - Connected
                   amount:
                     type: integer
+                    minimum: 0
                     description: >
                       Amount of connected peers.
 
@@ -260,6 +262,8 @@ paths:
                     description: Version of the `exonum` crate.
                   protocol_version:
                     type: integer
+                    minimum: 0
+                    maximum: 255
                     description: Major version of the Exonum serialization protocol.
                   services:
                     type: array
@@ -349,6 +353,8 @@ components:
             - Reconnect
         delay:
           type: integer
+          minimum: 0
+          maximum: 18446744073709551615
           description: >
             Interval between reconnect attempts (ms).
             Is present only if **type** is `Reconnect`.
@@ -357,6 +363,8 @@ components:
       properties:
         id:
           type: integer
+          minimum: 0
+          maximum: 65535
           description: Unique service identifier.
         name:
           type: string
