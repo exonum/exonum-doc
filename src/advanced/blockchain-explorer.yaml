@@ -4,7 +4,7 @@ info:
   version: 0.9.0
   description: >
     All explorer endpoints are public.
-    `enable_blockchain_explorer` local configuration parameter
+    [`enable_blockchain_explorer` local configuration parameter](https://exonum.com/doc/architecture/configuration/#api)
     allows to turn explorer endpoints on/off.
 
 servers:
