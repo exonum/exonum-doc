@@ -82,9 +82,9 @@ paths:
                       $ref: "#/components/schemas/Precommit"
                   txs:
                     type: array
-                    description: The list of the transactions included into the block.
+                    description: The list of hashes of transactions included into the block.
                     items:
-                      $ref: "#/components/schemas/SerializedTransaction"
+                      $ref: "#/components/schemas/Hash"
                 example:
                   block:
                     height: 20
