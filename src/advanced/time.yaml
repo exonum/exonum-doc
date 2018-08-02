@@ -77,6 +77,12 @@ paths:
       summary: Get timestamps of all validators
       description: >
         Returns the latest timestamps indicated by all validator nodes for which time is known.
+
+        This includes timestamps from current validators known by the node
+        (as provided by `/validators_times`).
+        The endpoint may return additional timestamps from past validators
+        which are not present in the current node configuration
+        but were there in the past.
       responses:
         200:
           description: >

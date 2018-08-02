@@ -288,6 +288,13 @@ components:
       - in-pool
       - unknown
     TransactionStatus:
+      oneOf:
+        - $ref: "#/components/schemas/TransactionStatusSuccess"
+        - $ref: "#/components/schemas/TransactionStatusError"
+        - $ref: "#/components/schemas/TransactionStatusPanic"
+      discriminator:
+        propertyName: type
+    TransactionStatusType:
       type: object
       description: >
         [Transaction execution](https://exonum.com/doc/architecture/transactions/#execute) status.
@@ -310,19 +317,33 @@ components:
           - sucess
           - error
           - panic
-        code:
-          type: integer
-          minimum: 0
-          maximum: 255
-          description: >
-            Error code supplied by the service developer.
-            Only present for erroneous transactions.
-            Has service-specific meaning.
-        description:
-          type: string
-          description: >
-            Optional human-readable error description.
-            Only relevant for erroneous and panicking transactions.
+    TransactionStatusSuccess:
+      allOf:
+        - $ref: "#/components/schemas/TransactionStatusType"
+    TransactionStatusError:
+      allOf:
+        - $ref: "#/components/schemas/TransactionStatusType"
+        - required: [type, code]
+        - properties:
+            code:
+              type: integer
+              minimum: 0
+              maximum: 255
+              description: >
+                Error code supplied by the service developer.
+                Has service-specific meaning.
+            description:
+              type: string
+              description: >
+                Optional human-readable error description.
+    TransactionStatusPanic:
+      allOf:
+        - $ref: "#/components/schemas/TransactionStatusType"
+        - properties:
+            description:
+              type: string
+              description: >
+                Optional human-readable panic description.
     TransactionLocation:
       type: object
       description: Transaction position in the blockchain.
