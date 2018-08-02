@@ -274,11 +274,13 @@ components:
   schemas:
     Hash:
       type: string
+      pattern: "^[0-9a-f]{64}$"
       example: "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76"
       description: >
         Hexadecimal string representing a hash (64 hex digits).
     PublicKey:
       type: string
+      pattern: "^[0-9a-f]{64}$"
       example: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
       description: >
         Hexadecimal string representing a public key (64 hex digits).

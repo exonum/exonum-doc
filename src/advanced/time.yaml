@@ -104,16 +104,19 @@ components:
   schemas:
     Hash:
       type: string
+      pattern: "^[0-9a-f]{64}$"
       example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
       description: >
         Hexadecimal string representing a hash (64 hex digits).
     Signature:
       type: string
+      pattern: "^[0-9a-f]{128}$"
       example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
       description: >
         Hexadecimal string representing a signature (128 hex digits).
     Time:
       type: string
+      format: date-time
       example: "2018-05-17T10:45:56.057753Z"
       description: >
         A string which combines date and time in UTC

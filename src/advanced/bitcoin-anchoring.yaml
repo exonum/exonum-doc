@@ -187,11 +187,13 @@ components:
   schemas:
     Hash:
       type: string
+      pattern: "^[0-9a-f]{64}$"
       example: "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
       description: >
         Hexadecimal string representing a hash (64 hex digits).
     BtcAddress:
       type: string
+      pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{33}$"
       example: "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
       description: >
         Bitcoin anchoring address in Base58Check format.
