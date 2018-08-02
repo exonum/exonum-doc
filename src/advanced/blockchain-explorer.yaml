@@ -449,9 +449,8 @@ components:
       minimum: 0
       maximum: 65535
       description: Validators identifier.
-    SerializedTransaction:
+    MessageHeader:
       type: object
-      description: Transaction with the specified hash.
       properties:
         protocol_version:
           type: integer
@@ -475,6 +474,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/Signature"
             - description: Signature of the transaction message.
+    SerializedTransaction:
+      allOf:
+        - $ref: "#/components/schemas/MessageHeader"
+        - description: Transaction with the specified hash.
     BlockHeader:
       type: object
       description: Description of a block in blockchain.
@@ -506,58 +509,40 @@ components:
             - $ref: "#/components/schemas/Hash"
             - description: Root hash of the transactions Merkle tree.
     Precommit:
-      type: object
-      description: >
-        Precommit is an Exonum message, serialized according to message serialization rules.
-      properties:
-        body:
-          type: object
-          description: The content of the `Precommit` message.
-          properties:
-            block_hash:
-              allOf:
-                - $ref: "#/components/schemas/Hash"
-                - description: >
-                    The hash of the current block (the `Precommit` message was created for).
-            height:
-              allOf:
-                - $ref: "#/components/schemas/Height"
-                - description: The height of the current block.
-            propose_hash:
-              allOf:
-                - $ref: "#/components/schemas/Hash"
-                - description: >
-                    Hash of the corresponding `Propose`.
-            round:
-              type: integer
-              minimum: 0
-              maximum: 4294967295
-              description: The round when the block proposal was created.
-            time:
-              allOf:
-                - $ref: "#/components/schemas/Time"
-                - description: >
-                    UTC time of the validator that created the block proposal.
-            validator:
-              allOf:
-                - $ref: "#/components/schemas/ValidatorId"
-                - description: ID of the validator that created this `Precommit` message.
-        message_id:
-          type: integer
-          minimum: 0
-          maximum: 65535
-          description: ID of the `Precommit` message. Equals 4.
-        protocol_version:
-          type: integer
-          minimum: 0
-          maximum: 255
-          description: The major version of the Exonum serialization protocol. Currently, 0.
-        service_id:
-          type: integer
-          minimum: 0
-          maximum: 65535
-          description: Unique service identifier. Equals 0.
-        signature:
-          allOf:
-            - $ref: "#/components/schemas/Signature"
-            - description: Signature of the `Precommit` message creator.
+      allOf:
+        - $ref: "#/components/schemas/MessageHeader"
+        - description: >
+            Precommit is an Exonum message, serialized according to message serialization rules.
+        - properties:
+            body:
+              type: object
+              description: The content of the `Precommit` message.
+              properties:
+                block_hash:
+                  allOf:
+                    - $ref: "#/components/schemas/Hash"
+                    - description: >
+                        The hash of the current block (the `Precommit` message was created for).
+                height:
+                  allOf:
+                    - $ref: "#/components/schemas/Height"
+                    - description: The height of the current block.
+                propose_hash:
+                  allOf:
+                    - $ref: "#/components/schemas/Hash"
+                    - description: >
+                        Hash of the corresponding `Propose`.
+                round:
+                  type: integer
+                  minimum: 0
+                  maximum: 4294967295
+                  description: The round when the block proposal was created.
+                time:
+                  allOf:
+                    - $ref: "#/components/schemas/Time"
+                    - description: >
+                        UTC time of the validator that created the block proposal.
+                validator:
+                  allOf:
+                    - $ref: "#/components/schemas/ValidatorId"
+                    - description: ID of the validator that created this `Precommit` message.
