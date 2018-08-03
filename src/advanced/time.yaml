@@ -117,7 +117,7 @@ components:
     Signature:
       type: string
       pattern: "^[0-9a-f]{128}$"
-      example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
+      example: "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9..."
       description: >
         Hexadecimal string representing a signature (128 hex digits).
     Time:

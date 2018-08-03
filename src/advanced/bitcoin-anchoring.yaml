@@ -70,6 +70,12 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/AnchoringInfo"
                   - nullable: true
+              example:
+                txid: "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
+                payload:
+                  block_hash: "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a"
+                  block_height: 0
+                  prev_tx_chain: null
 
   /actual_lect/validator:
     get:
@@ -232,12 +238,6 @@ components:
                     Hash of the last transaction in the previous chain
                     of anchoring transactions if it has been broken.
                     Otherwise, `null`.
-      example:
-        txid: "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-        payload:
-          block_hash: "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a"
-          block_height: 0
-          prev_tx_chain: null
     AnchoredBlockHeaderProof:
       type: object
       description: >
