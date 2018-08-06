@@ -1,7 +1,7 @@
 # Cryptocurrency Advanced Tutorial
 
 This tutorial is an extended version of the
-[simple Cryptocurrency Tutorial](https://exonum.com/doc/get-started/create-service/).
+[simple Cryptocurrency Tutorial](create-service.md).
 We suggest that you try to launch the simple service first before proceeding
 with the advanced tutorial as some very
 basic steps may be omitted here for the sake of smooth exposition.
@@ -17,7 +17,7 @@ The service allows the following operations:
 - creating a wallet
 - replenishing the wallet balance
 - transferring money between wallets
-- obtaining [cryptographic proofs](https://exonum.com/doc/architecture/storage/#merkelized-indices)
+- obtaining [cryptographic proofs](../architecture/storage.md#merkelized-indices)
   of executed transactions
 - reviewing wallets history.
 
@@ -203,8 +203,8 @@ specified below.
 
 ## Create Schema
 
-As we already mentioned in the simple cryptocurrency tutorial Schema is a
-structured view of the [key-value storage](https://exonum.com/doc/architecture/storage/)
+As we already mentioned in the simple cryptocurrency tutorial schema is a
+structured view of the [key-value storage](../architecture/storage.md)
 used in Exonum. We will use the same `Snapshot` and `Fork` abstractions - for
 read requests and transactions
 correspondingly - to interact with the schema in this tutorial as well.
@@ -295,7 +295,7 @@ wallets:
 impl<'a> CurrencySchema<&'a mut Fork> {
     /// Returns mutable `MerklePatriciaTable` with wallets.
     pub fn wallets_mut(
-      &mut self
+        &mut self
     ) -> ProofMapIndex<&mut Fork, PublicKey, Wallet> {
         ProofMapIndex::new("cryptocurrency.wallets", &mut self.view)
     }
@@ -316,10 +316,10 @@ impl<'a> CurrencySchema<&'a mut Fork> {
     ///
     /// Panics if there is no wallet with the given public key.
     pub fn increase_wallet_balance(
-      &mut self,
-      wallet: Wallet,
-      amount: u64,
-      transaction: &Hash
+        &mut self,
+        wallet: Wallet,
+        amount: u64,
+        transaction: &Hash
     ) {
         let wallet = {
             let mut history = self.wallet_history_mut(wallet.pub_key());
@@ -335,10 +335,10 @@ impl<'a> CurrencySchema<&'a mut Fork> {
     ///
     /// Panics if there is no wallet with given public key.
     pub fn decrease_wallet_balance(
-      &mut self,
-      wallet: Wallet,
-      amount: u64,
-      transaction: &Hash
+        &mut self,
+        wallet: Wallet,
+        amount: u64,
+        transaction: &Hash
     ) {
         let wallet = {
             let mut history = self.wallet_history_mut(wallet.pub_key());
@@ -352,10 +352,10 @@ impl<'a> CurrencySchema<&'a mut Fork> {
 
     /// Creates new wallet and appends first record to its history.
     pub fn create_wallet(
-      &mut self,
-      key: &PublicKey,
-      name: &str,
-      transaction: &Hash
+        &mut self,
+        key: &PublicKey,
+        name: &str,
+        transaction: &Hash
     ) {
         let wallet = {
             let mut history = self.wallet_history_mut(key);
@@ -370,7 +370,7 @@ impl<'a> CurrencySchema<&'a mut Fork> {
 
 ## Reporting Errors
 
-Before defining the types of transactions, the service will realize, we define
+Before defining the types of transactions for the service we define
 the types of errors that might occur
 during execution thereof. The section is identical to the
 [one]( https://exonum.com/doc/get-started/create-service/#reporting-errors) in
@@ -421,15 +421,16 @@ impl From<Error> for ExecutionError {
 }
 ```
 
-The implementation code above returns a JSON that provides a corresponding error
-code together with its verbal description.
+The code above defines how our internal `Error` type will be converted into
+exonum internal `ExecutionError`. The latter converts to human-readable JSON
+with an error code and its verbal description before being sent to the user.
 
 ## Define Transactions
 
-We use transactions! macro to define the service transactions.
+We use `transactions!` macro to define the service transactions.
 
-In this tutorial, however, we unite the transactions under the
-`WalletTransaсtions` group as they all refer to the same
+In this tutorial we unite the transactions under the
+`WalletTransactions` group as they all refer to the same
 structure. Although this is the only transactions group in our demo, the idea
 might be of use in cases where a larger
 number of different groups of transactions is applied.
@@ -448,15 +449,15 @@ transactions! {
 
         /// Transfers `amount` of the currency from one wallet to another.
         struct Transfer {
-            from:    &PublicKey,
-            to:      &PublicKey,
-            amount:  u64,
-            seed:    u64,
+            from:   &PublicKey,
+            to:     &PublicKey,
+            amount: u64,
+            seed:   u64,
         }
 
         /// Issues `amount` of the currency to the `wallet`.
         struct Issue {
-            pub_key:  &PublicKey,
+            pub_key: &PublicKey,
             amount:  u64,
             seed:    u64,
         }
@@ -660,20 +661,26 @@ particular wallet together with cryptographic
 proof of its existence. The proofs also allow to get confirmation of existence
 of a particular transaction in the wallet history.
 
+```rust
+impl CryptocurrencyApi {
+    pub fn wallet_info(
+        state: &ServiceApiState,
+        query: WalletQuery
+    ) -> api::Result<WalletInfo> {
+        // implementation we elaborate further
+    }
+}
+```
+
 First, we claim `API` structure to which the mentioned method refers. We create
 two schemas – one general schema of our
 blockchain and the other one is the schema of our service described in the
 relevant section above:
 
 ```rust
-impl CryptocurrencyApi {
-    pub fn wallet_info(
-      state: &ServiceApiState,
-      query: WalletQuery
-    ) -> api::Result<WalletInfo> {
-        let snapshot = state.snapshot();
-        let general_schema = blockchain::Schema::new(&snapshot);
-        let currency_schema = CurrencySchema::new(&snapshot);
+let snapshot = state.snapshot();
+let general_schema = blockchain::Schema::new(&snapshot);
+let currency_schema = CurrencySchema::new(&snapshot);
 ```
 
 Secondly, we get the current height of our blockchain and obtain all the blocks
@@ -695,16 +702,17 @@ let to_table: MapProof<Hash, Hash> =
     general_schema.get_proof_to_service_table(CRYPTOCURRENCY_SERVICE_ID, 0);
 ```
 
-Note that we indicate `0` as the value of the upper boarder of the interval.
-This value is the first (and only) element
-in the array of the `state_hash` method described in the Schema section. It
+Note that we indicate `0` as the table identifier.
+We use `0` here as the first (and only) element
+in the array of the `state_hash` method described in the Schema section
 corresponds to the root hash of the `Wallets` table.
 
 Next, we fetch a proof of existence of a particular wallet inside the `Wallets`
 table and include both parts of the proof into the `WalletProof` structure:
 
 ```rust
-let to_wallet: MapProof<PublicKey, Wallet> = currency_schema.wallets().get_proof(query.pub_key);
+let to_wallet: MapProof<PublicKey, Wallet> = 
+    currency_schema.wallets().get_proof(query.pub_key);
 
 let wallet_proof = WalletProof {
     to_table,
@@ -725,33 +733,32 @@ one:
 ```rust
 let wallet = currency_schema.wallet(&query.pub_key);
 
-        let wallet_history = wallet.map(|_| {
-            let history = currency_schema.wallet_history(&query.pub_key);
-            let proof = history.get_range_proof(0, history.len());
+let wallet_history = wallet.map(|_| {
+    let history = currency_schema.wallet_history(&query.pub_key);
+    let proof = history.get_range_proof(0, history.len());
 ```
 
 Next, we obtain transaction data for each history hash, transform them into the
 readable format and output them in the form of an array:
 
 ```rust
-        let transactions: Vec<WalletTransactions> = history
-            .iter()
-            .map(|record| general_schema.transactions().get(&record).unwrap())
-            .map(|raw| WalletTransactions::tx_from_raw(raw).unwrap())
-            .collect::<Vec<_>>();
+    let transactions: Vec<WalletTransactions> = history
+        .iter()
+        .map(|record| general_schema.transactions().get(&record).unwrap())
+        .map(|raw| WalletTransactions::tx_from_raw(raw).unwrap())
+        .collect::<Vec<_>>();
 
-        WalletHistory {
-            proof,
-            transactions,
-        }
-    });
+    WalletHistory {
+        proof,
+        transactions,
+    }
+});
 
-    Ok(WalletInfo {
-        block_proof,
-        wallet_proof,
-        wallet_history,
-    })
-}
+Ok(WalletInfo {
+    block_proof,
+    wallet_proof,
+    wallet_history,
+})
 ```
 
 We now have a complete proof for availability of a block in the blockchain, of a
