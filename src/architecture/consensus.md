@@ -59,9 +59,9 @@ The process of reaching consensus on the next block (at the blockchain height
 `H`) consists of several **rounds**, numbered from 1\. The first round starts
 once the
 validator commits the block at height `H - 1`. The onsets of rounds are
-determined
-by a fixed timetable: rounds start after regular intervals. As there is no
-global time, rounds may start at different time for different validators.
+determined by the following timetable: rounds start after linearly increasing
+with round number time intervals. As there is no global time,
+rounds may start at different time for different validators.
 
 When the round number `R` comes, the previous rounds are not completed.
 That is, round `R` means that the validator can process messages
