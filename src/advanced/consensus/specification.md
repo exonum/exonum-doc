@@ -75,7 +75,7 @@ message processing.
   Proposal timeout after a new block is committed to the blockchain locally.
 
 - `first_round_timeout`  
-  Initial interval between algorithm rounds at specific height.
+  Initial interval between algorithm rounds.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
@@ -352,9 +352,8 @@ round are placed into a separate queue (`queued`).
 - If the timeout does not match the current height and round, skip further
   timeout processing.
 - Add a timeout (its length is specified by the following formula
-  `first_round_timeout + (N-1)*round_timeout_increase`) for the Nth round.
-  Where `round_timeout_increase` is constant percentage of
-  `first_round_timeout` (current value is 10%).
+  `first_round_timeout + (N-1)*first_round_timeout*q`) for the Nth round,
+  where `q = 0.1`.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new
