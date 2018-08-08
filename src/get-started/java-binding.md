@@ -13,7 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.1.2 \
+    -DarchetypeVersion=0.2 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
@@ -366,10 +366,8 @@ service:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
-- Not all system Rust services are available ([configuration](../advanced/configuration-updater.md),
-  [time oracle](../advanced/time.md) and
-  [anchoring service](../advanced/bitcoin-anchoring.md)
-  will be integrated into EJB App soon).
+- [Time oracle](../advanced/time.md) service is not available,
+  but will be integrated into EJB App soon.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
 - The application supports only one Java service. Support of multiple Java
@@ -381,7 +379,7 @@ service:
 - [Java Binding App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -393,7 +391,7 @@ service:
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
 [standardserializers]: https://exonum.com/doc/api/java-proofs/latest/com/exonum/binding/storage/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
-[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.1/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/messages/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/TransactionConverter.html
