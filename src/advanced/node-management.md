@@ -428,6 +428,7 @@ curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api
 ```json
 null
 ```
+
 ### Rebroadcast
 
 ```none
@@ -447,6 +448,7 @@ curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api
 ```
 
 #### Response
+
 ```json
 null
 ```
