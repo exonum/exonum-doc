@@ -327,6 +327,7 @@ changes made to `Fork` to the database state:
 
 !!! warning
     Java integration tests that use the shared native library currently work on MacOS only.
+    The Java Binding App which runs Java services, however, works fine on Linux.
 
 ### Transactions
 
