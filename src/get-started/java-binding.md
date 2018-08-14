@@ -232,8 +232,7 @@ For more information on using Guice, see the [project wiki][Guice].
 ### Schema and Operations with Storage
 
 To test the schema and operations with the storage, Exonum provides a
-database that stores the values in the RAM -
-[`MemoryDb`][Memorydb].
+database that stores the values in the RAM — [`MemoryDb`][Memorydb].
 Before using it in integration tests, it is necessary to load
 a library with the implementation of native methods:
 
@@ -325,6 +324,11 @@ changes made to `Fork` to the database state:
       }
     }
     ```
+
+!!! warning
+    Java integration tests that use the shared native library currently work
+    on MacOS only. However, the Java Binding App, which runs Java services,
+    works fine on both MacOS and Linux.
 
 ### Transactions
 
