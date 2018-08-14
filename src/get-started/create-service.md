@@ -14,7 +14,8 @@ You can view and download the full source code of this tutorial
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
 the client part and does not use [Merkelized data collections](../architecture/storage.md#merkelized-indices).
-A tutorial adding these features is coming soon.
+You can find a tutorial containing these features
+[here](data-proofs.md).
 
 ## Create Rust Project
 
