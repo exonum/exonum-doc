@@ -1,4 +1,4 @@
-# Cryptocurrency Advanced Tutorial
+# Service with Data Proofs
 
 This tutorial is an extended version of the
 [service creation tutorial](create-service.md).

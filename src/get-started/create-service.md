@@ -15,7 +15,7 @@ For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
 the client part and does not use [Merkelized data collections](../architecture/storage.md#merkelized-indices).
 You can find a tutorial containing these features
-[here](../get-started/cryptocurrency-advanced.md).
+[here](data-proofs.md).
 
 ## Create Rust Project
 
