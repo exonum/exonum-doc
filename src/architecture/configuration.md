@@ -81,8 +81,8 @@ two parts:
   Peers exchange timeout (in ms)
 - **propose_timeout_threshold**  
   Amount of transactions in the pool to start using `min_propose_timeout`
-- **round_timeout**  
-  Timeout interval (ms) between rounds
+- **first_round_timeout**  
+  Timeout interval (ms) between first two rounds
 - **status_timeout**  
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
