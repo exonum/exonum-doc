@@ -121,6 +121,114 @@ pub const SERVICE_NAME: &str = "timestamping";
 We have separated the code that
 configures the schema for this service into a separate file - [src/schema.rs][src/schema.rs].
 
+The schema describes the main elements with which our service will operate.
+
+First, using the `encoding_struct!` macro we define the two structures that the service can save in the Exonum blockchain.
+
+```rust
+encoding_struct! {
+    /// Stores content's hash and some metadata about it.
+    struct Timestamp {
+        /// Hash of the content.
+        content_hash: &Hash,
+
+        /// Additional metadata.
+        metadata: &str,
+    }
+}
+```
+
+The timestamp structure includes the hash of the timestamp and some additional metadata which can be added to the timestamp if required.
+
+```rust
+encoding_struct! {
+    /// Timestamp entry.
+    struct TimestampEntry {
+        /// Timestamp data.
+        timestamp: Timestamp,
+
+        /// Hash of transaction.
+        tx_hash: &Hash,
+
+        /// Timestamp time.
+        time: DateTime<Utc>,
+    }
+}
+```
+
+The timestamp entry includes the timestamp itself, the hash of the timestamping transaction and the time when the timestamp was recorded. The time value is provided by the time oracle.
+
+Next we need to define the storage schema for our service:
+
+```rust
+#[derive(Debug)]
+pub struct Schema<T> {
+    view: T,
+}
+```
+We need to implement (Debug) here to later be able to efficiently process error during the debugging process.
+
+For our new schema, we next implement a method for passing a snapshot to the timestamping service.
+
+```rust
+impl<T> Schema<T> {
+    /// Creates a new schema from the database view.
+    pub fn new(snapshot: T) -> Self {
+        Schema { view: snapshot }
+    }
+}
+```
+
+Using that snapshot, we implement the following two methods:
+
+```rust
+impl<T> Schema<T>
+where
+    T: AsRef<dyn Snapshot>,
+{
+    /// Returns the `ProofMapIndex` of timestamps.
+    pub fn timestamps(&self) -> ProofMapIndex<&T, Hash, TimestampEntry> {
+        ProofMapIndex::new("timestamping.timestamps", &self.view)
+    }
+
+    /// Returns the state hash of the timestamping service.
+    pub fn state_hash(&self) -> Vec<Hash> {
+        vec![self.timestamps().merkle_root()]
+    }
+}
+```
+ The `timestamps` method returns the list of all existing timestamps using the `ProofMapIndex` method of Exonum core.
+
+ The `state_hash` method takes the hashes of all existing timestamps and calculates the resulting hash of the blockchain state.
+
+Finally we need to declare the methods which will allow us to add new timestamps to the blockchain as they appear:
+
+```rust
+impl<'a> Schema<&'a mut Fork> {
+    /// Returns the mutable `ProofMapIndex` of timestamps.
+    pub fn timestamps_mut(&mut self) -> ProofMapIndex<&mut Fork, Hash, TimestampEntry> {
+        ProofMapIndex::new("timestamping.timestamps", &mut self.view)
+    }
+
+    /// Adds the timestamp entry to the database.
+    pub fn add_timestamp(&mut self, timestamp_entry: TimestampEntry) {
+        let timestamp = timestamp_entry.timestamp();
+        let content_hash = timestamp.content_hash();
+
+        // Check that timestamp with given content_hash does not exist.
+        if self.timestamps().contains(content_hash) {
+            return;
+        }
+
+        // Add timestamp
+        self.timestamps_mut().put(content_hash, timestamp_entry);
+    }
+}
+```
+
+First, we declare the `timestamps_mut` method which returns a mutable Fork of the blockchain.
+Then, we declare the `add_timestamp` method which adds a new timestamp which will contain the timestamp entry we have defined previously and the hash of the timestamp.
+The structure above also check if a timestamp with the given hash already exists in the blockchain. If the check is succesful the service adds the timestamp to the blockchain.
 
 ## Configure Transactions
 
@@ -188,6 +296,46 @@ transactions! {
 }
 ```
 We take the time from the time oracle. The transaction contains the public key of the node, which is used for transaction encryption and the timestamp. The timestamp represents the current time received from the time oracle.
+
+As the final step of configuring the transactions, we need to implement the `Transaction` trait for our timestamping transaction. The `Transaction` trait needs to be implemnted for all transactions which are to be used in Exonum.
+
+```rust
+impl Transaction for TxTimestamp {
+    fn verify(&self) -> bool {
+        self.verify_signature(self.pub_key())
+    }
+
+    fn execute(&self, fork: &mut Fork) -> ExecutionResult {
+        let time = TimeSchema::new(&fork)
+            .time()
+            .get()
+            .expect("Can't get the time");
+
+        let content = self.content();
+        let hash = content.content_hash();
+
+        let mut schema = Schema::new(fork);
+        if let Some(_entry) = schema.timestamps().get(hash) {
+            Err(Error::HashAlreadyExists)?;
+        }
+
+        trace!("Timestamp added: {:?}", self);
+        let entry = TimestampEntry::new(self.content(), &self.hash(), time);
+        schema.add_timestamp(entry);
+        Ok(())
+    }
+}
+```
+
+First, the code above verifies the validity of the timestamping transaction using the public key, and then executes the transaction. The transaction performs the following operations:
+1. Gets the current time value provided by the time oracle. If the system cannot get the time value, it will output a corresponding error.
+2. Takes the content of the transaction and calculates its hash.
+3. Checks if a transaction with the same hash does not already exist in the blockchain. If such a transaction with such a hash is located in the blockchain, the system will output a corresponding error.
+4. Creates a new entry which includes the content of the transaction, its hash and the current time value.
+
+
+### Configure API endpoints
+
 
 
 ### Define Service
