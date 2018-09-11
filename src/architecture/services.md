@@ -429,7 +429,7 @@ It must be redefined for services that have global configuration parameters.
 ### Commit Handler
 
 ```rust
-fn after_commit(&self, context: &mut ServiceContext) { }
+fn after_commit(&self, context: &ServiceContext) { }
 ```
 
 `after_commit` is invoked for every deployed service each time a block
