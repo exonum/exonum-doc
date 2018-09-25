@@ -609,9 +609,11 @@ A JSON object with the following fields:
 - **block**: BlockHeader  
   The header of the specified block
 - **precommits**: Array<Precommit\>  
-  The list of 'Precommit' messages supporting the block.
+  The list of 'Precommit' messages supporting the block
 - **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into the block
+- **time**: Time
+  Median time from 'Precommit' messages for this block
 
 ??? example "Response Example"
     ```json
@@ -670,6 +672,7 @@ A JSON object with the following fields:
         }
       ],
       "txs": []
+      "time": "2018-09-25T13:38:04.651087Z"
     }
     ```
 
@@ -689,6 +692,9 @@ smallest and largest heights traversed to collect at most `count` blocks.
   [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
 - **skip_empty_blocks**: bool=  
   If `true`, then only non-empty blocks are returned. The default value is `false`
+- **add_blocks_time**: bool=
+  If `true`, `times` field will contain median time from the corresponding blocks
+  precommits. The default value is `false`
 - **latest**: integer=  
   The maximum height of the returned blocks. The blocks are returned
   in reverse order, starting from the `latest` and at least up to the `latest -
@@ -696,14 +702,20 @@ smallest and largest heights traversed to collect at most `count` blocks.
 
 #### Response
 
-The JSON object of the explored block range `range` and the array `blocks` of
-the `BlockHeader` objects. The range specifies the largest and the smallest
-heights of blocks that have been traversed to collect at most `count` blocks.
-The largest height `end` equals to `latest + 1` if provided or to the height of
-the latest block in the blockchain, the smallest height `start` takes values
-in `0..latest - count + 1`. Blocks in the array are sorted in descending order
-according to their heights. Height of any block in the array is greater or
-equal than `start` and less than `end`.
+A JSON object with the following fields:
+
+- **range**: Range
+  The range specifies the largest and the smallest heights of blocks that have
+  been traversed to collect at most `count` blocks. The largest height `end`
+  equals to `latest + 1` if provided or to the height of the latest block in the
+  blockchain, the smallest height `start` takes values in `0..latest - count + 1`
+- **blocks**: Array<BlockHeader\>
+  The list of 'BlockHeader' in the requested range. Blocks in the array are sorted
+  in descending order according to their heights. Height of any block in the array
+  is greater or equal than `start` and less than `end`
+- **times**: Array<Time\>
+  The list of the 'Time' objects containing median time from 'Precommit' messages
+  from the corresponding blocks. `null` if `add_blocks_time` is `false`
 
 ??? example "Response Example"
     Assume the following request
@@ -716,6 +728,10 @@ equal than `start` and less than `end`.
 
     ```JSON
     {
+      "range": {
+        "end": 101,
+        "start": 2
+      },
       "blocks": [
         {
           "height": "18",
@@ -763,10 +779,7 @@ equal than `start` and less than `end`.
           "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
         }
       ],
-      "range": {
-        "end": 101,
-        "start": 2
-      }
+      "times": null
     }
     ```
 
