@@ -85,7 +85,7 @@ intervene into the consensus process.
 
 ### Java Binding: Protobuf Support and Separation of Transactions and Messages
 
-As we develop Java Bingding alongside with Exonum Core, to equalize their
+As we develop Java Binding alongside with Exonum Core, to equalize their
 functionality it is required to implement Protobuf support and separate the
 transactions and messages for Java Binding too. This step will promote all the
 corresponding [benefits](#Protobuf_as_the_Serialization_Format_in_Exonum)
