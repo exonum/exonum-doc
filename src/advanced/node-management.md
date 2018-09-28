@@ -609,11 +609,11 @@ A JSON object with the following fields:
 - **block**: BlockHeader  
   The header of the specified block
 - **precommits**: Array<Precommit\>  
-  The list of 'Precommit' messages supporting the block
+  The list of `Precommit` messages supporting the block
 - **txs**: Array<SerializedTransaction\>  
   The list of the transactions included into the block
 - **time**: Time
-  Median time from 'Precommit' messages for this block
+  Median time from `Precommit` messages for this block
 
 ??? example "Response Example"
     ```json
@@ -671,7 +671,7 @@ A JSON object with the following fields:
           "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
         }
       ],
-      "txs": []
+      "txs": [],
       "time": "2018-09-25T13:38:04.651087Z"
     }
     ```
@@ -710,11 +710,11 @@ A JSON object with the following fields:
   equals to `latest + 1` if provided or to the height of the latest block in the
   blockchain, the smallest height `start` takes values in `0..latest - count + 1`
 - **blocks**: Array<BlockHeader\>
-  The list of 'BlockHeader' in the requested range. Blocks in the array are sorted
+  The list of `BlockHeader`s in the requested range. Blocks in the array are sorted
   in descending order according to their heights. Height of any block in the array
   is greater or equal than `start` and less than `end`
 - **times**: Array<Time\>
-  The list of the 'Time' objects containing median time from 'Precommit' messages
+  The list of the 'Time' objects containing median time from `Precommit` messages
   from the corresponding blocks. `null` if `add_blocks_time` is `false`
 
 ??? example "Response Example"
