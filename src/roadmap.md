@@ -111,8 +111,8 @@ that transactions do not lead to any errors when processed.
 ### Dynamic Java Services
 
 The introduction of dynamic Java services will enable adding Java services to
-a running blockchain without the need to restart nodes. New services, in the
-form of Java modules, will be included into the network on the go. Support for
+a running blockchain without the need to restart nodes. In other words, new
+services will be included into the network on the go. Support for
 dependencies between dynamic services will be added in one of the following
 versions.
 
@@ -168,10 +168,10 @@ add a light client in Java – one of the most popular programming languages.
 ### Dynamic Java Services: Dependencies
 
 To expand the feature of dynamic Java services in Exonum, we will add the
-support for dependencies between services. Dependencies will be indicated
+support for dependencies between services. Dependencies will be specified
 during service installation or initialization. Services will be able to
 process transactions issued by other services, in this way broadening and
-supplementing the functionality of one another.
+extending the functionality of one another.
 
 ### Private Transactions
 
