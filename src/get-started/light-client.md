@@ -8,10 +8,11 @@ purpose we will mostly refer to the tutorial for the
 partly to the [Exonum Timestamping Demo](https://github.com/exonum/exonum/tree/master/examples/timestamping).
 
 Light client is a JavaScript library used for a number of purposes:
-  - forming and sending transactions to the blockchain
-  - creating digital signatures over transactions
-  - obtaining and checking cryptographic proofs of data authenticity and
-    integrity.
+
+- forming and sending transactions to the blockchain
+- creating digital signatures over transactions
+- obtaining and checking cryptographic proofs of data authenticity and
+  integrity.
 
 Below we will provide you with the detailed description of how said
 functionality is executed in Exonum light client.
@@ -21,7 +22,7 @@ functionality is executed in Exonum light client.
 To start using Exonum light client, include [exonum-client](https://github.com/exonum/exonum-client#getting-started)
 into your JavaScript application. Please refer to our detailed guide
 for instructions on how to customize your client. The present tutorial will
-show you the ready-made examples of the client use.   
+show you the ready-made examples of the client use.
 
 ## Execute a Transaction
 
@@ -30,6 +31,7 @@ state. The structure, contents and number of transaction types within one
 service vary depending on the business logic of each service.
 
 The general algorithm of executing a transaction in Exonum includes 4 stages:
+
 - define transaction schema with its data types
 - define transaction data
 - generate a signing key pair (if required) and sign the transaction
@@ -215,6 +217,7 @@ corresponding error, if such data is absent in the blockchain for some reason.
 
 In other words, a [cryptographic proof](https://exonum.com/doc/glossary/#merkle-proof)
 is a response to the read request made through the light client that:
+
 - validates authenticity of the data contained therein
 - certifies that said data is safely stored in the blockchain.
 
@@ -225,7 +228,7 @@ therein.
 
 Below, we will discuss the proof from the Service with Proofs which in its
 structure repeats the proofs from the Timestamping service plus contains some
-custom parts.      
+custom parts.
 
 The proof itself comprises several levels and, when executed, unfolds from the
 highest level down to the lowest one, which is represented by the requested
@@ -345,7 +348,8 @@ const Wallet = Exonum.newType({
   ]
 })
 
-const walletProof = new Exonum.MapProof(data.wallet_proof.to_wallet, Exonum.PublicKey, Wallet)
+const walletProof = new Exonum.MapProof(data.wallet_proof.to_wallet,
+  Exonum.PublicKey, Wallet)
 ```
 
 Here we also check that `merkleRoot` which is now the root hash of the wallets
@@ -444,7 +448,8 @@ transaction to further validate its signature:
 ```javascript
 let owner = transaction.body.from
 
-if (Transaction.verifySignature(transaction.signature, owner, transaction.body) === false) {
+if (Transaction.verifySignature(transaction.signature, owner, transaction.body)
+  === false) {
   throw new Error('Invalid transaction signature has been found')
 }
 ```
