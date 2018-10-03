@@ -191,8 +191,9 @@ pub struct Schema<T> {
 }
 ```
 
-We need to implement `(Debug)` here to efficiently process errors during the
-debugging process.
+We need to implement
+[(Debug)](https://doc.rust-lang.org/stable/std/fmt/trait.Debug.html) here to
+efficiently process errors during the debugging process.
 
 To access to the objects inside the storage, we need to declare the layout of
 the data. As we want to keep the timestamps in the storage and be able to
@@ -227,7 +228,7 @@ where
         ProofMapIndex::new("timestamping.timestamps", &self.view)
     }
 
-    /// Returns the state hash of the timestamping service.
+    /// Returns the hash of the timestamping service schema.
     pub fn state_hash(&self) -> Vec<Hash> {
         vec![self.timestamps().merkle_root()]
     }
@@ -280,10 +281,10 @@ impl<'a> Schema<&'a mut Fork> {
 perform atomic actions on the blockchain state. We have separated the code that
 configures transactions for our Timestamping service into a separate file -
 [src/transactions.rs][src/transactions.rs]. The Timestamping service we are
-creating requires a single transaction type - adding timestamping transactions
-to the blockchain.
+creating requires a single transaction type - adding timestamps to the
+blockchain.
 
-First, we define the structures we need from Exonum core and the time oracle.
+First, we import the structures we need from Exonum core and the time oracle.
 Here we also indicate a connection to the schema we have configured previously
 in [src/schema.rs][src/schema.rs] and the `TIMESTAMPING_SERVICE` constant
 declared in [src/lib.rs][src/lib.rs].
@@ -320,15 +321,14 @@ transactions! {
 ```
 
 The transaction to create a timestamping transaction (`TxTimestamp`) contains
-the public key of the node, which is used for transaction encryption, and the
+the public key of the user, which is applied for transaction encryption, and the
 timestamp - the hash of the submitted file.
 
 ### Reporting Errors
 
 We next define the error which might occur when processing transactions in our
 service. The current Timestamping service includes only one error, which
-occurs when a timestamping transaction with the given hash already exists in
-the blockchain.
+occurs when a timestamp with the given hash already exists in the blockchain.
 
 ```rust
 #[derive(Debug, Fail)]
@@ -343,10 +343,10 @@ pub enum Error {
 Here we automatically implement the `Debug` and `Fail` traits for the `Error`
 enum using the `#[derive(Debug, Fail)] command`.
 
-The `#[fail(display = "Content hash already exists")]` command will cause a
-panic and display the indicated message in case the error occurs.
+The `#[fail(display = "Content hash already exists")]` attribute sets the
+message which will be displayed in case the error occurs.
 
-The `#[repr(u8)]` command defines that the `Error` enum will be represented as
+The `#[repr(u8)]` attribute defines that the `Error` enum will be represented as
 a u8 variable in memory.
 
 Next, we describe how to transform the `Error` enum into `ExecutionError` of
@@ -361,7 +361,7 @@ impl From<Error> for ExecutionError {
 }
 ```
 
-The `ExecutionError` will have description the description we have indicated
+The `ExecutionError` will have the description we have indicated
 for the `Error` enum.
 
 ### Transaction Execution
@@ -379,8 +379,8 @@ signature, while `execute` performs the following operations:
 1. Gets the current time value provided by the time oracle. If the system
    cannot get the time value, it will output a corresponding error.
 2. Takes the content of the transaction and calculates its hash.
-3. Checks whether a transaction with the same hash already exists in the
-   blockchain. If a transaction with such a hash is found, the system will
+3. Checks whether a timestamp with the same hash already exists in the
+   blockchain. If a timestamp with such a hash is found, the system will
    output a corresponding error.
 4. Creates a new entry in the database `Fork`, which includes the content of
    the transaction, its hash and the current time value.
@@ -422,8 +422,8 @@ configures API endpoints for our Timestamping service into a separate file -
 First, we need to define the structures required to implement the API endpoints.
 For our Timestamping service, we will define the following three structures:
 
-- the `TimestampQuery` structure which contains only the hash of the
-  timestamping transaction:
+- the `TimestampQuery` structure which contains the hash of a
+  timestamp:
 
   ```rust
   pub struct TimestampQuery {
@@ -448,7 +448,7 @@ For our Timestamping service, we will define the following three structures:
       pub block_info: BlockProof,
       /// Actual state hashes of the timestamping service with their proofs.
       pub state_proof: MapProof<Hash, Hash>,
-      /// Actual state of the timestamping database with proofs.
+      /// Proof of existance of a specific entry in the timestamping database.
       pub timestamp_proof: MapProof<Hash, TimestampEntry>,
   }
   ```
@@ -476,11 +476,10 @@ pub fn handle_post_transaction(
 The `handle_post_transaction` function sends a timestamping transaction to the
 blockchain performing the following operations:
 
-- take a  timestamping transaction
+- take a timestamping transaction
 - calculate its hash
 - send it to the blockchain network, using the methods defined in Exonum
-- add transaction event with the timestamping transaction in the form which
-  can be processed by Exonum.
+- return the hash of the transaction to the user.
 
 After the transaction is successfully completed, the system returns the hash
 of the timestamping transaction.
@@ -496,10 +495,10 @@ pub fn handle_timestamp(
     }
 ```
 
-The `handle_timestamp` method takes the hash of a timestamping transaction and
-checks whether a transaction with this hash exists in the current state of the
+The `handle_timestamp` method takes the hash of a timestamp and
+checks whether a timestamp with this hash exists in the current state of the
 blockchain. To apply this method, the user needs to know the hash of the
-transaction in question. To perform the check, the method makes a snapshot of
+timestamp in question. To perform the check, the method makes a snapshot of
 the current state of the blockchain.
 
 ```rust
@@ -538,7 +537,7 @@ structures related to the timestamping transaction:
 - take that latest block and its precommit messages
 - take the proof structure that proves the correctness of the service table, in
   this case the table of our Timestamping service. This operation checks
-  whether the table of a certain service is included into the blockchain network.
+  whether the table of a certain service is included into the blockchain.
 - return proofs of the latest block and the Timestamping service table.
 
 The second block contains the operations that prove the correctness of the
@@ -656,8 +655,9 @@ structure builds an instance of our service.
 pub struct ServiceFactory;
 ```
 
-The `ServiceFactory` structure compiles an instance of the Timestamping service
-from the code we have written previously.
+The `ServiceFactory` returns the name of the service and includes the
+`make_service` function which will later allow us to include the new service
+into the `NodeBuilder`.
 
 ```rust
 impl fabric::ServiceFactory for ServiceFactory {
@@ -670,10 +670,6 @@ impl fabric::ServiceFactory for ServiceFactory {
     }
 }
 ```
-
-The `ServiceFactory` returns the name of the service and includes the
-`make_service` function which will later allow us to include the new service
-into the `NodeBuilder`.
 
 ## Create Builder for Exonum Node With Timestamping
 
@@ -698,12 +694,6 @@ fn main() {
 When called, the `main` function will launch an Exonum node with the
 Configuration, Time and Timestamping services.
 
-!!! note
-    The services should be defined in exactly the same order as in the `main`
-    function above. The Timestamping service should be launched last, as it
-    depends on the Configuration and Time services which should be running when
-    it starts.
-
 The backend part of our Timestamping service is now ready for use.
 However, in the demo on [Github](timestamping) we have taken it a step further
 and addedd frontend.
@@ -714,7 +704,7 @@ Now that our service is ready, we can start up a network of four nodes running
 Exonum with the Timestamping service we have created. All these steps are to be
 performed in the directory containing `Cargo.toml`.
 
-1. Install Rust dependencies:
+1. Install the actual node binary:
 
    ```none
    cargo install
@@ -751,7 +741,8 @@ performed in the directory containing `Cargo.toml`.
    exonum-timestamping finalize --public-api-address 0.0.0.0:8203 --private-api-address 0.0.0.0:8094 example/sec_4.toml example/node_4_cfg.toml --public-configs example/pub_1.toml example/pub_2.toml example/pub_3.toml example/pub_4.toml
    ```
 
-5. Run the nodes, indicating the file to which the database will be written:
+5. Run the nodes, each in a separated terminal, indicating the file to which
+   the database will be written. To enable logs, use the `RUST_LOG` variable.
 
    ```none
    exonum-timestamping run --node-config example/node_1_cfg.toml --db-path example/db1 --public-api-address 0.0.0.0:8200
@@ -927,7 +918,7 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
     ```
 
     The request returns the following components of the timestamp proof:
-    
+
     - the proof of the last block in the blockchain
     - the proof of the timestamping service table
     - the proof of the timestamp itself
