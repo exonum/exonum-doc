@@ -4,8 +4,8 @@ In our previous tutorials we covered the principle of structuring and operation
 of the backend part of Exonum services. In this tutorial we intend to disclose
 how the services interact and are managed with Exonum light client. For this
 purpose we will mostly refer to the tutorial for the
-[Service with Data Proofs](https://exonum.com/doc/get-started/data-proofs/) and
-partly to the [Exonum Timestamping Demo](https://github.com/exonum/exonum/tree/master/examples/timestamping).
+[Service with Data Proofs](data-proofs.md) and
+partly to the [Exonum Timestamping Demo][timestamping-demo].
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -19,7 +19,7 @@ functionality is executed in Exonum light client.
 
 ## Before You Start
 
-To start using Exonum light client, include [exonum-client](https://github.com/exonum/exonum-client#getting-started)
+To start using Exonum light client, include [exonum-client][javascript-client]
 into your JavaScript application. Please refer to our detailed guide
 for instructions on how to customize your client. The present tutorial will
 show you the ready-made examples of the client use.
@@ -168,7 +168,7 @@ blockchain. The methods applied in this case are identical to those shown in the
 
 ### Create Timestamping Transaction
 
-As it was stated in our [guide for the light client](https://github.com/exonum/exonum-client#nested-data-types),
+As it was stated in our [guide for the light client][javascript-client-nested-types],
 a custom data type can be a field of other custom data type without limitation
 as to the depth of the nested data.
 
@@ -228,7 +228,7 @@ request is made with the light client. The response to the request should
 contain your data together with either a cryptographic proof for it or a
 corresponding error, if such data is absent in the blockchain for some reason.
 
-In other words, a [cryptographic proof](https://exonum.com/doc/glossary/#merkle-proof)
+In other words, a [cryptographic proof](../glossary.md#merkle-proof)
 is a response to the read request made through the light client that:
 
 - validates authenticity of the data contained therein
@@ -255,7 +255,7 @@ while we will be further analyzing it.
 Thus, first of all, we check that the block containing our data is correct and
 bears the state hash indicated in the proof. For this purpose we load and
 format the actual list of public keys of validator nodes stored in the network
-[configuration](https://exonum.com/doc/architecture/configuration/). The keys
+[configuration](../architecture/configuration.md). The keys
 are applied to assert that the data received from the
 blockchain was indeed agreed upon by all the member nodes in the network:
 
@@ -474,3 +474,7 @@ service through the light client so far.
 
 Well done! You have now equipped your application with a full-stack Exonum-based
 support! Here is the point where you can build and run your application.
+
+[timestamping-demo]: https://github.com/exonum/exonum/tree/master/examples/timestamping
+[javascript-client]: https://github.com/exonum/exonum-client#getting-started
+[javascript-client-nested-types]: https://github.com/exonum/exonum-client#nested-data-types

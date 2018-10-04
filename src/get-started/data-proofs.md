@@ -756,8 +756,7 @@ Good job! You managed to set up, describe and launch an extended version of a
 fully functional Exonum service!
 
 Next you can see how to interact with the service with the help of the Exonum
-[light client][light-client-tutorial].
+[light client](light-client.md).
 
 [demo]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
 [demo-frontend]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced/frontend
-[light-client-tutorial]: https://exonum.com/doc/get-started/light-client
