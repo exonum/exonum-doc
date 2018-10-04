@@ -35,26 +35,41 @@ The general algorithm of executing a transaction in Exonum includes 4 stages:
 - generate a signing key pair (if required) and sign the transaction
 - send transaction to the blockchain.
 
-!!! note
-    In our Timestamping demo we generate a new signing key pair for each new
-    timestamp. In the Service with Data Proofs we generate a key pair that
-    corresponds to a certain wallet and its user and, thus, is applied for
-    signing all transactions made on its behalf.
+Below we provide two examples of transaction execution in Exonum services.
 
-Below we provide some examples of transaction execution in Exonum services.
+### Create Timestamping Transaction
 
-### Transaction for Creating a Wallet
+As it is stated in our [guide for the light client][javascript-client-nested-types],
+a custom data type can be a field of other custom data type without limitation
+as to the depth of the nested data.
 
-Define `CreateWallet` transaction schema and data types:
+In view of the above, in the Timestamping demo we start defining the transaction
+with the `Timestamp` entity itself. Said entity is further applied as a custom
+type within `CreateTimestamp` transaction schema:
 
 ```javascript
-const CreateWallet = Exonum.newMessage({
+const Timestamp = Exonum.newType({
+  fields: [
+    { name: 'content_hash', type: Exonum.Hash },
+    { name: 'metadata', type: Exonum.String }
+  ]
+})
+```
+
+- `content_hash` - is a sha256 hash of some data or file to be stamped
+- `metadata` - is an optional description of the data to be stamped that is
+  included into the stamp.
+
+Define `CreateTimestamp` transaction schema and fields types:
+
+```javascript
+const CreateTimestamp = Exonum.newMessage({
   protocol_version: 0,
-  service_id: 128,
-  message_id: 2,
+  service_id: 130,
+  message_id: 0,
   fields: [
     { name: 'pub_key', type: Exonum.PublicKey },
-    { name: 'name', type: Exonum.String }
+    { name: 'content', type: Timestamp }
   ]
 })
 ```
@@ -68,56 +83,61 @@ const CreateWallet = Exonum.newMessage({
   sources, starting with `0`;
 - `fields` - represents the fields of the transaction. In this case it contains
   two fields:
-  - `pub_key` - user's public key;
-  - `name` - user's name.
+  - `pub_key` - author's public key;
+  - `content` - object of `Timestamp` type defined above.
 
-Prepare transaction data according to the above-mentioned schema:
-
-```javascript
-const data = {
-  pub_key: keyPair.publicKey,
-  name: name
-}
-```
-
-- `name` - represents name of a user owning the new wallet as String.
-
-Generate a new signing key pair for signing and sending the transaction. This
-key pair will be further used for all the transactions executed in respect of
-this wallet:
+Next, generate a signing key pair for signing and sending the transaction.
 
 ```javascript
 const keyPair = Exonum.keyPair()
 ```
 
-Sign the transaction with the obtained secret key:
+!!! note
+    In our Timestamping demo we generate a new signing key pair for each new
+    timestamp. In the Service with Data Proofs we generate a key pair that
+    corresponds to a certain wallet and its user and, thus, is applied for
+    signing all transactions made on its behalf.
+
+Prepare transaction data according to the above-defined schema:
 
 ```javascript
-const signature = CreateWallet.sign(keyPair.secretKey, data)
+const data = {
+  pub_key: keyPair.publicKey,
+  content: {
+    content_hash: hash,
+    metadata: metadata
+  }
+}
+```
+
+Sign the transaction with the secret key from key pair generated above:
+
+```javascript
+const signature = CreateTimestamp.sign(keyPair.secretKey, data)
 ```
 
 Finally, send the resulted transaction into the blockchain using built-in
 `send` method which returns a `Promise`:
 
 ```javascript
-const transactionHash = await CreateWallet.send(transactionEndpoint, explorerBasePath, data, signature)
+const transactionHash = await CreateTimestamp.send(transactionEndpoint, explorerBasePath, data, signature)
 ```
 
 - `transactionEndpoint` - represents API address of transaction handler at a
   blockchain node. Example:
   ```
-  http://127.0.0.1:8200/api/services/cryptocurrency/v1/wallets'
+  http://127.0.0.1:8200/api/services/timestamping/v1/timestamps'
   ```
-- `explorerBasePath` - represents API address of transaction explorer where your
+- `explorerBasePath` - represents API address of transaction explorer where
   you can see transaction details at a blockchain node. Example:
   ```
-  http://127.0.0.1:8200/api/explorer/v1/transactions?hash=
+  http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=
   ```
 
 ### Transaction for Transferring Funds from One Wallet to Another
 
-To execute this type of transaction, obviously, you need to create at least two
-wallets as described above.
+To execute this type of transaction, obviously, you need to create two
+wallets: sender and receiver.
 
 Define `TransferFunds` transaction schema and data types:
 
@@ -135,10 +155,10 @@ const TransferFunds = Exonum.newMessage({
 })
 ```
 
-As you might know from our very first Cryptocurrency demo, in order to
-transfer funds from one wallet to another a "seed" is included into each
-such transaction. This prevents transactions from being hacked by a third
-person. You can generate seed as follows:
+As you might know from our very first [Cryptocurrency demo](create-service.md),
+in order to transfer funds from one wallet to another a "seed" is included
+into each such transaction. This prevents transactions from being hacked by
+a third person. You can generate seed as follows:
 
 ```javascript
 const seed = Exonum.randomUint64()
@@ -157,69 +177,10 @@ const data = {
 }
 ```
 
-- `receiver` - represents public key of the receiver's wallet
-- `amount` - represents amount to be transferred from one wallet to the other
-  passed as String
-- `seed` - represents a random number of cryptographic quality.
-
 Now you can sign transaction with the sender's secret key from the key pair
 generated when creating his wallet and send the resulted transaction into the
 blockchain. The methods applied in this case are identical to those shown in the
-`CreateWallet` transaction example.
-
-### Create Timestamping Transaction
-
-As it was stated in our [guide for the light client][javascript-client-nested-types],
-a custom data type can be a field of other custom data type without limitation
-as to the depth of the nested data.
-
-In view of the above, in the Timestamping demo we start defining the transaction
-with the `Timestamp` entity itself. Said entity is further applied as a custom
-type within `CreateTimestamp` transaction schema:
-
-```javascript
-const Timestamp = Exonum.newType({
-  fields: [
-    { name: 'content_hash', type: Exonum.Hash },
-    { name: 'metadata', type: Exonum.String }
-  ]
-})
-```
-
-Define `CreateTimestamp` transaction schema and fields types:
-
-```javascript
-const CreateTimestamp = Exonum.newMessage({
-  protocol_version: 0,
-  service_id: 130,
-  message_id: 0,
-  fields: [
-    { name: 'pub_key', type: Exonum.PublicKey },
-    { name: 'content', type: Timestamp }
-  ]
-})
-```
-
-Prepare transaction data according to the above-defined schema:
-
-```javascript
-const data = {
-  pub_key: keyPair.publicKey,
-  content: {
-    content_hash: hash,
-    metadata: metadata
-  }
-}
-```
-
-- `hash` - is a sha256 hash of some data or file to be stamped
-- `metadata` - is an optional description of the data to be stamped that is
-  included into the stamp.
-
-Now you can generate a new signing key pair, sign transaction with the sender's
-secret key and send the resulted transaction into the
-blockchain. The required methods are again identical to those shown in the
-`CreateWallet` transaction example.
+`CreateTimestamp` transaction from previous example.
 
 ## Cryptographic Proofs
 
