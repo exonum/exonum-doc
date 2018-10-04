@@ -120,7 +120,8 @@ Finally, send the resulting transaction into the blockchain using built-in
 `send` method which returns a `Promise`:
 
 ```javascript
-const transactionHash = await CreateTimestamp.send(transactionEndpoint, explorerBasePath, data, signature)
+const transactionHash = await CreateTimestamp.send(transactionEndpoint,
+  explorerBasePath, data, signature)
 ```
 
 - `transactionEndpoint` - represents API address of transaction handler at a
@@ -417,8 +418,8 @@ data.wallet_history.transactions.forEach(function(transaction) {
   })
 
   // validate transaction signature
-  if (!Transaction.verifySignature(
-    transaction.signature, transaction.body.from, transaction.body)) {
+  if (!Transaction.verifySignature(transaction.signature,
+    transaction.body.from, transaction.body)) {
     throw new Error('Invalid transaction signature has been found')
   }
 
