@@ -415,19 +415,22 @@ if (data.wallet_history.transactions.length !== transactionsMetaData.length) {
 ```
 
 Next we validate each transaction. For this purpose we iterate them in the
-array and first check them according to their structure. This check allows us to
-confirm that a transaction of a certain type is present at a definite place in
-the array. In our example, for the sake of brevity, we provide structure
+array and first check them according to their structure. This check allows us
+to confirm that a transaction of a certain type is present at a definite place
+in the array. In our example, for the sake of brevity, we provide structure
 definition of an issue-type transaction only. However, note that all the
-transaction types of the service should be defined:
+transaction types of the service should be defined.
+
+Next we validate each transaction signature with `Transaction.verifySignature`
+method.
+
+Finally, we calculate a hash from a transaction body with `Transaction.hash`
+method to compare it with the corresponding hash from the proof.
 
 ```javascript
-for (let i in data.wallet_history.transactions) {
-  // get current transaction
-  let transaction = data.wallet_history.transactions[i]
-
+data.wallet_history.transactions.forEach(function(transaction) {
   // generate transaction definition
-  let Transaction =  new Exonum.newMessage({
+  const Transaction =  new Exonum.newMessage({
     protocol_version: 0,
     service_id: 128,
     message_id: 2,
@@ -439,28 +442,17 @@ for (let i in data.wallet_history.transactions) {
     ],
     signature: transaction.signature
   })
-}
-```
 
-We also extract information on the public key of the wallet owner from each
-transaction to further validate its signature:
+  // validate transaction signature
+  if (!Transaction.verifySignature(transaction.signature, transaction.body.from, transaction.body)) {
+    throw new Error('Invalid transaction signature has been found')
+  }
 
-```javascript
-let owner = transaction.body.from
-
-if (Transaction.verifySignature(transaction.signature, owner, transaction.body)
-  === false) {
-  throw new Error('Invalid transaction signature has been found')
-}
-```
-
-Finally, we calculate a hash from a transaction body with `Transaction.hash`
-method to compare it with the corresponding hash from the proof:
-
-```javascript
-if (Transaction.hash(transaction.body) !== transactionsMetaData[i]) {
-  throw new Error('Invalid transaction hash has been found')
-}
+  // validate hash
+  if (Transaction.hash(transaction.body) !== transactionsMetaData[i]) {
+    throw new Error('Invalid transaction hash has been found')
+  }
+})
 ```
 
 ## Conclusion
