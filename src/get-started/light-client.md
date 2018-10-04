@@ -99,14 +99,7 @@ Finally, send the resulted transaction into the blockchain using built-in
 `send` method which returns a `Promise`:
 
 ```javascript
-CreateWallet
-  .send(transactionEndpoint, explorerBasePath, data, signature)
-  .then(txHash => {
-    // `txHash` - transaction hash
-  })
-  .catch(error => {
-    // ...
-  })
+const transactionHash = await CreateWallet.send(transactionEndpoint, explorerBasePath, data, signature)
 ```
 
 - `transactionEndpoint` - represents API address of transaction handler at a
@@ -267,9 +260,10 @@ are applied to assert that the data received from the
 blockchain was indeed agreed upon by all the member nodes in the network:
 
 ```javascript
-axios.get('/api/services/configuration/v1/configs/actual').then(response => {
-  const validators = response.data.config.validator_keys.map(validator => validator.consensus_key)
-})
+const response = await axios.get('/api/services/configuration/v1/configs/actual')
+
+
+const validators = response.data.config.validator_keys.map(validator => validator.consensus_key)
 ```
 
 Now make a request for the data on a particular wallet together with its proof.
@@ -277,13 +271,9 @@ Note, that we identify the wallet by its public key which is in fact the public
 key of its holder:
 
 ```javascript
-axios.get(`/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
-  .then(response => {
-    // ...
-  })
-  .catch(error => {
-    // ...
-  })
+const response = await axios.get(`/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
+
+// response.data contains wallet together with its proof
 ```
 
 - `publicKey` - public key of the wallet of interest.
