@@ -237,7 +237,7 @@ data. The highest level, evidently, corresponds to the blockchain state hash.
 Below is the proof chart representing the proof structure. You can refer to it
 while we will be further analyzing it.
 
-![proof-chart](../src/images/proof-chart.png)
+![proof-chart](../images/proof-chart.png)
 
 Thus, first of all, we check that the block containing our data is correct and
 bears the state hash indicated in the proof. For this purpose we load and
