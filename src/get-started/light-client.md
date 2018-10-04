@@ -61,8 +61,12 @@ const CreateWallet = Exonum.newMessage({
 })
 ```
 
-- `message_id` - represents the serial number of the transaction type in the
-  service.
+- `protocol_version` - represents the major version of the Exonum
+  serialization protocol. Currently, `0`;
+- `service_id` - represents the identifier of the service. Can be found in service sources;
+- `message_id` - represents the identifier of the transaction in the service. Corresponds
+  to the index number of the transaction in service sources, starting with `0`;
+- `fields` - represents the fields of the transaction.
 
 Prepare transaction data according to the above-mentioned schema:
 
