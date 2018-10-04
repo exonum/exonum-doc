@@ -18,7 +18,7 @@ functionality is executed in Exonum light client.
 ## Before You Start
 
 To start using Exonum light client, include [exonum-client][javascript-client]
-into your JavaScript application. Please refer to our detailed guide
+into your JavaScript application. Please refer to this detailed guide
 for instructions on how to customize your client. The present tutorial will
 show you the ready-made examples of the client use.
 
