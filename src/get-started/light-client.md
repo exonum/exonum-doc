@@ -95,16 +95,30 @@ Sign the transaction with the obtained secret key:
 const signature = CreateWallet.sign(keyPair.secretKey, data)
 ```
 
-Finally, send the resulted transaction into the blockchain:
+Finally, send the resulted transaction into the blockchain using built-in
+`send` method which returns a `Promise`:
 
 ```javascript
-CreateWallet.send(transactionEndpoint, explorerBasePath, data, signature)
+CreateWallet
+  .send(transactionEndpoint, explorerBasePath, data, signature)
+  .then(txHash => {
+    // `txHash` - transaction hash
+  })
+  .catch(error => {
+    // ...
+  })
 ```
 
 - `transactionEndpoint` - represents API address of transaction handler at a
-  blockchain node
+  blockchain node. Example:
+  ```
+  http://127.0.0.1:8200/api/services/cryptocurrency/v1/wallets'
+  ```
 - `explorerBasePath` - represents API address of transaction explorer where your
-  you can see transaction details at a blockchain node.
+  you can see transaction details at a blockchain node. Example:
+  ```
+  http://127.0.0.1:8200/api/explorer/v1/transactions?hash=
+  ```
 
 ### Transaction for Transferring Funds from One Wallet to Another
 
@@ -264,8 +278,10 @@ key of its holder:
 
 ```javascript
 axios.get(`/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
-  .then(response => response.data)
-  .then(data => {
+  .then(response => {
+    // ...
+  })
+  .catch(error => {
     // ...
   })
 ```
