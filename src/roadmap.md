@@ -25,7 +25,8 @@ changing the serialization format of Exonum to a more common one.
 
 ### Protobuf as the Serialization Format in Exonum
 
-Protobuf is the industry accepted serialization format supported in multiple
+[Protobuf](https://developers.google.com/protocol-buffers/) is the industry
+accepted serialization format supported in multiple
 programming languages. Use of Protobuf will ease the integration of Exonum with
 applications in other languages. It will also enable the development of light
 clients in other languages with less effort required.
@@ -47,9 +48,8 @@ the following versions.
 
 To change the way services are defined in Exonum, we will introduce a uniform
 service interface description, processed by means of Protobuf. Services will
-now be defined not by their ID, but by a specific language for interface
-description. As a result, services will be described uniformly, thus, making
-clear which transactions and arguments they process.
+be described in a language-independent manner, according to a template which
+will, for example, simplify definition of transactions, their arguments, etc.
 
 Uniform service definition will also ease the development of light clients in
 any language supported by Protobuf. In the first phase of the implementation,
@@ -144,9 +144,8 @@ versions do not provide.
 The resistance of Exonum blockchains to several types of DoS attacks will
 further enhance the security of the system by defining the amount of memory a
 node can consume at any moment of time. We are working on improving the
-consensus mechanism and
-limiting the number of consensus messages and unconfirmed transactions which a
-node can store.
+consensus mechanism to limit the number of consensus messages and unconfirmed
+transactions which a node needs to store at any given time.
 
 ### Save Points
 
