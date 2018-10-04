@@ -39,7 +39,7 @@ Below we provide two examples of transaction execution in Exonum services.
 
 ### Create Timestamping Transaction
 
-As it is stated in our [guide for the light client][javascript-client-nested-types],
+As stated in our [guide for the light client][javascript-client-nested-types],
 a custom data type can be a field of other custom data type without limitation
 as to the depth of the nested data.
 
@@ -60,7 +60,7 @@ const Timestamp = Exonum.newType({
 - `metadata` - is an optional description of the data to be stamped that is
   included into the stamp.
 
-Define `CreateTimestamp` transaction schema and fields types:
+Define `CreateTimestamp` transaction schema and field types:
 
 ```javascript
 const CreateTimestamp = Exonum.newMessage({
@@ -116,7 +116,7 @@ Sign the transaction with the secret key from key pair generated above:
 const signature = CreateTimestamp.sign(keyPair.secretKey, data)
 ```
 
-Finally, send the resulted transaction into the blockchain using built-in
+Finally, send the resulting transaction into the blockchain using built-in
 `send` method which returns a `Promise`:
 
 ```javascript
@@ -164,7 +164,7 @@ a third person. You can generate seed as follows:
 const seed = Exonum.randomUint64()
 ```
 
-Prepare transaction data according to the above-defined schema. Note that we
+Prepare the transaction data according to the above-defined schema. Note that we
 identify the sender by the public key of his wallet that was generated when
 creating said wallet:
 
@@ -178,7 +178,7 @@ const data = {
 ```
 
 Now you can sign transaction with the sender's secret key from the key pair
-generated when creating his wallet and send the resulted transaction into the
+generated when creating his wallet and send the resulting transaction into the
 blockchain. The methods applied in this case are identical to those shown in the
 `CreateTimestamp` transaction from previous example.
 
@@ -250,7 +250,7 @@ if (!Exonum.verifyBlock(data.block_info, validators)) {
 }
 ```
 
-Next we need to obtain the root hash of the table that bears all the registered
+Next, we need to obtain the root hash of the table that bears all the registered
 wallets from the table containing hashes of all tables
 defined in the service (state hash aggregator). The root hashes of the service
 tables are
@@ -380,7 +380,7 @@ const transactionsMetaData = Exonum.merkleProof(
 Upon obtainment of the proof, make sure that number of transactions in the
 wallet history, that we extracted earlier together with other information on the
 wallet, is equal to the number of transactions in the array of the proof.
-Otherwise transactions cannot be verified against the proof:
+Otherwise, transactions cannot be verified against the proof:
 
 ```javascript
 if (data.wallet_history.transactions.length !== transactionsMetaData.length) {
@@ -388,14 +388,14 @@ if (data.wallet_history.transactions.length !== transactionsMetaData.length) {
 }
 ```
 
-Next we validate each transaction. For this purpose we iterate them in the
+Next, we validate each transaction. For this purpose we iterate them in the
 array and first check them according to their structure. This check allows us
 to confirm that a transaction of a certain type is present at a definite place
 in the array. In our example, for the sake of brevity, we provide structure
 definition of an issue-type transaction only. However, note that all the
 transaction types of the service should be defined.
 
-Next we validate each transaction signature with `Transaction.verifySignature`
+Next, we validate each transaction signature with `Transaction.verifySignature`
 method.
 
 Finally, we calculate a hash from a transaction body with `Transaction.hash`
