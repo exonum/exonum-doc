@@ -83,8 +83,8 @@ const CreateTimestamp = Exonum.newMessage({
   sources, starting with `0`;
 - `fields` - represents the fields of the transaction. In this case it contains
   two fields:
-  - `pub_key` - author's public key;
-  - `content` - object of `Timestamp` type defined above.
+    - `pub_key` - author's public key;
+    - `content` - object of `Timestamp` type defined above.
 
 Next, generate a signing key pair for signing and sending the transaction.
 
@@ -125,19 +125,18 @@ const transactionHash = await CreateTimestamp.send(transactionEndpoint, explorer
 
 - `transactionEndpoint` - represents API address of transaction handler at a
   blockchain node. Example:
-  ```
-  http://127.0.0.1:8200/api/services/timestamping/v1/timestamps'
-  ```
+
+  `http://127.0.0.1:8200/api/services/timestamping/v1/timestamps`
+
 - `explorerBasePath` - represents API address of transaction explorer where
   you can see transaction details at a blockchain node. Example:
-  ```
-  http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=
-  ```
+
+  `http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=`
 
 ### Transaction for Transferring Funds from One Wallet to Another
 
-To execute this type of transaction, obviously, you need to create two
-wallets: sender and receiver.
+To execute this type of transaction you need to create two wallets:
+sender and receiver.
 
 Define `TransferFunds` transaction schema and data types:
 
@@ -418,7 +417,8 @@ data.wallet_history.transactions.forEach(function(transaction) {
   })
 
   // validate transaction signature
-  if (!Transaction.verifySignature(transaction.signature, transaction.body.from, transaction.body)) {
+  if (!Transaction.verifySignature(
+    transaction.signature, transaction.body.from, transaction.body)) {
     throw new Error('Invalid transaction signature has been found')
   }
 
