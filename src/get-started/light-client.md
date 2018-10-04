@@ -105,7 +105,7 @@ const data = {
   pub_key: keyPair.publicKey,
   content: {
     content_hash: hash,
-    metadata: metadata
+    metadata
   }
 }
 ```
@@ -172,8 +172,8 @@ creating said wallet:
 const data = {
   from: keyPair.publicKey,
   to: receiver,
-  amount: amount,
-  seed: seed
+  amount,
+  seed
 }
 ```
 
