@@ -1,11 +1,9 @@
 # Managing Exonum Services with the Help of Light Client
 
-In our previous tutorials we covered the principle of structuring and operation
-of the backend part of Exonum services. In this tutorial we intend to disclose
-how the services interact and are managed with Exonum light client. For this
-purpose we will mostly refer to the tutorial for the
-[Service with Data Proofs](data-proofs.md) and
-partly to the [Exonum Timestamping Demo][timestamping-demo].
+In this tutorial we describe how to use the light client to interact with Exonum
+services. The tutorial extends other tutorials:
+[Service with Data Proofs](data-proofs.md)
+and, partly, [Exonum Timestamping Demo][timestamping-demo].
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -63,10 +61,13 @@ const CreateWallet = Exonum.newMessage({
 
 - `protocol_version` - represents the major version of the Exonum
   serialization protocol. Currently, `0`;
-- `service_id` - represents the identifier of the service. Can be found in service sources;
-- `message_id` - represents the identifier of the transaction in the service. Corresponds
-  to the index number of the transaction in service sources, starting with `0`;
-- `fields` - represents the fields of the transaction. Contain two fields:
+- `service_id` - represents the identifier of the service. Can be found in
+  service sources;
+- `message_id` - represents the identifier of the transaction type in the
+  service. Corresponds to the index number of the transaction in service
+  sources, starting with `0`;
+- `fields` - represents the fields of the transaction. In this case it contains
+  two fields:
   - `pub_key` - user's public key;
   - `name` - user's name.
 
@@ -220,7 +221,7 @@ secret key and send the resulted transaction into the
 blockchain. The required methods are again identical to those shown in the
 `CreateWallet` transaction example.
 
-## Obtain the Wallet Information with a Cryptographic Proof
+## Cryptographic Proofs
 
 The idea behind this functionality is one of the core features of the light
 client. Whenever you want to check presence of some data in the blockchain, a
