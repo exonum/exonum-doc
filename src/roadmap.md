@@ -1,198 +1,191 @@
 # Exonum Roadmap
 
-Exonum is an open source software, so there is no particular concept of
-“Exonum core developers” (see [the contributing guide](contributing.md)). However,
-there are preferred directions of the development. These include maintainers
-opinions, natural improvements and a will to correspond to good practices.
+Exonum roadmap represents the major functionality points our team is planning
+to bring to the product. Most of the features mentioned in this roadmap will be
+implemented for both Exonum Core and Java Binding. However, keep in mind that
+there will be a certain time interval between the availability of new features
+in Core and Java Binding with some latency for the latter.
+
+Stay tuned for news about updates to the Exonum platform in
+our [blog](https://exonum.com/blog/).
 
 !!! warning
     This document is provided for informational purposes only. It is subject
     to changes at any time without specific notifications and approvals.
 
-## Overall Direction
+## Fourth Quarter of 2018
 
-Currently Exonum is a
-[*framework*](https://en.wikipedia.org/wiki/Software_framework). This means
-that in order to run a specific Exonum-based application, one needs to develop
-this application with the aid of Exonum public API. This approach is similar
-to using [third-party libraries](https://en.wikipedia.org/wiki/Third-party_software_component).
-Typical workflow in this case is as follows:
+### Separation of Transactions and Messages
 
-- Download the source code of Exonum and additional modules
-- Implement the logic of interaction with blockchain and other functionality
-- Build the application
-- Deploy it on the necessary hardware infrastructure
+The separation of transactions and messages into two individual entities will
+lay the foundation for other crucial features such as standardization of
+interfaces of services, communication between services within the blockchain and
+other. This separation will also prove extremely useful in the efforts of
+changing the serialization format of Exonum to a more common one.
 
-For the convenience, we want to make Exonum a *standalone application*. Thus,
-after downloading and building Exonum (or even downloading a pre-built
-version), one can deploy it at once. Afterwards it can be extended with
-additional modules, possibly, custom-built directly for the purpose of the
-specific project.
+### Protobuf as the Serialization Format in Exonum
 
-!!! note
-    This automatically means that [services](architecture/services.md) should
-    be able to connect to already working Exonum application. Similar property
-    is valid for [shared
-    libraries](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries)
-    (`.dll` in Windows or `.so` in Unix-based systems): one can override a
-    library while programs are running using it.
+[Protobuf](https://developers.google.com/protocol-buffers/) is the industry
+accepted serialization format supported in multiple
+programming languages. Use of Protobuf will ease the integration of Exonum with
+applications in other languages. It will also enable the development of light
+clients in other languages with less effort required.
 
-    In other words, this means that Exonum will support **(dynamic)
-    smart contracts**, as they are known in other blockchain systems. The
-    difference of our approach from public blockchains is the following. A
-    service can be *added* to a blockchain, however, in order to *use* it,
-    validators need to approve new
-    [configuration](architecture/configuration.md) with the service marked as
-    active.
+Protobuf has already been used in several applications of [Exonum Java Binding](https://github.com/exonum/exonum-java-binding).
 
-Lifecycle for a service in Exonum would look as follows:
+### Storage Enhancements
 
-- The service is uploaded as a shared library (or an authenticated commitment
-  to the library, e.g., its cryptographic hash, and list of URIs to get the
-  library from)
-  within a specific transaction in the Exonum blockchain
-- [Validators](architecture/consensus.md#assumptions) make a decision on
-  activating the service, which is performed using
-  [configuration](architecture/configuration.md) management
-- The service becomes active, that is available for processing requests on
-  its endpoints
-- If necessary, services can be removed in a similar way by the
-  [consensus](architecture/consensus.md) of validators
+We are planning to make Exonum storage interfaces more developer-friendly and,
+due to this optimization, improve system performance and data auditability. The
+first stage of storage
+improvements will include the separation of node-specific and consensus-related
+data, which may, for example, accelerate the node recovery process. Within this
+stage we will also implement a basic form of Storage API for services and
+external clients. Further improvements to storage will be introduced in one of
+the following versions.
 
-## Java Binding
+### Services Interface Standard
 
-[Rust](https://www.rust-lang.org/en-US/) is a systems programming language,
-which is focused on memory safety. It is a good fit for security critical
-applications. However, the community of Rust developers is small. This fact can
-become a problem on the way of adoption of Exonum. It would be logical to
-extend its functionality to other programming languages by implementing
-[bindings](https://en.wikipedia.org/wiki/Language_binding).
+To change the way services are defined in Exonum, we will introduce a uniform
+service interface description, processed by means of Protobuf. Services will
+be described in a language-independent manner, according to a template which
+will, for example, simplify definition of transactions, their arguments, etc.
 
-Java was chosen for
-the first Exonum binding since it has a large developer community
-and rich set of tools,
-has more or less adequate execution safety (e.g., via JVM sandboxing)
-and type safety (static typing, availability
-of static analysis tools like [JML](https://en.wikipedia.org/wiki/Java_Modeling_Language)).
-We already started the implementation of Java binding.
+Uniform service definition will also ease the development of light clients in
+any language supported by Protobuf. In the first phase of the implementation,
+service interfaces will support a single method type – transactions. Other
+method types will be added in one of the following versions.
 
-!!! note
-    Java binding consists of two substantially different parts:
+### Service Identification
 
-    - **High level binding**, or a Java interface for Exonum public API. This
-      part allows the developer to connect blockchain to Java applications
-      directly. Technically, within this part Rust code (Exonum core) is called
-      from Java code (the application that makes use of Exonum).
-    - **Service binding**. This part allows to implement services and
-      potentially other Exonum modules (for example,
-      [storage](architecture/storage.md)) in Java. Thus, Exonum
-      core (Rust code) should be able to run JVM and launch
-      Java code.
+We plan on implementing a more logical mechanism of service identification in
+Exonum. Such a solution will ease the communication between services and
+external clients. This mechanism will also lay the foundation for the
+implementation of dynamic services.
 
-## Interface Description
+Within the scope of implementing the service identification mechanism, we also
+plan to provide a uniform framework for installing external services in
+Exonum blockchains.
 
-Exonum requires that a service developer should manually specify a number of
-parameters (service ID, transaction IDs, binary offsets of data in
-[transactions](architecture/transactions.md)). This specification may be unclear
-and leads to a number of potential problems.
+### Secure Workflow for Node Administration
 
-!!! note "Example"
-    One can easily imagine a problem caused by two different services having
-    the same ID. Such code will panic during the execution.
+The introduction of a workflow for administrative operations, such as the
+deployment of services, is aimed at improving the security of the system.
+The exact details of the workflow are being currently discussed. One of the
+promising ideas is devising a service through which all the administrative
+processes will be conducted.
 
-As a solution of this issue a declarative format is considered for service
-specification. Such technique is similar to
-[interface description languages](https://en.wikipedia.org/wiki/Interface_description_language).
+### Secure Storage for Private Keys of the Node
 
-Declarative service description can be added to a blockchain using specific
-transaction. It should include:
+A separate and secured storage for private keys of the nodes will enhance the
+safety of the
+system. Even in the case of unauthorized users gaining access to a node,
+they will not have access to its private key and will not be able to
+intervene into the consensus process.
 
-- [Data schema](architecture/services.md#data-schema) (a set of indices,
-  related to a service)
-- A list of [transactions](architecture/services.md#transactions)
-- API description (both [public](architecture/services.md#read-requests) and
-  [private](architecture/services.md#private-api))
+### Java Binding: Protobuf Support and Separation of Transactions and Messages
 
-!!! note
-    The main part of the service, which cannot be stated (at least in a
-    simple way) within the declarative description, is transactions application
-    to a database (see [`execute` method](architecture/transactions.md#execute)).
+As we develop Java Binding alongside with Exonum Core, to equalize their
+functionality it is required to implement Protobuf support and separate the
+transactions and messages for Java Binding too. This step will promote all the
+corresponding [benefits](#Protobuf-as-the-Serialization-Format-in-Exonum)
+discussed above.
 
-Declarative description is a feature that helps developer make less mistakes.
-Besides, it also enables several important features. Here are two of them.
+## First Quarter of 2019
 
-- **Server-side code generation**. Having service description, one can generate
-  the major part of the boilerplate server code. This refers to the definition of
-  all necessary service functions, indices hierarchy, usage of the relevant
-  function arguments and so on. Code generation will substantially ease
-  developers’ work, leaving him only the implementation of service business
-  logic.
-- **Unified light client**. In the current version of the [light
-  client](architecture/clients.md), one need to specify it for each
-  Exonum-based project. This is a consequence of unknown index hierarchy, which
-  leads to inability to check entire cryptographic proofs,
-  which are returned from the
-  backend. Instead light client is able to check the proof within a single
-  Merkle proof. Having declarative description in the blockchain (and thus
-  clients’ ability to get it), will allow the light client to determine proof
-  structure automatically and there will be no need for customization of a
-  light client for different Exonum-based systems.
+### Service Interface Standard: Read Requests
 
-## Service Isolation
+To increase the performance of the system, we will add read requests to the
+list of methods supported by interfaces of services. Read requests do not modify
+the blockchain state and can be handled locally on the full node which
+receives the request from a client.
 
-An essential part of Exonum services is [Data schema](architecture/services.md#data-schema).
-It represents the data, which
-is directly related to service. In current version of Exonum there’s no data
-access control within storage. On one hand, this brings the ability of service
-interaction: service A can change the data, which is described in the data
-schema of service B. This approach is similar
-to [inter-process communication](https://en.wikipedia.org/wiki/Inter-process_communication)
-using [shared memory](https://en.wikipedia.org/wiki/Shared_memory).
+### Pre-check of Transactions in the Memory Pool
 
-!!! note "Example"
-    The key rotation in
-    [bitcoin anchoring service](advanced/bitcoin-anchoring.md) is implemented
-    using this mechanism (keys
-    are updated using [configuration updater](advanced/configuration-updater.md)
-    service).
+Checking the validity of transactions which are included into the memory pool
+is one of the methods for preventing DoS attacks. This check will also ensure
+that transactions do not lead to any errors when processed.
 
-However, this approach has its drawbacks: a malicious or bogus service can harm
-other services and even halt the whole blockchain. This problem can be solved
-using **service isolation** concept, that is separating service data and
-execution on the middleware level (on the level of Exonum core).
+## Second Quarter of 2019
 
-!!! note
-    Virtual machine or Docker containers are examples of approaches that
-    lead to isolation of service execution (but not necessary isolate
-    service persistent data)
+### Dynamic Java Services
 
-## Transactions Improvements
+The introduction of dynamic Java services will enable adding Java services to
+a running blockchain without the need to restart nodes. In other words, new
+services will be included into the network on the go. Support for
+dependencies between dynamic services will be added in one of the following
+versions.
 
-As mentioned in [services description](architecture/services.md#transaction-interface),
-transactions are
-separate entities rather than datatypes. This directly leads to the ability to
-incorporate within transaction object additional logic. As a first step we
-consider implementing the ability to determine **transaction ordering**
-mechanics (unconfirmed transactions prioritization) as a method of transaction
-interface. This logic comes hand-by-hand with *transaction finalization*.
+### Communication between Services within the Blockchain
 
-!!! note
-    In current Exonum implementation transactions are finalized only by
-    recording into blockchain (even if transaction execution does not lead to
-    changes in storage). This potentially results in problems with the size
-    of data storage, but gives protection against
-    [replay attacks](https://en.wikipedia.org/wiki/Replay_attack).
+As a method of improving the modularity of services and expanding the
+possibilities for their reuse, the Exonum team will introduce the ability for
+services to communicate with one another within one blockchain. Services will
+be able to issue and process transactions from other services and can, thus, be
+reused in a variety of scenarios.
 
-## Networking Improvements
+### Storage Enhancements: Proofs and Storage API Improvements
 
-Currently all network channels in Exonum (channels between validators, full
-nodes and light clients) are unsafe. Because of this 3rd parties can possibly
-get an access to a blockchain data, even if they’re not allowed to.
+As the next stage of improvements to the Exonum storage, we will add support
+for proofs in storage and in Storage API for external clients in particular.
+As for Storage API for services, it will include access control mechanisms and
+support for other metadata.
 
-!!! note
-    [Packet sniffing](https://en.wikipedia.org/wiki/Packet_analyzer) is a
-    common network attack strategy.
+## Third Quarter of 2019
 
-We’re going to solve this issue by introducing **authenticated encrypted channels**
-(this can be done, for example, using
-[SSL/TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security)).
+### Service Migration
+
+Service migration will enable a smooth update to new versions of the services
+running in the blockchain, thus, making use of improvements, which the older
+versions do not provide.
+
+### DoS Resistance
+
+The resistance of Exonum blockchains to several types of DoS attacks will
+further enhance the security of the system by defining the amount of memory a
+node can consume at any moment of time. We are working on improving the
+consensus mechanism to limit the number of consensus messages and unconfirmed
+transactions which a node needs to store at any given time.
+
+### Save Points
+
+Introduction of save points, which are snapshots of the blockchain at a
+certain moment in time, will let a node quickly catch up with the rest of the
+network in case of downtime. It is highly probable that this feature will be
+based on [check points](https://github.com/facebook/rocksdb/wiki/Checkpoints)
+in [RocksDB](https://rocksdb.org), the database currently used in Exonum.
+
+### Java Light Client
+
+Exonum already features a
+[light client library](https://github.com/exonum/exonum-client) in JavaScript.
+We wish to expand the range of clients available for the framework and will
+add a light client in Java – one of the most popular programming languages.
+
+## Fourth Quarter of 2019
+
+### Dynamic Java Services: Dependencies
+
+To expand the feature of dynamic Java services in Exonum, we will add the
+support for dependencies between services. Dependencies will be specified
+during service installation or initialization. Services will be able to
+process transactions issued by other services, in this way broadening and
+extending the functionality of one another.
+
+### Private Transactions
+
+The functionality of private transactions implements the existence of certain
+data within the blockchain network which are known only to certain validators.
+These validators will execute private transactions locally, without changing
+the blockchain state.
+
+### Non-replayability of Transactions
+
+Making sure that a certain transaction has not been conducted in the past will
+no longer require storing the whole blockchain history.
+
+As you may have noticed, the new features are to be released quarterly. You are
+welcome to contribute to Exonum development and improvement (see our
+[contribution policy](https://github.com/exonum/exonum/blob/master/CONTRIBUTING.md)).
+For any questions on the upcoming implementations feel free to contact us in
+[Gitter](https://gitter.im/exonum) or [Reddit](https://www.reddit.com/r/Exonum/).
