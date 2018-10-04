@@ -66,7 +66,9 @@ const CreateWallet = Exonum.newMessage({
 - `service_id` - represents the identifier of the service. Can be found in service sources;
 - `message_id` - represents the identifier of the transaction in the service. Corresponds
   to the index number of the transaction in service sources, starting with `0`;
-- `fields` - represents the fields of the transaction.
+- `fields` - represents the fields of the transaction. Contain two fields:
+  - `pub_key` - user's public key;
+  - `name` - user's name.
 
 Prepare transaction data according to the above-mentioned schema:
 
