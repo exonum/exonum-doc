@@ -35,11 +35,12 @@ The general algorithm of executing a transaction in Exonum includes 4 stages:
 - generate a signing key pair (if required) and sign the transaction
 - send transaction to the blockchain.
 
-Below we provide two examples of transaction execution in Exonum services.
+Below we provide two peculiar examples of transaction execution in Exonum
+services.
 
 ### Create Timestamping Transaction
 
-As stated in our [guide for the light client][javascript-client-nested-types],
+As stated in our [Guide for the Light Client][javascript-client-nested-types],
 a custom data type can be a field of other custom data type without limitation
 as to the depth of the nested data.
 
@@ -76,11 +77,12 @@ const CreateTimestamp = Exonum.newMessage({
 
 - `protocol_version` - represents the major version of the Exonum
   serialization protocol. Currently, `0`;
-- `service_id` - represents the identifier of the service. Can be found in
-  service sources;
+- `service_id` - represents the identifier of the service. Check the identifier
+  in the source code of the service (the smart-contract designed in Rust or
+  Java);
 - `message_id` - represents the identifier of the transaction type in the
-  service. Corresponds to the index number of the transaction in service
-  sources, starting with `0`;
+  service. Corresponds to the index number of the transaction in source code of
+  the service, starting with `0`;
 - `fields` - represents the fields of the transaction. In this case it contains
   two fields:
     - `pub_key` - author's public key;
@@ -94,9 +96,9 @@ const keyPair = Exonum.keyPair()
 
 !!! note
     In our Timestamping demo we generate a new signing key pair for each new
-    timestamp. In the Service with Data Proofs we generate a key pair that
-    corresponds to a certain wallet and its user and, thus, is applied for
-    signing all transactions made on its behalf.
+    timestamp. On the contrary, in the Service with Data Proofs we generate only
+    one key pair that corresponds to a certain wallet and its user and, thus, is
+    applied for signing all transactions made on its behalf.
 
 Prepare transaction data according to the above-defined schema:
 
@@ -110,13 +112,13 @@ const data = {
 }
 ```
 
-Sign the transaction with the secret key from key pair generated above:
+Sign the transaction with the secret key from the key pair generated above:
 
 ```javascript
 const signature = CreateTimestamp.sign(keyPair.secretKey, data)
 ```
 
-Finally, send the resulting transaction into the blockchain using built-in
+Finally, send the resulting transaction into the blockchain using the built-in
 `send` method which returns a `Promise`:
 
 ```javascript
@@ -134,12 +136,15 @@ const transactionHash = await CreateTimestamp.send(transactionEndpoint,
 
   `http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=`
 
-### Transaction for Transferring Funds from One Wallet to Another
+### Transfer Funds Transaction
 
-To execute this type of transaction you need to create two wallets:
-sender and receiver.
+To execute this type of transaction you need to have two wallets
+created in advance: a sender and a receiver. You should also generate a separate
+key pair for each wallet, so that these keys could be used for defining and
+signing the transfer transactions between the wallets.
 
-Define `TransferFunds` transaction schema and data types:
+Next, define `TransferFunds` transaction schema and data types as we did in the
+example above:
 
 ```javascript
 const TransferFunds = Exonum.newMessage({
@@ -155,10 +160,10 @@ const TransferFunds = Exonum.newMessage({
 })
 ```
 
-As you might know from our very first [Cryptocurrency demo](create-service.md),
-in order to transfer funds from one wallet to another a "seed" is included
+As you might know from our very first [Cryptocurrency Demo](create-service.md),
+in order to transfer funds from one wallet to another, a `seed` is included
 into each such transaction. This prevents transactions from being hacked by
-a third person. You can generate seed as follows:
+a third person. You can generate `seed` as follows:
 
 ```javascript
 const seed = Exonum.randomUint64()
@@ -177,27 +182,27 @@ const data = {
 }
 ```
 
-Now you can sign transaction with the sender's secret key from the key pair
-generated when creating his wallet and send the resulting transaction into the
-blockchain. The methods applied in this case are identical to those shown in the
-`CreateTimestamp` transaction from previous example.
+Now you can sign the transaction with the sender's secret key and send the
+resulting
+transaction into the blockchain. The methods applied in this case are identical
+to those shown in the `CreateTimestamp` transaction described above.
 
 ## Cryptographic Proofs
 
 The idea behind this functionality is one of the core features of the light
-client. Whenever you want to check presence of some data in the blockchain, a
-request is made with the light client. The response to the request should
+client. Whenever you want to check the presence of some data in the blockchain,
+a request is made with the light client. The response to the request should
 contain your data together with either a cryptographic proof for it or a
 corresponding error, if such data is absent in the blockchain for some reason.
 
 In other words, a [cryptographic proof](../glossary.md#merkle-proof)
 is a response to the read request made through the light client that:
 
-- validates authenticity of the data contained therein
+- validates authenticity of the data included therein
 - certifies that said data is safely stored in the blockchain.
 
 In the same way as transactions, data proofs provided by Exonum light client
-have a general common structure and comprise of several parts. Meanwhile,
+have a general common structure and comprise several parts. Meanwhile,
 depending on the service business logic some extra custom parts may be included
 therein.
 
@@ -210,20 +215,19 @@ highest level down to the lowest one, which is represented by the requested
 data. The highest level, evidently, corresponds to the blockchain state hash.
 
 Below is the proof chart representing the proof structure. You can refer to it
-while we will be further analyzing it.
+while we will be further conducting the proof analyses.
 
 ![proof-chart](../images/proof-chart.png)
 
 Thus, first of all, we check that the block containing our data is correct and
-bears the state hash indicated in the proof. For this purpose we load and
-format the actual list of public keys of validator nodes stored in the network
+bears the state hash indicated in the proof. For this purpose we load the actual
+list of public keys of validator nodes stored in the network
 [configuration](../architecture/configuration.md). The keys
 are applied to assert that the data received from the
 blockchain was indeed agreed upon by all the member nodes in the network:
 
 ```javascript
 const response = await axios.get('/api/services/configuration/v1/configs/actual')
-
 
 const validators = response.data.config.validator_keys.map(validator => validator.consensus_key)
 ```
@@ -271,8 +275,8 @@ const tableKey = TableKey.hash({
 })
 ```
 
-We also obtain a proof for the state hash aggregator and check presence of the
-wallets table root hash therein:
+We also obtain a proof for the state hash aggregator and check the presence of
+the wallets table root hash therein:
 
 ```javascript
 const tableProof = new Exonum.MapProof(data.wallet_proof.to_table, Exonum.Hash, Exonum.Hash)
@@ -326,8 +330,8 @@ const walletProof = new Exonum.MapProof(data.wallet_proof.to_wallet,
   Exonum.PublicKey, Wallet)
 ```
 
-Here we also check that `merkleRoot` which is now the root hash of the wallets
-table coincides with `walletsHash` we obtained at the previous level. In this
+Here we also check that `merkleRoot`, which is now the root hash of the wallets
+table, coincides with `walletsHash` we obtained at the previous level. In this
 way we can link two parts of the proof:
 
 ```javascript
@@ -346,7 +350,7 @@ if (typeof wallet === 'undefined') {
 }
 ```
 
-Basically, the proof from the Timestamping demo comprises the same validation
+Basically, the proof from the Timestamping Demo comprises the same validation
 levels as described above. Specifically, to obtain confirmation for the
 timestamp data, the proof validates the block, the root table and the table of
 timestamps. The data on the timestamp can then be extracted from the validated
@@ -377,7 +381,7 @@ const transactionsMetaData = Exonum.merkleProof(
 )
 ```
 
-Upon obtainment of the proof, make sure that number of transactions in the
+Upon obtainment of the proof, make sure that the number of transactions in the
 wallet history, that we extracted earlier together with other information on the
 wallet, is equal to the number of transactions in the array of the proof.
 Otherwise, transactions cannot be verified against the proof:
@@ -436,7 +440,7 @@ We have described all the functionality required to interact with an Exonum
 service through the light client so far.
 
 Well done! You have now equipped your application with a full-stack Exonum-based
-support! Here is the point where you can build and run your application.
+support! At this the point you can build and run your application.
 
 [timestamping-demo]: https://github.com/exonum/exonum/tree/master/examples/timestamping
 [javascript-client]: https://github.com/exonum/exonum-client#getting-started
