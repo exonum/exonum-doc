@@ -1000,7 +1000,7 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
 
 Great! You have created a fully functional Timestamping Service.
 Next you can see how to interact with the service with the help of the Exonum
-[light client](light-client-tutorial).
+[light client](light-client.md).
 
 Refer to [Cryptocurrency][Cryptocurrency] and
 [Service with Data Proofs][Service with Data Proofs] for our other tutorials.
@@ -1016,5 +1016,4 @@ our [blog](https://exonum.com/blog/).
 [src/schema.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/schema.rs
 [src/api.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/api.rs
 [src/main.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/main.rs
-[light-client-tutorial]: https://exonum.com/doc/get-started/light-client
 [client]: https://github.com/exonum/exonum-client
