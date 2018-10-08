@@ -119,7 +119,7 @@ Transactions from light clients are authenticated with the help of
 signatures, which are the part of JSON serialization of transactions. Read
 requests are generally not authenticated.
 
-Full nodes use [Iron framework](http://ironframework.io/) to implement REST
+Full nodes use [Actix-web framework](https://actix.rs) to implement REST
 HTTP API. Addresses for public and private API endpoints are specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration.

@@ -19,6 +19,14 @@ it is possible to determine which one comes first.
 Transactions are applied to the Exonum key-value storage sequentially
 in the same order transactions are placed into the blockchain.
 
+!!! note
+    The order of transaction issuance at the client side does not necessarily
+    correspond to the order of their processing. To maintain the logical order
+    of processing, it is useful to
+    adhere to the following pattern: send the next transaction only after
+    the previous one was processed. This behavior is already
+    implemented in the [light client library](https://github.com/exonum/exonum-client#send-multiple-transactions).
+
 All transactions are authenticated with the help of public-key digital signatures.
 Generally, a transaction contains the signature verification key (aka public key)
 among its parameters. Thus, authorization (verifying whether the transaction author

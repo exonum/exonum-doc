@@ -81,6 +81,9 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   ID of the validator that created an approved block proposal
 - **schema_version**: integer  
   Information schema version. Currently, `0`
+- **state_hash**: Hash  
+  Hash of the current [Exonum state][blockchain-state] after applying transactions
+  in the block
 - **tx_count**: integer  
   Number of transactions included into the block
 - **tx_hash**: Hash  
@@ -88,12 +91,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ### Time
 
-`Time` is a JSON object with the following fields:
-
-- **seconds**: integer  
-  The UNIX timestamp
-- **nanos**: integer  
-  Number of nanoseconds
+`Time` is a string that combined date and time in UTC as per [ISO 8601][ISO8601]
+(for example, `2018-05-17T10:45:56.057753Z`).
 
 ### Precommit
 
@@ -105,6 +104,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
   The hash of the current block (the `Precommit` message was created for)
 - **body.height**: integer  
   The height of the current block
+- **body.propose_hash**: Hash  
+  Hash of the corresponding Propose
 - **body.round**: integer  
   The round when the block proposal was created
 - **body.time**: Time  
@@ -236,18 +237,27 @@ will not be established.
 
 #### Parameters
 
-- **ip**: PeerAddress
+- **address**: PeerAddress
+  IP address of the node which our node have to connect.
+- **public_key**: PublicKey
+  Public key of the other node.
 
 #### Example
 
 ```None
-curl --data "ip=127.0.0.1:8800" http://127.0.0.1:7780/api/system/v1/peers
+curl -H "Content-Type: application/json" \
+  --data '{ \
+    "address": "127.0.0.1:8800", \
+    "public_key": \
+      \"dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a" \
+  }' \
+  http://127.0.0.1:8081/api/system/v1/peers
 ```
 
 #### Response
 
-```None
-"Ok"
+```json
+null
 ```
 
 ### Peers info
@@ -353,8 +363,8 @@ curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0
 
 #### Response
 
-```None
-"Ok"
+```json
+null
 ```
 
 ### Network info
@@ -410,13 +420,13 @@ None.
 #### Example
 
 ```none
-curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
+curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api/system/v1/shutdown
 ```
 
 #### Response
 
-```none
-"Ok"
+```json
+null
 ```
 
 ## Explorer API endpoints
@@ -430,7 +440,7 @@ configuration parameter allows to turn explorer endpoints on/off.
 ### Transaction
 
 ```none
-GET {explorer_base_path}/transactions/{transaction_hash}
+GET {explorer_base_path}/transactions?hash={transaction_hash}
 ```
 
 Searches for a transaction, either committed or uncommitted, by the hash.
@@ -582,7 +592,7 @@ Response is a JSON object with the following fields:
 ### Block by height
 
 ```none
-GET {explorer_base_path}/blocks/{height}
+GET {explorer_base_path}/block?height={height}
 ```
 
 Returns the content for a block of a specific height.
@@ -622,10 +632,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 807015000,
-              "secs": "1499869987"
-            },
+            "time": "2018-05-17T10:43:59.404962Z",
             "validator": 2
           },
           "message_id": 4,
@@ -639,10 +646,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 806850000,
-              "secs": "1499869987"
-            },
+            "time": "2018-05-17T10:49:09.161549Z",
             "validator": 3
           },
           "message_id": 4,
@@ -656,10 +660,7 @@ A JSON object with the following fields:
             "height": "20",
             "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
             "round": 2,
-            "time": {
-              "nanos": 7842000,
-              "secs": "1499869988"
-            },
+            "time": "2018-05-17T10:49:11.161549Z",
             "validator": 0
           },
           "message_id": 4,
@@ -698,11 +699,11 @@ smallest and largest heights traversed to collect at most `count` blocks.
 The JSON object of the explored block range `range` and the array `blocks` of
 the `BlockHeader` objects. The range specifies the largest and the smallest
 heights of blocks that have been traversed to collect at most `count` blocks.
-The largest height `to` equals to `latest` if provided or to the height of
-the latest block in the blockchain, the smallest height `from` takes values
+The largest height `end` equals to `latest + 1` if provided or to the height of
+the latest block in the blockchain, the smallest height `start` takes values
 in `0..latest - count + 1`. Blocks in the array are sorted in descending order
 according to their heights. Height of any block in the array is greater or
-equal than `from` and less or equal than `to`.
+equal than `start` and less than `end`.
 
 ??? example "Response Example"
     Assume the following request
@@ -715,10 +716,6 @@ equal than `from` and less or equal than `to`.
 
     ```JSON
     {
-      "range": {
-        "from": 100,
-        "to": 2
-      },
       "blocks": [
         {
           "height": "18",
@@ -765,7 +762,11 @@ equal than `from` and less or equal than `to`.
           "tx_count": 1000,
           "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
         }
-      ]
+      ],
+      "range": {
+        "end": 101,
+        "start": 2
+      }
     }
     ```
 
@@ -774,3 +775,5 @@ equal than `from` and less or equal than `to`.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
+[blockchain-state]: ../glossary.md#blockchain-state
+[ISO8601]: https://en.wikipedia.org/wiki/ISO_8601

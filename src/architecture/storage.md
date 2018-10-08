@@ -211,7 +211,8 @@ As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
 In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
 since 0.3 its support has been dropped.
 
-Values from different tables are stored in column families in the low-level storage,
+Values from different tables are stored in column families in the low-level
+storage,
 wherein the keys are represented as
 a byte sequence, and values are serialized according to Exonum binary
 serialization format. A single column family may store data for
@@ -228,9 +229,11 @@ low-level storage. A table identifier consists of 2 parts:
 
 - **String name,** which is mapped 1-to-1 to a column family.
   The name may contain uppercase and lowercase Latin letters, digits,
-  underscores `_`, and periods `.`. By convention, table names in services should
+  underscores `_`, and periods `.`. By convention, table names in services
+  should
   start with [the service name][service-name] and a period. For example,
-  the only table in the cryptocurrency tutorial is named `cryptocurrency.wallets`,
+  the only table in the cryptocurrency tutorial is named
+  `cryptocurrency.wallets`,
   where `cryptocurrency` is the service name, and `wallets` is the own name
   of the table.
 - **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust terms).
@@ -298,14 +301,14 @@ for core blockchain functionality:
 
 - `transactions: MapIndex`  
   Represents a map from transaction hash into raw transaction structure.
-- `tx_location_by_hash: MapIndex`  
+- `transactions_locations: MapIndex`  
   Keeps the block height and tx position inside block for every
   transaction hash.
 - `blocks: MapIndex`  
   Stores block object for every block height.
 - `block_hashes_by_height: ListIndex`  
   Saves a block hash that has the requested height.
-- `block_txs: ProofListIndex`  
+- `block_transactions: ProofListIndex`  
   Group of tables keyed by the block height. Each table keeps
   a list of transactions for the specific block.
 - `precommits: ListIndex`  
@@ -325,9 +328,10 @@ possible to create additional tables with indexing semantics and update their
 content together with the tables being indexed.
 
 !!! note "Example"
-    The system table `block_txs` stores a list of transactions
-    for every block. `tx_location_by_hash` is an auxiliary table that provides
-    an index to quickly lookup `block_txs` by a transaction hash.
+    The system table `block_transactions` stores a list of transactions
+    for every block. `transactions_locations` is an auxiliary table that
+    provides
+    an index to quickly lookup `block_transactions` by a transaction hash.
 
 [level-db]: http://leveldb.org/
 [rocks-db]: http://rocksdb.org/
