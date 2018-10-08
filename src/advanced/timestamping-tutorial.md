@@ -1,13 +1,13 @@
 # Create Timestamping Service
 
-In this tutorial we will create a Timestamping service for an Exonum
+In this tutorial we will create a Timestamping Service for an Exonum
 powered blockchain and start up a four-node network that will process requests
 to this service. The service accepts a single transaction type: submitting
 hashes of files to the blockchain. It also allows checking whether a file
-with a certain hash has been submitted to the blockchain before.
+with a certain hash has been submitted to the blockchain already.
 
 The implemented service relies on the Exonum time oracle to determine the
-current time value.
+current blockchain time value.
 
 You can view and download the full source code of this tutorial at
 our [GitHub repository][timestamping].
@@ -19,13 +19,10 @@ installed:
 - [Rust](https://rustup.rs)
 - [Node.js & npm](https://nodejs.org/en/download/)
 
-Refer to [Cryptocurrency][Cryptocurrency] and
-[Cryptocurrency Advanced][Cryptocurrency Advanced] for our other tutorials.
-
 ## Set up Rust Project
 
 Exonum is written in Rust, therefore, you need a stable Rust compiler for this
-tutorial. Refer to our [Installation guide](./install.md) for detailed
+tutorial. Refer to our [Installation Guide](./install.md) for detailed
 instructions on setting up the required environment.
 
 The very first step of developing a service, is creating a crate and adding
@@ -59,7 +56,7 @@ version = "0.9.0"
 path = "../../../services/configuration"
 ```
 
-Additionally, you can add the following dependencies to `Cargo.toml`
+Also, you can add the following dependencies to `Cargo.toml`
 for future testing purposes:
 
 ```toml
@@ -120,7 +117,7 @@ pub mod transactions;
 ## Constants
 
 Next, let's declare the constants which will be used in the service. These
-include the ID of our Timestamping service and its name.
+include the ID of our Timestamping Service and its name.
 
 !!! note
     The ID and name of the service should be unique for every service
@@ -292,8 +289,8 @@ impl<'a> Schema<&'a mut Fork> {
 
 [Transactions](../architecture/transactions.md) resemble messages and
 perform atomic actions on the blockchain state. We have separated the code that
-configures transactions for our Timestamping service into a separate file -
-[src/transactions.rs][src/transactions.rs]. The Timestamping service we are
+configures transactions for our Timestamping Service into a separate file -
+[src/transactions.rs][src/transactions.rs]. The Timestamping Service we are
 creating requires a single transaction type - adding timestamps to the
 blockchain.
 
@@ -341,7 +338,7 @@ transactions, and the timestamp - the hash of the submitted file.
 ### Reporting Errors
 
 We next define the error which might occur when processing transactions in our
-service. The current Timestamping service includes only one error, which
+service. The current Timestamping Service includes only one error, which
 occurs when a timestamp with the given hash already exists in the blockchain.
 
 ```rust
@@ -430,11 +427,11 @@ impl Transaction for TxTimestamp {
 ## Configure API endpoints
 
 Next, we need to implement the node API. We have separated the code that
-configures API endpoints for our Timestamping service into a separate file -
+configures API endpoints for our Timestamping Service into a separate file -
 [src/api.rs][src/api.rs].
 
 First, we need to define the structures required to implement the API
-endpoints. For our Timestamping service, we will define the following three
+endpoints. For our Timestamping Service, we will define the following three
 structures:
 
 - the `TimestampQuery` structure which contains the hash of a
@@ -553,7 +550,7 @@ structures related to the timestamping transaction:
 - find the latest block of the blockchain
 - take that latest block and its precommit messages
 - take the proof structure that proves the correctness of the service table, in
-  this case the table of our Timestamping service. This operation checks
+  this case the table of our Timestamping Service. This operation checks
   whether the table of a certain service is included into the blockchain.
 - return proofs of the latest block and the Timestamping service table.
 
@@ -564,7 +561,7 @@ timestamping transaction itself and construct a proof for it:
   blockchain state
 - find the timestamping transaction proof using its hash
 - return the proof of the timestamping transaction which is comprised of the
-  proofs of the latest blockchain block, timestamping service table and the
+  proofs of the latest blockchain block, Timestamping service table and the
   timestamping transaction.
 
 As a result of the operations above, the `handle_timestamp_proof` method proves
@@ -693,12 +690,12 @@ impl fabric::ServiceFactory for ServiceFactory {
 
 ## Create Builder for Exonum Node With Timestamping
 
-As the final step of configuring the backend of our Timestamping service, we
+As the final step of configuring the backend of our Timestamping Service, we
 add the [src/main.rs][src/main.rs] file, which lets us launch an Exonum node
 with additional services.
 
 In this file we import Exonum, its Configuration service, the Time oracle which
-will provide the current time values and the Timestamping service itself.
+will provide the current time values and the Timestamping Service itself.
 
 ```rust
 fn main() {
@@ -714,14 +711,14 @@ fn main() {
 When called, the `main` function will launch an Exonum node with the
 Configuration, Time and Timestamping services.
 
-The backend part of our Timestamping service is now ready for use.
+The backend part of our Timestamping Service is now ready for use.
 However, in the demo on [Github](timestamping) we have taken it a step further
 and addedd frontend.
 
 ## Start the Blockchain network
 
 Now that our service is ready, we can start up a network of four nodes running
-Exonum with the Timestamping service we have created. All these steps are to be
+Exonum with the Timestamping Service we have created. All these steps are to be
 performed in the directory containing `Cargo.toml`.
 
 1. Install the actual node binary:
@@ -807,7 +804,7 @@ performed in the directory containing `Cargo.toml`.
        --db-path example/db4 --public-api-address 0.0.0.0:8203
    ```
 
-Now you have four nodes running Exonum blockchain with Timestamping service.
+Now you have four nodes running Exonum blockchain with Timestamping Service.
 You can interact with this blockchain using API requests.
 
 ## Interact with the Timestamping Service
@@ -851,7 +848,6 @@ curl -H “Content-Type: application/json” -X POST -d @create-timestamp-1.json
     ```
 
     The request returns the hash of the timestamp.
-
 
 ### Get information on a timestamp
 
@@ -999,17 +995,21 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
     The request returns the following components of the timestamp proof:
 
     - the proof of the last block in the blockchain
-    - the proof of the timestamping service table
+    - the proof of the Timestamping service table
     - the proof of the timestamp itself
 
-Great! You have created a fully functional Timestamping service.
+Great! You have created a fully functional Timestamping Service.
 Next you can see how to interact with the service with the help of the Exonum
 [light client](light-client-tutorial).
+
+Refer to [Cryptocurrency][Cryptocurrency] and
+[Service with Data Proofs][Service with Data Proofs] for our other tutorials.
+
 Stay tuned for news about updates to the Exonum platform in
 our [blog](https://exonum.com/blog/).
 
 [timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping
-[Cryptocurrency Advanced]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
+[Service with Data Proof]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
 [Cryptocurrency]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency
 [src/lib.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/lib.rs
 [src/transactions.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/transactions.rs
