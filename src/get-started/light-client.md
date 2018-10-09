@@ -254,66 +254,21 @@ if (!Exonum.verifyBlock(data.block_info, validators)) {
 }
 ```
 
-Next, we need to obtain the root hash of the table that bears all the registered
-wallets from the table containing hashes of all tables
-defined in the service (state hash aggregator). The root hashes of the service
-tables are
-stored as values under their tables keys. To be able to obtain the root hash of
-interest we define the table key structure:
+Next, we need to obtain the root hash of the table that bears all the
+registered wallets from the table containing hashes of all tables defined
+in the service (state hash aggregator) and check the presence of
+the wallets table:
 
 ```javascript
-const TableKey = Exonum.newType({
-  fields: [
-    { name: 'service_id', type: Exonum.Uint16 },
-    { name: 'table_index', type: Exonum.Uint16 }
-  ]
-})
-
-const tableKey = TableKey.hash({
-  service_id: 128,
-  table_index: 0
-})
-```
-
-We also obtain a proof for the state hash aggregator and check the presence of
-the wallets table root hash therein:
-
-```javascript
-const tableProof = new Exonum.MapProof(data.wallet_proof.to_table, Exonum.Hash, Exonum.Hash)
-```
-
-- `Exonum.Hash` - represents 1) the key of the wallets table; 2) the value of
-  its root hash.
-
-As soon as we detect the wallets table inside the state hash aggregator, we
-check if the
-obtained `merkleRoot` of the proof is equal to the system state hash stored in
-the previously validated block. If so, the present part of the proof is
-considered valid:
-
-```javascript
-if (tableProof.merkleRoot !== data.block_proof.block.state_hash) {
-  throw new Error('Wallets table proof is corrupted')
-}
-```
-
-We can now extract the root hash of the wallets table from the obtained proof
-based on the table key defined above:
-
-```javascript
-const walletsHash = tableProof.entries.get(tableKey)
-
-if (typeof walletsHash === 'undefined') {
-  throw new Error('Wallets table not found')
-}
+const tableRootHash = Exonum.verifyTable(data.wallet_proof.to_table,
+  data.block_proof.block.state_hash, SERVICE_ID, TABLE_INDEX)
 ```
 
 The next proof level is devoted to the validation of existence of a particular
-wallet inside the system. The procedure here is similar to the one we faced at
-the previous level.
+wallet inside the system.
 
 First, we define the structure that we search for in the proof. In this case it
-is a wallet. We then obtain the proof down to the required wallet:
+is a wallet.
 
 ```javascript
 const Wallet = Exonum.newType({
@@ -325,17 +280,22 @@ const Wallet = Exonum.newType({
     { name: 'history_hash', type: Exonum.Hash }
   ]
 })
+```
+
+We then obtain the proof down to the required wallet:
+
+```javascript
 
 const walletProof = new Exonum.MapProof(data.wallet_proof.to_wallet,
   Exonum.PublicKey, Wallet)
 ```
 
 Here we also check that `merkleRoot`, which is now the root hash of the wallets
-table, coincides with `walletsHash` we obtained at the previous level. In this
+table, coincides with `tableRootHash` we obtained at the previous level. In this
 way we can link two parts of the proof:
 
 ```javascript
-if (walletProof.merkleRoot !== walletsHash) {
+if (walletProof.merkleRoot !== tableRootHash) {
   throw new Error('Wallet proof is corrupted')
 }
 ```
@@ -406,7 +366,7 @@ Finally, we calculate a hash from a transaction body with `Transaction.hash`
 method to compare it with the corresponding hash from the proof.
 
 ```javascript
-data.wallet_history.transactions.forEach(function(transaction) {
+data.wallet_history.transactions.forEach(function(transaction, index) {
   // generate transaction definition
   const Transaction =  new Exonum.newMessage({
     protocol_version: 0,
@@ -428,7 +388,7 @@ data.wallet_history.transactions.forEach(function(transaction) {
   }
 
   // validate hash
-  if (Transaction.hash(transaction.body) !== transactionsMetaData[i]) {
+  if (Transaction.hash(transaction.body) !== transactionsMetaData[index]) {
     throw new Error('Invalid transaction hash has been found')
   }
 })
