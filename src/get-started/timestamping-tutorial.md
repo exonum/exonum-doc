@@ -715,7 +715,7 @@ When called, the `main` function will launch an Exonum node with the
 Configuration, Time and Timestamping services.
 
 The backend part of our Timestamping Service is now ready for use.
-Refer to our [Github](timestamping) repository to view the code of the service,
+Refer to our [Github][timestamping] repository to view the code of the service,
 the frontend we have added and the instructions on launching our demo
 Timestamping Service.
 
