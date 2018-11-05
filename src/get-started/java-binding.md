@@ -13,7 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.2 \
+    -DarchetypeVersion=0.3 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
@@ -75,12 +75,10 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-Exonum stores elements in the collections as byte arrays. Therefore, a user
-must implement serialization of values stored in the collection. Java Binding
-provides *serializers* for standard and some commonly used types 
-as well as protobuf messages. 
-See [`StandardSerializers`][standardserializers] for details.
-
+Exonum stores elements in the collections as byte arrays. Therefore, a serialization 
+for values stored in the collection must be provided.
+See [Serialization](#serialization) for details.
+ 
 !!! note "Example of ProofMapIndex Creation"
     ```java
     void updateBalance(Fork fork) {
@@ -103,6 +101,21 @@ blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
 implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
+
+### Serialization
+
+Exonum stores an information as a byte arrays. That's because serialization takes the place.
+Java Binding provides a set of built-in *serializers* for Java primitive types, 
+some Exonum library types and serialization of any Protobuf messages,
+thanks to [`StandardSerializers`][standardserializers].
+The list of serializers covers the most often-used entities and includes:
+- Standard types: `bool`, `fixed32`, `uint32`, `sint32`, `fixed64`, `uint64`, 
+`sint64`, `float`, `double`, `byte[]` and `String`
+- Exonum types: `PrivateKey`, `PublicKey` and `HashCode`
+- A deterministic serializer of any Protobuf messages  
+
+Besides the available built-in serializers, users can implement their own serializers 
+for storing their data in a custom format instead of using the built-in one.
 
 ### Transactions Description
 
@@ -180,6 +193,12 @@ implementations.
 current storage state when the transaction is executed. Exonum passes `Fork`
 as an argument – a view that allows performing modifying operations. A service
 schema object can be used to access data collections of this service.
+
+Also, `Transaction#execute` method may throw `TransactionExecutionException` 
+which contains transaction error report. This feature allows the service to notify 
+Exonum about an error in a transaction execution whenever one occurs. 
+If transaction execution fails, the changes invoked by the transaction are rolled 
+back, while the error data is stored in the database for further user reference.
 
 ### External Service API
 
@@ -362,6 +381,21 @@ service:
 - Install the system dependencies and [build][how-to-build] the application.
 - Follow the instructions in the [application guide][app-tutorial] to configure
   and start an Exonum node with your service.
+
+## Common Library
+
+Java Binding includes the common library module that can be useful for Java clients 
+and it does not have a dependency on Java Binding Core.
+The library provides ability to create transaction messages, check proofs, 
+serialize/deserialize data and perform cryptographic operations.
+For using the library just include the dependency in your `pom.xml`:
+``` xml
+    <dependency>
+      <groupId>com.exonum.binding</groupId>
+      <artifactId>exonum-java-binding-common</artifactId>
+      <version>0.3</version>
+    </dependency>
+```
 
 ## Known Limitations
 
