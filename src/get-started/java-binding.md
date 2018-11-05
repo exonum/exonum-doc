@@ -195,7 +195,7 @@ as an argument – a view that allows performing modifying operations. A service
 schema object can be used to access data collections of this service.
 
 Also, `Transaction#execute` method may throw `TransactionExecutionException` 
-which contains transaction error report. This feature allows the service to notify 
+which contains a transaction error report. This feature allows the service to notify 
 Exonum about an error in a transaction execution whenever one occurs. 
 If transaction execution fails, the changes invoked by the transaction are rolled 
 back, while the error data is stored in the database for further user reference.
@@ -385,8 +385,8 @@ service:
 ## Common Library
 
 Java Binding includes the common library module that can be useful for Java clients 
-and it does not have a dependency on Java Binding Core.
-The library provides ability to create transaction messages, check proofs, 
+and does not have a dependency on Java Binding Core.
+The library provides the ability to create transaction messages, check proofs, 
 serialize/deserialize data and perform cryptographic operations.
 For using the library just include the dependency in your `pom.xml`:
 ``` xml
