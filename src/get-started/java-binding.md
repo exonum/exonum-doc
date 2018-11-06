@@ -114,9 +114,9 @@ The list of serializers covers the most often-used entities and includes:
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
   Fixed and variable length `integers` for `32-bytes` and `64-bytes` size
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`
-- A deterministic serializer of any Protobuf messages  
+- Any Protobuf messages using `StandardSerializers#protobuf`  
 
-Besides the available built-in serializer for Protobuf messages, users can still implement 
+Besides the available built-in serializers, users can still implement 
 their own serializers for storing their data in a custom format instead of using the built-in one.
 
 ### Transactions Description
