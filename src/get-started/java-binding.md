@@ -75,10 +75,10 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-Exonum stores elements in collections as byte arrays. Therefore, a serialization 
-for values stored in collection must be provided.
+Exonum stores elements in collections as byte arrays. Therefore, a 
+serialization for values stored in collection must be provided.
 See [Serialization](#serialization) for details.
- 
+
 !!! note "Example of ProofMapIndex Creation"
     ```java
     void updateBalance(Fork fork) {
@@ -104,20 +104,21 @@ implements [`Schema`][schema] interface; when implementing
 
 ### Serialization
 
-As far as Exonum storage accepts data in the form of byte arrays, storing users' 
-data as is, is not possible in Exonum. Thus, serialization of users' data into 
-arrays of bytes is required.
-Java Binding provides a set of built-in *serializers* for Java primitive types, 
+As far as Exonum storage accepts data in the form of byte arrays, storing 
+users' data as is, is not possible in Exonum. Thus, serialization of users' 
+data into arrays of bytes is required.
+Java Binding provides a set of built-in *serializers* for Java primitive types,
 some Exonum library types and serialization of any Protobuf messages,
 thanks to [`StandardSerializers`][standardserializers].
 The list of serializers covers the most often-used entities and includes:
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
-  Fixed and variable length `integers` for `32-bytes` and `64-bytes` size
-- Exonum types: `PrivateKey`, `PublicKey` and `HashCode`
-- Any Protobuf messages using `StandardSerializers#protobuf`  
+  Fixed and variable length `integers` for `32-bytes` and `64-bytes` size.
+- Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
+- Any Protobuf messages using `StandardSerializers#protobuf`.
 
-Besides the available built-in serializers, users can still implement 
-their own serializers for storing their data in a custom format instead of using the built-in one.
+Besides the available built-in serializers, users can still implement
+their own serializers for storing their data in a custom format instead 
+of using the built-in one.
 
 ### Transactions Description
 
@@ -198,13 +199,13 @@ schema object can be used to access data collections of this service.
 
 Also, `Transaction#execute` method may throw `TransactionExecutionException`
 which contains a transaction error report. This feature allows users to notify
-Exonum about an error in a transaction execution whenever one occurs. 
+Exonum about an error in a transaction execution whenever one occurs.
 The service checks the preconditions before executing a transaction and either 
 accepts it or issues an exception that is further transformed into an Exonum core 
-[TransactionResult enum][transaction-result] containing an error code and 
-a message with error data. 
+[TransactionResult enum][transaction-result] containing an error code and
+a message with error data.
 If transaction execution fails, the changes invoked by the transaction are rolled back, 
-while the error data is stored in the database for further user reference. 
+while the error data is stored in the database for further user reference.
 Light clients also provide access to information on the transaction error, 
 stored in the Exonum storage, to their users.
 
@@ -399,6 +400,7 @@ if necessary. In this case the classes are simply launched by a user as a librar
 The library provides the ability to create transaction messages, check proofs, 
 serialize/deserialize data and perform cryptographic operations.
 For using the library just include the dependency in your `pom.xml`:
+
 ``` xml
     <dependency>
       <groupId>com.exonum.binding</groupId>
