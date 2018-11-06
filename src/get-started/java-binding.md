@@ -75,8 +75,8 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-Exonum stores elements in collections as byte arrays. Therefore, a
-serialization for values stored in collection must be provided.
+As far as Exonum stores elements in collections as byte arrays. Therefore, a
+serialization for values stored in collections must be provided.
 See [Serialization](#serialization) for details.
 
 !!! note "Example of ProofMapIndex Creation"
@@ -113,13 +113,13 @@ thanks to [`StandardSerializers`][standardserializers].
 The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
-  Fixed and variable length `integers` for `32-bytes` and `64-bytes` size.
+  Fixed- and variable-length `integers` for `32-bytes` and `64-bytes` size.
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
 - Any Protobuf messages using `StandardSerializers#protobuf`.
 
 Besides the available built-in serializers, users can still implement
 their own serializers for storing their data in a custom format instead
-of using the built-in one.
+of using the built-in ones.
 
 ### Transactions Description
 
