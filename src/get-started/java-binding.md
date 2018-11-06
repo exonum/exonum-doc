@@ -75,7 +75,7 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-As far as Exonum stores elements in collections as byte arrays. Therefore, a
+Exonum stores elements in collections as byte arrays. Therefore, a
 serialization for values stored in collections must be provided.
 See [Serialization](#serialization) for details.
 
@@ -104,7 +104,7 @@ implements [`Schema`][schema] interface; when implementing
 
 ### Serialization
 
-As far as Exonum storage accepts data in the form of byte arrays, storing
+As Exonum storage accepts data in the form of byte arrays, storing
 users' data as is, is not possible in Exonum. Thus, serialization of users'
 data into arrays of bytes is required.
 Java Binding provides a set of built-in *serializers* for Java primitive types,
