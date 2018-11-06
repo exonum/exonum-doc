@@ -111,8 +111,8 @@ Java Binding provides a set of built-in *serializers* for Java primitive types,
 some Exonum library types and serialization of any Protobuf messages,
 thanks to [`StandardSerializers`][standardserializers].
 The list of serializers covers the most often-used entities and includes:
-- Standard types: `bool`, `fixed32`, `uint32`, `sint32`, `fixed64`, `uint64`, 
-`sint64`, `float`, `double`, `byte[]` and `String`
+- Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
+  Fixed and variable length `integers` for `32-bytes` and `64-bytes` size
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`
 - A deterministic serializer of any Protobuf messages  
 
