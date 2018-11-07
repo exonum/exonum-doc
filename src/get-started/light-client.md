@@ -2,8 +2,8 @@
 
 In this tutorial we describe how to use the light client to interact with Exonum
 services. The tutorial extends other tutorials:
-[Service with Data Proofs](data-proofs.md)
-and, partly, [Exonum Timestamping Demo][timestamping-demo].
+[How to Create a Service with Data Proofs](data-proofs.md)
+and, partly, [Timestamping Demo][timestamping-demo].
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -44,7 +44,7 @@ As stated in our [Guide for the Light Client][javascript-client-nested-types],
 a custom data type can be a field of other custom data type without limitation
 as to the depth of the nested data.
 
-In view of the above, in the Timestamping demo we start defining the transaction
+In view of the above, in the Timestamping Demo we start defining the transaction
 with the `Timestamp` entity itself. Said entity is further applied as a custom
 type within `CreateTimestamp` transaction schema:
 
@@ -95,7 +95,7 @@ const keyPair = Exonum.keyPair()
 ```
 
 !!! note
-    In our Timestamping demo we generate a new signing key pair for each new
+    In our Timestamping Demo we generate a new signing key pair for each new
     timestamp. On the contrary, in the Service with Data Proofs we generate only
     one key pair that corresponds to a certain wallet and its user and, thus, is
     applied for signing all transactions made on its behalf.
@@ -160,7 +160,8 @@ const TransferFunds = Exonum.newMessage({
 })
 ```
 
-As you might know from our very first [Cryptocurrency Demo](create-service.md),
+As you might know from our very first tutorial
+[How to Create a Service](create-service.md),
 in order to transfer funds from one wallet to another, a `seed` is included
 into each such transaction. This prevents transactions from being hacked by
 a third person. You can generate `seed` as follows:
@@ -206,9 +207,9 @@ have a general common structure and comprise several parts. Meanwhile,
 depending on the service business logic some extra custom parts may be included
 therein.
 
-Below, we will discuss the proof from the Service with Proofs which in its
-structure repeats the proofs from the Timestamping service plus contains some
-custom parts.
+Below, we will discuss the proof from the Service with Data Proofs which in its
+structure repeats the proofs from the Timestamping Demo service plus contains
+some custom parts.
 
 The proof itself comprises several levels and, when executed, unfolds from the
 highest level down to the lowest one, which is represented by the requested
