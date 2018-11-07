@@ -733,10 +733,14 @@ performed in the directory containing `Cargo.toml`.
 
 2. Generate blockchain configuration for the network we are setting up:
 
+<!-- markdownlint-disable MD013 -->
+
    ```none
    mkdir example
    exonum-demo-timestamping generate-template example/common.toml --validators-count 4
    ```
+
+<!-- markdownlint-enable MD013 -->
 
 3. Generate templates of node configurations indicating the addresses which the
    nodes will use for communication.
