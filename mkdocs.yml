@@ -57,7 +57,7 @@ pages:
     # An advanced tutorial for building a cryptocurrency services
     - 'Service with Data Proofs': 'get-started/data-proofs.md'
     # A tutorial on applying light client for Exonum services
-    - 'Light Client Tutorial': 'get-started/light-client.md'
+    - 'Tutorial: How to Manage Services Using Light Client': 'get-started/light-client.md'
     - 'Java Binding User Guide': 'get-started/java-binding.md'
   - 'Architecture':
     # Includes guidelines for services
