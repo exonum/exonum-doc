@@ -744,7 +744,7 @@ performed in the directory containing `Cargo.toml`.
    nodes will use for communication.
 
    ```none
-   eexonum-demo-timestamping generate-config example/common.toml \
+   exonum-demo-timestamping generate-config example/common.toml \
        example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331
    exonum-demo-timestamping generate-config example/common.toml \
        example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332
