@@ -725,6 +725,8 @@ Now that our service is ready, we can start up a network of four nodes running
 Exonum with the Timestamping Service we have created. All these steps are to be
 performed in the directory containing `Cargo.toml`.
 
+<!-- markdownlint-disable MD013 -->
+
 1. Install the actual node binary:
 
    ```none
@@ -733,14 +735,10 @@ performed in the directory containing `Cargo.toml`.
 
 2. Generate blockchain configuration for the network we are setting up:
 
-<!-- markdownlint-disable MD013 -->
-
    ```none
    mkdir example
    exonum-demo-timestamping generate-template example/common.toml --validators-count 4
    ```
-
-<!-- markdownlint-enable MD013 -->
 
 3. Generate templates of node configurations indicating the addresses which the
    nodes will use for communication.
@@ -811,6 +809,8 @@ performed in the directory containing `Cargo.toml`.
    exonum-demo-timestamping run --node-config example/node_4_cfg.toml \
        --db-path example/db4 --public-api-address 0.0.0.0:8203
    ```
+
+<!-- markdownlint-enable MD013 -->
 
 Now you have four nodes running Exonum blockchain with Timestamping Service.
 You can interact with this blockchain using API requests.
