@@ -1,4 +1,4 @@
-# Create Timestamping Service
+# Tutorial: How to Create a Timestamping Service
 
 In this tutorial we will create a Timestamping Service for an Exonum
 powered blockchain and start up a four-node network that will process requests
@@ -29,14 +29,14 @@ The very first step of developing a service, is creating a crate and adding
 the necessary dependencies to it.
 
 ```bash
-cargo new timestamping
+cargo new demo-timestamping
 ```
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
 
 ```toml
 [package]
-name = "exonum-timestamping"
+name = "exonum-demo-timestamping"
 version = "0.0.0"
 publish = false
 authors = ["Your name <your@email.com>"]
@@ -139,8 +139,8 @@ rolled back. `Snapshot`s are used in
 [read requests](../architecture/services.md#read-requests), and `Fork`s
 are used in transaction processing.
 
-We have separated the code that configures the schema for our timestamping
-service into a separate file - [src/schema.rs][src/schema.rs]. Here we describe
+We have separated the code that configures the schema for our Timestamping
+Service into a separate file - [src/schema.rs][src/schema.rs]. Here we describe
 the main elements with which our service will operate.
 
 ### Declare Persistent Data
@@ -735,20 +735,20 @@ performed in the directory containing `Cargo.toml`.
 
    ```none
    mkdir example
-   exonum-timestamping generate-template example/common.toml --validators-count 4
+   exonum-demo-timestamping generate-template example/common.toml --validators-count 4
    ```
 
 3. Generate templates of node configurations indicating the addresses which the
    nodes will use for communication.
 
    ```none
-   exonum-timestamping generate-config example/common.toml \
+   eexonum-demo-timestamping generate-config example/common.toml \
        example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331
-   exonum-timestamping generate-config example/common.toml \
+   exonum-demo-timestamping generate-config example/common.toml \
        example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332
-   exonum-timestamping generate-config example/common.toml \
+   exonum-demo-timestamping generate-config example/common.toml \
        example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333
-   exonum-timestamping generate-config example/common.toml \
+   exonum-demo-timestamping generate-config example/common.toml \
        example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334
    ```
 
@@ -760,7 +760,7 @@ performed in the directory containing `Cargo.toml`.
    node, such a node will be regarded as an auditor by the validator nodes.
 
    ```none
-   exonum-timestamping finalize example/node_1_cfg.toml \
+   exonum-demo-timestamping finalize example/node_1_cfg.toml \
        --public-api-address 0.0.0.0:8200 \
        --private-api-address 0.0.0.0:8091 example/sec_1.toml \
        --public-configs \
@@ -768,7 +768,7 @@ performed in the directory containing `Cargo.toml`.
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-timestamping finalize example/node_2_cfg.toml \
+   exonum-demo-timestamping finalize example/node_2_cfg.toml \
        --public-api-address 0.0.0.0:8201 \
        --private-api-address 0.0.0.0:8092 example/sec_2.toml \
        --public-configs \
@@ -776,7 +776,7 @@ performed in the directory containing `Cargo.toml`.
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-timestamping finalize example/node_3_cfg.toml \
+   exonum-demo-timestamping finalize example/node_3_cfg.toml \
        --public-api-address 0.0.0.0:8202 \
        --private-api-address 0.0.0.0:8093 example/sec_3.toml \
        --public-configs \
@@ -784,7 +784,7 @@ performed in the directory containing `Cargo.toml`.
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-timestamping finalize example/node_4_cfg.toml \
+   exonum-demo-timestamping finalize example/node_4_cfg.toml \
        --public-api-address 0.0.0.0:8203 \
        --private-api-address 0.0.0.0:8094 example/sec_4.toml \
        --public-configs \
@@ -798,13 +798,13 @@ performed in the directory containing `Cargo.toml`.
    the database will be written. To enable logs, use the `RUST_LOG` variable.
 
    ```none
-   exonum-timestamping run --node-config example/node_1_cfg.toml \
+   exonum-demo-timestamping run --node-config example/node_1_cfg.toml \
        --db-path example/db1 --public-api-address 0.0.0.0:8200
-   exonum-timestamping run --node-config example/node_2_cfg.toml \
+   exonum-demo-timestamping run --node-config example/node_2_cfg.toml \
        --db-path example/db2 --public-api-address 0.0.0.0:8201
-   exonum-timestamping run --node-config example/node_3_cfg.toml \
+   exonum-demo-timestamping run --node-config example/node_3_cfg.toml \
        --db-path example/db3 --public-api-address 0.0.0.0:8202
-   exonum-timestamping run --node-config example/node_4_cfg.toml \
+   exonum-demo-timestamping run --node-config example/node_4_cfg.toml \
        --db-path example/db4 --public-api-address 0.0.0.0:8203
    ```
 
@@ -1004,18 +1004,19 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
 
 Great! You have created a fully functional Timestamping Service.
 
-Next you can refer to [Cryptocurrency][Cryptocurrency] and
-[Service with Data Proofs][Service with Data Proofs] for our other tutorials.
+Next you can refer to [How to Create a Service][demo-service] and
+[How to Create a Service with Data Proofs][demo-data-proofs] for our other
+tutorials.
 
 Stay tuned for news about updates to the Exonum platform in
 our [blog](https://exonum.com/blog/).
 
-[timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping
-[Service with Data Proof]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
-[Cryptocurrency]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency
-[src/lib.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/lib.rs
-[src/transactions.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/transactions.rs
-[src/schema.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/schema.rs
-[src/api.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/api.rs
-[src/main.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/main.rs
+[timestamping]: https://github.com/exonum/exonum/tree/master/examples/demo-timestamping
+[demo-data-proofs]: https://github.com/exonum/exonum/tree/master/examples/demo-data-proofs
+[demo-service]: https://github.com/exonum/exonum/tree/master/examples/demo-service
+[src/lib.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/lib.rs
+[src/transactions.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/transactions.rs
+[src/schema.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/schema.rs
+[src/api.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/api.rs
+[src/main.rs]: https://github.com/exonum/exonum/blob/master/examples/demotimestamping/backend/src/main.rs
 [client]: https://github.com/exonum/exonum-client
