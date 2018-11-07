@@ -352,15 +352,15 @@ body, and signature.
 
 Fields used in message serialization are listed below.
 
-| Field              | Binary format     | Binary offset | JSON       |
-|--------------------|:-----------------:|--------------:|:----------:|
-| (padding)          | `u8`              | 0             | -          |
-| `protocol_version` | `u8`              | 1             | number     |
-| `service_id`       | `u16`             | 4..6          | number     |
-| `message_id`       | `u16`             | 2..4          | number     |
-| `payload_length`   | `u32`             | 6..10         | -          |
-| `body`             | `&[u8]`           | 10..-64       | object     |
-| `signature`        | Ed25519 signature | -64..         | hex string |
+| Field              |   Binary format   | Binary offset |    JSON    |
+|:-------------------|:-----------------:|--------------:|:----------:|
+| (padding)          |       `u8`        |             0 |     -      |
+| `protocol_version` |       `u8`        |             1 |   number   |
+| `service_id`       |       `u16`       |          4..6 |   number   |
+| `message_id`       |       `u16`       |          2..4 |   number   |
+| `payload_length`   |       `u32`       |         6..10 |     -      |
+| `body`             |      `&[u8]`      |       10..-64 |   object   |
+| `signature`        | Ed25519 signature |         -64.. | hex string |
 
 !!! tip
     For the binary format, the table uses the type notation taken
@@ -395,10 +395,9 @@ used to look up the implementation of [the transaction interface](transactions.m
 `message_id` defines the type of message within the service.
 
 !!! note "Example"
-    [The sample cryptocurrency service][cryptocurrency] includes 2 main
-    types of transactions: `TxCreateWallet` for creating a wallet with an initial
-    coins balance,
-    and `TxTransfer` for coin transfer.
+    [The demo service][demo-service] includes 2 main
+    types of transactions: `TxCreateWallet` for creating a wallet with an
+    initial coins balance, and `TxTransfer` for coin transfer.
 
 **Binary presentation:** `u16` (unsigned 2-byte integer).  
 **JSON presentation:** number.
@@ -505,13 +504,13 @@ assert_eq!(my_wallet.into_bytes(), expected_buffer);
 
 Serialized representation of `my_wallet`:
 
-| Position | Stored data  | Hexadecimal form | Comment |
-|:--------|:------:|:---------------------|:--------------------------------------------------|
-0..32  |       | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key |
-32..36  | 48    | `30 00 00 00`            | A little endian segment pointer that refers to the string position in the serialization buffer |
-36..40  | 6     | `06 00 00 00`            | A little endian segment size |
-40..48 | 1234   | `d2 04 00 00 00 00 00 00` | A number in little endian format |
-48..54 | Andrew | `41 6e 64 72 65 77`       | UTF-8 string converted into a byte array |
+| Position | Stored data | Hexadecimal form                                                                                  | Comment                                                                                        |
+|:---------|:-----------:|:--------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
+| 0..32    |             | `99 ac e6 c7 21 db 29 3b 0e d5 b4 87 e6 d6 11 1f 22 a8 c5 5d 2a 1b 76 06 b6 fa 6e 6c 29 67 1a a1` | Public key                                                                                     |
+| 32..36   |     48      | `30 00 00 00`                                                                                     | A little endian segment pointer that refers to the string position in the serialization buffer |
+| 36..40   |      6      | `06 00 00 00`                                                                                     | A little endian segment size                                                                   |
+| 40..48   |    1234     | `d2 04 00 00 00 00 00 00`                                                                         | A number in little endian format                                                               |
+| 48..54   |   Andrew    | `41 6e 64 72 65 77`                                                                               | UTF-8 string converted into a byte array                                                       |
 
 [transactions_macro]: https://docs.rs/exonum/*/exonum/macro.transactions.html
 [encoding_struct_macro]: https://docs.rs/exonum/*/exonum/macro.encoding_struct.html
@@ -526,7 +525,7 @@ Serialized representation of `my_wallet`:
 [utf8]: https://en.wikipedia.org/wiki/UTF-8
 [rust_structs]: https://doc.rust-lang.org/book/first-edition/structs.html
 [rust_enums]: https://doc.rust-lang.org/book/first-edition/enums.html
-[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
+[demo-service]: https://github.com/exonum/exonum/blob/master/examples/demo-service
 [rust-slice]: https://doc.rust-lang.org/book/first-edition/primitive-types.html#slicing-syntax
 [rust]: http://rust-lang.org/
 [cargo_features]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section

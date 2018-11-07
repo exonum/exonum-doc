@@ -60,6 +60,6 @@ Exonumのドキュメントには、[シリアル化](architecture/serialization
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
+[tutorial]: https://github.com/exonum/exonum/blob/master/examples/demo-service
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum/tree/master/services/configuration

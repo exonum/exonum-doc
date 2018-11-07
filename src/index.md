@@ -21,9 +21,9 @@ of the Exonum framework. It is available under [the Apache 2.0 license][apache].
 You may refer to [the installation guide](get-started/install.md) in order to install
 the library together with its prerequisites.
 
-### Cryptocurrency Tutorial
+### Tutorial: How to Create a Service
 
-[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum
+[How to Create a Service](get-started/create-service.md) showcases how Exonum
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum core, the tutorial also makes use of [the light client][client] –
 a JavaScript library intended for client-side verification of blockchain information
@@ -71,6 +71,6 @@ what features are coming soon.
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
-[tutorial]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
+[tutorial]: https://github.com/exonum/exonum/blob/master/examples/demo-service
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
 [config]: https://github.com/exonum/exonum/tree/master/services/configuration

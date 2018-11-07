@@ -1,7 +1,7 @@
 ---
 title: Service testing tutorial
 ---
-# Service Testing Tutorial
+# Tutorial: How to Test a Service
 
 As blockchain technology is focused on security, a natural desire after
 [creating an Exonum service](create-service.md) is to test it. This tutorial
@@ -15,7 +15,7 @@ Correspondingly,
 service testing could be performed with the help
 of [integration tests][integration-testing],
 in which the service is treated like a black or gray box. In the case of
-the cryptocurrency service, which we created in the previous tutorial, it
+the demo service, which we created in the previous tutorial, it
 would be natural to test
 how the service reacts to overcharges, transfers from or to the unknown
 wallet, transfers to self, and other scenarios which may work not as
@@ -64,7 +64,7 @@ need to import the service crate along with **exonum** and **exonum-testkit**:
 
 ```rust
 extern crate exonum;
-extern crate exonum_cryptocurrency as cryptocurrency;
+extern crate exonum_demo_service as cryptocurrency;
 #[macro_use] extern crate exonum_testkit;
 ```
 
@@ -377,7 +377,7 @@ streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
 [integration-testing]: http://doc.crates.io/manifest.html#integration-tests
-[tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
-[tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
+[tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-service/tests/tx_logic.rs
+[tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-service/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKitApi.html
 [TestKit-snapshot]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKit.html#method.snapshot

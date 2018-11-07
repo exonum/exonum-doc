@@ -1,7 +1,7 @@
 ---
 title: Service development tutorial
 ---
-# Cryptocurrency Tutorial: How to Create Services
+# Tutorial: How to Create a Service
 
 In this tutorial we create an Exonum service that implements
 a minimalistic cryptocurrency, and a single-node blockchain network processing
@@ -9,7 +9,7 @@ requests to this service. The service accepts two types of transactions:
 creates a wallet with a default balance and transfers money between wallets.
 
 You can view and download the full source code of this tutorial
-[here][cryptocurrency].
+[here][demo-service].
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
@@ -33,7 +33,7 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 
 ```toml
 [package]
-name = "exonum_cryptocurrency"
+name = "exonum-demo-service"
 version = "0.0.0"
 authors = ["Your Name <your@email.com>"]
 
@@ -199,7 +199,7 @@ impl<'a> CurrencySchema<&'a mut Fork> {
 [Transaction](../architecture/transactions.md) is a kind of message which
 performs atomic actions on the blockchain state.
 
-For our cryptocurrency tutorial we need two transaction types:
+For our tutorial we need two transaction types:
 
 - Create a new wallet and add some money to it
 - Transfer money between two different wallets
@@ -844,7 +844,7 @@ Hurray! 🎉 You have created the first fully functional Exonum blockchain
 with two wallets and transferred some money between them. Next,
 [we are going to test it](test-service.md).
 
-[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
+[demo-service]: https://github.com/exonum/exonum/blob/master/examples/demo-service
 [explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
 [rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
@@ -852,6 +852,6 @@ with two wallets and transferred some money between them. Next,
 [arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
 [ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
 [cargo-example]: http://doc.crates.io/manifest.html#examples
-[lib.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/lib.rs
-[demo.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/examples/demo.rs
+[lib.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-service/src/lib.rs
+[demo.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-service/examples/demo.rs
 [std-asref]: https://doc.rust-lang.org/std/convert/trait.AsRef.html

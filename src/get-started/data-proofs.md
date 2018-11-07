@@ -1,7 +1,7 @@
-# Service with Data Proofs
+# Tutorial: How to Create a Service with Data Proofs
 
-This tutorial is an extended version of the
-[service creation tutorial](create-service.md).
+This tutorial is an extended version of
+[How to Create a Service](create-service.md).
 It shows how to create cryptographic proofs for data in Exonum
 and how to organize the corresponding data layout.
 
@@ -34,7 +34,7 @@ and the latest version of
 Create a crate with the **exonum** crate as a dependency.
 
 ```sh
-cargo new cryptocurrency-advanced
+cargo new demo-data-proofs
 ```
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
@@ -147,8 +147,8 @@ impl fabric::ServiceFactory for ServiceFactory {
 
 ## Declare Persistent Data
 
-Similarly to a simple cryptocurrency demo we need to declare the data that we
-will store in our blockchain, i.e. the `Wallet` type:
+Similarly to the tutorial on creating a service we need to declare the data
+that we will store in our blockchain, i.e. the `Wallet` type:
 
 ```rust
 encoding_struct! {
@@ -193,7 +193,7 @@ specified below.
 
 ### Create Schema
 
-As we already mentioned in the simple cryptocurrency tutorial schema is a
+As we already mentioned in the tutorial on creating a service, schema is a
 structured view of the [key-value storage](../architecture/storage.md)
 used in Exonum. We will use the same `Snapshot` and `Fork` abstractions – for
 read requests and transactions
@@ -388,7 +388,7 @@ Before implementing transaction logic we define
 the types of errors that might occur
 during their execution. The code is identical to the
 [one](create-service.md#reporting-errors) in
-the simple Cryptocurrency demo.
+the tutorial on creating a service.
 
 ??? "Error definitions"
     ```rust
@@ -747,7 +747,7 @@ is configured, please, consult
 [the service documentation][demo].
 
 Note that for the commands to work you need to use the name of your service
-instead of `exonum-cryptocurrency-advanced`.
+instead of `exonum-demo-data-proofs`.
 Or just use `cargo run` command instead of your crate name.
 
 ## Conclusion
@@ -755,5 +755,5 @@ Or just use `cargo run` command instead of your crate name.
 Good job! You managed to set up, describe and launch an extended version of a
 fully functional Exonum service!
 
-[demo]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
-[demo-frontend]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced/frontend
+[demo]: https://github.com/exonum/exonum/tree/master/examples/demo-data-proofs
+[demo-frontend]: https://github.com/exonum/exonum/tree/master/examples/demo-data-proofs/frontend

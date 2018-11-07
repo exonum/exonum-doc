@@ -142,8 +142,9 @@ is tested on Node 4+.
 
 ## Developing with Exonum
 
-[The cryptocurrency tutorial](create-service.md) provides a step-by-step
-guide on how to develop applications on top of the Exonum framework.
+The [How to Create a Service](create-service.md) tutorial provides a
+step-by-step guide on how to develop applications on top of the Exonum
+framework.
 
 [exonum]: https://github.com/exonum/exonum/
 [readme]: https://github.com/exonum/exonum/#readme

@@ -42,7 +42,7 @@ various constraints based on this key.
     the [light client library](https://github.com/exonum/exonum-client).
 
 !!! note "Example"
-    In a sample [cryptocurrency service][cryptocurrency],
+    In the [How to Create a Service][demo-service] tutorial,
     an owner of cryptocurrency may authorize transferring his coins by signing
     a transfer transaction with a key associated with coins. Authentication
     in this case means verifying that a transaction is digitally signed with
@@ -111,8 +111,8 @@ Binary serialization of the body is performed using
 according to the transaction specification in the service.
 
 !!! note "Example"
-    The body of `TxTransfer` transaction type in the sample cryptocurrency service
-    is structured as follows:
+    The body of `TxTransfer` transaction type in the tutorial on creating a
+    service is structured as follows:
 
     | Field      | Binary format | Binary offset | JSON       |
     |------------|:-------------:|--------------:|:----------:|
@@ -157,7 +157,7 @@ be included into any correct block proposal. Incorrect transactions are never
 included into the blockchain.
 
 !!! note "Example"
-    In [the cryptocurrency service][cryptocurrency],
+    In the [How to Create a Service][demo-service] tutorial,
     `TxTransfer.verify` checks the digital signature and ensures that
     the sender of coins is not the same as the receiver.
 
@@ -180,7 +180,7 @@ storage [under certain conditions](consensus.md).
     the block with the given transaction is committed into the blockchain.
 
 !!! note "Example"
-    In the sample cryptocurrency service, `TxTransfer.execute` verifies
+    In the tutorial on creating a service, `TxTransfer.execute` verifies
     that the sender’s and recipient’s accounts exist and the sender has enough
     coins to complete the transfer. If these conditions hold, the sender’s
     balance of coins is decreased and the recipient’s one is increased by the amount
@@ -300,7 +300,7 @@ only once – when it’s submitted to the pool of unconfirmed transactions.
 
 !!! note
     As a downside, `verify` cannot perform any checks that depend on the blockchain
-    state. For example, in the cryptocurrency service, `TxTransfer.verify`
+    state. For example, in the tutorial on creating a service, `TxTransfer.verify`
     cannot check whether the sender has sufficient amount of coins to transfer.
 
 ### Sequential Consistency
@@ -318,8 +318,7 @@ Non-replayability means that an attacker cannot take an old legitimate
 transaction from the blockchain and apply it to the blockchain state again.
 
 !!! note "Example"
-    Assume Alice pays Bob 10 coins using
-    [the sample cryptocurrency service][cryptocurrency].
+    Assume Alice pays Bob 10 coins using the [demo service][demo-service].
     Non-replayability prevents Bob from taking Alice’s transaction and submitting
     it to the network again to get extra coins.
 
@@ -336,14 +335,14 @@ on the verify step.
     an additional field to distinguish among transactions with the same
     set of parameters. This field needs to have a sufficient length (e.g., 8 bytes)
     and can be generated deterministically (e.g., via a counter) or
-    (pseudo-)randomly. See `TxTransfer.seed` in the cryptocurrency service
-    as an example.
+    (pseudo-)randomly. See `TxTransfer.seed` in the tutorial on creating a
+    service as an example.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [wiki:order]: https://en.wikipedia.org/wiki/Total_order
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
-[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
+[demo-service]: https://github.com/exonum/exonum/blob/master/examples/demo-service
 [core-tx]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [rust-trait]: https://doc.rust-lang.org/book/first-edition/traits.html
 [mdn:safe-int]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger

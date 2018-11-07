@@ -90,7 +90,7 @@ with other transactions in a block.
     recipient’s
     public keys, the amount of transferred funds and the digital signature
     created by the sender’s private key. See
-    [the cryptocurrency tutorial](../get-started/create-service.md)
+    [How to Create a Service](../get-started/create-service.md)
     for more details.
 
 ### Read Requests
@@ -120,8 +120,8 @@ is as secure as if the client queried a supermajority of blockchain validators.
 
 !!! note "Example"
     Retrieving information on a particular wallet (e.g., the current
-    wallet balance) is implemented as a read request in the cryptocurrency
-    tutorial.
+    wallet balance) is implemented as a read request in the tutorial on
+    creating a service.
 
 ### Private API
 
@@ -143,9 +143,9 @@ however, they can create transactions and broadcast them to the network.
 
 ### Data Schema
 
-Usually, a service needs to persist some data. For example, the sample
-cryptocurrency service persists account balances, which are changed by transfer
-and issuance transactions.
+Usually, a service needs to persist some data. For example, the demo service
+persists account balances, which are changed by transfer and issuance
+transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented with
 [RocksDB][rocksdb]. Each service needs to define a
@@ -278,7 +278,7 @@ Here is a list of things to figure out when developing an Exonum service:
 - Are there any foreign key relationships among stored entities? (Exonum data
   model supports relationships among entities via hash links;
   see organization of wallet history in
-  [the cryptocurrency tutorial](../get-started/create-service.md)
+  [How to Create a Service](../get-started/create-service.md)
   for more details.)
 - What persistent data will be returned to external clients? (You might want
   to use Merkelized data collections for this data and create corresponding
@@ -293,9 +293,9 @@ Here is a list of things to figure out when developing an Exonum service:
   should be a part of the local configuration or stored in the blockchain.)
 
 !!! tip
-    [The cryptocurrency tutorial](../get-started/create-service.md)
-    provides a hands-on guide how to build an Exonum service that implements
-    a minimalistic crypto-token.
+    The [How to Create a Service](../get-started/create-service.md)
+    tutorial provides a hands-on guide how to build an Exonum service that
+    implements a minimalistic crypto-token.
 
 ### Limitations
 

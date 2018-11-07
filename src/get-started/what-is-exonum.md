@@ -93,7 +93,7 @@ clients of the system) to continuously verify the system operation against
 these definitions.
 
 !!! note "Example"
-    In a [sample cryptocurrency implementation](create-service.md),
+    In the service developed in [How to Create a Service](create-service.md),
     users can monitor the state of their wallet in real time.
     The state returned to a user by network nodes is supplied with an
     unforgeable cryptographic proof.
@@ -191,7 +191,7 @@ blockchain through web or mobile apps. A light client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
 !!! note "Example"
-    [In the cryptocurrency tutorial](create-service.md),
+    In [How to Create a Service](create-service.md),
     a client corresponds to an owner of currency; it is only interested in
     transactions that involve the owner.
 
