@@ -1,4 +1,4 @@
-# Managing Exonum Services with the Help of Light Client
+# Interacting with Exonum Services
 
 In this tutorial we describe how to use the light client to interact with Exonum
 services. The tutorial extends other tutorials:
@@ -57,8 +57,8 @@ const Timestamp = Exonum.newType({
 })
 ```
 
-- `content_hash` - is a sha256 hash of some data or file to be stamped
-- `metadata` - is an optional description of the data to be stamped that is
+- `content_hash` is a SHA-256 hash of some data or file to be stamped
+- `metadata` is an optional description of the data to be stamped that is
   included into the stamp.
 
 Define `CreateTimestamp` transaction schema and field types:
@@ -75,18 +75,18 @@ const CreateTimestamp = Exonum.newMessage({
 })
 ```
 
-- `protocol_version` - represents the major version of the Exonum
-  serialization protocol. Currently, `0`;
-- `service_id` - represents the identifier of the service. Check the identifier
+- `protocol_version` represents the major version of the Exonum
+  serialization protocol. Currently, `0`
+- `service_id` represents the identifier of the service. Check the identifier
   in the source code of the service (the smart-contract designed in Rust or
-  Java);
-- `message_id` - represents the identifier of the transaction type in the
+  Java)
+- `message_id` represents the identifier of the transaction type in the
   service. Corresponds to the index number of the transaction in source code of
-  the service, starting with `0`;
-- `fields` - represents the fields of the transaction. In this case it contains
+  the service, starting with `0`
+- `fields` represents the fields of the transaction. In this case it contains
   two fields:
-    - `pub_key` - author's public key;
-    - `content` - object of `Timestamp` type defined above.
+    - `pub_key` author’s public key
+    - `content` object of `Timestamp` type defined above.
 
 Next, generate a signing key pair for signing and sending the transaction.
 
@@ -126,15 +126,19 @@ const transactionHash = await CreateTimestamp.send(transactionEndpoint,
   explorerBasePath, data, signature)
 ```
 
-- `transactionEndpoint` - represents API address of transaction handler at a
+- `transactionEndpoint` represents API address of transaction handler at a
   blockchain node. Example:
 
-  `http://127.0.0.1:8200/api/services/timestamping/v1/timestamps`
+    ```none
+    http://127.0.0.1:8200/api/services/timestamping/v1/timestamps
+    ```
 
-- `explorerBasePath` - represents API address of transaction explorer where
+- `explorerBasePath` represents API address of transaction explorer where
   you can see transaction details at a blockchain node. Example:
 
-  `http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=`
+    ```none
+    http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=
+    ```
 
 ### Transfer Funds Transaction
 
@@ -183,7 +187,7 @@ const data = {
 }
 ```
 
-Now you can sign the transaction with the sender's secret key and send the
+Now you can sign the transaction with the sender’s secret key and send the
 resulting
 transaction into the blockchain. The methods applied in this case are identical
 to those shown in the `CreateTimestamp` transaction described above.
@@ -228,9 +232,10 @@ are applied to assert that the data received from the
 blockchain was indeed agreed upon by all the member nodes in the network:
 
 ```javascript
-const response = await axios.get('/api/services/configuration/v1/configs/actual')
-
-const validators = response.data.config.validator_keys.map(validator => validator.consensus_key)
+const response = await axios.get(
+  '/api/services/configuration/v1/configs/actual')
+const validators = response.data.config.validator_keys.map(
+  validator => validator.consensus_key)
 ```
 
 Now make a request for the data on a particular wallet together with its proof.
@@ -238,8 +243,8 @@ Note, that we identify the wallet by its public key which is in fact the public
 key of its holder:
 
 ```javascript
-const response = await axios.get(`/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
-
+const response = await axios.get(
+  `/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
 // response.data contains wallet together with its proof
 ```
 
@@ -348,7 +353,9 @@ wallet, is equal to the number of transactions in the array of the proof.
 Otherwise, transactions cannot be verified against the proof:
 
 ```javascript
-if (data.wallet_history.transactions.length !== transactionsMetaData.length) {
+if (data.wallet_history.transactions.length !==
+    transactionsMetaData.length)
+{
   throw new Error('Transactions can not be verified')
 }
 ```
@@ -367,7 +374,7 @@ Finally, we calculate a hash from a transaction body with `Transaction.hash`
 method to compare it with the corresponding hash from the proof.
 
 ```javascript
-data.wallet_history.transactions.forEach(function(transaction, index) {
+data.wallet_history.transactions.forEach((transaction, index) => {
   // generate transaction definition
   const Transaction =  new Exonum.newMessage({
     protocol_version: 0,
