@@ -120,8 +120,8 @@ is as secure as if the client queried a supermajority of blockchain validators.
 
 !!! note "Example"
     Retrieving information on a particular wallet (e.g., the current
-    wallet balance) is implemented as a read request in the tutorial on
-    creating a service.
+    wallet balance) is implemented as a read request in the tutorial
+    [How to Create a Service](../get-started/create-service.md).
 
 ### Private API
 
@@ -143,9 +143,9 @@ however, they can create transactions and broadcast them to the network.
 
 ### Data Schema
 
-Usually, a service needs to persist some data. For example, the demo service
-persists account balances, which are changed by transfer and issuance
-transactions.
+Usually, a service needs to persist some data. For example, in our
+[sample service][demo-service] we persist account balances, which are changed
+by transfer and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented with
 [RocksDB][rocksdb]. Each service needs to define a
@@ -295,7 +295,7 @@ Here is a list of things to figure out when developing an Exonum service:
 !!! tip
     The [How to Create a Service](../get-started/create-service.md)
     tutorial provides a hands-on guide how to build an Exonum service that
-    implements a minimalistic crypto-token.
+    implements a minimalistic cryptocurrency.
 
 ### Limitations
 
@@ -517,3 +517,4 @@ running the service might not know this information.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
+[demo-service]: https://github.com/exonum/exonum/tree/master/examples/demo-service

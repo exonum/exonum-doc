@@ -42,8 +42,8 @@ various constraints based on this key.
     the [light client library](https://github.com/exonum/exonum-client).
 
 !!! note "Example"
-    In the [How to Create a Service][demo-service] tutorial,
-    an owner of cryptocurrency may authorize transferring his coins by signing
+    In the [sample service][demo-service] demo, an owner of cryptocurrency may
+    authorize transferring his coins by signing
     a transfer transaction with a key associated with coins. Authentication
     in this case means verifying that a transaction is digitally signed with
     a specific key, and authorization means that this key is associated with

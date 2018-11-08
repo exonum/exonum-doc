@@ -93,7 +93,8 @@ clients of the system) to continuously verify the system operation against
 these definitions.
 
 !!! note "Example"
-    In the service developed in [How to Create a Service](create-service.md),
+    In the service developed in the tutorial
+    [How to Create a Service](create-service.md),
     users can monitor the state of their wallet in real time.
     The state returned to a user by network nodes is supplied with an
     unforgeable cryptographic proof.

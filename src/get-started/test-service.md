@@ -15,7 +15,8 @@ Correspondingly,
 service testing could be performed with the help
 of [integration tests][integration-testing],
 in which the service is treated like a black or gray box. In the case of
-the demo service, which we created in the previous tutorial, it
+the demo service, which we created in the
+[How to Create a Service](../get-started/create-service.md) tutorial, it
 would be natural to test
 how the service reacts to overcharges, transfers from or to the unknown
 wallet, transfers to self, and other scenarios which may work not as

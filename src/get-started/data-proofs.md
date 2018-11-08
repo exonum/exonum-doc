@@ -1,6 +1,6 @@
 # Tutorial: How to Create a Service with Data Proofs
 
-This tutorial is an extended version of
+This tutorial is an extended version of the tutorial
 [How to Create a Service](create-service.md).
 It shows how to create cryptographic proofs for data in Exonum
 and how to organize the corresponding data layout.
