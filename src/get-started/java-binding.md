@@ -112,7 +112,7 @@ The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
   Integers with various encoding types,
-  see [`StandardSerializers`][standardserializers] Javadocs.
+  see [`StandardSerializers`][standardserializers] Java documentation.
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
 - Any Protobuf messages using `StandardSerializers#protobuf`.
 
