@@ -7,6 +7,28 @@
 .admonition .md-typeset__scrollwrap {
   margin: 1em 0;
 }
+
 .md-typeset .admonition .md-typeset__table {
   padding: 0;
+}
+
+.md-header-nav__version select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  margin-top: 14px;
+  color: #fff;
+  font-size: 16px;
+
+  background: none;
+  padding-right: 25px;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='#fff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: -2px;
+}
+
+.md-header-nav__version select:focus {
+  outline: 0;
 }
