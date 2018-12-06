@@ -75,7 +75,7 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-Exonum stores elements in collections as byte arrays. Therefore, a
+Exonum stores elements in collections as byte arrays. Therefore,
 serializers for values stored in collections must be provided.
 See [Serialization](#serialization) for details.
 
@@ -102,7 +102,7 @@ blockchain state hash, which is included in each committed block. When using
 implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
 
-### Serialization
+#### Serialization
 
 As Exonum storage accepts data in the form of byte arrays,
 storing user data requires serialization.
