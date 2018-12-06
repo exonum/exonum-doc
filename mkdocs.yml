@@ -34,9 +34,7 @@ extra:
       link: 'https://twitter.com/BitFuryGroup'
   versions:
     - name: 0.9.4-latest
-      id: 97b65df39d8afbefc2dc7de8efff365d7e444cc3
-    - name: 0.9.0
-      id: 643e0b5bf881cadf863dd6b25799e7bfa78237b7
+      id: 3450853b943488526ff0fe74f4f1d7c69963332b
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'
