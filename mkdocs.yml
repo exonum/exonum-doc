@@ -51,13 +51,13 @@ pages:
     # Installation guide
     - 'Install': 'get-started/install.md'
     # Writing one's first Exonum service
-    - 'Create Service': 'get-started/create-service.md'
+    - 'Cryptocurrency Service': 'get-started/create-service.md'
     # Testing one's first Exonum service
     - 'Test Service': 'get-started/test-service.md'
     # An advanced tutorial for building a cryptocurrency services
-    - 'Service with Data Proofs': 'get-started/data-proofs.md'
+    - 'Cryptocurrency Advanced Service': 'get-started/data-proofs.md'
     # A tutorial on applying light client for Exonum services
-    - 'Tutorial: Light Client': 'get-started/light-client.md'
+    - 'Light Client Tutorial': 'get-started/light-client.md'
     - 'Java Binding User Guide': 'get-started/java-binding.md'
   - 'Architecture':
     # Includes guidelines for services

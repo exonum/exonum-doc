@@ -1,7 +1,7 @@
-# Service with Data Proofs
+# Advanced Cryptocurrency Tutorial: Service with Data Proofs
 
 This tutorial is an extended version of the
-[service creation tutorial](create-service.md).
+[cryptocurrency tutorial](create-service.md).
 It shows how to create cryptographic proofs for data in Exonum
 and how to organize the corresponding data layout.
 
