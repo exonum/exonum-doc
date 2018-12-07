@@ -60,7 +60,7 @@ pages:
     - 'Tutorial: Light Client': 'get-started/light-client.md'
     - 'Java Binding User Guide': 'get-started/java-binding.md'
     # A tutorial on creating a Timestamping Service based on a demo service.
-    - 'Tutorial: Timestamping': 'get-started/timestamping-tutorial.md'
+    - 'Timestamping Service': 'get-started/timestamping-tutorial.md'
   - 'Architecture':
     # Includes guidelines for services
     - 'Services': 'architecture/services.md'

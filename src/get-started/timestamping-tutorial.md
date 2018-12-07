@@ -1,4 +1,4 @@
-# Tutorial: How to Create a Timestamping Service
+# Timestamping Service Tutorial
 
 In this tutorial we will create a Timestamping Service for an Exonum
 powered blockchain and start up a four-node network that will process requests
@@ -1008,19 +1008,20 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
 
 Great! You have created a fully functional Timestamping Service.
 
-Next you can refer to [How to Create a Service][demo-service] and
-[How to Create a Service with Data Proofs][demo-data-proofs] for our other
+Next you can refer to [cryptocurrency](create-service.md),
+[cryptocurrency advanced](demo-data-proofs.md) and
+[Exonum light client](light-client.md) for our other
 tutorials.
 
 Stay tuned for news about updates to the Exonum platform in
 our [blog](https://exonum.com/blog/).
 
-[timestamping]: https://github.com/exonum/exonum/tree/master/examples/demo-timestamping
-[demo-data-proofs]: https://github.com/exonum/exonum/tree/master/examples/demo-data-proofs
-[demo-service]: https://github.com/exonum/exonum/tree/master/examples/demo-service
-[src/lib.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/lib.rs
-[src/transactions.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/transactions.rs
-[src/schema.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/schema.rs
-[src/api.rs]: https://github.com/exonum/exonum/blob/master/examples/demo-timestamping/backend/src/api.rs
-[src/main.rs]: https://github.com/exonum/exonum/blob/master/examples/demotimestamping/backend/src/main.rs
+[timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping
+[demo-data-proofs]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced
+[demo-service]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency
+[src/lib.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/lib.rs
+[src/transactions.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/transactions.rs
+[src/schema.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/schema.rs
+[src/api.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/api.rs
+[src/main.rs]: https://github.com/exonum/exonum/blob/master/examples/timestamping/backend/src/main.rs
 [client]: https://github.com/exonum/exonum-client
