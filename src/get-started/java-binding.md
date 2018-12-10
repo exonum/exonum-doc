@@ -432,7 +432,7 @@ For using the library just include the dependency in your `pom.xml`:
 - [Java Binding App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3-release/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -444,7 +444,7 @@ For using the library just include the dependency in your `pom.xml`:
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
-[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3-release/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/transaction/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/TransactionConverter.html
