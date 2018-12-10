@@ -206,8 +206,9 @@ core [TransactionResult enum][transaction-result] containing an error code and
 a message with error data.
 If transaction execution fails, the changes made by the transaction are
 rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the [transaction][exonum-transaction]
-execution result (which may be either success or failure) to their users.
+reference. Light clients also provide access to information on the
+[transaction][exonum-transaction] execution result
+(which may be either success or failure) to their users.
 
 ### External Service API
 
