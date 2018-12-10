@@ -206,7 +206,7 @@ core [TransactionResult enum][transaction-result] containing an error code and
 a message with error data.
 If transaction execution fails, the changes made by the transaction are
 rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the transaction
+reference. Light clients also provide access to information on the [transaction][exonum-transaction]
 execution result (which may be either success or failure) to their users.
 
 ### External Service API
@@ -453,3 +453,4 @@ For using the library just include the dependency in your `pom.xml`:
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
 [transaction-result]: https://docs.rs/exonum/latest/exonum/blockchain/type.TransactionResult.html
+[exonum-transaction]: https://exonum.com/doc/advanced/node-management/#transaction
