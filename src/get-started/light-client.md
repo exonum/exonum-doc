@@ -2,8 +2,8 @@
 
 In this tutorial we describe how to use the light client to interact with Exonum
 services. The tutorial extends other tutorials:
-[cryptocurrency advanced](data-proofs.md)
-and, partly, [timestamping][timestamping-demo].
+[Cryptocurrency Advanced](data-proofs.md)
+and, partly, [Timestamping][timestamping-demo].
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -165,7 +165,7 @@ const TransferFunds = Exonum.newMessage({
 ```
 
 As you might know from our very first tutorial
-[cryptocurrency tutorial](create-service.md),
+[Cryptocurrency Tutorial](create-service.md),
 in order to transfer funds from one wallet to another, a `seed` is included
 into each such transaction. This prevents transactions from being hacked by
 a third person. You can generate `seed` as follows:

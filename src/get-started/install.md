@@ -142,7 +142,7 @@ is tested on Node 4+.
 
 ## Developing with Exonum
 
-[The cryptocurrency tutorial](create-service.md) provides a step-by-step
+[The Cryptocurrency Tutorial](create-service.md) provides a step-by-step
 guide on how to develop applications on top of the Exonum framework.
 
 [exonum]: https://github.com/exonum/exonum/
