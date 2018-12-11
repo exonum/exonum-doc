@@ -1009,7 +1009,7 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
 Great! You have created a fully functional Timestamping Service.
 
 Next you can refer to [cryptocurrency](create-service.md),
-[cryptocurrency advanced](demo-data-proofs.md) and
+[cryptocurrency advanced](data-proofs.md) and
 [Exonum light client](light-client.md) for our other
 tutorials.
 
