@@ -121,7 +121,7 @@ Besides the available built-in serializers, users can still implement
 their own serializers for storing their data in a custom format instead
 of using the built-in ones.
 
-#### Integer Encoding Types Comparison Table
+##### Integer Encoding Types Comparison Table
 
 | Type | Description | The most efficient range |
 |---|---|---|
