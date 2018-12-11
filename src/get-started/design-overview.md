@@ -282,6 +282,11 @@ the tree root to a particular cell (a Merkle path). Merkle Patricia
 tables also allow to generate proofs that there is no data in the
 database with a specific key.
 
+> Recently we have been [working][1] on proofs-of-absence for lists as well.
+> However, they are not going to be merged into 0.10, as far as I know.
+>
+> [1]: https://github.com/exonum/exonum/pull/1057
+
 When a full node communicates with a light client, proofs are returned together
 with the requested data. This allows to prove data authenticity efficiently.
 
@@ -296,6 +301,9 @@ While the core is responsible for consensus, and provides middleware
 functionality for sending and receiving transactions and blocks,
 services implement all business logic of the blockchain
 and are the main point to extend Exonum functionality.
+
+> As I have noted before, this may change in later versions on Exonum.
+> However, Exonum 0.10 is still going with REST API.
 
 Exonum services interact with the external world with the help of *endpoints*.
 A service may define 3 types of endpoints:
@@ -334,6 +342,11 @@ As services are Rust modules, they can be easily reused across Exonum
 projects. You may use open source services already written by the
 community, or open your service for other uses.
 
+> Maybe we should make more accent on Exonum Java Binding
+> (or at least mention it here)
+> which seems to be _the_ way for writing services in Exonum.
+> Or at least that's our high-level goal is, if I remember it correctly.
+
 ### Smart Contracting
 
 Endpoints defined by services fulfill the same role as smart contracts
@@ -354,6 +367,13 @@ used in blockchains are as follows:
 - **No isolation.** Request processing is performed
   in the same execution context as the core of the system. This is beneficial
   for performance, although has certain security risks
+
+  > This reads _very_ strangely.
+  > Almost as if we admit security vulnerabilities in Exonum and are proud of it.
+  > Maybe we should rephrase this item a little to present it in a more positive way.
+  > We say (below) that isolation is a high priority on the roadmap,
+  > but the roadmap itself does not seem to mention this item explicitly.
+
 - **Local state.** Exonum services may define a local state, which
   is specific to the node on which the service is running. The local state
   can be used to manage secret information (e.g., private keys). The local
@@ -443,6 +463,9 @@ signing keys. Keys can also be managed by full nodes themselves. In this case,
 a private key is stored in the local configuration of the node, does not enter
 the blockchain and is specific to a particular node. It’s a good practice
 to manage such keys locally via private APIs of the corresponding service.
+
+> Here we may tell something about our new file-based approach to managing keys.
+> We may also remove the warning block below if/when these changes are merged.
 
 The Exonum core defines two pairs of Ed25519 keys for full nodes:
 
