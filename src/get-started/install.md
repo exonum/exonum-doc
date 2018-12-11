@@ -19,6 +19,11 @@ to these projects, testing them, and developing using Exonum.
     In future releases, Exonum will become more modular and will work as
     a standalone application. See [the roadmap](../roadmap.md) for more details.
 
+    > I guess we can update the version to the current one
+    > or just not mention it at all ("Currently, you need to...")
+    > I don't think it's good TV to say that
+    > we have not improved something for seven versions. 
+
 ## Dependencies
 
 Exonum depends on the following third-party system libraries:
@@ -60,6 +65,15 @@ Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
+
+> Um... Are we sure that Exonum works on Windows?
+> If so then we'd better provide some instruction too
+> as I'm not sure that it will work without dependencies.
+>
+> Alternatively, we may not mention Windows support at all
+> or say that it is upcoming and redirect the reader to the roadmap.
+> I think it's better to be honest that we don't support it well
+> rather than making an impression that Exonum will work without a hitch on Windows.
 
 ## Adding environment variables
 
@@ -125,6 +139,11 @@ You may also run the extended test suite located in the `sandbox` directory:
 cargo test --manifest-path sandbox/Cargo.toml
 ```
 
+> It's kinda shameful to admit,
+> but Exonum tests have quite high resource requirements
+> and may make user system unresponsive in case of shortage.
+> I guess it would be nice to clarify, for example, memory requirements.
+
 ## Non-Rust Components
 
 ### Light Client Library
@@ -139,6 +158,9 @@ is tested on Node 4+.
 
 !!! note
     The light client library itself can run both on Node and in browsers.
+
+> Not an expert on light client
+> but this section may need an update as well.
 
 ## Developing with Exonum
 
