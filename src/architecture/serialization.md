@@ -26,7 +26,7 @@ storage is not validated, since it is assumed to be validated earlier.
 
 To apply protobuf serialization to structures in Exonum, users are required to
 describe the structures in a file with `.proto` extension, using the
-[protobuf interface description language](language).  All the `.proto` files
+[protobuf interface description language][language].  All the `.proto` files
 are then combined into a single module which is used to generate files with
 `.rs` extension. The `.rs` files handle the serialization of structures
 described in them. And that is it, the described structures can then be
@@ -70,7 +70,7 @@ pub struct Timestamp {
 Besides the description of structures, the `.rs` files also contain additional
 code and functions required for protobuf serialization and deserialization.
 
-For convenience, the [protobuf descriptions](proto-files) of the typical
+For convenience, the [protobuf descriptions][proto-files] of the typical
 structures used in Exonum are already included in the framework.
 
 ## Build Exonum with Protobuf Serialization
