@@ -29,16 +29,15 @@ To apply protobuf serialization to structures in Exonum, users are required to d
 ## Message Serialization
 
 A message is a [digitally signed](../glossary.md#digital-signature) piece of data
-transmitted through an Exonum network. There are 2 major kinds of messages:
+transmitted through an Exonum network. Exonum operates with with messages and transaction, which transaction being a definite part of the message.
 
 - **Consensus messages** are used among full
   nodes in the course of [the consensus algorithm](../glossary.md#consensus)
 - **Transactions** are used to invoke [blockchain state](../glossary.md#blockchain-state)
   changes and usually come from [external clients](../glossary.md#light-client)
 
-The message serialization consists of 3 main parts: header (includes
-`service_id`, `message_id`, and `payload_length` fields),
-body, and signature.
+The message serialization consists of 3 main parts: header (the public address of the message author),
+payload, and signature.
 
 ### Service ID
 
