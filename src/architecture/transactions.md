@@ -76,6 +76,10 @@ separate implementation details from transaction invocation.
 
 ## Serialization
 
+> This needs an update to **Protobuf**.
+> I'm not sure what format will be used by the light client
+> but nodes and storage are currently using Protobuf.
+
 Transactions in Exonum are subtypes of messages and share the serialization logic
 with [consensus messages](consensus.md#messages) (see the [Serialization](serialization.md)
 article for more details).
@@ -141,7 +145,16 @@ Transaction interface defines 2 methods: [`verify`](#verify) and
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
     See [Exonum core code][core-tx] for more details.
 
+> Again, it will be nicer to link the API documentation from docs.rs
+> rather than raw unadorned source code.
+
 ### Verify
+
+> There is no more `verify`,
+> transactions have only `execute` method.
+> We need to remove this section and all its mentions from other places.
+> We may mention that signatures are verified by the Exonum framework
+> so developers don't need to worry about that.
 
 ```rust
 fn verify(&self) -> bool;
@@ -160,6 +173,8 @@ included into the blockchain.
     In [the cryptocurrency service][cryptocurrency],
     `TxTransfer.verify` checks the digital signature and ensures that
     the sender of coins is not the same as the receiver.
+
+> Sending coins to oneself is now verified in `execute`.
 
 ### Execute
 
@@ -204,6 +219,11 @@ Such transactions can be and are included into the blockchain provided they
 lead to the same result (panic or return an identical error code)
 for at least 2/3 of the validators.
 
+> Side note:
+> maybe we could explain what happens
+> if transactions behave differently on different nodes.
+> It may be useful to emphasize the importance of identical behavior among nodes.
+
 ## Lifecycle
 
 ### 1. Creation
@@ -233,6 +253,8 @@ via [an appropriate transaction endpoint](services.md#transactions).
     If a transaction is valid (i.e., its `verify` returns `true`), it’s expected
     to be committed in a matter of seconds.
 
+> Promise about event-based subscription that could replace polling?
+
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
@@ -247,6 +269,12 @@ consistency of the transaction.
 If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
+
+> `verify` is no longer a thing,
+> but Exonum still verifies transactions
+> by checking their digital signatures
+> and validates their content
+> by attempting to deserialize them without execution.
 
 ### 4. Broadcasting
 
@@ -290,6 +318,8 @@ Hence, the order of application is the same for every node in the network.
 ## Transaction Properties
 
 ### Purity
+
+> This section can be removed.
 
 `verify` in transactions is [pure](https://en.wikipedia.org/wiki/Pure_function),
 which means that the verification result doesn’t depend on the
