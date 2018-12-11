@@ -36,8 +36,8 @@ template. For more information see an [example][build-description].
 The service abstraction serves to extend the framework and implement the
 business logic of an application. The service defines the schema of the stored
 data that constitute the service state; transaction processing rules that can
-make changes to the stored data; and an API for external clients
-that allows interacting
+make changes to the stored data; handles events occurring in the ledger; 
+and defines an API for external clients that allows interacting
 with the service from outside of the system. See more information on the
 software model of services in the [corresponding section][Exonum-services].
 
@@ -221,6 +221,26 @@ rolled back, while the error data is stored in the database for further user
 reference. Light clients also provide access to information on the
 [transaction][exonum-transaction] execution result
 (which may be either success or failure) to their users.
+
+### Blockchain events
+
+A service can also handle a block commit event, that occurs each time
+the framework commits a new block. The framework delivers this event to
+implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
+in each deployed service. Each node in the network processes that event 
+independently from other nodes. The event includes a `Snapshot`, 
+allowing a read-only access to the database state _exactly_ after the commit
+of the corresponding block.
+
+As services can read the database state in the handler, they may detect
+any changes in it, e.g., that a certain transaction is executed;
+or some condition is met. Services may also create and submit new transactions
+using [`Node#submitTransaction`][node-submittransaction]. Using this callback
+to notify other systems is another common use case, but the implementations
+must pay attention to **not** perform any blocking operations such as synchronous I/O
+in this handler, as it is invoked synchronously in the same thread that handles
+transactions. Blocking that thread will delay transaction processing on the node.
+
 
 ### External Service API
 
@@ -454,6 +474,8 @@ For using the library just include the dependency in your `pom.xml`:
 [nodefake]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
+[service-after-commit]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html <!--TODO: Insert the correct Javadoc -->
+[node-submittransaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html <!--TODO: Insert the correct Javadoc (once we merge messages) -->
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
