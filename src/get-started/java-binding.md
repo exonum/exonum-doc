@@ -112,13 +112,25 @@ The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
   Integers with various encoding types,
-  see [`StandardSerializers`][standardserializers] Java documentation.
+  see [`StandardSerializers`][standardserializers] Java documentation
+  and the table below.
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
 - Any Protobuf messages using `StandardSerializers#protobuf`.
 
 Besides the available built-in serializers, users can still implement
 their own serializers for storing their data in a custom format instead
 of using the built-in ones.
+
+#### Integer Encoding Types Comparison Table
+
+| Type | Description | The most efficient range |
+|---|---|---|
+| `fixed32` | Always four bytes | If values are often greater than `2^28` |
+| `uint32` | Unsigned int that uses variable-length encoding | If values are in range `[0; 2^21-1]` |
+| `sint32` | Signed int that uses variable-length encoding | If values are in range  `[-2^20; 2^20-1]` |
+| `fixed64` | Always eight bytes | If values are often greater than `2^56` |
+| `uint64` | Unsigned int that uses variable-length encoding | If values are in range `[0; 2^49-1]` |
+| `sint64` | Signed int that uses variable-length encoding | If values are in range  `[-2^48; 2^48-1]` |
 
 ### Transactions Description
 
