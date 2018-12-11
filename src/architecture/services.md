@@ -167,6 +167,10 @@ serializable. Exonum provides a simple and robust
 and the corresponding set of tools for (de)serialization and conversion of
 Exonum datatypes to JSON for communication with light clients.
 
+> This may be different with Exonum 0.10,
+> but I'm not up-to-date with the latest Light Client development
+> so I'm not sure whether they still use JSON as a primary vessel.
+
 ### Configuration
 
 Services may use [configuration](configuration.md)
@@ -175,6 +179,12 @@ to store parameters that will be received by the service constructor during
 *global configuration*, which is stored on the blockchain, and
 *local configuration*,
 which is specific to each node instance.
+
+> We have been reworking configuration, right?
+> Also, didn't we convert it into Protobuf?
+> Or the configuration service accepts Protobuf
+> but the configuration itself is a TOML string
+> embedded into Protobuf?
 
 #### Global Configuration
 
@@ -225,6 +235,10 @@ service configuration and initializes its persistent storage.
     In the future releases services will be able to be deployed dynamically as
     shared libraries.
 
+> Maybe we should update the Exonum version here
+> so that it does not stand out that much.
+> It's not that specifying 0.1 is meaningful to the user.
+
 ### Initialization
 
 Each time a validating or auditing node is started, it initializes all
@@ -256,6 +270,10 @@ the blockchain network.
     and emit events and for services and light clients to subscribe to events
     emitted by the services.
 
+> Ditto for Exonum version.
+> This is still actual.
+> Maybe we can extend this to before_commit and after_commit.
+
 ## Service Development
 
 !!! note
@@ -264,6 +282,9 @@ the blockchain network.
     Rust is probably the safest general-purpose programming language, but it is
     not very easy to master. Java binding
     [is a high-priority task](../roadmap.md).
+
+> Version.
+> Here and later, I won't mention it anymore.
 
 Here is a list of things to figure out when developing an Exonum service:
 
@@ -320,10 +341,16 @@ the responsibility of a service developer.
 
 ## Interface with Exonum Framework
 
+> This section is going to change heavily with introduction of gRPC.
+> However, with Exonum 0.10 we'll ride with what we have.
+
 Internally, services communicate with the Exonum framework via an interface
 established in the [`Service`][service.rs] trait.
 This trait defines the following methods that need to be implemented by
 a service developer.
+
+> We'd better link docs.rs page for the `Service` trait
+> rather than its source code.
 
 ### Service Identifiers
 
@@ -387,6 +414,9 @@ return an empty list.
     a more even key distribution, which results in a more balanced
     Merkle Patricia tree.
 
+> We may like to mention that
+> **MerkleDB** will soon relieve the developers from writing this method manually.
+
 ### Parse Raw Transaction
 
 ```rust
@@ -427,6 +457,8 @@ The default trait implementation returns `null` (i.e., no configuration).
 It must be redefined for services that have global configuration parameters.
 
 ### Commit Handler
+
+> There's also `before_commit` handler now.
 
 ```rust
 fn after_commit(&self, context: &ServiceContext) { }
