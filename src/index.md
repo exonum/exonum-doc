@@ -59,6 +59,8 @@ Exonum documentation contains in-depth discussions on numerous other aspects
 of the framework, such as [binary serialization](architecture/serialization.md),
 [storage](architecture/storage.md) and [networking](advanced/network.md).
 
+> May need updates due to serialization changes.
+
 ## Contributing
 
 See the [contributing guide](contributing.md) to get information on how
