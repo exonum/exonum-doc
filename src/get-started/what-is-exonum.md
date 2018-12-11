@@ -133,6 +133,11 @@ second (tps). During test benchmarks, Exonum handles up to 7,000 tps, with a
 2.5 sec. clearing delay (the interval between transaction generation and its
 inclusion into a block).
 
+> I would like to see a link to a blog post
+> which illustrates the benchmarks
+> and explains their results.
+> It will greatly increase credibility of such statements.
+
 ## Main Components
 
 ### Services
@@ -158,6 +163,10 @@ There are 3 types of service endpoints:
 - **Read requests** correspond to `GET` requests in REST
 - **Private APIs** represent administrative and maintenance endpoints,
   generally not accessible to the outside world
+
+> This will change in the future versions.
+> Exonum 0.10 still includes REST API so this is fine,
+> but later we will need to update this section.
 
 #### Persistence
 
