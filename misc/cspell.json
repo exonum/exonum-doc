@@ -117,7 +117,9 @@
     "validators",
     "Vertx",
     "whitelisted",
-    "whitelisting"
+    "whitelisting",
+    "sint",
+    "uint"
   ],
   "flagWords": [
     "indexes"
