@@ -14,28 +14,38 @@ const cleanUp = () => asyncExec(CLEANUP_COMMAND)
 const asyncExec = command => new Promise((resolve, reject) =>
   exec(command, (code, stdout, stderr) => code === 0 ? resolve(stdout) : reject(stderr)))
 
-const generateVersionedDocs = async (versions, mkdocs) => {
+const to = promise => promise.then(data => [data, null]).catch(err => [null, { err }])
+
+const generateVersionedDocs = async (versions) => {
   await cleanUp()
 
   const git = new Git({})
   const returnToBranch = await git.getBranchName()
 
   fs.mkdirSync('./version')
+  let failed = 0
   for (let version of versions) {
-    await git.checkout(version.id).catch(() => {throw 'Checkout failed, stash or commit changes'})
+    const [, error] = await to(git.checkout(version))
+    if (error) {
+      console.error(`Checkout failed. Tag ${version} is not built.`)
+      failed++
+      continue
+    }
     const versionedMkdocs = YAML.load('mkdocs.yml')
-    const configFile = `./version/${version.id}.yml`
-    versionedMkdocs.extra.versions = mkdocs.extra.versions
-    fs.writeFileSync(`./version/${version.id}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
-    await mkdocsBuild(`./version/${version.name}`, configFile)
+    const configFile = `./version/${version}.yml`
+    versionedMkdocs.extra.versions = versions
+    fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
+    await mkdocsBuild(`./version/${version}`, configFile)
     await git.checkout(returnToBranch)
   }
 
-  return versions
+  return { failed, success: versions.length - failed }
 }
 
-const mkdocs = YAML.load('mkdocs.yml')
-const { extra: { versions } } = mkdocs
-generateVersionedDocs(versions, mkdocs)
-  .then(versions => console.info(`${versions.length} versions of documentation successfully builded`))
+const versionsList = fs.readFileSync('./versions.txt', 'utf-8')
+  .split(/\r\n|\r|\n/)
+  .filter(item => item !== '')
+
+generateVersionedDocs(versionsList)
+  .then(data => console.info(`Documentation built: ${data.success} versions success, ${data.failed} failed.`))
   .catch(e => console.error('[ERROR]', e))

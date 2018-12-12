@@ -32,9 +32,6 @@ extra:
       link: 'https://www.facebook.com/Exonum'
     - type: 'twitter'
       link: 'https://twitter.com/BitFuryGroup'
-  versions:
-    - name: 0.9.4-latest
-      id: 0.9.4
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'
