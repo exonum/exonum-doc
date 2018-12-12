@@ -121,7 +121,7 @@ for `ProtobufConvert` should have the same fields as the structures in
 The
 [`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
 crate provides descriptions of the structures typically used in Exonum with all
-the required validations. So when using these structure users only need to 
+the required validations. So when using these structure users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
 implement the `ProtobufConvert` trait for any additional structures they need.
 
