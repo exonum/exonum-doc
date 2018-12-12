@@ -15,7 +15,8 @@ serialize messages for sending and
 deserialize messages when they are received. All the information that passes in
 the network between nodes turns into messages.
 
-**Communication with Light Clients** Light clients form messages which include
+**Communication with Light Clients** Light clients form
+[messages](transactions.md) which include
 transactions serialized in protobuf, sign them and send to the network.
 
 **Storage of Data** [The storage](../architecture/storage.md) is used to place
@@ -89,7 +90,8 @@ use exonum_build::protobuf_generate;
 protobuf_generate("src/proto", &["src/proto"], "example_mod.rs")
 ```
 
-To use protobuf generated Rust structures:
+To use protobuf generated Rust structures, users first need to create a module
+which will include the protobuf generated files:
 
 ```rust
 extern crate exonum;
@@ -100,19 +102,49 @@ include!(concat!(env!("OUT_DIR"), "/example_mod.rs"));
 use exonum::proto::schema::*;
 ```
 
+Then to access a structure from a protobuf generated file, you need to indicate
+the name of the module with the generated files and the name of the required
+file and structure in it:
+
+```rust
+module_name::proto_file_name::StructNameInProtoFile
+```
+
+For example, the generated `Wallet` structure, included in the
+`cryptocurrency.proto` file, which resides in the [`proto`][module] module,
+will be available using `proto::cryptocurrency::Wallet`.
+
+`exonum_build` also includes a function which returns the path to the `.proto`
+files come with the `exonum` crate - `get_exonum_protobuf_files_path()`:
+
+```rust
+let exonum_protos = get_exonum_protobuf_files_path();
+    protobuf_generate(
+        "src/proto",
+        &["src/proto", &exonum_protos],
+        "example_mod.rs",
+    );
+```
+
+After applying the `get_exonum_protobuf_files_path()` function, users can
+import protobuf descriptions from the `exonum` crate in their `.proto` files.
+For example, `import "helpers.proto;"` can be used to get access to protobuf
+types `exonum.PublicKey`, `exonum.Hash`, etc. An example of such usage can be
+found in our [cryptocurrency example service][cryptocurrency].
+
 ## Additional Validation for Protobuf Generated Structures
 
 Protobuf is a versatile and flexible tool, which presents not only
 opportunities but also certain complications for the Exonum framework. For
 example, fields in protobuf cannot be fixed size arrays, however, fixed size
 arrays are required in Exonum (e.g. for hashes). It is possible to implement
-additional validations using the `.rs` protobuf generated files. However, the
-`.rs` files might seem large and complicated, so Exonum features the
-tools that almost fully remove the need to work with the protobuf generated
-files.
+additional validations using the `.rs` protobuf generated files. However, if
+users work with protobuf generated structures, field validation would need to
+be performed every time they are used.
 
-To somewhat limit the flexibility of protobuf generated structures, Exonum
-provides the `ProtobufConvert` trait. This trait lets users automatically map
+To have validation performed only once for the whole structure, Exonum
+provides the conversion mechanism using the `ProtobufConvert` trait. This trait
+lets users automatically map
 their structures and the structures generated from `.proto` descriptions,
 providing a mechanism for validating protobuf generated data. The structures
 for `ProtobufConvert` should have the same fields as the structures in
@@ -120,35 +152,33 @@ for `ProtobufConvert` should have the same fields as the structures in
 
 The
 [`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
-crate provides descriptions of the structures typically used in Exonum with all
+crate provides the ability to use structures typical for Exonum with all
 the required validations. So when using these structure users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
-implement the `ProtobufConvert` trait for any additional structures they need.
+implement the [`ProtobufConvert`][convert] trait for any additional structures
+they need.
 
-For example, the protobuf description of the `Connect` message in Exonum is as
-follows:
+For example, the protobuf description of the `TransactionRequest` message in
+Exonum is as follows:
 
 ```protobuf
-message Connect {
-  string pub_addr = 1;
-  google.protobuf.Timestamp time = 2;
-  string user_agent = 3;
+message TransactionsRequest {
+  exonum.PublicKey to = 1;
+  repeated exonum.Hash txs = 2;
 }
 ```
 
-The corresponding `Connect` structure with `ProtobufConvert` has the following
-representation:
+The corresponding `TransactionRequest` structure with `ProtobufConvert` has
+the following representation:
 
 ```rust
 #[derive(Clone, PartialEq, Eq, Ord, PartialOrd, Debug, ProtobufConvert)]
-#[exonum(pb = "proto::Connect", crate = "crate")]
-pub struct Connect {
-    /// The node's address.
-    pub_addr: String,
-    /// Time when the message was created.
-    time: DateTime<Utc>,
-    /// String containing information about this node.
-    user_agent: String,
+#[exonum(pb = "proto::TransactionsRequest", crate = "crate")]
+pub struct TransactionsRequest {
+    /// Public key of the recipient.
+    to: PublicKey,
+    /// The list of the transaction hashes.
+    txs: Vec<Hash>,
 }
 ```
 
@@ -158,3 +188,6 @@ current structure refers, in the case above `proto::Connect`.
 [protobuf]: https://developers.google.com/protocol-buffers/docs/overview
 [proto-files]: https://github.com/exonum/exonum/tree/master/exonum/src/proto/schema/exonum
 [language]: https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
+[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/proto/cryptocurrency.proto
+[convert]: https://github.com/exonum/exonum/blob/master/exonum/src/proto/mod.rs
+[module]:https://github.com/exonum/exonum/tree/master/examples/cryptocurrency/src/proto
