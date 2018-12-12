@@ -52,8 +52,8 @@ message Timestamp {
 }
 ```
 
-The same structure will have the following representation in an `.rs` protobuf
-generated file:
+The same structure will have the following representation in an `.rs`
+protobuf-generated file:
 
 ```rust
 pub struct Timestamp {
@@ -90,8 +90,8 @@ use exonum_build::protobuf_generate;
 protobuf_generate("src/proto", &["src/proto"], "example_mod.rs")
 ```
 
-To use protobuf generated Rust structures, users first need to create a module
-which will include the protobuf generated files:
+To use protobuf-generated Rust structures, users first need to create a module
+which will include the protobuf-generated files:
 
 ```rust
 extern crate exonum;
@@ -102,7 +102,7 @@ include!(concat!(env!("OUT_DIR"), "/example_mod.rs"));
 use exonum::proto::schema::*;
 ```
 
-Then to access a structure from a protobuf generated file, you need to indicate
+Then to access a structure from a protobuf-generated file, you need to indicate
 the name of the module with the generated files and the name of the required
 file and structure in it:
 
@@ -115,7 +115,7 @@ For example, the generated `Wallet` structure, included in the
 will be available using `proto::cryptocurrency::Wallet`.
 
 `exonum_build` also includes a function which returns the path to the `.proto`
-files come with the `exonum` crate - `get_exonum_protobuf_files_path()`:
+files that come with the `exonum` crate - `get_exonum_protobuf_files_path()`:
 
 ```rust
 let exonum_protos = get_exonum_protobuf_files_path();
@@ -126,34 +126,34 @@ let exonum_protos = get_exonum_protobuf_files_path();
     );
 ```
 
-After applying the `get_exonum_protobuf_files_path()` function, users can
+After calling the `get_exonum_protobuf_files_path()` function, users can
 import protobuf descriptions from the `exonum` crate in their `.proto` files.
 For example, `import "helpers.proto;"` can be used to get access to protobuf
 types `exonum.PublicKey`, `exonum.Hash`, etc. An example of such usage can be
 found in our [cryptocurrency example service][cryptocurrency].
 
-## Additional Validation for Protobuf Generated Structures
+## Additional Validation for Protobuf-Generated Structures
 
 Protobuf is a versatile and flexible tool, which presents not only
 opportunities but also certain complications for the Exonum framework. For
-example, fields in protobuf cannot be fixed size arrays, however, fixed size
+example, fields in protobuf cannot be fixed-size arrays, however, fixed-size
 arrays are required in Exonum (e.g. for hashes). It is possible to implement
-additional validations using the `.rs` protobuf generated files. However, if
-users work with protobuf generated structures, field validation would need to
+additional validations using the `.rs` protobuf-generated files. However, if
+users work with protobuf-generated structures, field validation would need to
 be performed every time they are used.
 
 To have validation performed only once for the whole structure, Exonum
 provides the conversion mechanism using the `ProtobufConvert` trait. This trait
 lets users automatically map
 their structures and the structures generated from `.proto` descriptions,
-providing a mechanism for validating protobuf generated data. The structures
+providing a mechanism for validating protobuf-generated data. The structures
 for `ProtobufConvert` should have the same fields as the structures in
 `.proto` files, but can contain additional validation.
 
 The
 [`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
 crate provides the ability to use structures typical for Exonum with all
-the required validations. So when using these structure users only need to
+the required validations. So when using these structures users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
 implement the [`ProtobufConvert`][convert] trait for any additional structures
 they need.
