@@ -997,14 +997,14 @@ curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab
         }],
         “proof”: []
     }
-}
+    }
     ```
 
-    The request returns the following components of the timestamp proof:
+The request returns the following components of the timestamp proof:
 
-    - the proof of the last block in the blockchain
-    - the proof of the Timestamping Service table
-    - the proof of the timestamp itself
+- the proof of the last block in the blockchain
+- the proof of the Timestamping Service table
+- the proof of the timestamp itself
 
 Great! You have created a fully functional Timestamping Service.
 
