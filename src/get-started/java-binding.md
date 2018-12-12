@@ -107,7 +107,7 @@ implements [`Schema`][schema] interface; when implementing
 As Exonum storage accepts data in the form of byte arrays,
 storing user data requires serialization.
 Java Binding provides a set of built-in *serializers* that you can find
-at the [`StandardSerializers`][standardserializers] utility class.
+in the [`StandardSerializers`][standardserializers] utility class.
 The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
@@ -222,9 +222,9 @@ reference. Light clients also provide access to information on the
 [transaction][exonum-transaction] execution result
 (which may be either success or failure) to their users.
 
-### Blockchain events
+### Blockchain Events
 
-A service can also handle a block commit event, that occurs each time
+A service can also handle a block commit event that occurs each time
 the framework commits a new block. The framework delivers this event to
 implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
 in each deployed service. Each node in the network processes that event 
@@ -427,9 +427,9 @@ service:
 ## Common Library
 
 Java Binding includes a library module that can be useful for Java client
-applications that interact with an Exonum service and
-does not have the dependency on Java Binding Core. The module contains Java
-classes obligatory for core that can now as well be easily applied in clients,
+applications that interact with an Exonum service. The module does not
+have the dependency on Java Binding Core, but it contains Java classes
+obligatory for core that can now as well be easily used in clients,
 if necessary.
 The library provides the ability to create transaction messages, check proofs,
 serialize/deserialize data and perform cryptographic operations.
