@@ -11,7 +11,7 @@ platform-neutral automated mechanism for serializing data.
 ## Usage
 
 **Communication Among Full Nodes** Full nodes can both
-[serialize messages](#message-serialization) for sending and
+serialize messages for sending and
 deserialize messages when they are received. All the information that passes in
 the network between nodes turns into messages.
 
@@ -73,7 +73,7 @@ code and functions required for protobuf serialization and deserialization.
 For convenience, the [protobuf descriptions][proto-files] of the typical
 structures used in Exonum are already included in the framework.
 
-## Build Exonum with Protobuf Serialization
+## Building Exonum with Protobuf Serialization
 
 Exonum includes the
 [`exonum_build`](https://github.com/exonum/exonum/tree/master/exonum_build)
@@ -100,14 +100,14 @@ include!(concat!(env!("OUT_DIR"), "/example_mod.rs"));
 use exonum::proto::schema::*;
 ```
 
-## Additional Verification for Protobuf Generated Structures
+## Additional Validation for Protobuf Generated Structures
 
 Protobuf is a versatile and flexible tool, which presents not only
 opportunities but also certain complications for the Exonum framework. For
 example, fields in protobuf cannot be fixed size arrays, however, fixed size
 arrays are required in Exonum (e.g. for hashes). It is possible to implement
 additional validations using the `.rs` protobuf generated files. However, the
-`.rs` files might seem large and complicated, so Exonum already features the
+`.rs` files might seem large and complicated, so Exonum features the
 tools that almost fully remove the need to work with the protobuf generated
 files.
 
@@ -115,14 +115,15 @@ To somewhat limit the flexibility of protobuf generated structures, Exonum
 provides the `ProtobufConvert` trait. This trait lets users automatically map
 their structures and the structures generated from `.proto` descriptions,
 providing a mechanism for validating protobuf generated data. The structures
-for `ProtobufConvert` should have the same fields that the structures in
-`.proto` files, but can contain additional validations.
+for `ProtobufConvert` should have the same fields as the structures in
+`.proto` files, but can contain additional validation.
 
-The [`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
-crate provides descriptions of the structures typically used in Exonum,
-so when using these structure users only need to implement
-`#[derive(ProtobufConvert)]` for them. If required, users can implement the
-`ProtobufConvert` trait for any additional structures they need.
+The
+[`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
+crate provides descriptions of the structures typically used in Exonum with all
+the required validations. So when using these structure users only need to 
+implement `#[derive(ProtobufConvert)]` for them. If required, users can
+implement the `ProtobufConvert` trait for any additional structures they need.
 
 For example, the protobuf description of the `Connect` message in Exonum is as
 follows:
