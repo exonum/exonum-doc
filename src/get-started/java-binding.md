@@ -36,7 +36,7 @@ template. For more information see an [example][build-description].
 The service abstraction serves to extend the framework and implement the
 business logic of an application. The service defines the schema of the stored
 data that constitute the service state; transaction processing rules that can
-make changes to the stored data; handles events occurring in the ledger; 
+make changes to the stored data; handles events occurring in the ledger;
 and defines an API for external clients that allows interacting
 with the service from outside of the system. See more information on the
 software model of services in the [corresponding section][Exonum-services].
@@ -227,8 +227,8 @@ reference. Light clients also provide access to information on the
 A service can also handle a block commit event that occurs each time
 the framework commits a new block. The framework delivers this event to
 implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
-in each deployed service. Each node in the network processes that event 
-independently from other nodes. The event includes a `Snapshot`, 
+in each deployed service. Each node in the network processes that event
+independently from other nodes. The event includes a `Snapshot`,
 allowing a read-only access to the database state _exactly_ after the commit
 of the corresponding block.
 
@@ -237,10 +237,10 @@ any changes in it, e.g., that a certain transaction is executed;
 or some condition is met. Services may also create and submit new transactions
 using [`Node#submitTransaction`][node-submittransaction]. Using this callback
 to notify other systems is another common use case, but the implementations
-must pay attention to **not** perform any blocking operations such as synchronous I/O
-in this handler, as it is invoked synchronously in the same thread that handles
-transactions. Blocking that thread will delay transaction processing on the node.
-
+must pay attention to **not** perform any blocking operations such as
+synchronous I/O in this handler, as it is invoked synchronously in the same
+thread that handles transactions. Blocking that thread will delay transaction
+processing on the node.
 
 ### External Service API
 
