@@ -40,6 +40,10 @@ this ordering coincides with that used in
 
 ### BaseIndex
 
+> This seems to be no longer exported.
+> We may remove this section
+> as well as all mentions of this implementation detail.
+
 [`BaseIndex`][base-index] represents the most basic table type. Other
 table types wrap `BaseIndex`, enhancing its functionality for specific use
 cases.
@@ -144,6 +148,16 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
   elements, while the `ValueSetIndex` orders elements arbitrarily due to hash
   function properties.
 
+### SparseListIndex
+
+> There's this new index type which is not really documented.
+> We probably should document it (or maybe remove it from the code base?)
+
+### Entry
+
+> It is also possible to store scalar values.
+> This feature is used in some system tables so we may like to document it.
+
 ### Merkelized Indices
 
 Merkelized indices represent a list and a map with additional
@@ -210,6 +224,9 @@ All the tables functionality is reduced to these atomic call types.
 As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
 In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
 since 0.3 its support has been dropped.
+
+> I guess we can safely forget about LevelDB by now
+> and update the Exonum version to the latest 0.10.
 
 Values from different tables are stored in column families in the low-level
 storage,
@@ -297,10 +314,18 @@ transactions continues normally.
 ## System Tables
 
 The core [maintains tables][blockchain-schema] that are used
-for core blockchain functionality:
+for core blockchain functionality.
+All of them have `core.*` prefix.
 
 - `transactions: MapIndex`  
   Represents a map from transaction hash into raw transaction structure.
+- `transaction_results: ProofMapIndex`  
+  Keep execution results for all accepted transactions,
+  indexed by transaction hashes.
+- `transactions_pool: KeySetIndex`  
+  Stores the set of hashes of known transactions that have not been committed yet.
+- `transactions_pool_len: Entry`  
+  Caches the number of entries in `transaction_pool`.
 - `transactions_locations: MapIndex`  
   Keeps the block height and tx position inside block for every
   transaction hash.
@@ -319,6 +344,23 @@ for core blockchain functionality:
 - `configs_actual_from: ListIndex`  
   Builds an index to quickly get a configuration activating at a specific
   height.
+- `state_hash_aggregator: ProofMapIndex`  
+  An accessory table
+  used to calculate the "aggregation" of root hashes of individual service tables,
+  in effect summing the state of various entities
+  scattered across distinct services and their tables.
+- `peers_cache: MapIndex`  
+  Keeps a persistent list of peer nodes (their public keys and known addresses).
+  It comes useful for recovery in case of abnormal node restart.
+  > crate-private, maybe no need to expose?
+- `consensus_messages_cache: ListIndex`  
+  Keeps a persistent cache of consensus messages.
+  It comes useful for recovery in case of abnormal node restart.
+  > crate-private, maybe no need to expose?
+- `consensus_round: Entry`  
+  Keeps the current value of consensus round.
+  It comes useful for recovery in case of abnormal node restart.
+  > crate-private, maybe no need to expose?
 
 ## Indexing
 
