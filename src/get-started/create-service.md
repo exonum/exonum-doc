@@ -199,7 +199,7 @@ impl<'a> CurrencySchema<&'a mut Fork> {
 [Transaction](../architecture/transactions.md) is a kind of message which
 performs atomic actions on the blockchain state.
 
-For our cryptocurrency tutorial we need two transaction types:
+For our Cryptocurrency Tutorial we need two transaction types:
 
 - Create a new wallet and add some money to it
 - Transfer money between two different wallets

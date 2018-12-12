@@ -1,7 +1,7 @@
-# Service with Data Proofs
+# Advanced Cryptocurrency Tutorial: Service with Data Proofs
 
 This tutorial is an extended version of the
-[service creation tutorial](create-service.md).
+[Cryptocurrency Tutorial](create-service.md).
 It shows how to create cryptographic proofs for data in Exonum
 and how to organize the corresponding data layout.
 
@@ -193,7 +193,7 @@ specified below.
 
 ### Create Schema
 
-As we already mentioned in the simple cryptocurrency tutorial schema is a
+As we already mentioned in the simple Cryptocurrency Tutorial schema is a
 structured view of the [key-value storage](../architecture/storage.md)
 used in Exonum. We will use the same `Snapshot` and `Fork` abstractions – for
 read requests and transactions

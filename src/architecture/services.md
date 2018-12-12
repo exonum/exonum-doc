@@ -89,8 +89,8 @@ with other transactions in a block.
     The transaction contains the fields corresponding to the sender’s and
     recipient’s
     public keys, the amount of transferred funds and the digital signature
-    created by the sender’s private key. See
-    [the cryptocurrency tutorial](../get-started/create-service.md)
+    created by the sender’s private key. See the
+    [Cryptocurrency Tutorial](../get-started/create-service.md)
     for more details.
 
 ### Read Requests
@@ -277,8 +277,8 @@ Here is a list of things to figure out when developing an Exonum service:
   and append-only lists)?
 - Are there any foreign key relationships among stored entities? (Exonum data
   model supports relationships among entities via hash links;
-  see organization of wallet history in
-  [the cryptocurrency tutorial](../get-started/create-service.md)
+  see organization of wallet history in the
+  [Cryptocurrency Tutorial](../get-started/create-service.md)
   for more details.)
 - What persistent data will be returned to external clients? (You might want
   to use Merkelized data collections for this data and create corresponding
@@ -293,7 +293,7 @@ Here is a list of things to figure out when developing an Exonum service:
   should be a part of the local configuration or stored in the blockchain.)
 
 !!! tip
-    [The cryptocurrency tutorial](../get-started/create-service.md)
+    [The Cryptocurrency Tutorial](../get-started/create-service.md)
     provides a hands-on guide how to build an Exonum service that implements
     a minimalistic crypto-token.
 

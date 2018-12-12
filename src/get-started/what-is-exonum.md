@@ -191,7 +191,7 @@ blockchain through web or mobile apps. A light client communicates with one or
 more services on a full node with the help of [public APIs](#endpoints).
 
 !!! note "Example"
-    [In the cryptocurrency tutorial](create-service.md),
+    [In the Cryptocurrency Tutorial](create-service.md),
     a client corresponds to an owner of currency; it is only interested in
     transactions that involve the owner.
 
