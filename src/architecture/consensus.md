@@ -199,6 +199,11 @@ must be processed only during round `R`).
     See [source code][src-messages] for more technical details on
     consensus messages.
 
+> Nice joke about source code being the best documentation.
+> I think that references to Exonum repository
+> should be replaced with appropriate docs.rs pages
+> in most places.
+
 ### Messages
 
 The consensus algorithm makes use of several types of messages. All messages
@@ -245,6 +250,10 @@ periodicity written in the `status_timeout`
 A `BlockResponse` message contains a block (in the meaning of blockchain) and a
 set of `Precommit` messages that allowed that block to be accepted.
 `BlockResponse` messages are sent upon request.
+
+#### Connect
+
+> This message is not documented.
 
 ### Request Messages
 
