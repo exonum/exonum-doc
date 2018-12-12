@@ -11,6 +11,10 @@ The client functions are divided into the following submodules:
 - **Data**. Functions for [serialization and deserialization of
   data](serialization.md) from the JSON format to
   Exonum binary format
+
+  > Update to Protobuf.
+  > Here and in other places in the document.
+
 - **Cryptography**. Functions for calculating hashes, creating
   and validating digital signatures
 - **Proofs**. Functions for checking cryptographic proofs that
@@ -180,6 +184,10 @@ difficulties during development:
 These problems above can be overcome with the aid of data
 schema stated in a language-independent format
 (see [the Exonum roadmap](../roadmap.md)).
+
+> We may modernize this paragraph a bit
+> by mentioning MerkleDB and Protobuf.
+> I'm not sure if MerkleDB plans are public though.
 
 Despite the complexity of the development, the presence of
 light clients in a blockchain-based system is the only practical way to
