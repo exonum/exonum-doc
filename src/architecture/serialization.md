@@ -75,7 +75,7 @@ Exonum includes the [`exonum_build`][build]
 crate which lets users add the `protobuf_generate` function to their
 `build.rs`. This function automatically generates the `.rs` files for all the
 `.proto` files during the build process. `exonum_build` needs to be added to
-the project as a build dependancy. To use `protobuf_generate`, add
+the project as a build dependency. To use `protobuf_generate`, add
 the following code to `build.rs` indicating the folder which contains the
 `.proto` files:
 
@@ -159,7 +159,7 @@ the required validations. So when using these structures users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
 implement the [`ProtobufConvert`][convert] trait for any other structure they
 need to add that cannot be sufficiently described by means of protobuf. An
-example of such usage can be viewed in the [`mod.rs`][anchoring-rs] file of the 
+example of such usage can be viewed in the [`mod.rs`][anchoring-rs] file of the
 Anchoring service and its corresponding [`.proto`][anchoring-proto] file.
 
 For example, the protobuf description of the `TransactionRequest` message in
