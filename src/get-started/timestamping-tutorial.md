@@ -42,8 +42,8 @@ publish = false
 authors = ["Your name <your@email.com>"]
 
 [dependencies]
-exonum = { version = "0.9.0", path = "../../../exonum" }
-exonum-time = { version = "0.9.0", path = "../../../services/time" }
+exonum = "0.9.0"
+exonum-time = "0.9.0"
 serde = "1.0.10"
 serde_derive = "1.0.10"
 serde_json = "1.0.2"
@@ -52,8 +52,7 @@ log = "=0.4.3"
 chrono = { version = "=0.4.5", features = ["serde"] }
 
 [dependencies.exonum-configuration]
-version = "0.9.0"
-path = "../../../services/configuration"
+exonum-configuration = "0.9.0"
 ```
 
 Also, you can add the following dependencies to `Cargo.toml`
@@ -61,7 +60,7 @@ for future testing purposes:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = { version = "0.9.0", path = "../../../testkit" }
+exonum-testkit = "0.9.0"
 pretty_assertions = "=0.5.1"
 ```
 
