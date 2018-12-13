@@ -35,6 +35,9 @@ and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
 
+> Configuration no longer includes `majority_count` field.
+> It is fixed to the Byzantine majority count (more than 2/3 of validators).
+
 !!! note
     Nodes can have only single following configuration. After a
     configuration proposal got a supermajority of votes and became the following
@@ -51,6 +54,12 @@ execution rules guarantee that only one of them will get activated.
     at any time.
 
 ## REST API
+
+> All these have been updated a bit so the docs are outdated.
+> [PR #235][pr-235] seems to contain more or less up-to-date information.
+> However, I still have a feeling that we'd need to drill into the source code to update this.
+
+[pr-235]: https://github.com/exonum/exonum-doc/pull/235
 
 Configuration update service specifies a set of public and private endpoints.
 
