@@ -227,15 +227,15 @@ reference. Light clients also provide access to information on the
 A service can also handle a block commit event that occurs each time
 the framework commits a new block. The framework delivers this event to
 implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
-in each deployed service. Each node in the network processes that event
-independently from other nodes. The event includes a `Snapshot`,
+callback in each deployed service. Each node in the network processes
+that event independently from other nodes. The event includes a `Snapshot`,
 allowing a read-only access to the database state _exactly_ after the commit
 of the corresponding block.
 
 As services can read the database state in the handler, they may detect
 any changes in it, e.g., that a certain transaction is executed;
 or some condition is met. Services may also create and submit new transactions
-using [`Node#submitTransaction`][node-submittransaction]. Using this callback
+using [`Node#submitTransaction`][node-submit-transaction]. Using this callback
 to notify other systems is another common use case, but the implementations
 must pay attention to **not** perform any blocking operations such as
 synchronous I/O in this handler, as it is invoked synchronously in the same
@@ -429,7 +429,7 @@ service:
 Java Binding includes a library module that can be useful for Java client
 applications that interact with an Exonum service. The module does not
 have the dependency on Java Binding Core, but it contains Java classes
-obligatory for core that can now as well be easily used in clients,
+obligatory for the core that can now as well be easily used in clients,
 if necessary.
 The library provides the ability to create transaction messages, check proofs,
 serialize/deserialize data and perform cryptographic operations.
@@ -475,7 +475,7 @@ For using the library just include the dependency in your `pom.xml`:
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html <!--TODO: Insert the correct Javadoc -->
-[node-submittransaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html <!--TODO: Insert the correct Javadoc (once we merge messages) -->
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html <!--TODO: Insert the correct Javadoc (once we merge messages) -->
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
