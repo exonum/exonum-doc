@@ -74,6 +74,11 @@ to exchange messages.
 
 #### Whitelist
 
+> Whitelist is no longer a thing, this section can be removed.
+> _List of known peers_ now effectively acts as a whitelist,
+> the node will refuse to talk to anyone not on that list.
+> That list includes all validators together with auditor nodes.
+
 If the whitelist is turned on, then upon receiving the `Connect` message, the
 node checks the presence of the public key from the message in the node’s
 whitelist. If the public key is not included in the whitelist, connection is not
@@ -108,6 +113,12 @@ an initial set of peers on the node start up. If some node changes its IP
 address, then through peer discovery mechanism a new address becomes known to
 all other nodes in some time.
 
+> The local configuration includes **connect_list** array
+> that defines the list of nodes this node is going to communicate with.
+> **listen_address** is the address on which _this_ node accepts connections.
+> The addresses in connect list may be specified as host names, not only IP addresses.
+> `PeersRequest` messages are still sent out but they are kinda useless now.
+
 ## Communication with Light Clients
 
 Light clients use [JSON serialization](../glossary.md#json-serialization)
@@ -132,6 +143,9 @@ All service endpoints are prefixed with
 [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
 where `service_name` is a string service identifier. This identifier needs
 to be unique within a specific Exonum blockchain.
+
+> The method hook is now called `wire_api`,
+> it initializes both public and private endpoints.
 
 !!! note
     There is no unified format for naming endpoints (e.g., passing parameters
