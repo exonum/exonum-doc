@@ -128,6 +128,8 @@ equal to `api/services/exonum_time/v1`.
     As of version 0.5.0, the **exonum-time** service does not provide
     cryptographic proofs of authenticity for returned values.
 
+> We can drop this warning, I guess.
+
 ### Current Time
 
 ```none
@@ -152,6 +154,10 @@ The response is combined date and time in UTC as per [ISO 8601][ISO8601].
 `null` is returned if there is no consolidated time.
 
 ### Timestamps of Current Validators
+
+> I think we should move this (and the following) section
+> into some "Private API" subsection
+> so that it is cleanly separated from public `current_time` endpoint.
 
 ```none
 GET {base_path}/validators_times
