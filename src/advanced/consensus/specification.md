@@ -44,6 +44,9 @@ by a fixed timetable:
 
 Rounds are not synchronized among nodes.
 
+> Rounds are actually started at gradually increasing intervals, not fixes ones.
+> I guess this page is a good place to describe the new behavior.
+
 ### Pool of Unconfirmed Transactions
 
 Each node has a set of transactions that have not yet been added to the
@@ -74,8 +77,16 @@ message processing.
 - `propose_timeout`  
   Proposal timeout after a new block is committed to the blockchain locally.
 
+  > It has been split into
+  > `min_propose_timeout`, `max_propose_timeout`, `propose_timeout_threshold`.
+  > Proposal timeout is dynamically adjustable based on transaction pressure.
+  > This behavior does not seem to be documented anywhere (other than API docs and comments).
+
 - `round_timeout`  
   Interval between algorithm rounds.
+
+  > It's called `first_round_timeout`
+  > and it's actually gradually increasing.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
@@ -119,6 +130,10 @@ The consensus algorithm uses the following types of messages:
 [`Block`](../../architecture/consensus.md#block).
 Only a part of their fields is described here. See
 [source code][message_source] for more details.
+
+> As in other places,
+> I believe that we should refer to the users
+> to the docs.rs API docs instead of the source code.
 
 The following fields are present in all messages:
 
