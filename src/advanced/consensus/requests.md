@@ -59,7 +59,13 @@ Byzantine. The receiving node saves this information in
 - It is possible to access the author by using the IP address + port
   mentioned in the message.
 
+  > It's just _address_.
+  > `Connect` messages now support host names as well as IP addresses.
+
 ## Request Messages
+
+> These message are now using Protobuf serialization.
+> We may like to publish commented *.proto files instead of this prose.
 
 ### Field Types
 
@@ -83,6 +89,12 @@ Requests a `Propose` message from a node. It has the following fields:
   Height of the blockchain for which information is requested.
 - **propose_hash**: Hash  
   Hash of the proposal for which information is requested.
+
+> Here and in all other messages
+> **from** is no longer a part of concrete message.
+> This field has been moved to the common message header
+> (along with the message signature, for example).
+> We may like to point it out somewhere early.
 
 ### `TransactionsRequest`
 
