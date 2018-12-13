@@ -159,7 +159,7 @@ the required validations. So when using these structures users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
 implement the [`ProtobufConvert`][convert] trait for any other structure they
 need to add that cannot be sufficiently described by means of protobuf. An
-example of such usage can be viewed in the [mod.rs][anchoring-rs] file of the 
+example of such usage can be viewed in the [`mod.rs`][anchoring-rs] file of the 
 Anchoring service and its corresponding [`.proto`][anchoring-proto] file.
 
 For example, the protobuf description of the `TransactionRequest` message in
