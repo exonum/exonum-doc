@@ -10,16 +10,20 @@ platform-neutral automated mechanism for serializing data.
 
 ## Usage
 
-**Communication Among Full Nodes** Full nodes can both
-serialize messages for sending and
+### Communication Among Full Nodes
+
+Full nodes can both serialize messages for sending and
 deserialize messages when they are received. All the information that passes in
 the network between nodes turns into messages.
 
-**Communication with Light Clients** Light clients form
-[messages](transactions.md) which include
+### Communication with Light Clients
+
+Light clients form [messages](transactions.md) which include
 transactions serialized in protobuf, sign them and send to the network.
 
-**Storage of Data** [The storage](../architecture/storage.md) is used to place
+### Storage of Data
+
+[The storage](../architecture/storage.md) is used to place
 blocks, configurations, data specific for services. Data obtained from the
 storage is not validated, since it is assumed to be validated earlier.
 
@@ -38,16 +42,7 @@ in a `.proto` file:
 
 ```protobuf
 message Timestamp {
-
-  // Represents seconds of UTC time since Unix epoch
-  // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
-  // 9999-12-31T23:59:59Z inclusive.
   int64 seconds = 1;
-
-  // Non-negative fractions of a second at nanosecond resolution. Negative
-  // second values with fractions must still have non-negative nanos values
-  // that count forward in time. Must be from 0 to 999,999,999
-  // inclusive.
   int32 nanos = 2;
 }
 ```
@@ -76,13 +71,13 @@ structures used in Exonum are already included in the framework.
 
 ## Building Exonum with Protobuf Serialization
 
-Exonum includes the
-[`exonum_build`](https://github.com/exonum/exonum/tree/master/exonum_build)
+Exonum includes the [`exonum_build`][build]
 crate which lets users add the `protobuf_generate` function to their
 `build.rs`. This function automatically generates the `.rs` files for all the
-`.proto` files during the build process. To use `protobuf_generate`, add the
-following code to `build.rs` indicating the folder which contains the `.proto`
-files:
+`.proto` files during the build process. `exonum_build` needs to be added to
+the project as a build dependancy. To use `protobuf_generate`, add
+the following code to `build.rs` indicating the folder which contains the
+`.proto` files:
 
 ```rust
 use exonum_build::protobuf_generate;
@@ -94,8 +89,6 @@ To use protobuf-generated Rust structures, users first need to create a module
 which will include the protobuf-generated files:
 
 ```rust
-extern crate exonum;
-
 include!(concat!(env!("OUT_DIR"), "/example_mod.rs"));
 
 // If you use types from `exonum` .proto files.
@@ -107,7 +100,17 @@ the name of the module with the generated files and the name of the required
 file and structure in it:
 
 ```rust
-module_name::proto_file_name::StructNameInProtoFile
+use module_name::proto_file_name::StructName;
+
+fn deserialize(bytes: &[u8]) -> StructName {
+    let mut pb = StructName::new();
+    pb.merge_from_bytes(slice).unwrap();
+    pb
+}
+
+fn serialize(pb: &StructName) -> Vec<u8> {
+    pb.write_to_bytes().unwrap()
+}
 ```
 
 For example, the generated `Wallet` structure, included in the
@@ -119,16 +122,16 @@ files that come with the `exonum` crate - `get_exonum_protobuf_files_path()`:
 
 ```rust
 let exonum_protos = get_exonum_protobuf_files_path();
-    protobuf_generate(
-        "src/proto",
-        &["src/proto", &exonum_protos],
-        "example_mod.rs",
+protobuf_generate(
+    "src/proto",
+    &["src/proto", &exonum_protos],
+    "example_mod.rs",
     );
 ```
 
 After calling the `get_exonum_protobuf_files_path()` function, users can
 import protobuf descriptions from the `exonum` crate in their `.proto` files.
-For example, `import "helpers.proto;"` can be used to get access to protobuf
+For example, `import "helpers.proto";` can be used to get access to protobuf
 types `exonum.PublicKey`, `exonum.Hash`, etc. An example of such usage can be
 found in our [cryptocurrency example service][cryptocurrency].
 
@@ -150,13 +153,14 @@ providing a mechanism for validating protobuf-generated data. The structures
 for `ProtobufConvert` should have the same fields as the structures in
 `.proto` files, but can contain additional validation.
 
-The
-[`exonum_derive`](https://github.com/exonum/exonum/tree/master/exonum_derive)
+The [`exonum_derive`][derive]
 crate provides the ability to use structures typical for Exonum with all
 the required validations. So when using these structures users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
-implement the [`ProtobufConvert`][convert] trait for any additional structures
-they need.
+implement the [`ProtobufConvert`][convert] trait for any other structure they
+need to add that cannot be sufficiently described by means of protobuf. An
+example of such usage can be viewed in the [mod.rs][anchoring-rs] file of the 
+Anchoring service and its corresponding [`.proto`][anchoring-proto] file.
 
 For example, the protobuf description of the `TransactionRequest` message in
 Exonum is as follows:
@@ -173,7 +177,7 @@ the following representation:
 
 ```rust
 #[derive(Clone, PartialEq, Eq, Ord, PartialOrd, Debug, ProtobufConvert)]
-#[exonum(pb = "proto::TransactionsRequest", crate = "crate")]
+#[exonum(pb = "proto::TransactionsRequest")]
 pub struct TransactionsRequest {
     /// Public key of the recipient.
     to: PublicKey,
@@ -183,7 +187,7 @@ pub struct TransactionsRequest {
 ```
 
 Note that it is required to indicate the protobuf structure to which the
-current structure refers, in the case above `proto::Connect`.
+current structure refers, in the case above `proto::TransactionRequest`.
 
 [protobuf]: https://developers.google.com/protocol-buffers/docs/overview
 [proto-files]: https://github.com/exonum/exonum/tree/master/exonum/src/proto/schema/exonum
@@ -191,3 +195,7 @@ current structure refers, in the case above `proto::Connect`.
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/proto/cryptocurrency.proto
 [convert]: https://github.com/exonum/exonum/blob/master/exonum/src/proto/mod.rs
 [module]:https://github.com/exonum/exonum/tree/master/examples/cryptocurrency/src/proto
+[derive]: https://github.com/exonum/exonum/tree/master/components/derive
+[build]: https://github.com/exonum/exonum/tree/master/components/build/
+[anchoring-rs]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/proto/mod.rs#L33
+[anchoring-proto]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/proto/btc_anchoring.proto#L20
