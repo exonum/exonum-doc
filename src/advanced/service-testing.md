@@ -24,6 +24,9 @@ exonum-testkit = "0.5.0"
     of the core Exonum library; the minor version of the testkit coincides
     with the minor version of the Exonum library it supports.
 
+> I guess we'd better update the version here (and keep it up-to-date).
+> Testkit's README also should be updated.
+
 ## Simple usage
 
 ### Transactions testing
@@ -69,6 +72,8 @@ you can do it without testkit in a simple way:
 let tx = MyTransaction::new(...);
 assert!(tx.verify());
 ```
+
+> There's no `verify` method anymore so its mention should be removed.
 
 Testkit also allows to check different orderings of transactions, including transactions
 for multiple services. This could allow to more efficiently test margin cases
