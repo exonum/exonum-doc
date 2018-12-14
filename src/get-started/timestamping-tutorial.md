@@ -43,6 +43,7 @@ authors = ["Your name <your@email.com>"]
 
 [dependencies]
 exonum = "0.9.0"
+exonum-configuration = "0.9.0"
 exonum-time = "0.9.0"
 serde = "1.0.10"
 serde_derive = "1.0.10"
@@ -50,9 +51,6 @@ serde_json = "1.0.2"
 failure = "0.1.2"
 log = "=0.4.3"
 chrono = { version = "=0.4.5", features = ["serde"] }
-
-[dependencies.exonum-configuration]
-exonum-configuration = "0.9.0"
 ```
 
 Also, you can add the following dependencies to `Cargo.toml`
