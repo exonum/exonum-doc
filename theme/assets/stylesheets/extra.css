@@ -13,20 +13,38 @@
 }
 
 .md-header-nav__version select {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
+  background-color: transparent;
   border: none;
-  margin-top: 14px;
-  color: #fff;
+  display: inline-block;
   font-size: 16px;
+  line-height: 48px;
+  height: 48px;
+  padding-right: 15px;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: white;
+}
 
-  background: none;
-  padding-right: 25px;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='#fff' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position-x: 100%;
-  background-position-y: -2px;
+.md-header-nav__version select option {
+  color: black;
+}
+
+.md-header-nav__version:after {
+  content: " ";
+  height: 0;
+  width: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid white;
+  position: absolute;
+  right: 0;
+  top: calc(50% - 3px);
+  transition: all 0.3s linear;
 }
 
 .md-header-nav__version select:focus {
