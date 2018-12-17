@@ -38,6 +38,7 @@
     "Guice",
     "healthcheck",
     "HMACs",
+    "Javadoc",
     "junit",
     "keypair",
     "leveldb",

@@ -36,8 +36,8 @@ template. For more information see an [example][build-description].
 The service abstraction serves to extend the framework and implement the
 business logic of an application. The service defines the schema of the stored
 data that constitute the service state; transaction processing rules that can
-make changes to the stored data; and an API for external clients
-that allows interacting
+make changes to the stored data; handles events occurring in the ledger;
+and defines an API for external clients that allows interacting
 with the service from outside of the system. See more information on the
 software model of services in the [corresponding section][Exonum-services].
 
@@ -107,7 +107,7 @@ implements [`Schema`][schema] interface; when implementing
 As Exonum storage accepts data in the form of byte arrays,
 storing user data requires serialization.
 Java Binding provides a set of built-in *serializers* that you can find
-at the [`StandardSerializers`][standardserializers] utility class.
+in the [`StandardSerializers`][standardserializers] utility class.
 The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
@@ -221,6 +221,26 @@ rolled back, while the error data is stored in the database for further user
 reference. Light clients also provide access to information on the
 [transaction][exonum-transaction] execution result
 (which may be either success or failure) to their users.
+
+### Blockchain Events
+
+A service can also handle a block commit event that occurs each time
+the framework commits a new block. The framework delivers this event to
+implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
+callback in each deployed service. Each node in the network processes
+that event independently from other nodes. The event includes a `Snapshot`,
+allowing a read-only access to the database state _exactly_ after the commit
+of the corresponding block.
+
+As services can read the database state in the handler, they may detect
+any changes in it, e.g., that a certain transaction is executed;
+or some condition is met. Services may also create and submit new transactions
+using [`Node#submitTransaction`][node-submit-transaction]. Using this callback
+to notify other systems is another common use case, but the implementations
+must pay attention to **not** perform any blocking operations such as
+synchronous I/O in this handler, as it is invoked synchronously in the same
+thread that handles transactions. Blocking that thread will delay transaction
+processing on the node.
 
 ### External Service API
 
@@ -407,9 +427,9 @@ service:
 ## Common Library
 
 Java Binding includes a library module that can be useful for Java client
-applications that interact with an Exonum service and
-does not have the dependency on Java Binding Core. The module contains Java
-classes obligatory for core that can now as well be easily applied in clients,
+applications that interact with an Exonum service. The module does not
+have the dependency on Java Binding Core, but it contains Java classes
+obligatory for the core that can now as well be easily used in clients,
 if necessary.
 The library provides the ability to create transaction messages, check proofs,
 serialize/deserialize data and perform cryptographic operations.
@@ -454,6 +474,10 @@ For using the library just include the dependency in your `pom.xml`:
 [nodefake]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
+<!--TODO: Insert the correct Javadoc below -->
+[service-after-commit]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
+<!--TODO: Insert the correct Javadoc (once we merge messages): -->
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
