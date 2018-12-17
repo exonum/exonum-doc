@@ -30,65 +30,89 @@ service vary depending on the business logic of each service.
 
 The general algorithm of executing a transaction in Exonum includes 4 stages:
 
-- define transaction schema with its data types
+- define transaction schema with protobuf
+- generate a signing key pair (if required)
+- define data types
 - define transaction data
-- generate a signing key pair (if required) and sign the transaction
+- sign the transaction
 - send transaction to the blockchain.
 
 Below we provide two peculiar examples of transaction execution in Exonum
 services.
 
-### Create Timestamping Transaction
+### Define transaction schema with protobuf
 
 As stated in our [Guide for the Light Client][javascript-client-nested-types],
 a custom data type can be a field of other custom data type without limitation
 as to the depth of the nested data.
 
 In view of the above, in the Timestamping Demo we start defining the transaction
-with the `Timestamp` entity itself. Said entity is further applied as a custom
-type within `CreateTimestamp` transaction schema:
+with the `TxTimestamp` entity itself. Said entity is further applied as a custom
+type within `CreateTimestamp` transaction schema. 
+For serialization in exonum-client used [protobufjs][protobufjs-lib] library. 
+In this library you can using `.proto files` or `reflection only method`
+In our timestamping structure are fields: 
 
-```javascript
-const Timestamp = Exonum.newType({
-  fields: [
-    { name: 'content_hash', type: Exonum.Hash },
-    { name: 'metadata', type: Exonum.String }
-  ]
-})
-```
-
-- `content_hash` is a SHA-256 hash of some data or file to be stamped
+- `content_hash` is a object with SHA-256 hash of some data or file to be stamped
 - `metadata` is an optional description of the data to be stamped that is
   included into the stamp.
 
-Define `CreateTimestamp` transaction schema and field types:
+#### .proto files
+
+Example of `timestamping.proto` file in view of the above: 
 
 ```javascript
-const CreateTimestamp = Exonum.newMessage({
-  protocol_version: 0,
-  service_id: 130,
-  message_id: 0,
-  fields: [
-    { name: 'pub_key', type: Exonum.PublicKey },
-    { name: 'content', type: Timestamp }
-  ]
-})
+syntax = "proto3";
+
+package timestamping;
+
+import "google/protobuf/timestamp.proto";
+
+message Hash { bytes data = 1; }
+
+// Stores content's hash and some metadata about it.
+message Timestamp {
+  Hash content_hash = 1;
+  string metadata = 2;
+}
+
+/// Timestamping transaction.
+message TxTimestamp { Timestamp content = 1; }
+
 ```
 
-- `protocol_version` represents the major version of the Exonum
-  serialization protocol. Currently, `0`
-- `service_id` represents the identifier of the service. Check the identifier
-  in the source code of the service (the smart-contract designed in Rust or
-  Java)
-- `message_id` represents the identifier of the transaction type in the
-  service. Corresponds to the index number of the transaction in source code of
-  the service, starting with `0`
-- `fields` represents the fields of the transaction. In this case it contains
-  two fields:
-    - `pub_key` author’s public key
-    - `content` object of `Timestamp` type defined above.
+After creating .proto file you need generate `proto.js` file with `pbjs` library.
+Example is in view of the above:
 
-Next, generate a signing key pair for signing and sending the transaction.
+``` package.json 
+
+"proto": "pbjs --keep-case -t static-module timestamping.proto -o ./proto.js",
+
+```
+
+#### Reflection only method
+
+Example of proto file in view of the above: 
+
+```javascript
+let Root  = protobuf.Root,
+    Type  = protobuf.Type,
+    Field = protobuf.Field;
+
+let Hash = new Type("Hash").add(new Field("data", 1, "bytes"));
+let root = new Root().define("timestamping").add(Hash);
+
+let Timestamp = new Type("Timestamp").add(new Field("content_hash", 1, "timestamping.Hash"));
+root.define("timestamping").add(Timestamp);
+
+let TxTimestamp = new Type("TxTimestamp").add(new Field("content", 1, "timestamping.Timestamp"));
+root.define("timestamping").add(TxTimestamp);
+
+```
+
+### Generate a signing key pair (if required)
+
+Generate a signing key pair for signing and sending the transaction.
 
 ```javascript
 const keyPair = Exonum.keyPair()
@@ -99,18 +123,42 @@ const keyPair = Exonum.keyPair()
     timestamp. On the contrary, in the Service with Data Proofs we generate only
     one key pair that corresponds to a certain wallet and its user and, thus, is
     applied for signing all transactions made on its behalf.
+   
+### Define data types
+ 
+Define `CreateTimestamp` transaction and field types:
+
+```javascript
+const CreateTimestamp = Exonum.newTransaction({
+   author: keyPair.publicKey,
+   service_id: 130,
+   message_id: 0,
+   schema: timestamping.TxTransaction
+})
+```
+- `author` author’s public key
+- `service_id` represents the identifier of the service. Check the identifier
+  in the source code of the service (the smart-contract designed in Rust or
+  Java)
+- `message_id` represents the identifier of the transaction type in the
+  service. Corresponds to the index number of the transaction in source code of
+  the service, starting with `0`
+- `schema` schema of `TxTimestamp` type defined above.
+
+### Define transaction data
 
 Prepare transaction data according to the above-defined schema:
 
 ```javascript
 const data = {
-  pub_key: keyPair.publicKey,
   content: {
-    content_hash: hash,
-    metadata
+    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) },
+    metadata: metadata
   }
 }
 ```
+
+### Sign the transaction
 
 Sign the transaction with the secret key from the key pair generated above:
 
@@ -118,27 +166,23 @@ Sign the transaction with the secret key from the key pair generated above:
 const signature = CreateTimestamp.sign(keyPair.secretKey, data)
 ```
 
+### Sign the transaction
+
 Finally, send the resulting transaction into the blockchain using the built-in
 `send` method which returns a `Promise`:
 
 ```javascript
 const transactionHash = await CreateTimestamp.send(transactionEndpoint,
-  explorerBasePath, data, signature)
+ data, keyPair.secretKey)
 ```
 
 - `transactionEndpoint` represents API address of transaction handler at a
   blockchain node. Example:
 
     ```none
-    http://127.0.0.1:8200/api/services/timestamping/v1/timestamps
+    http://127.0.0.1:8200/api/explorer/v1/transactions
     ```
 
-- `explorerBasePath` represents API address of transaction explorer where
-  you can see transaction details at a blockchain node. Example:
-
-    ```none
-    http://127.0.0.1:8200/api/explorer/v1/timestamps/value?hash=
-    ```
 
 ### Transfer Funds Transaction
 
@@ -413,3 +457,4 @@ support! At this the point you can build and run your application.
 [timestamping-demo]: https://github.com/exonum/exonum/tree/master/examples/timestamping
 [javascript-client]: https://github.com/exonum/exonum-client#getting-started
 [javascript-client-nested-types]: https://github.com/exonum/exonum-client#nested-data-types
+[protobufjs-lib]: https://github.com/dcodeIO/protobuf.js
