@@ -10,8 +10,8 @@ cache:
 branches:
   only:
     - master
-    # Any develop (pre-release) branches, such as 'develop-ejb-0.4'
-    - /^develop-.*$/
+    # Any develop (pre-release) branches, such as 'develop' or 'develop-ejb-0.4'
+    - /^develop(-.*)?$/
     # Tags
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 before_install:
