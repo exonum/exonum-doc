@@ -474,8 +474,10 @@ For using the library just include the dependency in your `pom.xml`:
 [nodefake]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
-[service-after-commit]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html <!--TODO: Insert the correct Javadoc -->
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html <!--TODO: Insert the correct Javadoc (once we merge messages) -->
+<!--TODO: Insert the correct Javadoc below -->
+[service-after-commit]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
+<!--TODO: Insert the correct Javadoc (once we merge messages): -->
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Node.html
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
