@@ -51,17 +51,25 @@ with the `TxTimestamp` entity itself. Said entity is further applied as a custom
 type within `CreateTimestamp` transaction schema. 
 For serialization in exonum-client used [protobufjs][protobufjs-lib] library. 
 In this library you can using `.proto files` or `reflection only method`
-In our timestamping structure are fields: 
 
-- `content_hash` is a object with SHA-256 hash of some data or file to be stamped
+In our timestamping services we have the next structures: 
+
+Hash: 
+- `data` is a object with SHA-256 hash of some data or file to be stamped
+
+Timestamp:
+- `content_hash` is a object of `Hash` type
 - `metadata` is an optional description of the data to be stamped that is
   included into the stamp.
+  
+TxTimestamp:
+  - `content` is a object of `Timestamp` type
 
 #### .proto files
 
-Example of `timestamping.proto` file in view of the above: 
+Example of `timestamping.proto` file is below: 
 
-```javascript
+```
 syntax = "proto3";
 
 package timestamping;
@@ -78,11 +86,10 @@ message Timestamp {
 
 /// Timestamping transaction.
 message TxTimestamp { Timestamp content = 1; }
-
 ```
 
-After creating .proto file you need generate `proto.js` file with `pbjs` library.
-Example is in view of the above:
+After creating .proto file you need generate `*.js` file with `pbjs` library.
+Sample code is below:
 
 ``` package.json 
 
@@ -92,7 +99,7 @@ Example is in view of the above:
 
 #### Reflection only method
 
-Example of proto file in view of the above: 
+Sample code is below: 
 
 ```javascript
 let Root  = protobuf.Root,
@@ -103,11 +110,10 @@ let Hash = new Type("Hash").add(new Field("data", 1, "bytes"));
 let root = new Root().define("timestamping").add(Hash);
 
 let Timestamp = new Type("Timestamp").add(new Field("content_hash", 1, "timestamping.Hash"));
-root.define("timestamping").add(Timestamp);
+root.add(Timestamp);
 
 let TxTimestamp = new Type("TxTimestamp").add(new Field("content", 1, "timestamping.Timestamp"));
-root.define("timestamping").add(TxTimestamp);
-
+root.add(TxTimestamp);
 ```
 
 ### Generate a signing key pair (if required)
@@ -152,8 +158,8 @@ Prepare transaction data according to the above-defined schema:
 ```javascript
 const data = {
   content: {
-    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) },
-    metadata: metadata
+    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) }, // some hash
+    metadata: metadata // some metadata 
   }
 }
 ```
@@ -166,7 +172,7 @@ Sign the transaction with the secret key from the key pair generated above:
 const signature = CreateTimestamp.sign(keyPair.secretKey, data)
 ```
 
-### Sign the transaction
+### Send the transaction
 
 Finally, send the resulting transaction into the blockchain using the built-in
 `send` method which returns a `Promise`:
@@ -194,17 +200,29 @@ signing the transfer transactions between the wallets.
 Next, define `TransferFunds` transaction schema and data types as we did in the
 example above:
 
+```
+syntax = "proto3";
+
+package examples;
+
+message TransferFunds {
+  uint64 amount = 1;
+  // Auxiliary number to guarantee non-idempotence of transactions.
+  uint64 seed = 2;
+}
+```
+
+``` package.json 
+"proto": "pbjs --keep-case -t static-module example.proto -o ./proto.js",
+
+```
+
 ```javascript
-const TransferFunds = Exonum.newMessage({
-  protocol_version: 0,
-  service_id: 128,
-  message_id: 0,
-  fields: [
-    { name: 'from', type: Exonum.PublicKey },
-    { name: 'to', type: Exonum.PublicKey },
-    { name: 'amount', type: Exonum.Uint64 },
-    { name: 'seed', type: Exonum.Uint64 }
-  ]
+const TransferFunds = Exonum.newTransaction({
+   author: publicKey,
+   service_id: 128,
+   message_id: 1,
+   schema: examples.TransferFunds
 })
 ```
 
@@ -224,10 +242,8 @@ creating said wallet:
 
 ```javascript
 const data = {
-  from: keyPair.publicKey,
-  to: receiver,
-  amount,
-  seed
+  amount: amount,
+  seed: seed
 }
 ```
 
@@ -320,16 +336,31 @@ wallet inside the system.
 First, we define the structure that we search for in the proof. In this case it
 is a wallet.
 
+```
+syntax = "proto3";
+
+package examples;
+
+message Hash { bytes data = 1; }
+
+message PublicKey { bytes data = 1; }
+
+// Wallet information stored in the database.
+message Wallet {
+  // `PublicKey` of the wallet.
+  PublicKey pub_key = 1;
+  // Name of the wallet.
+  string name = 2;
+  // Current balance of the wallet.
+  uint64 balance = 3;
+  // Length of the transactions history.
+  uint64 history_len = 4;
+  // `Hash` of the transactions history.
+  Hash history_hash = 5;
+```
+
 ```javascript
-const Wallet = Exonum.newType({
-  fields: [
-    { name: 'pub_key', type: Exonum.PublicKey },
-    { name: 'name', type: Exonum.String },
-    { name: 'balance', type: Exonum.Uint64 },
-    { name: 'history_len', type: Exonum.Uint64 },
-    { name: 'history_hash', type: Exonum.Hash }
-  ]
-})
+const Wallet = Exonum.newType(examples.Wallet)
 ```
 
 We then obtain the proof down to the required wallet:
@@ -375,19 +406,13 @@ information for the whole wallet transaction history, however, any suitable
 range may be selected:
 
 ```javascript
-const TransactionMetaData = Exonum.newType({
-  fields: [
-    { name: 'tx_hash', type: Exonum.Hash },
-    { name: 'execution_status', type: Exonum.Bool }
-  ]
-})
 
 const transactionsMetaData = Exonum.merkleProof(
-  wallet.history_hash,
+  Exonum.uint8ArrayToHexadecimal(new Uint8Array(wallet.history_hash.data)),
   wallet.history_len,
   data.wallet_history.proof,
   [0, wallet.history_len],
-  TransactionMetaData
+  Exonum.Hash
 )
 ```
 
@@ -418,32 +443,36 @@ Finally, we calculate a hash from a transaction body with `Transaction.hash`
 method to compare it with the corresponding hash from the proof.
 
 ```javascript
-data.wallet_history.transactions.forEach((transaction, index) => {
-  // generate transaction definition
-  const Transaction =  new Exonum.newMessage({
-    protocol_version: 0,
-    service_id: 128,
-    message_id: 2,
-    fields: [
-      { name: 'from', type: Exonum.PublicKey },
-      { name: 'to', type: Exonum.PublicKey },
-      { name: 'amount', type: Exonum.Uint64 },
-      { name: 'seed', type: Exonum.Uint64 }
-    ],
-    signature: transaction.signature
-  })
+for (let transaction of data.wallet_history.transactions) {
+  const hash = transactionsMetaData[index++]
+  const buffer = Exonum.hexadecimalToUint8Array(transaction.message)
+  const bufferWithoutSignature = buffer.subarray(0, buffer.length - 64)
+  const author = Exonum.uint8ArrayToHexadecimal(buffer.subarray(0, 32))
+  const signature = Exonum.uint8ArrayToHexadecimal(buffer.subarray(buffer.length - 64, buffer.length));
 
-  // validate transaction signature
-  if (!Transaction.verifySignature(transaction.signature,
-    transaction.body.from, transaction.body)) {
-    throw new Error('Invalid transaction signature has been found')
+  const Transaction = getTransaction(transaction.debug, author)
+
+  if (Exonum.hash(buffer) !== hash) {
+     throw new Error('Invalid transaction hash')
   }
 
-  // validate hash
-  if (Transaction.hash(transaction.body) !== transactionsMetaData[index]) {
-    throw new Error('Invalid transaction hash has been found')
+  // serialize transaction and compare with message
+  if (!Transaction.serialize(transaction.debug).every(function (el, i) {
+     return el === bufferWithoutSignature[i]
+  })) {
+    throw new Error('Invalid transaction message')
   }
-})
+
+  if (!Transaction.verifySignature(signature, author, transaction.debug)) {
+     throw new Error('Invalid transaction signature')
+  }
+
+  const transactionData = Object.assign({ hash: hash }, transaction.debug)
+     if (transactionData.to) {
+       transactionData.to = Exonum.uint8ArrayToHexadecimal(new Uint8Array(transactionData.to.data))
+     }
+   transactions.push(transactionData)
+  }
 ```
 
 ## Conclusion
