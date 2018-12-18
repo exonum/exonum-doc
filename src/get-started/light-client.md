@@ -48,30 +48,31 @@ as to the depth of the nested data.
 
 In view of the above, in the Timestamping Demo we start defining the transaction
 with the `TxTimestamp` entity itself. Said entity is further applied as a custom
-type within `CreateTimestamp` transaction schema. 
-For serialization in exonum-client used [protobufjs][protobufjs-lib] library. 
-In this library you can using `.proto files` or `reflection only method`
+type within `CreateTimestamp` transaction schema.
+For serialization in exonum-client used [protobufjs][protobufjs-lib] library.
+In this library you can using `.proto` files or `reflection only method`
 
-In our timestamping services we have the next structures: 
+In our timestamping services we have the next structures:
 
-Hash: 
+Hash:
+
 - `data` is a object with SHA-256 hash of some data or file to be stamped
 
 Timestamp:
+
 - `content_hash` is a object of `Hash` type
 - `metadata` is an optional description of the data to be stamped that is
   included into the stamp.
   
 TxTimestamp:
-  - `content` is a object of `Timestamp` type
+
+- `content` is a object of `Timestamp` type
 
 #### .proto files
 
-Example of `timestamping.proto` file is below: 
+Example of `timestamping.proto` file is below:
 
-```
-syntax = "proto3";
-
+```proto
 package timestamping;
 
 import "google/protobuf/timestamp.proto";
@@ -88,18 +89,18 @@ message Timestamp {
 message TxTimestamp { Timestamp content = 1; }
 ```
 
-After creating .proto file you need generate `*.js` file with `pbjs` library.
+After creating .proto file you need generate `*.js` file with [pbjs][pbjs-lib] library.
 Sample code is below:
 
-``` package.json 
-
-"proto": "pbjs --keep-case -t static-module timestamping.proto -o ./proto.js",
-
+```json
+{
+  "proto": "pbjs --keep-case -t static-module timestamping.proto -o ./proto.js"
+}
 ```
 
 #### Reflection only method
 
-Sample code is below: 
+Sample code is below:
 
 ```javascript
 let Root  = protobuf.Root,
@@ -129,9 +130,9 @@ const keyPair = Exonum.keyPair()
     timestamp. On the contrary, in the Service with Data Proofs we generate only
     one key pair that corresponds to a certain wallet and its user and, thus, is
     applied for signing all transactions made on its behalf.
-   
+
 ### Define data types
- 
+
 Define `CreateTimestamp` transaction and field types:
 
 ```javascript
@@ -142,6 +143,7 @@ const CreateTimestamp = Exonum.newTransaction({
    schema: timestamping.TxTransaction
 })
 ```
+
 - `author` author’s public key
 - `service_id` represents the identifier of the service. Check the identifier
   in the source code of the service (the smart-contract designed in Rust or
@@ -158,8 +160,8 @@ Prepare transaction data according to the above-defined schema:
 ```javascript
 const data = {
   content: {
-    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) }, // some hash
-    metadata: metadata // some metadata 
+    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) },
+    metadata: metadata
   }
 }
 ```
@@ -178,8 +180,7 @@ Finally, send the resulting transaction into the blockchain using the built-in
 `send` method which returns a `Promise`:
 
 ```javascript
-const transactionHash = await CreateTimestamp.send(transactionEndpoint,
- data, keyPair.secretKey)
+const transactionHash = await CreateTimestamp.send(transactionEndpoint, data, keyPair.secretKey)
 ```
 
 - `transactionEndpoint` represents API address of transaction handler at a
@@ -188,7 +189,6 @@ const transactionHash = await CreateTimestamp.send(transactionEndpoint,
     ```none
     http://127.0.0.1:8200/api/explorer/v1/transactions
     ```
-
 
 ### Transfer Funds Transaction
 
@@ -200,9 +200,7 @@ signing the transfer transactions between the wallets.
 Next, define `TransferFunds` transaction schema and data types as we did in the
 example above:
 
-```
-syntax = "proto3";
-
+```proto
 package examples;
 
 message TransferFunds {
@@ -212,9 +210,10 @@ message TransferFunds {
 }
 ```
 
-``` package.json 
-"proto": "pbjs --keep-case -t static-module example.proto -o ./proto.js",
-
+```json
+{
+  "proto": "pbjs --keep-case -t static-module example.proto -o ./proto.js"
+}
 ```
 
 ```javascript
@@ -336,9 +335,7 @@ wallet inside the system.
 First, we define the structure that we search for in the proof. In this case it
 is a wallet.
 
-```
-syntax = "proto3";
-
+```proto
 package examples;
 
 message Hash { bytes data = 1; }
@@ -448,7 +445,8 @@ for (let transaction of data.wallet_history.transactions) {
   const buffer = Exonum.hexadecimalToUint8Array(transaction.message)
   const bufferWithoutSignature = buffer.subarray(0, buffer.length - 64)
   const author = Exonum.uint8ArrayToHexadecimal(buffer.subarray(0, 32))
-  const signature = Exonum.uint8ArrayToHexadecimal(buffer.subarray(buffer.length - 64, buffer.length));
+  const signature = Exonum.uint8ArrayToHexadecimal(
+    buffer.subarray(buffer.length - 64, buffer.length));
 
   const Transaction = getTransaction(transaction.debug, author)
 
@@ -469,7 +467,9 @@ for (let transaction of data.wallet_history.transactions) {
 
   const transactionData = Object.assign({ hash: hash }, transaction.debug)
      if (transactionData.to) {
-       transactionData.to = Exonum.uint8ArrayToHexadecimal(new Uint8Array(transactionData.to.data))
+       transactionData.to = Exonum.uint8ArrayToHexadecimal(
+         new Uint8Array(transactionData.to.data)
+       )
      }
    transactions.push(transactionData)
   }
@@ -487,3 +487,4 @@ support! At this the point you can build and run your application.
 [javascript-client]: https://github.com/exonum/exonum-client#getting-started
 [javascript-client-nested-types]: https://github.com/exonum/exonum-client#nested-data-types
 [protobufjs-lib]: https://github.com/dcodeIO/protobuf.js
+[pbjs-lib]: https://www.npmjs.com/package/pbjs
