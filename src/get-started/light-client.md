@@ -111,7 +111,7 @@ let Hash = new Type("Hash").add(new Field("data", 1, "bytes"));
 let root = new Root().define("timestamping").add(Hash);
 
 let Timestamp = new Type("Timestamp").add(new Field("content_hash", 1, "timestamping.Hash"));
-let Timestamp.add(new Field("metadata", 2, "string"));
+Timestamp.add(new Field("metadata", 2, "string"));
 root.add(Timestamp);
 
 let TxTimestamp = new Type("TxTimestamp").add(new Field("content", 1, "timestamping.Timestamp"));
