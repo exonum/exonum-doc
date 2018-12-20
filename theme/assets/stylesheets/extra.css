@@ -44,7 +44,6 @@
   position: absolute;
   right: 0;
   top: calc(50% - 3px);
-  transition: all 0.3s linear;
 }
 
 .md-header-nav__version select:focus {

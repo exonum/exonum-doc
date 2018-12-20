@@ -2,14 +2,12 @@ const { Git } = require('git-interface')
 const { exec } = require('shelljs')
 const YAML = require('yamljs')
 const fs = require('fs')
+const rimraf = require('rimraf')
 const path = require('path')
 
-const sitePath = path.join(__dirname, '/site')
 const BUILD_COMMAND = 'mkdocs build'
-const CLEANUP_COMMAND = 'rm -rf ./version'
 
 const mkdocsBuild = (path, configFile) => asyncExec(`${BUILD_COMMAND} -d ${path} -f ${configFile}`)
-const cleanUp = () => asyncExec(CLEANUP_COMMAND)
 
 const asyncExec = command => new Promise((resolve, reject) =>
   exec(command, (code, stdout, stderr) => code === 0 ? resolve(stdout) : reject(stderr)))
@@ -17,7 +15,7 @@ const asyncExec = command => new Promise((resolve, reject) =>
 const to = promise => promise.then(data => [data, null]).catch(err => [null, { err }])
 
 const generateVersionedDocs = async (versions) => {
-  await cleanUp()
+  await rimraf.sync('./version')
 
   const git = new Git({})
   const returnToBranch = await git.getBranchName()
