@@ -108,18 +108,30 @@ Let `T(height, index)` be a value at tree node for element `index` at height
 `height`. Elements `T(0, index)` contain serialized values of the underlying list
 according to [the Exonum binary serialization spec](../architecture/serialization.md).
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
-rules.
+rules. Each node, including root, hashes with corresponding prefix:
+```none
+0x0 - leaf node
+0x1 - branch node
+0x2 - root node
+```
 
 #### Rule 1. Empty tree
 
-Hash of an empty tree is defined as 32 zero bytes.
+Hash of an empty tree is defined as list hash of empty list.
+
+```none
+hash( 0x2 || 0 || Hash::default() )
+```
+
+where 0x2 is root node prefix for `ProofListIndex`, 0 - length of empty list, 
+Hash::default() is 32 zero bytes.
 
 #### Rule 2. `height=1`
 
 Hash of a value, contained in `(height = 0, index)`, is defined as:
 
 ```none
-T(1, index) = hash(T(0, index)).
+T(1, index) = hash(0x0 || T(0, index)).
 ```
 
 #### Rule 3. `height > 1`, two children
@@ -128,7 +140,7 @@ If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist then:
 
 ```none
-T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).
+T(height, index) = hash(0x1 || T(height-1, index*2) || T(height-1, index*2+1)).
 ```
 
 #### Rule 4. `height > 1` and the only child
@@ -137,7 +149,7 @@ If `height > 1`, node `T(height - 1, index * 2)` exists and
 node `(height - 1, index * 2 + 1)` is absent in the tree, then:
 
 ```none
-T(height > 1, index) = hash(T(height - 1, index * 2)).
+T(height > 1, index) = hash(0x1 || T(height - 1, index * 2)).
 ```
 
 ## Merkle Tree Proofs
@@ -192,8 +204,13 @@ While validating the proof a client is required to verify the following conditio
   tree.
 3. Collected indices of `ValueJson`(s) in proof correspond to the requested
   range of indices `[start_index, end_index)`.
-4. The root hash of the proof evaluates to the root hash of the `ProofListIndex`
-  in question.
+4. List hash of the `ProofListIndex` evaluates to 
+	```none
+	hash( 0x2 || length || root_hash)
+	```
+	Where root hash is the root hash of the proof. Root hash needs to be 
+	calculated using prefixes described above.
+ 
 
 If either of these verifications fails, the proof is deemed invalid.
 
