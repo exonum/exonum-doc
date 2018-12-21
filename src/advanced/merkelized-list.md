@@ -108,49 +108,57 @@ Let `T(height, index)` be a value at tree node for element `index` at height
 `height`. Elements `T(0, index)` contain serialized values of the underlying list
 according to [the Exonum binary serialization spec](../architecture/serialization.md).
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
-rules. Each node, including root, hashes with corresponding prefix:
+rules. Each node are hashed with the corresponding prefix:
 
 ```none
-0x0 - leaf node
-0x1 - branch node
-0x2 - root node
+0x00 - leaf node
+0x01 - branch node
 ```
 
-#### Rule 1. Empty tree
-
-Hash of an empty tree is defined as list hash of empty list.
+The root node is hashed with `0x02` prefix and with number elements of the list.
 
 ```none
-hash( 0x2 || 0 || Hash::default() )
+hash( 0x02 || length || root_hash )
 ```
 
-where 0x2 is root node prefix for `ProofListIndex`, 0 - length of empty list,
-Hash::default() is 32 zero bytes.
+Where `root_hash` is the merkle root of the `ProofListIndex`, `length` is
+8-bytes length of the `ProofListIndex` encoded in little endian.
+
+#### Rule 1. Empty Tree
+
+Hash of an empty tree is defined as follows:
+
+```none
+hash( 0x02 || 0 || Hash::default() )
+```
+
+where `0x02` is root node prefix for `ProofListIndex`, `0` - length of empty list,
+`Hash::default()` is 32 zero bytes.
 
 #### Rule 2. `height=1`
 
 Hash of a value, contained in `(height = 0, index)`, is defined as:
 
 ```none
-T(1, index) = hash(0x0 || T(0, index)).
+T(1, index) = hash(0x00 || T(0, index)).
 ```
 
-#### Rule 3. `height > 1`, two children
+#### Rule 3. `height > 1`, Two Children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist then:
 
 ```none
-T(height, index) = hash(0x1 || T(height-1, index*2) || T(height-1, index*2+1)).
+T(height, index) = hash(0x01 || T(height-1, index*2) || T(height-1, index*2+1)).
 ```
 
-#### Rule 4. `height > 1` and the only child
+#### Rule 4. `height > 1` and the Only Child
 
 If `height > 1`, node `T(height - 1, index * 2)` exists and
 node `(height - 1, index * 2 + 1)` is absent in the tree, then:
 
 ```none
-T(height > 1, index) = hash(0x1 || T(height - 1, index * 2)).
+T(height, index) = hash(0x01 || T(height - 1, index * 2)).
 ```
 
 ## Merkle Tree Proofs
@@ -208,11 +216,12 @@ While validating the proof a client is required to verify the following conditio
 4. List hash of the `ProofListIndex` evaluates to:
 
 ```none
-hash( 0x2 || length || root_hash)
+hash( 0x02 || length || root_hash)
 ```
 
-Where root hash is the root hash of the proof. Root hash needs to be
-calculated using prefixes described above.
+Where `root_hash` is the root hash of the proof. Root hash needs to be
+calculated using prefixes described above. `length` encoding is decribed
+above.
 
 If either of these verifications fails, the proof is deemed invalid.
 
