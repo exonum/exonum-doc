@@ -222,6 +222,29 @@ reference. Light clients also provide access to information on the
 [transaction][exonum-transaction] execution result
 (which may be either success or failure) to their users.
 
+### Core Schema API
+
+Users can access blockchain state using methods of [`Blockchain`][blockchain] class. The following functionality is available:
+
+- `getHeight: long`
+  The height of the latest committed block in the blockchain.
+- `getAllBlockHashes: ListIndex<HashCode>`
+  The list of all block hashes, indexed by the block height.
+- `getBlockTransactions: ProofListIndexProxy<HashCode>`
+  The proof list of transaction hashes committed in the block with given height or ID.
+- `getTxMessages: MapIndex<HashCode, TransactionMessage>`
+  The map of transaction messages identified by their SHA-256 hashes. Both committed and in-pool (not yet processed) transactions are returned.
+- `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
+  The map with a key-value pair of a transaction hash and execution result. It's also possible to get a `TransactionResult` of a single transaction by its hash.
+- `getTxLocations: MapIndex<HashCode, TransactionLocation>`
+  Returns a map that keeps the transaction position inside the blockchain for every transaction hash. It's also possible to get a `TransactionLocation` of a single transaction by its hash.
+- `getBlocks: MapIndex<HashCode, Block>`
+  The map that stores a block object for every block hash.  It's also possible to get a single block object by its hash.
+- `getLastBlock: Block`
+  The latest commited block.
+- `getActualConfiguration: StoredConfiguration`
+  The configuration for the latest height of the blockchain, including services and their parameters.
+
 ### External Service API
 
 The external service API is used for the interaction between the service and the
@@ -446,6 +469,7 @@ For using the library just include the dependency in your `pom.xml`:
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
+[blockchain]: https://github.com/exonum/exonum-java-binding/0.4/master/exonum-java-binding-core/src/main/java/com/exonum/binding/blockchain/Blockchain.java
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
