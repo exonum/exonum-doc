@@ -220,7 +220,7 @@ hash( 0x02 || length || root_hash)
 ```
 
 Where `root_hash` is the root hash of the proof. Root hash needs to be
-calculated using prefixes described above. `length` encoding is decribed
+calculated using prefixes described above. `length` encoding is described
 above.
 
 If either of these verifications fails, the proof is deemed invalid.
