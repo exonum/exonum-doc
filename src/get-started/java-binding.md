@@ -248,7 +248,7 @@ Users can access blockchain state using methods of [`Blockchain`][blockchain] cl
 
 - `getHeight: long`
   The height of the latest committed block in the blockchain.
-- `getAllBlockHashes: ListIndex<HashCode>`
+- `getBlockHashes: ListIndex<HashCode>`
   The list of all block hashes, indexed by the block height.
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
   The proof list of transaction hashes committed in the block with given height or ID.
