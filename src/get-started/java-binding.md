@@ -261,7 +261,7 @@ Users can access blockchain state using methods of [`Blockchain`][blockchain] cl
 - `getBlocks: MapIndex<HashCode, Block>`
   The map that stores a block object for every block hash.  It's also possible to get a single block object by its hash.
 - `getLastBlock: Block`
-  The latest commited block.
+  The latest committed block.
 - `getActualConfiguration: StoredConfiguration`
   The configuration for the latest height of the blockchain, including services and their parameters.
 
