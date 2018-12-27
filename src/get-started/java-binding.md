@@ -258,7 +258,7 @@ class. The following functionality is available:
   The map of transaction messages identified by their SHA-256 hashes. Both
   committed and in-pool (not yet processed) transactions are returned.
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
-  The map with of transaction execution results identified by corresponding
+  The map of transaction execution results identified by corresponding
   transaction SHA-256 hashes.
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
   The map of transaction positions inside the blockchain identified by
