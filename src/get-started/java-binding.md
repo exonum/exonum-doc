@@ -258,16 +258,13 @@ class. The following functionality is available:
   The map of transaction messages identified by their SHA-256 hashes. Both
   committed and in-pool (not yet processed) transactions are returned.
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
-  The map with a key-value pair of a transaction hash and execution result.
-  It's also possible to get a `TransactionResult` of a single transaction by its
-  hash.
+  The map with of transaction execution results identified by corresponding
+  transaction SHA-256 hashes.
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
-  Returns a map that keeps the transaction position inside the blockchain for
-  every transaction hash. It's also possible to get a `TransactionLocation` of
-  a single transaction by its hash.
+  The map of transaction positions inside the blockchain identified by
+  corresponding transaction SHA-256 hashes.
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map that stores a block object for every block hash.  It's also possible
-  to get a single block object by its hash.
+  The map of block objects identified by corresponding block hashes.
 - `getLastBlock: Block`
   The latest committed block.
 - `getActualConfiguration: StoredConfiguration`
@@ -498,7 +495,8 @@ For using the library just include the dependency in your `pom.xml`:
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
-[blockchain]: https://github.com/exonum/exonum-java-binding/0.4/master/exonum-java-binding-core/src/main/java/com/exonum/binding/blockchain/Blockchain.java
+<!-- TODO: change `blob` with `0.4` after the release OR insert a Javadoc link instead -->
+[blockchain]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/src/main/java/com/exonum/binding/blockchain/Blockchain.java
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
