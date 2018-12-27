@@ -15,6 +15,7 @@
   "scripts": {
     "cspell": "cspell --config=misc/cspell.json src/**/*.md",
     "md": "markdownlint --config=misc/markdownlint.json src/**/*.md",
+    "versioned": "node versioned.js",
     "test": "./misc/lint.sh all"
   },
   "repository": {

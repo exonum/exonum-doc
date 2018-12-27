@@ -12,16 +12,21 @@ const mkdocsBuild = (path, configFile) => asyncExec(`${BUILD_COMMAND} -d ${path}
 const asyncExec = command => new Promise((resolve, reject) =>
   exec(command, (code, stdout, stderr) => code === 0 ? resolve(stdout) : reject(stderr)))
 
+const cleanUp = () => new Promise((resolve, reject) =>
+  rimraf('./version', (err) => err ? reject(err) : resolve()))
+
 const to = promise => promise.then(data => [data, null]).catch(err => [null, { err }])
 
 const generateVersionedDocs = async (versions) => {
-  await rimraf.sync('./version')
+  await cleanUp()
 
   const git = new Git({})
   const returnToBranch = await git.getBranchName()
 
   fs.mkdirSync('./version')
   let failed = 0
+  const extraVersions = [...versions]
+  extraVersions[0] = 'latest'
   for (let version of versions) {
     const [, error] = await to(git.checkout(version))
     if (error) {
@@ -29,9 +34,10 @@ const generateVersionedDocs = async (versions) => {
       failed++
       continue
     }
+    version = versions.indexOf(version) === 0 ? 'latest' : version
     const versionedMkdocs = YAML.load('mkdocs.yml')
     const configFile = `./version/${version}.yml`
-    versionedMkdocs.extra.versions = versions
+    versionedMkdocs.extra.versions = extraVersions
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
     await mkdocsBuild(`./version/${version}`, configFile)
     await git.checkout(returnToBranch)
