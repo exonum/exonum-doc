@@ -244,26 +244,35 @@ processing on the node.
 
 ### Core Schema API
 
-Users can access blockchain state using methods of [`Blockchain`][blockchain] class. The following functionality is available:
+Users can access blockchain state using methods of [`Blockchain`][blockchain]
+class. The following functionality is available:
 
 - `getHeight: long`
   The height of the latest committed block in the blockchain.
 - `getBlockHashes: ListIndex<HashCode>`
   The list of all block hashes, indexed by the block height.
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
-  The proof list of transaction hashes committed in the block with given height or ID.
+  The proof list of transaction hashes committed in the block with given height
+  or ID.
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
-  The map of transaction messages identified by their SHA-256 hashes. Both committed and in-pool (not yet processed) transactions are returned.
+  The map of transaction messages identified by their SHA-256 hashes. Both
+  committed and in-pool (not yet processed) transactions are returned.
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
-  The map with a key-value pair of a transaction hash and execution result. It's also possible to get a `TransactionResult` of a single transaction by its hash.
+  The map with a key-value pair of a transaction hash and execution result.
+  It's also possible to get a `TransactionResult` of a single transaction by its
+  hash.
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
-  Returns a map that keeps the transaction position inside the blockchain for every transaction hash. It's also possible to get a `TransactionLocation` of a single transaction by its hash.
+  Returns a map that keeps the transaction position inside the blockchain for
+  every transaction hash. It's also possible to get a `TransactionLocation` of
+  a single transaction by its hash.
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map that stores a block object for every block hash.  It's also possible to get a single block object by its hash.
+  The map that stores a block object for every block hash.  It's also possible
+  to get a single block object by its hash.
 - `getLastBlock: Block`
   The latest committed block.
 - `getActualConfiguration: StoredConfiguration`
-  The configuration for the latest height of the blockchain, including services and their parameters.
+  The configuration for the latest height of the blockchain, including services
+  and their parameters.
 
 ### External Service API
 
