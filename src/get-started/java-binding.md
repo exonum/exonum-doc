@@ -252,17 +252,17 @@ class. The following functionality is available:
 - `getBlockHashes: ListIndex<HashCode>`
   The list of all block hashes, indexed by the block height.
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
-  The proof list of transaction hashes committed in the block with given height
-  or ID.
+  The proof list of transaction hashes committed in the block with the given
+  height or ID.
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
   committed and in-pool (not yet processed) transactions are returned.
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
-  The map of transaction execution results identified by corresponding
+  The map of transaction execution results identified by the corresponding
   transaction SHA-256 hashes.
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
   The map of transaction positions inside the blockchain identified by
-  corresponding transaction SHA-256 hashes.
+  the corresponding transaction SHA-256 hashes.
 - `getBlocks: MapIndex<HashCode, Block>`
   The map of block objects identified by corresponding block hashes.
 - `getLastBlock: Block`
