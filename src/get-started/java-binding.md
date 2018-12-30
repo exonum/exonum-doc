@@ -244,8 +244,10 @@ processing on the node.
 
 ### Core Schema API
 
-Users can access blockchain state using methods of [`Blockchain`][blockchain]
-class. The following functionality is available:
+Users can access information stored in the blockchain by the framework using
+methods of [`Blockchain`][blockchain] class. This API can be used both in
+transaction code and in read requests. The following functionality is
+available:
 
 - `getHeight: long`
   The height of the latest committed block in the blockchain.
