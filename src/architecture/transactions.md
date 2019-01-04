@@ -49,48 +49,52 @@ various constraints based on this key.
     a specific key, and authorization means that this key is associated with
     a sufficient amount of coins to make the transaction.
 
-## Transaction Templates
+## Messages
 
-All transactions in Exonum are *templated*. Every Exonum transaction
-is defined by its template and a set of parameters, rather than by an overt
-sequence of operations on the key-value storage. The sequence of operations
-can be unambiguously restored given a template identifier and template parameters.
-This design leads to a more safe and controlled environment for transactional
-processing.
+Messages are digitally signed pieces of data transmitted through the Exonum framework. The core of the framework validates the signature over the message. All messages have a uniform structure with which they should comply:
 
-Transaction templates are defined in services and could be viewed as an analogue
-to stored procedures in database management systems, or to POST/PUT endpoints
-in web services. Similar to these cases, the goal of templating is to restrict
-eligible transaction patterns (e.g., to preserve certain invariants) and to
-separate implementation details from transaction invocation.
+| Position (bytes) | Stored data             |
+| - - - - - | - - - - - - - - - - - - |
+| `0..32`   | author's public key     |
+| `32`      | message class           |
+| `33`      | message type            |
+| `34..N`   | payload                |
+| `N..N+64` | signature               |
 
-!!! summary "Trivia"
-    From the computer science perspective, an arbitrary Exonum transaction
-    can be defined as `Tx: S -> S`, where `S` denotes the key-value storage type.
-    Templating corresponds to defining parameterized families of transactions
-    `TxTemplate(i: I): P(i) -> S -> S`,
-    where `I` is the set of defined transaction families and `P(i)`
-    is the parameter space for the `i`th family. Correspondingly, any transaction
-    in Exonum is [a partially applied function][wiki:currying]
-    with the transaction family and parameters fixed.
+Exonum utilizes the following message classes and types:
+
+- Service class messages have the following types:
+  - Transaction
+  - Status
+  - Connect
+- Consensus class messages have the following types:
+  - Precommit
+  - Propose
+  - Prevote
+- Request response class messages have the following types:
+  - TransactionsBatch
+  - BlockResponse
+- Additional information request class messages have the following types:
+  - TransactionsRequest
+  - PrevotesRequest
+  - PeersRequest
+  - BlockRequest
+
+The payload varies for different messages, depending on their class and type.
+
+Transactions are an entity within the messages. The message payload constituing a transaction has the following fields:
+
+- ID of the service for which the transaction is intended
+- ID of the transaction
+- Service transaction payload
+
+When defining a new transaction using the `Transaction` macro, users need to define only the fields which are to constitute the message payload. All the other fields (e.g. signature, public key, etc.) are automatically added and handled by the Exonum Core.
+
 
 ## Serialization
 
-Transactions in Exonum are subtypes of messages and share the serialization logic
-with [consensus messages](consensus.md#messages) (see the [Serialization](serialization.md)
+All transactions in Exonum are serialized using protobuf. See the [Serialization](serialization.md)
 article for more details).
-All transaction messages are serialized in a uniform
-fashion. There are 2 serialization formats:
-
-- **Binary serialization** is used in communication among nodes and
-  to persist transactions in the [storage](./storage.md)
-- **JSON** is used to receive and send transactions when communicating
-  with [light clients](./clients.md)
-
-!!! note
-    Although light clients communicate with full nodes using the JSON format,
-    they implement serialization internally in order to sign transactions
-    and calculate their hashes.
 
 !!! note
     Each unique transaction message serialization is hashed with
@@ -101,7 +105,7 @@ fashion. There are 2 serialization formats:
     (e.g., when determining whether a specific transaction has been committed
     previously).
 
-### Transaction Body
+### Transaction Structure
 
 Transaction body includes data specific for a given
 transaction type. Format of the body is specified by the
@@ -134,32 +138,12 @@ according to the transaction specification in the service.
 
 ## Interface
 
-Transaction interface defines 2 methods: [`verify`](#verify) and
-[`execute`](#execute).
+Transaction interface defines a single method - [`execute`](#execute).
 
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
     See [Exonum core code][core-tx] for more details.
 
-### Verify
-
-```rust
-fn verify(&self) -> bool;
-```
-
-The `verify` method verifies the transaction, which includes the message
-signature verification and other specific internal constraints.
-`verify` is intended to check the internal consistency of a transaction;
-it has no access to the blockchain state.
-
-If a transaction fails `verify`, it is considered incorrect and cannot
-be included into any correct block proposal. Incorrect transactions are never
-included into the blockchain.
-
-!!! note "Example"
-    In [the cryptocurrency service][cryptocurrency],
-    `TxTransfer.verify` checks the digital signature and ensures that
-    the sender of coins is not the same as the receiver.
 
 ### Execute
 
@@ -230,8 +214,8 @@ via [an appropriate transaction endpoint](services.md#transactions).
     in a response to a client’s request. To determine transaction status,
     you may poll the transaction status using [read requests](services.md#read-requests)
     defined in the corresponding service or the blockchain explorer.
-    If a transaction is valid (i.e., its `verify` returns `true`), it’s expected
-    to be committed in a matter of seconds.
+    If a transaction is valid, it’s expected to be committed in a matter of
+    seconds.
 
 ### 3. Verification
 
@@ -288,20 +272,6 @@ in the same order the transactions appear in the block.
 Hence, the order of application is the same for every node in the network.
 
 ## Transaction Properties
-
-### Purity
-
-`verify` in transactions is [pure](https://en.wikipedia.org/wiki/Pure_function),
-which means that the verification result doesn’t depend on the
-blockchain state and the local environment of the verifier. Thus, transaction
-verification could easily be
-parallelized over transactions. Moreover, it’s sufficient to verify any transaction
-only once – when it’s submitted to the pool of unconfirmed transactions.
-
-!!! note
-    As a downside, `verify` cannot perform any checks that depend on the blockchain
-    state. For example, in the cryptocurrency service, `TxTransfer.verify`
-    cannot check whether the sender has sufficient amount of coins to transfer.
 
 ### Sequential Consistency
 
