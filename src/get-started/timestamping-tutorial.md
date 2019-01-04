@@ -42,18 +42,15 @@ publish = false
 authors = ["Your name <your@email.com>"]
 
 [dependencies]
-exonum = { version = "0.9.0", path = "../../../exonum" }
-exonum-time = { version = "0.9.0", path = "../../../services/time" }
+exonum = "0.9.0"
+exonum-configuration = "0.9.0"
+exonum-time = "0.9.0"
 serde = "1.0.10"
 serde_derive = "1.0.10"
 serde_json = "1.0.2"
 failure = "0.1.2"
 log = "=0.4.3"
 chrono = { version = "=0.4.5", features = ["serde"] }
-
-[dependencies.exonum-configuration]
-version = "0.9.0"
-path = "../../../services/configuration"
 ```
 
 Also, you can add the following dependencies to `Cargo.toml`
@@ -61,7 +58,7 @@ for future testing purposes:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = { version = "0.9.0", path = "../../../testkit" }
+exonum-testkit = "0.9.0"
 pretty_assertions = "=0.5.1"
 ```
 
@@ -614,10 +611,10 @@ pub struct Service;
 To turn `Service` into a blockchain service, we need to implement the Exonum
 `Service` trait for it.
 
-!!!tip
-   Read more on how to turn a type into a blockchain service in the
-   [Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
-   section.
+!!! tip
+    Read more on how to turn a type into a blockchain service in the
+    [Interface with Exonum Framework](../architecture/services.md#interface-with-exonum-framework)
+    section.
 
 ```rust
 impl blockchain::Service for Service {
@@ -729,13 +726,13 @@ performed in the directory containing `Cargo.toml`.
 
 1. Install the actual node binary:
 
-   ```none
+   ```shell
    cargo install
    ```
 
 2. Generate blockchain configuration for the network we are setting up:
 
-   ```none
+   ```shell
    mkdir example
    exonum-demo-timestamping generate-template example/common.toml --validators-count 4
    ```
@@ -743,7 +740,7 @@ performed in the directory containing `Cargo.toml`.
 3. Generate templates of node configurations indicating the addresses which the
    nodes will use for communication.
 
-   ```none
+   ```shell
    exonum-demo-timestamping generate-config example/common.toml \
        example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331
    exonum-demo-timestamping generate-config example/common.toml \
@@ -761,7 +758,7 @@ performed in the directory containing `Cargo.toml`.
    nodes. If you do not include the public configuration file of a certain
    node, such a node will be regarded as an auditor by the validator nodes.
 
-   ```none
+   ```shell
    exonum-demo-timestamping finalize example/node_1_cfg.toml \
        --public-api-address 0.0.0.0:8200 \
        --private-api-address 0.0.0.0:8091 example/sec_1.toml \
@@ -799,7 +796,7 @@ performed in the directory containing `Cargo.toml`.
 5. Run the nodes, each in a separated terminal, indicating the file to which
    the database will be written. To enable logs, use the `RUST_LOG` variable.
 
-   ```none
+   ```shell
    exonum-demo-timestamping run --node-config example/node_1_cfg.toml \
        --db-path example/db1 --public-api-address 0.0.0.0:8200
    exonum-demo-timestamping run --node-config example/node_2_cfg.toml \
@@ -825,19 +822,19 @@ Timestamping Service with response examples.
 To add a new timestamp create a `create-timestamp-1.json` file and insert the
 following code into it:
 
-```none
+```json
 {
-  “size”: 80,
-  “network_id”: 0,
-  “protocol_version”: 0,
-  “service_id”: 130,
-  “message_id”: 0,
-  “signature”:“f84e2242d10d92e18a7b256a56dff8fb989269f177f61873f49481dcfcb6c1c783ec59cf63d9716ffa8fde1ca8a43fa2632e119105f5393295c1cea22a3c2a0a”,
-  “body”: {
-    “pub_key”: “5ce4675f37b6378e869ccc1f9134b3555220d384cf87e73d03d400032015f84d”,
-    “content”: {
-      “content_hash”: “6e98e39cb76fac1ebdbad8208773589eb6d88b99c025352447c219bc6a4c9f80",
-      “metadata”: “test”
+  "size": 80,
+  "network_id": 0,
+  "protocol_version": 0,
+  "service_id": 130,
+  "message_id": 0,
+  "signature":"f84e2242d10d92e18a7b256a56dff8fb989269f177f61873f49481dcfcb6c1c783ec59cf63d9716ffa8fde1ca8a43fa2632e119105f5393295c1cea22a3c2a0a",
+  "body": {
+    "pub_key": "5ce4675f37b6378e869ccc1f9134b3555220d384cf87e73d03d400032015f84d",
+    "content": {
+      "content_hash": "6e98e39cb76fac1ebdbad8208773589eb6d88b99c025352447c219bc6a4c9f80",
+      "metadata": "test"
     }
   }
 }
@@ -845,8 +842,9 @@ following code into it:
 
 Use the `curl` command to send this transaction to the node by HTTP:
 
-```none
-curl -H “Content-Type: application/json” -X POST -d @create-timestamp-1.json \ http://127.0.0.1:8081/api/services/timestamping/v1/timestamps
+```shell
+curl -H "Content-Type: application/json" -X POST -d @create-timestamp-1.json \
+    http://127.0.0.1:8081/api/services/timestamping/v1/timestamps
 ```
 
 ??? note "Response example"
@@ -855,156 +853,156 @@ curl -H “Content-Type: application/json” -X POST -d @create-timestamp-1.json
     ee1b51883e00c4e62d3204427acc3bf9500bad79e4dde044dffe51c0986bf6d5
     ```
 
-    The request returns the hash of the timestamp.
+The request returns the hash of the timestamp.
 
 ### Get Information on a Timestamp
 
 To retrieve information about an existing timestamp, use the following request
 indicating the hash of the timestamp in question:
 
-```none
+```shell
 curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/value?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
 ```
 
 ??? note "Response example"
 
-    ```none
+    ```json
     {
-    “time”: {
-        “nanos”: 133304000,
-        “secs”: “1536757761”
-    },
-    “timestamp”: {
-        “content_hash”: “bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-        “metadata”: “test”
-    },
-    “tx_hash”: “a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
+      "time": {
+          "nanos": 133304000,
+          "secs": "1536757761"
+      },
+      "timestamp": {
+        "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
+        "metadata": "test"
+      },
+      "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
     }
     ```
 
-    The request returns the following information:
+The request returns the following information:
 
-    - the time when the timestamp was created
-    - the hash of the timestamp
-    - the description of the timestamp
-    - the hash of the timestamping transaction
+- the time when the timestamp was created
+- the hash of the timestamp
+- the description of the timestamp
+- the hash of the timestamping transaction
 
 ### Get Proof for a Timestamp
 
 To retrieve a proof for an existing timestamp, use the following request
 indicating the hash of the timestamp in question:
 
-```none
+```shell
 curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
 ```
 
 ??? note "Response example"
 
-    ```none
+    ```json
     {
-    “block_info”: {
-        “block”: {
-            “height”: “857",
-            “prev_hash”: “f2f4b6778abbbf285efe3cf638a1b36f2eb7e2866a8221933279a68bd24a2da8",
-            “proposer_id”: 0,
-            “state_hash”: “654fd7bf570242832f2a51d6f3f019deeb2234bbe9cc07feb048880c75963d12”,
-            “tx_count”: 3,
-            “tx_hash”: “24038928624fc9e10774bf37de85ffb3a2b0f5d14ccd815d06603475b3b93513"
+      "block_info": {
+        "block": {
+          "height": "857",
+          "prev_hash": "f2f4b6778abbbf285efe3cf638a1b36f2eb7e2866a8221933279a68bd24a2da8",
+          "proposer_id": 0,
+          "state_hash": "654fd7bf570242832f2a51d6f3f019deeb2234bbe9cc07feb048880c75963d12",
+          "tx_count": 3,
+          "tx_hash": "24038928624fc9e10774bf37de85ffb3a2b0f5d14ccd815d06603475b3b93513"
         },
-        “precommits”: [{
-            “body”: {
-                “block_hash”: “68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-                “height”: “857",
-                “propose_hash”: “19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-                “round”: 1,
-                “time”: {
-                    “nanos”: 23630000,
-                    “secs”: “1536757888”
-                },
-                “validator”: 1
+        "precommits": [{
+          "body": {
+            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
+            "height": "857",
+            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
+            "round": 1,
+            "time": {
+                "nanos": 23630000,
+                "secs": "1536757888"
             },
-            “message_id”: 4,
-            “protocol_version”: 0,
-            “service_id”: 0,
-            “signature”: “8a741a19ac88b2c8763654ab367c33cdfce6488b17f520a380d75acdef13611049db3e06cae61661d1d67f17e34728caf38e1ad98ef17ee654e84418ea38c30b”
+            "validator": 1
+          },
+          "message_id": 4,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "8a741a19ac88b2c8763654ab367c33cdfce6488b17f520a380d75acdef13611049db3e06cae61661d1d67f17e34728caf38e1ad98ef17ee654e84418ea38c30b"
         }, {
-            “body”: {
-                “block_hash”: “68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-                “height”: “857",
-                “propose_hash”: “19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-                “round”: 1,
-                “time”: {
-                    “nanos”: 23274000,
-                    “secs”: “1536757888”
-                },
-                “validator”: 0
+          "body": {
+            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
+            "height": "857",
+            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
+            "round": 1,
+            "time": {
+                "nanos": 23274000,
+                "secs": "1536757888"
             },
-            “message_id”: 4,
-            “protocol_version”: 0,
-            “service_id”: 0,
-            “signature”: “b06526052eecc9da3ebe18a33277c0837485788d31791676b6e869ab527274e1bd6446a4ce6e01d630157fa2dc1976634562b4960a879611d3dd32f18ee6a70b”
+            "validator": 0
+          },
+          "message_id": 4,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "b06526052eecc9da3ebe18a33277c0837485788d31791676b6e869ab527274e1bd6446a4ce6e01d630157fa2dc1976634562b4960a879611d3dd32f18ee6a70b"
         }, {
-            “body”: {
-                “block_hash”: “68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-                “height”: “857",
-                “propose_hash”: “19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-                “round”: 1,
-                “time”: {
-                    “nanos”: 23598000,
-                    “secs”: “1536757888”
-                },
-                “validator”: 2
+          "body": {
+            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
+            "height": "857",
+            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
+            "round": 1,
+            "time": {
+              "nanos": 23598000,
+              "secs": "1536757888"
             },
-            “message_id”: 4,
-            “protocol_version”: 0,
-            “service_id”: 0,
-            “signature”: “ddc9e7459a6c785bb6a0dd5bf7d6ddeadbe876a5f9b9c06be1469bd7b1e4d6138230d38b944637d2290475d5c15d0c86f74e45646f838d84be5ae975ad727d09”
+            "validator": 2
+          },
+          "message_id": 4,
+          "protocol_version": 0,
+          "service_id": 0,
+          "signature": "ddc9e7459a6c785bb6a0dd5bf7d6ddeadbe876a5f9b9c06be1469bd7b1e4d6138230d38b944637d2290475d5c15d0c86f74e45646f838d84be5ae975ad727d09"
         }]
-    },
-    “state_proof”: {
-        “entries”: [{
-            “key”: “775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581”,
-            “value”: “a12823b8e2b76001acb7f4c117546438d7398a71b1d8883875a9f23ed41fd2a5”
+      },
+      "state_proof": {
+        "entries": [{
+          "key": "775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581",
+          "value": "a12823b8e2b76001acb7f4c117546438d7398a71b1d8883875a9f23ed41fd2a5"
         }],
-        “proof”: [{
-            “path”: “0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
-            “hash”: “0000000000000000000000000000000000000000000000000000000000000000"
+        "proof": [{
+          "path": "0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
+          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
         }, {
-            “path”: “1101",
-            “hash”: “dea7c92b6c17088b7dbb3d7995737f1e80e89c5950e4263e811f999d004bdaa0"
+          "path": "1101",
+          "hash": "dea7c92b6c17088b7dbb3d7995737f1e80e89c5950e4263e811f999d004bdaa0"
         }, {
-            “path”: “1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
-            “hash”: “0000000000000000000000000000000000000000000000000000000000000000"
+          "path": "1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
+          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
         }, {
-            “path”: “1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
-            “hash”: “7d5e5b6f055e66b56e3e329c973c12be13b3b4eea9e5400c1e570211d2d5281a”
+          "path": "1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
+          "hash": "7d5e5b6f055e66b56e3e329c973c12be13b3b4eea9e5400c1e570211d2d5281a"
         }]
-    },
-    “timestamp_proof”: {
-        “entries”: [{
-            “key”: “bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-            “value”: {
-                “time”: {
-                    “nanos”: 133304000,
-                    “secs”: “1536757761”
-                },
-                “timestamp”: {
-                    “content_hash”: “bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-                    “metadata”: “test”
-                },
-                “tx_hash”: “a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
-            }
+      },
+      "timestamp_proof": {
+        "entries": [{
+          "key": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
+          "value": {
+            "time": {
+              "nanos": 133304000,
+              "secs": "1536757761"
+            },
+            "timestamp": {
+              "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
+              "metadata": "test"
+            },
+            "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
+          }
         }],
-        “proof”: []
+        "proof": []
+      }
     }
-}
     ```
 
-    The request returns the following components of the timestamp proof:
+The request returns the following components of the timestamp proof:
 
-    - the proof of the last block in the blockchain
-    - the proof of the Timestamping Service table
-    - the proof of the timestamp itself
+- the proof of the last block in the blockchain
+- the proof of the Timestamping Service table
+- the proof of the timestamp itself
 
 Great! You have created a fully functional Timestamping Service.
 
