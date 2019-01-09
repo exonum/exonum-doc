@@ -12,9 +12,9 @@ one written to the Bitcoin blockchain will be found instantly.
 
 !!! note
     This page mostly describes how the service functions. There is a
-    separate page, describing how the service should be [configured and
-    deployed][anchoring-deploy]. The source code is located [on
-    GitHub][github-anchoring].
+    separate page, describing how the service should be
+    [configured and deployed][anchoring-deploy]. The source code is located
+    [on GitHub][github-anchoring].
 
 ## General Idea
 
@@ -52,8 +52,7 @@ Decentralization during the anchoring process is built over the internal
 Bitcoin multisignature address architecture.
 
 When the Exonum network should be anchored, every validator builds an
-anchoring transaction using a [deterministic
-algorithm](#creating-anchoring-transaction).
+anchoring transaction using a [deterministic algorithm](#creating-anchoring-transaction).
 Its results are guaranteed to match for every honest validator. This
 anchoring transaction spends one or more UTXOs from the current anchoring
 multisig address. Every validator can sign this transaction without regard for
@@ -106,8 +105,9 @@ Correct Transaction (LECT). LECTs of all validators are published in the
 Exonum blockchain. While creating a new anchoring transaction, the
 supermajority of validators select a common LECT and spend its change output.
 
-Every validator refreshes its LECT with a [custom
-schedule](#lect-updating-interval). To get a new LECT, the validator uses the
+Every validator refreshes its LECT with a
+[custom schedule](#lect-updating-interval). To get a new LECT, the validator
+uses the
 API of a [Bitcoin node](#bitcoind-node). The new LECT must have the following
 properties:
 
@@ -145,8 +145,7 @@ An anchoring transaction proposal is constructed as follows:
 - Its outputs contain data output and change output only. The
   change output goes first, and the data output goes second.
 - Its data output contains a single `OP_RETURN` instruction with the
-  anchored data. Such data consist of multiple [data
-  chunks](#data-chunks)
+  anchored data. Such data consist of multiple [data chunks](#data-chunks)
 - Its change output reroutes funds to the next anchoring address if the
   anchoring address [should be changed](#changing-validators-list).
   Otherwise, the current address is used.
@@ -186,8 +185,7 @@ reasons for such stops are described further.
 
 The recovery chunk is optional and may appear in the very first Bitcoin
 anchoring transaction only if the previous anchoring chain failed
-(as described in [Recovering the previous
-chain](#recovering-broken-anchoring)).
+(as described in [Recovering the previous chain](#recovering-broken-anchoring)).
 
 ### Creating Anchoring Transaction
 
@@ -217,16 +215,16 @@ will be no anchor for block `#11000`.
 
 ## Setup and Configuration
 
-Anchoring requires additional [global and local configuration
-parameters](../architecture/configuration.md) to be set.
+Anchoring requires additional
+[global and local configuration parameters](../architecture/configuration.md)
+to be set.
 
 ### Local Configuration
 
 #### Bitcoind Node
 
 The service uses a third-party Bitcoin node to communicate with the
-Bitcoin blockchain network. Currently, [Bitcoin
-Core][bitcoind] is supported only.
+Bitcoin blockchain network. Currently, [Bitcoin Core][bitcoind] is supported only.
 
 The following settings need to be specified to access the bitcoind node:
 
@@ -263,9 +261,9 @@ blockchain to update the LECT of the node.
 
 #### Bitcoin Public Keys
 
-As written earlier, every validator should store its own [private
-key](#bitcoin-private-keys). Corresponding public keys are stored in the
-global configuration.
+As written earlier, every validator should store its own
+[private key](#bitcoin-private-keys). Corresponding public keys are stored in
+the global configuration.
 
 #### Transaction Fees
 
@@ -312,22 +310,22 @@ Both procedures require disabling the old anchoring keys and adding the new ones
 Additionally, as the anchoring Bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. The pub-keys list
 is stored in the global configuration; it can be updated by out-of-band
-means, for example, using [Configuration Update
-service](configuration-updater.md). The following properties should be taken
- into account:
+means, for example, using
+[Configuration Update service](configuration-updater.md). The following
+properties should be taken into account:
 
 1. New configuration is spread over nodes. It is still not active.
 2. New configuration has an additional parameter that indicates the height when
-  this configuration should be applied. The height is selected by the
-  administrator. It is recommended to choose the height so that the
-  configuration is applied in ~3-6 hours after it is sent into the Exonum
-  blockchain.
+   this configuration should be applied. The height is selected by the
+   administrator. It is recommended to choose the height so that the
+   configuration is applied in ~3-6 hours after it is sent into the Exonum
+   blockchain.
 3. After the indicated height is reached, the new configuration is applied by
-  every validator simultaneously. The list of validators is finally changed.
+   every validator simultaneously. The list of validators is finally changed.
 
 !!! warning
     It is important that the pause between configuration appearing and
-     applying is big enough. It should be defined in accordance
+    applying is big enough. It should be defined in accordance
     with the necessary number of confirmations for the latest LECT.
 
 ### Transitional Transaction
@@ -366,8 +364,8 @@ After the anchoring chain is broken, administrators must generate a new
 funding transaction to the new anchoring address and add it to the
 global configuration as the funding UTXO. A new anchoring chain will be produced,
 starting with this funding transaction. The very first anchoring transaction
-from this chain will include the optional [anchoring-recovering data
-chunk](#recovery-data-chunk) in the data output.
+from this chain will include the optional
+[anchoring-recovering data chunk](#recovery-data-chunk) in the data output.
 
 ## Available API
 
@@ -491,7 +489,7 @@ Example of JSON response:
 - **hash**: the hash of Exonum transaction, where the specified
   validator published this LECT
 - **content**: the LECT in the same format as in `actual_lect` API
-- **content.payload.blockhash**: the hash of the anchored Exonum block
+- **content.payload.block_hash**: the hash of the anchored Exonum block
 - **content.payload.block_height**: the height of the anchored Exonum
   block
 - **content.payload.prev_tx_chain**: the last tx-id of the previous transactions
@@ -523,7 +521,7 @@ Returns `null` on any of the following conditions:
 The string which has the value of a hex-encoded content of the nearest Bitcoin
 anchoring transaction.
 
-[anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
-[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters
+[anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/v0.9.1/DEPLOY.md
+[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/v0.9.1/DEPLOY.md#change-configuration-parameters
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
