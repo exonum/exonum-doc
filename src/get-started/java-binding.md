@@ -143,7 +143,7 @@ rules – see the corresponding section of our [documentation][transactions].
 
 #### Messages
 
-Transactions are transmitted by the service clients to the framework as 
+Transactions are transmitted by external service clients to the framework as
 an Exonum message. <!-- TODO: Link a section on messages in the main Exonum docs when/if it is updated? -->
 The transaction message contains a header with identifying information,
 such as a message type, an id of the service this transaction belongs to,
@@ -155,9 +155,22 @@ The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
 and the service itself.
 
-Ed25519 is a standard cryptographic system for digital signature 
+If a service itself needs to create a transaction on a particular node,
+it can use [`Node#submitTransaction`][node-submit-transaction] method.
+This method will create and sign a transaction message using
+the [service key][node-configuration-validator-keys]
+of _that particular node_ (meaning that the node will be an author
+of the transaction), and submit it into the network.
+Invoking this method on each node unconditionally will produce
+_N_ transactions that have the same payloads, but distinct
+authors’ public keys and signatures, where _N_ is the number of nodes
+in the network.
+
+Ed25519 is a standard cryptographic system for digital signature
 of Exonum messages. It is available through
 [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
+
+[node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
 
 #### Transaction lifecycle
 The lifecycle of a Java service transaction is the same as in any other
@@ -186,10 +199,11 @@ and [execute](#transaction-execution) it.
 1. When all transaction in a block are executed, all changes are atomically 
 applied to the database state and a new block is commited.
 
-<!-- TODO: Is there a more detailed description? Or have I written the one? -->
-
 The transaction messages are preserved in the database regardless of
 the execution result, and can be later accessed via `Blockchain` class.
+For a more detailed description of transaction processing, 
+see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
+section.
 
 ##### Transaction Execution
 
@@ -200,8 +214,6 @@ a [`TransactionConverter`][transactionconvererter] for this purpose (see also
 `Service#convertToTransaction`).
 When the framework requests a service to convert a transaction,
 its message is guaranteed to have a correct cryptographic signature.
-
-<!-- todo: shall we describe `Node#submitTransaction` method somewhere else? -->
 
 An executable transaction is an instance of a class implementing
 [`Transaction`][transaction] interface and defining transaction
@@ -233,7 +245,7 @@ The implementation of `Transaction#execute` method must be a pure function,
 i.e. for the given transaction to produce the same _observable_ result on
 all nodes of the system. An observable result is the one that affects the
 blockchain state hash:<!-- TODO: link the definition? -->
-a write to a collection affecting the service state hash, an execution 
+a write to a collection affecting the service state hash, or an execution
 exception.
 
 ### Blockchain Events
@@ -481,6 +493,8 @@ For using the library just include the dependency in your `pom.xml`:
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
+<!--TODO: Insert the correct Javadoc to Blockchain (once we publish things): https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/blockchain/Blockchain.html -->
+[blockchain]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
