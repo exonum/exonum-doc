@@ -11,7 +11,7 @@ This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
 
 !!! note
-    As of version 0.3, you need to compile the core locally for every application
+    Currently, you need to compile the core locally for every application
     that depends on it. [Cargo][cargo] (the Rust package manager) takes care
     of most things, but you still need to have dependencies
     installed locally as described below for the core to compile.
@@ -19,10 +19,6 @@ to these projects, testing them, and developing using Exonum.
     In future releases, Exonum will become more modular and will work as
     a standalone application. See [the roadmap](../roadmap.md) for more details.
 
-    > I guess we can update the version to the current one
-    > or just not mention it at all ("Currently, you need to...")
-    > I don't think it's good TV to say that
-    > we have not improved something for seven versions. 
 
 ## Dependencies
 
@@ -159,8 +155,6 @@ is tested on Node 4+.
 !!! note
     The light client library itself can run both on Node and in browsers.
 
-> Not an expert on light client
-> but this section may need an update as well.
 
 ## Developing with Exonum
 
