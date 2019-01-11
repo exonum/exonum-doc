@@ -162,14 +162,7 @@ the items of the collection. Merkelized versions of maps and lists are
 `ProofMapIndex` and `ProofListIndex`, respectively.
 
 Naturally, the items of collections (and keys in the case of maps) need to be
-serializable. Exonum provides a simple and robust
-[binary serialization format](serialization.md),
-and the corresponding set of tools for (de)serialization and conversion of
-Exonum datatypes to JSON for communication with light clients.
-
-> This may be different with Exonum 0.10,
-> but I'm not up-to-date with the latest Light Client development
-> so I'm not sure whether they still use JSON as a primary vessel.
+serializable. Exonum uses `protobuf` for (de)serialization and conversion of Exonum datatypes to JSON for communication with light clients.
 
 ### Configuration
 
