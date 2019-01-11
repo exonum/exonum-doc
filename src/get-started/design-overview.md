@@ -361,9 +361,6 @@ used in blockchains are as follows:
   for performance while at the same time such approach requires particular attention when creating and 
   testing smart-contracts.
 
-  > This reads _very_ strangely.
-  > Almost as if we admit security vulnerabilities in Exonum and are proud of it.
-  > Maybe we should rephrase this item a little to present it in a more positive way.
   > We say (below) that isolation is a high priority on the roadmap,
   > but the roadmap itself does not seem to mention this item explicitly.
 
