@@ -244,8 +244,8 @@ An implementation of the `Transaction#execute` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
 for the given transaction. An observable result is the one that affects the
 blockchain state hash:<!-- TODO: link the definition? -->
-a write to a collection affecting the service state hash, or an execution
-exception.
+a modification of a collection that affects the service state hash, or
+an execution exception.
 
 ### Blockchain Events
 
