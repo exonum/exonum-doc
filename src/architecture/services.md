@@ -173,12 +173,6 @@ to store parameters that will be received by the service constructor during
 *local configuration*,
 which is specific to each node instance.
 
-> We have been reworking configuration, right?
-> Also, didn't we convert it into Protobuf?
-> Or the configuration service accepts Protobuf
-> but the configuration itself is a TOML string
-> embedded into Protobuf?
-
 #### Global Configuration
 
 Global configuration is common for all nodes in the blockchain network.
