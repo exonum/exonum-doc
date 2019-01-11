@@ -213,7 +213,7 @@ naturally, nodes have different private keys and they cannot be put on the
 blockchain for security reasons.
 
 Local configuration can be changed via editing the local configuration file
-of the node instance. As of Exonum 0.1, the only
+of the node instance. The only
 way for a service to read its local configuration is to retain it after it is
 passed
 to the service constructor during [service initialization](#initialization).
@@ -229,7 +229,7 @@ with the blockchain. During deployment, the service creates an initial
 service configuration and initializes its persistent storage.
 
 !!! note
-    As of Exonum 0.1, services may be deployed only during the blockchain
+    Services may be deployed only during the blockchain
     initialization (i.e., before the blockchain network starts creating any
     blocks).
     In the future releases services will be able to be deployed dynamically as
@@ -265,7 +265,7 @@ updating local parameters, and/or generating and broadcasting transactions to
 the blockchain network.
 
 !!! note
-    As of Exonum 0.1, the only built-in event is block commit. More events
+    The only built-in event is block commit. More events
     will be added in the future, including possibility for services to define
     and emit events and for services and light clients to subscribe to events
     emitted by the services.
@@ -277,7 +277,7 @@ the blockchain network.
 ## Service Development
 
 !!! note
-    As of Exonum 0.1, you can only code services in
+    You can only code services in
     [Rust](http://rust-lang.org/).
     Rust is probably the safest general-purpose programming language, but it is
     not very easy to master. Java binding
@@ -320,13 +320,13 @@ Here is a list of things to figure out when developing an Exonum service:
 
 ### Limitations
 
-As of Exonum 0.1, there are some temporary limitations on what you can do
+There are some temporary limitations on what you can do
 with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
 on when and how these limitations are going to be lifted.
 
 #### Interaction Among Services
 
-In Exonum 0.1, there is no unified API for services to
+There is no unified API for services to
 access other services’ endpoints. As an example, a service cannot call a
 transaction
 defined in another service, and cannot read data from another service
@@ -334,7 +334,7 @@ via its read endpoint.
 
 #### Authentication Middleware
 
-Unlike common web frameworks, Exonum 0.1 does not provide authentication
+Unlike common web frameworks, Exonum does not provide authentication
 middleware
 for service endpoints. Implementing authentication and authorization is thus
 the responsibility of a service developer.
