@@ -277,7 +277,7 @@ and external systems.
 A set of operations defined by a service usually includes read requests
 for the blockchain data with the provision of the corresponding cryptographic
 proof. Exonum provides an embedded web framework for implementing
-the RESTful API of the service.
+the REST-interace of the service.
 
 [`Service#createPublicApiHandlers`][createpublicapi] method is used to
 set the handlers for HTTP requests. These handlers are available at the
