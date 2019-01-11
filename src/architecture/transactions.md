@@ -138,8 +138,7 @@ according to the transaction specification in the service.
 
 ## Interface
 
-Transaction interface defines 2 methods: [`verify`](#verify) and
-[`execute`](#execute).
+Transaction interface defines single method: [`execute`](#execute).
 
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
@@ -147,34 +146,6 @@ Transaction interface defines 2 methods: [`verify`](#verify) and
 
 > Again, it will be nicer to link the API documentation from docs.rs
 > rather than raw unadorned source code.
-
-### Verify
-
-> There is no more `verify`,
-> transactions have only `execute` method.
-> We need to remove this section and all its mentions from other places.
-> We may mention that signatures are verified by the Exonum framework
-> so developers don't need to worry about that.
-
-```rust
-fn verify(&self) -> bool;
-```
-
-The `verify` method verifies the transaction, which includes the message
-signature verification and other specific internal constraints.
-`verify` is intended to check the internal consistency of a transaction;
-it has no access to the blockchain state.
-
-If a transaction fails `verify`, it is considered incorrect and cannot
-be included into any correct block proposal. Incorrect transactions are never
-included into the blockchain.
-
-!!! note "Example"
-    In [the cryptocurrency service][cryptocurrency],
-    `TxTransfer.verify` checks the digital signature and ensures that
-    the sender of coins is not the same as the receiver.
-
-> Sending coins to oneself is now verified in `execute`.
 
 ### Execute
 
@@ -188,9 +159,6 @@ operates on a fork of the blockchain state, which is merged to the persistent
 storage [under certain conditions](consensus.md).
 
 !!! note
-    `verify` and `execute` are triggered at different times. `verify` checks
-    internal consistency of a transaction before the transaction is included
-    into a [pool of unconfirmed transactions](consensus.md).
     `execute` is performed during the `Precommit` stage of consensus and when
     the block with the given transaction is committed into the blockchain.
 
@@ -204,6 +172,8 @@ storage [under certain conditions](consensus.md).
     if the transaction execution is unsuccessful (e.g., the sender has insufficient
     number of coins). Logging helps to ensure that
     the account state is verifiable by light clients.
+    
+!!! note "Example" In the cryptocurrency service, TxTransfer.execute checks the digital signature and ensures that the sender of coins is not the same as the receiver.
 
 The `execute` method can signal that a transaction should be aborted
 by returning an error. The error contains a transaction-specific error code
@@ -250,7 +220,7 @@ via [an appropriate transaction endpoint](services.md#transactions).
     in a response to a client’s request. To determine transaction status,
     you may poll the transaction status using [read requests](services.md#read-requests)
     defined in the corresponding service or the blockchain explorer.
-    If a transaction is valid (i.e., its `verify` returns `true`), it’s expected
+    If a transaction is valid, it’s expected
     to be committed in a matter of seconds.
 
 > Promise about event-based subscription that could replace polling?
@@ -264,8 +234,6 @@ discarded, and the following steps are skipped.
 
 The transaction implementation is then looked up
 using the `(service_id, message_id)` type identifier.
-The `verify` method of the implementation is invoked to check the internal
-consistency of the transaction.
 If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
@@ -317,22 +285,6 @@ Hence, the order of application is the same for every node in the network.
 
 ## Transaction Properties
 
-### Purity
-
-> This section can be removed.
-
-`verify` in transactions is [pure](https://en.wikipedia.org/wiki/Pure_function),
-which means that the verification result doesn’t depend on the
-blockchain state and the local environment of the verifier. Thus, transaction
-verification could easily be
-parallelized over transactions. Moreover, it’s sufficient to verify any transaction
-only once – when it’s submitted to the pool of unconfirmed transactions.
-
-!!! note
-    As a downside, `verify` cannot perform any checks that depend on the blockchain
-    state. For example, in the cryptocurrency service, `TxTransfer.verify`
-    cannot check whether the sender has sufficient amount of coins to transfer.
-
 ### Sequential Consistency
 
 [Sequential consistency](https://en.wikipedia.org/wiki/Sequential_consistency)
@@ -360,6 +312,8 @@ network with his own or others’ transactions.
 Non-replayability in Exonum is guaranteed by discarding transactions already
 included into the blockchain (which is determined by the transaction hash),
 on the verify step.
+
+>remove verify
 
 !!! tip
     If a transaction is not [idempotent][wiki:idempotent], it needs to have
