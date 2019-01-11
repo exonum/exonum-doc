@@ -458,14 +458,12 @@ It must be redefined for services that have global configuration parameters.
 
 ### Commit Handler
 
-> There's also `before_commit` handler now.
-
 ```rust
 fn after_commit(&self, context: &ServiceContext) { }
 ```
 
 `after_commit` is invoked for every deployed service each time a block
-is committed in the blockchain locally. This method is so far the only example
+is committed in the blockchain locally. This method is example
 of [event-based processing](#event-handling). The method receives the service
 context, which can be used to inspect the blockchain state, create transactions
 and push them in the queue for broadcasting, etc.
@@ -473,6 +471,15 @@ and push them in the queue for broadcasting, etc.
 !!! note
     Keep in mind that `after_commit` is sequentially invoked for each block
     in the blockchain during an initial full node synchronization.
+
+```rust
+fn before_commit(&self, fork: &mut Fork) { }
+```
+The order of invoking `before_commit` method for every service depends on the
+service ID. `before_commit` for the service with the smallest ID is invoked
+first up to the largest one.
+Effectively, this means that services should not rely on a particular ordering of
+`Service::execute` invocations.
 
 ### REST API Initialization
 
