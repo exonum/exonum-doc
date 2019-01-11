@@ -269,8 +269,8 @@ processing on the node.
 
 ### External Service API
 
-The external service API is used for the interaction between the service and the
-external systems.
+The external service API is used for the interaction between a service
+and external systems.
 A set of operations defined by a service usually includes read requests
 for the blockchain data with the provision of the corresponding cryptographic
 proof. Exonum provides an embedded web framework for implementing 
