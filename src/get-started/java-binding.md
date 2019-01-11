@@ -495,7 +495,8 @@ For using the library just include the dependency in your `pom.xml`:
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
-<!--TODO: Insert the correct Javadoc to Blockchain (once we publish things): https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/blockchain/Blockchain.html -->
+<!--TODO: Insert the correct Javadoc to Blockchain (once we publish things):
+java-binding-core/latest/com/exonum/binding/blockchain/Blockchain.html -->
 [blockchain]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
