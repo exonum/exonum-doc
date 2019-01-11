@@ -266,7 +266,7 @@ available:
   The map of transaction positions inside the blockchain identified by
   the corresponding transaction SHA-256 hashes.
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map of block objects identified by corresponding block hashes.
+  The map of block objects identified by the corresponding block hashes.
 - `getLastBlock: Block`
   The latest committed block.
 - `getActualConfiguration: StoredConfiguration`
