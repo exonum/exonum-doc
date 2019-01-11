@@ -144,7 +144,9 @@ rules – see the corresponding section of our [documentation][transactions].
 #### Messages
 
 Transactions are transmitted by external service clients to the framework as
-Exonum messages. <!-- TODO: Link a section on messages in the main Exonum docs when/if it is updated? -->
+Exonum messages.
+<!-- TODO: Link a section on messages in the main Exonum docs
+when/if it is updated to 0.10? -->
 A transaction message contains a header with the identifying information,
 such as an ID of the service this transaction belongs to and a transaction ID
 within that service; a payload containing transaction parameters;
@@ -172,10 +174,11 @@ the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 [node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
 
 #### Transaction Lifecycle
+
 The lifecycle of a Java service transaction is the same as in any other
 Exonum service:
 
-1. A service client creates a transaction message, including IDs of 
+1. A service client creates a transaction message, including IDs of
 the service and this transaction, serialized transaction parameters
 as a payload, and signs the message with the author’s key pair.
 1. The client transmits the message to one of the Exonum nodes in the network.
@@ -196,7 +199,7 @@ into the next block, they take the message from the transaction pool and
 convert it into an executable transaction,
 and [execute](#transaction-execution) it.
 1. When all transaction in the block are executed, all changes are atomically
-applied to the database state and a new block is commited.
+applied to the database state and a new block is committed.
 
 The transaction messages are preserved in the database regardless of
 the execution result, and can be later accessed via `Blockchain` class.
@@ -222,7 +225,7 @@ rule for the transaction in `execute` method.
 The `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes
 an [execution context][transaction-execution-context] as an argument,
-which allows to get a `Fork`&nbsp;– a view that allows tp perform modifying
+which allows to get a `Fork` – a view that allows tp perform modifying
 operations; and some information about the corresponding transaction message:
 its SHA-256 hash that uniquely identifies it, and the author’s public key.
 A service schema object can be used to access data collections of this service.
@@ -273,7 +276,7 @@ The external service API is used for the interaction between a service
 and external systems.
 A set of operations defined by a service usually includes read requests
 for the blockchain data with the provision of the corresponding cryptographic
-proof. Exonum provides an embedded web framework for implementing 
+proof. Exonum provides an embedded web framework for implementing
 the RESTful API of the service.
 
 [`Service#createPublicApiHandlers`][createpublicapi] method is used to
