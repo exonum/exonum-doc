@@ -358,7 +358,8 @@ used in blockchains are as follows:
   smart contract safety
 - **No isolation.** Request processing is performed
   in the same execution context as the core of the system. This is beneficial
-  for performance, although has certain security risks
+  for performance while at the same time such approach requires particular attention when creating and 
+  testing smart-contracts.
 
   > This reads _very_ strangely.
   > Almost as if we admit security vulnerabilities in Exonum and are proud of it.
