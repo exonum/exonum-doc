@@ -282,11 +282,6 @@ the tree root to a particular cell (a Merkle path). Merkle Patricia
 tables also allow to generate proofs that there is no data in the
 database with a specific key.
 
-> Recently we have been [working][1] on proofs-of-absence for lists as well.
-> However, they are not going to be merged into 0.10, as far as I know.
->
-> [1]: https://github.com/exonum/exonum/pull/1057
-
 When a full node communicates with a light client, proofs are returned together
 with the requested data. This allows to prove data authenticity efficiently.
 
@@ -301,9 +296,6 @@ While the core is responsible for consensus, and provides middleware
 functionality for sending and receiving transactions and blocks,
 services implement all business logic of the blockchain
 and are the main point to extend Exonum functionality.
-
-> As I have noted before, this may change in later versions on Exonum.
-> However, Exonum 0.10 is still going with REST API.
 
 Exonum services interact with the external world with the help of *endpoints*.
 A service may define 3 types of endpoints:
@@ -463,9 +455,6 @@ signing keys. Keys can also be managed by full nodes themselves. In this case,
 a private key is stored in the local configuration of the node, does not enter
 the blockchain and is specific to a particular node. It’s a good practice
 to manage such keys locally via private APIs of the corresponding service.
-
-> Here we may tell something about our new file-based approach to managing keys.
-> We may also remove the warning block below if/when these changes are merged.
 
 The Exonum core defines two pairs of Ed25519 keys for full nodes:
 
