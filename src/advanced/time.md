@@ -124,12 +124,6 @@ The following endpoints are exposed for the private API:
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
 
-!!! warning
-    As of version 0.5.0, the **exonum-time** service does not provide
-    cryptographic proofs of authenticity for returned values.
-
-> We can drop this warning, I guess.
-
 ### Current Time
 
 ```none
