@@ -235,10 +235,6 @@ service configuration and initializes its persistent storage.
     In the future releases services will be able to be deployed dynamically as
     shared libraries.
 
-> Maybe we should update the Exonum version here
-> so that it does not stand out that much.
-> It's not that specifying 0.1 is meaningful to the user.
-
 ### Initialization
 
 Each time a validating or auditing node is started, it initializes all
@@ -270,8 +266,6 @@ the blockchain network.
     and emit events and for services and light clients to subscribe to events
     emitted by the services.
 
-> Ditto for Exonum version.
-> This is still actual.
 > Maybe we can extend this to before_commit and after_commit.
 
 ## Service Development
@@ -282,9 +276,6 @@ the blockchain network.
     Rust is probably the safest general-purpose programming language, but it is
     not very easy to master. Java binding
     [is a high-priority task](../roadmap.md).
-
-> Version.
-> Here and later, I won't mention it anymore.
 
 Here is a list of things to figure out when developing an Exonum service:
 
@@ -340,9 +331,6 @@ for service endpoints. Implementing authentication and authorization is thus
 the responsibility of a service developer.
 
 ## Interface with Exonum Framework
-
-> This section is going to change heavily with introduction of gRPC.
-> However, with Exonum 0.10 we'll ride with what we have.
 
 Internally, services communicate with the Exonum framework via an interface
 established in the [`Service`][service.rs] trait.
