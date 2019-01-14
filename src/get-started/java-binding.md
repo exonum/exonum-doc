@@ -179,27 +179,27 @@ The lifecycle of a Java service transaction is the same as in any other
 Exonum service:
 
 1. A service client creates a transaction message, including IDs of
-the service and this transaction, serialized transaction parameters
-as a payload, and signs the message with the author’s key pair.
+  the service and this transaction, serialized transaction parameters
+  as a payload, and signs the message with the author’s key pair.
 2. The client transmits the message to one of the Exonum nodes in the network.
-The transaction is identified by the hash of the corresponding message.
+  The transaction is identified by the hash of the corresponding message.
 3. The node verifies the correctness of the message: its header,
-including the service ID, and its cryptographic signature
-against the author’s public key included into it.
+  including the service ID, and its cryptographic signature
+  against the author’s public key included into it.
 4. The node verifies that the transaction payload can be correctly decoded
-by the service into an *executable transaction*.
+  by the service into an *executable transaction*.
 5. If all checks pass, the node that received the message adds it to its
-local transaction pool and broadcasts the message to all the other nodes
-in the network.
+  local transaction pool and broadcasts the message to all the other nodes
+  in the network.
 6. Other nodes, having received the transaction message, perform all
-the previous verification steps, and, if they pass, add the message to
-the local transaction pool.
+  the previous verification steps, and, if they pass, add the message to
+  the local transaction pool.
 7. When majority of validator nodes agree to include this transaction
-into the next block, they take the message from the transaction pool and
-convert it into an executable transaction,
-and [execute](#transaction-execution) it.
+  into the next block, they take the message from the transaction pool and
+  convert it into an executable transaction,
+  and [execute](#transaction-execution) it.
 8. When all transaction in the block are executed, all changes are atomically
-applied to the database state and a new block is committed.
+  applied to the database state and a new block is committed.
 
 The transaction messages are preserved in the database regardless of
 the execution result, and can be later accessed via `Blockchain` class.
