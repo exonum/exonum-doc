@@ -26,6 +26,7 @@ Exonum depends on the following third-party system libraries:
 
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
+- [protobuf][protobuf] (mechanism for serializing structured data)
 
 You can find instructions how to install dependencies in various environments
 below.
@@ -35,7 +36,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium rocksdb pkg-config
+brew install libsodium rocksdb protobuf pkg-config
 ```
 
 ### Linux
@@ -48,10 +49,16 @@ apt-get install build-essential libsodium-dev libsnappy-dev \
     librocksdb-dev pkg-config
 ```
 
+For `protobuf` installation:
+```shell
+add-apt-repository ppa:maarten-fonville/protobuf
+apt install libprotobuf-dev protobuf-compiler
+```
+
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
 
-Depending on the version of your distributive, libsodium and RocksDB may not
+Depending on the version of your distributive, libsodium, RocksDB and protobuf may not
 be present in the default package lists. In this case you may need to install
 these packages from third-party PPAs, or build them from sources.
 
@@ -61,15 +68,12 @@ Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
+- [protobuf][protobuf]
 
-> Um... Are we sure that Exonum works on Windows?
-> If so then we'd better provide some instruction too
-> as I'm not sure that it will work without dependencies.
->
-> Alternatively, we may not mention Windows support at all
-> or say that it is upcoming and redirect the reader to the roadmap.
-> I think it's better to be honest that we don't support it well
-> rather than making an impression that Exonum will work without a hitch on Windows.
+Use package manager [Chocolatey][chocolatey] to install protobuf:
+```shell
+choco install -y protobuf
+```
 
 ## Adding environment variables
 
@@ -134,11 +138,7 @@ You may also run the extended test suite located in the `sandbox` directory:
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml
 ```
-
-> It's kinda shameful to admit,
-> but Exonum tests have quite high resource requirements
-> and may make user system unresponsive in case of shortage.
-> I guess it would be nice to clarify, for example, memory requirements.
+Notice that `tests` are required up to 30Gb free disk space.
 
 ## Non-Rust Components
 
@@ -167,8 +167,10 @@ guide on how to develop applications on top of the Exonum framework.
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
+[protobuf]: https://developers.google.com/protocol-buffers/
 [libsodium]: https://download.libsodium.org/doc/
 [homebrew]: https://brew.sh/
+[chocolatey]: https://chocolatey.org/
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/
