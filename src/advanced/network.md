@@ -114,14 +114,11 @@ configuration.
 ### Service Endpoints
 
 API endpoints for a particular service are defined via
-[`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
+[`wire_api` hook](../architecture/services.md#rest-api-initialization).
 All service endpoints are prefixed with
 [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
 where `service_name` is a string service identifier. This identifier needs
 to be unique within a specific Exonum blockchain.
-
-> The method hook is now called `wire_api`,
-> it initializes both public and private endpoints.
 
 !!! note
     There is no unified format for naming endpoints (e.g., passing parameters
