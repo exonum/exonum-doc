@@ -198,7 +198,7 @@ Exonum service:
   into the next block, they take the message from the transaction pool and
   convert it into an executable transaction,
   and [execute](#transaction-execution) it.
-8. When all transaction in the block are executed, all changes are atomically
+8. When all transactions in the block are executed, all changes are atomically
   applied to the database state and a new block is committed.
 
 The transaction messages are preserved in the database regardless of
@@ -225,7 +225,7 @@ rule for the transaction in `execute` method.
 The `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes
 an [execution context][transaction-execution-context] as an argument,
-which allows to get a `Fork` – a view that allows tp perform modifying
+which provides a `Fork` – a view that allows performing modifying
 operations; and some information about the corresponding transaction message:
 its SHA-256 hash that uniquely identifies it, and the author’s public key.
 A service schema object can be used to access data collections of this service.
