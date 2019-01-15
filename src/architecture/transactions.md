@@ -313,8 +313,6 @@ Non-replayability in Exonum is guaranteed by discarding transactions already
 included into the blockchain (which is determined by the transaction hash),
 on the verify step.
 
->remove verify
-
 !!! tip
     If a transaction is not [idempotent][wiki:idempotent], it needs to have
     an additional field to distinguish among transactions with the same
