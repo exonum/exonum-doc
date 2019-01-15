@@ -110,8 +110,6 @@ two parts:
 - **service_secret_key**  
   Node’s private key (hex) for signing service transactions
 
-> These fields may change with the latest development of improved key security.
-
 #### [network]
 
 [Local connection](../advanced/network.md) parameters.
