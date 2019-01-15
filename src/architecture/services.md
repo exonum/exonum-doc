@@ -45,8 +45,7 @@ They are guaranteed to be the same for all nodes in the blockchain network.
     are not isolated in a virtual machine environment and are not containerized.
     This makes Exonum services more efficient and flexible in their
     capabilities,
-    but at the same time requires more careful service programming. Service
-    isolation is on [the Exonum roadmap](../roadmap.md).
+    but at the same time requires more careful service programming.
 
 ## Service Interface
 
