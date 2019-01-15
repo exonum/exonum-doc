@@ -14,7 +14,7 @@ to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.5.0"
+exonum-testkit = "0.10.0"
 ```
 
 !!! note
@@ -23,9 +23,6 @@ exonum-testkit = "0.5.0"
     Each release of the testkit crate is compatible with the specific version
     of the core Exonum library; the minor version of the testkit coincides
     with the minor version of the Exonum library it supports.
-
-> I guess we'd better update the version here (and keep it up-to-date).
-> Testkit's README also should be updated.
 
 ## Simple usage
 
