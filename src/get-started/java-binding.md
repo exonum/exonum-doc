@@ -143,71 +143,92 @@ rules – see the corresponding section of our [documentation][transactions].
 
 #### Messages
 
-Transactions are transmitted by the service client as an Exonum message. The
-transaction payload in the message can be serialized using an arbitrary
-algorithm supported by both the service client and the service itself.
+Transactions are transmitted by external service clients to the framework as
+Exonum messages.
+<!-- TODO: Link a section on messages in the main Exonum docs
+when/if it is updated to 0.10? -->
+A transaction message contains a header with the identifying information,
+such as an ID of the service this transaction belongs to and a transaction ID
+within that service; a payload containing transaction parameters;
+a public key of the author and a signature that authenticates them.
 
-!!! note
-    In the current framework version each service must implement a method for
-    sending transactions of this service to the network. It is planned that this
-    mechanism will be standardized and moved to the core.
-    An example of a pseudo-code transaction handler is shown below. For an
-    implementation example, see
-    [`ApiController#submitTransaction`][submittransaction] in the cryptocurrency
-    demo.
+The transaction payload in the message can be serialized
+using an arbitrary algorithm supported by both the service client
+and the service itself.
 
-!!! note "Example of a Transaction Handler in Pseudo-code"
-    ```none
-    def handle_tx(request):
-      var body = request.getBody()
-      try:
-        var message = txMessageFromBody(body)
-        var tx = service.convertTransaction(txMessage)
-        var hash = tx.hash()
-        node.submitTransaction(tx)
-        return ok(createTxResponse(hash))
-      catch IllegalArgumentException as e:
-        return badRequest("Invalid request: " + e)
-      catch VerificationError as e:
-        return badRequest("Invalid transaction: " + e)
-      catch Error as e:
-        log("Internal error:" + e)
-        return internalServerError()
-    ```
+If the service itself needs to create a transaction on a particular node,
+it can use the [`Node#submitTransaction`][node-submit-transaction] method.
+This method will create and sign a transaction message using
+the [service key][node-configuration-validator-keys]
+of _that particular node_ (meaning that the node will be the author
+of the transaction), and submit it to the network.
+Invoking this method on each node unconditionally will produce
+_N_ transactions that have the same payloads, but different
+authors’ public keys and signatures, where _N_ is the number of nodes
+in the network.
 
-#### Executable Transactions
+Ed25519 is a standard cryptographic system for digital signing
+of Exonum messages. It is available through
+the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 
-To correctly process a transaction, it must be transformed into an
-*executable transaction* (see
-[`TransactionConverter`][transactionconvererter] or
-`Service#convertToTransaction` method) and transmitted to the framework using
-`Node#submitTransaction` method. The framework verifies it, and if the
-transactions is correct,
-broadcasts it to other nodes of the system. Other nodes, having received the
-transaction message, convert it into an executable transaction, also using the
-service transaction converter.
+[node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
+
+#### Transaction Lifecycle
+
+The lifecycle of a Java service transaction is the same as in any other
+Exonum service:
+
+1. A service client creates a transaction message, including IDs of
+  the service and this transaction, serialized transaction parameters
+  as a payload, and signs the message with the author’s key pair.
+2. The client transmits the message to one of the Exonum nodes in the network.
+  The transaction is identified by the hash of the corresponding message.
+3. The node verifies the correctness of the message: its header,
+  including the service ID, and its cryptographic signature
+  against the author’s public key included into it.
+4. The node verifies that the transaction payload can be correctly decoded
+  by the service into an *executable transaction*.
+5. If all checks pass, the node that received the message adds it to its
+  local transaction pool and broadcasts the message to all the other nodes
+  in the network.
+6. Other nodes, having received the transaction message, perform all
+  the previous verification steps, and, if they pass, add the message to
+  the local transaction pool.
+7. When majority of validator nodes agree to include this transaction
+  into the next block, they take the message from the transaction pool and
+  convert it into an executable transaction,
+  and [execute](#transaction-execution) it.
+8. When all transactions in the block are executed, all changes are atomically
+  applied to the database state and a new block is committed.
+
+The transaction messages are preserved in the database regardless of
+the execution result, and can be later accessed via `Blockchain` class.
+For a more detailed description of transaction processing,
+see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
+section.
+
+##### Transaction Execution
+
+When the framework receives a transaction message, it must transform it into
+an *executable transaction* to process. As every service has several transaction
+types each with its own parameters, it must provide
+a [`TransactionConverter`][transactionconvererter] for this purpose (see also
+`Service#convertToTransaction`).
+When the framework requests a service to convert a transaction,
+its message is guaranteed to have a correct cryptographic signature.
 
 An executable transaction is an instance of a class implementing
-[`Transaction`][transaction] interface and defining transaction
-business logic. The interface implementations must define the
-transaction authentication rule (usually, the digital signature verification of
-the message) – `isValid` method; and the execution rule for the
-transaction – `execute` method.
+the [`Transaction`][transaction] interface and defining transaction
+business logic. The interface implementations must define an execution
+rule for the transaction in `execute` method.
 
-Ed25519 is a standard cryptographic system for digital signature of Exonum
-messages. It is available through
-[`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
-
-The implementation of `Transaction#isValid` transaction authentication method
-must be a pure function, i.e. for the given transaction to return the same
-result on all nodes of the system. For this reason, access to the Exonum
-storage, files or network resources is not allowed within the method
-implementations.
-
-`Transaction#execute` method describes the operations that are applied to the
-current storage state when the transaction is executed. Exonum passes `Fork`
-as an argument – a view that allows performing modifying operations. A service
-schema object can be used to access data collections of this service.
+The `Transaction#execute` method describes the operations that are applied to the
+current storage state when the transaction is executed. Exonum passes
+an [execution context][transaction-execution-context] as an argument,
+which provides a `Fork` – a view that allows performing modifying
+operations; and some information about the corresponding transaction message:
+its SHA-256 hash that uniquely identifies it, and the author’s public key.
+A service schema object can be used to access data collections of this service.
 
 Also, `Transaction#execute` method may throw `TransactionExecutionException`
 which contains a transaction error report. This feature allows users to notify
@@ -221,6 +242,13 @@ rolled back, while the error data is stored in the database for further user
 reference. Light clients also provide access to information on the
 [transaction][exonum-transaction] execution result
 (which may be either success or failure) to their users.
+
+An implementation of the `Transaction#execute` method must be a pure function,
+i.e. it must produce the same _observable_ result on all the nodes of the system
+for the given transaction. An observable result is the one that affects the
+blockchain state hash:<!-- TODO: link the definition? -->
+a modification of a collection that affects the service state hash, or
+an execution exception.
 
 ### Blockchain Events
 
@@ -275,18 +303,18 @@ available:
 
 ### External Service API
 
-The external service API is used for the interaction between the service and the
-external systems.
-A set of operations is defined by each service and can include sending
-transactions to the network, read requests for blockchain data with the
-provision of corresponding cryptographic proof, etc. Exonum provides an embedded
-web framework for implementing the REST-interface of the service.
+The external service API is used for the interaction between a service
+and external systems.
+A set of operations defined by a service usually includes read requests
+for the blockchain data with the provision of the corresponding cryptographic
+proof. Exonum provides an embedded web framework for implementing
+the REST-interface of the service.
 
 [`Service#createPublicApiHandlers`][createpublicapi] method is used to
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
-at `/cryptocurrency/balance/:walletId`.
+at `/api/cryptocurrency/balance/:walletId`.
 
 See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
 framework.
@@ -501,6 +529,9 @@ For using the library just include the dependency in your `pom.xml`:
   instead -->
 [blockchain]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/src/main/java/com/exonum/binding/blockchain/Blockchain.java
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
+<!--TODO: Insert the correct Javadoc to Blockchain (once we publish things):
+java-binding-core/latest/com/exonum/binding/blockchain/Blockchain.html -->
+[blockchain]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
@@ -516,6 +547,8 @@ For using the library just include the dependency in your `pom.xml`:
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
 [submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/transaction/Transaction.html
+<!--TODO: Insert the correct Javadoc (once we publish things): -->
+[transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/transaction/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/TransactionConverter.html
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
