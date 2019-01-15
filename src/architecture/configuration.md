@@ -163,20 +163,6 @@ API configuration parameters.
     delivering web assets  (for example, Nginx). In this case, the requests to API
     would be same-origin, so CORS restrictions would not apply.
 
-#### [whitelist]
-
-> This can be removed, I guess?
-> I don't remember at the moment whether peer/connect list is effectively a whitelist now,
-> but this configuration section is definitely obsolete
-> (as well as the section it refers to).
-
-[Network whitelisting](../advanced/network.md#whitelist) parameters.
-
-- **whitelist_enabled**  
-  Enables whitelisting
-- **whitelisted_peers**  
-  List of consensus public keys for trusted peers
-
 #### [mempool]
 
 > The structure has changed a bit.
