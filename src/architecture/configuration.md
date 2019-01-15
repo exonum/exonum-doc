@@ -163,22 +163,6 @@ API configuration parameters.
     delivering web assets  (for example, Nginx). In this case, the requests to API
     would be same-origin, so CORS restrictions would not apply.
 
-#### [mempool]
-
-> The structure has changed a bit.
-> **tx_pool_capacity** has been removed
-> and **events_pool_capacity** now has inner options.
-> See the next section which should replace this one.
->
-> Some advanced sections may needs updates as well.
-
-Message processing parameters.
-
-- **events_pool_capacity**  
-  Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing)
-- **tx_pool_capacity**  
-  Maximum number of transactions in the [pool of unconfirmed transactions](../advanced/consensus/specification.md#pool-of-unconfirmed-transactions)
-
 #### [mempool.events_pool_capacity]
 
 [Message queuing][processing] parameters.
