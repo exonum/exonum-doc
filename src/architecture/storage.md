@@ -221,12 +221,7 @@ interface should be implemented for it:
 
 All the tables functionality is reduced to these atomic call types.
 
-As of Exonum 0.3, the main database engine is [RocksDB][rocks-db].
-In versions 0.1 and 0.2, [LevelDB][level-db] was supported as well, but
-since 0.3 its support has been dropped.
-
-> I guess we can safely forget about LevelDB by now
-> and update the Exonum version to the latest 0.10.
+Currently the main database engine is [RocksDB][rocks-db].
 
 Values from different tables are stored in column families in the low-level
 storage,
