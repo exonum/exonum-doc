@@ -72,30 +72,6 @@ the _list of known peers_. As soon as a handshake is reached (the `Connect`
 message is received and successfully processed) from both sides, the nodes begin
 to exchange messages.
 
-#### Whitelist
-
-> Whitelist is no longer a thing, this section can be removed.
-> _List of known peers_ now effectively acts as a whitelist,
-> the node will refuse to talk to anyone not on that list.
-> That list includes all validators together with auditor nodes.
-
-If the whitelist is turned on, then upon receiving the `Connect` message, the
-node checks the presence of the public key from the message in the node’s
-whitelist. If the public key is not included in the whitelist, connection is not
-accepted.
-
-Whitelist is specified in the `whitelist` section of the
-[local configuration](../glossary.md#local-configuration):
-
-```TOML
-[whitelist]
-whitelist_enabled = true
-whitelisted_peers = ["99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1",
-"a32464be9bef16a6186a7f29d5ebc3223346faab91ea10cc00e68ba26322a1b0",
-"c3f5730d81402e7453df97df2895884e0c49b5cf5ff54737c3dd28dc6537b3fd",
-"f542cdc91f73747ecc20076962a2ed91749b8e0af66693ba6f67dd92f99b1533"]
-```
-
 #### Peer Discovery
 
 Node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest) to a
