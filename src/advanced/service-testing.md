@@ -62,15 +62,7 @@ fn test_my_tx() {
 ```
 
 Make sure that you have full coverage of the business logic in the `execute` method
-of your transactions. If you just want to check the `verify` logic in the transaction,
-you can do it without testkit in a simple way:
-
-```rust
-let tx = MyTransaction::new(...);
-assert!(tx.verify());
-```
-
-> There's no `verify` method anymore so its mention should be removed.
+of your transactions.
 
 Testkit also allows to check different orderings of transactions, including transactions
 for multiple services. This could allow to more efficiently test margin cases
