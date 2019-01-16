@@ -442,11 +442,8 @@ null
 All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
 
-All explorer endpoints are public. `enable_blockchain_explorer` local
-configuration parameter allows to turn explorer endpoints on/off.
+All explorer endpoints are public.
 
-> Transaction explorer cannot be disabled now.
->
 > Serialization format has been changed
 > so transactions are now returned as hex-serialized Protobuf objects,
 > it seems.
