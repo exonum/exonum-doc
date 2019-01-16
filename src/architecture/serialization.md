@@ -71,10 +71,10 @@ structures used in Exonum are already included in the framework.
 
 ## Building Exonum with Protobuf Serialization
 
-Exonum includes the [`exonum_build`][build]
+Exonum includes the [`exonum-build`][build]
 crate which lets users add the `protobuf_generate` function to their
 `build.rs`. This function automatically generates the `.rs` files for all the
-`.proto` files during the build process. `exonum_build` needs to be added to
+`.proto` files during the build process. `exonum-build` needs to be added to
 the project as a build dependency. To use `protobuf_generate`, add
 the following code to `build.rs` indicating the folder which contains the
 `.proto` files:
@@ -117,7 +117,7 @@ For example, the generated `Wallet` structure, included in the
 `cryptocurrency.proto` file, which resides in the [`proto`][module] module,
 will be available using `proto::cryptocurrency::Wallet`.
 
-`exonum_build` also includes a function which returns the path to the `.proto`
+`exonum-build` also includes a function which returns the path to the `.proto`
 files that come with the `exonum` crate - `get_exonum_protobuf_files_path()`:
 
 ```rust
@@ -126,7 +126,7 @@ protobuf_generate(
     "src/proto",
     &["src/proto", &exonum_protos],
     "example_mod.rs",
-    );
+);
 ```
 
 After calling the `get_exonum_protobuf_files_path()` function, users can
@@ -153,7 +153,7 @@ providing a mechanism for validating protobuf-generated data. The structures
 for `ProtobufConvert` should have the same fields as the structures in
 `.proto` files, but can contain additional validation.
 
-The [`exonum_derive`][derive]
+The [`exonum-derive`][derive]
 crate provides the ability to use structures typical for Exonum with all
 the required validations. So when using these structures users only need to
 implement `#[derive(ProtobufConvert)]` for them. If required, users can
@@ -195,7 +195,7 @@ current structure refers, in the case above `proto::TransactionRequest`.
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/proto/cryptocurrency.proto
 [convert]: https://github.com/exonum/exonum/blob/master/exonum/src/proto/mod.rs
 [module]:https://github.com/exonum/exonum/tree/master/examples/cryptocurrency/src/proto
-[derive]: https://github.com/exonum/exonum/tree/master/components/derive
-[build]: https://github.com/exonum/exonum/tree/master/components/build/
-[anchoring-rs]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/proto/mod.rs#L33
-[anchoring-proto]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/proto/btc_anchoring.proto#L20
+[derive]: https://crates.io/crates/exonum-derive
+[build]: https://crates.io/crates/exonum-build
+[anchoring-rs]: https://github.com/exonum/exonum-btc-anchoring/commit/40ab8246926780e61c45f0cb58e85dd28052a4b7#diff-bd54eeb91f53aed3cdb8f077921cae50
+[anchoring-proto]: https://github.com/exonum/exonum-btc-anchoring/commit/40ab8246926780e61c45f0cb58e85dd28052a4b7#diff-ca4fef992e1e3385019634379fabdb6c
