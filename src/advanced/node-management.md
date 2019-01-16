@@ -444,10 +444,6 @@ All explorer API endpoints share the same base path, denoted
 
 All explorer endpoints are public.
 
-> Serialization format has been changed
-> so transactions are now returned as hex-serialized Protobuf objects,
-> it seems.
-
 ### Transaction
 
 ```none
