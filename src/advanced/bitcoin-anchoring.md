@@ -375,8 +375,6 @@ The service provides the following public API endpoints:
 
 - [Get actual anchoring address](#actual-address)
 - [Get next anchoring address](#following-address)
-- [Get actual common LECT](#actual-common-lect)
-- [Get actual LECT for specific validator](#actual-lect-for-specific-validator)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/btc_anchoring/v1`.
@@ -418,110 +416,6 @@ None.
 #### Response
 
 The string with a value of the anchoring address in the Base58Check format.
-
-### Actual Common LECT
-
-```None
-GET {base_path}/actual_lect
-```
-
-Returns the LECT that is agreed upon by the supermajority of validators now,
-if such exists. Otherwise, returns `null`.
-
-#### Parameters
-
-None.
-
-#### Response
-
-Example of JSON response:
-
-```JSON
-{
-  "payload": {
-    "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-    "block_height": 0,
-    "prev_tx_chain": null
-  },
-  "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-}
-```
-
-- **payload.blockhash**: the hash of the anchored Exonum block
-- **payload.block_height**: the height of the anchored Exonum block
-- **content.payload.prev_tx_chain**: the last tx-id of the previous chain of
-  anchoring transactions if it has been broken. Otherwise, `null`
-- **txid**: the hash for the anchoring Bitcoin transaction, which is
-  considered to be the LECT
-
-### Actual LECT for Specific Validator
-
-```None
-GET {base_path}/actual_lect?validator_id={id}
-```
-
-Returns the actual LECT for the specified validator, along with the
-hash of the Exonum transaction published in this LECT.
-
-If the specified validator `id` is greater or equal to the total validators
-amount, an error is returned.
-
-#### Parameters
-
-`id`: unsigned 32-bit integer
-
-#### Response
-
-Example of JSON response:
-
-```JSON
-{
-  "hash": "c1b20563e3db4041bfb30da589b6f25a22bb19d02ed8c81abf32461f0634b784",
-  "content": {
-    "payload": {
-      "block_hash": "03c5d221357d5d10c20792d480ba29267f3895575fbe36bef175abab9e9c9f5a",
-      "block_height": 0,
-      "prev_tx_chain": null
-    },
-    "txid": "021dd89bd3343a8a6ad259fbe1eed638217358b262db66a9619af2ca92fb89d9"
-  }
-}
-```
-
-- **hash**: the hash of Exonum transaction, where the specified
-  validator published this LECT
-- **content**: the LECT in the same format as in `actual_lect` API
-- **content.payload.blockhash**: the hash of the anchored Exonum block
-- **content.payload.block_height**: the height of the anchored Exonum
-  block
-- **content.payload.prev_tx_chain**: the last tx-id of the previous transactions
-  chain if it has been broken. Otherwise, `null`.
-- **content.txid**: the hash for the anchoring Bitcoin transaction,
-  which is considered to be the current LECT by the validator.
-
-### Nearest LECT
-
-```None
-GET {base_path}/nearest_lect?height={height}
-```
-
-Returns the content of the anchoring transaction which anchors the
-specific block.
-Returns `null` on any of the following conditions:
-
-- The selected block has not been anchored yet
-- The [observer interval](#observer-interval) is not set
-- The number of confirmations of anchoring transaction is less than
-  the [UTXO confirmations][anchoring-parameters] parameter
-
-#### Parameters
-
-`height`: unsigned 64-bit integer
-
-#### Response
-
-The string which has the value of a hex-encoded content of the nearest Bitcoin
-anchoring transaction.
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md
 [anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters
