@@ -38,7 +38,6 @@
     "Guice",
     "healthcheck",
     "HMACs",
-    "idempotence"
     "junit",
     "keypair",
     "leveldb",
@@ -103,7 +102,6 @@
     "templating",
     "tendermint",
     "testkit",
-    "timestamped"
     "timestamping",
     "timestamps",
     "toml",
