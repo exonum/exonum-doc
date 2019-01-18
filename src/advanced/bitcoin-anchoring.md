@@ -399,7 +399,7 @@ the height that is greater or equal to the given one.
 Example of JSON response:
 
 ??? example "Response Example"
-    <!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD013 -->
     ```JSON
     {
         "latest_authorized_block": {
@@ -438,7 +438,7 @@ Example of JSON response:
         "transactions_count": 4
     }
     ```
-    <!-- markdownlint-enable MD013 -->
+<!-- markdownlint-enable MD013 -->
 
 - **latest_authorized_block**: the latest authorized block in the blockchain for
   the moment when the request is made
@@ -481,7 +481,7 @@ certain Exonum block in the blockchain.
 Example of JSON response:
 
 ??? example "Response Example"
-    <!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD013 -->
     ```JSON
     {
         "latest_authorized_block": {
@@ -543,7 +543,7 @@ Example of JSON response:
         }
     }
     ```
-    <!-- markdownlint-enable MD013 -->
+<!-- markdownlint-enable MD013 -->
 
 - **latest_authorized_block**: the latest authorized block in the blockchain
   for the moment when the request is made
