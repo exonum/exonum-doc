@@ -174,7 +174,7 @@ anchoring transaction only if the previous anchoring chain failed
 - When such transaction is executed, its signature is stored in the
   corresponding anchoring service table. When the number of signatures for the
   same anchoring proposal reaches `+2/3` value, said anchoring transaction
-  appears in the table of anchoring transactions   
+  appears in the table of anchoring transactions
 - A handler performs synchronization between Exonum network and Bitcoin network
   for availability of uncommitted anchoring transactions and sends all such
   anchoring transactions to Bitcoin.
@@ -391,7 +391,7 @@ the height that is greater or equal to the given one.
 
 #### Parameters
 
-- **height**: Option<Height>
+- **height**: Option&lt;Height&gt;
   Optional parameter. Exonum block height.
 
 #### Response
@@ -399,6 +399,7 @@ the height that is greater or equal to the given one.
 Example of JSON response:
 
 ??? example "Response Example"
+    <!-- markdownlint-disable MD013 -->
     ```JSON
     {
         "latest_authorized_block": {
@@ -437,6 +438,7 @@ Example of JSON response:
         "transactions_count": 4
     }
     ```
+    <!-- markdownlint-enable MD013 -->
 
 - **latest_authorized_block**: the latest authorized block in the blockchain for
   the moment when the request is made
@@ -479,6 +481,7 @@ certain Exonum block in the blockchain.
 Example of JSON response:
 
 ??? example "Response Example"
+    <!-- markdownlint-disable MD013 -->
     ```JSON
     {
         "latest_authorized_block": {
@@ -540,6 +543,7 @@ Example of JSON response:
         }
     }
     ```
+    <!-- markdownlint-enable MD013 -->
 
 - **latest_authorized_block**: the latest authorized block in the blockchain
   for the moment when the request is made
