@@ -471,10 +471,10 @@ Provides cryptographic proofs for Exonum blocks including those also anchored to
 the Bitcoin blockchain. The proof is an apparent evidence of availability of a
 certain Exonum block in the blockchain.
 
-#### Parameters
+<!-- #### Parameters
 
 - **height**: u64
-  Exonum block height.
+  Exonum block height. -->
 
 #### Response
 
