@@ -398,8 +398,8 @@ the height that is greater or equal to the given one.
 
 Example of JSON response:
 
-??? example "Response Example"
 <!-- markdownlint-disable MD013 -->
+??? example "Response Example"
     ```JSON
     {
         "latest_authorized_block": {
@@ -480,8 +480,8 @@ certain Exonum block in the blockchain.
 
 Example of JSON response:
 
-??? example "Response Example"
 <!-- markdownlint-disable MD013 -->
+??? example "Response Example"
     ```JSON
     {
         "latest_authorized_block": {
@@ -569,4 +569,4 @@ Example of JSON response:
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
 [transaction_malleability]: https://en.bitcoin.it/wiki/Transaction_malleability#Segwit
 [segwit]: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
-[handler]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/handler.rs -->
+[handler]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/handler.rs
