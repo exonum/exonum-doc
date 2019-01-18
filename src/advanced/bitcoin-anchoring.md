@@ -471,10 +471,10 @@ Provides cryptographic proofs for Exonum blocks including those also anchored to
 the Bitcoin blockchain. The proof is an apparent evidence of availability of a
 certain Exonum block in the blockchain.
 
-<!-- #### Parameters
+#### Parameters
 
 - **height**: u64
-  Exonum block height. -->
+  Exonum block height.
 
 #### Response
 
@@ -569,4 +569,4 @@ Example of JSON response:
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
 [transaction_malleability]: https://en.bitcoin.it/wiki/Transaction_malleability#Segwit
 [segwit]: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
-[handler]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/handler.rs
+[handler]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/handler.rs -->
