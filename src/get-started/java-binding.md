@@ -240,6 +240,29 @@ at `/cryptocurrency/balance/:walletId`.
 See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
 framework.
 
+### Supported Services
+
+Currently Java Binding supports the following services:
+- Configuration Update Service. 
+  Although every node has its own configuration file, some settings should be
+  changed for all nodes simultaneously. This service allows updating
+  configuration through the blockchain itself.
+  See the [*Configuration Update Service*](../advanced/configuration-updater.md)
+  article for more details.
+- Anchoring Service.
+  The anchoring service writes the hash of the current Exonum blockchain state
+  to the Bitcoin blockchain with a certain time interval. The anchored data is
+  authenticated by a supermajority of validators using digital signature tools
+  available in Bitcoin.
+  See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
+  article for more details.
+
+To enable services put `ejb_app_services.toml` file into EJB App's directory
+with the following content:
+```toml
+services = ["configuration", "btc-anchoring"]
+```
+
 ### Dependencies Management
 
 Exonum uses [Guice](https://github.com/google/guice) to describe the
