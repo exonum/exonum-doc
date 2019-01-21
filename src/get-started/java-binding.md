@@ -247,6 +247,7 @@ Currently Java Binding supports the following services:
   Although every node has its own configuration file, some settings should be
   changed for all nodes simultaneously. This service allows updating
   configuration through the blockchain itself.
+
   See the [*Configuration Update Service*](../advanced/configuration-updater.md)
   article for more details.
 - **Anchoring Service.**
@@ -254,6 +255,7 @@ Currently Java Binding supports the following services:
   to the Bitcoin blockchain with a certain time interval. The anchored data is
   authenticated by a supermajority of validators using digital signature tools
   available in Bitcoin.
+  
   See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
   article for more details.
 
