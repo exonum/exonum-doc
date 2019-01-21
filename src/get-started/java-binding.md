@@ -243,13 +243,13 @@ framework.
 ### Supported Services
 
 Currently Java Binding supports the following services:
-- Configuration Update Service. 
+- **Configuration Update Service.**
   Although every node has its own configuration file, some settings should be
   changed for all nodes simultaneously. This service allows updating
   configuration through the blockchain itself.
   See the [*Configuration Update Service*](../advanced/configuration-updater.md)
   article for more details.
-- Anchoring Service.
+- **Anchoring Service.**
   The anchoring service writes the hash of the current Exonum blockchain state
   to the Bitcoin blockchain with a certain time interval. The anchored data is
   authenticated by a supermajority of validators using digital signature tools
