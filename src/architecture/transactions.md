@@ -120,9 +120,9 @@ message TxTransfer {
 ```
 
 This transaction is then included into a message which includes the public
-key of the trnasaction autor, the binary representation of the transaction
+key of the transaction author, the binary representation of the transaction
 as described above and the message signature. The transaction does not
-need to include information about who is transafering funds, the sender is
+need to include information about who is transaferring funds, the sender is
 defined by the public key of the message author.
 
 ## Serialization
@@ -151,7 +151,6 @@ the `execute` method.
 !!! tip
     From the Rust perspective, `Transaction` is a [trait][rust-trait].
     See [Exonum core code][core-tx] for more details.
-
 
 ### Execute
 
@@ -251,8 +250,8 @@ presented as a byte array. This structure helps us avoid verifying the
 signature repeatedly during the next steps, as every `SignedMessage` is
 guaranteed to contain the correct signature.
 
-The `SignedMessage` is then passed to the `deserialize` method, which
-deserializes the message body and converts the `SignedMessage` into the
+The `SignedMessage` is then passed to the `deserialize` method, which can
+deserialize the message body and convert the `SignedMessage` into the
 `Message` structure. `Message` contains both the `SignedMessage` and the
 deserialized payload.
 
