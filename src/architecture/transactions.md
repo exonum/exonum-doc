@@ -91,7 +91,7 @@ Exonum utilizes the following message classes and types:
 
 The payload varies for different messages, depending on their class and type.
 
-A transaction is the payload of a message. The message payload constituing
+A transaction is the payload of a message. The message payload constituting
 a transaction has the following fields:
 
 - ID of the service for which the transaction is intended
@@ -105,24 +105,25 @@ handled by the Exonum Core. Transaction payload includes data specific for a
 given transaction type. Format of the payload is specified by the
 service identified by `service_id`.
 
-!!! note "Example"
-    The `TxTransfer` transaction type in the sample cryptocurrency service
-    is represented as follows using the protobuf description:
+For example, he `TxTransfer` transaction type in the sample cryptocurrency service
+is represented as follows using the protobuf description:
 
-    ```message TxTransfer {
-        // Public key of the receiver.
-        exonum.PublicKey to = 1;
-        // Number of tokens to transfer from sender's account to receiver.
-        uint64 amount = 2;
-        // Auxiliary number to guarantee non-idempotence of transactions.
-        uint64 seed = 3;
-      }
-      ```
-    This transaction is then included into a message which includes the public
-    key of the trnasaction autor, the binary representation of the transaction
-    as described above and the message signature. The transaction does not
-    need to include information about who is transafering funds, the sender is
-    defined by the public key of the message author.
+```protobuf
+message TxTransfer {
+  // Public key of the receiver.
+  exonum.PublicKey to = 1;
+  // Number of tokens to transfer from sender's account to receiver.
+  uint64 amount = 2;
+  // Auxiliary number to guarantee non-idempotence of transactions.
+  uint64 seed = 3;  
+ }
+```
+
+This transaction is then included into a message which includes the public
+key of the trnasaction autor, the binary representation of the transaction
+as described above and the message signature. The transaction does not
+need to include information about who is transafering funds, the sender is
+defined by the public key of the message author.
 
 ## Serialization
 
