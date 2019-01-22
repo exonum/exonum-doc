@@ -262,6 +262,7 @@ Currently Java Binding supports the following services:
 
 To enable services put `ejb_app_services.toml` file into EJB App's directory
 with the following content:
+
 ```toml
 services = ["configuration", "btc-anchoring"]
 ```
