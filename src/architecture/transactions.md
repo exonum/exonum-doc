@@ -122,7 +122,7 @@ message TxTransfer {
 This transaction is then included into a message which includes the public
 key of the transaction author, the binary representation of the transaction
 as described above and the message signature. The transaction does not
-need to include information about who is transaferring funds, the sender is
+need to include information about who is transferring funds, the sender is
 defined by the public key of the message author.
 
 ## Serialization
