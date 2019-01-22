@@ -9,7 +9,9 @@ these rules determine business logic of any Exonum-powered blockchain.
 
 Exonum transactions are an entity within messages. Except for the
 transaction, a messages also contains the public key of the message author, the
-type and class of the message and the message signature.
+type and class of the message and the message signature. This approach allowed
+the separation of business logic and information related to authorization
+within a message.
 
 Transactions are executed
 [atomically, consistently, in isolation and durably][wiki:acid].
@@ -34,16 +36,17 @@ in the same order transactions are placed into the blockchain.
     implemented in the [light client library](https://github.com/exonum/exonum-client#send-multiple-transactions).
 
 All transactions are authenticated with the help of public-key digital
-signatures. A transaction contains the signature verification key (aka public
-key) among its parameters. Thus, authorization (verifying whether the
-transaction author actually has the right to perform the transaction) can be
-accomplished with the help of building a [public key infrastructure][wiki:pki]
-and/or various constraints based on this key.
+signatures. The message containing the transaction includes the signature
+verification key (aka public key) among its parameters. Thus, authorization
+(verifying whether the transaction author actually has the right to perform the
+transaction) can be accomplished with the help of building a
+[public key infrastructure][wiki:pki] and/or various constraints based
+on this key.
 
 !!! tip
-    It is recommended for transaction signing to be decentralized in order
+    It is recommended for message signing to be decentralized in order
     to minimize security risks. Roughly speaking, there should not be a single
-    server signing all transactions in the system; this could create a security
+    server signing all messages in the system; this could create a security
     chokepoint. One of the options to decentralize signing is to use
     the [light client library](https://github.com/exonum/exonum-client).
 
@@ -102,6 +105,25 @@ handled by the Exonum Core. Transaction payload includes data specific for a
 given transaction type. Format of the payload is specified by the
 service identified by `service_id`.
 
+!!! note "Example"
+    The `TxTransfer` transaction type in the sample cryptocurrency service
+    is represented as follows using the protobuf description:
+
+    ```message TxTransfer {
+        // Public key of the receiver.
+        exonum.PublicKey to = 1;
+        // Number of tokens to transfer from sender's account to receiver.
+        uint64 amount = 2;
+        // Auxiliary number to guarantee non-idempotence of transactions.
+        uint64 seed = 3;
+      }
+      ```
+    This transaction is then included into a message which includes the public
+    key of the trnasaction autor, the binary representation of the transaction
+    as described above and the message signature. The transaction does not
+    need to include information about who is transafering funds, the sender is
+    defined by the public key of the message author.
+
 ## Serialization
 
 All transactions in Exonum are serialized using protobuf. See the
@@ -133,7 +155,7 @@ the `execute` method.
 ### Execute
 
 ```rust
-fn execute(&self, view: &mut Fork) -> ExecutionResult;
+fn execute<'a>(&self, context: TransactionContext<'a>) -> ExecutionResult;
 ```
 
 The `execute` method takes the current blockchain state and can modify it (but
