@@ -52,7 +52,7 @@ Decentralization during the anchoring process is built over the internal
 Bitcoin multisignature address architecture.
 
 When the Exonum network should be anchored, an anchoring transaction is built
-baed on a [deterministic algorithm](#creating-anchoring-transaction).
+based on a [deterministic algorithm](#creating-anchoring-transaction).
 Its results are guaranteed to match for every honest validator. This
 anchoring transaction spends one or more UTXOs from the current anchoring
 multisig address. Every validator can sign this transaction without regard for
@@ -70,8 +70,7 @@ floor(2/3*N) + 1` is used as a supermajority.
     If `N=4`, then `M=3` signatures are required.
 
 After the necessary amount of signatures is gathered, a synchronization method
-creates a correct and signed anchoring transaction and commits it to the Bitcoin
-blockchain.
+commits a signed anchoring transaction to the Bitcoin blockchain.
 
 ### Transaction Malleability and SegWit
 
@@ -81,8 +80,8 @@ signatures formed a part of the anchoring transaction body, the transaction hash
 depended on the number and order of signatures put over said transaction.
 Therefore, the anchoring service faced a problem of
 [transaction malleability][transaction_malleability] -
-there was a chance that an anchoring transaction containing a certain
-Exonum state hash could be mutated by some malicious validator. The validator
+there was a chance that an anchoring transaction could be mutated by some
+malicious validator. The validator
 would use a different set of signatures for the same transaction and commit it
 to the Bitcoin network. This would make the original transaction ineligible for
 inclusion into the Bitcoin blockchain.
@@ -90,13 +89,19 @@ inclusion into the Bitcoin blockchain.
 As of Exonum 0.10 version the problem was solved by introducing
 [Segregated Witness][segwit] into the
 anchoring service. This allowed to store signatures of the anchoring
-transactions separately from the transactions merkle tree so they are not
+transactions separately from the transactions Merkle tree so they are not
 considered when calculating the block hash. Now, since signature data
 is no longer a part of the transaction hash, changes to how the transaction was
 signed no longer influence the transaction identification. In this way anchoring
 transactions are fully deterministic - a new transaction is determined based on
 the latest anchoring transaction and the current Exonum state hash to be
 anchored.
+
+Moreover, as it is not possible to mutate an anchoring transaction any more,
+there is no need to wait every time for confirmations from the Bitcoin
+Blockchain that a new anchoring transaction has been committed into the network.
+The following anchoring transaction may be safely suggested without such
+confirmations.  
 
 Exonum uses a [`bitcoind` client](#bitcoind-node), and the transaction
 determined by the service is considered valid by the bitcoind-node.
@@ -177,7 +182,9 @@ anchoring transaction only if the previous anchoring chain failed
   appears in the table of anchoring transactions
 - A handler performs synchronization between Exonum network and Bitcoin network
   for availability of uncommitted anchoring transactions and sends all such
-  anchoring transactions to Bitcoin.
+  anchoring transactions to Bitcoin. Therefore, even if some committed anchoring
+  transactions are lost from the network due to a fork, the handler will send
+  them to Bitcoin once again.
 
 ## Setup and Configuration
 
@@ -278,19 +285,28 @@ means, for example, using
 [Configuration Update service](configuration-updater.md). The following
 properties should be taken into account:
 
-1. New configuration is spread over nodes. It is still not active.
+1. New configuration is spread over nodes. At this point it is not active yet.
 2. New configuration has an additional parameter that indicates the height when
-   this configuration should be applied. The height is selected by the
+   this configuration should be applied. The height is set by the
    administrator.
 3. After the indicated height is reached, the new configuration is applied by
-   every validator simultaneously. The list of validators is finally changed.
+   all validators simultaneously. At this point the list of validators is
+   finally changed.
+
+!!! tip
+    The administrator should make the interval between the moment a new
+    configuration is proposed and the height when it will be applied sufficient
+    for validators to vote for the new configuration.
 
 !!! warning
-    It is important that the interval between the moment a new configuration
-    appears and the height when it will be applied, should be sufficient for
-    validators to vote for the new configuration.
+    When switching anchoring to a different address, the administrator should
+    make sure that the service has enough funds to create a
+    [transition transaction](#transition-transaction) to the new address.
+    Therefore, the service will continue the old
+    anchoring chain at a new address. Otherwise, the old anchoring chain will be
+    [lost](#recovering-broken-anchoring).  
 
-### Transitional Transaction
+### Transition Transaction
 
 Anchoring pubkeys define the anchoring BTC-address. In order to
 prolong the anchoring chain at a new address, a new anchoring transaction should
@@ -300,28 +316,15 @@ transaction should be committed to the Bitcoin blockchain **before** the list of
 validators is changed. Thus the anchoring process is suspended.
 
 - After the latest anchoring transactions is committed to the Bitcoin
-  blockchain, the service waits until it gathers a sufficient number of
-  confirmations (ex., `24`).
-- Next, a transitional anchoring transaction proposal is generated. That
+  blockchain, a transitional anchoring transaction proposal is generated. That
   transaction moves money to the new anchoring address.
 - As the anchoring chain has already been moved to the new anchoring address,
-  Exonum nodes wait until the new validators set is applied; after that the
-  anchoring process resumes.
-
-This process can suspend the anchoring transaction for a fairly large amount of
-time. For example, if the service waits for 24 confirmations, the total pause
-can last for 4-6 hours.
-
-If the latest anchoring transaction does not get enough confirmations before the
-Exonum blockchain moves to the new validators list, the anchoring chain is
-**BROKEN** and cannot be prolonged.
-To ensure that the anchoring chain is not broken during
-the change of the pubkeys list, the value of a new configuration activation
-height should be big enough.
+  Exonum nodes wait until the new validators set comes into force; after that
+  the anchoring process resumes at the new address.
 
 ## Recovering Broken Anchoring
 
-After the anchoring chain is broken, administrators must generate a new
+If the anchoring chain is broken, administrators must generate a new
 funding transaction to the new anchoring address and add it to the
 global configuration as the funding UTXO. A new anchoring chain will be
 produced,
