@@ -10,7 +10,7 @@ The client functions are divided into the following submodules:
 
 - **Data**. Functions for [serialization and deserialization of
   data](serialization.md) from the JSON format to
-  Exonum binary format
+  protobuf binary format
 
   > Update to Protobuf.
   > Here and in other places in the document.
@@ -46,7 +46,7 @@ implemented in Exonum light client.
 
 1. On triggering frontend application (for example, by a button click handler)
   a new transaction is created. The transaction data is stored in JSON format.
-  Then the data is *converted to the Exonum binary format* and
+  Then the data is *converted to the protobuf binary format* and
   *digitally signed* using the light client library.
 2. Frontend application receives a digital signature from
   the light client library.
@@ -57,7 +57,7 @@ implemented in Exonum light client.
 
 !!! note
     Serialization during signing is a necessary step, since all
-    data (including transactions) is stored in Exonum in a [custom binary
+    data (including transactions) is stored in Exonum in a [protobuf binary
     format](serialization.md). This is done for several reasons:
 
     - The binary format is unambiguous, while the same data can have multiple
