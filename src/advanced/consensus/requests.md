@@ -56,11 +56,8 @@ Byzantine. The receiving node saves this information in
 
 ### `Connect`
 
-- It is possible to access the author by using the IP address + port
+- It is possible to access the author by using the address + port
   mentioned in the message.
-
-  > It's just _address_.
-  > `Connect` messages now support host names as well as IP addresses.
 
 ## Request Messages
 
