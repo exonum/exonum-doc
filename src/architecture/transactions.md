@@ -223,8 +223,6 @@ via [an appropriate transaction endpoint](services.md#transactions).
     If a transaction is valid, it’s expected
     to be committed in a matter of seconds.
 
-> Promise about event-based subscription that could replace polling?
-
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
@@ -237,12 +235,6 @@ using the `(service_id, message_id)` type identifier.
 If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
 steps are skipped.
-
-> `verify` is no longer a thing,
-> but Exonum still verifies transactions
-> by checking their digital signatures
-> and validates their content
-> by attempting to deserialize them without execution.
 
 ### 4. Broadcasting
 
