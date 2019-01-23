@@ -35,9 +35,6 @@ and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
 
-> Configuration no longer includes `majority_count` field.
-> It is fixed to the Byzantine majority count (more than 2/3 of validators).
-
 !!! note
     Nodes can have only single following configuration. After a
     configuration proposal got a supermajority of votes and became the following
