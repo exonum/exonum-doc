@@ -388,9 +388,6 @@ return an empty list.
     a more even key distribution, which results in a more balanced
     Merkle Patricia tree.
 
-> We may like to mention that
-> **MerkleDB** will soon relieve the developers from writing this method manually.
-
 ### Parse Raw Transaction
 
 ```rust
