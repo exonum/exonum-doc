@@ -46,11 +46,11 @@ the [Timestamping Service][timestamping].
 As mentioned above, Exonum light client uses Protobuf as data serialization
 format. For this purpose [protobufjs][protobufjs-lib] library is applied. With
 this library you can describe data either through `.proto` files or with the
-help of the reflection method.
+help of the built-in reflection methods.
 
 The first method presupposes that the transaction schema is initially defined
-in a `.proto` file. And then a corresponding `.js` file is generated out of
-said `.proto` file.
+in a `.proto` file. And then a corresponding `.js` file called stub is generated
+out of said `.proto` file.
 
 In the reflection method the .proto definitions are directly reflected in
 JavaScript.
@@ -104,7 +104,7 @@ message Timestamp {
 message TxTimestamp { Timestamp content = 1; }
 ```
 
-When the `.proto` file is ready, generate the `*.js` file with
+When the `.proto` file is ready, generate the `*.js` stub file with
 [pbjs][pbjs-lib] library as follows:
 
 ```json
@@ -267,11 +267,13 @@ As the `.proto` file is ready, generate the `*.js` file as follows:
 Define `TransferFunds` transaction schema and its field types:
 
 ```javascript
+import * as proto from 'stubs.js'
+
 const TransferFunds = Exonum.newTransaction({
    author: publicKey,
    service_id: 128,
    message_id: 1,
-   schema: examples.TransferFunds
+   schema: proto.exonum.examples.cryptocurrency_advanced.Transfer
 })
 ```
 
@@ -406,7 +408,7 @@ message Wallet {
 ```
 
 ```javascript
-const Wallet = Exonum.newType(examples.Wallet)
+const Wallet = Exonum.newType(proto.exonum.examples.cryptocurrency_advanced.Wallet)
 ```
 
 We then obtain the proof down to the required wallet:
