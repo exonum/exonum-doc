@@ -7,10 +7,10 @@ is a group of sequential operations with the data (i.e., the Exonum
 Transaction processing rules are defined in [services](services.md);
 these rules determine business logic of any Exonum-powered blockchain.
 
-Exonum transactions are an entity within messages. Except for the
-transaction, a messages also contains the public key of the message author, the
-type and class of the message and the message signature. This approach allowed
-the separation of business logic and information related to authorization
+Exonum transactions are an entity within [messages](#messages). Except for the
+transaction, a message also contains a public key of the message author, a type
+and class of the message and a message signature. This approach allowed
+the separation of the business logic and information related to authorization
 within a message.
 
 Transactions are executed
@@ -44,8 +44,8 @@ transaction) can be accomplished with the help of building a
 on this key.
 
 !!! tip
-    It is recommended for message signing to be decentralized in order
-    to minimize security risks. Roughly speaking, there should not be a single
+    In order to minimize security risks, it is recommended to decentralize
+    message signing. Roughly speaking, there should not be a single
     server signing all messages in the system; this could create a security
     chokepoint. One of the options to decentralize signing is to use
     the [light client library](https://github.com/exonum/exonum-client).
@@ -91,7 +91,7 @@ Exonum utilizes the following message classes and types:
 
 The payload varies for different messages, depending on their class and type.
 
-A transaction is the payload of a message. The message payload constituting
+A transaction is a payload of the message. The message payload constituting
 a transaction has the following fields:
 
 - ID of the service for which the transaction is intended
@@ -105,14 +105,14 @@ handled by the Exonum Core. Transaction payload includes data specific for a
 given transaction type. Format of the payload is specified by the
 service identified by `service_id`.
 
-For example, he `TxTransfer` transaction type in the sample cryptocurrency service
-is represented as follows using the protobuf description:
+For example, the `TxTransfer` transaction type in the sample Cryptocurrency Service
+is represented as follows using the Protobuf description:
 
 ```protobuf
 message TxTransfer {
   // Public key of the receiver.
   exonum.PublicKey to = 1;
-  // Number of tokens to transfer from sender's account to receiver.
+  // Amount of tokens to transfer from sender's account to receiver.
   uint64 amount = 2;
   // Auxiliary number to guarantee non-idempotence of transactions.
   uint64 seed = 3;  
@@ -127,7 +127,7 @@ defined by the public key of the message author.
 
 ## Serialization
 
-All transactions in Exonum are serialized using protobuf. See the
+All transactions in Exonum are serialized using Protobuf. See the
 [Serialization](serialization.md) article for more details).
 
 !!! note
@@ -143,7 +143,7 @@ All transactions in Exonum are serialized using protobuf. See the
 Transaction interface currently defines a single method - [`execute`](#execute).
 
 An extended version of the `verify` method, which was available previously, is
-scheduled for implementation by our team. As of now, the verification of the
+scheduled for implementation by our team. Currently, the verification of the
 transaction signature is performed by the core of the framework. Additional
 verifications you might need to implement for transactions can be added using
 the `execute` method.
@@ -159,10 +159,10 @@ fn execute<'a>(&self, context: TransactionContext<'a>) -> ExecutionResult;
 ```
 
 The `execute` method takes the current blockchain state and can modify it (but
-can choose not to if certain conditions are not met). Technically `execute`
+can choose not to do so if certain conditions are not met). Technically `execute`
 operates on a fork of the blockchain state, which is merged to the persistent
 storage [under certain conditions](consensus.md). `execute` is performed during
-the `Precommit` stage of consensus and when the block with the given
+the `Precommit` stage of the consensus and when the block with the given
 transaction is committed into the blockchain.
 
 `execute` operates solely with the payload of the message, any additional
@@ -171,10 +171,10 @@ is passed into `execute`. `TransactionContext` includes a fork of the
 blockchain, ID of the service for which the transaction is intended, the hash
 of the message containing the transaction and the public key of the transaction
 author. For an example of `execute` implementation, refer to our
-[demo service][execute-demo].
+[Cryptocurrency Advanced service][execute-demo].
 
 !!! note "Example"
-    In the sample cryptocurrency service, `TxTransfer.execute` verifies
+    In the sample Cryptocurrency Service, `TxTransfer.execute` verifies
     that the sender’s and recipient’s accounts exist and the sender has enough
     coins to complete the transfer. If these conditions hold, the sender’s
     balance of coins is decreased and the recipient’s one is increased by the
@@ -182,7 +182,7 @@ author. For an example of `execute` implementation, refer to our
     logged in the sender’s and recipient’s history of transactions; the logging
     is performed even if the transaction execution is unsuccessful (e.g., the
     sender has insufficient number of coins). Logging helps to ensure that
-    the account state is verifiable by light clients.
+    account state can be verified by light clients.
 
 The `execute` method can signal that a transaction should be aborted
 by returning an error. The error contains a transaction-specific error code
@@ -223,29 +223,30 @@ via [an appropriate transaction endpoint](services.md#transactions).
 !!! tip
     From the point of view of a light client, transaction execution is
     asynchronous; full nodes do not return an execution status synchronously
-    in a response to a client’s request. To determine transaction status,
+    in response to the request of the client. To determine the transaction status,
     you may poll the transaction status using
     [read requests](services.md#read-requests) defined in the corresponding
-    service or the blockchain explorer. If a transaction is valid, it’s
+    service or the blockchain explorer. If a transaction is valid, it is
     expected to be committed in a matter of seconds.
 
 ### 3. Verification
 
 After a transaction is received by a full node, it is looked up
 among committed transactions, using the transaction hash as the unique
-identifier. If a transaction has been committed previously, it is
+identifier. If the transaction has been committed previously, it is
 discarded, and the following steps are skipped.
 
 The transaction implementation is then looked up
 using the `(service_id, message_id)` type identifier.
 
-The `raw_from_buffer` method then checks that the byte array constituting the
+If the transaction is absent in the blockchain, the `raw_from_buffer` method
+then checks that the byte array constituting the
 transaction message contains the author’s public key and signature and that the
 signature corresponds to the indicated public key.
 
 Next, if `raw_from_buffer` is successful, the byte array is converted into a
 `SignedMessage` structure. This structure contains all the fields of the
-message in deserialized form, except for the message payload which is still
+message in the deserialized form, except for the message payload which is still
 presented as a byte array. This structure helps us avoid verifying the
 signature repeatedly during the next steps, as every `SignedMessage` is
 guaranteed to contain the correct signature.
@@ -289,13 +290,13 @@ has collected all
 transactions for a block proposal and certain conditions are met, which imply
 that the proposal is going to be accepted in the near future.
 The results of execution are reflected in `Precommit` consensus messages and
-are agreed upon within the consensus algorithm. This allows ensuring that
+are agreed upon within the consensus algorithm. This ensures that
 transactions are executed in the same way on all nodes.
 
 ### 6. Commitment
 
 When a certain block proposal and the result of its execution gather
-sufficient approval among validators, a block with the transaction is committed
+sufficient approvals among validators, the block with the transaction is committed
 to the blockchain. All transactions from the committed block are sequentially
 applied to the persistent blockchain state by invoking their `execute` method
 in the same order the transactions appear in the block.
@@ -319,7 +320,7 @@ transaction from the blockchain and apply it to the blockchain state again.
 
 !!! note "Example"
     Assume Alice pays Bob 10 coins using
-    [the sample cryptocurrency service][cryptocurrency].
+    [Cryptocurrency Service][cryptocurrency].
     Non-replayability prevents Bob from taking Alice’s transaction and
     submitting it to the network again to get extra coins.
 
@@ -329,15 +330,15 @@ network with his own or others’ transactions.
 
 Non-replayability in Exonum is guaranteed by discarding transactions already
 included into the blockchain (which is determined by the transaction hash),
-on the verification step.
+at the verification step.
 
 !!! tip
     If a transaction is not [idempotent][wiki:idempotent], it needs to have
     an additional field to distinguish among transactions with the same
     set of parameters. This field needs to have a sufficient length
     (e.g., 8 bytes) and can be generated deterministically (e.g., via a
-    counter) or (pseudo-)randomly. See `TxTransfer.seed` in the cryptocurrency
-    service as an example.
+    counter) or (pseudo-)randomly. See `TxTransfer.seed` in the Cryptocurrency
+    Service as an example.
 
 [wiki:acid]: https://en.wikipedia.org/wiki/ACID
 [wiki:order]: https://en.wikipedia.org/wiki/Total_order
