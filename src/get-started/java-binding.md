@@ -240,9 +240,9 @@ at `/cryptocurrency/balance/:walletId`.
 See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
 framework.
 
-### Supported Services
+### Built-In Services
 
-Currently Java Binding supports the following services:
+Currently Java Binding includes the following built-in services:
 
 - **Configuration Update Service.**
   Although every node has its own configuration file, some settings should be
@@ -260,12 +260,18 @@ Currently Java Binding supports the following services:
   See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
   article for more details.
 
-To enable services put `ejb_app_services.toml` file into EJB App's directory
-with the following content:
+To enable a particular service, include its name in "ejb_app_services.toml"
+configuration file into EJB App's directory with the following content:
 
 ```toml
-services = ["configuration", "btc-anchoring"]
+services = ["service-name", ...]
 ```
+
+where possible values for "service-name" are: "configuration" for Configuration
+Service and "btc-anchoring" for Anchoring Service.
+
+In case of no "ejb_app_services.toml" file, only "configuration" service will
+be activated.
 
 ### Dependencies Management
 
