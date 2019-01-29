@@ -105,8 +105,8 @@ handled by the Exonum Core. Transaction payload includes data specific for a
 given transaction type. Format of the payload is specified by the
 service identified by `service_id`.
 
-For example, the `TxTransfer` transaction type in the sample Cryptocurrency Service
-is represented as follows using the Protobuf description:
+For example, the `TxTransfer` transaction type in the sample Cryptocurrency
+Service is represented as follows using the Protobuf description:
 
 ```protobuf
 message TxTransfer {
@@ -142,8 +142,8 @@ All transactions in Exonum are serialized using Protobuf. See the
 
 Transaction interface defines a single method – [`execute`](#execute).
 
-An extended version of the `verify` method, which was available in Exonum <0.10, is
-scheduled for implementation. Currently, the verification of the
+An extended version of the `verify` method, which was available in Exonum <0.10,
+is scheduled for implementation. Currently, the verification of the
 transaction signature is performed automatically by the core of the framework.
 Additional verifications might be implemented in
 the `execute` method.
@@ -239,25 +239,25 @@ discarded, and the following steps are skipped.
 The transaction implementation is then looked up
 using the `(service_id, message_id)` type identifier.
 
-If the transaction is absent in the blockchain, the `raw_from_buffer` method
-then checks that the byte array constituting the
-transaction message contains the author’s public key and signature and that the
-signature corresponds to the indicated public key.
+If the transaction is absent in the blockchain, the
+`SignedMessage::from_raw_buffer` method then checks that the byte array
+constituting the transaction message contains the author’s public key and
+signature and that the signature corresponds to the indicated public key.
 
-Next, if `raw_from_buffer` is successful, the byte array is converted into a
-`SignedMessage` structure. This structure contains all the fields of the
-message in the deserialized form, except for the message payload which is still
-presented as a byte array. This structure helps us avoid verifying the
-signature repeatedly during the next steps, as every `SignedMessage` is
-guaranteed to contain the correct signature.
+Next, if `SignedMessage::from_raw_buffer` is successful, the byte array is
+converted into a `SignedMessage` structure. This structure contains all the
+fields of the message in the deserialized form, except for the message payload
+which is still presented as a byte array. This structure helps us avoid
+verifying the signature repeatedly during the next steps, as every
+`SignedMessage` is guaranteed to contain the correct signature.
 
 The `SignedMessage` is then passed to the `deserialize` method, which can
 deserialize the message body and convert the `SignedMessage` into the
-`Message` structure. `Message` contains both the `SignedMessage` and the
+`Signed<T>` structure. `Signed<T>` contains both the `SignedMessage` and the
 deserialized payload.
 
-Finally, the `Message` is passed to the `handle` method, which concludes
-the transaction processing mechanism.
+Finally, the `Signed<T>` is passed to the `NodeHandler::handle_message` method,
+which concludes the transaction processing mechanism.
 
 If the verification is successful, the transaction is added to the pool
 of unconfirmed transactions; otherwise, it is discarded, and the following
