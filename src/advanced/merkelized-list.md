@@ -108,21 +108,22 @@ Let `T(height, index)` be a value at tree node for element `index` at height
 `height`. Elements `T(0, index)` contain serialized values of the underlying list
 according to [the Exonum binary serialization spec](../architecture/serialization.md).
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
-rules. Each node are hashed with the corresponding prefix:
+rules. Each node is hashed with the corresponding prefix:
 
-```none
-0x00 - leaf node
-0x01 - branch node
-```
+| Prefix | Node type |
+|--------|-----------|
+| `0x00` | leaf node |
+| `0x01` | branch node |
 
-The root node is hashed with `0x02` prefix and with number elements of the list.
+The root node is hashed with the `0x02` prefix and with the number of elements
+of the list.
 
 ```none
 hash( 0x02 || length || root_hash )
 ```
 
 Where `root_hash` is the merkle root of the `ProofListIndex`, `length` is
-8-bytes length of the `ProofListIndex` encoded in little endian.
+8-bytes length of the `ProofListIndex` encoded as little endian.
 
 #### Rule 1. Empty Tree
 
@@ -132,12 +133,12 @@ Hash of an empty tree is defined as follows:
 hash( 0x02 || 0 || Hash::default() )
 ```
 
-where `0x02` is root node prefix for `ProofListIndex`, `0` - length of empty list,
-`Hash::default()` is 32 zero bytes.
+where `0x02` is the root node prefix for `ProofListIndex`,
+`0` is the length of an empty list, `Hash::default()` is 32 zero bytes.
 
 #### Rule 2. `height=1`
 
-Hash of a value, contained in `(height = 0, index)`, is defined as:
+Hash of a value contained in `(height = 0, index)` is defined as
 
 ```none
 T(1, index) = hash(0x00 || T(0, index)).
@@ -146,16 +147,16 @@ T(1, index) = hash(0x00 || T(0, index)).
 #### Rule 3. `height > 1`, Two Children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
-`T(height - 1, index * 2 + 1)` exist then:
+`T(height - 1, index * 2 + 1)` exist, then
 
 ```none
 T(height, index) = hash(0x01 || T(height-1, index*2) || T(height-1, index*2+1)).
 ```
 
-#### Rule 4. `height > 1` and the Only Child
+#### Rule 4. `height > 1`, Single Child
 
 If `height > 1`, node `T(height - 1, index * 2)` exists and
-node `(height - 1, index * 2 + 1)` is absent in the tree, then:
+node `(height - 1, index * 2 + 1)` is absent in the tree, then
 
 ```none
 T(height, index) = hash(0x01 || T(height - 1, index * 2)).
@@ -235,10 +236,9 @@ If either of these verifications fails, the proof is deemed invalid.
 
 #### Example
 
-Below is depicted a Merkle tree with `6` elements (i.e., not full binary) with
-elements, that are a saved inside a proof for range `[3, 5)` in
-**bold\_and\_underscored** on the bottom. The elements of the underlying Merkelized
-list are `3`-byte buffers `[u8; 3]`.
+Depicted below is a Merkle tree with 6 elements (i.e., not full binary) with
+elements that are saved inside a proof for range `[3, 5)`.
+The elements of the underlying merkelized list are `3`-byte buffers `[u8; 3]`.
 
 ![Proof_Structure](../images/merkle-tree-example-2.png)
 
