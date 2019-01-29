@@ -12,8 +12,8 @@ one written to the Bitcoin blockchain will be found instantly.
 
 This document describes the **anchoring service operable with Exonum v0.10**.
 For information on the anchoring service compatible with all previous versions
-of the framework, please refer to a
-[separate document](../bitcoin-anchoring-without-segwit.md).
+of the framework, please refer to a separate document.
+<!--add the link when the documentation is updated-->
 
 !!! note
     This page mostly describes how the service functions. There is a
