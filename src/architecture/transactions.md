@@ -7,9 +7,9 @@ is a group of sequential operations with the data (i.e., the Exonum
 Transaction processing rules are defined in [services](services.md);
 these rules determine business logic of any Exonum-powered blockchain.
 
-Exonum transactions are an entity within [messages](#messages). Except for the
+Exonum transactions are wrapped in [messages](#messages). Except for the
 transaction, a message also contains a public key of the message author, a type
-and class of the message and a message signature. This approach allowed
+and class of the message and a message signature. This approach allows
 the separation of the business logic and information related to authorization
 within a message.
 
@@ -128,7 +128,7 @@ defined by the public key of the message author.
 ## Serialization
 
 All transactions in Exonum are serialized using Protobuf. See the
-[Serialization](serialization.md) article for more details).
+[Serialization](serialization.md) article for more details.
 
 !!! note
     Each unique transaction message serialization is hashed with
@@ -140,12 +140,12 @@ All transactions in Exonum are serialized using Protobuf. See the
 
 ## Interface
 
-Transaction interface currently defines a single method - [`execute`](#execute).
+Transaction interface defines a single method – [`execute`](#execute).
 
-An extended version of the `verify` method, which was available previously, is
-scheduled for implementation by our team. Currently, the verification of the
-transaction signature is performed by the core of the framework. Additional
-verifications you might need to implement for transactions can be added using
+An extended version of the `verify` method, which was available in Exonum <0.10, is
+scheduled for implementation. Currently, the verification of the
+transaction signature is performed automatically by the core of the framework.
+Additional verifications might be implemented in
 the `execute` method.
 
 !!! tip
