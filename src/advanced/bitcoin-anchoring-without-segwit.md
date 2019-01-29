@@ -10,6 +10,10 @@ Even in the case of validators collusion, transaction history cannot be
 falsified. The discrepancy between the actual Exonum blockchain state and the
 one written to the Bitcoin blockchain will be found instantly.
 
+This document describes the **anchoring service operable** for all version of
+the framework **before Exonum v0.10**. Since Exonum v0.10 an
+[updated anchoring service](../bitcoin-anchoring.md) is applied.
+
 !!! note
     This page mostly describes how the service functions. There is a
     separate page, describing how the service should be
@@ -140,7 +144,7 @@ An anchoring transaction proposal is constructed as follows:
     - The change output of the selected common LECT. This input is present in
     every anchoring transaction except the first one.
     - The funding UTXO written in the global configuration (if it has not been
-       spent yet).
+      spent yet).
 
 - Its outputs contain data output and change output only. The
   change output goes first, and the data output goes second.
