@@ -5,11 +5,14 @@ Pygments==2.3.1
 pygments-github-lexers==0.0.5
 mkdocs-material==2.9.4
 ## The following requirements were added by pip freeze:
+backports-abc==0.5
+certifi==2018.4.16
 click==6.7
 livereload==2.5.2
 Markdown==2.6.11
 MarkupSafe==1.0
 pymdown-extensions==4.12
 PyYAML==3.13
+singledispatch==3.4.0.3
 six==1.11.0
 tornado==4.5.3
