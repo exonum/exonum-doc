@@ -246,8 +246,9 @@ Currently Java Binding includes the following built-in services:
 
 - **Configuration Update Service.**
   Although every node has its own configuration file, some settings should be
-  changed for all nodes simultaneously. This service allows updating
-  configuration through the blockchain itself.
+  changed for all nodes simultaneously. This service allows updating global
+  configuration parameters of the network without stopping the nodes. The
+  changes are agreed upon through the consensus mechanism.
 
   See the [*Configuration Update Service*](../advanced/configuration-updater.md)
   article for more details.
@@ -261,7 +262,7 @@ Currently Java Binding includes the following built-in services:
   article for more details.
 
 To enable a particular service, include its name in `ejb_app_services.toml`
-configuration file into EJB App's directory with the following content:
+configuration file in the EJB App's directory with the following content:
 
 ```toml
 services = ["service-name"]
@@ -269,10 +270,10 @@ services = ["service-name"]
 
 where possible values for `service-name` are:
 
-- `configuration` for Configuration Service.
+- `configuration` for Configuration Update Service.
 - `btc-anchoring` for Anchoring Service.
 
-In case of no `ejb_app_services.toml` file, only Configuration Service will
+In case there is no `ejb_app_services.toml` file, only Configuration Service will
 be activated.
 
 ### Dependencies Management
