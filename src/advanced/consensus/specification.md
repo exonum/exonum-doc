@@ -36,11 +36,11 @@ and -1/3 means less than one third.
 The consensus algorithm proceeds in rounds for each blockchain height
 (i.e., the number of blocks in the blockchain).
 Rounds are numbered from 1\. The onsets of rounds are determined
-by a fixed timetable:
+by the following timetable:
 
 - The first round starts after committing a block at the previous height
   to the blockchain
-- Rounds 2, 3, … start after regular intervals
+- Rounds 2, 3, … start after linearly increasing time intervals
 
 Rounds are not synchronized among nodes.
 
@@ -74,8 +74,8 @@ message processing.
 - `propose_timeout`  
   Proposal timeout after a new block is committed to the blockchain locally.
 
-- `round_timeout`  
-  Interval between algorithm rounds.
+- `first_round_timeout`  
+  Initial interval between algorithm rounds.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
@@ -351,7 +351,9 @@ round are placed into a separate queue (`queued`).
 
 - If the timeout does not match the current height and round, skip further
   timeout processing.
-- Add a timeout (its length is specified by `round_timeout`) for the next round.
+- Add a timeout for the `N`th round with the length
+  `first_round_timeout * (1 + (N - 1) * q)`,
+  where `q = 0.1` is the relative increase in a timeout after each round.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new
