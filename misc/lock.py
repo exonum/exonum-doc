@@ -43,6 +43,12 @@ RE_INFO_REQS = r'^Requires: (.*)$'
 # Comment separating packages automatically included by `pip freeze`
 RE_AUTO_REQS_COMMENT = r'^#.*pip freeze'
 
+def convert_to_str(s):
+    """Python 2/3 polyfill for strings."""
+    if 'bytes' in dir(__builtins__):
+        s = s.decode('utf-8') if isinstance(s, bytes) else s
+    return s
+
 def log(line):
     sys.stderr.write(line + '\n')
     sys.stderr.flush()
@@ -75,6 +81,7 @@ def package_info(name):
     log('Retrieving info for package {}'.format(name))
 
     output = subprocess.check_output(['pip', 'show', name])
+    output = convert_to_str(output)
     info = [ None, [] ]
     for line in output.splitlines():
         m_name, m_reqs = re.match(RE_INFO_NAME, line), re.match(RE_INFO_REQS, line)
@@ -102,6 +109,7 @@ def lock(filename):
         i += 1
 
     output = subprocess.check_output(['pip', 'freeze', '-r', filename])
+    output = convert_to_str(output)
     tr_output = ''
     auto_reqs = False
     for line in output.splitlines():
