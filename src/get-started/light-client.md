@@ -446,12 +446,12 @@ timestamps. The data on the timestamp can then be extracted from the validated
 timestamps table.
 
 Meanwhile, the proof we presently investigate contains another level. This level
-refers to the validation of transactions in respect of each wallet (wallet
+refers to the validation of transactions concerning a specific wallet (wallet
 history).  
 
 First, we obtain a proof for all transactions in the wallet. It will contain
 transactions hashes as well as statuses thereof. In our example we obtain
-information for the whole wallet transactions history. However, any suitable
+information for the whole wallet history. However, any suitable
 range of the history may be selected:
 
 ```javascript
