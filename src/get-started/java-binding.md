@@ -404,6 +404,42 @@ service:
 - Follow the instructions in the [application guide][app-tutorial] to configure
   and start an Exonum node with your service.
 
+## Built-In Services
+
+Currently Java Binding includes the following built-in services:
+
+- **Configuration Update Service.**
+  Although every node has its own configuration file, some settings should be
+  changed for all nodes simultaneously. This service allows updating global
+  configuration parameters of the network without stopping the nodes. The
+  changes are agreed upon through the consensus mechanism.
+
+  See the [*Configuration Update Service*](../advanced/configuration-updater.md)
+  article for more details.
+- **Anchoring Service.**
+  The anchoring service writes the hash of the current Exonum blockchain state
+  to the Bitcoin blockchain with a certain time interval. The anchored data is
+  authenticated by a supermajority of validators using digital signature tools
+  available in Bitcoin.
+
+  See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
+  article for more details.
+
+To enable a particular service, include its name in `ejb_app_services.toml`
+configuration file in the EJB App's directory with the following content:
+
+```toml
+services = ["service-name"]
+```
+
+where possible values for `service-name` are:
+
+- `configuration` for Configuration Update Service.
+- `btc-anchoring` for Anchoring Service.
+
+In case there is no `ejb_app_services.toml` file, only Configuration Service will
+be activated.
+
 ## Common Library
 
 Java Binding includes a library module that can be useful for Java client
