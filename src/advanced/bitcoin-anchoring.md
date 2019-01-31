@@ -10,7 +10,7 @@ Even in the case of validators collusion, transaction history cannot be
 falsified. The discrepancy between the actual Exonum blockchain state and the
 one written to the Bitcoin blockchain will be found instantly.
 
-This document describes the **anchoring service operable with Exonum v0.10**.
+This document describes the **anchoring service operable with Exonum v0.10+**.
 For information on the anchoring service compatible with all previous versions
 of the framework, please refer to a
 [separate document](bitcoin-anchoring-without-segwit.md).
@@ -83,23 +83,23 @@ Validators signatures over anchoring transactions are openly written in the
 Exonum blockchain; more than `M` signatures can be published (it is a common
 case).
 
-As of Exonum 0.10 version the anchoring service applies
-[Segregated Witness][segwit] for building anchoring bitcoin transactions. Now,
-since signature data is no longer a part of the transaction hash, the number
+The anchoring service applies
+[Segregated Witness][segwit] for building anchoring bitcoin transactions.
+Since signature data is not a part of the SegWit transaction hash, the number
 and order of signatures put over a transaction no longer influence the
 [transaction identification][transaction_malleability]. In this way
-anchoring transactions are fully deterministic - a new transaction is determined
+anchoring transactions are fully deterministic – a new transaction is determined
 based on the latest anchoring transaction and the current Exonum state hash to
 be anchored.
 
-Moreover, as it is not possible to mutate an anchoring transaction any more,
+Moreover, as it is not possible to mutate a SegWit anchoring transaction,
 there is no need to wait every time for confirmations from the Bitcoin
 Blockchain that a new anchoring transaction has been committed into the network.
-The following anchoring transaction may be safely suggested without such
+The following anchoring transaction(s) may be safely suggested without such
 confirmations.  
 
 Exonum uses a [`bitcoind` client](#bitcoind-node), and the transaction
-determined by the service is considered valid by the bitcoind-node.
+determined by the service is considered valid by the `bitcoind` node.
 
 ### Anchoring Transaction Proposal Detailed Structure
 
