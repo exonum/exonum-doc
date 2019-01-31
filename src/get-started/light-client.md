@@ -111,7 +111,8 @@ When the `.proto` file is ready, generate the `*.js` stub file with
 pbjs --keep-case -t static-module timestamping.proto -o ./proto.js
 ```
 
-This command can be added into `scripts` section of your `package.json` for further build automatization.
+This command can be added into `scripts` section of your `package.json`
+for further build automatization.
 
 ##### Reflection Method
 
