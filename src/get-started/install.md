@@ -49,7 +49,7 @@ apt-get install build-essential libsodium-dev libsnappy-dev \
     librocksdb-dev pkg-config
 ```
 
-For `protobuf` installation:
+For `protobuf` installation add the following dependencies:
 ```shell
 add-apt-repository ppa:maarten-fonville/protobuf
 apt install libprotobuf-dev protobuf-compiler
@@ -58,7 +58,8 @@ apt install libprotobuf-dev protobuf-compiler
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
 
-Depending on the version of your distributive, libsodium, RocksDB and protobuf may not
+Depending on the version of your distributive, libsodium, RocksDB and Protobuf
+may not
 be present in the default package lists. In this case you may need to install
 these packages from third-party PPAs, or build them from sources.
 
@@ -68,14 +69,14 @@ Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
-- [protobuf][protobuf]
+- [Protobuf][protobuf]
 
-Use package manager [Chocolatey][chocolatey] to install protobuf:
+Use package manager [Chocolatey][chocolatey] to install Protobuf:
 ```shell
 choco install -y protobuf
 ```
 
-## Adding environment variables
+## Adding Environment Variables
 
 If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
 you may setup `ROCKSDB_LIB_DIR` and/or `SNAPPY_LIB_DIR` environment variable
@@ -105,8 +106,8 @@ by using the [rustup](https://www.rustup.rs) program:
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 ```
 
-For Windows, download and run `rustup-init.exe` from [the rustup website](https://www.rustup.rs/)
-instead.
+For Windows, download and run `rustup-init.exe` from
+[the rustup website](https://www.rustup.rs/) instead.
 
 The Rust toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
@@ -119,8 +120,8 @@ of which the most important one is [Cargo][cargo], the Rust package manager.
     a precise range of supported Rust versions.
     Older toolchains (for example, those that come with Linux
     distributions) might cause Exonum compilation to fail, as Exonum uses
-    some new language features. Please use rustup to install a compatible toolchain
-    in this case.
+    some new language features. Please use rustup to install a compatible
+    toolchain in this case.
 
 ## Compiling Exonum
 
@@ -138,7 +139,7 @@ You may also run the extended test suite located in the `sandbox` directory:
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml
 ```
-Notice that `tests` are required up to 30Gb free disk space.
+Notice that `tests` requires up to 30Gb free disk space.
 
 ## Non-Rust Components
 
@@ -146,11 +147,11 @@ Notice that `tests` are required up to 30Gb free disk space.
 
 [The light client library][exonum-client] uses a fairly standard JavaScript
 development toolchain:
-[Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for testing
-(and [Karma][karma] for browser testing),
+[Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for
+testing (and [Karma][karma] for browser testing),
 [istanbul][istanbul] for measuring test coverage, and
-[Babel][babel] for transpiling to ES5. Workability of the development environment
-is tested on Node 4+.
+[Babel][babel] for transpiling to ES5. Workability of the development
+environment is tested on Node 4+.
 
 !!! note
     The light client library itself can run both on Node and in browsers.
