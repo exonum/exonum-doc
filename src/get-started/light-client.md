@@ -120,21 +120,21 @@ The same schema, as produced above, is represented below with the help of
 JavaScript reflections of .proto definitions:
 
 ```javascript
-let Root  = protobuf.Root,
-    Type  = protobuf.Type,
-    Field = protobuf.Field;
+const { Root, Type, Field } = protobuf
 
-let root = new Root().define("timestamping")
+const root = new Root().define("timestamping")
 
-let Hash = new Type("Hash").add(new Field("data", 1, "bytes"));
-root.add(Hash);
+const Hash = new Type("Hash").add(new Field("data", 1, "bytes"))
+root.add(Hash)
 
-let Timestamp = new Type("Timestamp").add(new Field("content_hash", 1, "timestamping.Hash"));
-Timestamp.add(new Field("metadata", 2, "string"));
-root.add(Timestamp);
+const Timestamp = new Type("Timestamp")
+  .add(new Field("content_hash", 1, "timestamping.Hash"))
+Timestamp.add(new Field("metadata", 2, "string"))
+root.add(Timestamp)
 
-let TxTimestamp = new Type("TxTimestamp").add(new Field("content", 1, "timestamping.Timestamp"));
-root.add(TxTimestamp);
+const TxTimestamp = new Type("TxTimestamp")
+  .add(new Field("content", 1, "timestamping.Timestamp"))
+root.add(TxTimestamp)
 ```
 
 #### Generate a Signing Key Pair
@@ -258,10 +258,8 @@ message TransferFunds {
 
 As the `.proto` file is ready, generate the `*.js` file as follows:
 
-```json
-{
-  "proto": "pbjs --keep-case -t static-module example.proto -o ./proto.js"
-}
+```shell
+pbjs --keep-case -t static-module example.proto -o ./proto.js
 ```
 
 #### Define a Transaction Schema
@@ -280,8 +278,7 @@ const TransferFunds = Exonum.newTransaction({
 ```
 
 The fields are the same as for the `CreateTimestamp` transaction. You can find
-their description in the corresponding [section][#define-a-transaction-schema]
-above.
+their description in the corresponding [section above](#define-a-transaction-schema).
 
 #### Define Transaction Data
 
@@ -290,10 +287,7 @@ identify the sender by the public key of his wallet. The wallet keys must be
 generated in advance, when creating said wallet:
 
 ```javascript
-const data = {
-  amount: amount,
-  seed: seed
-}
+const data = { amount, seed }
 ```
 
 #### Sign and Send the Transaction
@@ -407,10 +401,12 @@ message Wallet {
   uint64 history_len = 4;
   // Hash of the transactions history.
   Hash history_hash = 5;
+}
 ```
 
 ```javascript
-const Wallet = Exonum.newType(proto.exonum.examples.cryptocurrency_advanced.Wallet)
+const { cryptocurrency_advanced } = proto.exonum.examples
+const Wallet = Exonum.newType(cryptocurrency_advanced.Wallet)
 ```
 
 We then obtain the proof down to the required wallet:
@@ -513,7 +509,7 @@ for (let transaction of data.wallet_history.transactions) {
   const bufferWithoutSignature = buffer.subarray(0, buffer.length - 64)
   const author = Exonum.uint8ArrayToHexadecimal(buffer.subarray(0, 32))
   const signature = Exonum.uint8ArrayToHexadecimal(
-    buffer.subarray(buffer.length - 64, buffer.length));
+    buffer.subarray(buffer.length - 64, buffer.length))
 
   const Transaction = new Exonum.newTransaction({
     author: author,
