@@ -107,11 +107,11 @@ message TxTimestamp { Timestamp content = 1; }
 When the `.proto` file is ready, generate the `*.js` stub file with
 [pbjs][pbjs-lib] library as follows:
 
-```json
-{
-  "proto": "pbjs --keep-case -t static-module timestamping.proto -o ./proto.js"
-}
+```bash
+pbjs --keep-case -t static-module timestamping.proto -o ./proto.js
 ```
+
+This command can be added into `scripts` section of your `package.json` for further build automatization.
 
 ##### Reflection Method
 
@@ -201,7 +201,8 @@ Finally, send the resulting transaction into the blockchain using the built-in
 `send` method which returns a `Promise`:
 
 ```javascript
-const transactionHash = await CreateTimestamp.send(transactionEndpoint, data, keyPair.secretKey)
+const transactionHash = await CreateTimestamp.send(
+  transactionEndpoint, data, keyPair.secretKey)
 ```
 
 - `transactionEndpoint` represents API address of the transaction handler in the
@@ -528,9 +529,8 @@ for (let transaction of data.wallet_history.transactions) {
 
   // Serialize transaction from the debug view and compare it with the
   // `bufferWithoutSignature` obtained above.
-  if (!Transaction.serialize(transaction.debug).every(function (el, i) {
-     return el === bufferWithoutSignature[i]
-  })) {
+  if (!Transaction.serialize(transaction.debug)
+    .every((el, i) => el === bufferWithoutSignature[i])) {
     throw new Error('Invalid transaction message')
   }
 
