@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "0.1",
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
@@ -38,6 +38,7 @@
     "Guice",
     "healthcheck",
     "HMACs",
+    "idempotence",
     "junit",
     "keypair",
     "leveldb",
@@ -62,6 +63,7 @@
     "outmost",
     "parallelized",
     "pbft",
+    "pbjs",
     "permissioned",
     "permissionless",
     "precommit",
@@ -101,6 +103,7 @@
     "templating",
     "tendermint",
     "testkit",
+    "timestamped",
     "timestamping",
     "timestamps",
     "toml",
