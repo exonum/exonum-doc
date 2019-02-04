@@ -64,12 +64,12 @@ Messages are digitally signed pieces of data transmitted through the Exonum
 framework. The core of the framework validates the signature over the message.
 All messages have a uniform structure with which they should comply:
 
-| Position (bytes) | Stored data             |
-| - - - - - | - - - - - - - - - - - - |
-| `0..32`   | author's public key     |
+| Position (bytes) | Stored data      |
+|:----------|:------------------------|
+| `0..32`   | author’s public key     |
 | `32`      | message class           |
 | `33`      | message type            |
-| `34..N`   | payload                |
+| `34..N`   | payload                 |
 | `N..N+64` | signature               |
 
 Exonum utilizes the following message classes and types:
@@ -112,7 +112,7 @@ Service is represented as follows using the Protobuf description:
 message TxTransfer {
   // Public key of the receiver.
   exonum.PublicKey to = 1;
-  // Amount of tokens to transfer from sender's account to receiver.
+  // Amount of tokens to transfer from sender’s account to receiver.
   uint64 amount = 2;
   // Auxiliary number to guarantee non-idempotence of transactions.
   uint64 seed = 3;  
