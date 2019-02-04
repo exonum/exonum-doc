@@ -60,7 +60,8 @@ Service endpoints are automatically aggregated and dispatched by the Exonum
 middleware layer.
 
 !!! note
-    Exonum uses [the `actix-web` framework][actix-web] to specify service endpoints,
+    Exonum uses [the `actix-web` framework][actix-web] to specify service
+    endpoints,
     both public and private. Public and private API endpoints are served on
     different
     sockets, which allows to specify stricter firewall rules for private APIs.
@@ -160,8 +161,9 @@ making it possible to efficiently compute proofs for read requests that involve
 the items of the collection. Merkelized versions of maps and lists are
 `ProofMapIndex` and `ProofListIndex`, respectively.
 
-Naturally, the items of collections (and keys in the case of maps) need to be
-serializable. Exonum uses `protobuf` for (de)serialization and conversion of Exonum datatypes to JSON for communication with light clients.
+Naturally, the items of collections (and keys, in case of maps) need to be
+serializable. Exonum uses `protobuf` for (de)serialization and conversion of
+Exonum datatypes to JSON for communication with light clients.
 
 ### Configuration
 
@@ -238,30 +240,33 @@ Transactions are executed during [the precommit stage](consensus.md)
 of the consensus (this concerns validators only) or when a node receives a
 block.
 
-### Event handling
+### Event Handling
 
 Services may subscribe to events (such as a block being committed) and perform
-some work in the event handler. The event handlers cannot modify the blockchain
-state, but can be used for various tasks such as logging, data migrations,
+some work in the event handlers. Some event handlers cannot modify the
+blockchain state, while some handlers can. See
+[Commit Handler](#commit-handler) section for more information on the applied
+handlers.
+
+The handlers can be used for various tasks such as logging, data migrations,
 updating local parameters, and/or generating and broadcasting transactions to
 the blockchain network.
 
 !!! note
-    The only built-in event is block commit. More events
+    Currently, the only built-in event for services subscription is block
+    commit. The handlers operable with this event are `before_commit` and
+    `after_commit`. More events
     will be added in the future, including possibility for services to define
     and emit events and for services and light clients to subscribe to events
     emitted by the services.
 
-> Maybe we can extend this to before_commit and after_commit.
-
 ## Service Development
 
 !!! note
-    You can only code services in
-    [Rust](http://rust-lang.org/).
-    Rust is probably the safest general-purpose programming language, but it is
-    not very easy to master. Java binding
-    [is a high-priority task](../roadmap.md).
+    You can code Exonum services in [Rust](http://rust-lang.org/) or Java.
+    Rust has been chosen as probably the safest general-purpose programming
+    language, but it is not very easy to master. To develop Exonum services in
+    Java, use the [Java Binding tool][java-binding].
 
 Here is a list of things to figure out when developing an Exonum service:
 
@@ -301,7 +306,7 @@ There are some temporary limitations on what you can do
 with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
 on when and how these limitations are going to be lifted.
 
-#### Interaction Among Services
+#### Interaction among Services
 
 There is no unified API for services to
 access other services’ endpoints. As an example, a service cannot call a
@@ -323,8 +328,7 @@ established in the [`Service`][service.rs] trait.
 This trait defines the following methods that need to be implemented by
 a service developer.
 
-> We'd better link docs.rs page for the `Service` trait
-> rather than its source code.
+<!-- link docs.rs page for the `Service` trait rather than its source code-->
 
 ### Service Identifiers
 
@@ -429,28 +433,41 @@ It must be redefined for services that have global configuration parameters.
 
 ### Commit Handler
 
-```rust
-fn after_commit(&self, context: &ServiceContext) { }
-```
+Currently Exonum provides two [event handlers](#event-handling).
 
-`after_commit` is invoked for every deployed service each time a block
-is committed in the blockchain locally. This method is example
-of [event-based processing](#event-handling). The method receives the service
-context, which can be used to inspect the blockchain state, create transactions
-and push them in the queue for broadcasting, etc.
-
-!!! note
-    Keep in mind that `after_commit` is sequentially invoked for each block
-    in the blockchain during an initial full node synchronization.
+- `before_commit` method:
 
 ```rust
 fn before_commit(&self, fork: &mut Fork) { }
 ```
+
+This method is invoked for every deployed service each time a new block
+is formed but before it is committed to the blockchain. The method analyses the
+results of a new block execution and adds some information into this block in
+accordance with the expected new blockchain state. For example, such
+information may be
+some statistical data. In this way the handler may affect the blockchain state.
+
 The order of invoking `before_commit` method for every service depends on the
 service ID. `before_commit` for the service with the smallest ID is invoked
 first up to the largest one.
-Effectively, this means that services should not rely on a particular ordering of
-`Service::execute` invocations.
+
+- `after_commit` method:
+
+```rust
+fn after_commit(&self, context: &ServiceContext) { }
+```
+
+This method is invoked for every deployed service each time a block
+is committed in the blockchain locally. `after_commit` receives the
+service context, which can be used to inspect the blockchain state, create
+transactions and push them into the queue for broadcasting, etc. Unlike
+`before_commit` the operations of this handler do not affect the blockchain
+state.
+
+!!! note
+    Keep in mind that `after_commit` is sequentially invoked for each block
+    in the blockchain during the initial full node synchronization.
 
 ### REST API Initialization
 
@@ -487,7 +504,8 @@ A good place for such code is event handlers.
 
 ### Services vs Smart Contracts
 
-Services are “larger” than smart contracts in Ethereum. For example, in Ethereum
+Services are “larger” than smart contracts in Ethereum. For example, in
+Ethereum
 multi-signature contracts are instantiated for each specific configuration of
 participants;
 in Exonum, all multi-signature functionality can be contained within a single
@@ -527,3 +545,4 @@ running the service might not know this information.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
+[java-binding]: https://github.com/exonum/exonum-java-binding
