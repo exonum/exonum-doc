@@ -35,14 +35,20 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 [package]
 name = "exonum_cryptocurrency"
 version = "0.0.0"
+edition = "2018"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "0.9.0"
+exonum = "0.10.0"
+exonum-derive = "0.10.0"
+failure = "0.1.5"
 serde = "1.0.0"
-serde_json = "1.0.0"
 serde_derive = "1.0.0"
-failure = "0.1.1"
+serde_json = "1.0.0"
+protobuf = "2.2.0"
+
+[build-dependencies]
+exonum-build = "0.10.0"
 ```
 
 ## Imports
@@ -53,15 +59,14 @@ Let’s start with importing crates with necessary types:
 
 ??? note "Imports"
     ```rust
-    #[macro_use]
-    extern crate exonum;
-    #[macro_use]
-    extern crate failure;
-    extern crate serde;
-    #[macro_use]
-    extern crate serde_derive;
-    extern crate serde_json;
-    use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
+	#[macro_use]
+	extern crate exonum_derive;
+	#[macro_use]
+	extern crate failure;
+	#[macro_use]
+	extern crate serde_derive;
+
+	use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
     use exonum::blockchain::{Blockchain, ExecutionError,
                              ExecutionResult, Service, Transaction,
                              TransactionSet};
@@ -90,38 +95,94 @@ We should declare what kind of data the service will store in the blockchain.
 In our case we need to declare a single type – *wallet*.
 Inside the wallet we want to store:
 
-- **Public key** to validate requests from the owner of the wallet
+- **Public key** address of the wallet
 - **Name of the owner** (purely for convenience reasons)
 - **Current balance** of the wallet
 
 Summing it all up, the `Wallet` datatype will look like:
 
-```rust
-encoding_struct! {
-    struct Wallet {
-        pub_key: &PublicKey,
-        name: &str,
-        balance: u64,
-    }
+`proto/cryptocurrency.proto`:
+```protobuf
+syntax = "proto3";
+
+import "helpers.proto"; // For exonum.PublicKey
+
+// Wallet struct used to persist data within the service.
+message Wallet {
+  exonum.PublicKey pub_key = 1;
+  string name = 2;
+  uint64 balance = 3;
 }
 ```
 
-Macro `encoding_struct!` helps declare a
-[serializable](../architecture/serialization.md)
-struct and determine bounds of its fields. We need to change the wallet balance,
-so we add methods to the `Wallet` type:
+To use generate rust struct from this definition:
+1) add module named `proto` to your project with `cryptocurrency.proto` file 
+2) Add `proto/mod.rs` file with the following content 
+```rust
+// For protobuf generated files.
+#![allow(bare_trait_objects)]
+#![allow(renamed_and_removed_lints)]
+
+pub use self::cryptocurrency::Wallet;
+
+include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
+
+use exonum::proto::schema::*;rust
+```
+
+3) Add rust code generate to your `build.rs`. You should have `protoc` installed.
+`build.rs`
+```rust
+extern crate exonum_build;
+
+use exonum_build::{get_exonum_protobuf_files_path, protobuf_generate};
+
+fn main() {
+    let exonum_protos = get_exonum_protobuf_files_path();
+    protobuf_generate(
+        "src/proto",
+        &["src/proto", &exonum_protos],
+        "protobuf_mod.rs",
+    );
+}
+```
+
+Then you can crate structure definition based on your .proto schema.
+```rust
+#[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
+#[exonum(pb = "proto::Wallet")]
+pub struct Wallet {
+    pub pub_key: PublicKey,
+    pub name: String,
+    pub balance: u64,
+}
+```
+
+Derive `ProtobufConvert` from `exonum_derive` helps to validate
+protobuf structure and use `exonum::crypto::PublicKey` in our struct. 
+
+We need to change the wallet balance, so we add methods to the `Wallet` type:
 
 ```rust
 impl Wallet {
+    pub fn new(&pub_key: &PublicKey, name: &str, balance: u64) -> Self {
+        Self {
+            pub_key,
+            name: name.to_owned(),
+            balance,
+        }
+    }
+
     pub fn increase(self, amount: u64) -> Self {
-        let balance = self.balance() + amount;
-        Self::new(self.pub_key(), self.name(), balance)
+        let balance = self.balance + amount;
+        Self::new(&self.pub_key, &self.name, balance)
     }
 
     pub fn decrease(self, amount: u64) -> Self {
-        let balance = self.balance() - amount;
-        Self::new(self.pub_key(), self.name(), balance)
-    }
+        debug_assert!(self.balance >= amount);
+        let balance = self.balance - amount;
+        Self::new(&self.pub_key, &self.name, balance)
+	}
 }
 ```
 
@@ -204,40 +265,60 @@ For our Cryptocurrency Tutorial we need two transaction types:
 - Create a new wallet and add some money to it
 - Transfer money between two different wallets
 
-Service transactions are defined through `transactions!` macro
+Service transactions are defined through enum with derive of the `TransactionSet`
 that automatically assigns transaction IDs based on the declaration order:
 
-```rust
-transactions! {
-    // Transaction group.
-    pub CurrencyTransactions {
-        const SERVICE_ID = SERVICE_ID;
+```protobuf
+// Transaction type for creating a new wallet.
+message TxCreateWallet {
+  // UTF-8 string with the owner's name.
+  string name = 1;
+}
 
-        // Transaction type for creating a new wallet.
-        struct TxCreateWallet {
-            pub_key: &PublicKey,
-            name: &str,
-        }
-
-        // Transaction type for transferring tokens between two wallets.
-        struct TxTransfer {
-            from: &PublicKey,
-            to: &PublicKey,
-            amount: u64,
-            seed: u64,
-        }
-    }
+// Transaction type for transferring tokens between two wallets.
+message TxTransfer {
+  // Public key of the receiver.
+  exonum.PublicKey to = 1;
+  // Number of tokens to transfer from sender's account to receiver's account.
+  uint64 amount = 2;
+  // Auxiliary number to guarantee non-idempotence of transactions.
+  uint64 seed = 3;
 }
 ```
 
-The transaction to create a new wallet (`TxCreateWallet`) contains
-the public key of the wallet and the name of the user who created this wallet.
+```rust
+#[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
+#[exonum(pb = "proto::TxCreateWallet")]
+pub struct TxCreateWallet {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
+#[exonum(pb = "proto::TxTransfer")]
+pub struct TxTransfer {
+    pub to: PublicKey,
+    pub amount: u64,
+    pub seed: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, TransactionSet)]
+pub enum CurrencyTransactions {
+    /// Create wallet transaction.
+    CreateWallet(TxCreateWallet),
+    /// Transfer tokens transaction.
+    Transfer(TxTransfer),
+}
+```
+
+The transaction to create a new wallet (`TxCreateWallet`) contains 
+name of the user who created this wallet. Address of the wallet will
+be derrived from public key that was used to sign this transaction.
 
 The transaction to transfer coins between different wallets (`TxTransfer`)
-involves two public keys: for the sender’s wallet (`from`) and
-for the receiver’s one (`to`). It also contains the amount of money to move
+has receiver public key (`to`). It also contains the amount of money to move
 between them. We add the `seed` field to make sure that our transaction is
 [impossible to replay](../architecture/transactions.md#non-replayability).
+Sender public key will be the same key that was used to sign transaction.
 
 ### Reporting Errors
 
@@ -283,29 +364,27 @@ impl From<Error> for ExecutionError {
 
 Every transaction in Exonum has business logic of the blockchain attached,
 which is encapsulated in the `Transaction` trait.
-This trait includes the `verify` method to verify the integrity of the
-transaction, and the `execute` method which contains logic applied to the
+This trait has `execute` method which contains logic applied to the
 storage when a transaction is executed.
 
-In our case, `verify` for both transaction types will check the transaction
-signature. `execute` method gets the reference to the `Fork` of the storage, so
-we wrap it with our `CurrencySchema` to access our data layout.
+In our case `execute` method gets the reference to the `TransactionContext` which 
+include `Fork` of the storage (can be accessed with `.fork()`) and public key which was
+used to sign transaction (can be accesses with `.author()`),
+we wrap `Fork` with our `CurrencySchema` to access our data layout.
 
 For creating a wallet, we check that the wallet does not exist and add a new
 wallet if so:
 
 ```rust
 impl Transaction for TxCreateWallet {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.pub_key())
-    }
-
-    fn execute(&self, view: &mut Fork) -> ExecutionResult {
+    fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
+        let author = context.author();
+        let view = context.fork();
         let mut schema = CurrencySchema::new(view);
-        if schema.wallet(self.pub_key()).is_none() {
-            let wallet = Wallet::new(self.pub_key(), self.name(), INIT_BALANCE);
+        if schema.wallet(&author).is_none() {
+            let wallet = Wallet::new(&author, &self.name, INIT_BALANCE);
             println!("Create the wallet: {:?}", wallet);
-            schema.wallets_mut().put(self.pub_key(), wallet);
+            schema.wallets_mut().put(&author, wallet);
             Ok(())
         } else {
             Err(Error::WalletAlreadyExists)?
@@ -329,32 +408,34 @@ create money out of thin air.
 
 ```rust
 impl Transaction for TxTransfer {
-    fn verify(&self) -> bool {
-         (*self.from() != *self.to()) &&
-             self.verify_signature(self.from())
-    }
+    fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
+        let author = context.author();
+        let view = context.fork();
 
-    fn execute(&self, view: &mut Fork) -> ExecutionResult {
+        if author == self.to {
+            Err(Error::SenderSameAsReceiver)?
+        }
+
         let mut schema = CurrencySchema::new(view);
 
-        let sender = match schema.wallet(self.from()) {
+        let sender = match schema.wallet(&author) {
             Some(val) => val,
             None => Err(Error::SenderNotFound)?,
         };
 
-        let receiver = match schema.wallet(self.to()) {
+        let receiver = match schema.wallet(&self.to) {
             Some(val) => val,
             None => Err(Error::ReceiverNotFound)?,
         };
 
-        let amount = self.amount();
-        if sender.balance() >= amount {
+        let amount = self.amount;
+        if sender.balance >= amount {
             let sender = sender.decrease(amount);
             let receiver = receiver.increase(amount);
             println!("Transfer between wallets: {:?} => {:?}", sender, receiver);
             let mut wallets = schema.wallets_mut();
-            wallets.put(self.from(), sender);
-            wallets.put(self.to(), receiver);
+            wallets.put(&author, sender);
+            wallets.put(&self.to, receiver);
             Ok(())
         } else {
             Err(Error::InsufficientCurrencyAmount)?
@@ -384,32 +465,10 @@ struct CryptocurrencyApi;
 
 ### API for Transactions
 
-The core processing logic is essentially the same for both types of transactions:
-
-1. Convert JSON input into a `Transaction`
-2. Send the transaction to the channel, so that it will be broadcasted over the
-  blockchain network and included into the block.
-3. Synchronously respond with a hash of the transaction
-
-This logic can be encapsulated in a method in `CryptocurrencyApi`:
-
-```rust
-#[derive(Serialize, Deserialize)]
-pub struct TransactionResponse {
-    // Hash of the transaction.
-    pub tx_hash: Hash,
-}
-
-impl CryptocurrencyApi {
-    fn post_transaction(state: &ServiceApiState, query: CurrencyTransactions)
-     -> api::Result<TransactionResponse> {
-        let transaction: Box<Transaction> = query.into();
-        let tx_hash = transaction.hash();
-        state.sender().send(transaction)?;
-        Ok(TransactionResponse { tx_hash })
-    }
-}
-```
+The core processing logic is essentially the same for all types of transactions and
+implemented by `exonum`, to send transaction you have to create transaction message 
+according to `message-TODO_LINK`. Where transaction id is transaction number in enum
+with `#[derive(TransactionSet)]` (count starts with 0).
 
 ### API for Read Requests
 
@@ -423,27 +482,25 @@ To accomplish this, we define a couple of corresponding methods in
 For parsing a public key of a specific wallet we define a helper structure.
 
 ```rust
-#[derive(Deserialize)]
 /// The structure describes the query parameters for the `get_wallet` endpoint.
-struct WalletQuery {
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub struct WalletQuery {
     /// Public key of the queried wallet.
-    pub_key: PublicKey,
+    pub pub_key: PublicKey,
 }
 
 impl CryptocurrencyApi {
     /// Endpoint for getting a single wallet.
-    fn get_wallet(state: &ServiceApiState, query: WalletQuery)
-     -> api::Result<Wallet> {
+    pub fn get_wallet(state: &ServiceApiState, query: WalletQuery) -> api::Result<Wallet> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         schema
             .wallet(&query.pub_key)
-            .ok_or_else(|| api::Error::NotFound("Wallet not found".to_owned()))
+            .ok_or_else(|| api::Error::NotFound("\"Wallet not found\"".to_owned()))
     }
 
     /// Endpoint for dumping all wallets from the storage.
-    fn get_wallets(state: &ServiceApiState, _query: ())
-     -> api::Result<Vec<Wallet>> {
+    pub fn get_wallets(state: &ServiceApiState, _query: ()) -> api::Result<Vec<Wallet>> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
@@ -464,17 +521,12 @@ We do this in the `CryptocurrencyApi::wire()` method:
 
 ```rust
 impl CryptocurrencyApi {
-    fn wire(builder: &mut ServiceApiBuilder) {
+    pub fn wire(builder: &mut ServiceApiBuilder) {
         // Binds handlers to specific routes.
         builder
             .public_scope()
-            // Read only endpoints uses `GET` method.
             .endpoint("v1/wallet", Self::get_wallet)
-            .endpoint("v1/wallets", Self::get_wallets)
-            // But for methods that can modify service state you should use
-            // `endpoint_mut` that uses `POST` method.
-            .endpoint_mut("v1/wallets", Self::post_transaction)
-            .endpoint_mut("v1/wallets/transfer", Self::post_transaction);
+            .endpoint("v1/wallets", Self::get_wallets);
     }
 }
 ```
@@ -485,6 +537,7 @@ Service is a group of templated transactions (we have defined them before). It
 has a name and a unique id to determine the service inside the blockchain.
 
 ```rust
+#[derive(Debug)]
 pub struct CurrencyService;
 ```
 
@@ -519,23 +572,27 @@ in `CryptocurrencyApi` earlier.
 
 ```rust
 impl Service for CurrencyService {
-    fn service_name(&self) -> &'static str { "cryptocurrency" }
+    fn service_name(&self) -> &'static str {
+        "cryptocurrency"
+    }
 
-    fn service_id(&self) -> u16 { SERVICE_ID }
+    fn service_id(&self) -> u16 {
+        SERVICE_ID
+    }
 
-    fn tx_from_raw(&self, raw: RawTransaction) ->
-        Result<Box<Transaction>, encoding::Error>
-    {
+    // Implement a method to deserialize transactions coming to the node.
+    fn tx_from_raw(&self, raw: RawTransaction) -> Result<Box<dyn Transaction>, failure::Error> {
         let tx = CurrencyTransactions::tx_from_raw(raw)?;
         Ok(tx.into())
     }
 
-    fn state_hash(&self, _: &Snapshot) -> Vec<Hash> {
+    fn state_hash(&self, _: &dyn Snapshot) -> Vec<Hash> {
         vec![]
     }
 
+    // Links the service api implementation to the Exonum.
     fn wire_api(&self, builder: &mut ServiceApiBuilder) {
-        CryptocurrencyApi::wire(builder)
+        CryptocurrencyApi::wire(builder);
     }
 }
 ```
@@ -674,14 +731,7 @@ Create `create-wallet-1.json` file and insert the following code into it:
 
 ```json
 {
-  "body": {
-    "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85",
-    "name": "Alice"
-  },
-  "protocol_version": 0,
-  "service_id": 1,
-  "message_id": 0,
-  "signature": "9f684227f1de663775848b3db656bca685e085391e2b00b0e115679fd45443ef58a5abeb555ab3d5f7a3cd27955a2079e5fd486743f36515c8e5bea07992100b"
+  "tx_body": "114e49a764813f2e92609d103d90f23dc5b7e94e74b3e08134c1272441614bd90000010000000a05416c69636587b54e335ef652ccae5112388d128e5162326f60d25196b34ad431e394ee2f77cfe72d201d7ba12db9b9ddd278235493dc444a3671a4710e87bad53411a45a0c"
 }
 ```
 
@@ -689,7 +739,7 @@ Use the `curl` command to send this transaction to the node by HTTP:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+    http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 This transaction creates the first wallet associated with user Alice.
@@ -714,14 +764,7 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 
 ```json
 {
-  "body": {
-    "pub_key": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
-    "name": "Bob"
-  },
-  "protocol_version": 0,
-  "service_id": 1,
-  "message_id": 0,
-  "signature": "059f0a281ab63e00839310db8ba680ca550c9f6e3ccc9463dc7a8a82342f70bdbdc8237f6af9d20bbcd3ad5547c3f24d2dc80fcd9c954e087a80742f995e160c"
+  "tx_body": "9359df9223bd4c263692a437e3d244b644c7b7f847db12cc556c2e25c73e61030000010000000a03426f62583236ff2afe268d31ca93ab0258cb3fea944551975d95888dbec88787fb5b1e23a044c4e674c6fbbb239ff7de83e8d3ba8ca57dc7e47a3eb52572f9dbd9df02"
 }
 ```
 
@@ -729,7 +772,7 @@ Send it with `curl` to the node:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+    http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 It returns the hash of the second transaction:
@@ -754,16 +797,7 @@ Create `transfer-funds.json` and add the following code to this file:
 
 ```json
 {
-  "body": {
-    "from": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85",
-    "to": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2",
-    "amount": "15",
-    "seed": "0"
-  },
-  "protocol_version": 0,
-  "service_id": 1,
-  "message_id": 1,
-  "signature": "2c234680adaa67f1e6573895f1557230ea5373b0972f8aa714611f78931c4bae49680580d41ac806977a7a4f9556781018f1061c9be4adcaabc3760c5a92a70b"
+  "tx_body": "114e49a764813f2e92609d103d90f23dc5b7e94e74b3e08134c1272441614bd90000010001000a220a209359df9223bd4c263692a437e3d244b644c7b7f847db12cc556c2e25c73e6103100f7611ddb5d15e4b77894fae770e5b15f19c07e0f7c7472e31fabe850f0067fb3ab4702130ba6325448d53516a8897a1d9228ba6a87b0e1224143c1b629c4d180b"
 }
 ```
 
@@ -772,7 +806,7 @@ Send it to the node with:
 
 ```sh
 curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json \
-    http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets/transfer
+    http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 This request returns the transaction hash:
