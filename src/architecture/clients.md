@@ -10,8 +10,7 @@ The client functions are divided into the following submodules:
 
 - **Data**. Functions for [serialization and deserialization of
   data](serialization.md) from the JSON format to
-  protobuf binary format
-
+  Protobuf binary format
 - **Cryptography**. Functions for calculating hashes, creating
   and validating digital signatures
 - **Proofs**. Functions for checking cryptographic proofs that
@@ -42,19 +41,19 @@ implemented in Exonum light client.
 ![Sending data to the blockchain](../images/send-data.png)
 
 1. On triggering frontend application (for example, by a button click handler)
-  a new transaction is created. The transaction data is stored in JSON format.
-  Then the data is *converted to the protobuf binary format* and
-  *digitally signed* using the light client library.
+   a new transaction is created. The transaction data is stored in JSON format.
+   Then the data is *converted to the Protobuf binary format* and
+   *digitally signed* using the light client library.
 2. Frontend application receives a digital signature from
-  the light client library.
+   the light client library.
 3. The generated transaction (JSON data + the digital signature) is sent
-  to a full node via an HTTP POST request.
+   to a full node via an HTTP POST request.
 4. Frontend application receives a notification (e.g., the transaction hash)
-  as a response to the HTTP POST request
+   as a response to the HTTP POST request
 
 !!! note
     Serialization during signing is a necessary step, since all
-    data (including transactions) is stored in Exonum in a [protobuf binary
+    data (including transactions) is stored in Exonum in a [Protobuf binary
     format](serialization.md). This is done for several reasons:
 
     - The binary format is unambiguous, while the same data can have multiple
