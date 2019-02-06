@@ -177,10 +177,6 @@ difficulties during development:
 - Changes in blockchain data model should be accompanied by relevant
   changes in the logic of proof verification performed by light clients
 
-These problems above can be overcome with the aid of data
-schema stated in a language-independent format
-(see [the Exonum roadmap](../roadmap.md)).
-
 Despite the complexity of the development, the presence of
 light clients in a blockchain-based system is the only practical way to
 largely remove the necessity of trust to third parties.
