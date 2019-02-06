@@ -160,8 +160,8 @@ API configuration parameters.
     being improperly processed by user agents with the CORS support
     (such as web browsers). However, you can easily avoid this by passing the
     public API of an Exonum node through the web server
-    delivering web assets  (for example, Nginx). In this case, the requests to API
-    would be same-origin, so CORS restrictions would not apply.
+    delivering web assets  (for example, Nginx). In this case, the requests to
+    API would be same-origin, so CORS restrictions would not apply.
 
 #### [mempool.events_pool_capacity]
 
