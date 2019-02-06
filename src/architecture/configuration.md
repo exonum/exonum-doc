@@ -9,17 +9,20 @@ network.
 The configuration is stored in the [TOML][toml] format. A path to the
 configuration file should be specified on the node start up.
 
-The configuration may be changed using [the global variables updater service](../advanced/configuration-updater.md)
+The configuration may be changed using
+[the global variables updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. On node initialization the
 configuration is passed to all services deployed in the blockchain.
 The configuration for a service is stored in the `services_configs` subtree
 of the overall configuration
-under a separate key equal to [the name of the service](services.md#service-identifiers).
+under a separate key equal to
+[the name of the service](services.md#service-identifiers).
 
 !!! note "Example"
-    The configuration settings of [the anchoring service](../advanced/bitcoin-anchoring.md)
+    The configuration settings of
+    [the anchoring service](../advanced/bitcoin-anchoring.md)
     include the parameters of the RPC connection to
     a Bitcoin Core node as well as a Bitcoin address used for anchoring.
     These parameters are stored in the `services_configs.btc_anchoring`
