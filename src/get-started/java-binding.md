@@ -481,8 +481,8 @@ For using the library just include the dependency in your `pom.xml`:
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java/blob/master/exonum-java-binding/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
-[build-description]: https://github.com/exonum/exonum-java/blob/master/exonum-java-binding/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
+[app-tutorial]: https://github.com/exonum/exonum-java/blob/master/exonum-java-binding-parent/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
+[build-description]: https://github.com/exonum/exonum-java/blob/master/exonum-java-binding-parent/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java/blob/master/CONTRIBUTING.md#how-to-build
