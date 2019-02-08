@@ -21,8 +21,8 @@ applications.
 Tables (aka indices) perform the same role as in relational database
 management systems (RDBMSs). Every
 table stores records of a specific type. However, unlike RDBMS tables,
-all Exonum tables internally are implemented
-[as wrappers around key-value stores](#baseindex).
+all Exonum tables internally are implemented as wrappers around key-value
+stores.
 Both keys and values in the wrapped stores are persisted as byte sequences.
 Exonum does not natively support operations (matching, grouping, sorting, etc.)
 over separate value fields, as it is the case with other key-value storages.
@@ -37,26 +37,6 @@ the iteration order.
 Namely, keys are lexicographically ordered over their binary serializations;
 this ordering coincides with that used in
 [RocksDB](#low-level-storage).
-
-### BaseIndex
-
-> This seems to be no longer exported.
-> We may remove this section
-> as well as all mentions of this implementation detail.
-
-[`BaseIndex`][base-index] represents the most basic table type. Other
-table types wrap `BaseIndex`, enhancing its functionality for specific use
-cases.
-`BaseIndex` implements a map interface:
-
-- Get, set and remove value by key
-- Check if a specific key is present
-- Iterate over the key-value pairs in the lexicographic key order
-- Clear the table (i.e., remove all stored key-value pairs)
-
-!!! warning
-    `BaseIndex` should not be used directly. Rather, you should use a built-in
-    table type that wraps `BaseIndex`, or write your own one.
 
 ### MapIndex
 
@@ -90,16 +70,25 @@ list or removing items by index
 (although it is still possible to implement these operations manually).
 
 !!! summary "Implementation Details"
-    `ListIndex` saves its items to the internal `BaseIndex` map
-    with 8-byte unsigned item
+    `ListIndex` saves its items with 8-byte unsigned item
     indices as keys, serialized in big-endian form (to support proper
     iteration).
     The list length is saved in this map with a
     zero-length byte sequence as a key.
 
+### SparseListIndex
+
+[`SparseListIndex`][sparse-list-index] represents a `Listindex` that may
+contain "gaps". It provides the possibility to delete elements not only from
+the end of the list, but from any part thereof. Such deletions do not break
+the order of the indices inside the list.
+
+The remaining functionality of the `SparseListIndex` is the same as for
+[`ListIndex`](#ListIndex).    
+
 ### ValueSetIndex
 
-[`ValueSetIndex`][value-set-index] implements a hash set.
+[`ValueSetIndex`][value-set-index] represents a hash set.
 The following operations are implemented:
 
 - Add and remove set elements
@@ -114,12 +103,12 @@ All built-in types implementing `StorageValue` compute this hash as SHA-256
 of the binary serialization of a type instance.
 
 !!! summary "Implementation Details"
-    Internally, `ValueSetIndex` uses `BaseIndex` with element hashes as keys,
+    Internally, `ValueSetIndex` uses element hashes as keys,
     and elements themselves as corresponding values.
 
 ### KeySetIndex
 
-[`KeySetIndex`][key-set-index] implements a set.
+[`KeySetIndex`][key-set-index] represents a set.
 The following procedures are implemented:
 
 - Add and remove set elements
@@ -128,14 +117,12 @@ The following procedures are implemented:
 - Clear the set (i.e., remove all stored elements)
 
 !!! summary "Implementation Details"
-    Internally, set elements
-    are inserted to the underlying `BaseIndex` as `(&element, ())`
-    (i.e., the element is used as a key, and the value is always empty).
+    Internally, the element is used as a key, and its value is always empty.
 
 #### KeySetIndex vs ValueSetIndex
 
-While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
-`KeySetIndex` puts an entire binary serialization of an element into the key.
+While `ValueSetIndex` uses a hash as a key, `KeySetIndex` puts an entire binary
+serialization of an element into the key.
 
 - `KeySetIndex` does not have an additional overhead on hashing
   set elements.
@@ -148,15 +135,14 @@ While `ValueSetIndex` uses a hash as a key for the underlying `BaseIndex`,
   elements, while the `ValueSetIndex` orders elements arbitrarily due to hash
   function properties.
 
-### SparseListIndex
-
-> There's this new index type which is not really documented.
-> We probably should document it (or maybe remove it from the code base?)
-
 ### Entry
 
-> It is also possible to store scalar values.
-> This feature is used in some system tables so we may like to document it.
+`Entry` represents an index that contains only one element.
+
+The following operations are implemented:
+
+- Get, set and remove value
+- Check if the value is present
 
 ### Merkelized Indices
 
@@ -226,11 +212,10 @@ Currently the main database engine is [RocksDB][rocks-db].
 Values from different tables are stored in column families in the low-level
 storage,
 wherein the keys are represented as
-a byte sequence, and values are serialized according to Exonum binary
+a byte sequence, and values are serialized according to Protobuf
 serialization format. A single column family may store data for
 more than one table (see table groups below).
-Keys of the wrapped `BaseIndex` of a specific table
-are mapped to the low-level storage keys
+Keys of a specific table are mapped to the low-level storage keys
 in a deterministic manner using [table identifiers](#table-identifiers).
 
 ### Table Identifiers
@@ -248,7 +233,8 @@ low-level storage. A table identifier consists of 2 parts:
   `cryptocurrency.wallets`,
   where `cryptocurrency` is the service name, and `wallets` is the own name
   of the table.
-- **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust terms).
+- **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust
+  terms).
 
 If the prefix is present, the column family identified by the table name
 stores a *group* of tables, rather than a single table.
@@ -308,54 +294,42 @@ transactions continues normally.
 
 ## System Tables
 
-The core [maintains tables][blockchain-schema] that are used
-for core blockchain functionality.
-All of them have `core.*` prefix.
+The core [maintains tables][blockchain-schema] that are used for core blockchain
+functionality. All of them have `core.*` prefix.
 
 - `transactions: MapIndex`  
-  Represents a map from transaction hash into raw transaction structure.
+  Represents a map from the transaction hash into a raw transaction structure.
 - `transaction_results: ProofMapIndex`  
-  Keep execution results for all accepted transactions,
+  Keeps execution results for all accepted transactions,
   indexed by transaction hashes.
 - `transactions_pool: KeySetIndex`  
-  Stores the set of hashes of known transactions that have not been committed yet.
+  Stores the set of hashes of the known transactions that have not been
+  committed yet.
 - `transactions_pool_len: Entry`  
   Caches the number of entries in `transaction_pool`.
 - `transactions_locations: MapIndex`  
-  Keeps the block height and tx position inside block for every
+  Keeps the block height and the tx position inside the block for every
   transaction hash.
 - `blocks: MapIndex`  
-  Stores block object for every block height.
+  Stores the block object for every block height.
 - `block_hashes_by_height: ListIndex`  
-  Saves a block hash that has the requested height.
+  Saves the block hash that has the requested height.
 - `block_transactions: ProofListIndex`  
-  Group of tables keyed by the block height. Each table keeps
+  Group of tables keyed by a block height. Each table keeps
   a list of transactions for the specific block.
 - `precommits: ListIndex`  
-  Group of tables keyed by the block hash. Each table stores a list of
-  validators’ precommits for the specific block.
+  Group of tables keyed by a block hash. Each table stores a list of precommits
+  of the validators for the specific block.
 - `configs: ProofMapIndex`  
-  Stores the configurations content in JSON format, using its hash as a key.
+  Stores the configuration content in JSON format, using its hash as a key.
 - `configs_actual_from: ListIndex`  
-  Builds an index to quickly get a configuration activating at a specific
-  height.
+  Builds an index to quickly get a configuration that should activate at the
+  specific height.
 - `state_hash_aggregator: ProofMapIndex`  
   An accessory table
-  used to calculate the "aggregation" of root hashes of individual service tables,
-  in effect summing the state of various entities
+  used to calculate the "aggregation" of the root hashes of the individual
+  service tables. In effect is sums up the state of various entities
   scattered across distinct services and their tables.
-- `peers_cache: MapIndex`  
-  Keeps a persistent list of peer nodes (their public keys and known addresses).
-  It comes useful for recovery in case of abnormal node restart.
-  > crate-private, maybe no need to expose?
-- `consensus_messages_cache: ListIndex`  
-  Keeps a persistent cache of consensus messages.
-  It comes useful for recovery in case of abnormal node restart.
-  > crate-private, maybe no need to expose?
-- `consensus_round: Entry`  
-  Keeps the current value of consensus round.
-  It comes useful for recovery in case of abnormal node restart.
-  > crate-private, maybe no need to expose?
 
 ## Indexing
 
@@ -375,6 +349,7 @@ content together with the tables being indexed.
 [base-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/base_index.rs
 [map-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/map_index.rs
 [list-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/list_index.rs
+[sparse-list-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/sparse_list_index.rs
 [proof-list-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_list_index/mod.rs
 [list-proof]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_list_index/proof.rs
 [proof-map-index]: https://github.com/exonum/exonum/blob/master/exonum/src/storage/proof_map_index/mod.rs
