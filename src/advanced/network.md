@@ -41,7 +41,8 @@ has been really authorized by a supermajority of validators.
 
 ## Peer-to-Peer Full Node Network
 
-Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
+Full nodes use the
+[Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
 [The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
@@ -74,26 +75,27 @@ to exchange messages.
 
 #### Peer Discovery
 
-Node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest) to a
-random known node  with the timeout `peers_timeout` defined in the
+`listen_address` is the address where each node in the network accepts
+connections from other peers.
+
+Each node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest)
+to a random known node with the timeout `peers_timeout` defined in the
 [global configuration](../architecture/configuration.md#genesisconsensus).
 [In response](consensus/requests.md#peersrequest-1), the addressee sends its
 list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the
 entire network.
 
-The initial list of IP addresses where other full nodes may be specified
-is defined in the [local configuration](../glossary.md#local-configuration)
-(parameter `listen_address`) of the node. This list is used to discover
-an initial set of peers on the node start up. If some node changes its IP
-address, then through peer discovery mechanism a new address becomes known to
+At the same time, the initial list of addresses, where other full nodes may
+be specified, is defined in the
+[local configuration](../glossary.md#local-configuration)
+(parameter `connect_list`) of the node. This list is used to discover
+the initial set of peers on the node start up. If some node changes its address,
+then through peer discovery mechanism a new address becomes known to
 all other nodes in some time.
 
-> The local configuration includes **connect_list** array
-> that defines the list of nodes this node is going to communicate with.
-> **listen_address** is the address on which _this_ node accepts connections.
-> The addresses in connect list may be specified as host names, not only IP addresses.
-> `PeersRequest` messages are still sent out but they are kinda useless now.
+Meanwhile, the addresses in the `connect_list` may be specified both as host
+names and IP addresses.
 
 ## Communication with Light Clients
 
