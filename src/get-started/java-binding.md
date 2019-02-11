@@ -13,7 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.3 \
+    -DarchetypeVersion=0.4 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
@@ -455,7 +455,7 @@ For using the library just include the dependency in your `pom.xml`:
     <dependency>
       <groupId>com.exonum.binding</groupId>
       <artifactId>exonum-java-binding-common</artifactId>
-      <version>0.3</version>
+      <version>0.4</version>
     </dependency>
 ```
 
@@ -480,9 +480,9 @@ For using the library just include the dependency in your `pom.xml`:
 - [Java Binding App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
@@ -492,7 +492,7 @@ For using the library just include the dependency in your `pom.xml`:
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
-[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
 [transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/transaction/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/TransactionConverter.html
