@@ -2,9 +2,10 @@
 
 <!-- cspell:ignore postvote -->
 
-**Configuration update service** allows modifying [the global configuration](../architecture/configuration.md)
-by the means of *proposing* a new configuration and *voting* for proposed configurations
-among the validators.
+**Configuration update service** allows modifying
+[the global configuration](../architecture/configuration.md)
+by the means of *proposing* a new configuration and *voting* for proposed
+configurations among the validators.
 
 The global configuration may need to be modified for various reasons:
 
@@ -15,9 +16,9 @@ The global configuration may need to be modified for various reasons:
 
 ## General Idea
 
-Any validator node can propose a new configuration, by broadcasting a corresponding
-propose transaction to the network. The transaction includes a new configuration
-in the JSON format, along with three auxiliary fields:
+Any validator node can propose a new configuration, by broadcasting a
+corresponding propose transaction to the network. The transaction includes a new
+configuration in the JSON format, along with three auxiliary fields:
 
 - `actual_from` is a non-negative integer height,
   upon reaching which the new configuration (if accepted) will become active.
@@ -25,12 +26,11 @@ in the JSON format, along with three auxiliary fields:
 - `majority_count` is the minimum number of validators that need to approve
   the proposal
 
-Validators may vote for or against configuration proposals by submitting vote transactions
-to the network. Each validator can cast
+Validators may vote for or against configuration proposals by submitting vote
+transactions to the network. Each validator can cast
 a single vote either for or against any configuration proposal (but not both).
 If the proposal gets a supermajority of approving votes
-(more than 2/3 of the validators by default; can be varied with the help of `majority_count`),
-then the proposal becomes locked in,
+(more than 2/3 of the validators), then the proposal becomes locked in,
 and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
@@ -41,14 +41,14 @@ the `actual_from` specified in the proposal.
     configuration, nodes can not vote for a new proposal until the following
     configuration is activated.
 
-There may be several proposals with the same `previous_cfg_hash`; the transaction
-execution rules guarantee that only one of them will get activated.
+There may be several proposals with the same `previous_cfg_hash`; the
+transaction execution rules guarantee that only one of them will get activated.
 
 !!! note
     The threshold of 2/3 of validators is chosen to reflect the security
-    model used in [the consensus algorithm](../architecture/consensus.md). According
-    to this model, up to 1/3 of validators may be compromised or be non-responsive
-    at any time.
+    model used in [the consensus algorithm](../architecture/consensus.md).
+    According to this model, up to 1/3 of validators may be compromised or be
+    non-responsive at any time.
 
 ## REST API
 
@@ -84,8 +84,8 @@ equal to `/api/services/configuration/v1`.
 
 !!! tip
     See [the configuration update service tutorial][http_api] for more details
-    on the configuration update service API, and [this][response_samples] for API
-    examples.
+    on the configuration update service API, and [this][response_samples] for
+    API examples.
 
 ### Types
 
@@ -202,11 +202,11 @@ JSON object with the following fields:
 
 - **committed_config**: ?ConfigBody  
   Configuration with the specified hash.
-  If only a proposal is present, `null`.
+  If only a proposal is present, the value is `null`.
 - **propose**: ?Propose  
   Proposal for the retrieved configuration.
-  If the configuration is not a result of a proposal (the genesis configuration),
-  `null`.
+  If the configuration is not a result of a proposal (the genesis
+  configuration), the value is `null`.
 
 ### Votes for Configuration
 
@@ -224,10 +224,12 @@ Looks up votes for a configuration proposal by the configuration hash.
 #### Response
 
 A nullable JSON array `?Array<?Vote>` containing
-votes for the configuration, where each vote is [the JSON serialization](../architecture/transactions.md#serialization)
+votes for the configuration, where each vote is
+[the JSON serialization](../architecture/transactions.md#serialization)
 of [the corresponding vote transaction](#vote-for-proposal).
 Indexing of the votes in the array corresponds
-to the indexing of validator public keys in the [actual configuration](../architecture/configuration.md#genesis).
+to the indexing of validator public keys in the
+[actual configuration](../architecture/configuration.md#genesis).
 If a vote from the validator is absent, then `null` is returned
 at the corresponding index. If the configuration with `config_hash` is absent,
 `null` is returned instead of the whole array.
@@ -244,7 +246,8 @@ the activation height and/or the previous configuration hash.
 #### Query Parameters
 
 - **previous_cfg_hash**: Hash
-  If present, filters configurations by the specified previous configuration hash.
+  If present, filters configurations by the specified previous configuration
+  hash.
 - **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration became actual.
@@ -273,7 +276,8 @@ the activation height and/or the previous configuration hash.
 #### Query Parameters
 
 - **previous_cfg_hash**: Hash
-  If present, filters configurations by the specified previous configuration hash.
+  If present, filters configurations by the specified previous configuration
+  hash.
 - **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration will become actual.
@@ -409,7 +413,8 @@ Creates a [`Propose` transaction](#configuration-proposal).
 The `from` field of the transaction and its signature are computed
 automatically based on the identity of the node that processes the POST request:
 `from` is set to the node’s public key, and the signature is computed
-based on the corresponding private key stored in [the local configuration](../architecture/configuration.md).
+based on the corresponding private key stored in
+[the local configuration](../architecture/configuration.md).
 
 #### Parameters
 
