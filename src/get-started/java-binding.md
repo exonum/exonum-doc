@@ -524,17 +524,17 @@ For using the library just include the dependency in your `pom.xml`:
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
 <!-- TODO: change `blob` with `0.4` after the release OR insert a Javadoc link
   instead -->
 [blockchain]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/core/src/main/java/com/exonum/binding/blockchain/Blockchain.java
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 <!--TODO: Insert the correct Javadoc to Blockchain (once we publish things):
 java-binding/core/latest/com/exonum/binding/blockchain/Blockchain.html -->
 [blockchain]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
-[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/master/CONTRIBUTING.md#how-to-build
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/v0.4/CONTRIBUTING.md#how-to-build
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
