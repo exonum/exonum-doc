@@ -531,7 +531,6 @@ For using the library just include the dependency in your `pom.xml`:
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 <!--TODO: Insert the correct Javadoc to Blockchain (once we publish things):
 java-binding/core/latest/com/exonum/binding/blockchain/Blockchain.html -->
-[blockchain]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [Exonum-services]: ../architecture/services.md
 [Guice]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/v0.4/CONTRIBUTING.md#how-to-build
