@@ -545,5 +545,5 @@ For using the library just include the dependency in your `pom.xml`:
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.4/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
-[transaction-result]: https://docs.rs/exonum/0.4/exonum/blockchain/type.TransactionResult.html
+[transaction-result]: https://docs.rs/exonum/0.10/exonum/blockchain/struct.TransactionResult.html
 [exonum-transaction]: https://exonum.com/doc/advanced/node-management/#transaction
