@@ -314,7 +314,7 @@ transaction has its corresponding endpoint to make a POST request.
 ###### Verification
 
 Signature of the transaction is verified against the public key of the
-transaction author, specified in the transaction header.
+transaction author.
 
 ###### Execution
 
@@ -378,7 +378,7 @@ proposed configuration.
 ###### Verification
 
 Signature of the transaction is verified against the public key of the
-transaction author, specified in the transaction header.
+transaction author.
 
 ###### Execution
 
@@ -435,7 +435,7 @@ proposed configuration.
 ###### Verification
 
 Signature of the transaction is verified against the public key of the
-transaction author, specified in the transaction header.
+transaction author.
 
 ###### Execution
 
