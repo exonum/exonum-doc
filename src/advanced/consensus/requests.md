@@ -61,66 +61,77 @@ Byzantine. The receiving node saves this information in
 
 ## Request Messages
 
-> These message are now using Protobuf serialization.
-> We may like to publish commented *.proto files instead of this prose.
+Exonum uses Protobuf as its serialization format for communication among full
+nodes. All messages in Exonum have a uniform
+[structure](../architecture/transactions.md#messages) with which they should
+comply.
+
+According to the Exonum message structure, the consensus requests constitute a
+payload of the corresponding consensus messages.
 
 ### Field Types
 
-`Hash` and `PublicKey` types represent SHA-256 hashes and Ed25519 public keys
-and take 32 bytes.
+#### exonum.Hash, exonum.PublicKey
 
-`u32` and `u64` are non-negative integers of appropriate size (4 and 8 bytes).
+`exonum.Hash` and `exonum.PublicKey` types represent SHA-256 hashes and Ed25519
+public keys and take 32 bytes.
 
-`BitVec` is a bit vector containing as many bits as there are validators in
-the system.
+#### uint32, uint64
+
+`uint32` and `uint64` are non-negative integers of appropriate size (4 and 8
+bytes).
+
+#### exonum.BitVec
+
+`exonum.BitVec` is a bit vector containing as many bits as there are validators
+in the system.
+
+#### string
+
+`string` is a UTF-8 encoded text.
+
+#### bytes
+
+`bytes` is an arbitrary sequence of bytes.
 
 ### `ProposeRequest`
 
+<!--here and further change the description format of the messages. Insert code
+snippets and comment them. This task requires new UI due to some large field
+descriptions. Same story with ../architecture/configuration.md-->
+
 Requests a `Propose` message from a node. It has the following fields:
 
-- **from**: PublicKey  
-  Requestor’s public key.
-- **to**: PublicKey  
+- **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **height**: u64  
+- **height**: uint64  
   Height of the blockchain for which information is requested.
-- **propose_hash**: Hash  
+- **propose_hash**: exonum.Hash  
   Hash of the proposal for which information is requested.
-
-> Here and in all other messages
-> **from** is no longer a part of concrete message.
-> This field has been moved to the common message header
-> (along with the message signature, for example).
-> We may like to point it out somewhere early.
 
 ### `TransactionsRequest`
 
 Requests transactions from a node. It has the following fields:
 
-- **from**: PublicKey  
-  Requestor’s public key.
-- **to**: PublicKey  
+- **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **txs**: Array<Hash\>  
+- **txs**: Array<exonum.Hash\>  
   List of the hashes of the requested transactions.
 
 ### `PrevotesRequest`
 
-Requests `Prevote` messages from a node. It
-has the following fields:
+Requests `Prevote` messages from a node. It has the following fields:
 
-- **from**: PublicKey  
-  Requestor’s public key.
-- **to**: PublicKey  
+- **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **height**: u64  
+- **height**: uint64  
   Blockchain height for which information is requested.
-- **round**: u32  
+- **round**: uint32  
   Round number (at the blockchain height specified in `height` field) for which
   information is requested.
-- **propose_hash**: Hash  
+- **propose_hash**: exonum.Hash  
   Hash of the proposal for which information is requested.
-- **validators**: BitVec  
+- **validators**: exonum.BitVec  
   Each bit of this field indicates the need to send a `Prevote` message from
   the corresponding validator (if the bit value is 1, `Prevote` is requested;
   otherwise, `Prevote` is not needed). Indexing of the `validator` bits
@@ -131,11 +142,9 @@ has the following fields:
 
 Requests a committed block from a node. It has the following fields:
 
-- **from**: PublicKey  
-  Requestor’s public key.
-- **to**: PublicKey  
+- **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **height**: u64  
+- **height**: uint64  
   Height of the blockchain for which information is requested.
 
 ### `PeersRequest`
@@ -145,8 +154,6 @@ Requests `Connect` messages from a node.
 defined in [the global configuration][config#global-parameters].
 It has the following fields:
 
-- **from**: PublicKey  
-  Requestor’s public key.
 - **to**: PublicKey  
   Public key of the node to which the request was sent.
 
