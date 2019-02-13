@@ -296,7 +296,7 @@ were committed as transactions to the Exonum blockchain.
 
 ### Transactions and Private APIs
 
-Configuration service has a separate API for creating transactions. Each
+Configuration service has separate APIs for creating transactions. Each
 transaction has its corresponding endpoint to make a POST request.
 
 #### Configuration Proposal
