@@ -25,6 +25,7 @@ Exonum depends on the following third-party system libraries:
 
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
+- [Protocol Buffers][protobuf] (mechanism for serializing structured data)
 
 You can find instructions how to install dependencies in various environments
 below.
@@ -34,7 +35,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium rocksdb pkg-config
+brew install libsodium rocksdb pkg-config protobuf
 ```
 
 ### Linux
@@ -44,7 +45,7 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb-dev pkg-config
+    librocksdb-dev pkg-config libprotobuf-dev protobuf-compiler
 ```
 
 Package names and installation methods may differ in other Linux distributives;
@@ -165,3 +166,4 @@ guide on how to develop applications on top of the Exonum framework.
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
 [build_tools]: https://www.visualstudio.com/downloads/
 [powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
+[protobuf]: https://developers.google.com/protocol-buffers/

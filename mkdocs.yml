@@ -11,6 +11,8 @@ theme:
 
 extra_css:
   - assets/stylesheets/extra.css
+extra_javascript:
+  - assets/js/index.js
 repo_name: 'exonum/exonum'
 repo_url: 'https://github.com/exonum/exonum'
 edit_uri: 'doc/blob/master/src'
@@ -85,8 +87,10 @@ pages:
     - 'Service Testing': 'advanced/service-testing.md'
     # Configuration change service documentation
     - 'Configuration Updater': 'advanced/configuration-updater.md'
-    # Anchoring service documentation
-    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'
+    # Anchoring service documentation without Segwit
+    - 'Bitcoin Anchoring (without SegWit)': 'advanced/bitcoin-anchoring-without-segwit.md'
+    # Anchoring service documentation with Segwit
+    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'    
     # Time service
     - 'Time Oracle': 'advanced/time.md'
     # Merkle index overview

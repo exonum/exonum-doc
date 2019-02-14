@@ -7,6 +7,45 @@
 .admonition .md-typeset__scrollwrap {
   margin: 1em 0;
 }
+
 .md-typeset .admonition .md-typeset__table {
   padding: 0;
+}
+
+.md-header-nav__version select {
+  background-color: transparent;
+  border: none;
+  display: inline-block;
+  font-size: 16px;
+  line-height: 48px;
+  height: 48px;
+  padding-right: 15px;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  color: white;
+}
+
+.md-header-nav__version select option {
+  color: black;
+}
+
+.md-header-nav__version:after {
+  content: " ";
+  height: 0;
+  width: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid white;
+  position: absolute;
+  right: 0;
+  top: calc(50% - 3px);
+}
+
+.md-header-nav__version select:focus {
+  outline: 0;
 }

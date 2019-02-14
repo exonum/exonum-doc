@@ -7,4 +7,6 @@ Please target the following branch:
 - `develop` if your pull request describes features introduced into an upcoming
   version of Exonum. A request targeting `develop` should be pushed to
   https://exonum.com/doc/ no earlier than this upcoming version is released.
+  If your documentation update has its own feature-branch,
+  e.g., `develop-ejb-1.1`, please target that one.
 -->

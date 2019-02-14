@@ -117,6 +117,15 @@ mkdocs build
 
 The generated pages will be available in the **site/** directory.
 
+### Build versioned documentation
+
+To generate versioned HTML files from the Markdown source files, use:
+```
+node run versioned
+```
+The generated folders will be available in the **version/** directory. It will contain folders named with its versions.
+Folder of the latest version will be named `latest`.
+
 ## License
 
 Copyright 2018, Exonum Team
