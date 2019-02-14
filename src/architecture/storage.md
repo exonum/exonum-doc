@@ -84,7 +84,7 @@ the end of the list, but from any part thereof. Such deletions do not break
 the order of the indices inside the list.
 
 The remaining functionality of the `SparseListIndex` is the same as for
-[`ListIndex`](#ListIndex).    
+[`ListIndex`](#ListIndex).
 
 ### ValueSetIndex
 
