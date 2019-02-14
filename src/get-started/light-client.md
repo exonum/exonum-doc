@@ -2,7 +2,7 @@
 
 !!! note
     Light client is also available in Java language.  
-    Please refer to the [readme][lc-java] for details. 
+    Please refer to the [readme][lc-java] for details.
 
 In this tutorial we describe how to use the light client to interact with
 Exonum services. The tutorial extends other tutorials:
