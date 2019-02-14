@@ -53,9 +53,9 @@ This categorization holds for both core and service parameters.
 
 ### Global Parameters
 
-<!--put a sample file from above here and make comments inside the file. make
-the comments as pop-up windows when navigating on each parameter in the sample
-file-->
+<!--TODO: put a sample file from above here and make comments inside the file.
+make the comments as pop-up windows when navigating on each parameter in the
+sample file-->
 
 #### [genesis]
 
@@ -89,7 +89,10 @@ two parts:
 - **propose_timeout_threshold**  
   Amount of transactions in the pool to start using `min_propose_timeout`
 - **first_round_timeout**  
-  Timeout interval (ms) between rounds
+  Timeout interval (ms) of the first round at each height. The default
+  value is 3000 ms. This parameter is used to estimate timeouts for further
+  consensus rounds. See [specification](../advanced/consensus/specification.md#rounds)
+  of the consensus algorithm for more details
 - **status_timeout**  
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
