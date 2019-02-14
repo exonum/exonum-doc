@@ -229,7 +229,7 @@ low-level storage. A table identifier consists of 2 parts:
   underscores `_`, and periods `.`. By convention, table names in services
   should
   start with [the service name][service-name] and a period. For example,
-  the only table in the cryptocurrency tutorial is named
+  the only table in the Cryptocurrency Tutorial is named
   `cryptocurrency.wallets`,
   where `cryptocurrency` is the service name, and `wallets` is the own name
   of the table.

@@ -376,7 +376,9 @@ round are placed into a separate queue (`queued`).
 
 - If the timeout does not match the current height and round, skip further
   timeout processing.
-- Add a timeout (its length is specified by `round_timeout`) for the next round.
+- Add a timeout for the `N`th round with the length
+  `first_round_timeout * (1 + (N - 1) * q)`,
+  where `q = 0.1` is the relative increase in a timeout after each round.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new

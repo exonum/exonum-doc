@@ -13,7 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.2 \
+    -DarchetypeVersion=0.3 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
@@ -75,10 +75,9 @@ requested at any time, while `Fork` – only when the transaction is executed. T
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
 
-Exonum stores elements in the collections as byte arrays. Therefore, a user
-must implement serialization of values stored in the collection. Java Binding
-provides *serializers* for standard and some commonly used types, see
-[`StandardSerializers`][standardserializers] for details.
+Exonum stores elements in collections as byte arrays. Therefore,
+serializers for values stored in collections must be provided.
+See [Serialization](#serialization) for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
@@ -102,6 +101,36 @@ blockchain state hash, which is included in each committed block. When using
 `AbstractService`, the root hash list must be defined in the schema class that
 implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
+
+#### Serialization
+
+As Exonum storage accepts data in the form of byte arrays,
+storing user data requires serialization.
+Java Binding provides a set of built-in *serializers* that you can find
+at the [`StandardSerializers`][standardserializers] utility class.
+The list of serializers covers the most often-used entities and includes:
+
+- Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
+  Integers with various encoding types,
+  see [`StandardSerializers`][standardserializers] Java documentation
+  and the table below.
+- Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
+- Any Protobuf messages using `StandardSerializers#protobuf`.
+
+Besides the available built-in serializers, users can still implement
+their own serializers for storing their data in a custom format instead
+of using the built-in ones.
+
+##### Integer Encoding Types Comparison Table
+
+| Type | Description | The most efficient range |
+|---|---|---|
+| `fixed32` | Always four bytes | If values are often greater than `2^28` |
+| `uint32` | Unsigned int that uses variable-length encoding | If values are in range `[0; 2^21-1]` |
+| `sint32` | Signed int that uses variable-length encoding | If values are in range  `[-2^20; 2^20-1]` |
+| `fixed64` | Always eight bytes | If values are often greater than `2^56` |
+| `uint64` | Unsigned int that uses variable-length encoding | If values are in range `[0; 2^49-1]` |
+| `sint64` | Signed int that uses variable-length encoding | If values are in range  `[-2^48; 2^48-1]` |
 
 ### Transactions Description
 
@@ -151,7 +180,7 @@ algorithm supported by both the service client and the service itself.
 To correctly process a transaction, it must be transformed into an
 *executable transaction* (see
 [`TransactionConverter`][transactionconvererter] or
-`Service#convertTransaction` method) and transmitted to the framework using
+`Service#convertToTransaction` method) and transmitted to the framework using
 `Node#submitTransaction` method. The framework verifies it, and if the
 transactions is correct,
 broadcasts it to other nodes of the system. Other nodes, having received the
@@ -180,11 +209,24 @@ current storage state when the transaction is executed. Exonum passes `Fork`
 as an argument – a view that allows performing modifying operations. A service
 schema object can be used to access data collections of this service.
 
+Also, `Transaction#execute` method may throw `TransactionExecutionException`
+which contains a transaction error report. This feature allows users to notify
+Exonum about an error in a transaction execution whenever one occurs.
+It may check the preconditions before executing a transaction and either
+accepts it or throws an exception that is further transformed into an Exonum
+core [TransactionResult enum][transaction-result] containing an error code and
+a message with error data.
+If transaction execution fails, the changes made by the transaction are
+rolled back, while the error data is stored in the database for further user
+reference. Light clients also provide access to information on the
+[transaction][exonum-transaction] execution result
+(which may be either success or failure) to their users.
+
 ### External Service API
 
 The external service API is used for the interaction between the service and the
-external
-systems. A set of operations is defined by each service and can include sending
+external systems.
+A set of operations is defined by each service and can include sending
 transactions to the network, read requests for blockchain data with the
 provision of corresponding cryptographic proof, etc. Exonum provides an embedded
 web framework for implementing the REST-interface of the service.
@@ -362,6 +404,61 @@ service:
 - Follow the instructions in the [application guide][app-tutorial] to configure
   and start an Exonum node with your service.
 
+## Built-In Services
+
+Currently Java Binding includes the following built-in services:
+
+- **Configuration Update Service.**
+  Although every node has its own configuration file, some settings should be
+  changed for all nodes simultaneously. This service allows updating global
+  configuration parameters of the network without stopping the nodes. The
+  changes are agreed upon through the consensus mechanism.
+
+  See the [*Configuration Update Service*](../advanced/configuration-updater.md)
+  article for more details.
+- **Anchoring Service.**
+  The anchoring service writes the hash of the current Exonum blockchain state
+  to the Bitcoin blockchain with a certain time interval. The anchored data is
+  authenticated by a supermajority of validators using digital signature tools
+  available in Bitcoin.
+
+  See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
+  article for more details.
+
+To enable a particular service, include its name in `ejb_app_services.toml`
+configuration file in the EJB App's directory with the following content:
+
+```toml
+services = ["service-name"]
+```
+
+where possible values for `service-name` are:
+
+- `configuration` for Configuration Update Service.
+- `btc-anchoring` for Anchoring Service.
+
+In case there is no `ejb_app_services.toml` file, only Configuration Service will
+be activated.
+
+## Common Library
+
+Java Binding includes a library module that can be useful for Java client
+applications that interact with an Exonum service and
+does not have the dependency on Java Binding Core. The module contains Java
+classes obligatory for core that can now as well be easily applied in clients,
+if necessary.
+The library provides the ability to create transaction messages, check proofs,
+serialize/deserialize data and perform cryptographic operations.
+For using the library just include the dependency in your `pom.xml`:
+
+``` xml
+    <dependency>
+      <groupId>com.exonum.binding</groupId>
+      <artifactId>exonum-java-binding-common</artifactId>
+      <version>0.3</version>
+    </dependency>
+```
+
 ## Known Limitations
 
 - Serialization is determined by a user, so Java services are not compatible
@@ -383,7 +480,7 @@ service:
 - [Java Binding App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-core/rust/ejb-app/TUTORIAL.md
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding-service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -393,14 +490,16 @@ service:
 [nodefake]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html
-[standardserializers]: https://exonum.com/doc/api/java-proofs/latest/com/exonum/binding/storage/serialization/StandardSerializers.html
+[standardserializers]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/storage/indices/package-summary.html
-[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.2/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
-[transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/messages/Transaction.html
+[submittransaction]: https://github.com/exonum/exonum-java-binding/blob/v0.3/exonum-java-binding-cryptocurrency-demo/src/main/java/com/exonum/binding/cryptocurrency/ApiController.java
+[transaction]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/transaction/Transaction.html
 [transactions]: ../architecture/transactions.md
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/TransactionConverter.html
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/crypto/CryptoFunctions.html#ed25519--
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/latest/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding-core/latest/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
+[transaction-result]: https://docs.rs/exonum/latest/exonum/blockchain/type.TransactionResult.html
+[exonum-transaction]: https://exonum.com/doc/advanced/node-management/#transaction

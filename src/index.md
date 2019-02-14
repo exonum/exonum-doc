@@ -23,7 +23,7 @@ the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
 
-[Cryptocurrency tutorial](get-started/create-service.md) showcases how Exonum
+[Cryptocurrency Tutorial](get-started/create-service.md) showcases how Exonum
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum core, the tutorial also makes use of [the light client][client] –
 a JavaScript library intended for client-side verification of blockchain information
