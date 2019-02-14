@@ -36,16 +36,24 @@ and -1/3 means less than one third.
 The consensus algorithm proceeds in rounds for each blockchain height
 (i.e., the number of blocks in the blockchain).
 Rounds are numbered from 1\. The onsets of rounds are determined
-by a fixed timetable:
+by the following timetable:
 
 - The first round starts after committing a block at the previous height
   to the blockchain
-- Rounds 2, 3, … start after regular intervals
+- The second round starts within `first_round_timeout` interval. The default
+  value of the `first_round_timeout` is 3000 ms and can be configured by the
+  network through a new proposal at any time
+- All further round timeouts are calculated according to the following formula:
+  `first_round_timeout + (r-1)*round_timeout_increase`. The
+  `round_timeout_increase` value is a percentage of the `first_round_timeout`.
+  `round_timeout_increase` is defined in the
+  `ConsensusConfig::TIMEOUT_LINEAR_INCREASE_PERCENT` constant and constitutes
+  10% of the `first_round_timeout`.
+
+Thus, the duration of rounds gradually increases. This provides the network with
+more time every round to make a decision on a new block.
 
 Rounds are not synchronized among nodes.
-
-> Rounds are actually started at gradually increasing intervals, not fixes ones.
-> I guess this page is a good place to describe the new behavior.
 
 ### Pool of Unconfirmed Transactions
 
@@ -74,19 +82,25 @@ message processing.
 
 ## Configuration Parameters
 
-- `propose_timeout`  
-  Proposal timeout after a new block is committed to the blockchain locally.
+- `max_propose_timeout`  
+  Initial proposal timeout after a new block is committed to the blockchain.
 
-  > It has been split into
-  > `min_propose_timeout`, `max_propose_timeout`, `propose_timeout_threshold`.
-  > Proposal timeout is dynamically adjustable based on transaction pressure.
-  > This behavior does not seem to be documented anywhere (other than API docs and comments).
+- `propose_timeout_threshold`
+  If the amount of transactions in the pool of unconfirmed transactions of a
+  node is larger than the `propose_timeout_threshold` value, the node switches
+  from `max_propose_timeout` to `min_propose_timeout`, i.e. generates blocks
+  faster, and vice versa.
 
-- `round_timeout`  
-  Interval between algorithm rounds.
+- `min_propose_timeout`
+  The proposal timeout for the case when the amount of transactions in the pool
+  of unconfirmed transactions is larger than `propose_timeout_threshold` value.
 
-  > It's called `first_round_timeout`
-  > and it's actually gradually increasing.
+- `first_round_timeout`  
+  Interval between the first and the second rounds of the consensus algorithm.
+  This parameter is used to estimate timeouts for further consensus rounds.
+  The estimation formula is
+  `first_round_timeout + (r-1)*round_timeout_increase`, where
+  `round_timeout_increase` is 10% of the `first_round_timeout`.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
@@ -130,10 +144,6 @@ The consensus algorithm uses the following types of messages:
 [`Block`](../../architecture/consensus.md#block).
 Only a part of their fields is described here. See
 [source code][message_source] for more details.
-
-> As in other places,
-> I believe that we should refer to the users
-> to the docs.rs API docs instead of the source code.
 
 The following fields are present in all messages:
 
