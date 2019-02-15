@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "0.1",
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
@@ -39,6 +39,7 @@
     "healthcheck",
     "HMACs",
     "idempotence",
+    "Javadoc",
     "junit",
     "keypair",
     "leveldb",
@@ -82,6 +83,7 @@
     "reddit",
     "replayability",
     "repr",
+    "RESTful",
     "roadmap",
     "rocksdb",
     "rustc",
