@@ -545,4 +545,4 @@ running the service might not know this information.
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
 [core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
-[java-binding]: https://github.com/exonum/exonum-java-binding
+[java-binding]: https://exonum.com/doc/version/latest/get-started/java-binding/
