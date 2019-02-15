@@ -164,7 +164,6 @@ There are 3 types of service endpoints:
 - **Private APIs** represent administrative and maintenance endpoints,
   generally not accessible to the outside world
 
-
 #### Persistence
 
 Exonum provides means for services to persist their data as scalars, or as

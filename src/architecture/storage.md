@@ -78,7 +78,7 @@ list or removing items by index
 
 ### SparseListIndex
 
-[`SparseListIndex`][sparse-list-index] represents a `Listindex` that may
+[`SparseListIndex`][sparse-list-index] represents a `ListIndex` that may
 contain "gaps". It provides the possibility to delete elements not only from
 the end of the list, but from any part thereof. Such deletions do not break
 the order of the indices inside the list.

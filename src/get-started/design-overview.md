@@ -357,8 +357,8 @@ used in blockchains are as follows:
   smart contract safety
 - **No isolation.** Request processing is performed
   in the same execution context as the core of the system. This is beneficial
-  for performance while at the same time such approach requires particular attention when creating and
-  testing smart-contracts.
+  for performance while at the same time such approach requires particular
+  attention when creating and testing smart-contracts.
 - **Local state.** Exonum services may define a local state, which
   is specific to the node on which the service is running. The local state
   can be used to manage secret information (e.g., private keys). The local

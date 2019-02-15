@@ -3,7 +3,7 @@ title: Installation guide
 ---
 # Installation Guide
 
-<!-- cspell:ignore ppas -->
+<!-- cspell:ignore ppas,Chocolatey -->
 
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
@@ -18,7 +18,6 @@ to these projects, testing them, and developing using Exonum.
 
     In future releases, Exonum will become more modular and will work as
     a standalone application. See [the roadmap](../roadmap.md) for more details.
-
 
 ## Dependencies
 
@@ -50,6 +49,7 @@ apt-get install build-essential libsodium-dev libsnappy-dev \
 ```
 
 For `protobuf` installation add the following dependencies:
+
 ```shell
 add-apt-repository ppa:maarten-fonville/protobuf
 apt install libprotobuf-dev protobuf-compiler
@@ -72,6 +72,7 @@ Install the latest version of the following packages:
 - [Protobuf][protobuf]
 
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
+
 ```shell
 choco install -y protobuf
 ```
@@ -139,6 +140,7 @@ You may also run the extended test suite located in the `sandbox` directory:
 ```shell
 cargo test --manifest-path sandbox/Cargo.toml
 ```
+
 Notice that `tests` requires up to 30Gb free disk space.
 
 ## Non-Rust Components
@@ -155,7 +157,6 @@ environment is tested on Node 4+.
 
 !!! note
     The light client library itself can run both on Node and in browsers.
-
 
 ## Developing with Exonum
 
