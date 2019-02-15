@@ -63,7 +63,7 @@ Byzantine. The receiving node saves this information in
 
 Exonum uses Protobuf as its serialization format for communication among full
 nodes. All messages in Exonum have a uniform
-[structure](../src/architecture/transactions.md#messages) with which they should
+[structure](../../architecture/transactions.md#messages) with which they should
 comply.
 
 According to the Exonum message structure, the consensus requests constitute a
