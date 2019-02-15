@@ -573,7 +573,7 @@ For using the library just include the dependency in your `pom.xml`:
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/transaction/Transaction.html
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
-[transactions-messages]: ../architecture/transactions/#messages
+[transactions-messages]: ../architecture/transactions.md#messages
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/TransactionConverter.html
 [vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
