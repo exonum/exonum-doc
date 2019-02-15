@@ -538,8 +538,6 @@ For using the library just include the dependency in your `pom.xml`:
 
 ## Known Limitations
 
-- Serialization is determined by a user, so Java services are not compatible
-  with JS light client.
 - Core collections necessary to form a complete cryptographic proof for user
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
