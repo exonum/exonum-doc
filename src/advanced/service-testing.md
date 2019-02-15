@@ -14,7 +14,7 @@ to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.5.0"
+exonum-testkit = "0.10.0"
 ```
 
 !!! note
@@ -62,13 +62,7 @@ fn test_my_tx() {
 ```
 
 Make sure that you have full coverage of the business logic in the `execute` method
-of your transactions. If you just want to check the `verify` logic in the transaction,
-you can do it without testkit in a simple way:
-
-```rust
-let tx = MyTransaction::new(...);
-assert!(tx.verify());
-```
+of your transactions.
 
 Testkit also allows to check different orderings of transactions, including transactions
 for multiple services. This could allow to more efficiently test margin cases

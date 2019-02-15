@@ -12,6 +12,15 @@ endpoint type is hosted at a separate address, which is specified in the
 [`api` section](../architecture/configuration.md#api) of the local
 configuration.
 
+> Most of this description is still true,
+> we're still using REST API and JSON for most of the requests.
+> However, some replies have been updated, there are new requests, etc.
+> Some updates are there in [this PR][pr-235]
+> but I have a feeling that we'd need to review the source code again for proper
+> update.
+
+[pr-235]: https://github.com/exonum/exonum-doc/pull/235
+
 ## Types
 
 As per [Google Closure Compiler][closure] conventions,
@@ -29,13 +38,14 @@ an optional type.
 ### Hash, PublicKey, Signature
 
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
-appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex digits).
-`Signature` is 64 bytes (that is, 128 hex digits).
+appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex
+digits). `Signature` is 64 bytes (that is, 128 hex digits).
 
 ### PeerAddress
 
 `PeerAddress` is a string containing address in `IP:port` format. `IP` is IPv4
-address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
+or IPv6 address formatted as 4 octets separated by dots (for example,
+`10.10.0.1`).
 
 ### OutgoingConnectionState
 
@@ -82,8 +92,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 - **schema_version**: integer  
   Information schema version. Currently, `0`
 - **state_hash**: Hash  
-  Hash of the current [Exonum state][blockchain-state] after applying transactions
-  in the block
+  Hash of the current [Exonum state][blockchain-state] after applying
+  transactions in the block
 - **tx_count**: integer  
   Number of transactions included into the block
 - **tx_hash**: Hash  
@@ -96,7 +106,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ### Precommit
 
-`Precommit` is a message, serialized according to [message serialization rules](../architecture/serialization.md#message-serialization).
+`Precommit` is a message, serialized according to
+[message serialization rules](../architecture/serialization.md#message-serialization).
 
 - **body**: Object  
   The content of the `Precommit` message
@@ -137,8 +148,8 @@ address formatted as 4 octets separated by dots (for example, `10.10.0.1`).
 
 ## System API endpoints
 
-All system API endpoints share the same base path, denoted **{system_base_path}**,
-equal to `/api/system/v1`.
+All system API endpoints share the same base path, denoted
+**{system_base_path}**, equal to `/api/system/v1`.
 
 ## Public endpoints
 
@@ -458,8 +469,7 @@ null
 All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
 
-All explorer endpoints are public. `enable_blockchain_explorer` local
-configuration parameter allows to turn explorer endpoints on/off.
+All explorer endpoints are public.
 
 ### Transaction
 
@@ -506,7 +516,8 @@ the HTTP status of the response is set to 404.
 
 ##### Known Uncommitted Transaction
 
-Response JSON has same fields as [`SerializedTransaction`](#serializedtransaction)
+Response JSON has same fields as
+[`SerializedTransaction`](#serializedtransaction)
 plus `type` field with value equal to `"in-pool"`.
 
 ??? example "Response Example"
@@ -703,8 +714,8 @@ A JSON object with the following fields:
 GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}
 ```
 
-Returns the explored range and the corresponding headers. The range specifies the
-smallest and largest heights traversed to collect at most `count` blocks.
+Returns the explored range and the corresponding headers. The range specifies
+the smallest and largest heights traversed to collect at most `count` blocks.
 
 #### Parameters
 
@@ -712,11 +723,13 @@ smallest and largest heights traversed to collect at most `count` blocks.
   The number of blocks to return. Should not be greater than
   [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
 - **skip_empty_blocks**: bool=  
-  If `true`, then only non-empty blocks are returned. The default value is `false`
+  If `true`, then only non-empty blocks are returned. The default value is
+  `false`
 - **latest**: integer=  
   The maximum height of the returned blocks. The blocks are returned
   in reverse order, starting from the `latest` and at least up to the `latest -
-  count + 1`. The default value is the height of the latest block in the blockchain
+  count + 1`. The default value is the height of the latest block in the
+  blockchain
 
 #### Response
 

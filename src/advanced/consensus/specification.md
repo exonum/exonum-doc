@@ -40,7 +40,18 @@ by the following timetable:
 
 - The first round starts after committing a block at the previous height
   to the blockchain
-- Rounds 2, 3, … start after linearly increasing time intervals
+- The second round starts within `first_round_timeout` interval. The default
+  value of the `first_round_timeout` is 3000 ms and can be configured by the
+  network through a new proposal at any time
+- All further round timeouts are calculated according to the following formula:
+  `first_round_timeout + (r-1)*round_timeout_increase`. The
+  `round_timeout_increase` value is a percentage of the `first_round_timeout`.
+  `round_timeout_increase` is defined in the
+  `ConsensusConfig::TIMEOUT_LINEAR_INCREASE_PERCENT` constant and constitutes
+  10% of the `first_round_timeout`.
+
+Thus, the duration of rounds gradually increases. This provides the network with
+more time every round to make a decision on a new block.
 
 Rounds are not synchronized among nodes.
 
@@ -71,11 +82,25 @@ message processing.
 
 ## Configuration Parameters
 
-- `propose_timeout`  
-  Proposal timeout after a new block is committed to the blockchain locally.
+- `max_propose_timeout`  
+  Initial proposal timeout after a new block is committed to the blockchain.
+
+- `propose_timeout_threshold`
+  If the amount of transactions in the pool of unconfirmed transactions of a
+  node is larger than the `propose_timeout_threshold` value, the node switches
+  from `max_propose_timeout` to `min_propose_timeout`, i.e. generates blocks
+  faster, and vice versa.
+
+- `min_propose_timeout`
+  The proposal timeout for the case when the amount of transactions in the pool
+  of unconfirmed transactions is larger than `propose_timeout_threshold` value.
 
 - `first_round_timeout`  
-  Initial interval between algorithm rounds.
+  Interval between the first and the second rounds of the consensus algorithm.
+  This parameter is used to estimate timeouts for further consensus rounds.
+  The estimation formula is
+  `first_round_timeout + (r-1)*round_timeout_increase`, where
+  `round_timeout_increase` is 10% of the `first_round_timeout`.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.

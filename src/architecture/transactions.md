@@ -200,6 +200,10 @@ Such transactions can be and are included into the blockchain provided they
 lead to the same result (panic or return an identical error code)
 for at least 2/3 of the validators.
 
+<!--Side note: maybe we could explain what happens
+if transactions behave differently on different nodes. It may be useful to
+emphasize the importance of identical behavior among nodes.-->
+
 ## Lifecycle
 
 ### 1. Creation
