@@ -12,15 +12,6 @@ endpoint type is hosted at a separate address, which is specified in the
 [`api` section](../architecture/configuration.md#api) of the local
 configuration.
 
-> Most of this description is still true,
-> we're still using REST API and JSON for most of the requests.
-> However, some replies have been updated, there are new requests, etc.
-> Some updates are there in [this PR][pr-235]
-> but I have a feeling that we'd need to review the source code again for proper
-> update.
-
-[pr-235]: https://github.com/exonum/exonum-doc/pull/235
-
 ## Types
 
 As per [Google Closure Compiler][closure] conventions,
