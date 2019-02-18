@@ -12,15 +12,6 @@ endpoint type is hosted at a separate address, which is specified in the
 [`api` section](../architecture/configuration.md#api) of the local
 configuration.
 
-> Most of this description is still true,
-> we're still using REST API and JSON for most of the requests.
-> However, some replies have been updated, there are new requests, etc.
-> Some updates are there in [this PR][pr-235]
-> but I have a feeling that we'd need to review the source code again for proper
-> update.
-
-[pr-235]: https://github.com/exonum/exonum-doc/pull/235
-
 ## Types
 
 As per [Google Closure Compiler][closure] conventions,
@@ -103,34 +94,6 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `Time` is a string that combined date and time in UTC as per [ISO 8601][ISO8601]
 (for example, `2018-05-17T10:45:56.057753Z`).
-
-### Precommit
-
-`Precommit` is a message, serialized according to
-[message serialization rules](../architecture/serialization.md#message-serialization).
-
-- **body**: Object  
-  The content of the `Precommit` message
-- **body.block_hash**: Hash  
-  The hash of the current block (the `Precommit` message was created for)
-- **body.height**: integer  
-  The height of the current block
-- **body.propose_hash**: Hash  
-  Hash of the corresponding Propose
-- **body.round**: integer  
-  The round when the block proposal was created
-- **body.time**: Time  
-  UTC time of the validator that created the block proposal
-- **body.validator**: integer  
-  ID of the validator that created this `Precommit` message
-- **message_id**: integer  
-  ID of the `Precommit` message. Equals `4`
-- **protocol_version**: integer  
-  The major version of the Exonum serialization protocol. Currently, `0`
-- **service_id**: integer  
-  Unique service identifier. Equals `0`
-- **signature**: Signature  
-  `Precommit` message creator's signature
 
 ### SerializedTransaction
 
