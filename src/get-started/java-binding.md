@@ -13,7 +13,7 @@ $ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.4 \
+    -DarchetypeVersion=0.4.0 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0
@@ -24,7 +24,8 @@ You can also use the interactive mode:
 ``` none
 $ mvn archetype:generate \
     -DarchetypeGroupId=com.exonum.binding \
-    -DarchetypeArtifactId=exonum-java-binding-service-archetype
+    -DarchetypeArtifactId=exonum-java-binding-service-archetype \
+    -DarchetypeVersion=0.4.0
 ```
 
 The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
@@ -531,7 +532,7 @@ For using the library just include the dependency in your `pom.xml`:
     <dependency>
       <groupId>com.exonum.binding</groupId>
       <artifactId>exonum-java-binding-common</artifactId>
-      <version>0.4</version>
+      <version>0.4.0</version>
     </dependency>
 ```
 
