@@ -7,6 +7,8 @@ const path = require('path')
 
 const BUILD_COMMAND = 'mkdocs build'
 
+const BUILD_ENVIRONMENT = process.env.BUILD_ENVIRONMENT
+
 const mkdocsBuild = (path, configFile) => asyncExec(`${BUILD_COMMAND} -d ${path} -f ${configFile}`)
 
 const asyncExec = command => new Promise((resolve, reject) =>
@@ -21,7 +23,11 @@ const generateVersionedDocs = async (versions) => {
   await cleanUp()
 
   const git = new Git({})
-  const returnToBranch = await git.getBranchName()
+  let returnToBranch = await git.getBranchName()
+
+  if (BUILD_ENVIRONMENT === 'jenkins') {
+    returnToBranch = 'master'
+  }
 
   fs.mkdirSync('./version')
   let failed = 0
