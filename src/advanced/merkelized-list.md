@@ -207,7 +207,7 @@ If either of these verifications fails, the proof is deemed invalid.
 
 #### Example
 
-Depicted below is a Merkle tree with 6 elements (i.e., not full binary) with
+Depicted below is a Merkle tree with 6 elements (i.e., not a full binary one) with
 elements that are a saved inside a proof for range `[3, 5)` in
 **bold\_and\_underscored** on the bottom. The elements of the underlying Merkelized
 list are 3-byte buffers `[u8; 3]`.
