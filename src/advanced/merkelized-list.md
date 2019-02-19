@@ -110,34 +110,34 @@ according to [the Exonum binary serialization spec](../architecture/serializatio
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
 rules.
 
-#### Rule 1. Empty tree
+#### Rule 1. Empty Tree
 
 Hash of an empty tree is defined as 32 zero bytes.
 
 #### Rule 2. `height=1`
 
-Hash of a value, contained in `(height = 0, index)`, is defined as:
+Hash of a value contained in `(height = 0, index)` is defined as
 
 ```none
 T(1, index) = hash(T(0, index)).
 ```
 
-#### Rule 3. `height > 1`, two children
+#### Rule 3. `height > 1`, Two Children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
-`T(height - 1, index * 2 + 1)` exist then:
+`T(height - 1, index * 2 + 1)` exist, then
 
 ```none
 T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).
 ```
 
-#### Rule 4. `height > 1` and the only child
+#### Rule 4. `height > 1`, Single Child
 
 If `height > 1`, node `T(height - 1, index * 2)` exists and
-node `(height - 1, index * 2 + 1)` is absent in the tree, then:
+node `(height - 1, index * 2 + 1)` is absent in the tree, then
 
 ```none
-T(height > 1, index) = hash(T(height - 1, index * 2)).
+T(height, index) = hash(T(height - 1, index * 2)).
 ```
 
 ## Merkle Tree Proofs
@@ -207,10 +207,10 @@ If either of these verifications fails, the proof is deemed invalid.
 
 #### Example
 
-Below is depicted a Merkle tree with `6` elements (i.e., not full binary) with
-elements, that are a saved inside a proof for range `[3, 5)` in
+Depicted below is a Merkle tree with 6 elements (i.e., not full binary) with
+elements that are a saved inside a proof for range `[3, 5)` in
 **bold\_and\_underscored** on the bottom. The elements of the underlying Merkelized
-list are `3`-byte buffers `[u8; 3]`.
+list are 3-byte buffers `[u8; 3]`.
 
 ![Proof_Structure](../images/merkle-tree-example-2.png)
 
