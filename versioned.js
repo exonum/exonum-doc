@@ -23,9 +23,10 @@ const generateVersionedDocs = async (versions) => {
   await cleanUp()
 
   const git = new Git({})
+  const returnToBranch = await git.getBranchName()
   
-  if (BUILD_ENVIRONMENT != 'jenkins') {
-    const returnToBranch = await git.getBranchName()
+  if (BUILD_ENVIRONMENT === 'jenkins') {
+    returnToBranch == 'master'
   }
 
   fs.mkdirSync('./version')
@@ -45,9 +46,7 @@ const generateVersionedDocs = async (versions) => {
     versionedMkdocs.extra.versions = extraVersions
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
     await mkdocsBuild(`./version/${version}`, configFile)
-    if (BUILD_ENVIRONMENT != 'jenkins') {
-      await git.checkout(returnToBranch)
-    }
+    await git.checkout(returnToBranch)
   }
 
   return { failed, success: versions.length - failed }
