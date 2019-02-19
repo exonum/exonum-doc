@@ -26,7 +26,7 @@ const generateVersionedDocs = async (versions) => {
   const returnToBranch = await git.getBranchName()
   
   if (BUILD_ENVIRONMENT === 'jenkins') {
-    returnToBranch == 'master'
+    returnToBranch = 'master'
   }
 
   fs.mkdirSync('./version')
