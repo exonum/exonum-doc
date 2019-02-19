@@ -23,7 +23,7 @@ const generateVersionedDocs = async (versions) => {
   await cleanUp()
 
   const git = new Git({})
-  const returnToBranch = await git.getBranchName()
+  let returnToBranch = await git.getBranchName()
   
   if (BUILD_ENVIRONMENT === 'jenkins') {
     returnToBranch = 'master'
