@@ -493,6 +493,7 @@ Currently Java Binding includes the following built-in services:
 
   See the [*Configuration Update Service*](../advanced/configuration-updater.md)
   article for more details.
+
 - **Anchoring Service.**
   The anchoring service writes the hash of the current Exonum blockchain state
   to the Bitcoin blockchain with a certain time interval. The anchored data is
