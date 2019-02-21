@@ -948,12 +948,11 @@ curl -H "Content-Type: application/json" -X POST -d @create-timestamp-1.json \
     {"tx_hash":"add5cf2617b1253afb3fbd24837935e39ec1ce1de3a3fad331deda652c6dad9d"}
     ```
 
-The request returns the hash of the timestamp.
+The request returns the hash of the transaction.
 
 ### Get Information on a Timestamp
 
-To retrieve information about an existing timestamp, use the following request
-indicating the hash of the timestamp in question:
+To retrieve information about an existing timestamp, use the following request:
 
 ```shell
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
@@ -988,8 +987,7 @@ The request returns the following information:
 
 ### Get Proof for a Timestamp
 
-To retrieve a proof for an existing timestamp, use the following request
-indicating the hash of the timestamp in question:
+To retrieve a proof for an existing timestamp, use the following request:
 
 ```shell
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
