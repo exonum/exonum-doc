@@ -29,7 +29,7 @@ The very first step of developing a service, is creating a crate and adding
 the necessary dependencies to it.
 
 ```bash
-cargo new demo-timestamping
+cargo new exonum-demo-timestamping
 ```
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
@@ -832,7 +832,7 @@ performed in the directory containing `Cargo.toml`.
 1. Install the actual node binary:
 
    ```shell
-   cargo install
+   cargo install --path .
    ```
 
 2. Generate blockchain configuration for the network we are setting up:
@@ -864,33 +864,37 @@ performed in the directory containing `Cargo.toml`.
    node, such a node will be regarded as an auditor by the validator nodes.
 
    ```shell
-   exonum-demo-timestamping finalize example/node_1_cfg.toml \
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8200 \
        --private-api-address 0.0.0.0:8091 example/sec_1.toml \
+       example/node_1_cfg.toml \
        --public-configs \
        example/pub_1.toml \
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_2_cfg.toml \
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8201 \
        --private-api-address 0.0.0.0:8092 example/sec_2.toml \
+       example/node_2_cfg.toml \
        --public-configs \
        example/pub_1.toml \
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_3_cfg.toml \
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8202 \
        --private-api-address 0.0.0.0:8093 example/sec_3.toml \
+       example/node_3_cfg.toml \
        --public-configs \
        example/pub_1.toml \
        example/pub_2.toml \
        example/pub_3.toml \
        example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_4_cfg.toml \
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8203 \
        --private-api-address 0.0.0.0:8094 example/sec_4.toml \
+       example/node_4_cfg.toml \
        --public-configs \
        example/pub_1.toml \
        example/pub_2.toml \
@@ -928,34 +932,20 @@ To add a new timestamp create a `create-timestamp-1.json` file and insert the
 following code into it:
 
 ```json
-{
-  "size": 80,
-  "network_id": 0,
-  "protocol_version": 0,
-  "service_id": 130,
-  "message_id": 0,
-  "signature":"f84e2242d10d92e18a7b256a56dff8fb989269f177f61873f49481dcfcb6c1c783ec59cf63d9716ffa8fde1ca8a43fa2632e119105f5393295c1cea22a3c2a0a",
-  "body": {
-    "pub_key": "5ce4675f37b6378e869ccc1f9134b3555220d384cf87e73d03d400032015f84d",
-    "content": {
-      "content_hash": "6e98e39cb76fac1ebdbad8208773589eb6d88b99c025352447c219bc6a4c9f80",
-      "metadata": "test"
-    }
-  }
-}
+{"tx_body": "29f4cf5b4e977d86b9461ce7603ee271f0e5df0fad68afb89fc708371fb245540000820000000a2a0a220a201099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca120474657374c14f9384cbf138f248fc4555c27c56dc01f4dee5e9a751ff99fea4a5c88fd46400d43ded634d76245b20a239429b26b599a26180f269cc49aa66d607f4733706"}
 ```
 
 Use the `curl` command to send this transaction to the node by HTTP:
 
 ```shell
 curl -H "Content-Type: application/json" -X POST -d @create-timestamp-1.json \
-    http://127.0.0.1:8081/api/services/timestamping/v1/timestamps
+    http://127.0.0.1:8200/api/explorer/v1/transactions
 ```
 
 ??? note "Response example"
 
-    ```none
-    ee1b51883e00c4e62d3204427acc3bf9500bad79e4dde044dffe51c0986bf6d5
+    ```json
+    {"tx_hash":"add5cf2617b1253afb3fbd24837935e39ec1ce1de3a3fad331deda652c6dad9d"}
     ```
 
 The request returns the hash of the timestamp.
@@ -966,22 +956,26 @@ To retrieve information about an existing timestamp, use the following request
 indicating the hash of the timestamp in question:
 
 ```shell
-curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/value?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
+curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
 ```
 
 ??? note "Response example"
 
     ```json
     {
-      "time": {
-          "nanos": 133304000,
-          "secs": "1536757761"
-      },
-      "timestamp": {
-        "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-        "metadata": "test"
-      },
-      "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
+        "timestamp": {
+            "content_hash": {
+                "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70, 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54, 92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
+            },
+            "metadata": "test"
+        },
+        "tx_hash": {
+            "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189, 36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250, 211, 49, 222, 218, 101, 44, 109, 173, 157]
+        },
+        "time": {
+            "seconds": 1550769625,
+            "nanos": 347857000
+        }
     }
     ```
 
@@ -998,108 +992,64 @@ To retrieve a proof for an existing timestamp, use the following request
 indicating the hash of the timestamp in question:
 
 ```shell
-curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
+curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
 ```
 
 ??? note "Response example"
 
     ```json
     {
-      "block_info": {
-        "block": {
-          "height": "857",
-          "prev_hash": "f2f4b6778abbbf285efe3cf638a1b36f2eb7e2866a8221933279a68bd24a2da8",
-          "proposer_id": 0,
-          "state_hash": "654fd7bf570242832f2a51d6f3f019deeb2234bbe9cc07feb048880c75963d12",
-          "tx_count": 3,
-          "tx_hash": "24038928624fc9e10774bf37de85ffb3a2b0f5d14ccd815d06603475b3b93513"
+        "block_info": {
+            "block": {
+                "proposer_id": 2,
+                "height": 4349,
+                "tx_count": 4,
+                "prev_hash": "9f70dd5916aeef649ff012ab0003214626bca68f6d39cb7f623b4ce6ea3c4b6c",
+                "tx_hash": "6cae88e605e589930386cd6400dfd346b034a727a2b5f5f6c5c35d1015eb33a7",
+                "state_hash": "9c5f13715bbbc344c7c040287112fd656dc2d8a94a42facb1a1d2e5364b8b133"
+            },
+            "precommits": ["356dbfb22307417a064f1d4df29066c40b92a3276bff40aba4607f845d816c25010010fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe30510d0cec9345d52182b5d5fac43cd0560d8f670e6ecd1ca4551a3cba0d90a460df73f24b0596f6ad181fa20e39c9c04fd6c36000bb3c993ed4abc4a22df8ac3c417df504e0e", "7108c24cde5165125ee5684d9a10b0f64af897b0b3ab0f5fd6d0762ad39851e60100080210fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe30510d0d7c63406c6e754c86c614c72c1e562bd7ebc2b2825cb14b3c6f8cab8197451ad8bb3b2eb92d456bcc04c1a2ca4c12e1fa15eb9e1b82743641a5ea03ba923407d2d970d", "5a25a06bb78f01022cb55922f4a3d269e3cd2d5d73748eef018c718dd785d5730100080110fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe3051098a5cf34e8b1ef7419a3eedab88f3701645ca83d2f247d6c6d6fa74f8d051c44b542aa4d0ba4875a38e3dd460ff13340b0438cae0ecde842f2002c6323a8515efb43ac04"]
         },
-        "precommits": [{
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-                "nanos": 23630000,
-                "secs": "1536757888"
-            },
-            "validator": 1
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "8a741a19ac88b2c8763654ab367c33cdfce6488b17f520a380d75acdef13611049db3e06cae61661d1d67f17e34728caf38e1ad98ef17ee654e84418ea38c30b"
-        }, {
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-                "nanos": 23274000,
-                "secs": "1536757888"
-            },
-            "validator": 0
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "b06526052eecc9da3ebe18a33277c0837485788d31791676b6e869ab527274e1bd6446a4ce6e01d630157fa2dc1976634562b4960a879611d3dd32f18ee6a70b"
-        }, {
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-              "nanos": 23598000,
-              "secs": "1536757888"
-            },
-            "validator": 2
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "ddc9e7459a6c785bb6a0dd5bf7d6ddeadbe876a5f9b9c06be1469bd7b1e4d6138230d38b944637d2290475d5c15d0c86f74e45646f838d84be5ae975ad727d09"
-        }]
-      },
-      "state_proof": {
-        "entries": [{
-          "key": "775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581",
-          "value": "a12823b8e2b76001acb7f4c117546438d7398a71b1d8883875a9f23ed41fd2a5"
-        }],
-        "proof": [{
-          "path": "0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }, {
-          "path": "1101",
-          "hash": "dea7c92b6c17088b7dbb3d7995737f1e80e89c5950e4263e811f999d004bdaa0"
-        }, {
-          "path": "1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }, {
-          "path": "1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
-          "hash": "7d5e5b6f055e66b56e3e329c973c12be13b3b4eea9e5400c1e570211d2d5281a"
-        }]
-      },
-      "timestamp_proof": {
-        "entries": [{
-          "key": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-          "value": {
-            "time": {
-              "nanos": 133304000,
-              "secs": "1536757761"
-            },
-            "timestamp": {
-              "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-              "metadata": "test"
-            },
-            "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
-          }
-        }],
-        "proof": []
-      }
+        "state_proof": {
+            "entries": [{
+                "key": "775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581",
+                "value": "631b20b61ff068db4a4e2884e543b1aea2b5f12b10199b19d0cc635310ade73c"
+            }],
+            "proof": [{
+                "path": "0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
+                "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }, {
+                "path": "1101",
+                "hash": "17bb01ba591eacc7971d7694d2779263839fa4347539e850a497d83816ade1a0"
+            }, {
+                "path": "1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
+                "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            }, {
+                "path": "1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
+                "hash": "e7b1255594e9941a3663a71863c89b19af900e352dafc4a0124f8b1b637b6a3c"
+            }]
+        },
+        "timestamp_proof": {
+            "entries": [{
+                "key": "1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca",
+                "value": {
+                    "timestamp": {
+                        "content_hash": {
+                            "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70, 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54, 92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
+                        },
+                        "metadata": "test"
+                    },
+                    "tx_hash": {
+                        "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189, 36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250, 211, 49, 222, 218, 101, 44, 109, 173, 157]
+                    },
+                    "time": {
+                        "seconds": 1550769625,
+                        "nanos": 347857000
+                    }
+                }
+            }],
+            "proof": []
+        }
     }
     ```
 
