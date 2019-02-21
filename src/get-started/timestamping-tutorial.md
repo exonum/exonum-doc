@@ -113,6 +113,7 @@ in [src/lib.rs][src/lib.rs]:
 
 ```rust
 pub mod api;
+pub mod proto;
 pub mod schema;
 pub mod transactions;
 ```
