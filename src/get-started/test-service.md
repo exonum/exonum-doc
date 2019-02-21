@@ -27,7 +27,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.6.0"
+exonum-testkit = "0.10.2"
 ```
 
 ## Testing Kinds
@@ -60,20 +60,29 @@ contain the tests for transaction business logic.
 ### Imports
 
 The created file is executed separately from the service code, meaning that we
-need to import the service crate along with **exonum** and **exonum-testkit**:
+need to import the service crate along with **exonum** and **exonum-crypto**:
 
-```rust
-extern crate exonum;
-extern crate exonum_cryptocurrency as cryptocurrency;
-#[macro_use] extern crate exonum_testkit;
+```toml
+[dependencies]
+exonum = "0.10.3"
+exonum-crypto = "0.10.4"
+serde_json = "1.0"
+cryptocurrency = { path = "path/to/cryptocurrency" }
+
+[dev-dependencies]
+assert_matches = "1.2"
+exonum-testkit = "0.10.2"
 ```
 
 Just like with the service itself, we then import the types we will use:
 
 ```rust
-use exonum::blockchain::Transaction;
-use exonum::crypto::{self, PublicKey, SecretKey};
-use exonum_testkit::{TestKit, TestKitBuilder};
+use assert_matches::assert_matches;
+use exonum::api::Error;
+use exonum::messages::{to_hex_string, RawTransaction, Signed};
+use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
+use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
+use serde_json::json;
 // Import datatypes used in tests from the crate where the service is defined.
 use cryptocurrency::schema::{CurrencySchema, Wallet};
 use cryptocurrency::transactions::{TxCreateWallet, TxTransfer};
@@ -123,9 +132,9 @@ persisted by the blockchain.
 #[test]
 fn test_create_wallet() {
     let mut testkit = init_testkit();
-    let (pubkey, key) = crypto::gen_keypair();
+    let (pubkey, key) = gen_keypair();
     testkit.create_block_with_transactions(txvec![
-        TxCreateWallet::new(&pubkey, "Alice", &key),
+        TxCreateWallet::sing("Alice", &pubkey, &key),
     ]);
     let wallet = {
         let snapshot = testkit.snapshot();
@@ -133,9 +142,9 @@ fn test_create_wallet() {
             "No wallet persisted",
         )
     };
-    assert_eq!(*wallet.pub_key(), pubkey);
-    assert_eq!(wallet.name(), "Alice");
-    assert_eq!(wallet.balance(), 100);
+    assert_eq!(wallet.pub_key, pubkey);
+    assert_eq!(wallet.name, "Alice");
+    assert_eq!(wallet.balance, 100);
 }
 ```
 
@@ -177,22 +186,22 @@ failures:
 
 > **Test:** `test_transfer`
 
-Let’s test a transfer between two wallets. First, we need to create the testkit
-and the wallets:
+Let’s test a transfer between two wallets. First, we need to create the 
+testkit and the wallets:
 
 ```rust
 let mut testkit = init_testkit();
-let (alice_pubkey, alice_key) = crypto::gen_keypair();
-let (bob_pubkey, bob_key) = crypto::gen_keypair();
+let (alice_pubkey, alice_key) = gen_keypair();
+let (bob_pubkey, bob_key) = gen_keypair();
 testkit.create_block_with_transactions(txvec![
-    TxCreateWallet::new(&alice_pubkey, "Alice", &alice_key),
-    TxCreateWallet::new(&bob_pubkey, "Bob", &bob_key),
-    TxTransfer::new(
-        &alice_pubkey, // sender
-        &bob_pubkey, // receiver
-        10, // amount
-        0, // seed
-        &alice_key, // private key used to sign the transaction
+    TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
+    TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
+    TxTransfer::sign(
+        &alice_pubkey,  // sender
+        &bob_pubkey,    // receiver
+        10,             // amount
+        0,              // seed
+        &alice_key,     // private key used to sign the transaction
     ),
 ]);
 ```
@@ -205,9 +214,10 @@ let wallets = {
     let schema = CurrencySchema::new(&snapshot);
     (schema.wallet(&alice_pubkey), schema.wallet(&bob_pubkey))
 };
+
 if let (Some(alice_wallet), Some(bob_wallet)) = wallets {
-    assert_eq!(alice_wallet.balance(), 90);
-    assert_eq!(bob_wallet.balance(), 110);
+    assert_eq!(alice_wallet.balance, 90);
+    assert_eq!(bob_wallet.balance, 110);
 } else {
     panic!("Wallets not persisted");
 }
@@ -229,9 +239,9 @@ Namely, the `create_block_with_transactions` call is replaced with
 
 ```rust
 testkit.create_block_with_transactions(txvec![
-    TxCreateWallet::new(&alice_pubkey, "Alice", &alice_key),
-    TxTransfer::new(&alice_pubkey, &bob_pubkey, 10, 0, &alice_key),
-    TxCreateWallet::new(&bob_pubkey, "Bob", &bob_key),
+    TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
+    TxTransfer::sign(&alice_pubkey, &bob_pubkey, 10, 0, &alice_key),
+    TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
 ]);
 ```
 
@@ -241,8 +251,8 @@ executed.
 We should check that Alice did not send her tokens to nowhere:
 
 ```rust
-assert_eq!(alice_wallet.balance(), 100);
-assert_eq!(bob_wallet.balance(), 100);
+assert_eq!(alice_wallet.balance, 100);
+assert_eq!(bob_wallet.balance, 100);
 ```
 
 ## Testing API
@@ -268,7 +278,7 @@ struct CryptocurrencyApi {
 }
 
 impl CryptocurrencyApi {
-    fn create_wallet(&self, name: &str) -> (TxCreateWallet, SecretKey) {
+    fn create_wallet(&self, name: &str) -> (Signed<RawTransaction>, SecretKey) {
         // Code skipped...
     }
 
@@ -276,7 +286,7 @@ impl CryptocurrencyApi {
         // Code skipped...
     }
 
-    fn get_wallet(&self, pubkey: &PublicKey) -> Wallet {
+    fn get_wallet(&self, pub_key: &PublicKey) -> Wallet {
         // Code skipped...
     }
 }
@@ -287,14 +297,14 @@ because it may be needed to sign other transactions authorized by the wallet
 owner.
 
 Inside, all wrapper methods call the `inner` API instance; for example,
-`get_wallet` is implemented as
+`get_wallet` is implemented as:
 
 ```rust
-fn get_wallet(&self, pubkey: &PublicKey) -> Wallet {
-    self.inner.get(
-        ApiKind::Service("cryptocurrency"),
-        &format!("v1/wallet/{}", pubkey.to_string()),
-    )
+fn get_wallet(&self, pub_key: &PublicKey) -> Wallet {
+    self.inner
+        .public(ApiKind::Service("cryptocurrency"))
+        .get(&format!("v1/wallet/{}", pub_key.to_string()))
+        .unwrap()
 }
 ```
 
@@ -311,16 +321,14 @@ would return information about a specific wallet.
 with a specified public key:
 
 ```rust
-fn assert_no_wallet(&self, pubkey: &PublicKey) {
-    let err = self.inner.get_err(
-        ApiKind::Service("cryptocurrency"),
-        &format!("v1/wallet/{}", pubkey.to_string()),
-    );
-
-    assert_matches!(
-        err,
-        ApiError::NotFound(ref body) if body == "Wallet not found"
-    );
+fn assert_no_wallet(&self, pub_key: &PublicKey) {
+    let err = self
+        .inner
+        .public(ApiKind::Service("cryptocurrency"))
+        .get::<Wallet>(&format!("v1/wallet/{}", pub_key.to_string()))
+        .unwrap_err();
+    
+    assert_matches!(err, Error::NotFound(ref body) if body == "Wallet not found");
 }
 ```
 
@@ -344,10 +352,9 @@ as follows:
 let (mut testkit, api) = create_testkit();
 let (tx, _) = api.create_wallet("Alice");
 testkit.create_block();
-let wallet = api.get_wallet(tx.pub_key());
-assert_eq!(wallet.pub_key(), tx.pub_key());
-assert_eq!(wallet.name(), tx.name());
-assert_eq!(wallet.balance(), 100);
+let wallet = api.get_wallet(&tx.author());
+assert_eq!(wallet.pub_key, tx.author());
+assert_eq!(wallet.balance, 100);
 ```
 
 Note that we call `create_block` after sending a transaction via HTTP API.
@@ -363,7 +370,7 @@ tokens from a non-existing wallet:
 let (tx_alice, key_alice) = api.create_wallet("Alice");
 let (tx_bob, _) = api.create_wallet("Bob");
 testkit.create_block_with_tx_hashes(&[tx_bob.hash()]);
-api.assert_no_wallet(tx_alice.pub_key());
+api.assert_no_wallet(&tx_alice.author());
 ```
 
 This code results in the testkit not committing Alice’s transaction,
@@ -379,5 +386,5 @@ logic and HTTP API.
 [integration-testing]: http://doc.crates.io/manifest.html#integration-tests
 [tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
-[TestKitApi]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKitApi.html
-[TestKit-snapshot]: https://docs.rs/exonum-testkit/0.1.1/exonum_testkit/struct.TestKit.html#method.snapshot
+[TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
+[TestKit-snapshot]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKit.html#method.snapshot
