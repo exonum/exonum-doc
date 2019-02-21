@@ -186,7 +186,7 @@ failures:
 
 > **Test:** `test_transfer`
 
-Let’s test a transfer between two wallets. First, we need to create the 
+Let’s test a transfer between two wallets. First, we need to create the
 testkit and the wallets:
 
 ```rust
@@ -327,7 +327,7 @@ fn assert_no_wallet(&self, pub_key: &PublicKey) {
         .public(ApiKind::Service("cryptocurrency"))
         .get::<Wallet>(&format!("v1/wallet/{}", pub_key.to_string()))
         .unwrap_err();
-    
+
     assert_matches!(err, Error::NotFound(ref body) if body == "Wallet not found");
 }
 ```
