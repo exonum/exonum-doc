@@ -952,7 +952,7 @@ The request returns the hash of the transaction.
 
 ### Get Information on a Timestamp
 
-To retrieve information about an existing timestamp, use the following request:
+To retrieve information about an existing timestamp by its hash, use the following request:
 
 ```shell
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
@@ -987,7 +987,7 @@ The request returns the following information:
 
 ### Get Proof for a Timestamp
 
-To retrieve a proof for an existing timestamp, use the following request:
+To retrieve a proof for an existing timestamp by its hash, use the following request:
 
 ```shell
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
