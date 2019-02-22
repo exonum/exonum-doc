@@ -283,8 +283,8 @@ pub struct TimestampEntry {
 
 impl TimestampEntry {
     /// New TimestampEntry.
-    pub fn new(timestamp: Timestamp, 
-               &tx_hash: &Hash, 
+    pub fn new(timestamp: Timestamp,
+               &tx_hash: &Hash,
                time: DateTime<Utc>) -> Self {
         Self {
             timestamp,
@@ -449,8 +449,12 @@ pub enum TimeTransactions {
 
 impl TxTimestamp {
     #[doc(hidden)]
-    pub fn sign(author: &PublicKey, content: Timestamp, key: &SecretKey) -> Signed<RawTransaction> {
-        Message::sign_transaction(Self { content }, TIMESTAMPING_SERVICE, *author, key)
+    pub fn sign(author: &PublicKey, 
+                content: Timestamp,
+                key: &SecretKey) -> Signed<RawTransaction> {
+        Message::sign_transaction(Self { content },
+                                  TIMESTAMPING_SERVICE,
+                                  *author, key)
     }
 }
 ```
@@ -571,7 +575,8 @@ structures:
   timestamp:
 
   ```rust
-  /// Describes query parameters for `handle_timestamp` and `handle_timestamp_proof` endpoints.
+  /// Describes query parameters for `handle_timestamp` and
+  /// `handle_timestamp_proof` endpoints.
   #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
   pub struct TimestampQuery {
       /// Hash of the requested timestamp.
@@ -590,7 +595,8 @@ structures:
   prove that a timestamping transaction has been included into the blockchain:
 
   ```rust
-  /// Describes the information required to prove the correctness of the timestamp entries.
+  /// Describes the information required to prove the correctness
+  /// of the timestamp entries.
   #[derive(Debug, Clone, Serialize, Deserialize)]
   pub struct TimestampProof {
       /// Proof of the last block.
@@ -973,12 +979,16 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=10
     {
         "timestamp": {
             "content_hash": {
-                "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70, 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54, 92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
+                "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70,
+                 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54,
+                  92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
             },
             "metadata": "test"
         },
         "tx_hash": {
-            "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189, 36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250, 211, 49, 222, 218, 101, 44, 109, 173, 157]
+            "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189,
+             36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250,
+             211, 49, 222, 218, 101, 44, 109, 173, 157]
         },
         "time": {
             "seconds": 1550769625,
@@ -1042,12 +1052,18 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=10
                 "value": {
                     "timestamp": {
                         "content_hash": {
-                            "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70, 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54, 92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
+                            "data": [16, 153, 215, 217, 4, 33, 114,
+                             66, 85, 70, 216, 225, 214, 64, 116, 174,
+                             170, 36, 126, 145, 54, 92, 55, 139, 163,
+                             202, 105, 90, 80, 28, 27, 202]
                         },
                         "metadata": "test"
                     },
                     "tx_hash": {
-                        "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189, 36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250, 211, 49, 222, 218, 101, 44, 109, 173, 157]
+                        "data": [173, 213, 207, 38, 23, 177, 37, 58,
+                         251, 63, 189, 36, 131, 121, 53, 227, 158, 193,
+                         206, 29, 227, 163, 250, 211, 49, 222, 218, 101,
+                         44, 109, 173, 157]
                     },
                     "time": {
                         "seconds": 1550769625,
