@@ -958,9 +958,9 @@ curl -H "Content-Type: application/json" -X POST -d @create-timestamp-1.json \
 
 ??? note "Response example"
 
-    ```json
-    {"tx_hash":"add5cf2617b1253afb3fbd24837935e39ec1ce1de3a3fad331deda652c6dad9d"}
-    ```
+```json
+{"tx_hash":"add5cf2617b1253afb3fbd24837935e39ec1ce1de3a3fad331deda652c6dad9d"}
+```
 
 The request returns the hash of the transaction.
 
@@ -975,7 +975,7 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=10
 
 ??? note "Response example"
 
-    ```json
+ ```json
     {
         "timestamp": {
             "content_hash": {
@@ -995,7 +995,7 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=10
             "nanos": 347857000
         }
     }
-    ```
+ ```
 
 The request returns the following information:
 
@@ -1012,6 +1012,7 @@ To retrieve a proof for an existing timestamp by its hash, use the following req
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
 ```
 
+<!-- markdownlint-disable MD013 -->
 ??? note "Response example"
 
 ```json
@@ -1076,6 +1077,7 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=10
     }
 }
 ```
+<!-- markdownlint-enable MD013 -->
 
 The request returns the following components of the timestamp proof:
 
