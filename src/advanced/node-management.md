@@ -45,7 +45,7 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 - **address**: string
   Address of the peer.
 - **public_key**: PublicKey
-  Public key of the peer.
+  Public key of the connected peer.
 
 ### OutgoingConnectionState
 
