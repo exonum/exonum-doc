@@ -143,7 +143,7 @@ mkdir proto
 Inside `proto` directory create two files: `timestamping.proto` and `mod.rs`.
 Define protobuf structures in `timestamping.proto`:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 package exonum.examples.timestamping;
