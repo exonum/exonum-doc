@@ -74,7 +74,7 @@ Install the latest version of the following packages:
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
 
 ```shell
-choco install -y protobuf
+choco install -y protoс
 ```
 
 ## Adding Environment Variables
