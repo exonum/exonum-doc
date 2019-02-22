@@ -176,7 +176,7 @@ None.
 
 A JSON object with the following fields:
 
-- **connectivity**: string or JSON object   
+- **connectivity**: string or JSON object
   Indicates the number of peers the node is connected to or `NotConnected` if
   the node is not connected to any peers.
 - **consensus_status**: string
@@ -515,6 +515,7 @@ the HTTP status of the response is set to 404.
 Response JSON has the same fields as
 [`Content`](#content) plus `type` field with value equal to `"in-pool"`.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
@@ -531,6 +532,7 @@ Response JSON has the same fields as
       }
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
 ##### Known Committed Transaction
 
@@ -563,6 +565,7 @@ Response is a JSON object with the following fields:
   Optional human-readable error description. Only relevant for erroneous and
   panicking transactions.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
@@ -589,6 +592,7 @@ Response is a JSON object with the following fields:
       }
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
 ### Block by Height
 
@@ -616,6 +620,7 @@ A JSON object with the following fields:
 - **time**: time object
   Time when the block was committed to the blockchain.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
@@ -632,6 +637,7 @@ A JSON object with the following fields:
       "time": "2019-02-14T14:12:52.037255Z"
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
 ### Blocks in Range
 
