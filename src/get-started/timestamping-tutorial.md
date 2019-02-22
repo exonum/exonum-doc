@@ -186,7 +186,7 @@ use exonum::proto::schema::*;
 
 ## Generate rust structs from proto files
 
-In the project root directory create `build.rs` file. 
+In the project root directory create `build.rs` file.
 Add the following code to `build.rs` file:
 
 ```rust
@@ -204,8 +204,8 @@ fn main() {
 }
 ```
 
-After successful run output directory will contain *.rs for each 
-*.proto file in `"src/proto/**/"` and `example_mod.rs` which will 
+After successful run output directory will contain *.rs for each
+*.proto file in `"src/proto/**/"` and `example_mod.rs` which will
 include all generated .rs files as submodules.
 
 ## Configure Schema
@@ -283,7 +283,9 @@ pub struct TimestampEntry {
 
 impl TimestampEntry {
     /// New TimestampEntry.
-    pub fn new(timestamp: Timestamp, &tx_hash: &Hash, time: DateTime<Utc>) -> Self {
+    pub fn new(timestamp: Timestamp, 
+               &tx_hash: &Hash, 
+               time: DateTime<Utc>) -> Self {
         Self {
             timestamp,
             tx_hash,
@@ -294,7 +296,7 @@ impl TimestampEntry {
 ```
 
 The `TimestampEntry` structure includes the timestamp itself, the hash of the
-timestamping transaction and the time when the timestamp was recorded. 
+timestamping transaction and the time when the timestamp was recorded.
 The time value is provided by the Exonum Time Oracle.
 
 ### Create Schema
@@ -584,7 +586,7 @@ structures:
   }
   ```
 
-- the `TimestampProof` structure which contains all the data required to 
+- the `TimestampProof` structure which contains all the data required to
   prove that a timestamping transaction has been included into the blockchain:
 
   ```rust
@@ -958,7 +960,7 @@ The request returns the hash of the transaction.
 
 ### Get Information on a Timestamp
 
-To retrieve information about an existing timestamp by its hash, 
+To retrieve information about an existing timestamp by its hash,
 use the following request:
 
 ```shell
