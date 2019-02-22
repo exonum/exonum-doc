@@ -135,6 +135,7 @@ pub const SERVICE_NAME: &str = "timestamping";
 ## Define protobuf structures
 
 Create new `proto` directory inside `src`:
+
 ```bash
 mkdir proto
 ```
@@ -169,7 +170,7 @@ message TimestampEntry {
 message TxTimestamp { Timestamp content = 1; }
 ```
 
-You must manually include protobuf files into the project. 
+You must manually include protobuf files into the project.
 `mod.rs` is responsible for that:
 
 ```rust
@@ -185,7 +186,8 @@ use exonum::proto::schema::*;
 
 ## Generate rust structs from proto files
 
-In the project root directory create `build.rs` file. Add the following code to `build.rs` file:
+In the project root directory create `build.rs` file. 
+Add the following code to `build.rs` file:
 
 ```rust
 extern crate exonum_build;
@@ -202,7 +204,9 @@ fn main() {
 }
 ```
 
-After successful run output directory will contain *.rs for each *.proto file in `"src/proto/**/"` and `example_mod.rs` which will include all generated .rs files as submodules.
+After successful run output directory will contain *.rs for each 
+*.proto file in `"src/proto/**/"` and `example_mod.rs` which will 
+include all generated .rs files as submodules.
 
 ## Configure Schema
 
@@ -222,6 +226,7 @@ the main elements with which our service will operate.
 ### Declare Persistent Data
 
 First of all we have to import required structures:
+
 ```rust
 use super::proto;
 use chrono::{DateTime, Utc};
@@ -233,7 +238,7 @@ use exonum::{
 
 As a part of the service schema, we first define the two structures that the
 service will be able to save in the Exonum blockchain. This is done using the
-`protobuf` structures. 
+`protobuf` structures.
 
 ```rust
 /// Stores content's hash and some metadata about it.
@@ -289,8 +294,8 @@ impl TimestampEntry {
 ```
 
 The `TimestampEntry` structure includes the timestamp itself, the hash of the
-timestamping transaction and the time when the timestamp was recorded. The time
-value is provided by the Exonum Time Oracle.
+timestamping transaction and the time when the timestamp was recorded. 
+The time value is provided by the Exonum Time Oracle.
 
 ### Create Schema
 
@@ -541,6 +546,7 @@ configures API endpoints for our Timestamping Service into a separate file -
 [src/api.rs][src/api.rs].
 
 Required imports:
+
 ```rust
 use exonum::{
     api::{self, ServiceApiBuilder, ServiceApiState},
@@ -578,8 +584,8 @@ structures:
   }
   ```
 
-- the `TimestampProof` structure which contains all the data required to prove
-  that a timestamping transaction has been included into the blockchain:
+- the `TimestampProof` structure which contains all the data required to 
+  prove that a timestamping transaction has been included into the blockchain:
 
   ```rust
   /// Describes the information required to prove the correctness of the timestamp entries.
@@ -700,7 +706,6 @@ endpoints:
 - For the `handle_timestamp_proof` method we declare the `v1/timestamps/proof`
   route, which will be used for getting proofs of correctness of certain
   timestamping transactions.
-
 
 ## Define Service
 
@@ -953,7 +958,8 @@ The request returns the hash of the transaction.
 
 ### Get Information on a Timestamp
 
-To retrieve information about an existing timestamp by its hash, use the following request:
+To retrieve information about an existing timestamp by its hash, 
+use the following request:
 
 ```shell
 curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
