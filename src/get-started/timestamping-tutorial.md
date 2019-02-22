@@ -185,7 +185,7 @@ use exonum::proto::schema::*;
 
 ## Generate rust structs from proto files
 
-In the project root create `build.rs` file. Add the following code to `build.rs`:
+In the project root directory create `build.rs` file. Add the following code to `build.rs` file:
 
 ```rust
 extern crate exonum_build;
