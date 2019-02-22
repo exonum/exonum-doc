@@ -1077,6 +1077,7 @@ curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=10
     }
 }
 ```
+
 <!-- markdownlint-enable MD013 -->
 
 The request returns the following components of the timestamp proof:
