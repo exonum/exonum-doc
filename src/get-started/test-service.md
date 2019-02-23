@@ -83,7 +83,7 @@ use exonum::messages::{to_hex_string, RawTransaction, Signed};
 use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
 use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
-// Import datatypes used in tests from the crate where the service is defined.
+// Imports datatypes used in tests from the crate where the service is defined.
 use cryptocurrency::schema::{CurrencySchema, Wallet};
 use cryptocurrency::transactions::{TxCreateWallet, TxTransfer};
 use cryptocurrency::service::CurrencyService;
@@ -186,8 +186,13 @@ failures:
 
 > **Test:** `test_transfer`
 
-Let’s test a transfer between two wallets. First, we need to create the
-testkit and the wallets:
+Let’s test a transfer between two wallets. To do this, first, we need
+to initialize the testkit. Then we need to create the wallets and
+transfer funds between them. As per the code of the
+Cryptocurrency Service, the wallets are created with the initial
+balance set to `100`.
+
+The mentioned three transactions will be included into the block:
 
 ```rust
 let mut testkit = init_testkit();
@@ -232,7 +237,7 @@ will include into the next block. This allows testing different orderings
 of transactions, even those that would be hard (but not impossible) to
 reproduce in a real network.
 
-Let’s test a case when Alice sends a transaction to Bob while Bob’s wallet
+Let’s test the case when Alice sends a transaction to Bob while Bob’s wallet
 is not committed. The test is quite similar to the previous one, with the
 exception of how the created transactions are placed into the block.
 Namely, the `create_block_with_transactions` call is replaced with
