@@ -56,6 +56,21 @@ fn test_my_tx() {
     assert!(schema.is_my_data_checked());
 }
 ```
+Here, we assume that the service developer has implemented `sign` constructor
+for `MyTransaction` struct, which returns a signed transaction,
+`Signed<RawTransaction>`. This method is not implemented automatically;
+it could be replaced with more verbose, but universal:
+
+```rust
+use exonum::messages::Message;
+
+let tx = Message::sign_transaction(
+    MyTransaction { /* fields */ },
+    MyService::ID, // service identifier
+    public_key,    // ...of the signer
+    &secret_key,   // ...of the signer
+);
+```
 
 Make sure that you have full coverage of the business logic in the `execute` method
 of your transactions.
