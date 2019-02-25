@@ -54,10 +54,6 @@ Then we need to import macro from dependencies into `src/lib.rs` file.
 
 ```rust
 #[macro_use]
-extern crate exonum_derive;
-#[macro_use]
-extern crate failure;
-#[macro_use]
 extern crate serde_derive;
 ```
 
@@ -162,6 +158,8 @@ message Wallet {
 ```
 
 ```rust
+use exonum_derive::ProtobufConvert;
+
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Wallet", serde_pb_convert)]
 pub struct Wallet {
@@ -407,6 +405,8 @@ message CreateWallet {
 ```
 
 ```rust
+use exonum_derive::{ProtobufConvert, TransactionSet};
+
 /// Transfer `amount` of the currency from one wallet to another.
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Transfer", serde_pb_convert)]
@@ -458,6 +458,8 @@ the simple Cryptocurrency demo.
 ??? "Error definitions"
 
     ```rust
+    use failure::Fail;
+
     #[derive(Debug, Fail)]
     #[repr(u8)]
     pub enum Error {
