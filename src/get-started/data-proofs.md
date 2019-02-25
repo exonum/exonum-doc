@@ -633,7 +633,7 @@ proof of its existence. The proofs also allow to confirm existence
 of a particular transaction in the wallet history.
 
 ```rust
-impl CryptocurrencyApi {
+impl PublicApi {
     pub fn wallet_info(
         state: &ServiceApiState,
         query: WalletQuery,
