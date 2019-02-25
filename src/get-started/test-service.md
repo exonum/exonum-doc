@@ -59,7 +59,7 @@ contain the tests for transaction business logic.
 
 ### Imports
 
-Just like with the service itself, we then import the types we will use:
+We need to import the types we will use:
 
 ```rust
 use assert_matches::assert_matches;
@@ -69,9 +69,10 @@ use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
 use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
 // Imports datatypes used in tests from the crate where the service is defined.
-use cryptocurrency::schema::{CurrencySchema, Wallet};
-use cryptocurrency::transactions::{TxCreateWallet, TxTransfer};
-use cryptocurrency::service::CurrencyService;
+use exonum_cryptocurrency::{service::CurrencyService,
+                            schema::{CurrencySchema, Wallet};
+                            transactions::{TxCreateWallet, TxTransfer}
+};
 ```
 
 ### Creating Test Network
