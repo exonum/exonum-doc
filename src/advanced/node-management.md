@@ -42,9 +42,9 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `ConnectInfo` is a JSON object with the following two fields:
 
-- **address**: string
+- **address**: string  
   Address of the peer.
-- **public_key**: PublicKey
+- **public_key**: PublicKey  
   Public key of the connected peer.
 
 ### OutgoingConnectionState
@@ -111,9 +111,9 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `Content` is a JSON object with the following fields:
 
-- **debug**: a JSON object
-  Transaction in the deserialized format.
-- **message**: SerializedTransaction
+- **debug**: object  
+  Transaction in the deserialized format.  
+- **message**: SerializedTransaction  
   Array of bytes of a transaction serialized according to the Protobuf
   serialization format.
 
@@ -123,7 +123,7 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 - **block_height**: integer  
   Height of the block including this transaction.
-- **position_in_block**: integer
+- **position_in_block**: integer  
   Position of the transaction in the block.
 
 ## System API Endpoints
@@ -176,10 +176,10 @@ None.
 
 A JSON object with the following fields:
 
-- **connectivity**: string or JSON object
+- **connectivity**: string or JSON object  
   Indicates the number of peers the node is connected to or `NotConnected` if
   the node is not connected to any peers.
-- **consensus_status**: string
+- **consensus_status**: string  
   Indicates whether consensus is launched on the node. Can be:
 
     - `active`:  consensus is enabled and the node has enough connected peers  
@@ -240,9 +240,9 @@ node asynchronously.
 
 #### Parameters
 
-- **address**: PeerAddress
+- **address**: PeerAddress  
   IP address of the node which the present node should connect to.
-- **public_key**: PublicKey
+- **public_key**: PublicKey  
   Public key of the node which the present node should connect to.
 
 #### Example
@@ -387,7 +387,7 @@ None.
 
 A JSON object with the following fields:
 
-- **core_version**: string
+- **core_version**: string  
   Current applied version of the Exonum framework.
 - **protocol_version**: integer  
   Major version of the Exonum serialization protocol. Currently, `1`.
@@ -519,16 +519,16 @@ Response JSON has the same fields as
 ??? example "Response Example"
     ```json
     {
-    "type": "in-pool",
-    "content": {
-      "debug": {
-        "to": {
-          "data": [242, 39, 156, 45, 245, 89, 252, 58, 143, 174, 88, 196, 76, 225, 223, 206, 177, 125, 63, 3, 90, 36, 128, 213, 70, 37, 243, 231, 174, 139, 81, 151]
+      "type": "in-pool",
+      "content": {
+        "debug": {
+          "to": {
+            "data": [242, 39, 156, 45, 245, 89, 252, 58, 143, 174, 88, 196, 76, 225, 223, 206, 177, 125, 63, 3, 90, 36, 128, 213, 70, 37, 243, 231, 174, 139, 81, 151]
           },
-        "amount": 10,
-        "seed": 9587307158524814255
+          "amount": 10,
+          "seed": 9587307158524814255
         },
-      "message": "ba76da2363c062f3dc25f5e353d0f8de2e3d02896b9c8f01683dbde7e3194eb90000800000000a220a20f2279c2df559fc3a8fae58c44ce1dfceb17d3f035a2480d54625f3e7ae8b5197100a18afc7b9838aa2bd8685019a6bf7a720fdfdf27948330d0a451f35aef3eb64f80f568136be91d2667f75b7eb4b03ba279b70c69bbf5b69db8d8edf5e1049f51c86e937c10d1408374faa08"
+        "message": "ba76da2363c062f3dc25f5e353d0f8de2e3d02896b9c8f01683dbde7e3194eb90000800000000a220a20f2279c2df559fc3a8fae58c44ce1dfceb17d3f035a2480d54625f3e7ae8b5197100a18afc7b9838aa2bd8685019a6bf7a720fdfdf27948330d0a451f35aef3eb64f80f568136be91d2667f75b7eb4b03ba279b70c69bbf5b69db8d8edf5e1049f51c86e937c10d1408374faa08"
       }
     }
     ```
@@ -569,26 +569,26 @@ Response is a JSON object with the following fields:
 ??? example "Response Example"
     ```json
     {
-    "type": "committed",
-    "content": {
-      "debug": {
-        "to": {
-          "data": [174, 116, 3, 32, 153, 158, 51, 93, 212, 245, 253, 192, 70, 143, 52, 235, 70, 84, 74, 161, 153, 91, 108, 172, 252, 237, 200, 36, 40, 189, 113, 221]
+      "type": "committed",
+      "content": {
+        "debug": {
+          "to": {
+            "data": [174, 116, 3, 32, 153, 158, 51, 93, 212, 245, 253, 192, 70, 143, 52, 235, 70, 84, 74, 161, 153, 91, 108, 172, 252, 237, 200, 36, 40, 189, 113, 221]
           },
-        "amount": 10,
-        "seed": 2084648087298472854
+          "amount": 10,
+          "seed": 2084648087298472854
         },
-      "message": "41c453a7f45cb0dd73644aa376d3802bb7da4c6797bcf6749211fbcabb5aa8710000800000000a220a20ae740320999e335dd4f5fdc0468f34eb46544aa1995b6cacfcedc82428bd71dd100a1896f7fda8bf8c8af71cfccd80d4c0d5d6f82955cf7c081969282604d3f7e416274a4319484ceea947981b8d337bd170210acd62508f3663acba395bd131456c0b6cd7f09690aec68a05"
+        "message": "41c453a7f45cb0dd73644aa376d3802bb7da4c6797bcf6749211fbcabb5aa8710000800000000a220a20ae740320999e335dd4f5fdc0468f34eb46544aa1995b6cacfcedc82428bd71dd100a1896f7fda8bf8c8af71cfccd80d4c0d5d6f82955cf7c081969282604d3f7e416274a4319484ceea947981b8d337bd170210acd62508f3663acba395bd131456c0b6cd7f09690aec68a05"
       },
-    "location": {
-      "block_height": 11,
-      "position_in_block": 0
+      "location": {
+        "block_height": 11,
+        "position_in_block": 0
       },
-    "location_proof": {
-      "val": "2f23541b10b258dfc80693ed1bf6ed6f53ccf8908047f7d33e0fec4f29a4a613"
+      "location_proof": {
+        "val": "2f23541b10b258dfc80693ed1bf6ed6f53ccf8908047f7d33e0fec4f29a4a613"
       },
-    "status": {
-      "type": "success"
+      "status": {
+        "type": "success"
       }
     }
     ```
@@ -617,7 +617,7 @@ A JSON object with the following fields:
   List of hashes of the 'Precommit' messages supporting the block.
 - **txs**: Array<SerializedTransaction\>  
   List of the transactions included into the block.
-- **time**: time object
+- **time**: time object  
   Time when the block was committed to the blockchain.
 
 <!-- markdownlint-disable MD013 -->
@@ -632,7 +632,9 @@ A JSON object with the following fields:
         "tx_hash": "336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13",
         "state_hash": "79a6f0fa233cc2d7d2e96855ec14bdcc4c0e0bb1a99ccaa912a555441e3b7512"
       },
-      "precommits": ["a410964c2c21199b48e278b64bb72e2b8b20374df1ba5c8a846d34de9254a706010008031001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510f09da312b91820e1a9b0132c32d608e5206bf5fe119c54c17424ef6f6c70b13490761ddd36f855e2c74e37c7aa7e1ac648893164a07ed413c2c0065738d6bea8825bbf04", "0776a07b194e1a9b918205331e0c1f62de82d5b23efccb5922624cb928b620c901001001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510e8bfe11105fcd4562131756c6f6c64d0e63f4cca67bf718fb43a1ca45161ee3328c97c2582ab70f40406d4b2aa5fc967e2b177b897a3cf2dc0a674df4eccb45f75db8900", "57b745d4e157299ede29129ba039a039e6f145aae3852481937ac1972b2ed131010008011001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510d8eee11143e792e3c8a72403fc3dc259f3e8e0c3de867be4555fb809e7c8f79ce9449d15020b9060eb6d41efb5079bd25147dc2a5f3071b9bb7ed2fc8751468e750b310d"],
+      "precommits": ["a410964c2c21199b48e278b64bb72e2b8b20374df1ba5c8a846d34de9254a706010008031001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510f09da312b91820e1a9b0132c32d608e5206bf5fe119c54c17424ef6f6c70b13490761ddd36f855e2c74e37c7aa7e1ac648893164a07ed413c2c0065738d6bea8825bbf04",
+      "0776a07b194e1a9b918205331e0c1f62de82d5b23efccb5922624cb928b620c901001001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510e8bfe11105fcd4562131756c6f6c64d0e63f4cca67bf718fb43a1ca45161ee3328c97c2582ab70f40406d4b2aa5fc967e2b177b897a3cf2dc0a674df4eccb45f75db8900",
+      "57b745d4e157299ede29129ba039a039e6f145aae3852481937ac1972b2ed131010008011001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510d8eee11143e792e3c8a72403fc3dc259f3e8e0c3de867be4555fb809e7c8f79ce9449d15020b9060eb6d41efb5079bd25147dc2a5f3071b9bb7ed2fc8751468e750b310d"],
       "txs": ["336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13"],
       "time": "2019-02-14T14:12:52.037255Z"
     }
@@ -652,8 +654,8 @@ blocks from the traversed range should not exceed `count` value.
 #### Parameters
 
 - **count**: integer  
-  Number of blocks to return. Should not be greater than.
-  [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
+  Number of blocks to return. Should not be greater than
+  [`MAX_BLOCKS_PER_REQUEST`][explorer].
 - **skip_empty_blocks**: bool=  
   If `true`, then only non-empty blocks are returned. The default value is
   `false`.
@@ -662,7 +664,7 @@ blocks from the traversed range should not exceed `count` value.
   in reverse order, starting from the `latest` and at least up to the `latest -
   count + 1`. The default value is the height of the latest block in the
   blockchain.
-- **add_blocks_time**: bool=
+- **add_blocks_time**: bool=  
   If `true`, then returns an array of `time` objects. The time value
   corresponds to the average time of submission of precommits by the
   validators for every returned block. The default value is `false`.
@@ -691,51 +693,59 @@ equal to `start` and is less than `end`.
 
     ```JSON
     {
-    "range": {
-      "start": 6,
-      "end": 288
-    },
-    "blocks": [{
-      "proposer_id": 3,
-      "height": 26,
-      "tx_count": 1,
-      "prev_hash": "932470a22d37a5a995519e01c50eab7db9e0e978f5b17f8342030ae3f066af82",
-      "tx_hash": "5cc41a2a7cf7c0d3a15ab6ca775b601208dba7d506e2f27368702b3334d37583",
-      "state_hash": "4d7bb34d7913e0784c24a1e440532e72900eb380129a54dbaac6ad9286f9d567"
-    },{
-      "proposer_id": 2,
-      "height": 21,
-      "tx_count": 1,
-      "prev_hash": "aa4ec89740a4ec380e8bcab0aedd0f5449184eb33b65ede5bb67e5e55e2dd004",
-      "tx_hash": "dcb05a3bd61f9b637335472802d8ab6026c8486dae3b4062ce48d561949c49af",
-      "state_hash": "e4ea2c6118326c6b00cd14ec7b8fb4cbf198eb4e65149ef3a96761740fc516c6"
-    },{
-      "proposer_id": 1,
-      "height": 16,
-      "tx_count": 1,
-      "prev_hash": "7183517c34e94ecc10a3e13269da2bfadb6e87eea86453a1946ebdfa9c4dae83",
-      "tx_hash": "362bc50ed56d33944a0d33fbac2a25fc08ceb8dc1aced1f38147b3da3d022bc1",
-      "state_hash": "00cca5682b677d4b4ac644d2ddae09ca5e260fb67c735df22774f2e983d24ef5"
-    },{
-      "proposer_id": 0,
-      "height": 11,
-      "tx_count": 1,
-      "prev_hash": "9297ef66d1d9ec286c00aec779f2dc273b3371e792bbc9c6635d00f9c4a6fa80",
-      "tx_hash": "c7aa20695380846e3f274d3d51c68e864e66e46f2618aa5fbd55d597675b9e6a",
-      "state_hash": "deb57ff0f82c9d2514dc51785675544e27b3054512ea62dce2c8e30ce6d91e77"
-    },{
-      "proposer_id": 3,
-      "height": 6,
-      "tx_count": 1,
-      "prev_hash": "dbec8f64a85ab56985c7ab7e63a191764f4d5c373c677f719c2f9ddf13b9d5a1",
-      "tx_hash": "ffee3d630f137aecff95aece36cfe4dc1b42f688d474219cb30d44c85cf36b1f",
-      "state_hash": "8ac9f2af6266b8e9b61fa7f3fcdd170375fb1bf8cc8d474904abe3672b44906e"
-    }],
-    "times": ["2019-02-21T13:01:44.321051Z",
-             "2019-02-21T13:01:43.287648Z",
-             "2019-02-21T13:01:42.251382Z",
-             "2019-02-21T13:01:41.228900Z",
-             "2019-02-21T13:01:40.199265Z"]
+      "range": {
+        "start": 6,
+        "end": 288
+      },
+      "blocks": [
+        {
+          "proposer_id": 3,
+          "height": 26,
+          "tx_count": 1,
+          "prev_hash": "932470a22d37a5a995519e01c50eab7db9e0e978f5b17f8342030ae3f066af82",
+          "tx_hash": "5cc41a2a7cf7c0d3a15ab6ca775b601208dba7d506e2f27368702b3334d37583",
+          "state_hash": "4d7bb34d7913e0784c24a1e440532e72900eb380129a54dbaac6ad9286f9d567"
+        },
+        {
+          "proposer_id": 2,
+          "height": 21,
+          "tx_count": 1,
+          "prev_hash": "aa4ec89740a4ec380e8bcab0aedd0f5449184eb33b65ede5bb67e5e55e2dd004",
+          "tx_hash": "dcb05a3bd61f9b637335472802d8ab6026c8486dae3b4062ce48d561949c49af",
+          "state_hash": "e4ea2c6118326c6b00cd14ec7b8fb4cbf198eb4e65149ef3a96761740fc516c6"
+        },
+        {
+          "proposer_id": 1,
+          "height": 16,
+          "tx_count": 1,
+          "prev_hash": "7183517c34e94ecc10a3e13269da2bfadb6e87eea86453a1946ebdfa9c4dae83",
+          "tx_hash": "362bc50ed56d33944a0d33fbac2a25fc08ceb8dc1aced1f38147b3da3d022bc1",
+          "state_hash": "00cca5682b677d4b4ac644d2ddae09ca5e260fb67c735df22774f2e983d24ef5"
+        },
+        {
+          "proposer_id": 0,
+          "height": 11,
+          "tx_count": 1,
+          "prev_hash": "9297ef66d1d9ec286c00aec779f2dc273b3371e792bbc9c6635d00f9c4a6fa80",
+          "tx_hash": "c7aa20695380846e3f274d3d51c68e864e66e46f2618aa5fbd55d597675b9e6a",
+          "state_hash": "deb57ff0f82c9d2514dc51785675544e27b3054512ea62dce2c8e30ce6d91e77"
+        },
+        {
+          "proposer_id": 3,
+          "height": 6,
+          "tx_count": 1,
+          "prev_hash": "dbec8f64a85ab56985c7ab7e63a191764f4d5c373c677f719c2f9ddf13b9d5a1",
+          "tx_hash": "ffee3d630f137aecff95aece36cfe4dc1b42f688d474219cb30d44c85cf36b1f",
+          "state_hash": "8ac9f2af6266b8e9b61fa7f3fcdd170375fb1bf8cc8d474904abe3672b44906e"
+        }
+      ],
+      "times": [
+        "2019-02-21T13:01:44.321051Z",
+        "2019-02-21T13:01:43.287648Z",
+        "2019-02-21T13:01:42.251382Z",
+        "2019-02-21T13:01:41.228900Z",
+        "2019-02-21T13:01:40.199265Z"
+      ]
     }
     ```
 
@@ -743,6 +753,6 @@ equal to `start` and is less than `end`.
     range from `288` to `6` has been traversed.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/node/public/explorer.rs#L42
+[explorer]: https://docs.rs/exonum/0.10.3/exonum/api/node/public/explorer/constant.MAX_BLOCKS_PER_REQUEST.html
 [blockchain-state]: ../glossary.md#blockchain-state
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
