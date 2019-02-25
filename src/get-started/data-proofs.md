@@ -185,6 +185,23 @@ simultaneously updates the balance and the history of the wallet:
 
 ```rust
 impl Wallet {
+    /// Create new Wallet.
+    pub fn new(
+        &pub_key: &PublicKey,
+        name: &str,
+        balance: u64,
+        history_len: u64,
+        &history_hash: &Hash,
+    ) -> Self {
+        Self {
+            pub_key,
+            name: name.to_owned(),
+            balance,
+            history_len,
+            history_hash,
+        }
+    }
+
     /// Returns a copy of this wallet with the updated balance.
     pub fn set_balance(self, balance: u64, history_hash: &Hash) -> Self {
         Self::new(
@@ -500,6 +517,8 @@ is similar to their predecessors.
 ??? "Transfer transaction"
 
     ```rust
+    const ERROR_SENDER_SAME_AS_RECEIVER: u8 = 0;
+
     impl Transaction for Transfer {
         fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
             let from = &context.author();
