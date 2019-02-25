@@ -69,8 +69,8 @@ use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
 use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
 // Imports datatypes used in tests from the crate where the service is defined.
-use exonum_cryptocurrency::{service::CurrencyService,
-                            schema::{CurrencySchema, Wallet};
+use exonum_cryptocurrency::{schema::{CurrencySchema, Wallet},
+                            service::CurrencyService,
                             transactions::{TxCreateWallet, TxTransfer}
 };
 ```
