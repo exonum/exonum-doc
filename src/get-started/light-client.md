@@ -1,5 +1,9 @@
 # Exonum Light Client Tutorial
 
+!!! note
+    Light client is also available in Java language.  
+    Please refer to the [readme][lc-java] for details.
+
 In this tutorial we describe how to use the light client to interact with
 Exonum services. The tutorial extends other tutorials:
 [Cryptocurrency Advanced](data-proofs.md)
@@ -553,3 +557,4 @@ support! At this the point you can build and run your application.
 [pbjs-lib]: https://www.npmjs.com/package/pbjs
 [cryptocurrency-advanced]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced/frontend
 [timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping/frontend
+[lc-java]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-light-client
