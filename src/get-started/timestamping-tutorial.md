@@ -204,9 +204,9 @@ fn main() {
 }
 ```
 
-After successful run output directory will contain *.rs for each
-*.proto file in `"src/proto/**/"` and `example_mod.rs` which will
-include all generated .rs files as submodules.
+After successful run output directory will contain `*.rs` for each
+`*.proto` file in `src/proto/**/` and `example_mod.rs` which will
+include all generated `.rs` files as submodules.
 
 ## Configure Schema
 
@@ -264,7 +264,9 @@ impl Timestamp {
 ```
 
 The `Timestamp` structure includes the hash of the submitted file and its
-optional description.
+optional description. We added `serde_pb_convert` to have JSON representation
+of our structure similar to protobuf declarations, it helps light client to
+handle proofs that contain `Wallet` structure.
 
 ```rust
 /// Timestamp entry.
@@ -283,9 +285,11 @@ pub struct TimestampEntry {
 
 impl TimestampEntry {
     /// New TimestampEntry.
-    pub fn new(timestamp: Timestamp,
-               &tx_hash: &Hash,
-               time: DateTime<Utc>) -> Self {
+    pub fn new(
+        timestamp: Timestamp,
+        &tx_hash: &Hash,
+        time: DateTime<Utc>
+    ) -> Self {
         Self {
             timestamp,
             tx_hash,
@@ -449,12 +453,17 @@ pub enum TimeTransactions {
 
 impl TxTimestamp {
     #[doc(hidden)]
-    pub fn sign(author: &PublicKey,
-                content: Timestamp,
-                key: &SecretKey) -> Signed<RawTransaction> {
-        Message::sign_transaction(Self { content },
-                                  TIMESTAMPING_SERVICE,
-                                  *author, key)
+    pub fn sign(
+        author: &PublicKey,
+        content: Timestamp,
+        key: &SecretKey
+    ) -> Signed<RawTransaction> {
+        Message::sign_transaction(
+            Self { content },
+            TIMESTAMPING_SERVICE,
+            *author,
+            key
+        )
     }
 }
 ```
