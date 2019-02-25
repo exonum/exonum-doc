@@ -59,21 +59,6 @@ contain the tests for transaction business logic.
 
 ### Imports
 
-The created file is executed separately from the service code, meaning that we
-need to import the service crate along with **exonum** and **exonum-crypto**:
-
-```toml
-[dependencies]
-exonum = "0.10.3"
-exonum-crypto = "0.10.4"
-serde_json = "1.0"
-cryptocurrency = { path = "path/to/cryptocurrency" }
-
-[dev-dependencies]
-assert_matches = "1.2"
-exonum-testkit = "0.10.2"
-```
-
 Just like with the service itself, we then import the types we will use:
 
 ```rust
@@ -134,14 +119,13 @@ fn test_create_wallet() {
     let mut testkit = init_testkit();
     let (pubkey, key) = gen_keypair();
     testkit.create_block_with_transactions(txvec![
-        TxCreateWallet::sing("Alice", &pubkey, &key),
+        TxCreateWallet::sign("Alice", &pubkey, &key),
     ]);
-    let wallet = {
-        let snapshot = testkit.snapshot();
-        CurrencySchema::new(&snapshot).wallet(&pubkey).expect(
-            "No wallet persisted",
-        )
-    };
+    let snapshot = testkit.snapshot();
+    let wallet = CurrencySchema::new(snapshot)
+            .wallet(&pk)
+            .expect("No wallet");
+
     assert_eq!(wallet.pub_key, pubkey);
     assert_eq!(wallet.name, "Alice");
     assert_eq!(wallet.balance, 100);
@@ -388,7 +372,7 @@ especially in typical blockchain applications. The testkit framework allows
 streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
-[integration-testing]: http://doc.crates.io/manifest.html#integration-tests
+[integration-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
 [tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
