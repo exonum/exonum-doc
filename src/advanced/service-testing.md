@@ -56,6 +56,7 @@ fn test_my_tx() {
     assert!(schema.is_my_data_checked());
 }
 ```
+
 Here, we assume that the service developer has implemented `sign` constructor
 for `MyTransaction` struct, which returns a signed transaction,
 `Signed<RawTransaction>`. This method is not implemented automatically;
