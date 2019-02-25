@@ -65,6 +65,10 @@ these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
+!!! note
+    Windows support is experimental. In case of any issues, please create an
+    issue on GitHub: https://github.com/exonum/exonum/issues/new
+
 Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
