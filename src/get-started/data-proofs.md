@@ -86,6 +86,8 @@ pub const SERVICE_NAME: &str = "cryptocurrency";
 const INITIAL_BALANCE: u64 = 100;
 ```
 
+## Implement a service
+
 Implement a service structure and realize a trait for it with all the necessary
 methods and credentials:
 
