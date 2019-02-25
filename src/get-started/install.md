@@ -136,16 +136,10 @@ by cloning the `exonum` repository and running its built-in unit test suite:
 ```shell
 git clone https://github.com/exonum/exonum.git
 cd exonum
-cargo test --manifest-path exonum/Cargo.toml
+cargo test -p exonum
 ```
 
-You may also run the extended test suite located in the `sandbox` directory:
-
-```shell
-cargo test --manifest-path sandbox/Cargo.toml
-```
-
-Notice that `tests` requires up to 30Gb free disk space.
+Notice that running tests may require up to 30 GB free disk space.
 
 ## Non-Rust Components
 
