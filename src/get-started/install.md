@@ -65,6 +65,10 @@ these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
+!!! note
+    Windows support is experimental. In case of any issues, please [create an
+    issue on GitHub][win-issue].
+
 Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
@@ -186,3 +190,4 @@ guide on how to develop applications on top of the Exonum framework.
 [build_tools]: https://www.visualstudio.com/downloads/
 [powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
 [protobuf]: https://developers.google.com/protocol-buffers/
+[win-issue]: https://github.com/exonum/exonum/issues/new?title=Windows+support+problem
