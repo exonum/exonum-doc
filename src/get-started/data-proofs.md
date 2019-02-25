@@ -90,6 +90,7 @@ Implement a service structure and realize a trait for it with all the necessary
 methods and credentials:
 
 ??? "Service definition"
+
     ```rust
     #[derive(Default, Debug)]
     pub struct Service;
@@ -227,6 +228,7 @@ of  `MapIndex` and `ListIndex`:
 
 <!-- markdownlint-disable no-inline-html -->
 ??? "Schema definition"
+
     ```rust
     impl<T> Schema<T>
     where
@@ -265,6 +267,7 @@ of  `MapIndex` and `ListIndex`:
         }
     }
     ```
+
 <!-- markdownlint-enable no-inline-html -->
 
 We have added two new getter methods
@@ -278,6 +281,7 @@ in all cases, we additionally record the hash of a transaction
 that influenced the balance.
 
 ??? "Mutable methods for the schema"
+
     ```rust
     impl<'a> Schema<&'a mut Fork> {
         /// Returns mutable `MerklePatriciaTable` with wallets.
@@ -415,7 +419,6 @@ pub enum WalletTransactions {
     Issue(Issue),
     CreateWallet(CreateWallet),
 }
-
 ```
 
 We added `serde_pb_convert` to `Transfer` transaction derive attributes
@@ -434,6 +437,7 @@ during their execution. The code is identical to the
 the simple Cryptocurrency demo.
 
 ??? "Error definitions"
+
     ```rust
     #[derive(Debug, Fail)]
     #[repr(u8)]
@@ -471,6 +475,7 @@ The verification logic for `CreateWallet` and `Transfer` transactions
 is similar to their predecessors.
 
 ??? "CreateWallet transaction"
+
     ```rust
     impl Transaction for CreateWallet {
         fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
@@ -491,6 +496,7 @@ is similar to their predecessors.
     ```
 
 ??? "Transfer transaction"
+
     ```rust
     impl Transaction for Transfer {
         fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
@@ -583,6 +589,7 @@ Besides this we also declare structures that
 will be used for processing users’ requests:
 
 ??? "Request data objects"
+
     ```rust
     /// Proof of existence for specific wallet.
     #[derive(Debug, Serialize, Deserialize)]
