@@ -68,10 +68,11 @@ use exonum::messages::{to_hex_string, RawTransaction, Signed};
 use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
 use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
-// Imports datatypes used in tests from the crate where the service is defined.
-use exonum_cryptocurrency::{schema::{CurrencySchema, Wallet},
-                            service::CurrencyService,
-                            transactions::{TxCreateWallet, TxTransfer}
+// Imports datatypes from the crate where the service is defined.
+use exonum_cryptocurrency::{
+    schema::{CurrencySchema, Wallet},
+    service::CurrencyService,
+    transactions::{TxCreateWallet, TxTransfer},
 };
 ```
 
@@ -124,8 +125,8 @@ fn test_create_wallet() {
     ]);
     let snapshot = testkit.snapshot();
     let wallet = CurrencySchema::new(snapshot)
-            .wallet(&pk)
-            .expect("No wallet");
+        .wallet(&pk)
+        .expect("No wallet");
 
     assert_eq!(wallet.pub_key, pubkey);
     assert_eq!(wallet.name, "Alice");
