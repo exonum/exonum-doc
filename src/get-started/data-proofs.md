@@ -731,6 +731,8 @@ Next, we obtain transaction data for each history hash, transform them into the
 readable format and output them in the form of an array:
 
 ```rust
+    let explorer = BlockchainExplorer::new(state.blockchain());
+
     let transactions = history
         .iter()
         .map(|record| explorer.transaction_without_proof(&record).unwrap())
