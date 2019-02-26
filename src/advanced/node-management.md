@@ -192,9 +192,9 @@ A JSON object with the following fields:
 ```JSON
 {
   "consensus_status": "Active",
-    "connectivity": {
-      "Connected": {
-        "amount": 1
+  "connectivity": {
+    "Connected": {
+      "amount": 1
     }
   }
 }
@@ -235,7 +235,7 @@ POST {system_base_path}/peers
 ```
 
 Adds new Exonum node to the list of peers for the present node.
-The latter will attempt to [connect](network.md#`connect`-messages) to the new
+The latter will attempt to [connect](network.md#connect-messages) to the new
 node asynchronously.
 
 #### Parameters
@@ -400,13 +400,16 @@ A JSON object with the following fields:
 {
   "core_version": "0.10.2",
   "protocol_version": 1,
-  "services": [{
+  "services": [
+    {
       "id": 128,
       "name": "cryptocurrency"
-  },{
+    },
+    {
       "name": "configuration",
       "id": 1
-  }]
+    }
+  ]
 }
 ```
 
