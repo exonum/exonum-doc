@@ -763,7 +763,7 @@ Finally, we `wire` function and call the above-mentioned methods with it:
 pub fn wire(builder: &mut ServiceApiBuilder) {
     builder
         .public_scope()
-        .endpoint("v1/wallets/info", Self::wallet_info)
+        .endpoint("v1/wallets/info", Self::wallet_info);
 }
 ```
 
