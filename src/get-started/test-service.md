@@ -276,7 +276,7 @@ impl CryptocurrencyApi {
         // Code skipped...
     }
 
-    fn transfer(&self, tx: &TxTransfer) {
+    fn transfer(&self, tx: &Signed<RawTransaction>) {
         // Code skipped...
     }
 
@@ -361,6 +361,7 @@ tokens from a non-existing wallet:
 > **Test:** `test_transfer_from_nonexisting_wallet`
 
 ```rust
+let (mut testkit, api) = create_testkit();
 let (tx_alice, key_alice) = api.create_wallet("Alice");
 let (tx_bob, _) = api.create_wallet("Bob");
 testkit.create_block_with_tx_hashes(&[tx_bob.hash()]);
