@@ -64,9 +64,11 @@ We need to import the types we will use:
 
 ```rust
 use assert_matches::assert_matches;
-use exonum::api::Error;
-use exonum::messages::{to_hex_string, RawTransaction, Signed};
-use exonum_crypto::{gen_keypair, PublicKey, SecretKey};
+use exonum::{
+    api::Error,
+    crypto::{gen_keypair, PublicKey, SecretKey},
+    messages::{to_hex_string, RawTransaction, Signed},
+};
 use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
 // Imports datatypes from the crate where the service is defined.
