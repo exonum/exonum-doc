@@ -27,6 +27,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
+assert_matches = "1.3.0"
 exonum-testkit = "0.10.2"
 ```
 
@@ -119,16 +120,16 @@ persisted by the blockchain.
 #[test]
 fn test_create_wallet() {
     let mut testkit = init_testkit();
-    let (pubkey, key) = gen_keypair();
+    let (pub_key, sec_key) = gen_keypair();
     testkit.create_block_with_transactions(txvec![
-        TxCreateWallet::sign("Alice", &pubkey, &key),
+        TxCreateWallet::sign("Alice", &pub_key, &sec_key),
     ]);
     let snapshot = testkit.snapshot();
     let wallet = CurrencySchema::new(snapshot)
-        .wallet(&pk)
+        .wallet(&pub_key)
         .expect("No wallet");
 
-    assert_eq!(wallet.pub_key, pubkey);
+    assert_eq!(wallet.pub_key, pub_key);
     assert_eq!(wallet.name, "Alice");
     assert_eq!(wallet.balance, 100);
 }
