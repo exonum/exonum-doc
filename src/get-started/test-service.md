@@ -280,7 +280,7 @@ impl CryptocurrencyApi {
         // Code skipped...
     }
 
-    fn get_wallet(&self, pub_key: &PublicKey) -> Wallet {
+    fn get_wallet(&self, pub_key: PublicKey) -> Wallet {
         // Code skipped...
     }
 }
@@ -297,7 +297,8 @@ Inside, all wrapper methods call the `inner` API instance; for example,
 fn get_wallet(&self, pub_key: &PublicKey) -> Wallet {
     self.inner
         .public(ApiKind::Service("cryptocurrency"))
-        .get(&format!("v1/wallet/{}", pub_key.to_string()))
+        .query(&WalletQuery { pub_key })
+        .get("v1/wallet")
         .unwrap()
 }
 ```
@@ -315,11 +316,12 @@ would return information about a specific wallet.
 with a specified public key:
 
 ```rust
-fn assert_no_wallet(&self, pub_key: &PublicKey) {
+fn assert_no_wallet(&self, pub_key: PublicKey) {
     let err = self
         .inner
         .public(ApiKind::Service("cryptocurrency"))
-        .get::<Wallet>(&format!("v1/wallet/{}", pub_key.to_string()))
+        .query(&WalletQuery { pub_key })
+        .get::<Wallet>("v1/wallet")
         .unwrap_err();
 
     assert_matches!(err, Error::NotFound(ref body) if body == "Wallet not found");
@@ -346,7 +348,7 @@ as follows:
 let (mut testkit, api) = create_testkit();
 let (tx, _) = api.create_wallet("Alice");
 testkit.create_block();
-let wallet = api.get_wallet(&tx.author());
+let wallet = api.get_wallet(tx.author());
 assert_eq!(wallet.pub_key, tx.author());
 assert_eq!(wallet.balance, 100);
 ```
@@ -365,7 +367,7 @@ let (mut testkit, api) = create_testkit();
 let (tx_alice, key_alice) = api.create_wallet("Alice");
 let (tx_bob, _) = api.create_wallet("Bob");
 testkit.create_block_with_tx_hashes(&[tx_bob.hash()]);
-api.assert_no_wallet(&tx_alice.author());
+api.assert_no_wallet(tx_alice.author());
 ```
 
 This code results in the testkit not committing Alice’s transaction,
