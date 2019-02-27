@@ -191,10 +191,10 @@ testkit.create_block_with_transactions(txvec![
     TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
     TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
     TxTransfer::sign(
-        &alice_pubkey,  // sender
         &bob_pubkey,    // receiver
         10,             // amount
         0,              // seed
+        &alice_pubkey,  // sender
         &alice_key,     // private key used to sign the transaction
     ),
 ]);
@@ -234,7 +234,7 @@ Namely, the `create_block_with_transactions` call is replaced with
 ```rust
 testkit.create_block_with_transactions(txvec![
     TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
-    TxTransfer::sign(&alice_pubkey, &bob_pubkey, 10, 0, &alice_key),
+    TxTransfer::sign(&bob_pubkey, 10, 0, &alice_pubkey, &alice_key),
     TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
 ]);
 ```
