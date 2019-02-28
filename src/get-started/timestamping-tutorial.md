@@ -134,7 +134,7 @@ pub const SERVICE_NAME: &str = "timestamping";
 
 ## Define protobuf structures
 
-Create new `proto` directory inside `src`:
+Create a new `proto` directory inside `src`:
 
 ```bash
 mkdir proto
