@@ -37,21 +37,17 @@ After that, create file `tests/transactions.rs` with the content similar
 to the one written below.
 
 ```rust
-extern crate exonum;
-extern crate exonum_testkit;
-extern crate my_service;
-
 use my_service::{MyService, MyTransaction, MySchema};
-use exonum_testkit::TestKitBuilder;
+use exonum_testkit::{txvec, TestKitBuilder};
 
 #[test]
 fn test_my_tx() {
     // Create simple testkit network.
     let mut testkit = TestKitBuilder::validator()
-        .with_service(MyService::new())
+        .with_service(MyService)
         .create();
     // Create transaction.
-    let tx = MyTransaction::new(...);
+    let tx = MyTransaction::sign(...);
     // Commit it into blockchain.
     testkit.create_block_with_transactions(txvec![tx]);
     // Check the expected result.
@@ -59,6 +55,22 @@ fn test_my_tx() {
     let schema = MySchema::new(&snapshot);
     assert!(schema.is_my_data_checked());
 }
+```
+
+Here, we assume that the service developer has implemented `sign` constructor
+for `MyTransaction` struct, which returns a signed transaction,
+`Signed<RawTransaction>`. This method is not implemented automatically;
+it could be replaced with more verbose, but universal:
+
+```rust
+use exonum::messages::Message;
+
+let tx = Message::sign_transaction(
+    MyTransaction { /* fields */ },
+    MyService::ID, // service identifier
+    public_key,    // ...of the signer
+    &secret_key,   // ...of the signer
+);
 ```
 
 Make sure that you have full coverage of the business logic in the `execute` method
@@ -70,12 +82,12 @@ that are quite difficult (but not impossible) to produce in the real network.
 
 ```rust
 let mut testkit = TestKitBuilder::validator()
-    .with_service(MyService::new())
-    .with_service(OtherService::new())
+    .with_service(MyService)
+    .with_service(OtherService)
     .create();
 // Create transactions.
-let tx1 = MyTransaction::new(...);
-let tx2 = OtherTransaction::new(...);
+let tx1 = MyTransaction::sign(...);
+let tx2 = OtherTransaction::sign(...);
 // Commit them into the blockchain.
 testkit.create_block_with_transactions(txvec![tx1, tx2]);
 // Check the expected result.
@@ -113,11 +125,11 @@ impl MyServiceApi for TestKitApi {
             .unwrap()
     }
 
-    fn post_private_data(&self, data: &PrivateData)
+    fn post_private_data(&self, query: &PrivateDataQuery)
         -> PostPrivateDataResponse
     {
         self.private(ApiKind::Service("my_service"))
-            .query(data)
+            .query(query)
             .post("v1/third_endpoint")
             .unwrap()
     }
@@ -126,7 +138,7 @@ impl MyServiceApi for TestKitApi {
 #[test]
 fn my_api_test() {
     let mut testkit = TestKitBuilder::validator()
-        .with_service(MyService::new())
+        .with_service(MyService)
         .create();
     fill_storage_with_data(&mut testkit);
     // Check API responses
@@ -206,7 +218,7 @@ cruel_world.expect_api_call(ApiCallInfo { ... })
 
 // Call the `after_commit` event.
 testkit.create_block();
-let expected_tx = MyOracleTx::new(...);
+let expected_tx = MyOracleTx::sign(...);
 
 // Check that the expected transaction is in the memory pool.
 assert!(testkit.mempool().contains_key(&expected_tx.hash()));
@@ -221,7 +233,7 @@ and then commit it.
 
 ```rust
 let mut testkit = TestKitBuilder::validator()
-    .with_service(MyOracleService::new())
+    .with_service(MyOracleService)
     .create();
 
 // Create a configuration change proposal.
