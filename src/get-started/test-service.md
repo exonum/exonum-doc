@@ -73,7 +73,7 @@ use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
 use serde_json::json;
 // Imports datatypes from the crate where the service is defined.
 use exonum_cryptocurrency::{
-    schema::{CurrencySchema, Wallet},
+    schema::{CurrencySchema, Wallet, WalletQuery},
     service::CurrencyService,
     transactions::{TxCreateWallet, TxTransfer},
 };
@@ -294,7 +294,7 @@ Inside, all wrapper methods call the `inner` API instance; for example,
 `get_wallet` is implemented as:
 
 ```rust
-fn get_wallet(&self, pub_key: &PublicKey) -> Wallet {
+fn get_wallet(&self, pub_key: PublicKey) -> Wallet {
     self.inner
         .public(ApiKind::Service("cryptocurrency"))
         .query(&WalletQuery { pub_key })
