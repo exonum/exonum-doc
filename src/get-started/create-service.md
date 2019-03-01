@@ -59,14 +59,14 @@ Let’s start with importing crates with necessary types:
 
 ??? note "Imports"
     ```rust
-	#[macro_use]
-	extern crate exonum_derive;
-	#[macro_use]
-	extern crate failure;
-	#[macro_use]
-	extern crate serde_derive;
+    #[macro_use]
+    extern crate exonum_derive;
+    #[macro_use]
+    extern crate failure;
+    #[macro_use]
+    extern crate serde_derive;
 
-	use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
+    use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
     use exonum::blockchain::{Blockchain, ExecutionError,
                              ExecutionResult, Service, Transaction,
                              TransactionSet};
@@ -198,7 +198,7 @@ impl Wallet {
         debug_assert!(self.balance >= amount);
         let balance = self.balance - amount;
         Self::new(&self.pub_key, &self.name, balance)
-	}
+  }
 }
 ```
 
@@ -528,7 +528,10 @@ pub struct WalletQuery {
 
 impl CryptocurrencyApi {
     /// Endpoint for getting a single wallet.
-    pub fn get_wallet(state: &ServiceApiState, query: WalletQuery) -> api::Result<Wallet> {
+    pub fn get_wallet(
+      state: &ServiceApiState,
+      query: WalletQuery
+    ) -> api::Result<Wallet> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         schema
@@ -537,7 +540,10 @@ impl CryptocurrencyApi {
     }
 
     /// Endpoint for dumping all wallets from the storage.
-    pub fn get_wallets(state: &ServiceApiState, _query: ()) -> api::Result<Vec<Wallet>> {
+    pub fn get_wallets(
+      state: &ServiceApiState,
+      _query: ()
+    ) -> api::Result<Vec<Wallet>> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
         let idx = schema.wallets();
@@ -618,7 +624,10 @@ impl Service for CurrencyService {
     }
 
     // Implements a method to deserialize transactions coming to the node.
-    fn tx_from_raw(&self, raw: RawTransaction) -> Result<Box<dyn Transaction>, failure::Error> {
+    fn tx_from_raw(
+      &self,
+      raw: RawTransaction
+    ) -> Result<Box<dyn Transaction>, failure::Error> {
         let tx = CurrencyTransactions::tx_from_raw(raw)?;
         Ok(tx.into())
     }
@@ -637,7 +646,8 @@ impl Service for CurrencyService {
 ## Create Demo Blockchain
 
 The service is ready. You can verify that the library code compiles by running
-`cargo build` in the shell. However, we do not have the means of processing requests
+`cargo build` in the shell. However, we do not have the means of processing
+requests
 to the service. To fix this, let us create a minimalistic blockchain network
 with one node and a single service we’ve just finished creating.
 
@@ -730,7 +740,8 @@ NodeConfig {
 
 ### Run Node
 
-Finally, we need to implement the entry point to our demo network – `main` function:
+Finally, we need to implement the entry point to our demo network – `main`
+function:
 
 ```rust
 fn main() {
@@ -747,11 +758,12 @@ fn main() {
 That is, we:
 
 1. Initialize logging in the Exonum core library
-2. Create a node with in-memory database (`MemoryDB`), a single service (`CurrencyService`),
-  and the configuration we have specified earlier
+2. Create a node with in-memory database (`MemoryDB`), a single service
+   (`CurrencyService`), and the configuration we have specified earlier
 3. Run the created node
 
-The demo blockchain can now be executed with the `cargo run --example demo` command.
+The demo blockchain can now be executed with the `cargo run --example demo`
+command.
 
 ## Interact With Blockchain
 
