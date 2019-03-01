@@ -531,8 +531,8 @@ pub struct WalletQuery {
 impl CryptocurrencyApi {
     /// Endpoint for getting a single wallet.
     pub fn get_wallet(
-      state: &ServiceApiState,
-      query: WalletQuery
+        state: &ServiceApiState,
+        query: WalletQuery
     ) -> api::Result<Wallet> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
@@ -543,8 +543,8 @@ impl CryptocurrencyApi {
 
     /// Endpoint for dumping all wallets from the storage.
     pub fn get_wallets(
-      state: &ServiceApiState,
-      _query: ()
+        state: &ServiceApiState,
+        _query: ()
     ) -> api::Result<Vec<Wallet>> {
         let snapshot = state.snapshot();
         let schema = CurrencySchema::new(snapshot);
@@ -627,8 +627,8 @@ impl Service for CurrencyService {
 
     // Implements a method to deserialize transactions coming to the node.
     fn tx_from_raw(
-      &self,
-      raw: RawTransaction
+        &self,
+        raw: RawTransaction
     ) -> Result<Box<dyn Transaction>, failure::Error> {
         let tx = CurrencyTransactions::tx_from_raw(raw)?;
         Ok(tx.into())
