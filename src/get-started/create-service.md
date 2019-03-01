@@ -3,6 +3,8 @@ title: Service development tutorial
 ---
 # Cryptocurrency Tutorial: How to Create Services
 
+<!-- cspell:ignore protoc -->
+
 In this tutorial we create an Exonum service that implements
 a minimalistic cryptocurrency, and a single-node blockchain network processing
 requests to this service. The service accepts two types of transactions:
