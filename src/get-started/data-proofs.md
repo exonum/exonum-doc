@@ -48,6 +48,13 @@ serde = "1.0.0"
 serde_derive = "1.0.0"
 failure = "0.1.5"
 protobuf = "2.2.0"
+
+[build-dependencies]
+exonum-build = "0.10.0"
+
+[features]
+default = ["with-serde"]
+with-serde = []
 ```
 
 Then we need to import macro from dependencies into `src/lib.rs` file.
@@ -776,7 +783,7 @@ launch the blockchain with our service:
 ```rust
 fn main() {
     exonum::crypto::init();
-    helpers::init_logger().unwrap();
+    exonum::helpers::init_logger().unwrap();
 
     let node = NodeBuilder::new()
         .with_service(Box::new(configuration::ServiceFactory))
