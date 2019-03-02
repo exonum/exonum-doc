@@ -37,7 +37,7 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 ```toml
 [package]
 name = "exonum-demo-timestamping"
-version = "0.0.0"
+version = "0.1.0"
 publish = false
 authors = ["Your name <your@email.com>"]
 edition = "2018"
@@ -79,8 +79,6 @@ where we indicate the external libraries required for our service.
 ??? note "Imports"
 
     ```rust
-    extern crate exonum;
-    extern crate exonum_time;
     #[macro_use]
     extern crate exonum_derive;
     #[macro_use]
