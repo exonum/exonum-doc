@@ -41,6 +41,7 @@ version = "0.1.0"
 publish = false
 authors = ["Your name <your@email.com>"]
 edition = "2018"
+
 [dependencies]
 exonum = "0.10.3"
 exonum-configuration = "0.10.2"
