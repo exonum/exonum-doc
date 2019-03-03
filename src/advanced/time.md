@@ -268,6 +268,10 @@ the tight integration with consensus. This approach is more flexible and
 manageable, and could be generalized to the agreement between arbitrary
 collectively trusted entities, which may behave maliciously.
 
+## Other languages support
+
+* [Java Time Oracle](https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle)
+
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime

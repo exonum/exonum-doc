@@ -503,6 +503,13 @@ Currently Java Binding includes the following built-in services:
   See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
   article for more details.
 
+- **Time Oracle.**
+  Time oracle allows determining time, importing it from the external world to
+  the blockchain and keeping its current value in the blockchain.
+
+  See the [*Time Oracle*](../advanced/time.md)
+  article for more details.
+
 To enable a particular service, include its name in `ejb_app_services.toml`
 configuration file in the EJB App's directory with the following content:
 
@@ -514,6 +521,7 @@ where possible values for `service-name` are:
 
 - `configuration` for Configuration Update Service.
 - `btc-anchoring` for Anchoring Service.
+- `time` for Time Oracle.
 
 In case there is no `ejb_app_services.toml` file, only Configuration Service will
 be activated.
@@ -543,8 +551,6 @@ For using the library just include the dependency in your `pom.xml`:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
-- [Time oracle](../advanced/time.md) service is not available,
-  but will be integrated into EJB App soon.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
 - The application supports only one Java service. Support of multiple Java
