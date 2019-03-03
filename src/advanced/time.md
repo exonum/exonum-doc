@@ -270,7 +270,7 @@ collectively trusted entities, which may behave maliciously.
 
 ## Other languages support
 
-* [Java Time Oracle](https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle)
+- [Java Time Oracle](https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle)
 
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
 [tlsdate]: https://github.com/ioerror/tlsdate
