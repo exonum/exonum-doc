@@ -800,7 +800,7 @@ The transaction endpoint returns the hash of the transaction:
 
 ```json
 {
-  "tx_hash": "099d455ab563505cad55b7c6ec02e8a52bca86b0c4446d9879af70f5ceca5dd8"
+  "tx_hash": "75a9d95694f22823ae01a6feafb3d4e27b55b83bd6897aa581456ea5da382dde"
 }
 ```
 
@@ -832,7 +832,7 @@ It returns the hash of the second transaction:
 
 ```json
 {
-  "tx_hash": "2fb289b9928f5a75acf261cc1e61fd654fcb63bf285688f0fc8e59f44dede048"
+  "tx_hash": "7a09053aa590704332b7a18f552150caa8b6e4f777afa4005d169038f481b7f7"
 }
 ```
 
@@ -866,7 +866,7 @@ This request returns the transaction hash:
 
 ```json
 {
-  "tx_hash": "4d6de957f58c894db2dca577d4fdd0da1249a8dff1df5eb69d23458e43320ee2"
+  "tx_hash": "ae3afbe35f1bfd102daea2f3f72884f04784a10aabe9d726749b1188a6b9fe9b"
 }
 ```
 
@@ -896,12 +896,12 @@ This request expectedly returns information on both wallets in the system:
   {
     "balance": "85",
     "name": "Alice",
-    "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
+    "pub_key": "114e49a764813f2e92609d103d90f23dc5b7e94e74b3e08134c1272441614bd9"
   },
   {
     "balance": "115",
     "name": "Bob",
-    "pub_key": "ae6a1c4e84886999dfec7f4d792bf133e7beacf974c000fe45c443727df49df2"
+    "pub_key": "9359df9223bd4c263692a437e3d244b644c7b7f847db12cc556c2e25c73e6103"
   }
 ]
 ```
@@ -912,7 +912,7 @@ The second read endpoint also works:
 
 ```sh
 curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet?\
-pub_key=6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
+pub_key=114e49a764813f2e92609d103d90f23dc5b7e94e74b3e08134c1272441614bd9"
 ```
 
 The response is:
@@ -921,7 +921,7 @@ The response is:
 {
   "balance": "85",
   "name": "Alice",
-  "pub_key": "6ce29b2d3ecadc434107ce52c287001c968a1b6eca3e5a1eb62a2419e2924b85"
+  "pub_key": "114e49a764813f2e92609d103d90f23dc5b7e94e74b3e08134c1272441614bd9"
 }
 ```
 
