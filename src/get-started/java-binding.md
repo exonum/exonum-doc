@@ -504,11 +504,10 @@ Currently Java Binding includes the following built-in services:
   article for more details.
 
 - **Time Oracle.**
-  Time oracle allows determining time, importing it from the external world to
-  the blockchain and keeping its current value in the blockchain.
+  Time oracle allows user services access the calendar time supplied by
+  validator nodes to the blockchain.
 
-  See the [*Time Oracle*](../advanced/time.md)
-  article for more details.
+  See the [*Time Oracle*](../advanced/time.md) article for more details.
 
 To enable a particular service, include its name in `ejb_app_services.toml`
 configuration file in the EJB App's directory with the following content:

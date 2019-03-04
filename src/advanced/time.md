@@ -7,6 +7,8 @@ This service allows determining time,
 importing it from the external world to the blockchain
 and keeping its current value in the blockchain.
 
+Time Oracle is supported in [Java][java-time-oracle] as well.
+
 ## The Problem
 
 Implementing the business logic of many practical blockchain solutions requires
@@ -268,11 +270,8 @@ the tight integration with consensus. This approach is more flexible and
 manageable, and could be generalized to the agreement between arbitrary
 collectively trusted entities, which may behave maliciously.
 
-## Other languages support
-
-- [Java Time Oracle](https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle)
-
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
+[java-time-oracle]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
