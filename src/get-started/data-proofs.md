@@ -74,6 +74,7 @@ pub mod proto;
 pub mod schema;
 pub mod transactions;
 pub mod wallet;
+
 ```
 
 ## Constants
@@ -97,6 +98,19 @@ methods and credentials:
 ??? "Service definition"
 
     ```rust
+    use exonum::{
+        api::ServiceApiBuilder,
+        blockchain::{self, Transaction, TransactionSet},
+        crypto::Hash,
+        helpers::fabric::{self, Context},
+        messages::RawTransaction,
+        storage::Snapshot,
+    };
+
+    use crate::transactions::WalletTransactions;
+    use crate::schema::Schema;
+
+
     #[derive(Default, Debug)]
     pub struct Service;
 
@@ -154,6 +168,8 @@ impl fabric::ServiceFactory for ServiceFactory {
 Similarly to a simple cryptocurrency demo we need to declare the data that we
 will store in our blockchain, i.e. the `Wallet` type:
 
+`proto/cryptocurrency.proto`:
+
 ```protobuf
 message Wallet {
   exonum.PublicKey pub_key = 1;
@@ -164,8 +180,13 @@ message Wallet {
 }
 ```
 
+`wallet.rs`:
+
 ```rust
+use exonum::crypto::{Hash, PublicKey};
 use exonum_derive::ProtobufConvert;
+
+use super::proto;
 
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Wallet", serde_pb_convert)]
@@ -226,6 +247,37 @@ modified `balance` field. It is called within mutable methods allowing
 manipulations with the Wallet that will be
 specified below.
 
+Similar to cryptocurrecy tutorial
+we have to add protobuf code generation to our project.
+
+In `build.rs`:
+
+```rust
+use exonum_build::{get_exonum_protobuf_files_path, protobuf_generate};
+
+fn main() {
+    let exonum_protos = get_exonum_protobuf_files_path();
+    protobuf_generate(
+        "src/proto",
+        &["src/proto", &exonum_protos],
+        "protobuf_mod.rs",
+    );
+}
+```
+
+and in `proto/mod.rs`:
+
+```rust
+#![allow(bare_trait_objects)]
+#![allow(renamed_and_removed_lints)]
+
+pub use self::cryptocurrency::{CreateWallet, Issue, Transfer, Wallet};
+
+include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
+
+use exonum::proto::schema::*;
+```
+
 ### Create Schema
 
 As we already mentioned in the simple Cryptocurrency Tutorial schema is a
@@ -233,6 +285,17 @@ structured view of the [key-value storage](../architecture/storage.md)
 used in Exonum. We will use the same `Snapshot` and `Fork` abstractions – for
 read requests and transactions
 correspondingly – to interact with the schema.
+
+`schema.rs`:
+
+```rust
+use exonum::{
+    crypto::{Hash, PublicKey},
+    storage::{Fork, ProofListIndex, ProofMapIndex, Snapshot},
+};
+
+use crate::{wallet::Wallet, INITIAL_BALANCE};
+```
 
 Declare schema as a generic wrapper to make it operable with both types of
 storage views:
@@ -385,11 +448,28 @@ We use `derive(TransactionSet)` to define the service transactions.
 It unites the transactions under the `WalletTransactions` structure,
 which we will use later to refer to any of the defined transactions.
 
+`transactions.rs`:
+
+```rust
+use exonum::{
+    blockchain::{ExecutionError, ExecutionResult, Transaction, TransactionContext},
+    crypto::{PublicKey, SecretKey},
+    messages::{Message, RawTransaction, Signed},
+};
+use exonum_derive::{ProtobufConvert, TransactionSet};
+use failure::Fail;
+
+use super::proto;
+use crate::{schema::Schema, CRYPTOCURRENCY_SERVICE_ID};
+```
+
 We need three types of transactions; apart from
 [the old ones](create-service.md#define-transactions)
 (“create a new wallet” and “transfer money between wallets”)
 we add a new transaction type that is responsible
 for reimbursement of the wallet balance:
+
+`proto/cryptocurrency.proto`:
 
 ```protobuf
 /// Transfer `amount` of the currency from one wallet to another.
@@ -412,8 +492,6 @@ message CreateWallet {
 ```
 
 ```rust
-use exonum_derive::{ProtobufConvert, TransactionSet};
-
 /// Transfer `amount` of the currency from one wallet to another.
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Transfer", serde_pb_convert)]
@@ -465,8 +543,6 @@ the simple Cryptocurrency demo.
 ??? "Error definitions"
 
     ```rust
-    use failure::Fail;
-
     #[derive(Debug, Fail)]
     #[repr(u8)]
     pub enum Error {
@@ -597,6 +673,16 @@ obtain the data stored in the blockchain but also will provide proofs of the
 correctness of the returned data:
 
 ```rust
+use exonum::{
+    api::{self, ServiceApiBuilder, ServiceApiState},
+    blockchain::{self, BlockProof, TransactionMessage},
+    crypto::{Hash, PublicKey},
+    explorer::BlockchainExplorer,
+    helpers::Height,
+    storage::{ListProof, MapProof},
+};
+
+use crate::{wallet::Wallet, Schema, CRYPTOCURRENCY_SERVICE_ID};
 #[derive(Debug, Clone, Copy)]
 pub struct PublicApi;
 ```
