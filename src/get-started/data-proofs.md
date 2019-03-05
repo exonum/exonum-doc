@@ -247,7 +247,7 @@ modified `balance` field. It is called within mutable methods allowing
 manipulations with the Wallet that will be
 specified below.
 
-Similar to cryptocurrecy tutorial
+Similar to cryptocurrency tutorial
 we have to add protobuf code generation to our project.
 
 In `build.rs`:
