@@ -2,10 +2,8 @@
 
 <!-- cspell:ignore tlsdate,roughtime -->
 
-[**exonum-time**][exonum-time] is a time oracle service for Exonum.
-This service allows determining time,
-importing it from the external world to the blockchain
-and keeping its current value in the blockchain.
+Time Oracle allows user services to access the calendar time supplied by
+validator nodes to the blockchain.
 
 Time Oracle is available in [Rust][exonum-time] and [Java][java-time-oracle].
 

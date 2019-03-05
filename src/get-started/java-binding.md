@@ -504,7 +504,7 @@ Currently Java Binding includes the following built-in services:
   article for more details.
 
 - **Time Oracle.**
-  Time oracle allows user services access the calendar time supplied by
+  Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
   See the [*Time Oracle*](../advanced/time.md) article for more details.
