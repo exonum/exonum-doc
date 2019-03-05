@@ -7,7 +7,7 @@ This service allows determining time,
 importing it from the external world to the blockchain
 and keeping its current value in the blockchain.
 
-Time Oracle is supported in [Java][java-time-oracle] as well.
+Time Oracle is available in [Rust][exonum-time] and [Java][java-time-oracle].
 
 ## The Problem
 
