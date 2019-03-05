@@ -3,9 +3,8 @@
 <!-- cspell:ignore tlsdate,roughtime -->
 
 Time Oracle allows user services to access the calendar time supplied by
-validator nodes to the blockchain.
-
-Time Oracle is available in [Rust][exonum-time] and [Java][java-time-oracle].
+validator nodes to the blockchain. Its implementations for Exonum are available
+in [Rust][exonum-time] and [Java][java-time-oracle].
 
 ## The Problem
 
