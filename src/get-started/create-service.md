@@ -28,7 +28,7 @@ follow [the installation guide](./install.md).
 Let’s create a minimal crate with the **exonum** crate as a dependency.
 
 ```sh
-cargo new cryptocurrency
+cargo new cryptocurrency --lib
 ```
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
@@ -36,7 +36,7 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 ```toml
 [package]
 name = "cryptocurrency"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2018"
 authors = ["Your Name <your@email.com>"]
 
@@ -68,15 +68,13 @@ Let’s start with importing crates with necessary types:
     #[macro_use]
     extern crate serde_derive;
 
-    use exonum::api::{ServiceApiState, ServiceApiBuilder, self};
-    use exonum::blockchain::{Blockchain, ExecutionError,
-                             ExecutionResult, Service, Transaction,
-                             TransactionSet};
+    use exonum::api::{self, ServiceApiBuilder, ServiceApiState};
+    use exonum::blockchain::{
+        ExecutionError, ExecutionResult, Service, Transaction,
+        TransactionContext, TransactionSet,
+    };
     use exonum::crypto::{Hash, PublicKey};
-    use exonum::encoding;
-    use exonum::encoding::serialize::FromHex;
-    use exonum::messages::{Message, RawTransaction};
-    use exonum::node::{ApiSender, TransactionSend};
+    use exonum::messages::RawTransaction;
     use exonum::storage::{Fork, MapIndex, Snapshot};
     ```
 
@@ -132,11 +130,15 @@ a `mod.rs` file with the following content to the `proto` module:
 #![allow(bare_trait_objects)]
 #![allow(renamed_and_removed_lints)]
 
-pub use self::cryptocurrency::Wallet;
-
 include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
 
 use exonum::proto::schema::*;
+```
+
+and don't forget to add this to `lib.rs` file.
+
+```rust
+mod proto;
 ```
 
 As a third step in the `build.rs` file we introduce the `main` function that
@@ -166,7 +168,7 @@ further operations with data schema:
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
-#[exonum(pb = "proto::Wallet")]
+#[exonum(pb = "proto::cryptocurrency::Wallet")]
 pub struct Wallet {
     pub pub_key: PublicKey,
     pub name: String,
@@ -323,13 +325,13 @@ same transactions in Rust:
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
-#[exonum(pb = "proto::TxCreateWallet")]
+#[exonum(pb = "proto::cryptocurrency::TxCreateWallet")]
 pub struct TxCreateWallet {
     pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
-#[exonum(pb = "proto::TxTransfer")]
+#[exonum(pb = "proto::cryptocurrency::TxTransfer")]
 pub struct TxTransfer {
     pub to: PublicKey,
     pub amount: u64,
@@ -381,6 +383,9 @@ pub enum Error {
 
     #[fail(display = "Insufficient currency amount")]
     InsufficientCurrencyAmount = 3,
+
+    #[fail(display = "Sender same as receiver")]
+    SenderSameAsReceiver = 4,
 }
 
 // Conversion between service-specific errors and the standard error type
@@ -660,6 +665,19 @@ while the demo blockchain is a specific example of its usage. For this reason,
 we will position the blockchain code as an [*example*][cargo-example] and
 place it into [`examples/demo.rs`][demo.rs].
 
+### Imports
+
+Add imports to `example/demo.rs` file:
+
+```rust
+use exonum::{
+    blockchain::{GenesisConfig, ValidatorKeys},
+    node::{Node, NodeApiConfig, NodeConfig},
+    storage::MemoryDB,
+};
+use cryptocurrency::CurrencyService;
+```
+
 ### Configure Node
 
 For launching a blockchain node, we need to specify its configuration.
@@ -720,7 +738,7 @@ for all network interfaces. This port is used for interactions among full nodes
 in the Exonum network.
 
 ```rust
-let peer_address = "0.0.0.0:2000".parse().unwrap();
+let peer_address = "0.0.0.0:2000";
 
 // Returns the value of the `NodeConfig` object from the `node_config` function
 NodeConfig {
@@ -753,6 +771,7 @@ fn main() {
         MemoryDB::new(),
         vec![Box::new(CurrencyService)],
         node_config(),
+        None,
     );
     node.run().unwrap();
 }
@@ -765,8 +784,8 @@ That is, we:
    (`CurrencyService`), and the configuration we have specified earlier
 3. Run the created node
 
-The demo blockchain can now be executed with the `cargo run --example demo`
-command.
+The demo blockchain can now be executed with the
+`RUST_LOG=info cargo run --example demo` command.
 
 ## Interact With Blockchain
 
