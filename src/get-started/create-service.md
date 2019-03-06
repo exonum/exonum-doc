@@ -135,13 +135,13 @@ include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
 use exonum::proto::schema::*;
 ```
 
-and don't forget to add this to `lib.rs` file.
+We also need to add the `proto` module to `lib.rs` file:
 
 ```rust
 mod proto;
 ```
 
-As a third step in the `build.rs` file we introduce the `main` function that
+As a third step, in the `build.rs` file we introduce the `main` function that
 generates Rust files from their Protobuf descriptions.
 
 !!! note
