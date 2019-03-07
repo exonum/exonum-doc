@@ -38,6 +38,15 @@ digits). `Signature` is 64 bytes (that is, 128 hex digits).
 or IPv6 address formatted as 4 octets separated by dots (for example,
 `10.10.0.1`).
 
+### ConnectInfo
+
+`ConnectInfo` is a JSON object with the following two fields:
+
+- **address**: string  
+  Address of the peer.
+- **public_key**: PublicKey  
+  Public key of the connected peer.
+
 ### OutgoingConnectionState
 
 `OutgoingConnectionState` is a JSON object with the following fields:
@@ -46,105 +55,85 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
   Connection type, can be:
 
     - `Active` for established connections
-    - `Reconnect` for yet unestablished connections
+    - `Reconnect` for yet unestablished connections.
 
 - **delay**: integer=  
   Interval between reconnect attempts (ms). Is present only if `type` is
-  `Reconnect`
+  `Reconnect`.
 
 ### OutgoingConnectionInfo
 
 `OutgoingConnectionInfo` is a JSON object with the following fields:
 
 - **public_key**: ?PublicKey  
-  The public key of the peer or `null` if the public key is unknown
+  Public key of the peer or `null` if the public key is unknown.
 - **state**: OutgoingConnectionState  
-  Current connection state
+  Current connection state.
 
 ### ServiceInfo
 
 `ServiceInfo` is a JSON object with the following fields:
 
 - **id**: integer  
-  Unique service identifier
+  Unique service identifier.
 - **name**: string  
-  Unique string service identifier
+  Unique string service identifier.
 
 ### BlockHeader
 
 `BlockHeader` is a JSON object with the following fields:
 
 - **height**: integer  
-  The height of the block
+  Height of the block.
 - **prev_hash**: Hash  
-  The hash of the previous block
+  Hash of the previous block.
 - **proposer_id**: integer  
-  ID of the validator that created an approved block proposal
-- **schema_version**: integer  
-  Information schema version. Currently, `0`
+  ID of the validator that created an approved block proposal.
 - **state_hash**: Hash  
   Hash of the current [Exonum state][blockchain-state] after applying
-  transactions in the block
+  transactions in the block.
 - **tx_count**: integer  
-  Number of transactions included into the block
+  Number of transactions included into the block.
 - **tx_hash**: Hash  
-  The root hash of the transactions Merkle tree
+  Root hash of the transactions Merkle tree.
 
 ### Time
 
 `Time` is a string that combined date and time in UTC as per [ISO 8601][ISO8601]
 (for example, `2018-05-17T10:45:56.057753Z`).
 
-### Precommit
-
-`Precommit` is a message, serialized according to
-[message serialization rules](../architecture/serialization.md#message-serialization).
-
-- **body**: Object  
-  The content of the `Precommit` message
-- **body.block_hash**: Hash  
-  The hash of the current block (the `Precommit` message was created for)
-- **body.height**: integer  
-  The height of the current block
-- **body.propose_hash**: Hash  
-  Hash of the corresponding Propose
-- **body.round**: integer  
-  The round when the block proposal was created
-- **body.time**: Time  
-  UTC time of the validator that created the block proposal
-- **body.validator**: integer  
-  ID of the validator that created this `Precommit` message
-- **message_id**: integer  
-  ID of the `Precommit` message. Equals `4`
-- **protocol_version**: integer  
-  The major version of the Exonum serialization protocol. Currently, `0`
-- **service_id**: integer  
-  Unique service identifier. Equals `0`
-- **signature**: Signature  
-  `Precommit` message creator's signature
-
 ### SerializedTransaction
 
-`SerializedTransaction` is a JSON object corresponding to
-[transaction serialization format](../architecture/serialization.md#message-serialization).
+`SerializedTransaction` is an array of bytes in the Protobuf
+[serialization format](../architecture/serialization.md#message-serialization).
+
+### Content
+
+`Content` is a JSON object with the following fields:
+
+- **debug**: object  
+  Transaction in the deserialized format.  
+- **message**: SerializedTransaction  
+  Array of bytes of a transaction serialized according to the Protobuf
+  serialization format.
 
 ### TransactionLocation
 
 `TransactionLocation` is a JSON object with the following fields:
 
 - **block_height**: integer  
-  The height of the block including this transaction
+  Height of the block including this transaction.
 - **position_in_block**: integer  
-  Position of the transaction in the block
+  Position of the transaction in the block.
 
-## System API endpoints
+## System API Endpoints
 
 All system API endpoints share the same base path, denoted
 **{system_base_path}**, equal to `/api/system/v1`.
 
-## Public endpoints
+## Public Endpoints
 
-### Number of unconfirmed transactions
+### Number of Unconfirmed Transactions
 
 ```none
 GET {system_base_path}/mempool
@@ -161,9 +150,9 @@ None.
 A JSON object with the following fields:
 
 - **size**: integer  
-  Amount of unconfirmed transactions
+  Amount of unconfirmed transactions.
 
-#### Response example
+#### Response Example
 
 ```JSON
 {
@@ -177,7 +166,7 @@ A JSON object with the following fields:
 GET {system_base_path}/healthcheck
 ```
 
-Returns a boolean value representing if the node is connected to other peers.
+Returns information whether the node is connected to other peers.
 
 #### Parameters
 
@@ -187,18 +176,31 @@ None.
 
 A JSON object with the following fields:
 
-- **connectivity**: bool  
-  Indicates whether the node is connected to the other peers.
+- **connectivity**: string or JSON object  
+  Indicates the number of peers the node is connected to or `NotConnected` if
+  the node is not connected to any peers.
+- **consensus_status**: string  
+  Indicates whether consensus is launched on the node. Can be:
 
-#### Response example
+    - `active`:  consensus is enabled and the node has enough connected peers  
+      for consensus operation
+    - `enabled`: consensus is enabled on the node
+    - `disabled`: consensus is disabled on the node.
+
+#### Response Example
 
 ```JSON
 {
-  "connectivity": true
+  "consensus_status": "Active",
+  "connectivity": {
+    "Connected": {
+      "amount": 1
+    }
+  }
 }
 ```
 
-### User agent info
+### User Agent Info
 
 ```None
 GET {system_base_path}/user_agent
@@ -216,42 +218,41 @@ curl http://127.0.0.1:7780/api/system/v1/user_agent
 
 #### Response
 
-Returns string containing information about Exonum, Rust and OS version.
+Returns a string containing information about Exonum, Rust and OS version.
 
-#### Response example
+#### Response Example
 
 ```None
-"exonum 0.6.0/rustc 1.26.0-nightly (2789b067d 2018-03-06)\n\n/Mac OS10.13.3"
+"exonum 0.10.2/rustc 1.32.0 (9fda7c223 2019-01-16)\n\n/Mac OS10.14.3"
 ```
 
-## Private endpoints
+## Private Endpoints
 
-### Add new peer
+### Add New Peer
 
 ```none
 POST {system_base_path}/peers
 ```
 
-Adds new Exonum node to the list of peers for the current node.
-The latter will attempt to connect to the new node asynchronously. If the public
-key of the new node is not in the whitelist, the connection between said nodes
-will not be established.
+Adds new Exonum node to the list of peers for the present node.
+The latter will attempt to [connect](network.md#connect-messages) to the new
+node asynchronously.
 
 #### Parameters
 
-- **address**: PeerAddress
-  IP address of the node which our node have to connect.
-- **public_key**: PublicKey
-  Public key of the other node.
+- **address**: PeerAddress  
+  IP address of the node which the present node should connect to.
+- **public_key**: PublicKey  
+  Public key of the node which the present node should connect to.
 
 #### Example
 
 ```None
 curl -H "Content-Type: application/json" \
-  --data '{ \
-    "address": "127.0.0.1:8800", \
-    "public_key": \
-      \"dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a" \
+  --data '{
+    "address": "127.0.0.1:8800",
+    "public_key":
+      \"dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
   }' \
   http://127.0.0.1:8081/api/system/v1/peers
 ```
@@ -262,13 +263,13 @@ curl -H "Content-Type: application/json" \
 null
 ```
 
-### Peers info
+### Peers Info
 
 ```none
 GET {system_base_path}/peers
 ```
 
-Returns list of peers.
+Returns a list of peers.
 
 #### Parameters
 
@@ -278,20 +279,20 @@ None.
 
 A JSON object with the following fields:
 
-- **incoming_connections**: Array<PeerAddress\>  
-  List of addresses of peers connected to this node
+- **incoming_connections**: Array<ConnectInfo\>  
+  Information on the peers connected to the present node.
 - **outgoing_connections**: Map  
-  The keys of the map are addresses of peers this node is connected to,
+  The keys of the map are addresses of peers the present node is connected to,
   corresponding values of type `OutgoingConnectionInfo` contain info about
   public keys and current connection status of peers.
 
 ??? example "Response Example"
     ```json
     {
-      "incoming_connections": [
-        "127.0.0.1:58635",
-        "127.0.0.1:58656"
-      ],
+      "incoming_connections": [{
+        "address": "127.0.0.1:57671",
+        "public_key": "8a17bdfe42c10abdb7f27b5648691db3338400c27812e847e02eb7193ad490f2"
+      }],
       "outgoing_connections": {
         "127.0.0.1:6334": {
           "public_key": "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a",
@@ -369,7 +370,7 @@ curl -H "Content-Type: application/json" --data '{"enabled":false}' http://127.0
 null
 ```
 
-### Network info
+### Network Info
 
 ```none
 GET {system_base_path}/network
@@ -386,20 +387,27 @@ None.
 
 A JSON object with the following fields:
 
+- **core_version**: string  
+  Current applied version of the Exonum framework.
 - **protocol_version**: integer  
-  The major version of the Exonum serialization protocol. Currently, `0`
+  Major version of the Exonum serialization protocol. Currently, `1`.
 - **services**: Array<ServiceInfo\>  
-  Info about services functioning in the network
+  Info about services functioning in the network.
 
 #### Response Example
 
 ```JSON
 {
-  "protocol_version": 0,
+  "core_version": "0.10.2",
+  "protocol_version": 1,
   "services": [
     {
       "id": 128,
       "name": "cryptocurrency"
+    },
+    {
+      "name": "configuration",
+      "id": 1
     }
   ]
 }
@@ -455,7 +463,7 @@ curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api
 null
 ```
 
-## Explorer API endpoints
+## Explorer API Endpoints
 
 All explorer API endpoints share the same base path, denoted
 **{explorer_base_path}**, equal to `/api/explorer/v1`.
@@ -473,7 +481,7 @@ Searches for a transaction, either committed or uncommitted, by the hash.
 #### Parameters
 
 - **transaction_hash**: Hash  
-  The hash of the transaction to be searched
+  Hash of the transaction to be searched.
 
 #### Response
 
@@ -488,7 +496,7 @@ Response is a JSON object with one required field:
     - `committed`: committed transaction (in blockchain)
     - `in-pool`: uncommitted transaction (in the pool of unconfirmed
       transactions)
-    - `unknown`: unknown transaction
+    - `unknown`: unknown transaction.
 
 The object may also contain other fields, which depend on `type` and are
 outlined below.
@@ -507,40 +515,41 @@ the HTTP status of the response is set to 404.
 
 ##### Known Uncommitted Transaction
 
-Response JSON has same fields as
-[`SerializedTransaction`](#serializedtransaction)
-plus `type` field with value equal to `"in-pool"`.
+Response JSON has the same fields as
+[`Content`](#content) plus `type` field with value equal to `"in-pool"`.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
       "type": "in-pool",
-      "body": {
-        "amount": "152",
-        "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-        "seed": "2953135335240383704",
-        "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
-      },
-      "protocol_version": 0,
-      "service_id": 128,
-      "message_id": 128,
-      "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
+      "content": {
+        "debug": {
+          "to": {
+            "data": [242, 39, 156, 45, 245, 89, 252, 58, 143, 174, 88, 196, 76, 225, 223, 206, 177, 125, 63, 3, 90, 36, 128, 213, 70, 37, 243, 231, 174, 139, 81, 151]
+          },
+          "amount": 10,
+          "seed": 9587307158524814255
+        },
+        "message": "ba76da2363c062f3dc25f5e353d0f8de2e3d02896b9c8f01683dbde7e3194eb90000800000000a220a20f2279c2df559fc3a8fae58c44ce1dfceb17d3f035a2480d54625f3e7ae8b5197100a18afc7b9838aa2bd8685019a6bf7a720fdfdf27948330d0a451f35aef3eb64f80f568136be91d2667f75b7eb4b03ba279b70c69bbf5b69db8d8edf5e1049f51c86e937c10d1408374faa08"
+      }
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
 ##### Known Committed Transaction
 
 Response is a JSON object with the following fields:
 
-- **content**: SerializedTransaction  
-  Transaction with the specified hash
-- **location**: TransactionLocation  
-  Transaction position in the blockchain
-- **location_proof**: ListProof  
-  [Merkle proof](merkelized-list.md#merkle-tree-proofs) tying transaction
-  to the `tx_hash` of the containing block
 - **type**: `"committed"`  
-  Always equals to `committed`
+  Always equals to `committed`.
+- **content**: Content  
+  Transaction data in the serialized and deserialized formats.
+- **location**: TransactionLocation  
+  Transaction position in the blockchain.
+- **location_proof**: ListProof  
+  [Merkle proof](merkelized-list.md#merkle-tree-proofs) serialized as a hex
+  tying transaction to the `tx_hash` of the containing block.
 - **status**: Object  
   [Transaction execution](../architecture/transactions.md#execute) status
 - **status.type**: `"success"` | `"error"` | `"panic"`  
@@ -550,258 +559,203 @@ Response is a JSON object with the following fields:
     - `"error"` denotes a transaction that has returned an error (for example,
       because of transaction parameters not satisfying context-dependent checks)
     - `"panic"` denotes a transaction that has raised a runtime exception
-      (for example, attempted to divide by zero)
+      (for example, attempted to divide by zero).
 
 - **status.code**: integer  
   Error code supplied by the service developer. Only present for erroneous
-  transactions. Has service-specific meaning
+  transactions. Has service-specific meaning.
 - **status.description**: string=  
   Optional human-readable error description. Only relevant for erroneous and
-  panicking transactions
+  panicking transactions.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
       "type": "committed",
       "content": {
-        "body": {
-          "amount": "152",
-          "from": "b0d6af8bbe45c574c5f9dd8876b5b037b38d1bf861fd7b90744957aa608ed0c2",
-          "seed": "2953135335240383704",
-          "to": "99e396355cb2146aba0457a954ebdae36e09e3abe152693cfd1b9a0975850789"
+        "debug": {
+          "to": {
+            "data": [174, 116, 3, 32, 153, 158, 51, 93, 212, 245, 253, 192, 70, 143, 52, 235, 70, 84, 74, 161, 153, 91, 108, 172, 252, 237, 200, 36, 40, 189, 113, 221]
+          },
+          "amount": 10,
+          "seed": 2084648087298472854
         },
-        "protocol_version": 0,
-        "service_id": 128,
-        "message_id": 128,
-        "signature": "7d3c503d6dc02ca24faaeb37af227f060d0bcf5f40399fae7831eb68921fd00407f7845affbd234f352d9f1541d7e4c17b4cd47ec3f3208f166ec9392abd4d00"
+        "message": "41c453a7f45cb0dd73644aa376d3802bb7da4c6797bcf6749211fbcabb5aa8710000800000000a220a20ae740320999e335dd4f5fdc0468f34eb46544aa1995b6cacfcedc82428bd71dd100a1896f7fda8bf8c8af71cfccd80d4c0d5d6f82955cf7c081969282604d3f7e416274a4319484ceea947981b8d337bd170210acd62508f3663acba395bd131456c0b6cd7f09690aec68a05"
       },
       "location": {
-        "block_height": "18",
-        "position_in_block": "261"
+        "block_height": 11,
+        "position_in_block": 0
       },
       "location_proof": {
-        "left": "07e641264ac4646495c54a379a5943bf88785bcf30a0b4c13f47d1e2e62b343d",
-        "right": {
-          "left": {
-            "left": {
-              "left": {
-                "left": {
-                  "left": {
-                    "left": "78044db9c2713a11c2fe7bb66f27665b6ca0ecbb9e61e09381534d449c4c24c4",
-                    "right": {
-                      "left": {
-                        "left": "f62e6a4d8b9c2c0cfb31ea599e08e6e3fe2337169ce07008d91390958e0613d4",
-                        "right": {
-                          "val": "f6415994136527a24d022595ec0d40f51e2a0c4230a34792a5203df779e3ffaf"
-                        }
-                      },
-                      "right": "daee36b5b7c24a831a62539d534c56e4f234a83ce83876fee48193d8eefabfb2"
-                    }
-                  },
-                  "right": "df8bb7e697e6eb7828975b67f64a77af06379435f4330f0cb0b7a21d18b616db"
-                },
-                "right": "59ab567cf0d1c09c5050680ea4ed4650238023666b0e5d90855d82dc83d1f982"
-              },
-              "right": "cf5fa45701ba6ae795da58a504eb1608075d7bbedf05c8f6f448aad4dbd03968"
-            },
-            "right": "eb583ba724a3b371c243f1268dfca2929c704fe0546875e5dfeb90860ac3533f"
-          },
-          "right": "bea1bae302dbf975cafa064ecfbc39f2cdcba5fe7ffddb2208c060cd9778c483"
-        }
+        "val": "2f23541b10b258dfc80693ed1bf6ed6f53ccf8908047f7d33e0fec4f29a4a613"
       },
       "status": {
         "type": "success"
       }
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
-### Block by height
+### Block by Height
 
 ```none
 GET {explorer_base_path}/block?height={height}
 ```
 
-Returns the content for a block of a specific height.
+Returns content of the block at a specific height.
 
 #### Parameters
 
 - **height**: integer  
-  The height of the desired block
+  Height of the desired block.
 
 #### Response
 
 A JSON object with the following fields:
 
 - **block**: BlockHeader  
-  The header of the specified block
-- **precommits**: Array<Precommit\>  
-  The list of 'Precommit' messages supporting the block.
+  Header of the specified block.
+- **precommits**: Array<Hash\>  
+  List of hashes of the 'Precommit' messages supporting the block.
 - **txs**: Array<SerializedTransaction\>  
-  The list of the transactions included into the block
+  List of the transactions included into the block.
+- **time**: time object  
+  Time when the block was committed to the blockchain.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     ```json
     {
       "block": {
-        "height": "20",
-        "prev_hash": "a6d3d838e4edc29bd977eba3885a4ef30a020d166ac0e9c51737ae97b8fb3bce",
-        "proposer_id": 2,
-        "schema_version": 0,
-        "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-        "tx_count": 0,
-        "tx_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        "proposer_id": 3,
+        "height": 1,
+        "tx_count": 1,
+        "prev_hash": "fd510fc923683a4bb77af8278cd51676fbd0fcb25e2437bd69513d468b874bbb",
+        "tx_hash": "336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13",
+        "state_hash": "79a6f0fa233cc2d7d2e96855ec14bdcc4c0e0bb1a99ccaa912a555441e3b7512"
       },
-      "precommits": [
-        {
-          "body": {
-            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-            "height": "20",
-            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-            "round": 2,
-            "time": "2018-05-17T10:43:59.404962Z",
-            "validator": 2
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "6cc77069b1c23083159decf219772dc904dc974342b19e558ee8a8fb0ef0233adcc1050700311907d6e4ad27c3910e38cda9bb49fcd8ad35740a632cceda870d"
-        },
-        {
-          "body": {
-            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-            "height": "20",
-            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-            "round": 2,
-            "time": "2018-05-17T10:49:09.161549Z",
-            "validator": 3
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "e6cb64f5d7a80e10fd8367a8379342c32ecb164906002ada775643000f4cbde7e1735a068c17aa7de0ce491fdfa05b3de9519018e4370e13f48675857d4e0307"
-        },
-        {
-          "body": {
-            "block_hash": "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76",
-            "height": "20",
-            "propose_hash": "8fcca116a080ccb0d2b31768f7c03408707d595ec9b48813a2e8aef2b95673cd",
-            "round": 2,
-            "time": "2018-05-17T10:49:11.161549Z",
-            "validator": 0
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "2eab829b3fc123025df6adac3f06bbafcd7882cee7601ad7791e5cc1171349c9f107b229543ee89cff2c323aafef228e850da36c4578c6c593fbb085a079d60e"
-        }
-      ],
-      "txs": []
+      "precommits": ["a410964c2c21199b48e278b64bb72e2b8b20374df1ba5c8a846d34de9254a706010008031001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510f09da312b91820e1a9b0132c32d608e5206bf5fe119c54c17424ef6f6c70b13490761ddd36f855e2c74e37c7aa7e1ac648893164a07ed413c2c0065738d6bea8825bbf04",
+      "0776a07b194e1a9b918205331e0c1f62de82d5b23efccb5922624cb928b620c901001001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510e8bfe11105fcd4562131756c6f6c64d0e63f4cca67bf718fb43a1ca45161ee3328c97c2582ab70f40406d4b2aa5fc967e2b177b897a3cf2dc0a674df4eccb45f75db8900",
+      "57b745d4e157299ede29129ba039a039e6f145aae3852481937ac1972b2ed131010008011001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510d8eee11143e792e3c8a72403fc3dc259f3e8e0c3de867be4555fb809e7c8f79ce9449d15020b9060eb6d41efb5079bd25147dc2a5f3071b9bb7ed2fc8751468e750b310d"],
+      "txs": ["336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13"],
+      "time": "2019-02-14T14:12:52.037255Z"
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
-### Blocks in range
+### Blocks in Range
 
 ```none
-GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}
+GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}&add_blocks_time={add}
 ```
 
-Returns the explored range and the corresponding headers. The range specifies
-the smallest and largest heights traversed to collect at most `count` blocks.
+Returns the block headers from the specified range. The range
+defines its smallest and largest block heights. The amount of collected
+blocks from the traversed range should not exceed `count` value.
 
 #### Parameters
 
 - **count**: integer  
-  The number of blocks to return. Should not be greater than
-  [`MAX_BLOCKS_PER_REQUEST`][github_explorer]
+  Number of blocks to return. Should not be greater than
+  [`MAX_BLOCKS_PER_REQUEST`][explorer].
 - **skip_empty_blocks**: bool=  
   If `true`, then only non-empty blocks are returned. The default value is
-  `false`
+  `false`.
 - **latest**: integer=  
-  The maximum height of the returned blocks. The blocks are returned
+  Maximum height of the returned blocks. The blocks are returned
   in reverse order, starting from the `latest` and at least up to the `latest -
   count + 1`. The default value is the height of the latest block in the
-  blockchain
+  blockchain.
+- **add_blocks_time**: bool=  
+  If `true`, then returns an array of `time` objects. The time value
+  corresponds to the average time of submission of precommits by the
+  validators for every returned block. The default value is `false`.
 
 #### Response
 
 The JSON object of the explored block range `range` and the array `blocks` of
-the `BlockHeader` objects. The range specifies the largest and the smallest
-heights of blocks that have been traversed to collect at most `count` blocks.
+the `BlockHeader` objects. The range defines its largest and the smallest
+heights of blocks. The amount of collected blocks from the traversed range
+should not exceed `count` value.
 The largest height `end` equals to `latest + 1` if provided or to the height of
 the latest block in the blockchain, the smallest height `start` takes values
-in `0..latest - count + 1`. Blocks in the array are sorted in descending order
-according to their heights. Height of any block in the array is greater or
-equal than `start` and less than `end`.
+in `0..latest - count + 1`. Blocks in the array are sorted in the descending
+order
+according to their heights. Height of any block in the array is greater than or
+equal to `start` and is less than `end`.
 
 ??? example "Response Example"
     Assume the following request
 
     ```none
-    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true
+    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true&add_blocks_time=true
     ```
 
     and response
 
     ```JSON
     {
+      "range": {
+        "start": 6,
+        "end": 288
+      },
       "blocks": [
         {
-          "height": "18",
-          "prev_hash": "ae24b1e0dca2df3c7565dc50e433d6d70bf5424a1ba40c221b0a7c27f7270a7e",
           "proposer_id": 3,
-          "schema_version": 0,
-          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-          "tx_count": 426,
-          "tx_hash": "f8e0a4ef1ee41ce82206757620c3a5f2d661fe2b5c939ed438f6ac287320709e"
+          "height": 26,
+          "tx_count": 1,
+          "prev_hash": "932470a22d37a5a995519e01c50eab7db9e0e978f5b17f8342030ae3f066af82",
+          "tx_hash": "5cc41a2a7cf7c0d3a15ab6ca775b601208dba7d506e2f27368702b3334d37583",
+          "state_hash": "4d7bb34d7913e0784c24a1e440532e72900eb380129a54dbaac6ad9286f9d567"
         },
         {
-          "height": "14",
-          "prev_hash": "87d3158f91ce3b3f8c8fab51ab15f0ddcb92a322b962c5a2b34299456c28f452",
-          "proposer_id": 3,
-          "schema_version": 0,
-          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-          "tx_count": 1000,
-          "tx_hash": "ad72304da7ded4039c54523c6e8372571df8851707e608c60f7a31d1e77515ad"
+          "proposer_id": 2,
+          "height": 21,
+          "tx_count": 1,
+          "prev_hash": "aa4ec89740a4ec380e8bcab0aedd0f5449184eb33b65ede5bb67e5e55e2dd004",
+          "tx_hash": "dcb05a3bd61f9b637335472802d8ab6026c8486dae3b4062ce48d561949c49af",
+          "state_hash": "e4ea2c6118326c6b00cd14ec7b8fb4cbf198eb4e65149ef3a96761740fc516c6"
         },
         {
-          "height": "10",
-          "prev_hash": "f9b4f236d5ef96fe9b06e77ff5e6f9c9c6352e2822846e98d427147ee89d0aee",
-          "proposer_id": 3,
-          "schema_version": 0,
-          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-          "tx_count": 1000,
-          "tx_hash": "687d757b742a28110c40d9246586767a49b4c2521732b9ac23686481168d7e6c"
+          "proposer_id": 1,
+          "height": 16,
+          "tx_count": 1,
+          "prev_hash": "7183517c34e94ecc10a3e13269da2bfadb6e87eea86453a1946ebdfa9c4dae83",
+          "tx_hash": "362bc50ed56d33944a0d33fbac2a25fc08ceb8dc1aced1f38147b3da3d022bc1",
+          "state_hash": "00cca5682b677d4b4ac644d2ddae09ca5e260fb67c735df22774f2e983d24ef5"
         },
         {
-          "height": "6",
-          "prev_hash": "f9ecccb5be51363744cffbb0b8241c2541c3aa7e53f1b9cca01d49d4991ae693",
-          "proposer_id": 3,
-          "schema_version": 0,
-          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-          "tx_count": 1000,
-          "tx_hash": "577b4d67d045d8aa08e1b63a08fe77f09ac2ae8b2f46a6c3294e4ef4efaceb6c"
+          "proposer_id": 0,
+          "height": 11,
+          "tx_count": 1,
+          "prev_hash": "9297ef66d1d9ec286c00aec779f2dc273b3371e792bbc9c6635d00f9c4a6fa80",
+          "tx_hash": "c7aa20695380846e3f274d3d51c68e864e66e46f2618aa5fbd55d597675b9e6a",
+          "state_hash": "deb57ff0f82c9d2514dc51785675544e27b3054512ea62dce2c8e30ce6d91e77"
         },
         {
-          "height": "2",
-          "prev_hash": "d8d583444b823db312be85dc5dfa6d41b658c2bfe8caf97cb4b7372f2154ad4b",
           "proposer_id": 3,
-          "schema_version": 0,
-          "state_hash": "8ad43ece286a45b6269183cc3fab215066c31054b06c9ef391697b88c03bb63c",
-          "tx_count": 1000,
-          "tx_hash": "94f251c0350c95024f46d26cbe0f9d2ea309e2817da4bab575fc4c571140291f"
+          "height": 6,
+          "tx_count": 1,
+          "prev_hash": "dbec8f64a85ab56985c7ab7e63a191764f4d5c373c677f719c2f9ddf13b9d5a1",
+          "tx_hash": "ffee3d630f137aecff95aece36cfe4dc1b42f688d474219cb30d44c85cf36b1f",
+          "state_hash": "8ac9f2af6266b8e9b61fa7f3fcdd170375fb1bf8cc8d474904abe3672b44906e"
         }
       ],
-      "range": {
-        "end": 101,
-        "start": 2
-      }
+      "times": [
+        "2019-02-21T13:01:44.321051Z",
+        "2019-02-21T13:01:43.287648Z",
+        "2019-02-21T13:01:42.251382Z",
+        "2019-02-21T13:01:41.228900Z",
+        "2019-02-21T13:01:40.199265Z"
+      ]
     }
     ```
 
     That is, to collect `5` non-empty blocks from the tail of the blockchain,
-    range from `100` to `2` has been traversed.
+    range from `288` to `6` has been traversed.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
-[github_explorer]: https://github.com/exonum/exonum/blob/master/exonum/src/api/public/blockchain_explorer.rs
+[explorer]: https://docs.rs/exonum/0.10.3/exonum/api/node/public/explorer/constant.MAX_BLOCKS_PER_REQUEST.html
 [blockchain-state]: ../glossary.md#blockchain-state
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
