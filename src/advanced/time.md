@@ -2,10 +2,9 @@
 
 <!-- cspell:ignore tlsdate,roughtime -->
 
-[**exonum-time**][exonum-time] is a time oracle service for Exonum.
-This service allows determining time,
-importing it from the external world to the blockchain
-and keeping its current value in the blockchain.
+Time Oracle allows user services to access the calendar time supplied by
+validator nodes to the blockchain. Its implementations for Exonum are available
+in [Rust][exonum-time] and [Java][java-time-oracle].
 
 ## The Problem
 
@@ -269,6 +268,7 @@ manageable, and could be generalized to the agreement between arbitrary
 collectively trusted entities, which may behave maliciously.
 
 [exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
+[java-time-oracle]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601
