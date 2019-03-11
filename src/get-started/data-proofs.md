@@ -57,16 +57,16 @@ default = ["with-serde"]
 with-serde = []
 ```
 
-Then we need to import macro from dependencies into `src/lib.rs` file.
+Then we need to import a macro from dependencies into the `src/lib.rs` file.
 
 ```rust
 #[macro_use]
 extern crate serde_derive;
 ```
 
-For convenience reasons we decided to divide the code into 5 submodules, each
-corresponding to a certain part of the
-service business logic and one is for protobuf structures. Let’s announce them below:
+For convenience reasons we decided to divide the code into five submodules. Four
+of them correspond to a certain part of the service business logic and one
+describes Protobuf structures. Let’s announce them below:
 
 ```rust
 pub mod api;
@@ -74,7 +74,6 @@ pub mod proto;
 pub mod schema;
 pub mod transactions;
 pub mod wallet;
-
 ```
 
 ## Constants
@@ -90,7 +89,7 @@ pub const SERVICE_NAME: &str = "cryptocurrency";
 const INITIAL_BALANCE: u64 = 100;
 ```
 
-## Implement a service
+## Implement a Service
 
 Implement a service structure and realize a trait for it with all the necessary
 methods and credentials:
@@ -165,10 +164,9 @@ impl fabric::ServiceFactory for ServiceFactory {
 
 ## Declare Persistent Data
 
-Similarly to a simple cryptocurrency demo we need to declare the data that we
-will store in our blockchain, i.e. the `Wallet` type:
-
-`proto/cryptocurrency.proto`:
+Similarly to a simple Cryptocurrency Demo we need to declare the data that we
+will store in our blockchain, i.e. the `Wallet` type. First, we describe this
+type in the Protobuf format in the `cryptocurrency.proto` file:
 
 ```protobuf
 message Wallet {
@@ -180,7 +178,7 @@ message Wallet {
 }
 ```
 
-`wallet.rs`:
+After that we provide the description of said type in Rust language:
 
 ```rust
 use exonum::crypto::{Hash, PublicKey};
@@ -202,16 +200,19 @@ pub struct Wallet {
 As you can see, apart from the already known fields (public key, owner’s name,
 balance), the new wallet type stores
 the **length of the wallet history** and its **hash**. These data are required
-to link the wallet history to the blockchain state hash. We added `serde_pb_convert`
-to have JSON representation of our structure similar to protobuf declarations, it
-helps light client to handle proofs that contain `Wallet` structure.
+to link the wallet history to the blockchain state hash.
+
+We also added
+`serde_pb_convert` to have JSON representation of our structure similar to
+Protobuf declarations, it helps the light client handle proofs that contain
+the `Wallet` structure.
 
 We also realize an auxiliary method for the `Wallet` structure. The method
 simultaneously updates the balance and the history of the wallet:
 
 ```rust
 impl Wallet {
-    /// Create new Wallet.
+    /// Creates a new wallet.
     pub fn new(
         &pub_key: &PublicKey,
         name: &str,
@@ -244,13 +245,25 @@ impl Wallet {
 This method is *immutable*; it consumes the old instance of the wallet and
 produces a new instance with the
 modified `balance` field. It is called within mutable methods allowing
-manipulations with the Wallet that will be
-specified below.
+manipulations with the wallet that will be specified below.
 
-Similar to cryptocurrency tutorial
-we have to add protobuf code generation to our project.
+Similar to Cryptocurrency Tutorial we need to add Protobuf code generation to
+our project. Therefore, in `proto/mod.rs` we launch the Protobuf-generated
+files to the `proto` module of our project:
 
-In `build.rs`:
+```rust
+#![allow(bare_trait_objects)]
+#![allow(renamed_and_removed_lints)]
+
+pub use self::cryptocurrency::{CreateWallet, Issue, Transfer, Wallet};
+
+include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
+
+use exonum::proto::schema::*;
+```
+
+Next, we generate the corresponding Rust files. For this we add the following
+code in the `build.rs` file:
 
 ```rust
 use exonum_build::{get_exonum_protobuf_files_path, protobuf_generate};
@@ -263,19 +276,6 @@ fn main() {
         "protobuf_mod.rs",
     );
 }
-```
-
-and in `proto/mod.rs`:
-
-```rust
-#![allow(bare_trait_objects)]
-#![allow(renamed_and_removed_lints)]
-
-pub use self::cryptocurrency::{CreateWallet, Issue, Transfer, Wallet};
-
-include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
-
-use exonum::proto::schema::*;
 ```
 
 ### Create Schema
@@ -363,7 +363,7 @@ cryptographic proofs.
 
 The mutable methods allow to persist changes caused by transactions
 to the service. These
-manipulations includes creating a wallet and changing its balance;
+manipulations include creating a wallet and changing its balance;
 in all cases, we additionally record the hash of a transaction
 that influenced the balance.
 
@@ -390,7 +390,23 @@ that influenced the balance.
             )
         }
 
-        /// Increases balance of the wallet and appends new record to its history.
+        /// Creates a new wallet and appends the first record to its history.
+        pub fn create_wallet(
+            &mut self,
+            key: &PublicKey,
+            name: &str,
+            transaction: &Hash,
+            ) {
+            let wallet = {
+                let mut history = self.wallet_history_mut(key);
+                history.push(*transaction);
+                let history_hash = history.merkle_root();
+                Wallet::new(key, name, INITIAL_BALANCE, history.len(), &history_hash)
+            };
+            self.wallets_mut().put(key, wallet);
+        }
+
+        /// Increases balance of the wallet and appends a new record to its history.
         pub fn increase_wallet_balance(
             &mut self,
             wallet: Wallet,
@@ -407,7 +423,7 @@ that influenced the balance.
             self.wallets_mut().put(&wallet.pub_key, wallet.clone());
         }
 
-        /// Decreases balance of the wallet and appends new record to its history.
+        /// Decreases balance of the wallet and appends a new record to its history.
         pub fn decrease_wallet_balance(
             &mut self,
             wallet: Wallet,
@@ -423,32 +439,13 @@ that influenced the balance.
             };
             self.wallets_mut().put(&wallet.pub_key, wallet.clone());
         }
-
-        /// Creates new wallet and appends first record to its history.
-        pub fn create_wallet(
-            &mut self,
-            key: &PublicKey,
-            name: &str,
-            transaction: &Hash,
-        ) {
-            let wallet = {
-                let mut history = self.wallet_history_mut(key);
-                history.push(*transaction);
-                let history_hash = history.merkle_root();
-                Wallet::new(key, name, INITIAL_BALANCE, history.len(), &history_hash)
-            };
-            self.wallets_mut().put(key, wallet);
-        }
     }
     ```
 
 ## Define Transactions
 
-We use `derive(TransactionSet)` to define the service transactions.
-It unites the transactions under the `WalletTransactions` structure,
-which we will use later to refer to any of the defined transactions.
-
-`transactions.rs`:
+First, we import structures, functions and traits that we will use further to
+define our transactions:
 
 ```rust
 use exonum::{
@@ -463,36 +460,45 @@ use super::proto;
 use crate::{schema::Schema, CRYPTOCURRENCY_SERVICE_ID};
 ```
 
+### Define Transaction Structures
+
 We need three types of transactions; apart from
 [the old ones](create-service.md#define-transactions)
 (“create a new wallet” and “transfer money between wallets”)
 we add a new transaction type that is responsible
-for reimbursement of the wallet balance:
-
-`proto/cryptocurrency.proto`:
+for reimbursement of the wallet balance. We start with describing these
+transactions in Protobuf format:
 
 ```protobuf
-/// Transfer `amount` of the currency from one wallet to another.
+/// Transfers `amount` of the currency from one wallet to another.
 message Transfer {
   exonum.PublicKey to = 1;
   uint64 amount = 2;
   uint64 seed = 3;
 }
 
-/// Issue `amount` of the currency to the `wallet`.
+/// Issues `amount` of the currency to the `wallet`.
 message Issue {
   uint64 amount = 1;
   uint64 seed = 2;
 }
 
-/// Create wallet with the given `name`.
+/// Creates a wallet with the given `name`.
 message CreateWallet {
   string name = 1;
 }
 ```
 
+Based on the above Protobuf descriptions we prepare the corresponding
+transaction descriptions in Rust.
+
+We need to add `serde_pb_convert` to `Transfer` transaction derive attributes
+to have JSON representation of this structure similar to Protobuf declarations.
+Just as with the `Wallet` structure, it helps the light client handle proofs
+that contain `Transfer` transaction.
+
 ```rust
-/// Transfer `amount` of the currency from one wallet to another.
+/// Transfers `amount` of the currency from one wallet to another.
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Transfer", serde_pb_convert)]
 pub struct Transfer {
@@ -500,8 +506,13 @@ pub struct Transfer {
     pub amount: u64,
     pub seed: u64,
 }
+```
 
-/// Issue `amount` of the currency to the `wallet`.
+The `Issue` transaction type contains the public key of the wallet it reimburses
+and applies a `seed` to avoid replay of the transaction.
+
+```rust
+/// Issues `amount` of the currency to the `wallet`.
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::Issue")]
 pub struct Issue {
@@ -509,13 +520,19 @@ pub struct Issue {
     pub seed: u64,
 }
 
-/// Create wallet with the given `name`.
+/// Creates a wallet with the given `name`.
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::CreateWallet")]
 pub struct CreateWallet {
     pub name: String,
 }
+```
 
+We use `derive(TransactionSet)` to define the service transactions.
+It unites the transactions under the `WalletTransactions` structure,
+which we will use later to refer to any of the defined transactions:
+
+```rust
 /// Transaction group.
 #[derive(Serialize, Deserialize, Clone, Debug, TransactionSet)]
 pub enum WalletTransactions {
@@ -525,20 +542,11 @@ pub enum WalletTransactions {
 }
 ```
 
-We added `serde_pb_convert` to `Transfer` transaction derive attributes
-to have JSON representation of this structure similar to protobuf declarations, it
-helps light client to handle proofs that contain `Transfer` transaction.
-
-The `Issue` transaction type contains the public key of the wallet it reimburses
-and applies a `seed` to avoid replay of the transaction.
-
 ### Reporting Errors
 
-Before implementing transaction logic we define
-the types of errors that might occur
-during their execution. The code is identical to the
-[one](create-service.md#reporting-errors) in
-the simple Cryptocurrency demo.
+Before implementing transaction logic we define the types of errors that might
+occur during their execution. The code is identical to the
+[one](create-service.md#reporting-errors) in the simple Cryptocurrency Demo.
 
 ??? "Error definitions"
 
@@ -739,7 +747,7 @@ pub struct WalletInfo {
 }
 ```
 
-### Retrieving Proof for Wallet
+### Retrieving Proof for a Wallet
 
 Now let’s define the method that will allow us to obtain information on a
 particular wallet together with cryptographic
@@ -752,7 +760,7 @@ impl PublicApi {
         state: &ServiceApiState,
         query: WalletQuery,
     ) -> api::Result<WalletInfo> {
-        // implementation we elaborate further
+        // Implementation is presented below.
     }
 }
 ```
@@ -850,7 +858,13 @@ said wallet’s history aggregated under the `WalletInfo` structure.
 
 ### Wiring API
 
-Finally, we `wire` function and call the above-mentioned methods with it:
+As we mentioned in the Cryptocurrency Tutorial, the
+[processing logic](../architecture/transactions.md#messages) for all
+transaction types is now unified and is implemented by `exonum`. Therefore, in
+our service we implement only API for read requests.
+
+We implement the `wire` function and call the above-mentioned `wallet_info`
+method with it:
 
 ```rust
 pub fn wire(builder: &mut ServiceApiBuilder) {
