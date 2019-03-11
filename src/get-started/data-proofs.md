@@ -248,7 +248,7 @@ modified `balance` field. It is called within mutable methods allowing
 manipulations with the wallet that will be specified below.
 
 Similar to Cryptocurrency Tutorial we need to add Protobuf code generation to
-our project. Therefore, in `proto/mod.rs` we launch the Protobuf-generated
+our project. Therefore, in `proto/mod.rs` we integrate the Protobuf-generated
 files to the `proto` module of our project:
 
 ```rust
