@@ -123,8 +123,9 @@ message Wallet {
 }
 ```
 
-Secondly, to generate a Rust structure from the above-stated definition, we add
-a `mod.rs` file with the following content to the `proto` module:
+Secondly, to integrate the Protobuf-generated files into the `proto` module of
+the project, we add a `mod.rs` file with the following content to the `proto`
+module:
 
 ```rust
 #![allow(bare_trait_objects)]
@@ -505,10 +506,13 @@ struct CryptocurrencyApi;
 ### API for Transactions
 
 The core processing logic is essentially the same for all types of transactions
-and is implemented by `exonum`. To send a transaction you have to create a
-transaction message according to the
+and is implemented by `exonum`. Therefore, there is no need to implement a
+separate API for transactions management within the service. To send a
+transaction you have to create a transaction message according to the
 [uniform structure](../architecture/transactions.md#messages) developed by
-Exonum. The transaction ID is a
+Exonum.
+
+The transaction ID is a
 transaction number in the enum with `#[derive(TransactionSet)]`. As we
 mentioned earlier, transactions count starts with 0.
 
