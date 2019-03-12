@@ -59,9 +59,10 @@ The process of reaching consensus on the next block (at the blockchain height
 `H`) consists of several **rounds**, numbered from 1\. The first round starts
 once the
 validator commits the block at height `H - 1`. The onsets of rounds are
-determined
-by a fixed timetable: rounds start after regular intervals. As there is no
-global time, rounds may start at different time for different validators.
+determined by the following timetable: rounds start with time intervals
+that linearly increase with the round number.
+As there is no global time,
+rounds may start at different time for different validators.
 
 When the round number `R` comes, the previous rounds are not completed.
 That is, round `R` means that the validator can process messages
@@ -159,7 +160,8 @@ and which has been discovered during the previous communication with the peer.
     A request is sent if a node receives a consensus message from
     a height greater than the local height. The peer is supposed to respond
     with a message that contains transactions in an accepted block, together
-    with a proof that the block is indeed accepted (i.e., precommits of +2/3 validators).
+    with a proof that the block is indeed accepted (i.e., precommits of +2/3
+    validators).
 
 There are requests for all consensus messages: proposals, prevotes, and
 precommits.
@@ -198,6 +200,8 @@ must be processed only during round `R`).
 !!! tip
     See [source code][src-messages] for more technical details on
     consensus messages.
+
+<!--TODO: change a link to docs.rs-->
 
 ### Messages
 
@@ -245,6 +249,13 @@ periodicity written in the `status_timeout`
 A `BlockResponse` message contains a block (in the meaning of blockchain) and a
 set of `Precommit` messages that allowed that block to be accepted.
 `BlockResponse` messages are sent upon request.
+
+#### Connect
+
+A node sends a `Connect` message to all addresses from the list of its known
+peers during initialization. The message tells the peer to connect to the
+address specified in this message. Each of the receiving nodes respond
+by their own `Connect` messages when `node::Event::Connected` occurs.
 
 ### Request Messages
 

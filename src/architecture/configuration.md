@@ -9,17 +9,20 @@ network.
 The configuration is stored in the [TOML][toml] format. A path to the
 configuration file should be specified on the node start up.
 
-The configuration may be changed using [the global variables updater service](../advanced/configuration-updater.md)
+The configuration may be changed using
+[the global variables updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. On node initialization the
 configuration is passed to all services deployed in the blockchain.
 The configuration for a service is stored in the `services_configs` subtree
 of the overall configuration
-under a separate key equal to [the name of the service](services.md#service-identifiers).
+under a separate key equal to
+[the name of the service](services.md#service-identifiers).
 
 !!! note "Example"
-    The configuration settings of [the anchoring service](../advanced/bitcoin-anchoring.md)
+    The configuration settings of
+    [the anchoring service](../advanced/bitcoin-anchoring.md)
     include the parameters of the RPC connection to
     a Bitcoin Core node as well as a Bitcoin address used for anchoring.
     These parameters are stored in the `services_configs.btc_anchoring`
@@ -49,6 +52,10 @@ This categorization holds for both core and service parameters.
     for reference.
 
 ### Global Parameters
+
+<!--TODO: put a sample file from above here and make comments inside the file.
+make the comments as pop-up windows when navigating on each parameter in the
+sample file-->
 
 #### [genesis]
 
@@ -81,8 +88,11 @@ two parts:
   Peers exchange timeout (in ms)
 - **propose_timeout_threshold**  
   Amount of transactions in the pool to start using `min_propose_timeout`
-- **round_timeout**  
-  Timeout interval (ms) between rounds
+- **first_round_timeout**  
+  Timeout interval (ms) of the first round at each height. The default
+  value is 3000 ms. This parameter is used to estimate timeouts for further
+  consensus rounds. See [specification](../advanced/consensus/specification.md#rounds)
+  of the consensus algorithm for more details
 - **status_timeout**  
   Timeout interval (ms) for sending a `Status` message
 - **txs_block_limit**  
@@ -114,64 +124,70 @@ two parts:
 - **max_outgoing_connections**  
   Maximum number of outgoing connections
 - **tcp_nodelay**  
-  Activation of the `NODELAY` algorithm from the TCP stack (see [RFC2126][rfc2126])
-- **tcp_reconnect_timeout**  
-  Timeout interval (ms) before the first reconnect attempt
-- **tcp_reconnect_timeout_max**  
-  Maximum timeout interval (ms) for reconnect attempt
+  Activates of the `NODELAY` algorithm from the TCP stack
+  (see [RFC2126][rfc2126])
+- **tcp_keep_alive**
+  Enables keep-alive and sets the idle time interval (ms) for the TCP stack
+  (see [RFC 1122][rfc1122]).
+  Keep-alive will be disabled if this configuration is not set
+  (default behavior).
+- **tcp_connect_retry_timeout**  
+  Timeout interval (ms) between reconnection attempts
+- **tcp_connect_max_retries**
+  Maximum number of reconnection attempts
 
 #### [api]
 
 API configuration parameters.
 
-- **enable_blockchain_explorer**  
-  Enables API endpoints for the blockchain explorer at the public API address
 - **state_update_timeout**  
   Timeout interval (ms) to update info about connected peers
 - **public_api_address**  
   Listen address for public API endpoints
 - **private_api_address**  
   Listen address for private API endpoints
-- **allow_origin**  
+- **public_allow_origin**  
   Sets up the [CORS][cors] headers for public API endpoints. The parameter
   can take any of the three forms:
 
     - `"*"` enables requests from all origins
     - [Origin string][origin-header] (e.g., `"http://example.com"`)
       enables requests from a single specific origin
-    - An array of origin strings (e.g., `["http://a.example.com", "http://b.example.com"]`)
+    - An array of origin strings
+      (e.g., `["http://a.example.com", "http://b.example.com"]`)
       enables requests from any of the specified origins
+- **private_allow_origin**
+  Sets up the CORS headers for private API endpoints.
+  Syntax is the same as for **public_allow_origin**.
 
 !!! note
-    If the `allow_origin` parameter is not specified, CORS headers are not added
+    If `allow_origin` parameters are not specified, CORS headers are not added
     to any requests, which can lead to requests from external origins
     being improperly processed by user agents with the CORS support
     (such as web browsers). However, you can easily avoid this by passing the
     public API of an Exonum node through the web server
-    delivering web assets  (for example, Nginx). In this case, the requests to API
-    would be same-origin, so CORS restrictions would not apply.
+    delivering web assets  (for example, Nginx). In this case, the requests to
+    API would be same-origin, so CORS restrictions would not apply.
 
-#### [whitelist]
+#### [mempool.events_pool_capacity]
 
-[Network whitelisting](../advanced/network.md#whitelist) parameters.
+Parameters that determine the maximum number of events that may be placed into
+the [event queue](../advanced/consensus/specification.md#message-processing)
+of each type:
 
-- **whitelist_enabled**  
-  Enables whitelisting
-- **whitelisted_peers**  
-  List of consensus public keys for trusted peers
-
-#### [mempool]
-
-Message processing parameters.
-
-- **events_pool_capacity**  
-  Maximum number of events in the [event queue](../advanced/consensus/specification.md#message-processing)
-- **tx_pool_capacity**  
-  Maximum number of transactions in the [pool of unconfirmed transactions](../advanced/consensus/specification.md#pool-of-unconfirmed-transactions)
+- **api_requests_capacity**
+  Maximum number of queued API requests.
+- **internal_events_capacity**
+  Maximum number of queued internal events.
+- **network_events_capacity**
+  Maximum number of queued incoming network messages.
+- **network_requests_capacity**
+  Maximum number of queued outgoing network messages.
 
 #### [services_configs]
 
-Service-specific parameters under the keys corresponding to [`service_name`s](services.md#service-identifiers)
+Service-specific parameters under the keys corresponding to
+[`service_name`s](services.md#service-identifiers)
 of the blockchain services.
 
 ## Changing Configuration
@@ -193,7 +209,7 @@ to keep the system operational.
     validator keys) using the global variables updater service.
 
 [toml]: https://en.wikipedia.org/wiki/TOML
-[github_config_file]: https://github.com/exonum/exonum/blob/v0.1/exonum/tests/testdata/config/config02.toml
+[github_config_file]: https://github.com/exonum/exonum/blob/master/exonum/tests/testdata/config/config02.toml
 [rfc2126]: https://tools.ietf.org/html/rfc2126
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin

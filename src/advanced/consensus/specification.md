@@ -36,11 +36,22 @@ and -1/3 means less than one third.
 The consensus algorithm proceeds in rounds for each blockchain height
 (i.e., the number of blocks in the blockchain).
 Rounds are numbered from 1\. The onsets of rounds are determined
-by a fixed timetable:
+by the following timetable:
 
 - The first round starts after committing a block at the previous height
   to the blockchain
-- Rounds 2, 3, … start after regular intervals
+- The second round starts within `first_round_timeout` interval. The default
+  value of the `first_round_timeout` is 3000 ms and can be configured by the
+  network through a new proposal at any time
+- All further round timeouts are calculated according to the following formula:
+  `first_round_timeout + (r-1)*round_timeout_increase`. The
+  `round_timeout_increase` value is a percentage of the `first_round_timeout`.
+  `round_timeout_increase` is defined in the
+  `ConsensusConfig::TIMEOUT_LINEAR_INCREASE_PERCENT` constant and constitutes
+  10% of the `first_round_timeout`.
+
+Thus, the duration of rounds gradually increases. This provides the network with
+more time every round to make a decision on a new block.
 
 Rounds are not synchronized among nodes.
 
@@ -71,11 +82,25 @@ message processing.
 
 ## Configuration Parameters
 
-- `propose_timeout`  
-  Proposal timeout after a new block is committed to the blockchain locally.
+- `max_propose_timeout`  
+  Initial proposal timeout after a new block is committed to the blockchain.
 
-- `round_timeout`  
-  Interval between algorithm rounds.
+- `propose_timeout_threshold`
+  If the amount of transactions in the pool of unconfirmed transactions of a
+  node is larger than the `propose_timeout_threshold` value, the node switches
+  from `max_propose_timeout` to `min_propose_timeout`, i.e. generates blocks
+  faster, and vice versa.
+
+- `min_propose_timeout`
+  The proposal timeout for the case when the amount of transactions in the pool
+  of unconfirmed transactions is larger than `propose_timeout_threshold` value.
+
+- `first_round_timeout`  
+  Interval between the first and the second rounds of the consensus algorithm.
+  This parameter is used to estimate timeouts for further consensus rounds.
+  The estimation formula is
+  `first_round_timeout + (r-1)*round_timeout_increase`, where
+  `round_timeout_increase` is 10% of the `first_round_timeout`.
 
 - `status_timeout`  
   Interval between `Status` message broadcasts.
@@ -351,7 +376,9 @@ round are placed into a separate queue (`queued`).
 
 - If the timeout does not match the current height and round, skip further
   timeout processing.
-- Add a timeout (its length is specified by `round_timeout`) for the next round.
+- Add a timeout for the `N`th round with the length
+  `first_round_timeout * (1 + (N - 1) * q)`,
+  where `q = 0.1` is the relative increase in a timeout after each round.
 - Process all messages from `queued` that have become relevant (their round
   and height coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new

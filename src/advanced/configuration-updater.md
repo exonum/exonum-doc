@@ -2,9 +2,10 @@
 
 <!-- cspell:ignore postvote -->
 
-**Configuration update service** allows modifying [the global configuration](../architecture/configuration.md)
-by the means of *proposing* a new configuration and *voting* for proposed configurations
-among the validators.
+**Configuration update service** allows modifying
+[the global configuration](../architecture/configuration.md)
+by the means of *proposing* a new configuration and *voting* for proposed
+configurations among the validators.
 
 The global configuration may need to be modified for various reasons:
 
@@ -15,22 +16,20 @@ The global configuration may need to be modified for various reasons:
 
 ## General Idea
 
-Any validator node can propose a new configuration, by broadcasting a corresponding
-propose transaction to the network. The transaction includes a new configuration
-in the JSON format, along with three auxiliary fields:
+Any validator node can propose a new configuration, by broadcasting a
+corresponding propose transaction to the network. The transaction includes a new
+configuration in the JSON format, along with two auxiliary fields:
 
 - `actual_from` is a non-negative integer height,
   upon reaching which the new configuration (if accepted) will become active.
-- `previous_cfg_hash` is the hash of the configuration that the proposal updates
-- `majority_count` is the minimum number of validators that need to approve
-  the proposal
+- `previous_cfg_hash` is the hash of the configuration that the proposal
+  updates.
 
-Validators may vote for or against configuration proposals by submitting vote transactions
-to the network. Each validator can cast
+Validators may vote for or against configuration proposals by submitting vote
+transactions to the network. Each validator can cast
 a single vote either for or against any configuration proposal (but not both).
 If the proposal gets a supermajority of approving votes
-(more than 2/3 of the validators by default; can be varied with the help of `majority_count`),
-then the proposal becomes locked in,
+(more than 2/3 of the validators), then the proposal becomes locked in,
 and is referred to as the *following configuration*. All the validators
 switch to the following configuration (activate it) as soon as they reach
 the `actual_from` specified in the proposal.
@@ -41,33 +40,33 @@ the `actual_from` specified in the proposal.
     configuration, nodes can not vote for a new proposal until the following
     configuration is activated.
 
-There may be several proposals with the same `previous_cfg_hash`; the transaction
-execution rules guarantee that only one of them will get activated.
+There may be several proposals with the same `previous_cfg_hash`; the
+transaction execution rules guarantee that only one of them will get activated.
 
 !!! note
     The threshold of 2/3 of validators is chosen to reflect the security
-    model used in [the consensus algorithm](../architecture/consensus.md). According
-    to this model, up to 1/3 of validators may be compromised or be non-responsive
-    at any time.
+    model used in [the consensus algorithm](../architecture/consensus.md).
+    According to this model, up to 1/3 of validators may be compromised or be
+    non-responsive at any time.
 
 ## REST API
 
 Configuration update service specifies a set of public and private endpoints.
 
-- Public read requests:
+- Public APIs for read requests:
 
     - [Actual configuration](#actual-configuration)
     - [Following configuration](#following-configuration)
     - [Configuration by hash](#configuration-by-hash)
-    - [Votes for a configuration](#votes-for-configuration)
-    - [List committed configurations](#committed-configurations)
-    - [List proposed configurations](#proposed-configurations)
+    - [Votes for a configuration](#votes-for-a-configuration)
+    - [List of committed configurations](#committed-configurations)
+    - [List of proposed configurations](#proposed-configurations)
 
-- Transactions with corresponding private APIs:
+- Transactions with their corresponding private APIs:
 
-    - [Propose configuration](#configuration-proposal), [private API](#submit-configuration-proposal)
-    - [Vote for configuration](#vote-for-proposal), [private API](#submit-vote-for-proposal)
-    - [Vote against configuration](#vote-against-proposal), [private API](#submit-vote-against-proposal)
+    - [Configuration proposal](#configuration-proposal)
+    - [Vote for configuration](#vote-for-proposal)
+    - [Vote against configuration](#vote-against-proposal)
 
 All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `/api/services/configuration/v1`.
@@ -78,8 +77,8 @@ equal to `/api/services/configuration/v1`.
 
 !!! tip
     See [the configuration update service tutorial][http_api] for more details
-    on the configuration update service API, and [this][response_samples] for API
-    examples.
+    on the configuration update service API, and [this][response_samples] for
+    API examples.
 
 ### Types
 
@@ -98,17 +97,14 @@ an optional type.
 
 #### ConfigBody
 
-`ConfigBody` is a JSON object corresponding to the [Exonum
-config][stored_configuration] serialization. It has the following fields:
+`ConfigBody` is a JSON object corresponding to the
+[Exonum config][stored_configuration] serialization. It has the following
+fields:
 
 - **actual_from**: integer  
   The height from which the configuration became actual.
 - **consensus**: Object  
   [Consensus-specific configuration parameters][genesis-consensus].
-- **majority_count**: integer  
-  Amount of votes required to commit a new configuration proposal.
-  By default the number of votes is calculated as
-  2/3 + 1 of total validators count.
 - **previous_cfg_hash**: Hash  
   Hash of the previous active configuration.
 - **services**: Object  
@@ -118,13 +114,11 @@ config][stored_configuration] serialization. It has the following fields:
 
 #### Propose
 
-`Propose` is a JSON object corresponding to the [Exonum
-config][config_propose] serialization. It has the following fields:
+`Propose` is a JSON object corresponding to the [Exonum config][config_propose]
+serialization. It has the following fields:
 
 - **tx_propose**: Object  
-  Information about configuration and its author.
-- **tx_propose.from**: PublicKey  
-  Author’s public key.
+  Information about configuration.
 - **tx_propose.cfg**: string  
   String containing JSON serialization of proposed configuration.
 - **votes_history_hash**: Hash  
@@ -132,9 +126,9 @@ config][config_propose] serialization. It has the following fields:
 - **num_validators**: integer  
   Number of validators that can vote for the proposal.
 
-## Read Requests
+### Public APIs
 
-### Actual Configuration
+#### Actual Configuration
 
 ```none
 GET {base_path}/configs/actual
@@ -142,11 +136,11 @@ GET {base_path}/configs/actual
 
 Looks up the actual global configuration.
 
-#### Parameters
+##### Parameters
 
 None.
 
-#### Response
+##### Response
 
 JSON object with the following fields:
 
@@ -154,21 +148,25 @@ JSON object with the following fields:
   Global configuration presently in use.
 - **hash**: Hash  
   Hash of the actual configuration.
+- **propose**: Hash
+  Hash of the transaction containing a new configuration proposal.
+- **votes**: Array of objects
+  Information on the votes of the validators for a new configuration.
 
-### Following Configuration
+#### Following Configuration
 
 ```none
 GET {base_path}/configs/following
 ```
 
-Looks up the locked-in following configuration which hasn’t taken effect yet.
+Looks up the locked-in following configuration which has not taken effect yet.
 Returns `null` if no configuration is locked in.
 
-#### Parameters
+##### Parameters
 
 None.
 
-#### Response
+##### Response
 
 JSON object with the following fields:
 
@@ -176,8 +174,12 @@ JSON object with the following fields:
   Global configuration locked in to take effect in the future.
 - **hash**: Hash  
   Hash of the following configuration.
+- **propose**: Hash
+  Hash of the transaction containing a new configuration proposal.
+- **votes**: Array of objects
+  Information on the votes of the validators for a new configuration.
 
-### Configuration by Hash
+#### Configuration by Hash
 
 ```none
 GET {base_path}/configs?hash={config_hash}
@@ -185,24 +187,24 @@ GET {base_path}/configs?hash={config_hash}
 
 Looks up configuration (including proposals) by the hash.
 
-#### Parameters
+##### Parameters
 
 - **hash**: Hash
   Hash of configuration to look up.
 
-#### Response
+##### Response
 
 JSON object with the following fields:
 
 - **committed_config**: ?ConfigBody  
   Configuration with the specified hash.
-  If only a proposal is present, `null`.
+  If only a proposal is present, the value is `null`.
 - **propose**: ?Propose  
   Proposal for the retrieved configuration.
-  If the configuration is not a result of a proposal (the genesis configuration),
-  `null`.
+  If the configuration is not a result of a proposal (the genesis
+  configuration), the value is `null`.
 
-### Votes for Configuration
+#### Votes for a Configuration
 
 ```none
 GET {base_path}/configs/votes?hash={config_hash}
@@ -210,23 +212,25 @@ GET {base_path}/configs/votes?hash={config_hash}
 
 Looks up votes for a configuration proposal by the configuration hash.
 
-#### Parameters
+##### Parameters
 
 - **hash**: Hash
   Hash of configuration to look up
 
-#### Response
+##### Response
 
 A nullable JSON array `?Array<?Vote>` containing
-votes for the configuration, where each vote is [the JSON serialization](../architecture/transactions.md#serialization)
+votes for the configuration, where each vote is
+[the JSON serialization](../architecture/transactions.md#serialization)
 of [the corresponding vote transaction](#vote-for-proposal).
 Indexing of the votes in the array corresponds
-to the indexing of validator public keys in the [actual configuration](../architecture/configuration.md#genesis).
+to the indexing of validator public keys in the
+[actual configuration](../architecture/configuration.md#genesis).
 If a vote from the validator is absent, then `null` is returned
 at the corresponding index. If the configuration with `config_hash` is absent,
 `null` is returned instead of the whole array.
 
-### Committed Configurations
+#### Committed Configurations
 
 ```none
 GET {base_path}/configs/committed
@@ -235,15 +239,16 @@ GET {base_path}/configs/committed
 Looks up all committed configurations, optionally filtered by
 the activation height and/or the previous configuration hash.
 
-#### Query Parameters
+##### Query Parameters
 
 - **previous_cfg_hash**: Hash
-  If present, filters configurations by the specified previous configuration hash.
+  If present, filters configurations by the specified previous configuration
+  hash.
 - **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration became actual.
 
-#### Response
+##### Response
 
 Array of objects with the following fields:
 
@@ -251,11 +256,15 @@ Array of objects with the following fields:
   Committed configuration satisfying filter criteria.
 - **hash**: Hash  
   Hash of the configuration.
+- **propose**: Hash
+  Hash of the transaction containing a new configuration proposal.
+- **votes**: Array of objects
+  Information on the votes of the validators for a new configuration.
 
 The elements of the array are ordered by the order, in which
 configuration proposals were committed as transactions to the Exonum blockchain.
 
-### Proposed Configurations
+#### Proposed Configurations
 
 ```none
 GET {base_path}/configs/proposed
@@ -264,46 +273,50 @@ GET {base_path}/configs/proposed
 Looks up all proposed configurations, optionally filtered by
 the activation height and/or the previous configuration hash.
 
-#### Query Parameters
+##### Query Parameters
 
 - **previous_cfg_hash**: Hash
-  If present, filters configurations by the specified previous configuration hash.
+  If present, filters configurations by the specified previous configuration
+  hash.
 - **actual_from**: integer
   If present, filters configurations by the specified minimum for the height
   from which the configuration will become actual.
 
-#### Response
+##### Response
 
 Array of objects with the following fields:
 
-- **config**: ConfigBody  
-  Proposed configuration satisfying filter criteria.
+- **propose_data**: ?Propose
+  Information on the new proposed configuration.
 - **hash**: Hash  
-  Hash of the configuration.
+  Hash of the proposed configuration.
 
-The elements of the array are ordered by the order, in which
-configuration proposals were committed as transactions to the Exonum blockchain.
+The elements of the array appear in the order, in which configuration proposals
+were committed as transactions to the Exonum blockchain.
 
-## Transactions
+### Transactions and Private APIs
 
-### Configuration Proposal
+Configuration service has separate APIs for creating transactions. Each
+transaction has its corresponding endpoint to make a POST request.
+
+#### Configuration Proposal
+
+##### Transaction Description
 
 `Propose` transaction is a new configuration proposal.
 
-#### Data Layout
+###### Data Layout
 
 - **cfg**: string  
   String serialization of the `ConfigBody` JSON object,
   which describes the proposed configuration.
-- **from**: PublicKey  
-  Public key of the transaction author.
 
-#### Verification
+###### Verification
 
-Signature of the transaction is verified against the public key
-specified in `from`.
+Signature of the transaction is verified against the public key of the
+transaction author.
 
-#### Execution
+###### Execution
 
 A `Propose` transaction is only successfully executed
 with a state change if all of the following conditions take place:
@@ -314,8 +327,8 @@ with a state change if all of the following conditions take place:
 - `cfg.actual_from` is greater than the current height of the blockchain,
   determined as the height of the latest committed block + 1
 - There is no agreed-upon following configuration
-- The actual configuration contains the `from` public key in the array of
-  validator keys
+- The actual configuration contains the public key of the transaction author in
+  the array of validator keys
 - There is no previously submitted configuration proposal, which evaluates
   to the same configuration hash
 
@@ -323,32 +336,59 @@ If all the checks pass, the proposal is recorded as a candidate
 for the next configuration. The validators can then vote
 for or against the proposal.
 
-### Vote for Proposal
+##### Submit Configuration Proposal Endpoint
+
+```none
+POST {base_path}/configs/postpropose
+```
+
+Creates a [`Propose` transaction](#configuration-proposal).
+The transaction signature is computed automatically based on the identity of the
+node that processes the POST request - the signature is computed
+based on the corresponding private key of the node stored in
+[the local configuration](../architecture/configuration.md).
+
+###### Parameters
+
+- **config_body**: ConfigBody  
+  Body of the request; the proposed configuration in the JSON format.
+
+###### Response
+
+JSON object with the following fields:
+
+- **cfg_hash**: Hash  
+  Hash of the proposed configuration. Should be used as `hash`
+  parameter of [`postvote` requests](#submit-vote-for-proposal-endpoint).
+- **tx_hash**: Hash  
+  Hash of the corresponding `Propose` transaction.
+
+#### Vote for Proposal
+
+##### Transaction Description
 
 `Vote` is a transaction that implements voting for a previously
 proposed configuration.
 
-#### Data Layout
+###### Data Layout
 
 - **cfg_hash**: Hash  
   Hash of configuration to vote for.
-- **from**: PublicKey  
-  Public key of the transaction author.
 
-#### Verification
+###### Verification
 
-Signature of the transaction is verified against the public key
-specified in `from`.
+Signature of the transaction is verified against the public key of the
+transaction author.
 
-#### Execution
+###### Execution
 
 Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
 - There is no agreed-upon following configuration
-- The actual configuration contains the `from` public key in the array of
-  validator keys
+- The actual configuration contains the public key of the transaction author in
+  the array of validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height
 - No vote on the same proposal from the same validator has been
@@ -358,32 +398,54 @@ If all the checks pass, the vote is recorded. If there is
 a sufficient number of votes approving the configuration, it is scheduled to
 be accepted as specified in its proposal.
 
-### Vote against Proposal
+##### Submit Vote for Proposal Endpoint
+
+```none
+POST {base_path}/configs/postvote
+```
+
+Creates a [`Vote` transaction](#vote-for-proposal).
+As with the previous endpoint, the transaction signature is computed
+automatically.
+
+###### Parameters
+
+- **hash**: Hash  
+  Body of the request; hash of the configuration to vote for.
+
+###### Response
+
+JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Hash of the corresponding `Vote` transaction.
+
+#### Vote against Proposal
+
+##### Transaction Description
 
 `VoteAgainst` is a transaction that implements voting against a previously
 proposed configuration.
 
-#### Data Layout
+###### Data Layout
 
 - **cfg_hash**: Hash  
   Hash of the configuration to be voted against.
-- **from**: PublicKey  
-  Public key of the transaction author.
 
-#### Verification
+###### Verification
 
-Signature of the transaction is verified against the public key
-specified in `from`.
+Signature of the transaction is verified against the public key of the
+transaction author.
 
-#### Execution
+###### Execution
 
 Vote transactions will only get submitted and executed with state change
 if all of the following conditions take place:
 
 - `cfg_hash` references a known proposed configuration `cfg`
 - There is no agreed-upon following configuration
-- The actual configuration contains the `from` public key in the array of
-  validator keys
+- The actual configuration contains the public key of the transaction author in
+  the array of validator keys
 - `cfg.previous_cfg_hash` is equal to hash of the actual configuration
 - `cfg.actual_from` is greater than the current height
 - No vote on the same proposal from the same validator has been
@@ -391,73 +453,22 @@ if all of the following conditions take place:
 
 If all the checks pass, the vote is recorded.
 
-## Private APIs
-
-### Submit Configuration Proposal
-
-```none
-POST {base_path}/configs/postpropose
-```
-
-Creates a [`Propose` transaction](#configuration-proposal).
-The `from` field of the transaction and its signature are computed
-automatically based on the identity of the node that processes the POST request:
-`from` is set to the node’s public key, and the signature is computed
-based on the corresponding private key stored in [the local configuration](../architecture/configuration.md).
-
-#### Parameters
-
-- **config_body**: ConfigBody  
-  Body of the request; the proposed configuration in the JSON format.
-
-#### Response
-
-JSON object with the following fields:
-
-- **cfg_hash**: Hash  
-  Hash of the proposed configuration. Should be used as `hash`
-  parameter of [`postvote` requests](#submit-vote-for-proposal).
-- **tx_hash**: Hash  
-  Hash of the corresponding `Propose` transaction.
-
-### Submit Vote for Proposal
-
-```none
-POST {base_path}/configs/postvote
-```
-
-Creates a [`Vote` transaction](#configuration-proposal).
-As with the previous endpoint, the `from` field of the transaction
-and its signature are computed automatically.
-
-#### Parameters
-
-- **hash**: Hash  
-  Body of the request; hash of the configuration to vote for.
-
-#### Response
-
-JSON object with the following fields:
-
-- **tx_hash**: Hash  
-  Hash of the corresponding `Vote` transaction.
-
-### Submit Vote against Proposal
+##### Submit Vote against Proposal Endpoint
 
 ```none
 POST {base_path}/configs/postagainst
 ```
 
-Creates a [`VoteAgainst` transaction](#configuration-proposal).
-As with the previous endpoint, the `from` field of the transaction
-and its signature are computed automatically.
+Creates a [`VoteAgainst` transaction](#vote-against-proposal).
+As with the previous endpoint, the transaction signature is computed
+automatically.
 
-#### Parameters
+###### Parameters
 
 - **hash**: Hash  
   Body of the request; hash of the configuration to be voted against.
 
-#### Response
+###### Response
 
 JSON object with the following fields:
 

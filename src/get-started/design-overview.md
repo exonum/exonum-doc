@@ -330,9 +330,13 @@ requests,
 dispatching incoming transactions and read requests to an appropriate service,
 performing conversion to and from JSON, etc.
 
-As services are Rust modules, they can be easily reused across Exonum
-projects. You may use open source services already written by the
-community, or open your service for other uses.
+Exonum services are Rust or Java modules that can be easily
+reused across Exonum projects. To use Java modules you should apply
+[Exonum Java Binding](java-binding.md) tool that realizes Exonum interface
+in Java.
+
+You may use open source services already written by the community, or
+open your service for other uses.
 
 ### Smart Contracting
 
@@ -353,7 +357,8 @@ used in blockchains are as follows:
   smart contract safety
 - **No isolation.** Request processing is performed
   in the same execution context as the core of the system. This is beneficial
-  for performance, although has certain security risks
+  for performance while at the same time such approach requires particular
+  attention when creating and testing smart-contracts.
 - **Local state.** Exonum services may define a local state, which
   is specific to the node on which the service is running. The local state
   can be used to manage secret information (e.g., private keys). The local
@@ -371,10 +376,6 @@ used in blockchains are as follows:
   as well as other structural checks over the transaction contents.
   At the same time, transaction verification has no access to the current
   blockchain state
-
-!!! note
-    Service execution isolation is a high-priority task
-    on [the Exonum roadmap](../roadmap.md).
 
 ### Existing Services
 

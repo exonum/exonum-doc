@@ -133,6 +133,11 @@ second (tps). During test benchmarks, Exonum handles up to 7,000 tps, with a
 2.5 sec. clearing delay (the interval between transaction generation and its
 inclusion into a block).
 
+<!--TODO: I would like to see a link to a blog post
+> which illustrates the benchmarks
+> and explains their results.
+> It will greatly increase credibility of such statements.-->
+
 ## Main Components
 
 ### Services

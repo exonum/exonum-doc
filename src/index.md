@@ -1,14 +1,18 @@
 # Exonum
 
-**Exonum** is an extensible open-source framework for creating blockchain applications.
+**Exonum** is an extensible open-source framework for creating blockchain
+applications.
 Exonum can be used to create cryptographically powered distributed
-ledgers in virtually any problem domain, including FinTech, GovTech, and LegalTech.
+ledgers in virtually any problem domain, including FinTech, GovTech, and
+LegalTech.
 The Exonum framework is oriented towards creating permissioned blockchains,
 that is, blockchains with the known set of blockchain infrastructure providers.
 
-Exonum uses [the Rust programming language][rust] to achieve utmost execution safety;
+Exonum uses [the Rust programming language][rust] to achieve utmost execution
+safety;
 [service-oriented architecture][wiki:soa] to provide extensibility, flexibility,
-and modularity; and client-side verification based on [cryptographic commitments][wiki:commitment]
+and modularity; and client-side verification based on
+[cryptographic commitments][wiki:commitment]
 (Merkle and Merkle Patricia trees) to ensure transparency of the system
 and client security.
 
@@ -18,7 +22,8 @@ and client security.
 
 [Exonum][core] is an open-source Rust library providing core functionality
 of the Exonum framework. It is available under [the Apache 2.0 license][apache].
-You may refer to [the installation guide](get-started/install.md) in order to install
+You may refer to [the installation guide](get-started/install.md) in order to
+install
 the library together with its prerequisites.
 
 ### Cryptocurrency Tutorial
@@ -26,7 +31,8 @@ the library together with its prerequisites.
 [Cryptocurrency Tutorial](get-started/create-service.md) showcases how Exonum
 can be used to build a simple cryptocurrency app step by step.
 Besides Exonum core, the tutorial also makes use of [the light client][client] –
-a JavaScript library intended for client-side verification of blockchain information
+a JavaScript library intended for client-side verification of blockchain
+information
 and for performing cryptographic operations (such as digital signing).
 
 The source code of the tutorial [is available on GitHub][tutorial].
@@ -38,7 +44,8 @@ The source code of the tutorial [is available on GitHub][tutorial].
 Refer to [*What is Exonum*](get-started/what-is-exonum.md)
 for the motivations behind building
 yet another permissioned blockchain framework. [*Design Overview*](get-started/design-overview.md)
-takes a more technical approach and gives in-depth description of the Exonum design.
+takes a more technical approach and gives in-depth description of the Exonum
+design.
 
 ### Services & Clients
 

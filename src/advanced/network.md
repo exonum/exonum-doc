@@ -41,7 +41,8 @@ has been really authorized by a supermajority of validators.
 
 ## Peer-to-Peer Full Node Network
 
-Full nodes use the [Exonum binary serialization format](../glossary.md#binary-serialization)
+Full nodes use the
+[Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
 [The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
@@ -72,41 +73,29 @@ the _list of known peers_. As soon as a handshake is reached (the `Connect`
 message is received and successfully processed) from both sides, the nodes begin
 to exchange messages.
 
-#### Whitelist
-
-If the whitelist is turned on, then upon receiving the `Connect` message, the
-node checks the presence of the public key from the message in the node’s
-whitelist. If the public key is not included in the whitelist, connection is not
-accepted.
-
-Whitelist is specified in the `whitelist` section of the
-[local configuration](../glossary.md#local-configuration):
-
-```TOML
-[whitelist]
-whitelist_enabled = true
-whitelisted_peers = ["99ace6c721db293b0ed5b487e6d6111f22a8c55d2a1b7606b6fa6e6c29671aa1",
-"a32464be9bef16a6186a7f29d5ebc3223346faab91ea10cc00e68ba26322a1b0",
-"c3f5730d81402e7453df97df2895884e0c49b5cf5ff54737c3dd28dc6537b3fd",
-"f542cdc91f73747ecc20076962a2ed91749b8e0af66693ba6f67dd92f99b1533"]
-```
-
 #### Peer Discovery
 
-Node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest) to a
-random known node  with the timeout `peers_timeout` defined in the
+`listen_address` is the address where each node in the network accepts
+connections from other peers.
+
+Each node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest)
+to a random known node with the timeout `peers_timeout` defined in the
 [global configuration](../architecture/configuration.md#genesisconsensus).
 [In response](consensus/requests.md#peersrequest-1), the addressee sends its
 list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the
 entire network.
 
-The initial list of IP addresses where other full nodes may be specified
-is defined in the [local configuration](../glossary.md#local-configuration)
-(parameter `listen_address`) of the node. This list is used to discover
-an initial set of peers on the node start up. If some node changes its IP
-address, then through peer discovery mechanism a new address becomes known to
+At the same time, the initial list of addresses, where other full nodes may
+be specified, is defined in the
+[local configuration](../glossary.md#local-configuration)
+(parameter `connect_list`) of the node. This list is used to discover
+the initial set of peers on the node start up. If some node changes its address,
+then through peer discovery mechanism a new address becomes known to
 all other nodes in some time.
+
+Meanwhile, the addresses in the `connect_list` may be specified both as host
+names and IP addresses.
 
 ## Communication with Light Clients
 
@@ -127,7 +116,7 @@ configuration.
 ### Service Endpoints
 
 API endpoints for a particular service are defined via
-[`public_api_handler` and `private_api_handler` hooks](../architecture/services.md#rest-api-initialization).
+[`wire_api` hook](../architecture/services.md#rest-api-initialization).
 All service endpoints are prefixed with
 [`/api/services/{service_name}`](../architecture/services.md#service-identifiers),
 where `service_name` is a string service identifier. This identifier needs

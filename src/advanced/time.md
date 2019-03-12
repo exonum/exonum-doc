@@ -112,23 +112,22 @@ since this value is reliable and, at the same time, the most recent one.
 
 ## REST API
 
-The service exposes the following API endpoint for the public API:
+All REST endpoints share the same base path, denoted **{base_path}**,
+equal to `api/services/exonum_time/v1`.
+
+The service exposes the following API endpoint for the
+[public API](#public_apis):
 
 - [Get the current consolidated time](#current-time)
 
-The following endpoints are exposed for the private API:
+The following endpoints are exposed for the [private API](#private_apis):
 
 - [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
 - [Dump timestamps of all validators](#timestamps-of-all-validators)
 
-All REST endpoints share the same base path, denoted **{base_path}**,
-equal to `api/services/exonum_time/v1`.
+### Public APIs
 
-!!! warning
-    As of version 0.5.0, the **exonum-time** service does not provide
-    cryptographic proofs of authenticity for returned values.
-
-### Current Time
+#### Current Time
 
 ```none
 GET {base_path}/current_time
@@ -136,11 +135,11 @@ GET {base_path}/current_time
 
 Returns the current consolidated time.
 
-#### Parameters
+##### Parameters
 
 None.
 
-#### Response
+##### Response
 
 Example of response:
 
@@ -151,7 +150,9 @@ Example of response:
 The response is combined date and time in UTC as per [ISO 8601][ISO8601].
 `null` is returned if there is no consolidated time.
 
-### Timestamps of Current Validators
+### Private APIs
+
+#### Timestamps of Current Validators
 
 ```none
 GET {base_path}/validators_times
@@ -159,11 +160,11 @@ GET {base_path}/validators_times
 
 Returns the latest timestamps indicated by current validator nodes.
 
-#### Parameters
+##### Parameters
 
 None.
 
-#### Response
+##### Response
 
 Example of JSON response:
 
@@ -183,7 +184,7 @@ Example of JSON response:
 The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
 `null` is returned if the validator time is unknown.
 
-### Timestamps of All Validators
+#### Timestamps of All Validators
 
 ```none
 GET {base_path}/validators_times/all
@@ -192,11 +193,11 @@ GET {base_path}/validators_times/all
 Returns the latest timestamps indicated by all validator nodes
 for which time is known.
 
-#### Parameters
+##### Parameters
 
 None.
 
-#### Response
+##### Response
 
 Example of JSON response:
 

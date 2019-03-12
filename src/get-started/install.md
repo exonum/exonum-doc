@@ -3,7 +3,7 @@ title: Installation guide
 ---
 # Installation Guide
 
-<!-- cspell:ignore ppas -->
+<!-- cspell:ignore ppas,Chocolatey -->
 
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
@@ -11,7 +11,7 @@ This document details how to setup development environment for contributing
 to these projects, testing them, and developing using Exonum.
 
 !!! note
-    As of version 0.3, you need to compile the core locally for every application
+    Currently, you need to compile the core locally for every application
     that depends on it. [Cargo][cargo] (the Rust package manager) takes care
     of most things, but you still need to have dependencies
     installed locally as described below for the core to compile.
@@ -25,6 +25,7 @@ Exonum depends on the following third-party system libraries:
 
 - [RocksDB][rocksdb] (persistent storage)
 - [libsodium][libsodium] (cryptography engine)
+- [Protocol Buffers][protobuf] (mechanism for serializing structured data)
 
 You can find instructions how to install dependencies in various environments
 below.
@@ -34,7 +35,7 @@ below.
 Install the necessary libraries using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium rocksdb pkg-config
+brew install libsodium rocksdb pkg-config protobuf
 ```
 
 ### Linux
@@ -44,24 +45,43 @@ use
 
 ```shell
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb-dev pkg-config
+    librocksdb-dev pkg-config libprotobuf-dev protobuf-compiler
+```
+
+For `protobuf` installation add the following dependencies:
+
+```shell
+add-apt-repository ppa:maarten-fonville/protobuf
+apt install libprotobuf-dev protobuf-compiler
 ```
 
 Package names and installation methods may differ in other Linux distributives;
 use package manager tools to locate and install dependencies.
 
-Depending on the version of your distributive, libsodium and RocksDB may not
+Depending on the version of your distributive, libsodium, RocksDB and Protobuf
+may not
 be present in the default package lists. In this case you may need to install
 these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
+!!! note
+    Windows support is experimental. In case of any issues, please [create an
+    issue on GitHub][win-issue].
+
 Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
+- [Protobuf][protobuf]
 
-## Adding environment variables
+Use package manager [Chocolatey][chocolatey] to install Protobuf:
+
+```shell
+choco install -y protoс
+```
+
+## Adding Environment Variables
 
 If your OS contains pre-compiled `rocksdb` or `snappy` libraries,
 you may setup `ROCKSDB_LIB_DIR` and/or `SNAPPY_LIB_DIR` environment variable
@@ -91,8 +111,8 @@ by using the [rustup](https://www.rustup.rs) program:
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable
 ```
 
-For Windows, download and run `rustup-init.exe` from [the rustup website](https://www.rustup.rs/)
-instead.
+For Windows, download and run `rustup-init.exe` from
+[the rustup website](https://www.rustup.rs/) instead.
 
 The Rust toolchain includes the Rust compiler (`rustc`) and several utilities,
 of which the most important one is [Cargo][cargo], the Rust package manager.
@@ -105,8 +125,8 @@ of which the most important one is [Cargo][cargo], the Rust package manager.
     a precise range of supported Rust versions.
     Older toolchains (for example, those that come with Linux
     distributions) might cause Exonum compilation to fail, as Exonum uses
-    some new language features. Please use rustup to install a compatible toolchain
-    in this case.
+    some new language features. Please use rustup to install a compatible
+    toolchain in this case.
 
 ## Compiling Exonum
 
@@ -116,14 +136,10 @@ by cloning the `exonum` repository and running its built-in unit test suite:
 ```shell
 git clone https://github.com/exonum/exonum.git
 cd exonum
-cargo test --manifest-path exonum/Cargo.toml
+cargo test -p exonum
 ```
 
-You may also run the extended test suite located in the `sandbox` directory:
-
-```shell
-cargo test --manifest-path sandbox/Cargo.toml
-```
+Notice that running tests may require up to 30 GB free disk space.
 
 ## Non-Rust Components
 
@@ -131,11 +147,11 @@ cargo test --manifest-path sandbox/Cargo.toml
 
 [The light client library][exonum-client] uses a fairly standard JavaScript
 development toolchain:
-[Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for testing
-(and [Karma][karma] for browser testing),
+[Node][nodejs] and [npm][npm], together with [Mocha][mocha] + [Chai][chai] for
+testing (and [Karma][karma] for browser testing),
 [istanbul][istanbul] for measuring test coverage, and
-[Babel][babel] for transpiling to ES5. Workability of the development environment
-is tested on Node 4+.
+[Babel][babel] for transpiling to ES5. Workability of the development
+environment is tested on Node 4+.
 
 !!! note
     The light client library itself can run both on Node and in browsers.
@@ -151,8 +167,10 @@ guide on how to develop applications on top of the Exonum framework.
 [rust]: http://rust-lang.org/
 [leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
+[protobuf]: https://developers.google.com/protocol-buffers/
 [libsodium]: https://download.libsodium.org/doc/
 [homebrew]: https://brew.sh/
+[chocolatey]: https://chocolatey.org/
 [cargo]: http://doc.crates.io/guide.html
 [exonum-client]: https://github.com/exonum/exonum-client
 [nodejs]: http://nodejs.org/
@@ -165,3 +183,5 @@ guide on how to develop applications on top of the Exonum framework.
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
 [build_tools]: https://www.visualstudio.com/downloads/
 [powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
+[protobuf]: https://developers.google.com/protocol-buffers/
+[win-issue]: https://github.com/exonum/exonum/issues/new?title=Windows+support+problem
