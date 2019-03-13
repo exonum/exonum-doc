@@ -4,7 +4,7 @@
 
 Time Oracle allows user services to access the calendar time supplied by
 validator nodes to the blockchain. Its implementations for Exonum are available
-in [Rust][exonum-time] and [Java][java-time-oracle].
+in [Rust][rust-time-oracle] and [Java][java-time-oracle].
 
 ## The Problem
 
@@ -267,7 +267,7 @@ the tight integration with consensus. This approach is more flexible and
 manageable, and could be generalized to the agreement between arbitrary
 collectively trusted entities, which may behave maliciously.
 
-[exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
+[rust-time-oracle]: https://github.com/exonum/exonum/tree/master/services/time
 [java-time-oracle]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
