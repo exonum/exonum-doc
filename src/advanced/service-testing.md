@@ -193,7 +193,7 @@ let tx = TxAfterCommit::new_with_signature(
     Height(1),
     &Signature::zero(),
 );
-assert!(testkit.mempool().contains_key(&tx.hash()));
+assert!(testkit.is_tx_in_pool(&tx.hash()));
 ```
 
 !!! tip
@@ -221,7 +221,7 @@ testkit.create_block();
 let expected_tx = MyOracleTx::sign(...);
 
 // Check that the expected transaction is in the memory pool.
-assert!(testkit.mempool().contains_key(&expected_tx.hash()));
+assert!(testkit.is_tx_in_pool(&expected_tx.hash()));
 ```
 
 ### Configuration Changes Testing
