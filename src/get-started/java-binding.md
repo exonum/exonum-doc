@@ -9,20 +9,20 @@ The easiest way to create a Java service project is to use a template project
 generator. After [installing Maven 3][maven-install], run the command:
 
 ``` none
-$ mvn archetype:generate \
+mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
     -DarchetypeVersion=0.5.0 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
-    -Dversion=1.0
+    -Dversion=1.0.0
 ```
 
 You can also use the interactive mode:
 
 ``` none
-$ mvn archetype:generate \
+mvn archetype:generate \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
     -DarchetypeVersion=0.5.0
