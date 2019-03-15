@@ -485,29 +485,21 @@ service:
 
 Currently Java Binding includes the following built-in services:
 
-- **Configuration Update Service.**
+- [**Configuration Update Service.**](../advanced/configuration-updater.md)
   Although every node has its own configuration file, some settings should be
   changed for all nodes simultaneously. This service allows updating global
   configuration parameters of the network without stopping the nodes. The
   changes are agreed upon through the consensus mechanism.
 
-  See the [*Configuration Update Service*](../advanced/configuration-updater.md)
-  article for more details.
-
-- **Anchoring Service.**
+- [**Anchoring Service.**](../advanced/bitcoin-anchoring.md)
   The anchoring service writes the hash of the current Exonum blockchain state
   to the Bitcoin blockchain with a certain time interval. The anchored data is
   authenticated by a supermajority of validators using digital signature tools
   available in Bitcoin.
 
-  See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
-  article for more details.
-
-- **Time Oracle.**
+- [**Time Oracle.**](../advanced/time.md)
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
-
-  See the [*Time Oracle*](../advanced/time.md) article for more details.
 
 To enable a particular service, include its name in `ejb_app_services.toml`
 configuration file in the EJB App's directory with the following content:
