@@ -505,28 +505,31 @@ Currently Java Binding includes the following built-in services:
 Services are disabled by default. To enable a particular service,
 include its name in `ejb_app_services.toml` configuration file.
 This configuration file should be located in a **working directory**,
-where you are running your commands.  
+where you are running commands.  
 The configuration file consists of two sections:
 `system_services` and `user_services`.
- 
+
 The optional `system_services` section is used to enable built-in Exonum services.
+
 ```toml
 system_services = ["service-name"]
 ```
+
 where possible values for `service-name` are:
+
 - `configuration` for Configuration Update Service.
 - `btc-anchoring` for Anchoring Service.
 - `time` for Time Oracle.
 
 !!! note
-    In case there is no `ejb_app_services.toml` file
-    or there is no such section, only Configuration Service will
-    be activated.
+    In case there is no such section,
+    only Configuration Service will be activated.
 
 The `user_services` section enumerates services in form of
 `name = artifact`, where `name` is one-word description of the service
-and `artifact` is full path to the service's artifact. 
+and `artifact` is full path to the service's artifact.
 At least one service must be defined.
+
 ```toml
 [user_services]
 service_name1 = "/path/to/service1_artifact.jar"
@@ -534,6 +537,7 @@ service_name1 = "/path/to/service1_artifact.jar"
 
 The sample of `ejb_app_services.toml` file that enables 
 all possible built-in Exonum services and two user services:
+
 ```toml
 system_services = ["configuration", "btc-anchoring", "time"]
 [user_services]
