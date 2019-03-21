@@ -501,13 +501,14 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
-## Services Definition
+## Services Activation
 
-Services are disabled by default. To enable a particular service,
-include its name in `ejb_app_services.toml` configuration file.
+No services are enabled on the node by default. 
+`ejb_app_services.toml` configuration file defines the services to enable
+and it is required for running node.
 This configuration file should be located in a **working directory**,
 where you are running commands.  
-The configuration file consists of two sections:
+It consists of two sections:
 `system_services` and `user_services`.
 
 The optional `system_services` section is used to enable built-in Exonum services.
@@ -528,8 +529,12 @@ where possible values for `service-name` are:
 
 The `user_services` section enumerates services in form of
 `name = artifact`, where `name` is one-word description of the service
-and `artifact` is full path to the service's artifact.
-At least one service must be defined.
+and `artifact` is full path to the service's artifact. It must be absolute
+unless you want to depend on the application working directory.  
+
+!!! note
+    At least one service must be defined
+    in the `[user_services]` section.
 
 ```toml
 [user_services]
