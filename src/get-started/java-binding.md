@@ -502,6 +502,7 @@ Currently Java Binding includes the following built-in services:
   validator nodes to the blockchain.
 
 ## Services Definition
+
 Services are disabled by default. To enable a particular service,
 include its name in `ejb_app_services.toml` configuration file.
 This configuration file should be located in a **working directory**,
@@ -535,7 +536,7 @@ At least one service must be defined.
 service_name1 = "/path/to/service1_artifact.jar"
 ```
 
-The sample of `ejb_app_services.toml` file that enables 
+The sample of `ejb_app_services.toml` file that enables
 all possible built-in Exonum services and two user services:
 
 ```toml
