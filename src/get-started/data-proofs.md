@@ -18,8 +18,8 @@ which allows the following operations:
 You can view and download the full source code of this tutorial [here][demo].
 
 !!! tip
-    We suggest that you try to launch the simpler service first before proceeding
-    with this tutorial as some
+    We suggest that you try to launch the simpler service first before
+    proceeding with this tutorial as some
     steps are omitted here for the sake of smooth exposition.
 
 Unlike its predecessor, the tutorial contains a [client part][demo-frontend],
@@ -178,7 +178,10 @@ message Wallet {
 }
 ```
 
-After that we provide the description of said type in Rust language:
+After that we provide the description of said type in Rust language in the
+`src/wallet.rs` file. The service will require this Rust definition to
+[validate](../architecture/serialization.md#additional-validation-for-protobuf-generated-structures)
+the corresponding `.rs` Protobuf-generated file with this structure:
 
 ```rust
 use exonum::crypto::{Hash, PublicKey};
