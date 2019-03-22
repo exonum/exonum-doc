@@ -131,26 +131,44 @@ const TIMESTAMPING_SERVICE: u16 = 130;
 pub const SERVICE_NAME: &str = "timestamping";
 ```
 
-## Define protobuf structures
+## Declare Persistent Data
 
-Create a new `proto` directory inside `src`:
+We need to declare the data that we will store in our blockchain. There are two
+structures that we will use in our service.
+
+The `Timestamp` structure comprises a hash of the
+timestamped object and some descriptive metadata about said object. The
+`TimestampEntry` structure is the way that we actually store timestamps in the
+blockchain. It comprises `Timestamp` itself plus a hash of the corresponding
+timestamping transaction and the time when the timestamp was recorded. The
+time value is provided by the Exonum Time Oracle.
+
+We add the transaction hash and the time value to the timestamp entry to
+further allow users making corresponding requests about their timestamps
+stored in the blockchain.
+
+Exonum uses Protobuf as its
+[serialization format](../architecture/serialization.md) for storage of data.
+Thus, we need to describe our structures using the Protobuf interface
+description language first. The corresponding Rust structures will be later
+generated from them. For this purpose create a new `proto` directory inside
+the `src` directory of your project:
 
 ```bash
 mkdir proto
 ```
 
-Inside `proto` directory create two files: `timestamping.proto` and `mod.rs`.
-Define protobuf structures in `timestamping.proto`:
+Inside the `proto` directory create the `timestamping.proto` file.
+It will contain Protobuf definitions of the above-mentioned structures used in
+the project:
 
 ```proto
 syntax = "proto3";
 
-package exonum.examples.timestamping;
-
 import "helpers.proto";
 import "google/protobuf/timestamp.proto";
 
-// Stores content's hash and some metadata about it.
+// Stores hash of the timestamped content and some metadata about it.
 message Timestamp {
   exonum.Hash content_hash = 1;
   string metadata = 2;
@@ -159,18 +177,16 @@ message Timestamp {
 message TimestampEntry {
   // Timestamp data.
   Timestamp timestamp = 1;
-  // Hash of transaction.
+  // Hash of the transaction.
   exonum.Hash tx_hash = 2;
   // Timestamp time.
   google.protobuf.Timestamp time = 3;
 }
-
-/// Timestamping transaction.
-message TxTimestamp { Timestamp content = 1; }
 ```
 
-You must manually include protobuf files into the project.
-`mod.rs` is responsible for that:
+Next we need to add Protobuf code generation to our project. Therefore, create
+the `mod.rs` file in the `proto` module. Here we manually integrate the
+Protobuf-generated files to the `proto` module of our project:
 
 ```rust
 #![allow(bare_trait_objects)]
@@ -183,10 +199,9 @@ include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
 use exonum::proto::schema::*;
 ```
 
-## Generate rust structs from proto files
-
-In the project root directory create `build.rs` file.
-Add the following code to `build.rs` file:
+And finally, we generate the Rust files based on the Protobuf descriptions of
+the structures presented above. For this, in the project root
+directory create the `build.rs` file and add the following code into it:
 
 ```rust
 extern crate exonum_build;
@@ -203,28 +218,14 @@ fn main() {
 }
 ```
 
-After successful run output directory will contain `*.rs` for each
-`*.proto` file in `src/proto/**/` and `example_mod.rs` which will
-include all generated `.rs` files as submodules.
+After successful run, the output directory will contain `*.rs` file for each
+`*.proto` file in the `src/proto/**/` directory; and the `example_mod.rs` file
+that will include all the generated `.rs` files as submodules.
 
-## Configure Schema
-
-Schema is a structured view of
-[the key-value storage](../architecture/storage.md)
-used in Exonum. Exonum services do not access the storage directly; they work
-with `Snapshot`s and `Fork`s. A `Snapshot` represents an immutable view
-of the storage, while a `Fork` is a mutable one, where changes can be easily
-rolled back. `Snapshot`s are used in
-[read requests](../architecture/services.md#read-requests), and `Fork`s
-are used in transaction processing.
-
-We have separated the code that configures the schema for our Timestamping
-Service into a separate file - [src/schema.rs][src/schema.rs]. Here we describe
-the main elements with which our service will operate.
-
-### Declare Persistent Data
-
-First of all we have to import required structures:
+At the same time, we define the above-mentioned two structures in Rust
+language in the `schema.rs` file. The service will further use these
+structures to [validate](../architecture/serialization.md/#additional-validation-for-protobuf-generated-structures)
+`.rs` Protobuf-generated files:
 
 ```rust
 use super::proto;
@@ -233,14 +234,8 @@ use exonum::{
     crypto::Hash,
     storage::{Fork, ProofMapIndex, Snapshot},
 };
-```
 
-As a part of the service schema, we first define the two structures that the
-service will be able to save in the Exonum blockchain. This is done using the
-`protobuf` structures.
-
-```rust
-/// Stores content's hash and some metadata about it.
+/// Stores hash of the timestamped content and some metadata about it.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ProtobufConvert)]
 #[exonum(pb = "proto::Timestamp")]
 pub struct Timestamp {
@@ -250,25 +245,15 @@ pub struct Timestamp {
     /// Additional metadata.
     pub metadata: String,
 }
-
-impl Timestamp {
-    /// Create new Timestamp.
-    pub fn new(&content_hash: &Hash, metadata: &str) -> Self {
-        Self {
-            content_hash,
-            metadata: metadata.to_owned(),
-        }
-    }
-}
 ```
 
-The `Timestamp` structure includes the hash of the submitted file and its
-optional description. We added `serde_pb_convert` to have JSON representation
-of our structure similar to protobuf declarations, it helps light client to
-handle proofs that contain `Wallet` structure.
+We also added `serde_pb_convert` to have a JSON representation
+of our structure similar to its Protobuf declaration. It helps the light
+client handle proofs that contain the `Timestamp` structure.
 
 ```rust
-/// Timestamp entry.
+/// Stores `Timestamp` with the hash of the timestamping transactions and
+/// the time when the timestamp was recorded.
 #[derive(Clone, Debug, ProtobufConvert)]
 #[exonum(pb = "proto::TimestampEntry", serde_pb_convert)]
 pub struct TimestampEntry {
@@ -281,9 +266,24 @@ pub struct TimestampEntry {
     /// Timestamp time.
     pub time: DateTime<Utc>,
 }
+```
+
+We also need to realize auxiliary methods for the creating `Timestamp` and
+`TimestampEntry` structures:
+
+```rust
+impl Timestamp {
+    /// Creates a new timestamp.
+    pub fn new(&content_hash: &Hash, metadata: &str) -> Self {
+        Self {
+            content_hash,
+            metadata: metadata.to_owned(),
+        }
+    }
+}
 
 impl TimestampEntry {
-    /// New TimestampEntry.
+    /// Creates a new timestamp entry.
     pub fn new(
         timestamp: Timestamp,
         &tx_hash: &Hash,
@@ -298,11 +298,21 @@ impl TimestampEntry {
 }
 ```
 
-The `TimestampEntry` structure includes the timestamp itself, the hash of the
-timestamping transaction and the time when the timestamp was recorded.
-The time value is provided by the Exonum Time Oracle.
+## Create Schema
 
-### Create Schema
+Schema is a structured view of
+[the key-value storage](../architecture/storage.md) used in Exonum.
+For convenience, we have separated the code that configures the schema for our
+Timestamping Service into a separate file - [src/schema.rs][src/schema.rs]. We
+have also included the Rust descriptions of the `Timestamp` and
+`TimestampEntry` structures there.
+
+Exonum services do not access the storage directly; they work
+with `Snapshot`s and `Fork`s. A `Snapshot` represents an immutable view
+of the storage, while a `Fork` is a mutable one, where changes can be easily
+rolled back. `Snapshot`s are used in
+[read requests](../architecture/services.md#read-requests), and `Fork`s
+are used in transaction processing.
 
 As the schema should work with both types of storage views, we declare it as a
 generic wrapper:
@@ -382,12 +392,12 @@ impl<'a> Schema<&'a mut Fork> {
         let timestamp = timestamp_entry.timestamp.clone();
         let content_hash = &timestamp.content_hash;
 
-        // Checks that timestamp with given content_hash does not exist.
+        // Checks that the timestamp with given `content_hash` does not exist.
         if self.timestamps().contains(content_hash) {
             return;
         }
 
-        // Adds timestamp.
+        // Adds a timestamp.
         self.timestamps_mut().put(content_hash, timestamp_entry);
     }
 }
@@ -401,38 +411,44 @@ impl<'a> Schema<&'a mut Fork> {
   value. This method also checks if a timestamp with the given hash already
   exists in the blockchain.
 
-## Configure Transactions
+## Define Transactions
 
-[Transactions](../architecture/transactions.md) resemble messages and
-perform atomic actions on the blockchain state. We have separated the code that
-configures transactions for our Timestamping Service into a separate file -
-[src/transactions.rs][src/transactions.rs]. The Timestamping Service we are
-creating requires a single transaction type - adding timestamps to the
+[Transactions](../architecture/transactions.md) are a kind of messages that
+perform atomic actions on the blockchain state. The Timestamping Service we
+are creating, requires a single transaction type - adding timestamps to the
 blockchain.
 
-First, we import the structures we need from Exonum core and the Time Oracle.
-Here we also indicate a connection to the schema we have configured previously
-in [src/schema.rs][src/schema.rs] and the `TIMESTAMPING_SERVICE` constant
-declared in [src/lib.rs][src/lib.rs].
+First, we import the structures, function and traits from the Exonum core and
+the Time Oracle that aree required to define our transaction.
+
+Here we also indicate a connection to the schema that we have already
+configured in [src/schema.rs][src/schema.rs].
 
 ```rust
 #![allow(bare_trait_objects)]
 
 use exonum::{
     blockchain::{ExecutionError, ExecutionResult, Transaction, TransactionContext},
-    crypto::{PublicKey, SecretKey},
-    messages::{Message, RawTransaction, Signed},
 };
 use exonum_time::schema::TimeSchema;
 
 use super::proto;
 use crate::{
     schema::{Schema, Timestamp, TimestampEntry},
-    TIMESTAMPING_SERVICE,
 };
 ```
 
-Service transactions are defined through the `protobuf`:
+The transaction to create a timestamp (`TxTimestamp`) contains only the
+`Timestamp` object. We start transaction definition with its Protobuf format:
+
+```proto
+/// Timestamping transaction.
+message TxTimestamp { Timestamp content = 1; }
+```
+
+Now, just as we did with the data structures above, we define the transaction
+in Rust language. We have separated this code into a separate file -
+[src/transactions.rs][src/transactions.rs].
 
 ```rust
 /// Timestamping transaction.
@@ -442,33 +458,23 @@ pub struct TxTimestamp {
     /// Timestamp content.
     pub content: Timestamp,
 }
+```
 
+Service transactions are defined through the enum with the derive of the
+`TransactionSet` that automatically assigns transaction IDs based on their
+declaration order starting from `0`:
+
+```rust
 /// Transaction group.
 #[derive(Serialize, Deserialize, Clone, Debug, TransactionSet)]
 pub enum TimeTransactions {
-    /// A timestamp transaction.
+    /// Timestamping transaction.
     TxTimestamp(TxTimestamp),
-}
-
-impl TxTimestamp {
-    #[doc(hidden)]
-    pub fn sign(
-        author: &PublicKey,
-        content: Timestamp,
-        key: &SecretKey
-    ) -> Signed<RawTransaction> {
-        Message::sign_transaction(
-            Self { content },
-            TIMESTAMPING_SERVICE,
-            *author,
-            key
-        )
-    }
 }
 ```
 
-The transaction to create a timestamping transaction (`TxTimestamp`) contains
-the timestamp - the hash of the submitted file.
+A timestamping transaction (`TxTimestamp`) contains a timestamp - a hash of
+the submitted file.
 
 ### Reporting Errors
 
@@ -553,13 +559,13 @@ impl Transaction for TxTimestamp {
 }
 ```
 
-## Configure API Endpoints
+## Implement API
 
 Next, we need to implement the node API. We have separated the code that
 configures API endpoints for our Timestamping Service into a separate file -
 [src/api.rs][src/api.rs].
 
-Required imports:
+Import structures and methods required to define API:
 
 ```rust
 use exonum::{
@@ -573,17 +579,20 @@ use crate::{
     schema::{Schema, TimestampEntry},
     TIMESTAMPING_SERVICE,
 };
+
+#[derive(Debug, Clone, Copy)]
+pub struct PublicApi;
 ```
 
-First, we need to define the structures required to implement the API
-endpoints. For our Timestamping Service, we will define the following three
-structures:
+### Data Structures
 
-- the `TimestampQuery` structure which contains the hash of a
-  timestamp:
+We need to define the structures required to implement the API endpoints. For
+our Timestamping Service, we will define the following two structures:
+
+- the `TimestampQuery` structure which contains a hash of the timestamp:
 
   ```rust
-  /// Describes query parameters for `handle_timestamp` and
+  /// Describes query parameters for the `handle_timestamp` and
   /// `handle_timestamp_proof` endpoints.
   #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
   pub struct TimestampQuery {
@@ -592,7 +601,7 @@ structures:
   }
 
   impl TimestampQuery {
-      /// Creates new `TimestampQuery` with given `hash`.
+      /// Creates a new `TimestampQuery` with given `hash`.
       pub fn new(hash: Hash) -> Self {
           TimestampQuery { hash }
       }
@@ -604,7 +613,7 @@ structures:
 
   ```rust
   /// Describes the information required to prove the correctness
-  /// of the timestamp entries.
+  /// of a timestamp entry.
   #[derive(Debug, Clone, Serialize, Deserialize)]
   pub struct TimestampProof {
       /// Proof of the last block.
@@ -616,13 +625,20 @@ structures:
   }
   ```
 
-- the `PublicApi` structure which enables us to implement public API endpoints
-  for our service:
+### API for Transactions
 
-  ```rust
-  #[derive(Debug, Clone, Copy)]
-  pub struct PublicApi;
-  ```
+The core processing logic is essentially the same for all types of
+transactions and is implemented by `exonum`. Therefore, there is no need to
+implement a separate API for transactions manangement within the service. To
+send a transaction, you have to create a transaction message according to the
+[uniform structure](../architecture/transactions.md#messages) developed by
+`exonum`.
+
+The transaction ID is a transaction number in the enum with
+`#[derive(TransactionSet)]`. As we mentioned earlier, transactions count
+starts with 0.
+
+### API for Read Requests
 
 Now we are ready to define the two endpoints required for our service:
 
@@ -639,7 +655,7 @@ pub fn handle_timestamp(
 
 The `handle_timestamp` method takes the hash of a timestamp and
 checks whether a timestamp with this hash exists in the current state of the
-blockchain. To apply this method, the user needs to know the hash of the
+blockchain. To apply this method, a user needs to know the hash of the
 timestamp in question. To perform the check, the method makes a snapshot of
 the current state of the blockchain.
 
@@ -668,10 +684,10 @@ pub fn handle_timestamp_proof(
 }
 ```
 
-`handle_timestamp_proof` takes the hash of a timestamping
+`handle_timestamp_proof` takes the hash of the timestamping
 transaction and constructs a proof of its inclusion into the blockchain. To
 construct the proof structure, the method above performs a number of operations
-separated into two sets:
+separated into two sets.
 
 The first set contains the operations that prove the correctness of
 structures related to the timestamping transaction:
@@ -700,8 +716,18 @@ block is correct and the Timestamping Service table that contains all data on
 the existing timestamps is also correct. This set of data is sufficient to
 trust that the timestamping transaction is legitimate.
 
+### Wire API
+
 Finally, having defined our API methods, we can connect them to certain
-endpoints:
+endpoints. We intend that the endpoints should be accessible to external users.
+Therefore, we declare them within the `public_scope` of API endpoints:
+
+- For the `handle_timestamp` method we declare the `v1/timestamps/value` route,
+  which will be used for checking whether a certain timestamping transaction
+  exists in the blockchain.
+- For the `handle_timestamp_proof` method we declare the `v1/timestamps/proof`
+  route, which will be used for getting proofs of correctness of certain
+  timestamping transactions.
 
 ```rust
 pub fn wire(builder: &mut ServiceApiBuilder) {
@@ -711,17 +737,6 @@ pub fn wire(builder: &mut ServiceApiBuilder) {
         .endpoint("v1/timestamps/proof", Self::handle_timestamp_proof);
 }
 ```
-
-As we intend for the endpoints to be accessible to external users, we declare
-them as within the `public_scope` of API endpoints. We create the following
-endpoints:
-
-- For the `handle_timestamp` method we declare the `v1/timestamps/value` route,
-  which will be used for checking whether a certain timestamping transaction
-  exists in the blockchain.
-- For the `handle_timestamp_proof` method we declare the `v1/timestamps/proof`
-  route, which will be used for getting proofs of correctness of certain
-  timestamping transactions.
 
 ## Define Service
 
