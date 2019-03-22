@@ -224,7 +224,7 @@ that will include all the generated `.rs` files as submodules.
 
 At the same time, we define the above-mentioned two structures in Rust
 language in the `schema.rs` file. The service will further use these
-structures to [validate](../architecture/serialization.md/#additional-validation-for-protobuf-generated-structures)
+structures to [validate](../architecture/serialization.md#additional-validation-for-protobuf-generated-structures)
 `.rs` Protobuf-generated files:
 
 ```rust
@@ -419,7 +419,7 @@ are creating, requires a single transaction type - adding timestamps to the
 blockchain.
 
 First, we import the structures, function and traits from the Exonum core and
-the Time Oracle that aree required to define our transaction.
+the Time Oracle that are required to define our transaction.
 
 Here we also indicate a connection to the schema that we have already
 configured in [src/schema.rs][src/schema.rs].
@@ -629,7 +629,7 @@ our Timestamping Service, we will define the following two structures:
 
 The core processing logic is essentially the same for all types of
 transactions and is implemented by `exonum`. Therefore, there is no need to
-implement a separate API for transactions manangement within the service. To
+implement a separate API for transactions management within the service. To
 send a transaction, you have to create a transaction message according to the
 [uniform structure](../architecture/transactions.md#messages) developed by
 `exonum`.
