@@ -503,11 +503,11 @@ Currently Java Binding includes the following built-in services:
 
 ## Services Activation
 
-No services are enabled on the node by default. 
-`ejb_app_services.toml` configuration file defines the services to enable
-and it is required for running node.
-This configuration file should be located in a **working directory**,
-where you are running commands.  
+No services are enabled on the node by default. To enable services,
+define them in the `ejb_app_services.toml` configuration file.
+This file is required for a running node. `ejb_app_services.toml`
+should be located in the **working directory** of your project,
+where you run commands.  
 It consists of two sections:
 `system_services` and `user_services`.
 
@@ -527,9 +527,9 @@ where possible values for `service-name` are:
     In case there is no such section,
     only Configuration Service will be activated.
 
-The `user_services` section enumerates services in form of
-`name = artifact`, where `name` is one-word description of the service
-and `artifact` is full path to the service's artifact. It must be absolute
+The `user_services` section enumerates services in the form of
+`name = artifact`, where `name` is a one-word description of the service
+and `artifact` is a full path to the service's artifact. It must be absolute
 unless you want to depend on the application working directory.  
 
 !!! note
@@ -541,7 +541,7 @@ unless you want to depend on the application working directory.
 service_name1 = "/path/to/service1_artifact.jar"
 ```
 
-The sample of `ejb_app_services.toml` file that enables
+The sample of the `ejb_app_services.toml` file that enables
 all possible built-in Exonum services and two user services:
 
 ```toml
