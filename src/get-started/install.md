@@ -58,7 +58,7 @@ apt install libprotobuf-dev protobuf-compiler
 !!! note
     Exonum is tested with RocksDB version 5.17, which is not available in some
     repositories (e.g. Ubuntu 16.04).
-    
+
 To install recommended version of RocksDB, you may use a PPA prepared by Exonum team:
 
 ```shell
