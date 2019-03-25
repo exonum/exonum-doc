@@ -511,6 +511,20 @@ where you run commands.
 It consists of two sections:
 `system_services` and `user_services`.
 
+The `user_services` section enumerates services in the form of
+`name = artifact`, where `name` is a one-word description of the service
+and `artifact` is a full path to the service's artifact. It must be absolute
+unless you want to depend on the application working directory.  
+
+!!! note
+    At least one service must be defined
+    in the `[user_services]` section.
+
+```toml
+[user_services]
+service_name1 = "/path/to/service1_artifact.jar"
+```
+
 The optional `system_services` section is used to enable built-in Exonum services.
 
 ```toml
@@ -527,21 +541,7 @@ where possible values for `service-name` are:
     In case there is no such section,
     only Configuration Service will be activated.
 
-The `user_services` section enumerates services in the form of
-`name = artifact`, where `name` is a one-word description of the service
-and `artifact` is a full path to the service's artifact. It must be absolute
-unless you want to depend on the application working directory.  
-
-!!! note
-    At least one service must be defined
-    in the `[user_services]` section.
-
-```toml
-[user_services]
-service_name1 = "/path/to/service1_artifact.jar"
-```
-
-The sample of the `ejb_app_services.toml` file that enables
+Below is the sample of the `ejb_app_services.toml` file that enables
 all possible built-in Exonum services and two user services:
 
 ```toml
