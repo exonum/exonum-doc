@@ -314,18 +314,21 @@ common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
 at `/api/cryptocurrency/balance/:walletId`.
 
-See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
+See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
 
 ### Dependencies Management
 
 Exonum uses [Guice](https://github.com/google/guice) to describe the
 dependencies of the service components (both system-specific
-ones, for example, Exonum time service, and external ones). 
+ones, for example, Exonum time service, and external ones).
 Each service should define a Guice module describing implementations of
-the `Service` and its dependencies, if any. The modules must be `public`,
-shall extend [`AbstractServiceModule`][abstract-service-module-javadoc]
-and be annotated with `@org.pf4j.Extension`:
+the `Service` and its dependencies, if any.
+
+A service module shall:
+  1. extend [`AbstractServiceModule`][abstract-service-module-javadoc]
+  2. be annotated with `@org.pf4j.Extension`.
+  3. be `public`.
 
 !!! note "Minimalistic Example of Service Module"
     ```java
@@ -477,66 +480,54 @@ client.
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
-<!-- TODO: Where it belongs? Do we need such instructions in these docs, or just have
-them in the generated project POM? -->
 ## Using Libraries
 
 An Exonum service can use any third-party library as its dependency.
 
-<!-- 
-Todo: Which of the following? The first, though complete, is a little wordy.
-
-The libraries, classes from which are used in Exonum public APIs, 
+The libraries, classes from which are used in Exonum public APIs,
 are provided with the framework distribution, and can also be used by the service.
-
----
-
-Some libraries are provided with the framework distribution, and can also be used
-by the service.
--->
-
-In this case, they *must not* be packaged in its artifact. Use `provided` scope
-in the dependency declaration to achieve that in Maven.
+Such libraries *must not* be packaged in its artifact. 
+<!-- … because in this case multiple incompatible versions of the same class 
+will be loaded by the plugin classloader and the application classloader, if they
+happen to need the same class -->
+Use `provided` scope in the dependency declaration to achieve that in Maven.
 
 The following dependencies **must** be used as provided, because types from these
 libraries appear in Exonum public APIs. They will not be changed in an incompatible
-way in a compatible Exonum release:
-- Exonum <!-- TODO: specify exact artifacts? -->
-- Guice
-- Gson
-- Vertx
-- Protobuf Java
-- PF4J.
+way in a compatible Exonum release. Note that they do not have to be declared 
+explicitly for your service already depends on "exonum-java-binding-core" which
+has them as transitive dependencies:
+- Exonum (exonum-java-binding-core, exonum-java-binding-common)
+- [Guice][Guice]
+- [Gson][gson]
+- [Vertx][vertx-web-docs] (vertx-web)
+- [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
+- [PF4J][https://pf4j.org/].
 
 An up-to-date list is available in the Exonum bill of materials (BOM).
 
-On top of that, Guava *can* be and is recommended to be used as a provided library.
+On top of that, Guava *can* be and is recommended to <!-- because of its considerable size -->
+be used as a provided library.
 
-<!-- TODO: Where it belongs? In 'How to configure the network and run a service'? Do we need such instructions at all? -->
+[gson]: https://github.com/google/gson
+
 ## How to Build a Service Artifact
 
 Exonum Java services are packaged as JAR archives with some extra metadata, 
 required to identify the service and instantiate it.
-The template project generated with the [service archetype](#creating-project)
-contains all required configuration, hence you can invoke `mvn verify`
-<!-- TODO: shall we apply some fancy configuration to maven-assembly 
-to keep *only* the artifact, not the JAR with module classes only? -->
+
+If you used the [service archetype](#creating-project) to generate 
+the project template, the build definition already contains 
+all required configuration. Hence you can invoke `mvn verify`
 and use the produced service artifact.
 
-<!-- TODO: Is it needed to document this? I find it useful only for users that:
-  - Can't use Maven, need to configure <build-system>
-  - Need to change the default configuration in a non-trivial way (e.g., shade dependencies —
-    but you can just copy manifest configuration!).
--->
-<!-- TODO: If we do keep this paragraph, I'd clarify that it is for informational
-purposes only, no configuration is required if you use the archetype.
-
-We can also move to a sub-section.
--->
-The following metadata is required in the service artifact JAR:
+<!-- This paragraph is inteded for users who don't use the archetype and/or
+need to make non-trivial changes to the build definition (e.g., shade dependencies)-->
+In case the service build definition needs to be configured, ensure that 
+the following required metadata is present in the service artifact JAR:
 
   - Entries in the JAR manifest:
-    - "Plugin-Id": must be set to "groupId:artifactId:version", for example, 
+    - "Plugin-Id": must be set to "groupId:artifactId:version", e.g.,
     "com.exonum.example.timestamping:timestamping-demo:1.0.2".
     - "Plugin-Version": must be set to the project version, e.g., "1.0.2".
   - A fully-qualified name of the [service module](#dependencies-management) class
@@ -644,7 +635,7 @@ For using the library just include the dependency in your `pom.xml`:
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/TransactionConverter.html
-[vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
+[vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.5.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
