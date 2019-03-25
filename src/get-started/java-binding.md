@@ -504,7 +504,7 @@ has them as transitive dependencies:
 - [Gson][gson]
 - [Vertx][vertx-web-docs] (vertx-web)
 - [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
-- [PF4J][https://pf4j.org].
+- [PF4J](https://pf4j.org).
 
 An up-to-date list is available in the Exonum bill of materials (BOM).
 
