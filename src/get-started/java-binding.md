@@ -606,8 +606,6 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
-- The application supports only one Java service. Support of multiple Java
-  services is coming in the near future.
 
 ## See Also
 
