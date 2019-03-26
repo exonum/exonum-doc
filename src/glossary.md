@@ -43,15 +43,12 @@ and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
 Serialization of [data stored in the blockchain](#stored-datatype) and
 [messages](#message) into a platform-independent sequence of bytes
-according to the set of rules defined by the Exonum framework.
+according to the set of rules defined by the Protobud serialization format.
 Binary serialization is used in Exonum for cryptographic operations, such as
 computing
 [hashes](#hash) and [digital signing](#digital-signature).
 It is implemented both in [the core](#core)
 and in [the light client library](#light-client).
-
-Exonum serialization format is optimized to provide almost zero-cost
-deserialization in low-level programming environments (such as Rust).
 
 !!! tip
     See [*Serialization*](architecture/serialization.md) for more details.
@@ -83,6 +80,19 @@ one of the design goals of a blockchain is achieving accountability of the
 [blockchain maintainers](#maintainer) and auditability of the system by third
 parties
 (e.g., internal and external auditors, regulators and end users of the system).
+
+## Blockchain Explorer
+
+An [application][explorer] for monitoring blocks and transactions in Exonum
+blockchain. The explorer allows obtaining the following information and
+executing the following actions via its endpoints:
+
+- information on a specified range of blocks
+- information on a block at a specific height
+- information on a transaction specified by a hash
+- sending a transaction into the pool of unconfirmed transactions and
+  broadcasting it to other nodes
+- subscribing to block commit events.
 
 ## Blockchain State
 
@@ -460,10 +470,9 @@ may define various entities, including [table](#table) schema,
 
 ## Service Endpoint
 
-A point of communication with [a service](#service). There are three kinds of
+A point of communication with [a service](#service). There are two kinds of
 endpoints:
 
-- [Transactions](#transaction) allow atomically changing the blockchain state;
 - [Read requests](#read-request) allow reading data from the blockchain state,
   usually together with [a proof](#merkle-proof);
 - [Private APIs](#private-api) allow configuring the service locally.
@@ -506,17 +515,19 @@ Transactions are ordered and grouped into [blocks](#block) in the course of
 same
 order on all [full nodes](#full-node) in the blockchain network.
 
-In Exonum, transactions are a subtype of [service endpoints](#service-endpoint).
+In Exonum, transactions are a subtype of
+[blockchain explorer endpoints](#blockchain-explorer). It allows sending
+transactions into the pool of unconfirmed transactions and broadcasting them to
+other nodes in the network.
+
 All transactions are templated and defined within [services](#service),
 acting similarly to [stored procedures][mysql-stored] in database management
 systems.
-Transaction endpoints of a service usually specify certain verification rules,
-such
-as the validity of a digital signature in the transaction. If the rules do not
-hold
-for a particular transaction,
-it does not change the blockchain state, but may still be recorded in
-the transaction log.
+
+Transaction verification rules, such as the validity of a digital signature in
+the transaction, are specified in the Exonum core. If the rules do not
+hold for a particular transaction, it does not change the blockchain state, but
+may still be recorded in the transaction log.
 
 !!! tip
     See [*Transactions*](architecture/transactions.md) for more details.
@@ -552,3 +563,4 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:hash]: https://en.wikipedia.org/wiki/Cryptographic_hash_function
 [sha-256]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 [sha.js]: https://www.npmjs.com/package/sha.js
+[explorer]: https://github.com/exonum/blockchain-explorer
