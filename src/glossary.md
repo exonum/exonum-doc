@@ -43,7 +43,7 @@ and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
 Serialization of [data stored in the blockchain](#stored-datatype) and
 [messages](#message) into a platform-independent sequence of bytes
-according to the set of rules defined by the Protobud serialization format.
+according to the set of rules defined by the Protobuf serialization format.
 Binary serialization is used in Exonum for cryptographic operations, such as
 computing
 [hashes](#hash) and [digital signing](#digital-signature).
