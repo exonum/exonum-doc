@@ -89,11 +89,6 @@ where we indicate the external libraries required for our service.
     #[macro_use]
     extern crate serde_derive;
 
-    pub mod api;
-    pub mod proto;
-    pub mod schema;
-    pub mod transactions;
-
     use exonum::{
         api::ServiceApiBuilder,
         blockchain::{self, Transaction, TransactionSet},
