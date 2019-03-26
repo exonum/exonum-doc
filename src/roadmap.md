@@ -33,7 +33,7 @@ clients in other languages with less effort required.
 
 Protobuf has already been used in several applications of [Exonum Java Binding](https://github.com/exonum/exonum-java-binding).
 
-### Storage Enhancements
+<!--### Storage Enhancements
 
 We are planning to make Exonum storage interfaces more developer-friendly and,
 due to this optimization, improve system performance and data auditability. The
@@ -67,13 +67,9 @@ Within the scope of implementing the service identification mechanism, we also
 plan to provide a uniform framework for installing external services in
 Exonum blockchains.
 
-### Secure Workflow for Node Administration
+-->
 
-The introduction of a workflow for administrative operations, such as the
-deployment of services, is aimed at improving the security of the system.
-The exact details of the workflow are being currently discussed. One of the
-promising ideas is devising a service through which all the administrative
-processes will be conducted.
+## First Quarter of 2019
 
 ### Secure Storage for Private Keys of the Node
 
@@ -91,9 +87,7 @@ transactions and messages for Java Binding too. This step will promote all the
 corresponding [benefits](#Protobuf-as-the-Serialization-Format-in-Exonum)
 discussed above.
 
-## First Quarter of 2019
-
-### Service Interface Standard: Read Requests
+<!--### Service Interface Standard: Read Requests
 
 To increase the performance of the system, we will add read requests to the
 list of methods supported by interfaces of services. Read requests do not modify
@@ -104,11 +98,19 @@ receives the request from a client.
 
 Checking the validity of transactions which are included into the memory pool
 is one of the methods for preventing DoS attacks. This check will also ensure
-that transactions do not lead to any errors when processed.
+that transactions do not lead to any errors when processed.-->
 
 ## Second Quarter of 2019
 
-### Dynamic Java Services
+### Secure Workflow for Node Administration
+
+The introduction of a workflow for administrative operations, such as the
+deployment of services, is aimed at improving the security of the system.
+The exact details of the workflow are being currently discussed. One of the
+promising ideas is devising a service through which all the administrative
+processes will be conducted.
+
+<!--### Dynamic Java Services
 
 The introduction of dynamic Java services will enable adding Java services to
 a running blockchain without the need to restart nodes. In other words, new
@@ -129,11 +131,11 @@ reused in a variety of scenarios.
 As the next stage of improvements to the Exonum storage, we will add support
 for proofs in storage and in Storage API for external clients in particular.
 As for Storage API for services, it will include access control mechanisms and
-support for other metadata.
+support for other metadata.-->
 
 ## Third Quarter of 2019
 
-### Service Migration
+<!--### Service Migration
 
 Service migration will enable a smooth update to new versions of the services
 running in the blockchain, thus, making use of improvements, which the older
@@ -160,7 +162,7 @@ in [RocksDB](https://rocksdb.org), the database currently used in Exonum.
 Exonum already features a
 [light client library](https://github.com/exonum/exonum-client) in JavaScript.
 We wish to expand the range of clients available for the framework and will
-add a light client in Java – one of the most popular programming languages.
+add a light client in Java – one of the most popular programming languages.-->
 
 ## Fourth Quarter of 2019
 
@@ -172,7 +174,7 @@ during service installation or initialization. Services will be able to
 process transactions issued by other services, in this way broadening and
 extending the functionality of one another.
 
-### Private Transactions
+<!--### Private Transactions
 
 The functionality of private transactions implements the existence of certain
 data within the blockchain network which are known only to certain validators.
@@ -182,7 +184,7 @@ the blockchain state.
 ### Non-replayability of Transactions
 
 Making sure that a certain transaction has not been conducted in the past will
-no longer require storing the whole blockchain history.
+no longer require storing the whole blockchain history.-->
 
 As you may have noticed, the new features are to be released quarterly. You are
 welcome to contribute to Exonum development and improvement (see our
