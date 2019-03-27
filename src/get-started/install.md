@@ -44,8 +44,9 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
+add-apt-repository ppa:exonum/rocksdb
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb-dev pkg-config libprotobuf-dev protobuf-compiler
+    librocksdb5.17 pkg-config libprotobuf-dev protobuf-compiler
 ```
 
 For `protobuf` installation add the following dependencies:
