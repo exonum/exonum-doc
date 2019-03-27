@@ -123,7 +123,7 @@ running in the blockchain, without service data loss.
 ### Merkle DB - Full-fledged Implementation
 
 In the final implementation of this functionality the nested data collections
-stored in Exonum will receive a hierarchichal pattern. The hierarchy of the
+stored in Exonum will receive a hierarchical pattern. The hierarchy of the
 Merkelized collections will allow to implement proofs of availability of the
 whole collections or their leaves in the blockchain. A user-friendly API of the
 Merkle DB will serve this purpose.
