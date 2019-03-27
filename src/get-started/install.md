@@ -44,8 +44,9 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
+add-apt-repository ppa:exonum/rocksdb
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    pkg-config libprotobuf-dev protobuf-compiler
+    librocksdb5.17 pkg-config libprotobuf-dev protobuf-compiler
 ```
 
 For `protobuf` installation add the following dependencies:
@@ -53,17 +54,6 @@ For `protobuf` installation add the following dependencies:
 ```shell
 add-apt-repository ppa:maarten-fonville/protobuf
 apt install libprotobuf-dev protobuf-compiler
-```
-
-!!! note
-    Exonum is tested with RocksDB version 5.17, which is not available in some
-    repositories (e.g. Ubuntu 16.04).
-
-To install recommended version of RocksDB, you may use a PPA prepared by Exonum team:
-
-```shell
-add-apt-repository ppa:exonum/rocksdb
-apt install librocksdb5.17
 ```
 
 Package names and installation methods may differ in other Linux distributives;
