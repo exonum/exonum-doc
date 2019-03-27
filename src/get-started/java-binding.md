@@ -567,11 +567,34 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
-To enable a particular service, include its name in `ejb_app_services.toml`
-configuration file in the EJB App's directory with the following content:
+## Services Activation
+
+No services are enabled on the node by default. To enable services,
+define them in the `ejb_app_services.toml` configuration file.
+This file is required for a running node. `ejb_app_services.toml`
+should be located in the **working directory** of your project,
+where you run commands.  
+It consists of two sections:
+`system_services` and `user_services`.
+
+The `user_services` section enumerates services in the form of
+`name = artifact`, where `name` is a one-word description of the service
+and `artifact` is a full path to the service's artifact. It must be absolute
+unless you want to depend on the application working directory.  
+
+!!! note
+    At least one service must be defined
+    in the `[user_services]` section.
 
 ```toml
-services = ["service-name"]
+[user_services]
+service_name1 = "/path/to/service1_artifact.jar"
+```
+
+The optional `system_services` section is used to enable built-in Exonum services.
+
+```toml
+system_services = ["service-name"]
 ```
 
 where possible values for `service-name` are:
@@ -580,8 +603,19 @@ where possible values for `service-name` are:
 - `btc-anchoring` for Anchoring Service.
 - `time` for Time Oracle.
 
-In case there is no `ejb_app_services.toml` file, only Configuration Service will
-be activated.
+!!! note
+    In case there is no such section,
+    only Configuration Service will be activated.
+
+Below is the sample of the `ejb_app_services.toml` file that enables
+all possible built-in Exonum services and two user services:
+
+```toml
+system_services = ["configuration", "btc-anchoring", "time"]
+[user_services]
+service_name1 = "/path/to/service1_artifact.jar"
+service_name2 = "/path/to/service2_artifact.jar"
+```
 
 ## Common Library
 
