@@ -7,7 +7,7 @@ there will be a certain time interval between the availability of new features
 in Core and Java Binding with some latency for the latter.
 
 Stay tuned for news about updates to the Exonum platform in
-our [blog](https://exonum.com/blog/).
+our [Medium blog](https://medium.com/@ExonumPlatform).
 
 !!! warning
     This document is provided for informational purposes only. It is subject
@@ -33,42 +33,6 @@ clients in other languages with less effort required.
 
 Protobuf has already been used in several applications of [Exonum Java Binding](https://github.com/exonum/exonum-java-binding).
 
-<!--### Storage Enhancements
-
-We are planning to make Exonum storage interfaces more developer-friendly and,
-due to this optimization, improve system performance and data auditability. The
-first stage of storage
-improvements will include the separation of node-specific and consensus-related
-data, which may, for example, accelerate the node recovery process. Within this
-stage we will also implement a basic form of Storage API for services and
-external clients. Further improvements to storage will be introduced in one of
-the following versions.
-
-### Services Interface Standard
-
-To change the way services are defined in Exonum, we will introduce a uniform
-service interface description, processed by means of Protobuf. Services will
-be described in a language-independent manner, according to a template which
-will, for example, simplify definition of transactions, their arguments, etc.
-
-Uniform service definition will also ease the development of light clients in
-any language supported by Protobuf. In the first phase of the implementation,
-service interfaces will support a single method type – transactions. Other
-method types will be added in one of the following versions.
-
-### Service Identification
-
-We plan on implementing a more logical mechanism of service identification in
-Exonum. Such a solution will ease the communication between services and
-external clients. This mechanism will also lay the foundation for the
-implementation of dynamic services.
-
-Within the scope of implementing the service identification mechanism, we also
-plan to provide a uniform framework for installing external services in
-Exonum blockchains.
-
--->
-
 ## First Quarter of 2019
 
 ### Secure Storage for Private Keys of the Node
@@ -87,18 +51,12 @@ transactions and messages for Java Binding too. This step will promote all the
 corresponding [benefits](#Protobuf-as-the-Serialization-Format-in-Exonum)
 discussed above.
 
-<!--### Service Interface Standard: Read Requests
+### Java Binding: Time Service
 
-To increase the performance of the system, we will add read requests to the
-list of methods supported by interfaces of services. Read requests do not modify
-the blockchain state and can be handled locally on the full node which
-receives the request from a client.
-
-### Pre-check of Transactions in the Memory Pool
-
-Checking the validity of transactions which are included into the memory pool
-is one of the methods for preventing DoS attacks. This check will also ensure
-that transactions do not lead to any errors when processed.-->
+We add another built-in Exonum service into the array of services that can be
+easily launched with an Exonum blockchain in Java – the Time Oracle. The Time
+Oracle allows user services to access the calendar time that validators supply
+to the blockchain.
 
 ## Second Quarter of 2019
 
@@ -110,81 +68,112 @@ The exact details of the workflow are being currently discussed. One of the
 promising ideas is devising a service through which all the administrative
 processes will be conducted.
 
-<!--### Dynamic Java Services
+### Merkle DB - Minimal Profile
 
-The introduction of dynamic Java services will enable adding Java services to
-a running blockchain without the need to restart nodes. In other words, new
-services will be included into the network on the go. Support for
-dependencies between dynamic services will be added in one of the following
-versions.
+The first step within the global initiative to introduce Merkle DB in Exonum.
+This step will result in implementation of a more intuitive storage API
+interface. Such interface will simplify interaction with the storage for service
+developers.
+
+### Java Application Package
+
+A usability achievement that presupposes shipment of Exonum as a
+ready-to-install application package. The package is targeted at Java developers
+who plan to develop Exonum-based services. The application will have Rust and
+other related libraries pre-installed. This means that no compilation of the
+application will be required.
+
+### Java Light Client - v.1
+
+With this step we expand the range of clients available for the framework.
+Apart from the [light client library](https://github.com/exonum/exonum-client)
+in JavaScript, we add a light client in Java – one of the most popular
+programming languages. Java client allows to send transaction of both Rust and
+Java services into the blockchain. It also supports functionality of the
+[blockchain explorer](https://github.com/exonum/blockchain-explorer)
+available in Exonum. Namely, it allows to obtain information on blocks,
+transactions, network nodes (a number of transactions in pool, Exonum version,
+etc.).
+
+### Multiple Java Services
+
+We enable support of several client services written in Java within
+one Exonum instance. The necessary set of services should be activated together
+with initialization of the blockchain. This feature serves as a prerequisite for
+dynamic Java services that will be implemented further.
+
+## Third Quarter of 2019
+
+### Base for Dynamic Services
+
+The executable file of Exonum instance contains a number of built-in services.
+Initially, developers launched the required services at the start of the network
+without further possibility to adjust the list of applied services. The present
+milestone provides an opportunity to turn on/off the services present in the
+executable Exonum file without restarting the network.
+
+### Service Migration
+
+An extension to the above-mentioned functionality on dynamic services. The
+service migration will enable a smooth update to new versions of the services,
+running in the blockchain, without service data loss.
+
+## Fourth Quarter of 2019
+
+### Merkle DB - Full-fledged Implementation
+
+In the final implementation of this functionality the nested data collections
+stored in Exonum will receive a hierarchichal pattern. The hierarchy of the
+Merkelized collections will allow to implement proofs of availability of the
+whole collections or their leaves in the blockchain. A user-friendly API of the
+Merkle DB will serve this purpose.
 
 ### Communication between Services within the Blockchain
 
 As a method of improving the modularity of services and expanding the
-possibilities for their reuse, the Exonum team will introduce the ability for
+possibilities for their reuse, we will introduce the ability for
 services to communicate with one another within one blockchain. Services will
 be able to issue and process transactions from other services and can, thus, be
 reused in a variety of scenarios.
 
-### Storage Enhancements: Proofs and Storage API Improvements
-
-As the next stage of improvements to the Exonum storage, we will add support
-for proofs in storage and in Storage API for external clients in particular.
-As for Storage API for services, it will include access control mechanisms and
-support for other metadata.-->
-
-## Third Quarter of 2019
-
-<!--### Service Migration
-
-Service migration will enable a smooth update to new versions of the services
-running in the blockchain, thus, making use of improvements, which the older
-versions do not provide.
-
-### DoS Resistance
-
-The resistance of Exonum blockchains to several types of DoS attacks will
-further enhance the security of the system by defining the amount of memory a
-node can consume at any moment of time. We are working on improving the
-consensus mechanism to limit the number of consensus messages and unconfirmed
-transactions which a node needs to store at any given time.
-
-### Save Points
+### Save Points and Old Blocks Clean-up
 
 Introduction of save points, which are snapshots of the blockchain at a
 certain moment in time, will let a node quickly catch up with the rest of the
-network in case of downtime. It is highly probable that this feature will be
-based on [check points](https://github.com/facebook/rocksdb/wiki/Checkpoints)
-in [RocksDB](https://rocksdb.org), the database currently used in Exonum.
+network in case of downtime.
+
+This feature is also considered as a basis to solve the problem of storing the
+blockchain when its history becomes to long and space-consuming.
+
+### New Storage API Support in Java
+
+Following implementation of Merkle DB in Exonum Core, the Java Binding tool will
+also have to update its storage API to make it compatible with Merkle DB.
 
 ### Java Light Client
 
-Exonum already features a
-[light client library](https://github.com/exonum/exonum-client) in JavaScript.
-We wish to expand the range of clients available for the framework and will
-add a light client in Java – one of the most popular programming languages.-->
+A full-fledged version of Java light client featuring support of cryptographic
+proofs of availability/absence of certain data in the blockchain.
 
-## Fourth Quarter of 2019
+### Dynamic Java Services
 
-### Dynamic Java Services: Dependencies
+The introduction of dynamic Java services will enable adding Java services to
+a running blockchain without the need to restart nodes. In other words, new
+services will be included into the network on the go.
 
-To expand the feature of dynamic Java services in Exonum, we will add the
-support for dependencies between services. Dependencies will be specified
-during service installation or initialization. Services will be able to
-process transactions issued by other services, in this way broadening and
-extending the functionality of one another.
+### Java Benchmarking
 
-<!--### Private Transactions
+Collection of metrics that allow to monitor efficiency of the Java Binding tool
+in the frame of the application; also to make application profiling and
+determine its weak spots.
 
-The functionality of private transactions implements the existence of certain
-data within the blockchain network which are known only to certain validators.
-These validators will execute private transactions locally, without changing
-the blockchain state.
+## First Quarter of 2020
 
-### Non-replayability of Transactions
+### Implementation of gRPC
 
-Making sure that a certain transaction has not been conducted in the past will
-no longer require storing the whole blockchain history.-->
+Exonum intends to shift from REST API to gRPC. Just like Exonum, gRPC supports
+Protobuf as an instrument for description and serialization of data types.
+Besides, gRPC is a potentially quicker communication protocol compared to REST.
 
 As you may have noticed, the new features are to be released quarterly. You are
 welcome to contribute to Exonum development and improvement (see our
