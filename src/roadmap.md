@@ -54,7 +54,8 @@ discussed above.
 ### Java Binding: Time Service
 
 We add another built-in Exonum service into the array of services that can be
-easily launched with an Exonum blockchain in Java – the Time Oracle. The Time
+easily launched with an Exonum blockchain in Java –
+[the Time Oracle](advanced/time.md). The Time
 Oracle allows user services to access the calendar time that validators supply
 to the blockchain.
 
@@ -77,13 +78,13 @@ developers.
 
 ### Java Application Package
 
-A usability achievement that presupposes shipment of Exonum as a
-ready-to-install application package. The package is targeted at Java developers
+This usability achievement allows shipping Exonum as a ready-to-install
+application package. The package is targeted at Java developers
 who plan to develop Exonum-based services. The application will have Rust and
 other related libraries pre-installed. This means that no compilation of the
 application will be required.
 
-### Java Light Client - v.1
+### Java Light Client
 
 With this step we expand the range of clients available for the framework.
 Apart from the [light client library](https://github.com/exonum/exonum-client)
@@ -150,7 +151,7 @@ blockchain when its history becomes to long and space-consuming.
 Following implementation of Merkle DB in Exonum Core, the Java Binding tool will
 also have to update its storage API to make it compatible with Merkle DB.
 
-### Java Light Client
+### Java Light Client Enhancements
 
 A full-fledged version of Java light client featuring support of cryptographic
 proofs of availability/absence of certain data in the blockchain.
