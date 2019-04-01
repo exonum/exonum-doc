@@ -494,7 +494,7 @@ Use `provided` scope in the dependency declaration to achieve that in Maven.
 will be loaded by the plugin classloader and the application classloader, if they
 happen to need the same class -->
 
-The following Exonum dependencies *must* be used in the `provided` scope. <!-- because types from these libraries appear in Exonum public APIs. -->
+The following Exonum dependencies *must* be used in the `provided` scope.
 They will not be changed in an incompatible way in a compatible Exonum release.
 Note that they do not have to be declared explicitly for your service already
 depends on "exonum-java-binding-core" which has them as transitive
