@@ -16,7 +16,8 @@ and modularity; and client-side verification based on
 (Merkle and Merkle Patricia trees) to ensure transparency of the system
 and client security.
 
-Exonum provides [the Java Binding tool][ejb] together with a software
+Exonum provides [the Java Binding tool](get-started/java-binding.md) together
+with a software
 development kit (SDK). This allows to build custom services in Java - one of
 the most popular programming languages - on top of the Rust-based Exonum
 framework.
@@ -55,7 +56,7 @@ signing).
 test your services with the help of the [testkit library][testkit].
 
 And finally, the [Java Binding User Guide](get-started/java-binding.md) will
-teach you how to start a Java project on the Rust-based Exonum framework.
+teach you how to start a Java project on the Exonum framework.
 
 ## Going Deeper
 
@@ -95,7 +96,6 @@ what features are coming soon.
 [rust]: http://rust-lang.org/
 [wiki:soa]: https://en.wikipedia.org/wiki/Service-oriented_architecture
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
-[ejb]: https://github.com/exonum/exonum-java-binding
 [core]: http://github.com/exonum/exonum/
 [apache]: https://opensource.org/licenses/Apache-2.0
 [client]: https://github.com/exonum/exonum-client
