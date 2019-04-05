@@ -79,7 +79,7 @@ Install the latest version of the following packages:
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
 
 ```shell
-choco install -y protoс
+choco install -y protoc
 ```
 
 ## Adding Environment Variables
