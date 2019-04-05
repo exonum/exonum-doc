@@ -176,9 +176,6 @@ None.
 
 A JSON object with the following fields:
 
-- **connectivity**: string or JSON object  
-  Indicates the number of peers the node is connected to or `NotConnected` if
-  the node is not connected to any peers.
 - **consensus_status**: string  
   Indicates whether consensus is launched on the node. Can be:
 
@@ -187,16 +184,15 @@ A JSON object with the following fields:
     - `enabled`: consensus is enabled on the node
     - `disabled`: consensus is disabled on the node.
 
+- **connected_peers**: integer
+  Indicates the number of nodes connected to the present node.
+
 #### Response Example
 
 ```JSON
 {
   "consensus_status": "Active",
-  "connectivity": {
-    "Connected": {
-      "amount": 1
-    }
-  }
+  "connected_peers": 3
 }
 ```
 
