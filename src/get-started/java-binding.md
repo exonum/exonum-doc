@@ -576,14 +576,14 @@ No services are enabled on the node by default. To enable services,
 define them in the `ejb_app_services.toml` configuration file.
 This file is required for a running node. `ejb_app_services.toml`
 should be located in the **working directory** of your project,
-where you run commands.  
+where you run commands.
 It consists of two sections:
 `system_services` and `user_services`.
 
 The `user_services` section enumerates services in the form of
 `name = artifact`, where `name` is a one-word description of the service
 and `artifact` is a full path to the service's artifact. It must be absolute
-unless you want to depend on the application working directory.  
+unless you want to depend on the application working directory.
 
 !!! note
     At least one service must be defined
