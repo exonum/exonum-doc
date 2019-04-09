@@ -319,7 +319,7 @@ framework.
 
 ### Dependencies Management
 
-Exonum uses [Guice][guice-home] to describe the dependencies of the service 
+Exonum uses [Guice][guice-home] to describe the dependencies of the service
 components (both system-specific ones, for example, Exonum time service,
 and external ones).
 Each service should define a Guice module describing implementations of
