@@ -319,9 +319,9 @@ framework.
 
 ### Dependencies Management
 
-Exonum uses [Guice](https://github.com/google/guice) to describe the
-dependencies of the service components (both system-specific
-ones, for example, Exonum time service, and external ones).
+Exonum uses [Guice][guice-home] to describe the dependencies of the service 
+components (both system-specific ones, for example, Exonum time service,
+and external ones).
 Each service should define a Guice module describing implementations of
 the `Service` and its dependencies, if any.
 
@@ -351,7 +351,7 @@ A service module shall:
 The fully-qualified name of the module class is recorded in the service artifact
 metadata and is used by the framework to instantiate services.
 
-For more information on using Guice, see the [project wiki][Guice].
+For more information on using Guice, see the [project wiki][guice-wiki].
 
 [abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractServiceModule.html
 
@@ -501,7 +501,7 @@ depends on "exonum-java-binding-core" which has them as transitive
 dependencies:
 
 - Exonum (exonum-java-binding-core, exonum-java-binding-common)
-- [Guice][Guice]
+- [Guice][guice-home]
 - [Gson][gson]
 - [Vertx][vertx-web-docs] (vertx-web)
 - [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
@@ -659,7 +659,8 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
-[Guice]: https://github.com/google/guice/wiki/GettingStarted
+[guice-home]: https://github.com/google/guice
+[guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/NodeFake.html
