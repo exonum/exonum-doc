@@ -276,28 +276,28 @@ transaction code and in read requests. The following functionality is
 available:
 
 - `getHeight: long`
-  The height of the latest committed block in the blockchain.
+  The height of the latest committed block in the blockchain
 - `getBlockHashes: ListIndex<HashCode>`
-  The list of all block hashes, indexed by the block height.
+  The list of all block hashes, indexed by the block height
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
   The proof list of transaction hashes committed in the block with the given
-  height or ID.
+  height or ID
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
-  committed and in-pool (not yet processed) transactions are returned.
+  committed and in-pool (not yet processed) transactions are returned
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
   The map of transaction execution results identified by the corresponding
-  transaction SHA-256 hashes.
+  transaction SHA-256 hashes
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
   The map of transaction positions inside the blockchain identified by
-  the corresponding transaction SHA-256 hashes.
+  the corresponding transaction SHA-256 hashes
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map of block objects identified by the corresponding block hashes.
+  The map of block objects identified by the corresponding block hashes
 - `getLastBlock: Block`
-  The latest committed block.
+  The latest committed block
 - `getActualConfiguration: StoredConfiguration`
   The configuration for the latest height of the blockchain, including services
-  and their parameters.
+  and their parameters
 
 ### External Service API
 
@@ -506,7 +506,7 @@ dependencies:
 - [Vertx][vertx-web-docs] (vertx-web)
 - [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
 - [Log4j 2][log4j2]
-- [PF4J](https://pf4j.org).
+- [PF4J](https://pf4j.org)
 
 An up-to-date list is available in the Exonum [bill of materials][bom] (BOM).
 
@@ -602,9 +602,9 @@ system_services = ["service-name"]
 
 where possible values for `service-name` are:
 
-- `configuration` for Configuration Update Service.
-- `btc-anchoring` for Anchoring Service.
-- `time` for Time Oracle.
+- `configuration` for Configuration Update Service
+- `btc-anchoring` for Anchoring Service
+- `time` for Time Oracle
 
 !!! note
     In case there is no such section,
