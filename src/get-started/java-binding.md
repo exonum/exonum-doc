@@ -484,21 +484,8 @@ An example of API service tests can be found in
 ## Using Libraries
 
 An Exonum service can use any third-party library as its dependency.
-
-The libraries, classes from which are used in Exonum public APIs,
-are included in the framework distribution, and can also be used by the service.
-Such libraries *must not* be packaged in its artifact.
-Use `provided` scope in the dependency declaration to achieve that in Maven.
-
-<!-- Otherwise multiple incompatible versions of the same class
-will be loaded by the plugin classloader and the application classloader, if they
-happen to need the same class -->
-
-The following Exonum dependencies *must* be used in the `provided` scope.
-They will not be changed in an incompatible way in a compatible Exonum release.
-Note that they do not have to be declared explicitly for your service already
-depends on "exonum-java-binding-core" which has them as transitive
-dependencies:
+At the same time, Exonum comes with its own dependencies.
+Classes of these dependencies are used in Exonum public APIs:
 
 - Exonum (exonum-java-binding-core, exonum-java-binding-common)
 - [Guice][guice-home]
@@ -508,14 +495,31 @@ dependencies:
 - [Log4j 2][log4j2]
 - [PF4J](https://pf4j.org)
 
-An up-to-date list is available in the Exonum [bill of materials][bom] (BOM).
+Said dependencies are provided by the framework and must be used as provided. 
+They will not be changed in an incompatible way in a compatible Exonum release.
+An up-to-date list is also available in the Exonum [bill of materials][bom] (BOM).
+
+<!-- Otherwise multiple incompatible versions of the same class
+will be loaded by the plugin classloader and the application classloader, if they
+happen to need the same class -->
 
 On top of that, Guava *can* be and is recommended to be used as a provided
 library. <!-- because of its considerable size -->
 
+!!! note
+    These dependencies do not have to be declared explicitly
+    because any service depends on "exonum-java-binding-core"
+    which has them as transitive dependencies.
+
+These libraries must not be packaged into the service artifact. 
+To achieve that in Maven, use the [`provided`][maven-provided-scope]
+Maven dependency scope in the dependency declarations if you would
+like to specify them explicitly.
+
 [gson]: https://github.com/google/gson
 [log4j2]: https://logging.apache.org/log4j/2.x/
 [bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/bom/pom.xml
+[maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
 
 ## How to Build a Service Artifact
 
@@ -524,7 +528,7 @@ required to identify the service and instantiate it.
 
 If you used the [service archetype](#creating-project) to generate
 the project template, the build definition already contains
-all required configuration. Hence you can invoke `mvn verify`
+all the required configuration. Hence you can invoke `mvn verify`
 and use the produced service artifact.
 
 <!-- This paragraph is intended for users who don't use the archetype
