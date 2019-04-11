@@ -495,7 +495,7 @@ Classes of these dependencies are used in Exonum public APIs:
 - [Log4j 2][log4j2]
 - [PF4J](https://pf4j.org)
 
-Said dependencies are provided by the framework and must be used as provided. 
+Said dependencies are provided by the framework and must be used as provided.
 They will not be changed in an incompatible way in a compatible Exonum release.
 An up-to-date list is also available in the Exonum [bill of materials][bom] (BOM).
 
@@ -511,7 +511,7 @@ library. <!-- because of its considerable size -->
     because any service depends on "exonum-java-binding-core"
     which has them as transitive dependencies.
 
-These libraries must not be packaged into the service artifact. 
+These libraries must not be packaged into the service artifact.
 To achieve that in Maven, use the [`provided`][maven-provided-scope]
 Maven dependency scope in the dependency declarations if you would
 like to specify them explicitly.
