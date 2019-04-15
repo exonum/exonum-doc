@@ -276,28 +276,28 @@ transaction code and in read requests. The following functionality is
 available:
 
 - `getHeight: long`
-  The height of the latest committed block in the blockchain.
+  The height of the latest committed block in the blockchain
 - `getBlockHashes: ListIndex<HashCode>`
-  The list of all block hashes, indexed by the block height.
+  The list of all block hashes, indexed by the block height
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
   The proof list of transaction hashes committed in the block with the given
-  height or ID.
+  height or ID
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
-  committed and in-pool (not yet processed) transactions are returned.
+  committed and in-pool (not yet processed) transactions are returned
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
   The map of transaction execution results identified by the corresponding
-  transaction SHA-256 hashes.
+  transaction SHA-256 hashes
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
   The map of transaction positions inside the blockchain identified by
-  the corresponding transaction SHA-256 hashes.
+  the corresponding transaction SHA-256 hashes
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map of block objects identified by the corresponding block hashes.
+  The map of block objects identified by the corresponding block hashes
 - `getLastBlock: Block`
-  The latest committed block.
+  The latest committed block
 - `getActualConfiguration: StoredConfiguration`
   The configuration for the latest height of the blockchain, including services
-  and their parameters.
+  and their parameters
 
 ### External Service API
 
@@ -314,37 +314,46 @@ common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
 at `/api/cryptocurrency/balance/:walletId`.
 
-See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
+See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
 
 ### Dependencies Management
 
-Exonum uses [Guice](https://github.com/google/guice) to describe the
-dependencies of the service components (both system-specific
-ones, for example, Exonum time service, and external ones). Each
-service should define a module describing implementations of the framework
-interfaces – `Service`, `TransactionConverter` and implementations of other
-components, if any.
+Exonum uses [Guice][guice-home] to describe the dependencies of the service
+components (both system-specific ones, for example, Exonum time service,
+and external ones).
+Each service should define a Guice module describing implementations of
+the `Service` and its dependencies, if any.
+
+A service module shall:
+
+  1. extend [`AbstractServiceModule`][abstract-service-module-javadoc]
+  2. be annotated with `@org.pf4j.Extension`.
+  3. be `public`.
 
 !!! note "Minimalistic Example of Service Module"
     ```java
-    public class ServiceModule extends AbstractModule {
+    @Extension
+    public class ServiceModule extends AbstractServiceModule {
 
       @Override
       protected void configure() {
         // Define the Service implementation.
         bind(Service.class).to(CryptocurrencyService.class).in(Singleton.class);
 
-        // Define the TransactionConverter implementation.
+        // Define the TransactionConverter implementation required
+        // by the CryptocurrencyService.
         bind(TransactionConverter.class).to(CryptocurrencyTransactionConverter.class);
       }
     }
     ```
 
-The fully-qualified name (FQN) of the module class must be specified/passed
-during configuration of an Exonum App that will run the service.
+The fully-qualified name of the module class is recorded in the service artifact
+metadata and is used by the framework to instantiate services.
 
-For more information on using Guice, see the [project wiki][Guice].
+For more information on using Guice, see the [project wiki][guice-wiki].
+
+[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractServiceModule.html
 
 ## Testing
 
@@ -472,6 +481,70 @@ client.
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
+## Using Libraries
+
+An Exonum service can use any third-party library as its dependency.
+At the same time, Exonum comes with its own dependencies.
+Classes of these dependencies are used in Exonum public APIs:
+
+- Exonum (exonum-java-binding-core, exonum-java-binding-common)
+- [Guice][guice-home]
+- [Gson][gson]
+- [Vertx][vertx-web-docs] (vertx-web)
+- [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
+- [Log4j 2][log4j2]
+- [PF4J](https://pf4j.org)
+
+Said dependencies are provided by the framework and must be used as provided.
+They will not be changed in an incompatible way in a compatible Exonum release.
+An up-to-date list is also available in the Exonum [bill of materials][bom] (BOM).
+
+<!-- Otherwise multiple incompatible versions of the same class
+will be loaded by the plugin classloader and the application classloader, if they
+happen to need the same class -->
+
+On top of that, Guava *can* be and is recommended to be used as a provided
+library. <!-- because of its considerable size -->
+
+!!! note
+    These dependencies do not have to be declared explicitly
+    because any service depends on "exonum-java-binding-core"
+    which has them as transitive dependencies.
+
+These libraries must not be packaged into the service artifact.
+To achieve that in Maven, use the [`provided`][maven-provided-scope]
+Maven dependency scope in the dependency declarations if you would
+like to specify them explicitly.
+
+[gson]: https://github.com/google/gson
+[log4j2]: https://logging.apache.org/log4j/2.x/
+[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/bom/pom.xml
+[maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
+
+## How to Build a Service Artifact
+
+Exonum Java services are packaged as JAR archives with some extra metadata,
+required to identify the service and instantiate it.
+
+If you used the [service archetype](#creating-project) to generate
+the project template, the build definition already contains
+all the required configuration. Hence you can invoke `mvn verify`
+and use the produced service artifact.
+
+<!-- This paragraph is intended for users who don't use the archetype
+and/or need to make non-trivial changes to the build definition (e.g.,
+shade dependencies)-->
+In case the service build definition needs to be configured, ensure that
+the following required metadata is present in the service artifact JAR:
+
+- Entries in the JAR manifest:
+    - "Plugin-Id": must be set to "groupId:artifactId:version", e.g.,
+    `com.exonum.example.timestamping:timestamping-demo:1.0.2`.
+    - "Plugin-Version": must be set to the project version, e.g., `1.0.2`.
+- A fully-qualified name of the [service module](#dependencies-management) class
+  in "META-INF/extensions.idx" file. This file is automatically generated
+  by the annotation processor of `@Extension`.
+
 ## How to Run a Service
 
 Currently you have to build a native application to run a node with your Java
@@ -507,14 +580,14 @@ No services are enabled on the node by default. To enable services,
 define them in the `ejb_app_services.toml` configuration file.
 This file is required for a running node. `ejb_app_services.toml`
 should be located in the **working directory** of your project,
-where you run commands.  
+where you run commands.
 It consists of two sections:
 `system_services` and `user_services`.
 
 The `user_services` section enumerates services in the form of
 `name = artifact`, where `name` is a one-word description of the service
 and `artifact` is a full path to the service's artifact. It must be absolute
-unless you want to depend on the application working directory.  
+unless you want to depend on the application working directory.
 
 !!! note
     At least one service must be defined
@@ -533,9 +606,9 @@ system_services = ["service-name"]
 
 where possible values for `service-name` are:
 
-- `configuration` for Configuration Update Service.
-- `btc-anchoring` for Anchoring Service.
-- `time` for Time Oracle.
+- `configuration` for Configuration Update Service
+- `btc-anchoring` for Anchoring Service
+- `time` for Time Oracle
 
 !!! note
     In case there is no such section,
@@ -578,8 +651,6 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
-- The application supports only one Java service. Support of multiple Java
-  services is coming in the near future.
 
 ## See Also
 
@@ -592,7 +663,8 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
-[Guice]: https://github.com/google/guice/wiki/GettingStarted
+[guice-home]: https://github.com/google/guice
+[guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/NodeFake.html
@@ -607,7 +679,7 @@ For using the library just include the dependency in your `pom.xml`:
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/TransactionConverter.html
-[vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
+[vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.5.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
