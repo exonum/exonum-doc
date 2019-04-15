@@ -2,7 +2,8 @@
 
 <!-- cspell:ignore nanos -->
 
-Exonum nodes can be controlled using RPC implemented via REST API and WebSocket.
+Exonum nodes can be controlled using RPC implemented via REST API. The clients
+also can obtain information on the blockchain from the nodes via WebSocket.
 Managing endpoints are handled by Exonum core and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
@@ -758,12 +759,14 @@ equal to `start` and is less than `end`.
 ## Explorer API Sockets
 
 Since Exonum 0.10 version, it is possible to connect to nodes via WebSocket.
+Clients subscribe to events that take place in the network and in this way
+obtain information on the blockchain from the nodes.
 
 Explorer API sockets have the same base path as endpoints, denoted
 **{explorer_base_path}** and equal to `/api/explorer/v1`.
 
-Currently only one socket is implemented - it shares information on block
-commit events.
+Currently only one type of events is provided for subscription - it shares
+information on block commit events.
 
 ### Subscribe to Block Commit
 
@@ -772,8 +775,8 @@ ws://${URL}{explorer_base_path}/blocks/subscribe
 ```
 
 Connects to a socket and receives notices on each new committed block starting
-from the moment of connection. The notices are displayed in the blockchain
-explorer.
+from the moment of connection. The notices are sent to the light client via the
+socket.
 
 #### Parameters
 
@@ -784,7 +787,8 @@ None.
 Returns notifications that a new block has been committed to the blockchain
 starting from the height when the client connected to the socket.
 
-Each notification is a JSON object with the following fields:
+Each notification is a string which can be deserialized into a JSON object that
+will contain the following fields:
 
 - **height**: integer
   Height of the new block committed to the blockchain.
