@@ -880,13 +880,17 @@ performed in the directory containing `Cargo.toml`.
 
    ```shell
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331 -n
+       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331 \
+       -c example/consensus_1.toml -s example/service_1.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332 -n
+       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332 \
+       -c example/consensus_2.toml -s example/service_2.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333 -n
+       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333 \
+       -c example/consensus_3.toml -s example/service_3.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334 -n
+       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334 \
+       -c example/consensus_4.toml -s example/service_4.toml -n
    ```
 
 4. Finalize the generation of node configurations indicating the following
