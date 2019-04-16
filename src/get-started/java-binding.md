@@ -378,8 +378,11 @@ The plug-in for running tests should be configured to pass
 `java.library.path` system property to JVM:
 
 ``` none
--Djava.library.path=<path-to-java-bindings-library>
+-Djava.library.path=$EXONUM_JAVA/lib/native
 ```
+
+`$EXONUM_JAVA` environment variable should point at installation location,
+as specified in [How to Run a Service section](#how-to-run-a-service).
 
 `Surefire/Failsafe` for Maven should be configured as follows:
 
@@ -547,12 +550,23 @@ the following required metadata is present in the service artifact JAR:
 
 ## How to Run a Service
 
-Currently you have to build a native application to run a node with your Java
-service:
+To run a node with your Java service you need to use Exonum Java application.
+You can download an archive containing the application and all the necessary 
+dependencies on [GitHub releases page][github-releases]. We suggest to use 
+`debug` version during development and `release` for production builds.
+Follow these steps:
 
-- Install the system dependencies and [build][how-to-build] the application.
+- Install [Libsodium][libsodium-gihub] headers for your system. The package has 
+  a name `libsodium-dev` in Ubuntu and `libsodium` in Brew on Mac OS.
+- Download and unpack the archive from [GitHub releases][github-releases] into
+  some known location. Create an environment variable `EXONUM_HOME` pointing at this
+  location. This is not necessary, but will help you in configuring your workflow.
 - Follow the instructions in the [application guide][app-tutorial] to configure
-  and start an Exonum node with your service.
+  and start an Exonum node with your service. The guide is provided inside the archive
+  as well.
+
+It is also possible to build Exonum Java application from sources. To do so,
+follow the instructions in [Contributing guide][how-to-build].
 
 ## Built-In Services
 
@@ -651,6 +665,7 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
+- Exonum Java application is not supporting the Windows platform yet.
 
 ## See Also
 
@@ -663,9 +678,11 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
+[github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
+[libsodium-github]: https://github.com/jedisct1/libsodium
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Schema.html
