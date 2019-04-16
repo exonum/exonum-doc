@@ -1,6 +1,6 @@
 # Java Binding User Guide
 
-**Java Binding App** is an application that includes the Exonum framework
+**Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
 
 ## Creating Project
@@ -577,8 +577,8 @@ Currently Java Binding includes the following built-in services:
 ## Services Activation
 
 No services are enabled on the node by default. To enable services,
-define them in the `ejb_app_services.toml` configuration file.
-This file is required for a running node. `ejb_app_services.toml`
+define them in the `services.toml` configuration file.
+This file is required for a running node. `services.toml`
 should be located in the **working directory** of your project,
 where you run commands.
 It consists of two sections:
@@ -614,7 +614,7 @@ where possible values for `service-name` are:
     In case there is no such section,
     only Configuration Service will be activated.
 
-Below is the sample of the `ejb_app_services.toml` file that enables
+Below is the sample of the `services.toml` file that enables
 all possible built-in Exonum services and two user services:
 
 ```toml
@@ -655,7 +655,7 @@ For using the library just include the dependency in your `pom.xml`:
 ## See Also
 
 - [Rust instruction](create-service.md)
-- [Java Binding App tutorial][app-tutorial]
+- [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
