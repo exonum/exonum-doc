@@ -2,8 +2,9 @@
 
 <!-- cspell:ignore nanos -->
 
-Exonum nodes can be controlled using RPC implemented via REST API. Managing
-endpoints are handled by Exonum core and are mainly purposed to receive
+Exonum nodes can be controlled using RPC implemented via REST API. The clients
+also can obtain information on the blockchain from the nodes via WebSocket.
+Managing endpoints are handled by Exonum core and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
 
@@ -750,6 +751,67 @@ equal to `start` and is less than `end`.
 
     That is, to collect `5` non-empty blocks from the tail of the blockchain,
     range from `288` to `6` has been traversed.
+
+## Explorer API Sockets
+
+Since Exonum 0.10 version, it is possible to connect to nodes via WebSocket.
+Clients subscribe to events that take place in the network and in this way
+obtain information on the blockchain from the nodes.
+
+Explorer API sockets have the same base path as endpoints, denoted
+**{explorer_base_path}** and equal to `/api/explorer/v1`.
+
+Currently only one type of events is provided for subscription - it shares
+information on block commit events.
+
+### Subscribe to Block Commit
+
+```none
+ws://${URL}{explorer_base_path}/blocks/subscribe
+```
+
+Connects to a socket and receives notices on each new committed block starting
+from the moment of connection. The notices are sent to the light client via the
+socket.
+
+#### Parameters
+
+None.
+
+#### Response
+
+Returns notifications that a new block has been committed to the blockchain
+starting from the height when the client connected to the socket.
+
+Each notification is a string which can be deserialized into a JSON object that
+will contain the following fields:
+
+- **height**: integer
+  Height of the new block committed to the blockchain.
+- **prev_hash**: Hash
+  Hash of the previous block.
+- **proposer_id**: integer
+  ID of the validator that created an approved block proposal.
+- **state_hash**: Hash
+  Hash of the current [Exonum state][blockchain-state] after applying
+  transactions in the new block.
+- **tx_count**: integer
+  Number of transactions included into the newly-committed block.
+- **tx_hash**: Hash
+  Root hash of the transactions Merkle tree in the newly-committed block.
+
+#### Response Example
+
+```JSON
+{  
+   "height":13002,
+   "prev_hash":"03d19b9821a5336d3be63840ccdfa119269bd7671672a1715a71a745770f025a",
+   "proposer_id":3,
+   "state_hash":"2d5bc93ec12ab46b5197281da7557d58e438d2aac24e58c784815f4ad77a2d24",
+   "tx_count":3,
+   "tx_hash":"9135c961f53c16d791daf1d9180d34eefcd23e50c5a02f915153493d4a905fbb"
+}
+```
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [explorer]: https://docs.rs/exonum/0.10.3/exonum/api/node/public/explorer/constant.MAX_BLOCKS_PER_REQUEST.html
