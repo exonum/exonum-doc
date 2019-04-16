@@ -514,7 +514,8 @@ for the `Error` enum.
 ### Transaction Execution
 
 Every transaction in Exonum has business logic of the blockchain attached,
-which is encapsulated in the `Transaction` trait. This trait includes the `execute`
+which is encapsulated in the `Transaction` trait. This trait includes the
+`execute`
 method which contains logic applied to the storage when a transaction is
 executed. The `Transaction` trait needs to be implemented for all transactions
 which are to be used in Exonum.
@@ -879,13 +880,17 @@ performed in the directory containing `Cargo.toml`.
 
    ```shell
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331
+       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331 \
+       -c example/consensus_1.toml -s example/service_1.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332
+       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332 \
+       -c example/consensus_2.toml -s example/service_2.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333
+       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333 \
+       -c example/consensus_3.toml -s example/service_3.toml -n
    exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334
+       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334 \
+       -c example/consensus_4.toml -s example/service_4.toml -n
    ```
 
 4. Finalize the generation of node configurations indicating the following
@@ -939,13 +944,13 @@ performed in the directory containing `Cargo.toml`.
 
    ```shell
    exonum-demo-timestamping run --node-config example/node_1_cfg.toml \
-       --db-path example/db1 --public-api-address 0.0.0.0:8200
+       --db-path example/db1 --public-api-address 0.0.0.0:8200 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_2_cfg.toml \
-       --db-path example/db2 --public-api-address 0.0.0.0:8201
+       --db-path example/db2 --public-api-address 0.0.0.0:8201 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_3_cfg.toml \
-       --db-path example/db3 --public-api-address 0.0.0.0:8202
+       --db-path example/db3 --public-api-address 0.0.0.0:8202 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_4_cfg.toml \
-       --db-path example/db4 --public-api-address 0.0.0.0:8203
+       --db-path example/db4 --public-api-address 0.0.0.0:8203 --consensus-key-pass pass --service-key-pass pass
    ```
 
 <!-- markdownlint-enable MD013 -->
