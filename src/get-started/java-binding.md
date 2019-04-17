@@ -3,6 +3,52 @@
 **Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
 
+## Installation
+
+To run a node with your Java service you need to use Exonum Java application.
+You can download an archive containing the application and all the necessary 
+dependencies on [GitHub releases page][github-releases]. We suggest to use 
+`debug` version during development and `release` for production builds.
+Follow these steps:
+
+- Install [Maven 3][maven-install] which is essential for developing and building
+  Java service.
+- Install [Libsodium][libsodium-gihub] development library for your system. 
+  You can use the following command for Ubuntu:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install libsodium-dev
+  ```
+
+  For Mac OS, you can use [Homebrew][brew-install] as following:
+
+  ```bash
+  brew install libsodium
+  ```
+
+- Download and unpack the archive from [GitHub releases][github-releases] into
+  some known location. Create an environment variable `EXONUM_HOME` pointing at this
+  location. You can execute the following command to add this variable to your `.profile`
+  and preserve its value for every terminal session.
+
+  ```bash
+  echo 'export EXONUM_HOME=/path/to/your/install/location' >> ~/.profile
+  ```
+
+  This step is not necessary, but will help you in configuring your workflow.
+- Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use the
+  following script:
+
+  ```bash
+  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | awk '{print $3}')}"
+  LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
+
+  export LD_LIBRARY_PATH="${LIBJVM_PATH}"
+  ```
+
+It is also possible to build Exonum Java application from sources. To do so,
+follow the instructions in [Contributing guide][how-to-build].
+
 ## Creating Project
 
 The easiest way to create a Java service project is to use a template project
@@ -550,23 +596,10 @@ the following required metadata is present in the service artifact JAR:
 
 ## How to Run a Service
 
-To run a node with your Java service you need to use Exonum Java application.
-You can download an archive containing the application and all the necessary 
-dependencies on [GitHub releases page][github-releases]. We suggest to use 
-`debug` version during development and `release` for production builds.
-Follow these steps:
-
-- Install [Libsodium][libsodium-gihub] headers for your system. The package has 
-  a name `libsodium-dev` in Ubuntu and `libsodium` in Brew on Mac OS.
-- Download and unpack the archive from [GitHub releases][github-releases] into
-  some known location. Create an environment variable `EXONUM_HOME` pointing at this
-  location. This is not necessary, but will help you in configuring your workflow.
+- Make sure you followed the steps mentioned in [Installation section](#Installation).
 - Follow the instructions in the [application guide][app-tutorial] to configure
   and start an Exonum node with your service. The guide is provided inside the archive
   as well.
-
-It is also possible to build Exonum Java application from sources. To do so,
-follow the instructions in [Contributing guide][how-to-build].
 
 ## Built-In Services
 
@@ -665,7 +698,7 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
-- Exonum Java application is not supporting the Windows platform yet.
+- Exonum Java application does not support Windows platform yet.
 
 ## See Also
 
@@ -676,6 +709,7 @@ For using the library just include the dependency in your `pom.xml`:
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
+[brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
