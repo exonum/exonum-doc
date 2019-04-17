@@ -39,6 +39,7 @@ Follow these steps:
 - Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use the
   following script:
 
+  <!-- cspell:ignore Xshow,LIBJVM,libjvm,xargs -->
   ```bash
   JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | awk '{print $3}')}"
   LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
