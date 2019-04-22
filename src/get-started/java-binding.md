@@ -28,11 +28,11 @@ Follow these steps:
 
 - Download and unpack the archive from [GitHub releases][github-releases] into
   some known location. Create an environment variable `EXONUM_HOME` pointing at this
-  location. You can execute the following command to add this variable to your `.profile`
-  and preserve its value for every terminal session.
+  location. You can also add an entry to the `PATH` variable.
 
   ```bash
-  echo 'export EXONUM_HOME=/path/to/your/install/location' >> ~/.profile
+  export EXONUM_HOME=/path/to/your/install/location
+  export PATH="$PATH:/path/to/your/install/location"
   ```
 
   This step is not necessary, but will help you in configuring your workflow.
@@ -699,7 +699,7 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
-- Exonum Java application does not support Windows platform yet.
+- Exonum Java application does not support Windows yet.
 
 ## See Also
 
