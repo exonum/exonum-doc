@@ -6,14 +6,14 @@ and Java services runtime environment.
 ## Installation
 
 To run a node with your Java service you need to use Exonum Java application.
-You can download an archive containing the application and all the necessary 
-dependencies on [GitHub releases page][github-releases]. We suggest to use 
+You can download an archive containing the application and all the necessary
+dependencies on [GitHub releases page][github-releases]. We suggest to use
 `debug` version during development and `release` for production builds.
 Follow these steps:
 
 - Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
-- Install [Libsodium][libsodium-gihub] development library for your system. 
+- Install [Libsodium][libsodium-gihub] development library for your system.
   You can use the following command for Ubuntu:
 
   ```bash
@@ -39,7 +39,8 @@ Follow these steps:
 - Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use the
   following script:
 
-  <!-- cspell:ignore Xshow,LIBJVM,libjvm,xargs -->
+  <!-- cspell:disable -->
+
   ```bash
   JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | awk '{print $3}')}"
   LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
@@ -47,6 +48,7 @@ Follow these steps:
   export LD_LIBRARY_PATH="${LIBJVM_PATH}"
   ```
 
+  <!-- cspell:enable -->
 It is also possible to build Exonum Java application from sources. To do so,
 follow the instructions in [Contributing guide][how-to-build].
 
