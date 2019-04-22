@@ -36,14 +36,16 @@ Follow these steps:
   ```
 
   This step is not necessary, but will help you in configuring your workflow.
-- Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use the
-  following script:
+- Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use
+  the following script:
 
   <!-- cspell:disable -->
 
   ```bash
-  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version 2>&1 > /dev/null \
-  | grep 'java.home' | awk '{print $3}')}"
+  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version \
+    2>&1 > /dev/null |\
+    grep 'java.home' |\
+    awk '{print $3}')}"
   LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
 
   export LD_LIBRARY_PATH="${LIBJVM_PATH}"
