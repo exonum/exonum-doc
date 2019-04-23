@@ -27,16 +27,28 @@ Follow these steps:
   ```
 
 - Download and unpack the archive from [GitHub releases][github-releases] into
-  some known location. Create an environment variable `EXONUM_HOME` pointing at this
+  some known location. To install the latest release to `~/bin`:
+
+  ```bash
+  mkdir -p ~/bin
+  cd ~/bin
+  cp /path/to/downloaded/exonum-java-0.6.0-release.zip .
+  unzip exonum-java-0.6.0-release.zip
+  ```
+
+- Create an environment variable `EXONUM_HOME` pointing at this
   location. You can also add an entry to the `PATH` variable.
 
   ```bash
-  export EXONUM_HOME=/path/to/your/install/location
-  export PATH="$PATH:/path/to/your/install/location"
+  export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
+  export PATH="$PATH:~/bin/exonum-java-0.6.0-release"
   ```
 
+  Debug builds are also available on the [release page][github-releases] and
+  can be installed similarly.
+
 - This step is not necessary during installation, but is required to configure
-  the JVM to use by the application. Add a path to your JVM to the
+  the JVM to use by the application. Add a path to your JVM library to the
   `LD_LIBRARY_PATH` environment variable. You can use the following script:
 
   <!-- cspell:disable -->
