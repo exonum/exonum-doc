@@ -35,8 +35,9 @@ Follow these steps:
   export PATH="$PATH:/path/to/your/install/location"
   ```
 
-- Add a path to your JVM to the `LD_LIBRARY_PATH` environment variable. You can use
-  the following script:
+- This step is not necessary during installation, but is required to configure
+  the JVM to use by the application. Add a path to your JVM to the
+  `LD_LIBRARY_PATH` environment variable. You can use the following script:
 
   <!-- cspell:disable -->
 
@@ -51,8 +52,6 @@ Follow these steps:
   ```
 
   <!-- cspell:enable -->
-  This step is not necessary during installation, but is required to configure
-  the JVM to use by the application.
 
 It is also possible to build Exonum Java application from sources. To do so,
 follow the instructions in [Contributing guide][how-to-build].
