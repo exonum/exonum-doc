@@ -7,7 +7,7 @@ and Java services runtime environment.
 
 To run a node with your Java service you need to use Exonum Java application.
 You can download an archive containing the application and all the necessary
-dependencies on [GitHub releases page][github-releases]. We suggest to use
+dependencies on [the Releases page][github-releases] on GitHub. We suggest using
 `debug` version during development and `release` for production builds.
 Follow these steps:
 
@@ -20,20 +20,19 @@ Follow these steps:
   sudo apt-get update && sudo apt-get install libsodium-dev
   ```
 
-  For Mac OS, you can use [Homebrew][brew-install] as following:
+  For Mac OS, you can use [Homebrew][brew-install] as follows:
 
   ```bash
   brew install libsodium
   ```
 
-- Download and unpack the archive from [GitHub releases][github-releases] into
-  some known location. To install the latest release to `~/bin`:
+- Download and unpack the archive from the [Releases page][github-releases]
+  into some known location. To install the latest release to `~/bin`:
 
   ```bash
   mkdir -p ~/bin
   cd ~/bin
-  cp /path/to/downloaded/exonum-java-0.6.0-release.zip .
-  unzip exonum-java-0.6.0-release.zip
+  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
   ```
 
 - Create an environment variable `EXONUM_HOME` pointing at this
@@ -66,7 +65,7 @@ Follow these steps:
   <!-- cspell:enable -->
 
 It is also possible to build Exonum Java application from sources. To do so,
-follow the instructions in [Contributing guide][how-to-build].
+follow the instructions in [Contribution Guide][how-to-build].
 
 ## Creating Project
 
@@ -616,7 +615,7 @@ the following required metadata is present in the service artifact JAR:
 ## How to Run a Service
 
 - Make sure you followed the steps mentioned in [Installation section](#Installation).
-- Follow the instructions in the [application guide][app-tutorial] to configure
+- Follow the instructions in the [Application Guide][app-tutorial] to configure
   and start an Exonum node with your service. The guide is provided inside the archive
   as well.
 
