@@ -1,7 +1,71 @@
 # Java Binding User Guide
 
-**Java Binding App** is an application that includes the Exonum framework
+**Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
+
+## Installation
+
+To run a node with your Java service you need to use Exonum Java application.
+You can download an archive containing the application and all the necessary
+dependencies on [the Releases page][github-releases] on GitHub. We suggest using
+`debug` version during development and `release` for deployment.
+Follow these steps:
+
+- Install [Maven 3][maven-install] which is essential for developing and building
+  Java service.
+- Install [Libsodium][libsodium-gihub] development library for your system.
+  You can use the following command for Ubuntu:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install libsodium-dev
+  ```
+
+  For Mac OS, you can use [Homebrew][brew-install] as follows:
+
+  ```bash
+  brew install libsodium
+  ```
+
+- Download and unpack the archive from the [Releases page][github-releases]
+  into some known location. To install the latest release to `~/bin`:
+
+  ```bash
+  mkdir -p ~/bin
+  cd ~/bin
+  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
+  ```
+
+- Create an environment variable `EXONUM_HOME` pointing at this
+  location. You should also add an entry to the `PATH` variable.
+
+  ```bash
+  export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
+  export PATH="$PATH:~/bin/exonum-java-0.6.0-release"
+  ```
+
+  Debug builds are also available on the [release page][github-releases] and
+  can be installed similarly.
+
+- This step is not necessary during installation, but is required to configure
+  the JVM to use by the application. Add a path to your JVM library to the
+  `LD_LIBRARY_PATH` environment variable. You can use the following script:
+
+  <!-- cspell:disable -->
+
+  ```bash
+  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version \
+    2>&1 > /dev/null |\
+    grep 'java.home' |\
+    awk '{print $3}')}"
+  LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
+
+  export LD_LIBRARY_PATH="${LIBJVM_PATH}"
+  ```
+
+  <!-- cspell:enable -->
+
+It is also possible to build Exonum Java application from sources. To do so,
+follow the instructions in [Contribution Guide][how-to-build].
 
 ## Creating Project
 
@@ -378,8 +442,11 @@ The plug-in for running tests should be configured to pass
 `java.library.path` system property to JVM:
 
 ``` none
--Djava.library.path=<path-to-java-bindings-library>
+-Djava.library.path=$EXONUM_JAVA/lib/native
 ```
+
+`$EXONUM_JAVA` environment variable should point at installation location,
+as specified in [How to Run a Service section](#how-to-run-a-service).
 
 `Surefire/Failsafe` for Maven should be configured as follows:
 
@@ -542,12 +609,10 @@ the following required metadata is present in the service artifact JAR:
 
 ## How to Run a Service
 
-Currently you have to build a native application to run a node with your Java
-service:
-
-- Install the system dependencies and [build][how-to-build] the application.
-- Follow the instructions in the [application guide][app-tutorial] to configure
-  and start an Exonum node with your service.
+- Make sure you followed the steps mentioned in [Installation section](#Installation).
+- Follow the instructions in the [Application Guide][app-tutorial] to configure
+  and start an Exonum node with your service. The guide is provided inside the archive
+  as well.
 
 ## Built-In Services
 
@@ -572,8 +637,8 @@ Currently Java Binding includes the following built-in services:
 ## Services Activation
 
 No services are enabled on the node by default. To enable services,
-define them in the `ejb_app_services.toml` configuration file.
-This file is required for a running node. `ejb_app_services.toml`
+define them in the `services.toml` configuration file.
+This file is required for a running node. `services.toml`
 should be located in the **working directory** of your project,
 where you run commands.
 It consists of two sections:
@@ -609,7 +674,7 @@ where possible values for `service-name` are:
     In case there is no such section,
     only Configuration Service will be activated.
 
-Below is the sample of the `ejb_app_services.toml` file that enables
+Below is the sample of the `services.toml` file that enables
 all possible built-in Exonum services and two user services:
 
 ```toml
@@ -646,21 +711,25 @@ For using the library just include the dependency in your `pom.xml`:
   difficult.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
+- Exonum Java application does not support Windows yet.
 
 ## See Also
 
 - [Rust instruction](create-service.md)
-- [Java Binding App tutorial][app-tutorial]
+- [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
+[brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
+[github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
+[libsodium-github]: https://github.com/jedisct1/libsodium
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Schema.html
