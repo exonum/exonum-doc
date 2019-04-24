@@ -8,7 +8,7 @@ and Java services runtime environment.
 To run a node with your Java service you need to use Exonum Java application.
 You can download an archive containing the application and all the necessary
 dependencies on [the Releases page][github-releases] on GitHub. We suggest using
-`debug` version during development and `release` for production builds.
+`debug` version during development and `release` for deployment.
 Follow these steps:
 
 - Install [Maven 3][maven-install] which is essential for developing and building
@@ -36,7 +36,7 @@ Follow these steps:
   ```
 
 - Create an environment variable `EXONUM_HOME` pointing at this
-  location. You can also add an entry to the `PATH` variable.
+  location. You should also add an entry to the `PATH` variable.
 
   ```bash
   export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
