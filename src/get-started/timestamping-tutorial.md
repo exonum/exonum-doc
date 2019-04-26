@@ -879,18 +879,14 @@ performed in the directory containing `Cargo.toml`.
    nodes will use for communication.
 
    ```shell
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331 \
-       -c example/consensus_1.toml -s example/service_1.toml -n
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332 \
-       -c example/consensus_2.toml -s example/service_2.toml -n
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333 \
-       -c example/consensus_3.toml -s example/service_3.toml -n
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334 \
-       -c example/consensus_4.toml -s example/service_4.toml -n
+   exonum-demo-timestamping generate-config example/1 \
+       --peer-address 127.0.0.1:6331 -n
+   exonum-demo-timestamping generate-config example/2 \
+       --peer-address 127.0.0.1:6332 -n
+   exonum-demo-timestamping generate-config example/3 \
+       --peer-address 127.0.0.1:6333 -n
+   exonum-demo-timestamping generate-config example/4 \
+       --peer-address 127.0.0.1:6334 -n
    ```
 
 4. Finalize the generation of node configurations indicating the following
@@ -903,40 +899,40 @@ performed in the directory containing `Cargo.toml`.
    ```shell
    exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8200 \
-       --private-api-address 0.0.0.0:8091 example/sec_1.toml \
-       example/node_1_cfg.toml \
+       --private-api-address 0.0.0.0:8091 example/1/sec_1.toml \
+       example/1/node_1_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
+       example/1/pub_1.toml \
+       example/1/pub_2.toml \
+       example/1/pub_3.toml \
+       example/1/pub_4.toml
    exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8201 \
-       --private-api-address 0.0.0.0:8092 example/sec_2.toml \
-       example/node_2_cfg.toml \
+       --private-api-address 0.0.0.0:8092 example/2/sec_2.toml \
+       example/2/node_2_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
+       example/2/pub_1.toml \
+       example/2/pub_2.toml \
+       example/2/pub_3.toml \
+       example/2/pub_4.toml
    exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8202 \
-       --private-api-address 0.0.0.0:8093 example/sec_3.toml \
-       example/node_3_cfg.toml \
+       --private-api-address 0.0.0.0:8093 example/3/sec_3.toml \
+       example/3/node_3_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
+       example/3/pub_1.toml \
+       example/3/pub_2.toml \
+       example/3/pub_3.toml \
+       example/3/pub_4.toml
    exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8203 \
-       --private-api-address 0.0.0.0:8094 example/sec_4.toml \
-       example/node_4_cfg.toml \
+       --private-api-address 0.0.0.0:8094 example/4/sec_4.toml \
+       example/4/node_4_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
+       example/4/pub_1.toml \
+       example/4/pub_2.toml \
+       example/4/pub_3.toml \
+       example/4/pub_4.toml
    ```
 
 5. Run the nodes, each in a separated terminal, indicating the file to which
