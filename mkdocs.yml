@@ -72,8 +72,11 @@ pages:
     - 'Clients': 'architecture/clients.md'
     # Local configuration - how to roughly configure a node (make it ready to run)
     - 'Configuration': 'architecture/configuration.md'
-    # Includes blockchain, genesis block, indexes, proofs, etc.
-    - 'Storage': 'architecture/storage.md'
+    - 'Storage': 
+      # Includes storage overview and system objects
+      - 'architecture/storage/storage.md'
+      # MerkledDB documentation
+      - 'architecture/storage/merkledb.md'
     # How the data is serialised and deserialised to be transfered through the network
     - 'Serialization': 'architecture/serialization.md'
     # Consensus overview
