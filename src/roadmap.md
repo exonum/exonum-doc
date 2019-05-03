@@ -69,9 +69,9 @@ The exact details of the workflow are being currently discussed. One of the
 promising ideas is devising a service through which all the administrative
 processes will be conducted.
 
-### Merkle DB - Minimal Profile
+### Exonum MerkleDB - Minimal Profile
 
-The first step within the global initiative to introduce Merkle DB in Exonum.
+The first step within the global initiative to introduce MerkleDB in Exonum.
 This step will result in implementation of a more intuitive storage API
 interface. Such interface will simplify interaction with the storage for service
 developers.
@@ -121,13 +121,13 @@ running in the blockchain, without service data loss.
 
 ## Fourth Quarter of 2019
 
-### Merkle DB - Full-fledged Implementation
+### Exonum MerkleDB - Full-fledged Implementation
 
 In the final implementation of this functionality the nested data collections
 stored in Exonum will receive a hierarchical pattern. The hierarchy of the
 Merkelized collections will allow to implement proofs of availability of the
 whole collections or their leaves in the blockchain. A user-friendly API of the
-Merkle DB will serve this purpose.
+Exonum MerkleDB will serve this purpose.
 
 ### Communication between Services within the Blockchain
 
@@ -148,8 +148,8 @@ blockchain when its history becomes to long and space-consuming.
 
 ### New Storage API Support in Java
 
-Following implementation of Merkle DB in Exonum Core, the Java Binding tool will
-also have to update its storage API to make it compatible with Merkle DB.
+Following implementation of MerkleDB in Exonum Core, the Java Binding tool will
+also have to update its storage API to make it compatible with MerkleDB.
 
 ### Java Light Client Enhancements
 
