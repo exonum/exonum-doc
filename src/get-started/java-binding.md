@@ -417,7 +417,7 @@ metadata and is used by the framework to instantiate services.
 
 For more information on using Guice, see the [project wiki][guice-wiki].
 
-[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractServiceModule.html
+[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractServiceModule.html
 
 ## Testing
 
@@ -718,10 +718,10 @@ For using the library just include the dependency in your `pom.xml`:
 - [Rust instruction](create-service.md)
 - [Exonum Java App tutorial][app-tutorial]
 
-[abstractservice]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/AbstractService.html
+[abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
-[blockchain]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/blockchain/Blockchain.html
+[blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
@@ -730,23 +730,23 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
 [libsodium-github]: https://github.com/jedisct1/libsodium
-[Memorydb]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/database/MemoryDb.html
-[nodefake]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/NodeFake.html
-[schema]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Schema.html
-[service]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Service.html
-[service-after-commit]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
-[standardserializers]: https://exonum.com/doc/api/java-binding-common/0.5.0/com/exonum/binding/common/serialization/StandardSerializers.html
-[storage-indices]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/storage/indices/package-summary.html
-[transaction]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/transaction/Transaction.html
-[transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/transaction/TransactionContext.html
+[Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
+[nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
+[schema]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Schema.html
+[service]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html
+[service-after-commit]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[standardserializers]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/serialization/StandardSerializers.html
+[storage-indices]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/indices/package-summary.html
+[transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/Transaction.html
+[transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
-[transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/TransactionConverter.html
+[transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.5.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.5.0/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
+[createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
 [transaction-result]: https://docs.rs/exonum/0.10/exonum/blockchain/struct.TransactionResult.html
 [exonum-transaction]: ../advanced/node-management.md#transaction
