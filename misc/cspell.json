@@ -129,9 +129,6 @@
     "sint",
     "uint"
   ],
-  "flagWords": [
-    "indexes"
-  ],
   "ignoreRegExpList": [
     "/^(```)[^\\1]*?\\1$/m",
     "/\\]\\(.+?\\)/",
