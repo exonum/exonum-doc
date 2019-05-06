@@ -580,7 +580,7 @@ like to specify them explicitly.
 
 [gson]: https://github.com/google/gson
 [log4j2]: https://logging.apache.org/log4j/2.x/
-[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/bom/pom.xml
+[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/bom/pom.xml
 [maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
 
 ## How to Build a Service Artifact
@@ -719,16 +719,16 @@ For using the library just include the dependency in your `pom.xml`:
 - [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
-[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.5.0/CONTRIBUTING.md#how-to-build
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
 [libsodium-github]: https://github.com/jedisct1/libsodium
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
