@@ -2,17 +2,20 @@
 
 Here is a brief overview of how Exonum works with persistent data.
 
-Exonum uses MerkleDB as storage framework. MerkleDB is a high-level wrapper over a key-value store, 
-that provides convenient abstractions to work with blockchain-specific data(for example lists that provides cryptographic proofs for its elements).
-Currently [RocksDB][rocks-db] is used for low-level key-value storage engine.
-It is also possible to plug in other engines.
+Exonum uses MerkleDB as storage framework. MerkleDB is a high-level wrapper over
+a key-value store, that provides convenient abstractions to work with
+blockchain-specific data(for example lists that provides cryptographic proofs
+for its elements). Currently [RocksDB][rocks-db] is used for low-level
+key-value storage engine. It is also possible to plug in other engines.
 
-All data in MerkleDB are represented as objects that can be multiple types - collections, blobs, and special objects.
-The framework provides basic collections such as `list` and `map` and also it's merklized versions.
+All data in MerkleDB are represented as objects that can be multiple types -
+collections, blobs, and special objects. The framework provides basic
+collections such as `list` and `map` and also it's merklized versions.
 
 Read more about MerkleDB [here][merkledb].
 
-The system data necessary for the blockchain to work is stored in the root objects which are listed below.
+The system data necessary for the blockchain to work is stored in the root
+objects which are listed below.
 
 ## System Root Objects
 
@@ -51,7 +54,6 @@ The core [root objects][blockchain-schema], all of them have `core.*` prefix.
   used to calculate the "aggregation" of the root hashes of the individual
   service tables. In effect is sums up the state of various entities
   scattered across distinct services and their tables.
-
 
 [rocks-db]: http://rocksdb.org/
 [merkledb]: merkledb.md

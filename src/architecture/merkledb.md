@@ -4,16 +4,17 @@ Exonum MerkleDB is a persistent storage implementation based on RocksDB
 which provides APIs to work with merklized data structures.
 
 MerkleDB is an object database. Objects represent the highest abstraction level
-for data storage. 
-- All objects fall into the following groups:
-collections, blobs, and special objects. 
-- Collections can have unlimited nesting. 
-- Objects of all groups can have hashed or non-hashed variants. 
+for data storage.
+
+- All objects fall into the following groups: collections, blobs, and special
+  objects
+- Collections can have unlimited nesting
+- Objects of all groups can have hashed or non-hashed variants
 
 There are also root objects that don't have parents and have UTF-8 identifiers,
 for example "block", "state".
 
-!!! Warning 
+!!! Warning
 Currently, only root objects with blob elements are supported.
 
 1. [Exonum object types](#object-types) lists supported types of
@@ -221,21 +222,22 @@ Values from different objects are stored in single column family in the low-leve
 storage,
 wherein the keys are represented as
 a byte sequence, and values are serialized according to Protobuf
-serialization format. Keys of a specific objects are mapped to the low-level storage keys
-in a deterministic manner using [object identifiers](#object-identifiers).
+serialization format. Keys of a specific objects are mapped to the low-level
+storage keys in a deterministic manner using
+[object identifiers](#object-identifiers).
 
 ### Object Identifiers
 
 Each object in the database has its own unique identifier and metadata.
 The metadata can store various information about the internal state of the object.
-For example, for [`ListIndex`], its length is stored in the metadata. 
-Metadata is represented by [`IndexMetadata`] [index-metadata] structure, which stores 
-object identifier and state.
+For example, for [`ListIndex`], its length is stored in the metadata.
+Metadata is represented by [`IndexMetadata`] [index-metadata] structure, which
+stores object identifier and state.
 
 To obtain object identifiers [object pool] [indexes-pool] is used. Pool
 stores the identifier of the last object and increments it when new object
 is created. The pool is stored in a separate column family. Key in this
-column family is the object identifier, value is the object metadata. 
+column family is the object identifier, value is the object metadata.
 
 On user level every object is uniquely identified by an address, which is used
 to map object keys into a key in the underlying low-level storage. Mapping is
@@ -255,21 +257,21 @@ An object address consists of 2 parts:
 
 All objects are stored in the same column-family. Full object key in RocksDB
 is a 32-elements byte array. The first 16 bytes is an object identifier
-obtained using the pool mentioned above, the second 16 bytes is the key of the 
+obtained using the pool mentioned above, the second 16 bytes is the key of the
 child object. In the database, it looks like this:
 `(identifier | key)` - 0x00000000000000100000000000000002
 
 !!! note "Example"
-	Suppose we have a list with the address `(" exchange.crypto "," BTC ")` in which
-	we put one value, for example `0.00019`. When this list is created pool assigned 
-   0x0000000000000003 identifier to it, the value `0.00019` which
-	we put in the list will have a key 0x0000000000000000, since this
-	a single value in the list. Thus, in the database it will look like this(in
-	HEX):
-	0x00000000000000030000000000000000 : 0x302E3030303139
+  Suppose we have a list with the address `(" exchange.crypto "," BTC ")` in
+  which we put one value, for example `0.00019`. When this list is created pool
+  assigned 0x0000000000000003 identifier to it, the value `0.00019` which
+  we put in the list will have a key 0x0000000000000000, since this
+  a single value in the list. Thus, in the database it will look like this(in
+  HEX):
+  0x00000000000000030000000000000000 : 0x302E3030303139
 
-Optional prefix is used for backwards compatibility with older versions of Exonum storage
-and for grouping objects with similar data.
+Optional prefix is used for backwards compatibility with older versions of
+Exonum storage and for grouping objects with similar data.
 
 ## View Layer
 
@@ -310,7 +312,6 @@ execution, its changes are promptly rolled back, so that execution of the
 following
 transactions continues normally.
 
-
 ## Indexing
 
 Unlike relational databases, Exonum does not support indices over fields
@@ -334,7 +335,7 @@ content together with the objects being indexed.
 [proof-map-index]: https://github.com/exonum/exonum/blob/master/components/merkledb/src/proof_map_index/mod.rs
 [value-set-index]: https://github.com/exonum/exonum/blob/master/components/merkledb/src/value_set_index.rs
 [key-set-index]: https://github.com/exonum/exonum/blob/master/components/merkledb/src/key_set_index.rs
-[database]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L452 
+[database]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L452
 [patch]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L146
 [snapshot]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L500
 [fork]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L394
