@@ -23,7 +23,7 @@ Follow these steps:
   For Mac OS, you can use [Homebrew][brew-install] as follows:
 
   ```bash
-  brew install libsodium
+  brew install libsodium rocksdb
   ```
 
 - Download and unpack the archive from the [Releases page][github-releases]
