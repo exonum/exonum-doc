@@ -148,9 +148,9 @@ JSON object with the following fields:
   Global configuration presently in use.
 - **hash**: Hash  
   Hash of the actual configuration.
-- **propose**: Hash
+- **propose**: Hash  
   Hash of the transaction containing a new configuration proposal.
-- **votes**: Array of objects
+- **votes**: Array of objects  
   Information on the votes of the validators for a new configuration.
 
 #### Following Configuration
@@ -174,9 +174,9 @@ JSON object with the following fields:
   Global configuration locked in to take effect in the future.
 - **hash**: Hash  
   Hash of the following configuration.
-- **propose**: Hash
+- **propose**: Hash  
   Hash of the transaction containing a new configuration proposal.
-- **votes**: Array of objects
+- **votes**: Array of objects  
   Information on the votes of the validators for a new configuration.
 
 #### Configuration by Hash
@@ -189,7 +189,7 @@ Looks up configuration (including proposals) by the hash.
 
 ##### Parameters
 
-- **hash**: Hash
+- **hash**: Hash  
   Hash of configuration to look up.
 
 ##### Response
@@ -214,7 +214,7 @@ Looks up votes for a configuration proposal by the configuration hash.
 
 ##### Parameters
 
-- **hash**: Hash
+- **hash**: Hash  
   Hash of configuration to look up
 
 ##### Response
@@ -241,10 +241,10 @@ the activation height and/or the previous configuration hash.
 
 ##### Query Parameters
 
-- **previous_cfg_hash**: Hash
+- **previous_cfg_hash**: Hash  
   If present, filters configurations by the specified previous configuration
   hash.
-- **actual_from**: integer
+- **actual_from**: integer  
   If present, filters configurations by the specified minimum for the height
   from which the configuration became actual.
 
@@ -256,9 +256,9 @@ Array of objects with the following fields:
   Committed configuration satisfying filter criteria.
 - **hash**: Hash  
   Hash of the configuration.
-- **propose**: Hash
+- **propose**: Hash  
   Hash of the transaction containing a new configuration proposal.
-- **votes**: Array of objects
+- **votes**: Array of objects  
   Information on the votes of the validators for a new configuration.
 
 The elements of the array are ordered by the order, in which
@@ -275,10 +275,10 @@ the activation height and/or the previous configuration hash.
 
 ##### Query Parameters
 
-- **previous_cfg_hash**: Hash
+- **previous_cfg_hash**: Hash  
   If present, filters configurations by the specified previous configuration
   hash.
-- **actual_from**: integer
+- **actual_from**: integer  
   If present, filters configurations by the specified minimum for the height
   from which the configuration will become actual.
 
@@ -286,7 +286,7 @@ the activation height and/or the previous configuration hash.
 
 Array of objects with the following fields:
 
-- **propose_data**: ?Propose
+- **propose_data**: ?Propose  
   Information on the new proposed configuration.
 - **hash**: Hash  
   Hash of the proposed configuration.

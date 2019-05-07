@@ -10,7 +10,7 @@ The configuration is stored in the [TOML][toml] format. A path to the
 configuration file should be specified on the node start up.
 
 The configuration may be changed using
-[the global variables updater service](../advanced/configuration-updater.md)
+[the Configuration Updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. On node initialization the
