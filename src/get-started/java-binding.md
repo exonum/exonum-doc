@@ -234,7 +234,7 @@ Ed25519 is a standard cryptographic system for digital signing
 of Exonum messages. It is available through
 the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 
-[node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
+[node-configuration-validator-keys]: ../architecture/configuration.md#genesisvalidator_keys
 
 #### Transaction Lifecycle
 
