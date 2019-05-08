@@ -13,7 +13,7 @@ Follow these steps:
 
 - Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
-- Install [Libsodium][libsodium-gihub] development library for your system.
+- Install [Libsodium][libsodium] development library for your system.
   You can use the following command for Ubuntu:
 
   ```bash
@@ -234,7 +234,7 @@ Ed25519 is a standard cryptographic system for digital signing
 of Exonum messages. It is available through
 the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 
-[node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
+[node-configuration-validator-keys]: ../architecture/configuration.md#genesisvalidator_keys
 
 #### Transaction Lifecycle
 
@@ -609,7 +609,7 @@ the following required metadata is present in the service artifact JAR:
 
 ## How to Run a Service
 
-- Make sure you followed the steps mentioned in [Installation section](#Installation).
+- Make sure you followed the steps mentioned in [Installation section](#installation).
 - Follow the instructions in the [Application Guide][app-tutorial] to configure
   and start an Exonum node with your service. The guide is provided inside the archive
   as well.
@@ -720,7 +720,7 @@ For using the library just include the dependency in your `pom.xml`:
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
@@ -729,7 +729,7 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
-[libsodium-github]: https://github.com/jedisct1/libsodium
+[libsodium]: https://download.libsodium.org/doc/
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Schema.html
