@@ -609,7 +609,7 @@ the following required metadata is present in the service artifact JAR:
 
 ## How to Run a Service
 
-- Make sure you followed the steps mentioned in [Installation section](#Installation).
+- Make sure you followed the steps mentioned in [Installation section](#installation).
 - Follow the instructions in the [Application Guide][app-tutorial] to configure
   and start an Exonum node with your service. The guide is provided inside the archive
   as well.
@@ -720,7 +720,7 @@ For using the library just include the dependency in your `pom.xml`:
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
