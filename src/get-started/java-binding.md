@@ -13,7 +13,7 @@ Follow these steps:
 
 - Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
-- Install [Libsodium][libsodium-gihub] development library for your system.
+- Install [Libsodium][libsodium] development library for your system.
   You can use the following command for Ubuntu:
 
   ```bash
@@ -729,7 +729,7 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
-[libsodium-github]: https://github.com/jedisct1/libsodium
+[libsodium]: https://download.libsodium.org/doc/
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Schema.html
