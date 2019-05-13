@@ -31,7 +31,7 @@ extra:
     - type: 'facebook'
       link: 'https://www.facebook.com/Exonum'
     - type: 'twitter'
-      link: 'https://twitter.com/BitFuryGroup'
+      link: 'https://twitter.com/ExonumPlatform'
 google_analytics:
   - 'UA-85962154-1'
   - 'auto'
