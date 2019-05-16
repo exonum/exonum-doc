@@ -48,7 +48,7 @@ intervene into the consensus process.
 As we develop Java Binding alongside with Exonum Core, to equalize their
 functionality it is required to implement Protobuf support and separate the
 transactions and messages for Java Binding too. This step will promote all the
-corresponding [benefits](#Protobuf-as-the-Serialization-Format-in-Exonum)
+corresponding [benefits](#protobuf-as-the-serialization-format-in-exonum)
 discussed above.
 
 ### Java Binding: Time Service

@@ -166,7 +166,6 @@ guide on how to develop applications on top of the Exonum framework.
 [readme]: https://github.com/exonum/exonum/#readme
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
-[leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
 [protobuf]: https://developers.google.com/protocol-buffers/
 [libsodium]: https://download.libsodium.org/doc/

@@ -556,7 +556,7 @@ is reasonably small, consisting of 4–15 nodes.
 [wiki:commitment]: https://en.wikipedia.org/wiki/Commitment_scheme
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [mysql-stored]: https://dev.mysql.com/doc/refman/5.6/en/stored-routines.html
-[sodiumoxide]: https://dnaq.github.io/sodiumoxide/sodiumoxide/index.html
+[sodiumoxide]: https://github.com/sodiumoxide/sodiumoxide
 [libsodium]: https://download.libsodium.org/doc/
 [tweetnacl]: https://github.com/dchest/tweetnacl-js
 [ed25519]: https://ed25519.cr.yp.to/

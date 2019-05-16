@@ -115,11 +115,11 @@ All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
 
 The service exposes the following API endpoint for the
-[public API](#public_apis):
+[public API](#public-apis):
 
 - [Get the current consolidated time](#current-time)
 
-The following endpoints are exposed for the [private API](#private_apis):
+The following endpoints are exposed for the [private API](#private-apis):
 
 - [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
 - [Dump timestamps of all validators](#timestamps-of-all-validators)

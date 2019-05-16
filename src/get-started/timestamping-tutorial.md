@@ -790,7 +790,7 @@ The code above declares a number of methods:
 - `state_hash` - calculates the hash of
   [the blockchain state](../glossary.md#blockchain-state). The method
   should return [a vector of hashes](../architecture/services.md#state-hash)
-  of the [Merkelized service tables](../glossary.md#merkelized-indices).
+  of the [Merkelized service tables](../architecture/merkledb.md#merkelized-indices).
 - `tx_from_raw` - deserialization of transactions processed by the service.
   If the incoming transaction is built successfully, we put it into
   a `Box<_>`.

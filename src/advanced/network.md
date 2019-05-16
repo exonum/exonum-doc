@@ -116,7 +116,7 @@ requests are generally not authenticated.
 
 Full nodes use [Actix-web framework](https://actix.rs) to implement REST
 HTTP API. Addresses for public and private API endpoints are specified in the
-[`node.api`](../architecture/configuration.md#nodeapi) section of the local
+[`api`](../architecture/configuration.md#api) section of the local
 configuration.
 
 ### Service Endpoints

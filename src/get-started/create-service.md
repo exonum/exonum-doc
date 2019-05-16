@@ -616,7 +616,7 @@ If the incoming transaction is built successfully, we put it into a `Box<_>`.
 The `state_hash` method is used to calculate the hash of
 [the blockchain state](../glossary.md#blockchain-state). The method
 should return [a vector of hashes](../architecture/services.md#state-hash) of
-the [Merkelized service tables](../glossary.md#merkelized-indices).
+the [Merkelized service tables](../architecture/merkledb.md#merkelized-indices).
 As the wallets table is not Merkelized (a simplifying assumption discussed at
 the beginning of the tutorial), the returned value should be an empty vector,
 `vec![]`.

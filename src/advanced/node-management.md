@@ -106,7 +106,7 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 ### SerializedTransaction
 
 `SerializedTransaction` is an array of bytes in the Protobuf
-[serialization format](../architecture/serialization.md#message-serialization).
+[serialization format](../architecture/serialization.md#principles-of-using-protobuf-serialization).
 
 ### Content
 
