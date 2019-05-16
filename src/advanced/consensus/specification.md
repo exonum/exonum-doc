@@ -141,7 +141,7 @@ The consensus algorithm uses the following types of messages:
 [`Prevote`](../../architecture/consensus.md#prevote),
 [`Precommit`](../../architecture/consensus.md#precommit),
 [`Status`](../../architecture/consensus.md#status),
-[`Block`](../../architecture/consensus.md#block).
+[`BlockResponse`](../../architecture/consensus.md#blockresponse).
 Only a part of their fields is described here. See
 [source code][message_source] for more details.
 
@@ -159,7 +159,7 @@ The following fields are present in all messages:
 - `hash`  
   Hash of the message.
 
-`Propose` and `Block` messages have the following additional field:
+`Propose` and `BlockResponse` messages have the following additional field:
 
 - `prev_hash`  
   Hash of the previous block in the blockchain.
@@ -338,17 +338,17 @@ round are placed into a separate queue (`queued`).
 
     - [Request missing information based on the message](requests.md#receiving-precommit).
 
-### Block
+### BlockResponse
 
 **Arguments:** `block`.
 
 !!! note
-    `Block` messages are requested by validators if they see a
-    consensus message belonging to a future height. `Block` messages are not a
-    part of an ordinary consensus message workflow for nodes at the latest
-    blockchain height.
+    `BlockResponse` messages are requested by validators if they see a
+    consensus message belonging to a future height. `BlockResponse`
+    messages are not a part of an ordinary consensus message workflow
+    for nodes at the latest blockchain height.
 
-- Check the `Block` message:
+- Check the `BlockResponse` message:
 
     - The key in the `to` field must match the key of the node.
     - `block.prev_hash` must match the hash of the latest committed block.
@@ -368,7 +368,7 @@ round are placed into a separate queue (`queued`).
 - Add the block to the blockchain and move to a new height. Set the value
   of the variable `locked_round` at the new height to `0` .
 
-- [Request missing information based on the message](requests.md#receiving-block).
+- [Request missing information based on the message](requests.md#receiving-blockresponse).
 
 ## Timeout Processing
 
