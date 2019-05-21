@@ -242,7 +242,7 @@ Exonum MerkleDB supports several types of data objects. All objects fall into
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
-- [`ProofListIndex`](../architecture/merkeldb.md#prooflistindex)
+- [`ProofListIndex`](../architecture/merkledb.md#prooflistindex)
   is an enhanced version of an array store. It implements a balanced (but not
   necessarily full) binary Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from

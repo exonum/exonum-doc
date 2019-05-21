@@ -19,7 +19,8 @@ management systems (RDBMSs). However, unlike RDBMS tables,
 all MerkleDB objects internally are implemented as wrappers around key-value
 stores.
 
-Root objects in MerkeDB fall into several types:
+Root objects in MerkleDB fall into several types:
+
 - **list**, where either keys or values are stored
 - **map**, where key-value pairs are stored
 - **set** of unique items
