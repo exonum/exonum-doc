@@ -46,7 +46,7 @@ are applied to the key-value storage.
 All data in the Exonum blockchain is divided into two parts:
 
 - **Data storage**, which contains data structured into objects. Objects
-  represent high-level wrappers over the key key-value store
+  represent high-level wrappers over the key-value store
 - **Transaction log**, i.e., the complete history of all transactions ever
   applied to the data storage.
 
@@ -270,14 +270,15 @@ Exonum MerkleDB supports several types of data objects. All objects fall into
   short serialization and need to be iterated in a deterministic order.
   `ValueSetIndex` is a better match for complex items or items that need to be
   looked up by a hash.
+- `Entry` represents an optional single item (i.e., `Option<T>` in Rust terms).
 
-  Both `ListIndex` and `ProofListIndex` support updating by index and
-  appending only. `MapIndex` and `ProofMapIndex` allow inserting,
-  updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex`
-  support adding and removing elements from the set. Finally, all collections
-  support iterations over items (or keys, values, and key-value pairs in the
-  case of maps).
-- `Entry` represents a set that contains only one item.
+Both `ListIndex` and `ProofListIndex` support updating by index and
+extending the lists. However, only `ListIndex` supports truncation from the
+tail. `MapIndex` and `ProofMapIndex` allow inserting,
+updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex`
+support adding and removing elements from the set. Finally, all collections
+support iterations over items (or keys, values, and key-value pairs in the
+case of maps).
 
 ### Proofs
 
@@ -285,7 +286,7 @@ Exonum MerkleDB supports several types of data objects. All objects fall into
 creating a proof that specific values are saved under particular keys.
 To prove that, it is sufficient to return a list of hashes from
 the tree root to a particular cell (a Merkle path). Merkle Patricia
-stores also allow to generate proofs that there is no data in the
+objects also allow to generate proofs that there is no data in the
 database with a specific key.
 
 When a full node communicates with a light client, proofs are returned together

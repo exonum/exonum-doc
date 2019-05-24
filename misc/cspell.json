@@ -39,7 +39,7 @@
     "healthcheck",
     "HMACs",
     "idempotence",
-	   "indexes",
+	  "indexes",
     "Javadoc",
     "junit",
     "keypair",
