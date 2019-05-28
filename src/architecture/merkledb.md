@@ -12,6 +12,8 @@ for the [data storage](storage.md). All objects fall into the following groups:
   identifiers, for example, "block", "state". Root objects can contain blob
   items inside them.
 
+The rest of the article describes the following:
+
 1. [Root Objects Types](#root-object-types) lists the types of data
    stores supported by MerkleDB. Objects represent the highest abstraction
    level for the data storage.
@@ -30,14 +32,12 @@ implemented as wrappers around key-value stores.
 
 Root objects in MerkleDB fall into several types:
 
-- **list** of items. Each item is preceded by an index which represents a `u64`
-  integer. Indices are implicitly defined by the items order
+- **list** of items
 - **map**, where key-value pairs are stored
 - **set** of unique items
 - **entry**, which represents an optional single item.
 
 Both keys and values in the wrapped stores are persisted as byte sequences.
-Values are serialized according to the Protobuf serialization format.
 MerkleDB does not natively support operations (matching, grouping, sorting,
 etc.) over separate value fields, as it is the case with other key-value
 storages.
@@ -77,7 +77,8 @@ list or removing items by the index
 
 !!! summary "Implementation Details"
     To support proper iteration, 8-byte unsigned indices precede `ListIndex`
-    items. The indices are serialized in the big-endian form.
+    items. Indices are implicitly defined by the items order. Indices are
+    serialized in the big-endian form.
 
 ### SparseListIndex
 
@@ -258,15 +259,15 @@ Both parts of the key are encoded as big-endian.
 
 !!! note "Example"
     Suppose we have a list with the address `(" exchange.crypto "," BTC ")` in
-    which we put one value, for example `7865`. The pool assigns identifier
-    `3` to this list when we create it. In the database the identifier looks
-    like this - `0x0000000000000003`.
+    which we put one value, for example `7865`. The pool assigns a
+    pseudo-random identifier `3` to this list when we create it. In the
+    database the identifier looks like this - `0x0000000000000003`.
 
     Since `7865` is a single value in the created list, its index in the
     database looks like this - `0x0000000000000000`.
 
     Thus, the whole key in the database will look as follows (in HEX) -
-    `0x00000000000000030000000000000000 : 0x302E3030303139`.
+    `0x00000000000000030000000000000000 : 0x_bd1e_0000_0000_0000`.
 
 ### Key Sorting and Iterators
 
@@ -310,8 +311,8 @@ the same database snapshot.
 Forks are used during transaction and block processing. A fork
 [is successively passed](transactions.md#execute)
 to each transaction in the block to accumulate changes produced by the
-transactions, in a [patch](#patches). If one of the transactions in the block
-quits with an unhandled exception (i.e., raises `panic`) during execution, its
+transactions. If one of the transactions in the block
+quits with an unhandled exception during execution, its
 changes are promptly rolled back, so that execution of the following
 transactions continues normally.
 
@@ -339,7 +340,6 @@ objects that they index.
 [key-set-index]: https://github.com/exonum/exonum/blob/master/components/merkledb/src/key_set_index.rs
 [object-hash]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/hash.rs#L205
 [database]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L452
-[patch]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L146
 [snapshot]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L500
 [fork]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L394
 [col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families

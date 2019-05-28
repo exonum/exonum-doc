@@ -2,9 +2,8 @@
 
 This page provides an overview of how Exonum works with the persistent data.
 
-Exonum uses MerkleDB as a storage framework. MerkleDB is an object database. It
-represents a high-level wrapper over the key-value store.
-
+Exonum uses [MerkleDB][merkledb] as a storage framework. MerkleDB is an object
+database. It represents a high-level wrapper over the key-value store.
 Currently [RocksDB][rocks-db] is used for low-level key-value storage engine in
 Exonum.
 
@@ -15,14 +14,13 @@ list that provides cryptographic proofs for its stored items.
 Currently, the objects in MerkleDB fall into two types:
 
 - **blobs**, which represent sequences of bytes, and
-- **root objects**, that do not have parents. These objects have UTF-8
+- **root objects**, that do not have parents. These objects have UTF-8 string
   identifiers, for example, "block", "state". Root objects can contain blob
   items inside them.
 
 The basic root objects of the framework are:
 
-- **list** of items. Each item is preceded by an index which represents a `u64`
-  integer. Indices are implicitly defined by the items order
+- **list** of items
 - **map**, where key-value pairs are stored
 - **set** of unique items
 - **entry**, which represents an optional single item.

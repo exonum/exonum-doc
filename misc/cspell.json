@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "0.1",
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
@@ -39,7 +39,7 @@
     "healthcheck",
     "HMACs",
     "idempotence",
-	  "indexes",
+    "indexes",
     "Javadoc",
     "junit",
     "keypair",
@@ -50,7 +50,6 @@
     "markdownlint",
     "mempool",
     "Merkelized",
-	   "merklized",
     "merkelizing",
     "Merkle",
     "minimalistic",
