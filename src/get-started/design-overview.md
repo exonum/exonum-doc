@@ -45,9 +45,10 @@ are applied to the key-value storage.
 
 All data in the Exonum blockchain is divided into two parts:
 
-- **Data storage**, which contains data structured into tables
+- **Data storage**, which contains data structured into objects. Objects
+  represent high-level wrappers over the key-value store
 - **Transaction log**, i.e., the complete history of all transactions ever
-  applied to the data storage
+  applied to the data storage.
 
 As transactions include operations on the key-value storage such as creating
 a new value, or updating already saved values, the actual data storage state
@@ -81,7 +82,7 @@ Exonum blocks consist of the following parts:
   included; however, transactions are applied deterministically and
   unequivocally. The agreement on the hash of data storage is a part of
   the Exonum consensus algorithm, so the hash is guaranteed to coincide
-  for all validators
+  for all validators.
 
 As every block includes the hash of the previous block,
 it is impossible to change one block
@@ -170,7 +171,7 @@ To generate a new block and vote upon it, a 3-phase approach is used.
 - Finally, if a validator receives precommits from a supermajority of
   validators
   for the same proposal, the proposal becomes a new block and is committed to
-  the local storage of the validator
+  the local storage of the validator.
 
 !!! note
     A block can be committed at different times for different validators.
@@ -209,7 +210,7 @@ Technically speaking, the consensus algorithm used in Exonum guarantees
   the same block at the same height; in other words, the blockchain cannot split
 - **Liveness** means that correctly operating validators continue committing
   blocks
-  from time to time
+  from time to time.
 
 These properties are formally proven to hold for the consensus algorithm
 in a partially synchronous network with up to 1/3 of validator nodes
@@ -224,32 +225,37 @@ which more than 1/3 (but less than 2/3) of the validators are compromised.
     See the [*Data Storage*](../architecture/storage.md) article
     for more details.
 
-### RocksDB
+### MerkleDB and RocksDB
 
-[RocksDB][rocks-db] is used to persist locally the data
-that transactions operate with. This storage engine provides high efficiency
+Exonum uses [MerkleDB][merkledb] as a storage framework. MerkleDB is an object
+database. It represents a high-level wrapper over the key-value store.
+
+[RocksDB][rocks-db] is used for low-level key-value storage engine in
+Exonum. This storage engine provides high efficiency
 and minimal storage overhead.
 
-### Table Types
+### Object Types
 
-Exonum supports several types of data tables, representing typed collections
-(lists, sets and maps):
+Exonum MerkleDB supports several types of data objects. All objects fall into
+*blobs* and *root objects*. Root objects represent typed data stores
+(lists, sets, maps and entries):
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
-- [`ProofListIndex`](../architecture/storage.md#prooflistindex)
-  is an enhanced version of
-  array storage. It implements a balanced (but not necessarily full) binary
-  Merkle tree. Leaves of the tree keep the
+- [`ProofListIndex`](../architecture/merkledb.md#prooflistindex)
+  is an enhanced version of an array store. It implements a balanced (but not
+  necessarily full) binary Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from
-  concatenated
-  children data. `ProofListIndex` only allows to append the data or update the
-  already stored items
-- [`ProofMapIndex`](../architecture/storage.md#proofmapindex)
-  extends the
+  concatenated children data. `ProofListIndex` only allows to append the data
+  or update the already stored items
+- [`SparseListIndex`][sparse-list-index] represents a `ListIndex` that may
+  contain "gaps". It provides the possibility to delete items not only from
+  the end of the list, but from any part thereof. Such deletions do not break
+  the order of the indices inside the list
+- [`ProofMapIndex`](../architecture/merkledb.md#proofmapindex) extends the
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
-  Leaves of the tree keep the actual
-  values from the map. Intermediate nodes consist of the following four parts:
+  Leaves of the tree keep the actual values from the map. Intermediate nodes
+  consist of the following four parts:
 
     - Hash of the left child value
     - Hash of the right child value
@@ -257,21 +263,22 @@ Exonum supports several types of data tables, representing typed collections
     - Key for the right child node
 
 - `ValueSetIndex` and `KeySetIndex` both implement sets, and both
-  reduce them to
-  maps (as it is commonly done in programming languages). `ValueSetIndex`
-  maps hashes of the set items to the items themselves,
+  reduce them to maps (as it is commonly done in programming languages).
+  `ValueSetIndex` maps hashes of the set items to the items themselves,
   while `KeySetIndex` maps set items to `null`.
   Thus, `KeySetIndex` is preferable when set items have relatively
   short serialization and need to be iterated in a deterministic order.
   `ValueSetIndex` is a better match for complex items or items that need to be
   looked up by a hash.
+- `Entry` represents an optional single item (i.e., `Option<T>` in Rust terms).
 
 Both `ListIndex` and `ProofListIndex` support updating by index and
-appending only. `MapIndex` and `ProofMapIndex` allow inserting,
-updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex` support
-adding and removing elements from the set. Finally, all collections support
-iterations over items (or keys, values, and key-value pairs in the case of
-  maps).
+extending the lists. However, only `ListIndex` supports truncation from the
+tail. `MapIndex` and `ProofMapIndex` allow inserting,
+updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex`
+support adding and removing elements from the set. Finally, all collections
+support iterations over items (or keys, values, and key-value pairs in the
+case of maps).
 
 ### Proofs
 
@@ -279,7 +286,7 @@ iterations over items (or keys, values, and key-value pairs in the case of
 creating a proof that specific values are saved under particular keys.
 To prove that, it is sufficient to return a list of hashes from
 the tree root to a particular cell (a Merkle path). Merkle Patricia
-tables also allow to generate proofs that there is no data in the
+objects also allow to generate proofs that there is no data in the
 database with a specific key.
 
 When a full node communicates with a light client, proofs are returned together
@@ -315,7 +322,7 @@ A service may define 3 types of endpoints:
   configuration, e.g., manage secret keys specific to the service.
   Private endpoints are executed locally, are not globally ordered, and
   cannot modify the blockchain state directly (although they
-  can generate transactions and push them to the network)
+  can generate transactions and push them to the network).
 
 !!! note
     Another type of endpoints, *events*, [is coming soon](../roadmap.md).
@@ -372,10 +379,10 @@ used in blockchains are as follows:
   the transaction, before applying the transaction to the blockchain state.
   Verification
   may include authentication checks (for example, verifying the transaction
-    signature),
+  signature),
   as well as other structural checks over the transaction contents.
   At the same time, transaction verification has no access to the current
-  blockchain state
+  blockchain state.
 
 ### Existing Services
 
@@ -442,7 +449,7 @@ In most cases, transactions are created by the external entities
 (such as light clients); these entities are assumed to manage the corresponding
 signing keys. Keys can also be managed by full nodes themselves. In this case,
 a private key is stored in the local configuration of the node, does not enter
-the blockchain and is specific to a particular node. It’s a good practice
+the blockchain and is specific to a particular node. It is a good practice
 to manage such keys locally via private APIs of the corresponding service.
 
 The Exonum core defines two pairs of Ed25519 keys for full nodes:
@@ -451,7 +458,7 @@ The Exonum core defines two pairs of Ed25519 keys for full nodes:
   validators) and
   signing network messages (for validators and auditors)
 - **Administrative key** is specific to validators and is used for
-  administrative tasks (such as voting for configuration updates)
+  administrative tasks (such as voting for configuration updates).
 
 Services may utilize additional key pairs, including from other cryptosystems.
 For example, the anchoring service defines an additional secp256k1 key pair
@@ -476,6 +483,7 @@ for signing anchoring transactions in Bitcoin.
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing
 [wiki:state-machine-repl]: https://en.wikipedia.org/wiki/State_machine_replication
 [rocks-db]: http://rocksdb.org/
+[merkledb]: ../architecture/merkledb.md
 [wiki:sha256]: https://en.wikipedia.org/wiki/SHA-2
 [wiki:ed25519]: https://en.wikipedia.org/wiki/EdDSA
 [libsodium]: https://download.libsodium.org/doc/
