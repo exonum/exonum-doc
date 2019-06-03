@@ -9,18 +9,24 @@ To run a node with your Java service you need to use Exonum Java application.
 You can download an archive containing the application and all the necessary
 dependencies on [the Releases page][github-releases] on GitHub. We suggest using
 `debug` version during development and `release` for deployment.
-Follow these steps:
 
-- Install [Maven 3][maven-install] which is essential for developing and building
-  Java service.
-- Install [Libsodium][libsodium] development library for your system.
-  You can use the following command for Ubuntu:
+### Mac OS
 
-  ```bash
-  sudo apt-get update && sudo apt-get install libsodium-dev
-  ```
+For Mac users, we provide a [Homebrew][homebrew] repository, which gives the
+easiest way of installing Exonum Java App:
 
-  For Mac OS, you can use [Homebrew][brew-install] as follows:
+```bash
+brew tap exonum/exonum
+brew install exonum-java
+```
+
+This will install `exonum-java` binary with all the necessary dependencies.
+However, you still need to install [Maven 3][maven-install] and follow the
+steps mentioned in [After Install][#after-install] section below.
+
+You can also install Exonum Java App manually:
+
+- Install [Libsodium][libsodium] and RocksDB libraries:
 
   ```bash
   brew install libsodium rocksdb
@@ -35,7 +41,28 @@ Follow these steps:
   unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
   ```
 
-- Create an environment variable `EXONUM_HOME` pointing at this
+
+### Linux
+
+- Install [Libsodium][libsodium] development library for your system.
+  You can use the following command for Ubuntu:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install libsodium-dev
+  ```
+
+- Download and unpack the archive from the [Releases page][github-releases]
+  into some known location. To install the latest release to `~/bin`:
+
+  ```bash
+  mkdir -p ~/bin
+  cd ~/bin
+  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
+  ```
+
+### After Install
+
+- Create an environment variable `EXONUM_HOME` pointing at installation
   location. You should also add an entry to the `PATH` variable.
 
   ```bash
@@ -45,6 +72,9 @@ Follow these steps:
 
   Debug builds are also available on the [release page][github-releases] and
   can be installed similarly.
+
+- Install [Maven 3][maven-install] which is essential for developing and building
+  Java service.
 
 - This step is not necessary during installation, but is required to configure
   the JVM to use by the application. Add a path to your JVM library to the
@@ -728,6 +758,7 @@ For using the library just include the dependency in your `pom.xml`:
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
+[homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
 [libsodium]: https://download.libsodium.org/doc/
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
