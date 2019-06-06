@@ -164,8 +164,9 @@ fn main() {
 ```
 
 Finally, we create the same structure definition of the wallet in Rust language
-based on the `proto` schema presented above. This structure will be used for
-further operations with data schema:
+based on the `proto` schema presented above. The service will use the structure
+for further operations with data schema and to [validate](../architecture/serialization.md#additional-validation-for-protobuf-generated-structures)
+the corresponding `.rs` Protobuf-generated file with this structure:
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
@@ -510,7 +511,7 @@ and is implemented by `exonum`. Therefore, there is no need to implement a
 separate API for transactions management within the service. To send a
 transaction you have to create a transaction message according to the
 [uniform structure](../architecture/transactions.md#messages) developed by
-Exonum.
+`exonum`.
 
 The transaction ID is a
 transaction number in the enum with `#[derive(TransactionSet)]`. As we
@@ -615,7 +616,7 @@ If the incoming transaction is built successfully, we put it into a `Box<_>`.
 The `state_hash` method is used to calculate the hash of
 [the blockchain state](../glossary.md#blockchain-state). The method
 should return [a vector of hashes](../architecture/services.md#state-hash) of
-the [Merkelized service tables](../glossary.md#merkelized-indices).
+the [Merkelized service tables](../architecture/merkledb.md#merkelized-indices).
 As the wallets table is not Merkelized (a simplifying assumption discussed at
 the beginning of the tutorial), the returned value should be an empty vector,
 `vec![]`.

@@ -44,8 +44,9 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
+add-apt-repository ppa:exonum/rocksdb
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb-dev pkg-config libprotobuf-dev protobuf-compiler
+    librocksdb5.17 pkg-config libprotobuf-dev protobuf-compiler
 ```
 
 For `protobuf` installation add the following dependencies:
@@ -78,7 +79,7 @@ Install the latest version of the following packages:
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
 
 ```shell
-choco install -y protoс
+choco install -y protoc
 ```
 
 ## Adding Environment Variables
@@ -165,7 +166,6 @@ guide on how to develop applications on top of the Exonum framework.
 [readme]: https://github.com/exonum/exonum/#readme
 [exonum-org]: http://github.com/exonum/
 [rust]: http://rust-lang.org/
-[leveldb]: http://leveldb.org/
 [rocksdb]: http://rocksdb.org/
 [protobuf]: https://developers.google.com/protocol-buffers/
 [libsodium]: https://download.libsodium.org/doc/

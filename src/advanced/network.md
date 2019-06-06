@@ -32,12 +32,18 @@ Full nodes are further subdivided into 2 categories:
     _light clients_.
 
 **Light clients** represent clients in the client-server paradigm; they connect
-to full nodes to retrieve information from the blockchain they are
-interested in, and to send transactions. Exonum provides a
-[“proofs mechanism”](../glossary.md#merkle-proof),
+to full nodes for several purposes:
+
+- to [retrieve](node-management.md#explorer-api-endpoints) information they are
+  interested in from the blockchain
+- to [subscribe](node-management.md#explorer-api-sockets) to block commit events
+  and be aware of every new accepted block
+- to send transactions.
+
+Exonum also provides a [“proofs mechanism”](../glossary.md#merkle-proof),
 based on cryptographic commitments via Merkle / Merkle Patricia
-trees. This mechanism allows verifying that a response from the full node
-has been really authorized by a supermajority of validators.
+trees. This mechanism enables light clients to verify that a response from the
+full node has been really authorized by a supermajority of validators.
 
 ## Peer-to-Peer Full Node Network
 
@@ -110,7 +116,7 @@ requests are generally not authenticated.
 
 Full nodes use [Actix-web framework](https://actix.rs) to implement REST
 HTTP API. Addresses for public and private API endpoints are specified in the
-[`node.api`](../architecture/configuration.md#nodeapi) section of the local
+[`api`](../architecture/configuration.md#api) section of the local
 configuration.
 
 ### Service Endpoints
