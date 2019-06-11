@@ -6,11 +6,48 @@ and Java services runtime environment.
 ## Installation
 
 To run a node with your Java service you need to use Exonum Java application.
-You can download an archive containing the application and all the necessary
-dependencies on [the Releases page][github-releases] on GitHub. We suggest using
-`debug` version during development and `release` for deployment.
 
-### Mac OS
+There are several installation options:
+
+- [Manual installation](#manual-installation) - available on Mac OS and Linux
+- [Homebrew package](#homebrew-package) - available on Mac OS only, recommended for
+  Mac users
+- [Build from source](#build-from-source) - available on Mac OS and Linux, does not
+  recommended for beginners
+
+### Manual Installation
+
+You can download an archive containing the application and 
+all the necessary dependencies on [the Releases page][github-releases] on GitHub.
+We suggest using `debug` version during development and `release` for deployment.
+
+- Download and unpack the archive from the [Releases page][github-releases]
+  into some known location. To install the latest release to `~/bin`:
+
+  ```bash
+  mkdir -p ~/bin
+  cd ~/bin
+  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
+  ```
+
+- Install necessary runtime dependencies: [Libsodium][libsodium] and
+  RocksDB libraries (the latter is only needed on Mac OS):
+  
+  __Linux (Ubuntu)__
+  
+  ```bash
+  sudo apt-get update && sudo apt-get install libsodium-dev
+  ```
+  
+  __Mac OS__
+  
+  ```bash
+  brew install libsodium rocksdb
+  ```
+
+- Follow steps in [After Install](#after-install) section below
+
+### Homebrew package
 
 For Mac users, we provide a [Homebrew][homebrew] repository, which gives the
 easiest way of installing Exonum Java App:
@@ -24,41 +61,10 @@ This will install `exonum-java` binary with all the necessary dependencies.
 However, you still need to install [Maven 3][maven-install] and follow the
 steps mentioned in [After Install][#after-install] section below.
 
-You can also install Exonum Java App manually:
+### Build from Source
 
-- Install [Libsodium][libsodium] and RocksDB libraries:
-
-  ```bash
-  brew install libsodium rocksdb
-  ```
-
-- Download and unpack the archive from the [Releases page][github-releases]
-  into some known location. To install the latest release to `~/bin`:
-
-  ```bash
-  mkdir -p ~/bin
-  cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
-  ```
-
-
-### Linux
-
-- Install [Libsodium][libsodium] development library for your system.
-  You can use the following command for Ubuntu:
-
-  ```bash
-  sudo apt-get update && sudo apt-get install libsodium-dev
-  ```
-
-- Download and unpack the archive from the [Releases page][github-releases]
-  into some known location. To install the latest release to `~/bin`:
-
-  ```bash
-  mkdir -p ~/bin
-  cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
-  ```
+It is also possible to build Exonum Java application from sources. To do so,
+follow the instructions in [Contribution Guide][how-to-build].
 
 ### After Install
 
@@ -69,9 +75,6 @@ You can also install Exonum Java App manually:
   export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
   export PATH="$PATH:~/bin/exonum-java-0.6.0-release"
   ```
-
-  Debug builds are also available on the [release page][github-releases] and
-  can be installed similarly.
 
 - Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
@@ -93,9 +96,6 @@ You can also install Exonum Java App manually:
   ```
 
   <!-- cspell:enable -->
-
-It is also possible to build Exonum Java application from sources. To do so,
-follow the instructions in [Contribution Guide][how-to-build].
 
 ## Creating Project
 
