@@ -35,34 +35,16 @@ Follow these steps:
   unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
   ```
 
-- Create an environment variable `EXONUM_HOME` pointing at this
-  location. You should also add an entry to the `PATH` variable.
+- Add the `bin` directory from this location to the `PATH` variable:
 
   ```bash
-  export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
-  export PATH="$PATH:~/bin/exonum-java-0.6.0-release"
+  export PATH="$PATH:~/bin/exonum-java-0.6.0-release/bin"
   ```
 
   Debug builds are also available on the [release page][github-releases] and
   can be installed similarly.
 
-- This step is not necessary during installation, but is required to configure
-  the JVM to use by the application. Add a path to your JVM library to the
-  `LD_LIBRARY_PATH` environment variable. You can use the following script:
-
-  <!-- cspell:disable -->
-
-  ```bash
-  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version \
-    2>&1 > /dev/null |\
-    grep 'java.home' |\
-    awk '{print $3}')}"
-  LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
-
-  export LD_LIBRARY_PATH="${LIBJVM_PATH}"
-  ```
-
-  <!-- cspell:enable -->
+- By default, the application tries to determine the location of JVM from the already installed Java, but you can configure the JVM to use with the JAVA_HOME environment variable.
 
 It is also possible to build Exonum Java application from sources. To do so,
 follow the instructions in [Contribution Guide][how-to-build].
