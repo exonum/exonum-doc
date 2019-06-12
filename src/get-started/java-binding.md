@@ -12,8 +12,7 @@ There are several installation options:
 - [Manual installation](#manual-installation) - available on Mac OS and Linux
 - [Homebrew package](#homebrew-package) - available on Mac OS only, recommended for
   Mac users
-- [Build from source](#build-from-source) - available on Mac OS and Linux, does not
-  recommended for beginners
+- [Build from source](#build-from-source) - available on Mac OS and Linux
 
 ### Manual Installation
 
