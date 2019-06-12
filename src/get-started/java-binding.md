@@ -33,11 +33,13 @@ We suggest using `debug` version during development and `release` for deployment
   RocksDB libraries (the latter is only needed on Mac OS):
   
   ??? example "Linux (Ubuntu)"
+    
     ```bash
     sudo apt-get update && sudo apt-get install libsodium-dev
     ```
   
   ??? example "Mac OS"
+    
     ```bash
     brew install libsodium rocksdb
     ```
