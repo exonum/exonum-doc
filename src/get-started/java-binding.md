@@ -44,7 +44,9 @@ Follow these steps:
   Debug builds are also available on the [release page][github-releases] and
   can be installed similarly.
 
-- By default, the application tries to determine the location of JVM from the already installed Java, but you can configure the JVM to use with the JAVA_HOME environment variable.
+- By default, the application tries to determine the location of JVM from the already
+  installed Java, but you can configure the JVM to use with the `JAVA_HOME`
+  environment variable.
 
 It is also possible to build Exonum Java application from sources. To do so,
 follow the instructions in [Contribution Guide][how-to-build].
