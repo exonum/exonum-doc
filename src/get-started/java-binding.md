@@ -16,7 +16,7 @@ There are several installation options:
 
 ### Manual Installation
 
-You can download an archive containing the application and 
+You can download an archive containing the application and
 all the necessary dependencies on [the Releases page][github-releases] on GitHub.
 We suggest using `debug` version during development and `release` for deployment.
 
