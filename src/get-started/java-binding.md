@@ -32,17 +32,15 @@ We suggest using `debug` version during development and `release` for deployment
 - Install necessary runtime dependencies: [Libsodium][libsodium] and
   RocksDB libraries (the latter is only needed on Mac OS):
   
-  __Linux (Ubuntu)__
+  ??? example "Linux (Ubuntu)"
+    ```bash
+    sudo apt-get update && sudo apt-get install libsodium-dev
+    ```
   
-  ```bash
-  sudo apt-get update && sudo apt-get install libsodium-dev
-  ```
-  
-  __Mac OS__
-  
-  ```bash
-  brew install libsodium rocksdb
-  ```
+  ??? example "Mac OS"
+    ```bash
+    brew install libsodium rocksdb
+    ```
 
 - Follow steps in [After Install](#after-install) section below
 
