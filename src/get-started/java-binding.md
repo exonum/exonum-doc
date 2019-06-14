@@ -10,15 +10,16 @@ To run a node with your Java service you need to use Exonum Java application.
 There are several installation options:
 
 - [Manual installation](#manual-installation) - available for Mac OS and Linux
-- [Homebrew package](#homebrew-package) - available for Mac OS only, recommended for
-  Mac users
+- [Homebrew package](#homebrew-package) - available for Mac OS only,
+  recommended for Mac users
 - [Build from source](#build-from-source) - available for Mac OS and Linux
 
 ### Manual Installation
 
 You can download an archive containing the application and
 all the necessary dependencies on [the Releases page][github-releases] on GitHub.
-We suggest using `debug` version during development and `release` version for deployment.
+We suggest using `debug` version during development and `release` version for
+deployment.
 
 - Download and unpack the archive from the [Releases page][github-releases]
   into some known location. To install the latest release to `~/bin`:
