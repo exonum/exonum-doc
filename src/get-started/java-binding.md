@@ -9,16 +9,16 @@ To run a node with your Java service you need to use Exonum Java application.
 
 There are several installation options:
 
-- [Manual installation](#manual-installation) - available on Mac OS and Linux
-- [Homebrew package](#homebrew-package) - available on Mac OS only, recommended for
+- [Manual installation](#manual-installation) - available for Mac OS and Linux
+- [Homebrew package](#homebrew-package) - available for Mac OS only, recommended for
   Mac users
-- [Build from source](#build-from-source) - available on Mac OS and Linux
+- [Build from source](#build-from-source) - available for Mac OS and Linux
 
 ### Manual Installation
 
 You can download an archive containing the application and
 all the necessary dependencies on [the Releases page][github-releases] on GitHub.
-We suggest using `debug` version during development and `release` for deployment.
+We suggest using `debug` version during development and `release` version for deployment.
 
 - Download and unpack the archive from the [Releases page][github-releases]
   into some known location. To install the latest release to `~/bin`:
@@ -29,8 +29,8 @@ We suggest using `debug` version during development and `release` for deployment
   unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
   ```
 
-- Install necessary runtime dependencies: [Libsodium][libsodium] and
-  RocksDB libraries (the latter is only needed on Mac OS):
+- Install [Libsodium][libsodium] as the necessary runtime dependency.
+  For Mac OS also install RocksDB library:
   
   ??? example "Linux (Ubuntu)"
   
@@ -44,9 +44,9 @@ We suggest using `debug` version during development and `release` for deployment
     brew install libsodium rocksdb
     ```
 
-- Follow steps in [After Install](#after-install) section below
+- Follow the steps in the [After Install](#after-install) section below
 
-### Homebrew package
+### Homebrew Package
 
 For Mac users, we provide a [Homebrew][homebrew] repository, which gives the
 easiest way of installing Exonum Java App:
