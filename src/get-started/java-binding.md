@@ -73,7 +73,7 @@ follow the instructions in [Contribution Guide][how-to-build].
 
   ```bash
   export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
-  export PATH="$PATH:~/bin/exonum-java-0.6.0-release"
+  export PATH="$PATH:$EXONUM_HOME"
   ```
 
 - Install [Maven 3][maven-install] which is essential for developing and building
