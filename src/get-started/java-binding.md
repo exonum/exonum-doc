@@ -59,7 +59,7 @@ brew install exonum-java
 
 This will install `exonum-java` binary with all the necessary dependencies.
 However, you still need to install [Maven 3][maven-install] and follow the
-steps mentioned in [After Install][#after-install] section below.
+steps mentioned in [After Install](#after-install) section below.
 
 ### Build from Source
 
