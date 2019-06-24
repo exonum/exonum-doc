@@ -75,6 +75,7 @@ Install the latest version of the following packages:
 - [Visual C++ Build Tools][build_tools]
 - [PowerShell][powershell]
 - [Protobuf][protobuf]
+- [LLVM][llvm]
 
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
 
@@ -168,6 +169,7 @@ guide on how to develop applications on top of the Exonum framework.
 [rust]: http://rust-lang.org/
 [rocksdb]: http://rocksdb.org/
 [protobuf]: https://developers.google.com/protocol-buffers/
+[llvm]: http://releases.llvm.org/8.0.0/
 [libsodium]: https://download.libsodium.org/doc/
 [homebrew]: https://brew.sh/
 [chocolatey]: https://chocolatey.org/
@@ -183,5 +185,4 @@ guide on how to develop applications on top of the Exonum framework.
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
 [build_tools]: https://www.visualstudio.com/downloads/
 [powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
-[protobuf]: https://developers.google.com/protocol-buffers/
 [win-issue]: https://github.com/exonum/exonum/issues/new?title=Windows+support+problem
