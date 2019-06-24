@@ -10,7 +10,7 @@ The configuration is stored in the [TOML][toml] format. A path to the
 configuration file should be specified on the node start up.
 
 The configuration may be changed using
-[the global variables updater service](../advanced/configuration-updater.md)
+[the Configuration Updater service](../advanced/configuration-updater.md)
 or [by editing the configuration file](#changing-configuration).
 
 Services may have their own configuration settings. On node initialization the
@@ -209,7 +209,7 @@ to keep the system operational.
     validator keys) using the global variables updater service.
 
 [toml]: https://en.wikipedia.org/wiki/TOML
-[github_config_file]: https://github.com/exonum/exonum/blob/master/exonum/tests/testdata/config/config02.toml
+[github_config_file]: https://github.com/exonum/exonum/blob/master/exonum/tests/testdata/config/with_pass/cfg/0/node.toml
 [rfc2126]: https://tools.ietf.org/html/rfc2126
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin

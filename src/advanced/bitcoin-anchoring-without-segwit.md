@@ -376,7 +376,7 @@ from this chain will include the optional
 The service provides the following public API endpoints:
 
 - [Get actual anchoring address](#actual-address)
-- [Get next anchoring address](#following-address)
+- [Get next anchoring address](#next-address)
 - [Get actual common LECT](#actual-common-lect)
 - [Get actual LECT for specific validator](#actual-lect-for-specific-validator)
 

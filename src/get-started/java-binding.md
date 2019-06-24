@@ -1,7 +1,99 @@
 # Java Binding User Guide
 
-**Java Binding App** is an application that includes the Exonum framework
+**Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
+
+## Installation
+
+To run a node with your Java service you need to use Exonum Java application.
+
+There are several installation options:
+
+- [Manual installation](#manual-installation) - available for Mac OS and Linux
+- [Homebrew package](#homebrew-package) - available for Mac OS only,
+  recommended for Mac users
+- [Build from source](#build-from-source) - available for Mac OS and Linux
+
+### Manual Installation
+
+You can download an archive containing the application and
+all the necessary dependencies on [the Releases page][github-releases] on GitHub.
+We suggest using `debug` version during development and `release` version for
+deployment.
+
+- Download and unpack the archive from the [Releases page][github-releases]
+  into some known location. To install the latest release to `~/bin`:
+
+  ```bash
+  mkdir -p ~/bin
+  cd ~/bin
+  unzip /path/to/downloaded/exonum-java-0.6.0-release.zip
+  ```
+
+- Install [Libsodium][libsodium] as the necessary runtime dependency.
+  For Mac OS also install RocksDB library:
+  
+??? example "Linux (Ubuntu)"
+    ```bash
+    sudo apt-get update && sudo apt-get install libsodium-dev
+    ```
+  
+??? example "Mac OS"
+    ```bash
+    brew install libsodium rocksdb
+    ```
+
+- Follow the steps in the [After Install](#after-install) section below
+
+### Homebrew Package
+
+For Mac users, we provide a [Homebrew][homebrew] repository, which gives the
+easiest way of installing Exonum Java App:
+
+```bash
+brew tap exonum/exonum
+brew install exonum-java
+```
+
+This will install `exonum-java` binary with all the necessary dependencies.
+However, you still need to install [Maven 3][maven-install] and follow the
+steps mentioned in [After Install](#after-install) section below.
+
+### Build from Source
+
+It is also possible to build Exonum Java application from sources. To do so,
+follow the instructions in [Contribution Guide][how-to-build].
+
+### After Install
+
+- Create an environment variable `EXONUM_HOME` pointing at installation
+  location. You should also add an entry to the `PATH` variable.
+
+  ```bash
+  export EXONUM_HOME=~/bin/exonum-java-0.6.0-release
+  export PATH="$PATH:$EXONUM_HOME"
+  ```
+
+- Install [Maven 3][maven-install] which is essential for developing and building
+  Java service.
+
+- This step is not necessary during installation, but is required to configure
+  the JVM to use by the application. Add a path to your JVM library to the
+  `LD_LIBRARY_PATH` environment variable. You can use the following script:
+
+  <!-- cspell:disable -->
+
+  ```bash
+  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version \
+    2>&1 > /dev/null |\
+    grep 'java.home' |\
+    awk '{print $3}')}"
+  LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
+
+  export LD_LIBRARY_PATH="${LIBJVM_PATH}"
+  ```
+
+  <!-- cspell:enable -->
 
 ## Creating Project
 
@@ -9,23 +101,23 @@ The easiest way to create a Java service project is to use a template project
 generator. After [installing Maven 3][maven-install], run the command:
 
 ``` none
-$ mvn archetype:generate \
+mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.4.0 \
+    -DarchetypeVersion=0.6.0 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
-    -Dversion=1.0
+    -Dversion=1.0.0
 ```
 
 You can also use the interactive mode:
 
 ``` none
-$ mvn archetype:generate \
+mvn archetype:generate \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.4.0
+    -DarchetypeVersion=0.6.0
 ```
 
 The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
@@ -170,7 +262,7 @@ Ed25519 is a standard cryptographic system for digital signing
 of Exonum messages. It is available through
 the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 
-[node-configuration-validator-keys]: ../architecture/configuration.md#genesis-validator-keys
+[node-configuration-validator-keys]: ../architecture/configuration.md#genesisvalidator_keys
 
 #### Transaction Lifecycle
 
@@ -276,28 +368,28 @@ transaction code and in read requests. The following functionality is
 available:
 
 - `getHeight: long`
-  The height of the latest committed block in the blockchain.
+  The height of the latest committed block in the blockchain
 - `getBlockHashes: ListIndex<HashCode>`
-  The list of all block hashes, indexed by the block height.
+  The list of all block hashes, indexed by the block height
 - `getBlockTransactions: ProofListIndexProxy<HashCode>`
   The proof list of transaction hashes committed in the block with the given
-  height or ID.
+  height or ID
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
-  committed and in-pool (not yet processed) transactions are returned.
+  committed and in-pool (not yet processed) transactions are returned
 - `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
   The map of transaction execution results identified by the corresponding
-  transaction SHA-256 hashes.
+  transaction SHA-256 hashes
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
   The map of transaction positions inside the blockchain identified by
-  the corresponding transaction SHA-256 hashes.
+  the corresponding transaction SHA-256 hashes
 - `getBlocks: MapIndex<HashCode, Block>`
-  The map of block objects identified by the corresponding block hashes.
+  The map of block objects identified by the corresponding block hashes
 - `getLastBlock: Block`
-  The latest committed block.
+  The latest committed block
 - `getActualConfiguration: StoredConfiguration`
   The configuration for the latest height of the blockchain, including services
-  and their parameters.
+  and their parameters
 
 ### External Service API
 
@@ -314,37 +406,46 @@ common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
 at `/api/cryptocurrency/balance/:walletId`.
 
-See [documentation][vertx.io] on the possibilities of `Vert.x` used as a web
+See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
 
 ### Dependencies Management
 
-Exonum uses [Guice](https://github.com/google/guice) to describe the
-dependencies of the service components (both system-specific
-ones, for example, Exonum time service, and external ones). Each
-service should define a module describing implementations of the framework
-interfaces – `Service`, `TransactionConverter` and implementations of other
-components, if any.
+Exonum uses [Guice][guice-home] to describe the dependencies of the service
+components (both system-specific ones, for example, Exonum time service,
+and external ones).
+Each service should define a Guice module describing implementations of
+the `Service` and its dependencies, if any.
+
+A service module shall:
+
+  1. extend [`AbstractServiceModule`][abstract-service-module-javadoc]
+  2. be annotated with `@org.pf4j.Extension`.
+  3. be `public`.
 
 !!! note "Minimalistic Example of Service Module"
     ```java
-    public class ServiceModule extends AbstractModule {
+    @Extension
+    public class ServiceModule extends AbstractServiceModule {
 
       @Override
       protected void configure() {
         // Define the Service implementation.
         bind(Service.class).to(CryptocurrencyService.class).in(Singleton.class);
 
-        // Define the TransactionConverter implementation.
+        // Define the TransactionConverter implementation required
+        // by the CryptocurrencyService.
         bind(TransactionConverter.class).to(CryptocurrencyTransactionConverter.class);
       }
     }
     ```
 
-The fully-qualified name (FQN) of the module class must be specified/passed
-during configuration of an Exonum App that will run the service.
+The fully-qualified name of the module class is recorded in the service artifact
+metadata and is used by the framework to instantiate services.
 
-For more information on using Guice, see the [project wiki][Guice].
+For more information on using Guice, see the [project wiki][guice-wiki].
+
+[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractServiceModule.html
 
 ## Testing
 
@@ -369,8 +470,11 @@ The plug-in for running tests should be configured to pass
 `java.library.path` system property to JVM:
 
 ``` none
--Djava.library.path=<path-to-java-bindings-library>
+-Djava.library.path=$EXONUM_JAVA/lib/native
 ```
+
+`$EXONUM_JAVA` environment variable should point at installation location,
+as specified in [How to Run a Service section](#how-to-run-a-service).
 
 `Surefire/Failsafe` for Maven should be configured as follows:
 
@@ -444,11 +548,6 @@ changes made to `Fork` to the database state:
     }
     ```
 
-!!! warning
-    Java integration tests that use the shared native library currently work
-    on MacOS only. However, the Java Binding App, which runs Java services,
-    works fine on both MacOS and Linux.
-
 ### Transactions
 
 To test transactions execution, you can use `MemoryDb`, as in the previous
@@ -472,50 +571,146 @@ client.
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
+## Using Libraries
+
+An Exonum service can use any third-party library as its dependency.
+At the same time, Exonum comes with its own dependencies.
+Classes of these dependencies are used in Exonum public APIs:
+
+- Exonum (exonum-java-binding-core, exonum-java-binding-common)
+- [Guice][guice-home]
+- [Gson][gson]
+- [Vertx][vertx-web-docs] (vertx-web)
+- [Protobuf Java](https://github.com/protocolbuffers/protobuf/tree/master/java)
+- [Log4j 2][log4j2]
+- [PF4J](https://pf4j.org)
+
+Said dependencies are provided by the framework and must be used as provided.
+They will not be changed in an incompatible way in a compatible Exonum release.
+An up-to-date list is also available in the Exonum [bill of materials][bom] (BOM).
+
+<!-- Otherwise multiple incompatible versions of the same class
+will be loaded by the plugin classloader and the application classloader, if they
+happen to need the same class -->
+
+On top of that, Guava *can* be and is recommended to be used as a provided
+library. <!-- because of its considerable size -->
+
+!!! note
+    These dependencies do not have to be declared explicitly
+    because any service depends on "exonum-java-binding-core"
+    which has them as transitive dependencies.
+
+These libraries must not be packaged into the service artifact.
+To achieve that in Maven, use the [`provided`][maven-provided-scope]
+Maven dependency scope in the dependency declarations if you would
+like to specify them explicitly.
+
+[gson]: https://github.com/google/gson
+[log4j2]: https://logging.apache.org/log4j/2.x/
+[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/bom/pom.xml
+[maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
+
+## How to Build a Service Artifact
+
+Exonum Java services are packaged as JAR archives with some extra metadata,
+required to identify the service and instantiate it.
+
+If you used the [service archetype](#creating-project) to generate
+the project template, the build definition already contains
+all the required configuration. Hence you can invoke `mvn verify`
+and use the produced service artifact.
+
+<!-- This paragraph is intended for users who don't use the archetype
+and/or need to make non-trivial changes to the build definition (e.g.,
+shade dependencies)-->
+In case the service build definition needs to be configured, ensure that
+the following required metadata is present in the service artifact JAR:
+
+- Entries in the JAR manifest:
+    - "Plugin-Id": must be set to "groupId:artifactId:version", e.g.,
+    `com.exonum.example.timestamping:timestamping-demo:1.0.2`.
+    - "Plugin-Version": must be set to the project version, e.g., `1.0.2`.
+- A fully-qualified name of the [service module](#dependencies-management) class
+  in "META-INF/extensions.idx" file. This file is automatically generated
+  by the annotation processor of `@Extension`.
+
 ## How to Run a Service
 
-Currently you have to build a native application to run a node with your Java
-service:
-
-- Install the system dependencies and [build][how-to-build] the application.
-- Follow the instructions in the [application guide][app-tutorial] to configure
-  and start an Exonum node with your service.
+- Make sure you followed the steps mentioned in [Installation section](#installation).
+- Follow the instructions in the [Application Guide][app-tutorial] to configure
+  and start an Exonum node with your service. The guide is provided inside the archive
+  as well.
 
 ## Built-In Services
 
 Currently Java Binding includes the following built-in services:
 
-- **Configuration Update Service.**
+- [**Configuration Update Service.**](../advanced/configuration-updater.md)
   Although every node has its own configuration file, some settings should be
   changed for all nodes simultaneously. This service allows updating global
   configuration parameters of the network without stopping the nodes. The
   changes are agreed upon through the consensus mechanism.
 
-  See the [*Configuration Update Service*](../advanced/configuration-updater.md)
-  article for more details.
-- **Anchoring Service.**
+- [**Anchoring Service.**](../advanced/bitcoin-anchoring.md)
   The anchoring service writes the hash of the current Exonum blockchain state
   to the Bitcoin blockchain with a certain time interval. The anchored data is
   authenticated by a supermajority of validators using digital signature tools
   available in Bitcoin.
 
-  See the [*Anchoring Service*](../advanced/bitcoin-anchoring.md)
-  article for more details.
+- [**Time Oracle.**](../advanced/time.md)
+  Time oracle allows user services to access the calendar time supplied by
+  validator nodes to the blockchain.
 
-To enable a particular service, include its name in `ejb_app_services.toml`
-configuration file in the EJB App's directory with the following content:
+## Services Activation
+
+No services are enabled on the node by default. To enable services,
+define them in the `services.toml` configuration file.
+This file is required for a running node. `services.toml`
+should be located in the **working directory** of your project,
+where you run commands.
+It consists of two sections:
+`system_services` and `user_services`.
+
+The `user_services` section enumerates services in the form of
+`name = artifact`, where `name` is a one-word description of the service
+and `artifact` is a full path to the service's artifact. It must be absolute
+unless you want to depend on the application working directory.
+
+!!! note
+    At least one service must be defined
+    in the `[user_services]` section.
 
 ```toml
-services = ["service-name"]
+[user_services]
+service_name1 = "/path/to/service1_artifact.jar"
+```
+
+The optional `system_services` section is used to enable built-in Exonum services.
+
+```toml
+system_services = ["service-name"]
 ```
 
 where possible values for `service-name` are:
 
-- `configuration` for Configuration Update Service.
-- `btc-anchoring` for Anchoring Service.
+- `configuration` for Configuration Update Service
+- `btc-anchoring` for Anchoring Service
+- `time` for Time Oracle
 
-In case there is no `ejb_app_services.toml` file, only Configuration Service will
-be activated.
+!!! note
+    In case there is no such section,
+    only Configuration Service will be activated.
+
+Below is the sample of the `services.toml` file that enables
+all possible built-in Exonum services and two user services:
+
+```toml
+system_services = ["configuration", "btc-anchoring", "time"]
+[user_services]
+service_name1 = "/path/to/service1_artifact.jar"
+service_name2 = "/path/to/service2_artifact.jar"
+```
 
 ## Common Library
 
@@ -532,7 +727,7 @@ For using the library just include the dependency in your `pom.xml`:
     <dependency>
       <groupId>com.exonum.binding</groupId>
       <artifactId>exonum-java-binding-common</artifactId>
-      <version>0.4.0</version>
+      <version>0.6.0</version>
     </dependency>
 ```
 
@@ -542,43 +737,45 @@ For using the library just include the dependency in your `pom.xml`:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
-- [Time oracle](../advanced/time.md) service is not available,
-  but will be integrated into EJB App soon.
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
-- The application supports only one Java service. Support of multiple Java
-  services is coming in the near future.
+- Exonum Java application does not support Windows yet.
 
 ## See Also
 
 - [Rust instruction](create-service.md)
-- [Java Binding App tutorial][app-tutorial]
+- [Exonum Java App tutorial][app-tutorial]
 
-[abstractservice]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/core/rust/ejb-app/TUTORIAL.md
-[blockchain]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/blockchain/Blockchain.html
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/v0.4/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
+[blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
+[brew-install]: https://docs.brew.sh/Installation
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [Exonum-services]: ../architecture/services.md
-[Guice]: https://github.com/google/guice/wiki/GettingStarted
-[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/v0.4/CONTRIBUTING.md#how-to-build
-[Memorydb]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/storage/database/MemoryDb.html
-[nodefake]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/NodeFake.html
-[schema]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Schema.html
-[service]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Service.html
-[service-after-commit]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
-[standardserializers]: https://exonum.com/doc/api/java-binding-common/0.4/com/exonum/binding/common/serialization/StandardSerializers.html
-[storage-indices]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/storage/indices/package-summary.html
-[transaction]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/transaction/Transaction.html
-[transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/transaction/TransactionContext.html
+[github-releases]: https://github.com/exonum/exonum-java-binding/releases
+[guice-home]: https://github.com/google/guice
+[guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
+[homebrew]: https://github.com/Homebrew/brew#homebrew
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
+[libsodium]: https://download.libsodium.org/doc/
+[Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
+[nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
+[schema]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Schema.html
+[service]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html
+[service-after-commit]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[standardserializers]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/serialization/StandardSerializers.html
+[storage-indices]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/indices/package-summary.html
+[transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/Transaction.html
+[transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
-[transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/TransactionConverter.html
-[vertx.io]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
+[transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/TransactionConverter.html
+[vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.4/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.4/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
-[transaction-result]: https://docs.rs/exonum/0.10/exonum/blockchain/struct.TransactionResult.html
-[exonum-transaction]: https://exonum.com/doc/advanced/node-management/#transaction
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
+[createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
+[transaction-result]: https://docs.rs/exonum/0.11/exonum/blockchain/struct.TransactionResult.html
+[exonum-transaction]: ../advanced/node-management.md#transaction

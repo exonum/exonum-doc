@@ -2,10 +2,9 @@
 
 <!-- cspell:ignore tlsdate,roughtime -->
 
-[**exonum-time**][exonum-time] is a time oracle service for Exonum.
-This service allows determining time,
-importing it from the external world to the blockchain
-and keeping its current value in the blockchain.
+Time Oracle allows user services to access the calendar time supplied by
+validator nodes to the blockchain. Its implementations for Exonum are available
+in [Rust][rust-time-oracle] and [Java][java-time-oracle].
 
 ## The Problem
 
@@ -116,11 +115,11 @@ All REST endpoints share the same base path, denoted **{base_path}**,
 equal to `api/services/exonum_time/v1`.
 
 The service exposes the following API endpoint for the
-[public API](#public_apis):
+[public API](#public-apis):
 
 - [Get the current consolidated time](#current-time)
 
-The following endpoints are exposed for the [private API](#private_apis):
+The following endpoints are exposed for the [private API](#private-apis):
 
 - [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
 - [Dump timestamps of all validators](#timestamps-of-all-validators)
@@ -268,7 +267,8 @@ the tight integration with consensus. This approach is more flexible and
 manageable, and could be generalized to the agreement between arbitrary
 collectively trusted entities, which may behave maliciously.
 
-[exonum-time]: https://github.com/exonum/exonum/tree/master/services/time
+[rust-time-oracle]: https://github.com/exonum/exonum/tree/master/services/time
+[java-time-oracle]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-java-binding/time-oracle
 [tlsdate]: https://github.com/ioerror/tlsdate
 [roughtime]: https://roughtime.googlesource.com/roughtime
 [ISO8601]: https://en.wikipedia.org/wiki/ISO_8601

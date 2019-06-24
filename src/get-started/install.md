@@ -44,8 +44,9 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
+add-apt-repository ppa:exonum/rocksdb
 apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb-dev pkg-config libprotobuf-dev protobuf-compiler
+    librocksdb5.17 pkg-config libprotobuf-dev protobuf-compiler
 ```
 
 For `protobuf` installation add the following dependencies:
@@ -65,6 +66,10 @@ these packages from third-party PPAs, or build them from sources.
 
 ### Windows
 
+!!! note
+    Windows support is experimental. In case of any issues, please [create an
+    issue on GitHub][win-issue].
+
 Install the latest version of the following packages:
 
 - [Visual C++ Build Tools][build_tools]
@@ -75,7 +80,7 @@ Install the latest version of the following packages:
 Use package manager [Chocolatey][chocolatey] to install Protobuf:
 
 ```shell
-choco install -y protobuf
+choco install -y protoc
 ```
 
 ## Adding Environment Variables
@@ -133,16 +138,10 @@ by cloning the `exonum` repository and running its built-in unit test suite:
 ```shell
 git clone https://github.com/exonum/exonum.git
 cd exonum
-cargo test --manifest-path exonum/Cargo.toml
+cargo test -p exonum
 ```
 
-You may also run the extended test suite located in the `sandbox` directory:
-
-```shell
-cargo test --manifest-path sandbox/Cargo.toml
-```
-
-Notice that `tests` requires up to 30Gb free disk space.
+Notice that running tests may require up to 30 GB free disk space.
 
 ## Non-Rust Components
 
@@ -186,3 +185,4 @@ guide on how to develop applications on top of the Exonum framework.
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
 [build_tools]: https://www.visualstudio.com/downloads/
 [powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
+[win-issue]: https://github.com/exonum/exonum/issues/new?title=Windows+support+problem
