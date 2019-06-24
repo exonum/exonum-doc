@@ -44,6 +44,7 @@
     "keypair",
     "leveldb",
     "LGTM",
+    "LLVM",
     "libsodium",
     "lifecycle",
     "markdownlint",
