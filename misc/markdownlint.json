@@ -4,5 +4,8 @@
   "line-length": { "tables": false },
   "ol-prefix": { "style": "ordered" },
   "no-trailing-spaces": { "br_spaces": 2 },
-  "ul-indent": { "indent": 4 }
+  "ul-indent": { "indent": 4 },
+  "code-block-style": false,
+  "no-space-in-code": false,
+  "single-h1": false
 }

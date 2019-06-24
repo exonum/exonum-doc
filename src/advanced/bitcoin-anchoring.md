@@ -365,7 +365,7 @@ The string with a value of the anchoring address in the Base58Check format.
 GET /{api_prefix}/v1/address/following
 ```
 
-If the [change of the validators list](#transitional-transaction) is
+If the [change of the validators list](#transition-transaction) is
 scheduled, returns the next anchoring address.
 Otherwise, returns `null`.
 
@@ -562,7 +562,7 @@ Example of JSON response:
 - **to_block_header**: proof for the specific block header in this table
 
 [anchoring-deploy]: https://github.com/exonum/exonum-btc-anchoring#deployment
-[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring/blob/master/DEPLOY.md#change-configuration-parameters
+[anchoring-parameters]: https://github.com/exonum/exonum-btc-anchoring#modify-configuration-parameters
 [github-anchoring]: https://github.com/exonum/exonum-btc-anchoring
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
 [transaction_malleability]: https://en.bitcoin.it/wiki/Transaction_malleability#Segwit

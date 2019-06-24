@@ -9,7 +9,7 @@
 [generator-image]: https://img.shields.io/badge/generator-mkdocs-blue.svg?style=flat-square
 [generator-url]: http://www.mkdocs.org/
 [gitter-image]: https://img.shields.io/gitter/room/exonum/exonum-doc.svg?style=flat-square
-[gitter-url]: https://gitter.im/exonum/exonum-doc
+[gitter-url]: https://gitter.im/exonum/exonum
 
 This is the documentation repo for the Exonum platform. It contains source files
 used to build the documentation displayed on the [Exonum
@@ -140,7 +140,7 @@ See [LICENSE](LICENSE) and [LICENSE-CODE](LICENSE-CODE) for details.
 [mdl-rules]: https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md
 [html5validator]: https://github.com/svenkreiss/html5validator
 [linkchecker]: https://github.com/wummel/linkchecker
-[mkdocs-meta]: https://pythonhosted.org/Markdown/extensions/meta_data.html
+[mkdocs-meta]: https://python-markdown.github.io/extensions/meta_data/
 [jekyll]: http://jekyllrb.com/
 [git-branching]: http://nvie.com/posts/a-successful-git-branching-model/
 [cspell]: https://github.com/Jason3S/cspell

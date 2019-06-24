@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "0.1",
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
@@ -15,6 +15,7 @@
     "canonicalization",
     "chokepoint",
     "chrono",
+    "classloader",
     "clippy",
     "cryptocurrencies",
     "cryptocurrency",
@@ -35,10 +36,12 @@
     "Ethereum",
     "Exonum",
     "gitter",
+    "Gson",
     "Guice",
     "healthcheck",
     "HMACs",
     "idempotence",
+    "indexes",
     "Javadoc",
     "junit",
     "keypair",
@@ -126,9 +129,6 @@
     "whitelisting",
     "sint",
     "uint"
-  ],
-  "flagWords": [
-    "indexes"
   ],
   "ignoreRegExpList": [
     "/^(```)[^\\1]*?\\1$/m",

@@ -29,7 +29,7 @@ The very first step of developing a service, is creating a crate and adding
 the necessary dependencies to it.
 
 ```bash
-cargo new demo-timestamping
+cargo new exonum-demo-timestamping
 ```
 
 Add necessary dependencies to `Cargo.toml` in the project directory:
@@ -37,20 +37,30 @@ Add necessary dependencies to `Cargo.toml` in the project directory:
 ```toml
 [package]
 name = "exonum-demo-timestamping"
-version = "0.0.0"
+version = "0.1.0"
 publish = false
 authors = ["Your name <your@email.com>"]
+edition = "2018"
 
 [dependencies]
-exonum = "0.9.0"
-exonum-configuration = "0.9.0"
-exonum-time = "0.9.0"
+exonum = "0.10.3"
+exonum-configuration = "0.10.2"
+exonum-time = "0.10.2"
+exonum-derive = "0.10.0"
 serde = "1.0.10"
 serde_derive = "1.0.10"
 serde_json = "1.0.2"
-failure = "0.1.2"
-log = "=0.4.3"
-chrono = { version = "=0.4.5", features = ["serde"] }
+failure = "0.1.5"
+log = "0.4.6"
+chrono = { version = "0.4.6", features = ["serde"] }
+protobuf = "2.2.0"
+
+[build-dependencies]
+exonum-build = "0.10.0"
+
+[features]
+default = ["with-serde"]
+with-serde = []
 ```
 
 Also, you can add the following dependencies to `Cargo.toml`
@@ -58,8 +68,8 @@ for future testing purposes:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.9.0"
-pretty_assertions = "=0.5.1"
+exonum-testkit = "0.10.2"
+pretty_assertions = "0.5.1"
 ```
 
 ## Imports
@@ -70,35 +80,25 @@ where we indicate the external libraries required for our service.
 ??? note "Imports"
 
     ```rust
-    extern crate chrono;
     #[macro_use]
-    extern crate exonum;
-    extern crate exonum_time;
+    extern crate exonum_derive;
     #[macro_use]
     extern crate failure;
     #[macro_use]
     extern crate log;
-    extern crate serde;
     #[macro_use]
     extern crate serde_derive;
-    extern crate serde_json;
-
-    pub mod api;
-    pub mod schema;
-    pub mod transactions;
 
     use exonum::{
         api::ServiceApiBuilder,
         blockchain::{self, Transaction, TransactionSet},
         crypto::Hash,
-        encoding::Error as StreamStructError,
-        helpers::fabric, messages::RawTransaction,
+        helpers::fabric,
+        messages::RawTransaction,
         storage::Snapshot,
     };
 
-    use api::PublicApi;
-    use schema::Schema;
-    use transactions::TimeTransactions;
+    use crate::{api::PublicApi, schema::Schema, transactions::TimeTransactions};
     ```
 
 As we have subdivided the code into several files corresponding to service
@@ -107,6 +107,7 @@ in [src/lib.rs][src/lib.rs]:
 
 ```rust
 pub mod api;
+pub mod proto;
 pub mod schema;
 pub mod transactions;
 ```
@@ -125,65 +126,188 @@ const TIMESTAMPING_SERVICE: u16 = 130;
 pub const SERVICE_NAME: &str = "timestamping";
 ```
 
-## Configure Schema
+## Declare Persistent Data
+
+We need to declare the data that we will store in our blockchain. There are two
+structures that we will use in our service.
+
+The `Timestamp` structure comprises a hash of the
+timestamped object and some descriptive metadata about said object. The
+`TimestampEntry` structure is the way that we actually store timestamps in the
+blockchain. It comprises `Timestamp` itself plus a hash of the corresponding
+timestamping transaction and the time when the timestamp was recorded. The
+time value is provided by the Exonum Time Oracle.
+
+We add the transaction hash and the time value to the timestamp entry to
+further allow users making corresponding requests about their timestamps
+stored in the blockchain.
+
+Exonum uses Protobuf as its
+[serialization format](../architecture/serialization.md) for storage of data.
+Thus, we need to describe our structures using the Protobuf interface
+description language first. The corresponding Rust structures will be later
+generated from them. For this purpose create a new `proto` directory inside
+the `src` directory of your project:
+
+```bash
+mkdir proto
+```
+
+Inside the `proto` directory create the `timestamping.proto` file.
+It will contain Protobuf definitions of the above-mentioned structures used in
+the project:
+
+```proto
+syntax = "proto3";
+
+import "helpers.proto";
+import "google/protobuf/timestamp.proto";
+
+// Stores hash of the timestamped content and some metadata about it.
+message Timestamp {
+  exonum.Hash content_hash = 1;
+  string metadata = 2;
+}
+
+message TimestampEntry {
+  // Timestamp data.
+  Timestamp timestamp = 1;
+  // Hash of the transaction.
+  exonum.Hash tx_hash = 2;
+  // Timestamp time.
+  google.protobuf.Timestamp time = 3;
+}
+```
+
+Next we need to add Protobuf code generation to our project. Therefore, create
+the `mod.rs` file in the `proto` module. Here we manually integrate the
+Protobuf-generated files to the `proto` module of our project:
+
+```rust
+#![allow(bare_trait_objects)]
+#![allow(renamed_and_removed_lints)]
+
+pub use self::timestamping::{Timestamp, TimestampEntry, TxTimestamp};
+
+include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
+
+use exonum::proto::schema::*;
+```
+
+And finally, we generate the Rust files based on the Protobuf descriptions of
+the structures presented above. For this, in the project root
+directory create the `build.rs` file and add the following code into it:
+
+```rust
+extern crate exonum_build;
+
+use exonum_build::{get_exonum_protobuf_files_path, protobuf_generate};
+
+fn main() {
+    let exonum_protos = get_exonum_protobuf_files_path();
+    protobuf_generate(
+        "src/proto",
+        &["src/proto", &exonum_protos],
+        "protobuf_mod.rs",
+    );
+}
+```
+
+After successful run, the output directory will contain `*.rs` file for each
+`*.proto` file in the `src/proto/**/` directory; and the `example_mod.rs` file
+that will include all the generated `.rs` files as submodules.
+
+At the same time, we define the above-mentioned two structures in Rust
+language in the `schema.rs` file. The service will further use these
+structures to [validate](../architecture/serialization.md#additional-validation-for-protobuf-generated-structures)
+`.rs` Protobuf-generated files:
+
+```rust
+use super::proto;
+use chrono::{DateTime, Utc};
+use exonum::{
+    crypto::Hash,
+    storage::{Fork, ProofMapIndex, Snapshot},
+};
+
+/// Stores hash of the timestamped content and some metadata about it.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ProtobufConvert)]
+#[exonum(pb = "proto::Timestamp")]
+pub struct Timestamp {
+    /// Hash of the content.
+    pub content_hash: Hash,
+
+    /// Additional metadata.
+    pub metadata: String,
+}
+```
+
+We also added `serde_pb_convert` to have a JSON representation
+of our structure similar to its Protobuf declaration. It helps the light
+client handle proofs that contain the `Timestamp` structure.
+
+```rust
+/// Stores `Timestamp` with the hash of the timestamping transactions and
+/// the time when the timestamp was recorded.
+#[derive(Clone, Debug, ProtobufConvert)]
+#[exonum(pb = "proto::TimestampEntry", serde_pb_convert)]
+pub struct TimestampEntry {
+    /// Timestamp data.
+    pub timestamp: Timestamp,
+
+    /// Hash of transaction.
+    pub tx_hash: Hash,
+
+    /// Timestamp time.
+    pub time: DateTime<Utc>,
+}
+```
+
+We also need to realize auxiliary methods for the creating `Timestamp` and
+`TimestampEntry` structures:
+
+```rust
+impl Timestamp {
+    /// Creates a new timestamp.
+    pub fn new(&content_hash: &Hash, metadata: &str) -> Self {
+        Self {
+            content_hash,
+            metadata: metadata.to_owned(),
+        }
+    }
+}
+
+impl TimestampEntry {
+    /// Creates a new timestamp entry.
+    pub fn new(
+        timestamp: Timestamp,
+        &tx_hash: &Hash,
+        time: DateTime<Utc>
+    ) -> Self {
+        Self {
+            timestamp,
+            tx_hash,
+            time,
+        }
+    }
+}
+```
+
+## Create Schema
 
 Schema is a structured view of
-[the key-value storage](../architecture/storage.md)
-used in Exonum. Exonum services do not access the storage directly; they work
+[the key-value storage](../architecture/storage.md) used in Exonum.
+For convenience, we have separated the code that configures the schema for our
+Timestamping Service into a separate file - [src/schema.rs][src/schema.rs]. We
+have also included the Rust descriptions of the `Timestamp` and
+`TimestampEntry` structures there.
+
+Exonum services do not access the storage directly; they work
 with `Snapshot`s and `Fork`s. A `Snapshot` represents an immutable view
 of the storage, while a `Fork` is a mutable one, where changes can be easily
 rolled back. `Snapshot`s are used in
 [read requests](../architecture/services.md#read-requests), and `Fork`s
 are used in transaction processing.
-
-We have separated the code that configures the schema for our Timestamping
-Service into a separate file - [src/schema.rs][src/schema.rs]. Here we describe
-the main elements with which our service will operate.
-
-### Declare Persistent Data
-
-As a part of the service schema, we first define the two structures that the
-service will be able to save in the Exonum blockchain. This is done using the
-`encoding_struct!` macro, which helps declare
-[serializable](../architecture/serialization.md) structures and determine the
-bounds of their fields.
-
-```rust
-encoding_struct! {
-    /// Stores the hash of the content and some metadata about it.
-    struct Timestamp {
-        /// Hash of the content.
-        content_hash: &Hash,
-        /// Additional metadata.
-        metadata: &str,
-    }
-}
-```
-
-The `Timestamp` structure includes the hash of the submitted file and its
-optional description.
-
-```rust
-encoding_struct! {
-    /// Timestamp entry.
-    struct TimestampEntry {
-        /// Timestamp data.
-        timestamp: Timestamp,
-
-        /// Hash of transaction.
-        tx_hash: &Hash,
-
-        /// Timestamp time.
-        time: DateTime<Utc>,
-    }
-}
-```
-
-The `TimestampEntry` structure includes the timestamp itself, the hash of the
-timestamping transaction and the time when the timestamp was recorded. The time
-value is provided by the Exonum Time Oracle.
-
-### Create Schema
 
 As the schema should work with both types of storage views, we declare it as a
 generic wrapper:
@@ -260,15 +384,15 @@ impl<'a> Schema<&'a mut Fork> {
 
     /// Adds the timestamp entry to the database.
     pub fn add_timestamp(&mut self, timestamp_entry: TimestampEntry) {
-        let timestamp = timestamp_entry.timestamp();
-        let content_hash = timestamp.content_hash();
+        let timestamp = timestamp_entry.timestamp.clone();
+        let content_hash = &timestamp.content_hash;
 
-        // Checks that timestamp with given content_hash does not exist.
+        // Checks that the timestamp with given `content_hash` does not exist.
         if self.timestamps().contains(content_hash) {
             return;
         }
 
-        // Adds timestamp.
+        // Adds a timestamp.
         self.timestamps_mut().put(content_hash, timestamp_entry);
     }
 }
@@ -282,58 +406,70 @@ impl<'a> Schema<&'a mut Fork> {
   value. This method also checks if a timestamp with the given hash already
   exists in the blockchain.
 
-## Configure Transactions
+## Define Transactions
 
-[Transactions](../architecture/transactions.md) resemble messages and
-perform atomic actions on the blockchain state. We have separated the code that
-configures transactions for our Timestamping Service into a separate file -
-[src/transactions.rs][src/transactions.rs]. The Timestamping Service we are
-creating requires a single transaction type - adding timestamps to the
+[Transactions](../architecture/transactions.md) are a kind of messages that
+perform atomic actions on the blockchain state. The Timestamping Service we
+are creating, requires a single transaction type - adding timestamps to the
 blockchain.
 
-First, we import the structures we need from Exonum core and the Time Oracle.
-Here we also indicate a connection to the schema we have configured previously
-in [src/schema.rs][src/schema.rs] and the `TIMESTAMPING_SERVICE` constant
-declared in [src/lib.rs][src/lib.rs].
+First, we import the structures, function and traits from the Exonum core and
+the Time Oracle that are required to define our transaction.
+
+Here we also indicate a connection to the schema that we have already
+configured in [src/schema.rs][src/schema.rs].
 
 ```rust
+#![allow(bare_trait_objects)]
+
 use exonum::{
-    blockchain::{ExecutionError, ExecutionResult, Transaction},
-    crypto::{CryptoHash, PublicKey},
-    messages::Message, storage::Fork,
+    blockchain::{ExecutionError, ExecutionResult, Transaction, TransactionContext},
 };
 use exonum_time::schema::TimeSchema;
 
-use schema::{Schema, Timestamp, TimestampEntry};
-use TIMESTAMPING_SERVICE;
+use super::proto;
+use crate::{
+    schema::{Schema, Timestamp, TimestampEntry},
+};
 ```
 
-Service transactions are defined through the `transactions!` macro which
-automatically assigns transaction IDs based on the declaration order:
+The transaction to create a timestamp (`TxTimestamp`) contains only the
+`Timestamp` object. We start transaction definition with its Protobuf format:
+
+```proto
+/// Timestamping transaction.
+message TxTimestamp { Timestamp content = 1; }
+```
+
+Now, just as we did with the data structures above, we define the transaction
+in Rust language. We have separated this code into a separate file -
+[src/transactions.rs][src/transactions.rs].
 
 ```rust
-transactions! {
-    pub TimeTransactions {
-        const SERVICE_ID = TIMESTAMPING_SERVICE;
-
-        /// A timestamp transaction.
-        struct TxTimestamp {
-            /// Public key of transaction.
-            pub_key: &PublicKey,
-
-            /// Timestamp content.
-            content: Timestamp,
-        }
-    }
+/// Timestamping transaction.
+#[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert)]
+#[exonum(pb = "proto::TxTimestamp")]
+pub struct TxTimestamp {
+    /// Timestamp content.
+    pub content: Timestamp,
 }
 ```
 
-The transaction to create a timestamping transaction (`TxTimestamp`) contains
-the public key of the user, which is applied for digital signing of
-transactions, and the timestamp - the hash of the submitted file. For
-simplicity, users in the given service do not have a fixed key pair assigned
-to them. Instead, a new key pair is generated for each new timestamping
-transaction.
+Service transactions are defined through the enum with the derive of the
+`TransactionSet` that automatically assigns transaction IDs based on their
+declaration order starting from `0`:
+
+```rust
+/// Transaction group.
+#[derive(Serialize, Deserialize, Clone, Debug, TransactionSet)]
+pub enum TimeTransactions {
+    /// Timestamping transaction.
+    TxTimestamp(TxTimestamp),
+}
+```
+
+A timestamping transaction (`TxTimestamp`) contains a timestamp - a hash of
+the submitted file.
 
 ### Reporting Errors
 
@@ -379,13 +515,12 @@ for the `Error` enum.
 
 Every transaction in Exonum has business logic of the blockchain attached,
 which is encapsulated in the `Transaction` trait. This trait includes the
-`verify` method to check the integrity of the transaction, and the `execute`
+`execute`
 method which contains logic applied to the storage when a transaction is
 executed. The `Transaction` trait needs to be implemented for all transactions
 which are to be used in Exonum.
 
-In our case, `verify` for the timestamping transaction checks the transaction
-signature, while `execute` performs the following operations:
+`execute` performs the following operations:
 
 1. Gets the current time value provided by the Time Oracle. If the system
    cannot get the time value, it will output the corresponding error.
@@ -398,63 +533,84 @@ signature, while `execute` performs the following operations:
 
 ```rust
 impl Transaction for TxTimestamp {
-    fn verify(&self) -> bool {
-        self.verify_signature(self.pub_key())
-    }
-
-    fn execute(&self, fork: &mut Fork) -> ExecutionResult {
-        let time = TimeSchema::new(&fork)
+    fn execute(&self, mut context: TransactionContext) -> ExecutionResult {
+        let tx_hash = context.tx_hash();
+        let time = TimeSchema::new(&context.fork())
             .time()
             .get()
             .expect("Can't get the time");
 
-        let content = self.content();
-        let hash = content.content_hash();
+        let hash = &self.content.content_hash;
 
-        let mut schema = Schema::new(fork);
+        let mut schema = Schema::new(context.fork());
         if let Some(_entry) = schema.timestamps().get(hash) {
             Err(Error::HashAlreadyExists)?;
         }
 
         trace!("Timestamp added: {:?}", self);
-        let entry = TimestampEntry::new(self.content(), &self.hash(), time);
+        let entry = TimestampEntry::new(self.content.clone(), &tx_hash, time);
         schema.add_timestamp(entry);
         Ok(())
     }
 }
 ```
 
-## Configure API Endpoints
+## Implement API
 
 Next, we need to implement the node API. We have separated the code that
 configures API endpoints for our Timestamping Service into a separate file -
 [src/api.rs][src/api.rs].
 
-First, we need to define the structures required to implement the API
-endpoints. For our Timestamping Service, we will define the following three
-structures:
+Import structures and methods required to define API:
 
-- the `TimestampQuery` structure which contains the hash of a
-  timestamp:
+```rust
+use exonum::{
+    api::{self, ServiceApiBuilder, ServiceApiState},
+    blockchain::{self, BlockProof},
+    crypto::Hash,
+    storage::MapProof,
+};
+
+use crate::{
+    schema::{Schema, TimestampEntry},
+    TIMESTAMPING_SERVICE,
+};
+
+#[derive(Debug, Clone, Copy)]
+pub struct PublicApi;
+```
+
+### Data Structures
+
+We need to define the structures required to implement the API endpoints. For
+our Timestamping Service, we will define the following two structures:
+
+- the `TimestampQuery` structure which contains a hash of the timestamp:
 
   ```rust
+  /// Describes query parameters for the `handle_timestamp` and
+  /// `handle_timestamp_proof` endpoints.
+  #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
   pub struct TimestampQuery {
       /// Hash of the requested timestamp.
       pub hash: Hash,
   }
 
   impl TimestampQuery {
-      /// Creates new `TimestampQuery` with given `hash`.
+      /// Creates a new `TimestampQuery` with given `hash`.
       pub fn new(hash: Hash) -> Self {
           TimestampQuery { hash }
       }
   }
   ```
 
-- the `TimestampProof` structure which contains all the data required to prove
-  that a timestamping transaction has been included into the blockchain:
+- the `TimestampProof` structure which contains all the data required to
+  prove that a timestamping transaction has been included into the blockchain:
 
   ```rust
+  /// Describes the information required to prove the correctness
+  /// of a timestamp entry.
+  #[derive(Debug, Clone, Serialize, Deserialize)]
   pub struct TimestampProof {
       /// Proof of the last block.
       pub block_info: BlockProof,
@@ -465,36 +621,22 @@ structures:
   }
   ```
 
-- the `PublicApi` structure which enables us to implement public API endpoints
-  for our service:
+### API for Transactions
 
-  ```rust
-  pub struct PublicApi;
-  ```
+The core processing logic is essentially the same for all types of
+transactions and is implemented by `exonum`. Therefore, there is no need to
+implement a separate API for transactions management within the service. To
+send a transaction, you have to create a transaction message according to the
+[uniform structure](../architecture/transactions.md#messages) developed by
+`exonum`.
 
-Now we are ready to define the three endpoints required for our service:
+The transaction ID is a transaction number in the enum with
+`#[derive(TransactionSet)]`. As we mentioned earlier, transactions count
+starts with 0.
 
-```rust
-pub fn handle_post_transaction(
-    state: &ServiceApiState,
-    transaction: TxTimestamp,
-) -> api::Result<Hash> {
-    let hash = transaction.hash();
-    state.sender().send(transaction.into())?;
-    Ok(hash)
-}
-```
+### API for Read Requests
 
-The `handle_post_transaction` function sends a timestamping transaction to the
-blockchain performing the following operations:
-
-- takes a timestamping transaction
-- calculates its hash
-- sends it to the blockchain network, using the methods defined in Exonum
-- returns the hash of the transaction to the user.
-
-After the transaction is successfully completed, the system returns the hash
-of the timestamping transaction.
+Now we are ready to define the two endpoints required for our service:
 
 ```rust
 pub fn handle_timestamp(
@@ -509,7 +651,7 @@ pub fn handle_timestamp(
 
 The `handle_timestamp` method takes the hash of a timestamp and
 checks whether a timestamp with this hash exists in the current state of the
-blockchain. To apply this method, the user needs to know the hash of the
+blockchain. To apply this method, a user needs to know the hash of the
 timestamp in question. To perform the check, the method makes a snapshot of
 the current state of the blockchain.
 
@@ -538,10 +680,10 @@ pub fn handle_timestamp_proof(
 }
 ```
 
-`handle_timestamp_proof` takes the hash of a timestamping
+`handle_timestamp_proof` takes the hash of the timestamping
 transaction and constructs a proof of its inclusion into the blockchain. To
 construct the proof structure, the method above performs a number of operations
-separated into two sets:
+separated into two sets.
 
 The first set contains the operations that prove the correctness of
 structures related to the timestamping transaction:
@@ -570,22 +712,11 @@ block is correct and the Timestamping Service table that contains all data on
 the existing timestamps is also correct. This set of data is sufficient to
 trust that the timestamping transaction is legitimate.
 
+### Wire API
+
 Finally, having defined our API methods, we can connect them to certain
-endpoints:
-
-```rust
-pub fn wire(builder: &mut ServiceApiBuilder) {
-    builder
-        .public_scope()
-        .endpoint("v1/timestamps/value", Self::handle_timestamp)
-        .endpoint("v1/timestamps/proof", Self::handle_timestamp_proof)
-        .endpoint_mut("v1/timestamps", Self::handle_post_transaction);
-}
-```
-
-As we intend for the endpoints to be accessible to external users, we declare
-them as within the `public_scope` of API endpoints. We create the following
-endpoints:
+endpoints. We intend that the endpoints should be accessible to external users.
+Therefore, we declare them within the `public_scope` of API endpoints:
 
 - For the `handle_timestamp` method we declare the `v1/timestamps/value` route,
   which will be used for checking whether a certain timestamping transaction
@@ -593,9 +724,15 @@ endpoints:
 - For the `handle_timestamp_proof` method we declare the `v1/timestamps/proof`
   route, which will be used for getting proofs of correctness of certain
   timestamping transactions.
-- For the `handle_post_transaction` method we declare the `v1/timestamps`
-  route, which will be used for sending timestamping transactions to the
-  blockchain network.
+
+```rust
+pub fn wire(builder: &mut ServiceApiBuilder) {
+    builder
+        .public_scope()
+        .endpoint("v1/timestamps/value", Self::handle_timestamp)
+        .endpoint("v1/timestamps/proof", Self::handle_timestamp_proof);
+}
+```
 
 ## Define Service
 
@@ -634,7 +771,7 @@ impl blockchain::Service for Service {
     fn tx_from_raw(
         &self,
         raw: RawTransaction,
-    ) -> Result<Box<dyn Transaction>, StreamStructError> {
+    ) -> Result<Box<dyn Transaction>, failure::Error> {
         let tx = TimeTransactions::tx_from_raw(raw)?;
         Ok(tx.into())
     }
@@ -653,7 +790,7 @@ The code above declares a number of methods:
 - `state_hash` - calculates the hash of
   [the blockchain state](../glossary.md#blockchain-state). The method
   should return [a vector of hashes](../architecture/services.md#state-hash)
-  of the [Merkelized service tables](../glossary.md#merkelized-indices).
+  of the [Merkelized service tables](../architecture/merkledb.md#merkelized-indices).
 - `tx_from_raw` - deserialization of transactions processed by the service.
   If the incoming transaction is built successfully, we put it into
   a `Box<_>`.
@@ -680,10 +817,9 @@ impl fabric::ServiceFactory for ServiceFactory {
         SERVICE_NAME
     }
 
-    fn make_service(
-        &mut self,
-        _: &fabric::Context,
-    ) -> Box<dyn blockchain::Service> {
+    fn make_service(&mut self, _: &fabric::Context)
+     -> Box<dyn blockchain::Service> {
+        Box::new(Service)
     }
 }
 ```
@@ -698,12 +834,14 @@ In this file we import Exonum, its Configuration Service, the Time Oracle which
 will provide the current time values and the Timestamping Service itself.
 
 ```rust
+use exonum::helpers::fabric::NodeBuilder;
+
 fn main() {
     exonum::helpers::init_logger().unwrap();
     NodeBuilder::new()
         .with_service(Box::new(exonum_configuration::ServiceFactory))
         .with_service(Box::new(exonum_time::TimeServiceFactory))
-        .with_service(Box::new(exonum_timestamping::ServiceFactory))
+        .with_service(Box::new(exonum_demo_timestamping::ServiceFactory))
         .run();
 }
 ```
@@ -727,7 +865,7 @@ performed in the directory containing `Cargo.toml`.
 1. Install the actual node binary:
 
    ```shell
-   cargo install
+   cargo install --path .
    ```
 
 2. Generate blockchain configuration for the network we are setting up:
@@ -741,14 +879,14 @@ performed in the directory containing `Cargo.toml`.
    nodes will use for communication.
 
    ```shell
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_1.toml example/sec_1.toml --peer-address 127.0.0.1:6331
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_2.toml example/sec_2.toml --peer-address 127.0.0.1:6332
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_3.toml example/sec_3.toml --peer-address 127.0.0.1:6333
-   exonum-demo-timestamping generate-config example/common.toml \
-       example/pub_4.toml example/sec_4.toml --peer-address 127.0.0.1:6334
+   exonum-demo-timestamping generate-config example/common.toml example/1 \
+       --peer-address 127.0.0.1:6331 -n
+   exonum-demo-timestamping generate-config example/common.toml example/2 \
+       --peer-address 127.0.0.1:6332 -n
+   exonum-demo-timestamping generate-config example/common.toml example/3 \
+       --peer-address 127.0.0.1:6333 -n
+   exonum-demo-timestamping generate-config example/common.toml example/4 \
+       --peer-address 127.0.0.1:6334 -n
    ```
 
 4. Finalize the generation of node configurations indicating the following
@@ -759,38 +897,42 @@ performed in the directory containing `Cargo.toml`.
    node, such a node will be regarded as an auditor by the validator nodes.
 
    ```shell
-   exonum-demo-timestamping finalize example/node_1_cfg.toml \
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8200 \
-       --private-api-address 0.0.0.0:8091 example/sec_1.toml \
+       --private-api-address 0.0.0.0:8091 example/1/sec_1.toml \
+       example/1/node_1_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_2_cfg.toml \
+       example/1/pub.toml \
+       example/2/pub.toml \
+       example/3/pub.toml \
+       example/4/pub.toml
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8201 \
-       --private-api-address 0.0.0.0:8092 example/sec_2.toml \
+       --private-api-address 0.0.0.0:8092 example/2/sec_2.toml \
+       example/2/node_2_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_3_cfg.toml \
+       example/1/pub.toml \
+       example/2/pub.toml \
+       example/3/pub.toml \
+       example/4/pub.toml
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8202 \
-       --private-api-address 0.0.0.0:8093 example/sec_3.toml \
+       --private-api-address 0.0.0.0:8093 example/3/sec_3.toml \
+       example/3/node_3_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
-   exonum-demo-timestamping finalize example/node_4_cfg.toml \
+       example/1/pub.toml \
+       example/2/pub.toml \
+       example/3/pub.toml \
+       example/4/pub.toml
+   exonum-demo-timestamping finalize \
        --public-api-address 0.0.0.0:8203 \
-       --private-api-address 0.0.0.0:8094 example/sec_4.toml \
+       --private-api-address 0.0.0.0:8094 example/4/sec_4.toml \
+       example/4/node_4_cfg.toml \
        --public-configs \
-       example/pub_1.toml \
-       example/pub_2.toml \
-       example/pub_3.toml \
-       example/pub_4.toml
+       example/1/pub.toml \
+       example/2/pub.toml \
+       example/3/pub.toml \
+       example/4/pub.toml
    ```
 
 5. Run the nodes, each in a separated terminal, indicating the file to which
@@ -798,13 +940,13 @@ performed in the directory containing `Cargo.toml`.
 
    ```shell
    exonum-demo-timestamping run --node-config example/node_1_cfg.toml \
-       --db-path example/db1 --public-api-address 0.0.0.0:8200
+       --db-path example/db1 --public-api-address 0.0.0.0:8200 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_2_cfg.toml \
-       --db-path example/db2 --public-api-address 0.0.0.0:8201
+       --db-path example/db2 --public-api-address 0.0.0.0:8201 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_3_cfg.toml \
-       --db-path example/db3 --public-api-address 0.0.0.0:8202
+       --db-path example/db3 --public-api-address 0.0.0.0:8202 --consensus-key-pass pass --service-key-pass pass
    exonum-demo-timestamping run --node-config example/node_4_cfg.toml \
-       --db-path example/db4 --public-api-address 0.0.0.0:8203
+       --db-path example/db4 --public-api-address 0.0.0.0:8203 --consensus-key-pass pass --service-key-pass pass
    ```
 
 <!-- markdownlint-enable MD013 -->
@@ -823,62 +965,56 @@ To add a new timestamp create a `create-timestamp-1.json` file and insert the
 following code into it:
 
 ```json
-{
-  "size": 80,
-  "network_id": 0,
-  "protocol_version": 0,
-  "service_id": 130,
-  "message_id": 0,
-  "signature":"f84e2242d10d92e18a7b256a56dff8fb989269f177f61873f49481dcfcb6c1c783ec59cf63d9716ffa8fde1ca8a43fa2632e119105f5393295c1cea22a3c2a0a",
-  "body": {
-    "pub_key": "5ce4675f37b6378e869ccc1f9134b3555220d384cf87e73d03d400032015f84d",
-    "content": {
-      "content_hash": "6e98e39cb76fac1ebdbad8208773589eb6d88b99c025352447c219bc6a4c9f80",
-      "metadata": "test"
-    }
-  }
-}
+{"tx_body": "29f4cf5b4e977d86b9461ce7603ee271f0e5df0fad68afb89fc708371fb245540000820000000a2a0a220a201099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca120474657374c14f9384cbf138f248fc4555c27c56dc01f4dee5e9a751ff99fea4a5c88fd46400d43ded634d76245b20a239429b26b599a26180f269cc49aa66d607f4733706"}
 ```
 
 Use the `curl` command to send this transaction to the node by HTTP:
 
 ```shell
 curl -H "Content-Type: application/json" -X POST -d @create-timestamp-1.json \
-    http://127.0.0.1:8081/api/services/timestamping/v1/timestamps
+    http://127.0.0.1:8200/api/explorer/v1/transactions
 ```
 
 ??? note "Response example"
 
-    ```none
-    ee1b51883e00c4e62d3204427acc3bf9500bad79e4dde044dffe51c0986bf6d5
-    ```
+```json
+{"tx_hash":"add5cf2617b1253afb3fbd24837935e39ec1ce1de3a3fad331deda652c6dad9d"}
+```
 
-The request returns the hash of the timestamp.
+The request returns the hash of the transaction.
 
 ### Get Information on a Timestamp
 
-To retrieve information about an existing timestamp, use the following request
-indicating the hash of the timestamp in question:
+To retrieve information about an existing timestamp by its hash,
+use the following request:
 
 ```shell
-curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/value?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
+curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/value?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
 ```
 
 ??? note "Response example"
 
-    ```json
+ ```json
     {
-      "time": {
-          "nanos": 133304000,
-          "secs": "1536757761"
-      },
-      "timestamp": {
-        "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-        "metadata": "test"
-      },
-      "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
+        "timestamp": {
+            "content_hash": {
+                "data": [16, 153, 215, 217, 4, 33, 114, 66, 85, 70,
+                 216, 225, 214, 64, 116, 174, 170, 36, 126, 145, 54,
+                  92, 55, 139, 163, 202, 105, 90, 80, 28, 27, 202]
+            },
+            "metadata": "test"
+        },
+        "tx_hash": {
+            "data": [173, 213, 207, 38, 23, 177, 37, 58, 251, 63, 189,
+             36, 131, 121, 53, 227, 158, 193, 206, 29, 227, 163, 250,
+             211, 49, 222, 218, 101, 44, 109, 173, 157]
+        },
+        "time": {
+            "seconds": 1550769625,
+            "nanos": 347857000
+        }
     }
-    ```
+ ```
 
 The request returns the following information:
 
@@ -889,114 +1025,79 @@ The request returns the following information:
 
 ### Get Proof for a Timestamp
 
-To retrieve a proof for an existing timestamp, use the following request
-indicating the hash of the timestamp in question:
+To retrieve a proof for an existing timestamp by its hash, use the following request:
 
 ```shell
-curl http://127.0.0.1:8081/api/services/timestamping/v1/timestamps/proof?hash=ab2b839d83b1bb728797ffc9778ed6d56a15ab59edb76077454890b5d9c59c68
+curl http://127.0.0.1:8200/api/services/timestamping/v1/timestamps/proof?hash=1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca
 ```
 
+<!-- markdownlint-disable MD013 -->
 ??? note "Response example"
 
-    ```json
-    {
-      "block_info": {
+```json
+{
+    "block_info": {
         "block": {
-          "height": "857",
-          "prev_hash": "f2f4b6778abbbf285efe3cf638a1b36f2eb7e2866a8221933279a68bd24a2da8",
-          "proposer_id": 0,
-          "state_hash": "654fd7bf570242832f2a51d6f3f019deeb2234bbe9cc07feb048880c75963d12",
-          "tx_count": 3,
-          "tx_hash": "24038928624fc9e10774bf37de85ffb3a2b0f5d14ccd815d06603475b3b93513"
+            "proposer_id": 2,
+            "height": 4349,
+            "tx_count": 4,
+            "prev_hash": "9f70dd5916aeef649ff012ab0003214626bca68f6d39cb7f623b4ce6ea3c4b6c",
+            "tx_hash": "6cae88e605e589930386cd6400dfd346b034a727a2b5f5f6c5c35d1015eb33a7",
+            "state_hash": "9c5f13715bbbc344c7c040287112fd656dc2d8a94a42facb1a1d2e5364b8b133"
         },
-        "precommits": [{
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-                "nanos": 23630000,
-                "secs": "1536757888"
-            },
-            "validator": 1
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "8a741a19ac88b2c8763654ab367c33cdfce6488b17f520a380d75acdef13611049db3e06cae61661d1d67f17e34728caf38e1ad98ef17ee654e84418ea38c30b"
-        }, {
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-                "nanos": 23274000,
-                "secs": "1536757888"
-            },
-            "validator": 0
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "b06526052eecc9da3ebe18a33277c0837485788d31791676b6e869ab527274e1bd6446a4ce6e01d630157fa2dc1976634562b4960a879611d3dd32f18ee6a70b"
-        }, {
-          "body": {
-            "block_hash": "68f32d10a4a3f0ef0aaa27145c1f09787f4de63b4d5883fe2e3b854e46d9cef2",
-            "height": "857",
-            "propose_hash": "19a4f9f6c9321f19e63c8ed263d11e6445b58e84214d05d5e0e8782ef58316e8",
-            "round": 1,
-            "time": {
-              "nanos": 23598000,
-              "secs": "1536757888"
-            },
-            "validator": 2
-          },
-          "message_id": 4,
-          "protocol_version": 0,
-          "service_id": 0,
-          "signature": "ddc9e7459a6c785bb6a0dd5bf7d6ddeadbe876a5f9b9c06be1469bd7b1e4d6138230d38b944637d2290475d5c15d0c86f74e45646f838d84be5ae975ad727d09"
-        }]
-      },
-      "state_proof": {
+        "precommits": [ "356dbfb22307417a064f1d4df29066c40b92a3276bff40aba4607f845d816c25010010fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe30510d0cec9345d52182b5d5fac43cd0560d8f670e6ecd1ca4551a3cba0d90a460df73f24b0596f6ad181fa20e39c9c04fd6c36000bb3c993ed4abc4a22df8ac3c417df504e0e", "7108c24cde5165125ee5684d9a10b0f64af897b0b3ab0f5fd6d0762ad39851e60100080210fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe30510d0d7c63406c6e754c86c614c72c1e562bd7ebc2b2825cb14b3c6f8cab8197451ad8bb3b2eb92d456bcc04c1a2ca4c12e1fa15eb9e1b82743641a5ea03ba923407d2d970d", "5a25a06bb78f01022cb55922f4a3d269e3cd2d5d73748eef018c718dd785d5730100080110fd21180122220a208ff2709d7a89def8d9df521bd14f16520e08cff6a8cb7481dc1e36474954175d2a220a204b4de16feabe338b0fdde828f89639965604a81d0530058669c6e40f391d57b8320b08fabdbbe3051098a5cf34e8b1ef7419a3eedab88f3701645ca83d2f247d6c6d6fa74f8d051c44b542aa4d0ba4875a38e3dd460ff13340b0438cae0ecde842f2002c6323a8515efb43ac04"
+        ]
+    },
+    "state_proof": {
         "entries": [{
-          "key": "775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581",
-          "value": "a12823b8e2b76001acb7f4c117546438d7398a71b1d8883875a9f23ed41fd2a5"
+            "key": "775be457774803ff0221f0d18f407c9718a2f4c635445a691f6061bd5d651581",
+            "value": "631b20b61ff068db4a4e2884e543b1aea2b5f12b10199b19d0cc635310ade73c"
         }],
         "proof": [{
-          "path": "0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            "path": "0000101010101110110000001010110110011000000001100011001110110111000101011001101100100100000010011111001000011101110010101110111001111111101111101110100011111110000111011111101111110011011010100100110101110010101000101110101000100110011100100010101101100001",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
         }, {
-          "path": "1101",
-          "hash": "dea7c92b6c17088b7dbb3d7995737f1e80e89c5950e4263e811f999d004bdaa0"
+            "path": "1101",
+            "hash": "17bb01ba591eacc7971d7694d2779263839fa4347539e850a497d83816ade1a0"
         }, {
-          "path": "1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+            "path": "1110011011010101101110110100111000001000001001000000111111111111011100101101000011111100001100101111010010000011110111001010001101011101001010111011010011010000000111101000101000101011011010100001101110110001000001001011110010101000010101010010010100001010",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
         }, {
-          "path": "1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
-          "hash": "7d5e5b6f055e66b56e3e329c973c12be13b3b4eea9e5400c1e570211d2d5281a"
+            "path": "1111101111111100100001100001100100100000100101011111010011011011000000101110101010011000101101000010001110111100111010110001001001010111111011100101000100111011010010100011110110010010001100010001011110100000001001000000001100101000000111011000100010011000",
+            "hash": "e7b1255594e9941a3663a71863c89b19af900e352dafc4a0124f8b1b637b6a3c"
         }]
-      },
-      "timestamp_proof": {
+    },
+    "timestamp_proof": {
         "entries": [{
-          "key": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-          "value": {
-            "time": {
-              "nanos": 133304000,
-              "secs": "1536757761"
-            },
-            "timestamp": {
-              "content_hash": "bc3bee69caa664f3020237fc01c1f661898487b3dd33d6848599ac8561501a90",
-              "metadata": "test"
-            },
-            "tx_hash": "a980002ef020ea9e9885d5dbe8350d9386049892acb5ca6a798011e490f5a8e5"
-          }
+            "key": "1099d7d9042172425546d8e1d64074aeaa247e91365c378ba3ca695a501c1bca",
+            "value": {
+                "timestamp": {
+                    "content_hash": {
+                        "data": [16, 153, 215, 217, 4, 33, 114,
+                         66, 85, 70, 216, 225, 214, 64, 116, 174,
+                         170, 36, 126, 145, 54, 92, 55, 139, 163,
+                         202, 105, 90, 80, 28, 27, 202]
+                    },
+                    "metadata": "test"
+                },
+                "tx_hash": {
+                    "data": [173, 213, 207, 38, 23, 177, 37, 58,
+                     251, 63, 189, 36, 131, 121, 53, 227, 158, 193,
+                     206, 29, 227, 163, 250, 211, 49, 222, 218, 101,
+                     44, 109, 173, 157]
+                },
+                "time": {
+                    "seconds": 1550769625,
+                    "nanos": 347857000
+                }
+            }
         }],
         "proof": []
-      }
     }
-    ```
+}
+```
+
+<!-- markdownlint-enable MD013 -->
 
 The request returns the following components of the timestamp proof:
 
