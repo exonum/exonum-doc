@@ -46,7 +46,7 @@ use
 ```shell
 add-apt-repository ppa:exonum/rocksdb
 apt-get install build-essential libsodium-dev libsnappy-dev libssl-dev \
-    librocksdb5.17 pkg-config
+    librocksdb5.17 pkg-config clang-7 lldb-7 lld-7
 ```
 
 For `protobuf` installation add the following dependencies:
