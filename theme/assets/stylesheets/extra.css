@@ -1,3 +1,4 @@
+
 /* Theme overrides. */
 .md-typeset .admonition table:not([class]) {
   box-shadow: none; /* Remove box shadow from tables in admonitions, it looks ugly. */
@@ -48,4 +49,14 @@
 
 .md-header-nav__version select:focus {
   outline: 0;
+}
+
+/* customized theme */
+[data-md-color-primary="light-green"] .md-header {
+  background-color: #26d07c;;
+}
+
+[data-md-color-accent="lime"] .md-typeset a:hover,
+[data-md-color-accent="lime"] .md-typeset a:active {
+  color: #26d07c;
 }
