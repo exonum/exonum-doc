@@ -1,4 +1,3 @@
-
 /* Theme overrides. */
 .md-typeset .admonition table:not([class]) {
   box-shadow: none; /* Remove box shadow from tables in admonitions, it looks ugly. */
@@ -53,10 +52,16 @@
 
 /* customized theme */
 [data-md-color-primary="light-green"] .md-header {
-  background-color: #26d07c;;
+  background-color: #000;
+}
+
+[data-md-color-primary="light-green"] .md-typeset a,
+[data-md-color-primary="light-green"] .md-nav__link--active,
+[data-md-color-accent="lime"] .md-typeset a:active {
+  color: #f6be00;
 }
 
 [data-md-color-accent="lime"] .md-typeset a:hover,
-[data-md-color-accent="lime"] .md-typeset a:active {
-  color: #26d07c;
+[data-md-color-accent="lime"] .md-nav__link:hover {
+  color: #ffc500;
 }
