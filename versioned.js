@@ -2,6 +2,7 @@ const { Git } = require('git-interface')
 const { exec } = require('shelljs')
 const YAML = require('yamljs')
 const fs = require('fs')
+const fse = require('fs-extra')
 const rimraf = require('rimraf')
 const path = require('path')
 
@@ -43,10 +44,13 @@ const generateVersionedDocs = async (versions) => {
     version = versions.indexOf(version) === 0 ? 'latest' : version
     const versionedMkdocs = YAML.load('mkdocs.yml')
     const configFile = `./version/${version}.yml`
+    const newSrc = `./version/src_${version}`
     versionedMkdocs.extra.versions = extraVersions
+    versionedMkdocs.docs_dir = newSrc
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
-    await mkdocsBuild(`./version/${version}`, configFile)
+    fse.copySync(`./src`, newSrc)
     await git.checkout(returnToBranch)
+    await mkdocsBuild(`./version/${version}`, configFile)
   }
 
   return { failed, success: versions.length - failed }
