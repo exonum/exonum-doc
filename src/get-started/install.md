@@ -52,8 +52,8 @@ apt-get install libsodium-dev libsnappy-dev \
 for installation. Meanwhile, as these packages reduce the build time, thus,
 their installation is highly recommended.
 
-You should also indicate the routes to these packages in the environment
-variables:
+You should also set the paths to libraries of these packages in the
+environment variables:
 
 ```shell
 export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
