@@ -44,8 +44,21 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
-apt-get install libssl-dev pkg-config
+apt-get install libsodium-dev libsnappy-dev \
+    librocksdb-dev libssl-dev pkg-config
 ```
+
+`libsodium-dev`, `libsnappy-dev` and `librocksdb-dev` are optional libraries
+for installation. Meanwhile, as these packages reduce the build time, thus,
+their installation is highly recommended.
+
+You should also indicate the routes to these packages in the environment
+variables:
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+```  
 
 For `protobuf` installation add the following dependencies:
 
