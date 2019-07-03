@@ -49,8 +49,8 @@ apt-get install libsodium-dev libsnappy-dev \
 ```
 
 `libsodium-dev`, `libsnappy-dev` and `librocksdb-dev` are optional libraries
-for installation. Meanwhile, as these packages reduce the build time, thus,
-their installation is highly recommended.
+for installation. Meanwhile, as these packages reduce the build time, their
+installation is highly recommended.
 
 You should also set the paths to libraries of these packages in the
 environment variables:
