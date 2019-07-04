@@ -3,7 +3,8 @@
 <!-- cspell:ignore nanos -->
 
 Exonum nodes can be controlled using RPC implemented via REST API. The clients
-also can obtain information on the blockchain from the nodes via WebSocket.
+also can  send transactions and obtain information on the blockchain from the
+nodes via WebSocket.
 Managing endpoints are handled by Exonum core and are mainly purposed to receive
 information about the current node and blockchain states as well as to change
 node [local configuration](../architecture/configuration.md#local-parameters).
@@ -97,6 +98,13 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
   Number of transactions included into the block.
 - **tx_hash**: Hash  
   Root hash of the transactions Merkle tree.
+
+### ListProof
+
+`ListProof` is a JSON object with the following field:
+
+- **val**: Hash  
+  [Merkle proof](merkelized-list.md#merkle-tree-proofs) serialized as a hex.
 
 ### Time
 
@@ -545,8 +553,8 @@ Response is a JSON object with the following fields:
 - **location**: TransactionLocation  
   Transaction position in the blockchain.
 - **location_proof**: ListProof  
-  [Merkle proof](merkelized-list.md#merkle-tree-proofs) serialized as a hex
-  tying transaction to the `tx_hash` of the containing block.
+  Ties transaction to the root hash of the transactions Merkle tree in the
+  block.
 - **status**: Object  
   [Transaction execution](../architecture/transactions.md#execute) status
 - **status.type**: `"success"` | `"error"` | `"panic"`  
@@ -754,15 +762,15 @@ equal to `start` and is less than `end`.
 
 ## Explorer API Sockets
 
-Since Exonum 0.10 version, it is possible to connect to nodes via WebSocket.
-Clients subscribe to events that take place in the network and in this way
-obtain information on the blockchain from the nodes.
+It is possible to connect to nodes via WebSocket. Clients subscribe to events
+that take place in the network and in this way obtain information on the
+blockchain from the nodes.
+
+Since Exonum 0.12 version, clients also can send transactions to the blockchain
+through websockets alongside with REST API.
 
 Explorer API sockets have the same base path as endpoints, denoted
 **{explorer_base_path}** and equal to `/api/explorer/v1`.
-
-Currently only one type of events is provided for subscription - it shares
-information on block commit events.
 
 ### Subscribe to Block Commit
 
@@ -812,6 +820,74 @@ will contain the following fields:
    "tx_hash":"9135c961f53c16d791daf1d9180d34eefcd23e50c5a02f915153493d4a905fbb"
 }
 ```
+
+### Subscribe to Transaction Commit
+
+```none
+ws://${URL}{explorer_base_path}/transactions/subscribe
+```
+
+Connects to a socket and receives notices on each new committed transaction
+starting from the moment of connection. The notices are sent to the light
+client via the socket.
+
+#### Parameters
+
+None.
+
+#### Response
+
+Returns notifications that a new transaction has been committed to a blockchain
+block starting from the height when the client connected to the socket.
+
+Each notification is a string which can be deserialized into a JSON object that
+will contain the following fields:
+
+- **type**: string
+  Type of the committed object.
+- **tx_hash**: Hash
+  <!--Hash of the committed transactions.-->
+- **service_id**: integer
+  ID of the service to which belongs the current transaction.
+- **message_id**: integer
+  ID of the transaction type.
+- **status.type**: "success" | "error" | "panic"  
+  Execution status kind:
+
+  - `"success"` denotes a successfully completed transaction
+  - `"error"` denotes a transaction that has returned an error (for example,
+    because of transaction parameters not satisfying context-dependent checks)
+  - `"panic"` denotes a transaction that has raised a runtime exception
+    (for example, attempted to divide by zero).
+
+- **location**: TransactionLocation  
+  Transaction position in the blockchain.
+- **proof**: ListProof  
+  <!-- Ties transaction to the root hash of the transactions Merkle tree in
+  the block.-->
+
+#### Response Example
+
+```JSON
+{
+  "type": "transaction",
+  "tx_hash": "fe59d6e5bbf493c4ebc112d6241a871671aa238f1c93e2726cf96fea9cb88cdd",
+  "service_id": 128,
+  "message_id": 2,
+  "status": {
+    "type": "success"
+  },
+  "location": {
+    "block_height": 317,
+    "position_in_block": 0
+  },
+  "proof": {
+    "val": "fe59d6e5bbf493c4ebc112d6241a871671aa238f1c93e2726cf96fea9cb88cdd"
+  }
+}
+```
+
+
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [explorer]: https://docs.rs/exonum/0.10.3/exonum/api/node/public/explorer/constant.MAX_BLOCKS_PER_REQUEST.html
