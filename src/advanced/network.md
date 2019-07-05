@@ -23,7 +23,13 @@ Full nodes are further subdivided into 2 categories:
   each other to reach consensus and add new blocks into the blockchain.
   Validators receive transactions, verify them,
   and include into a new block. The list of the validators is restricted by
-  network maintainers, and normally should consist of 4–15 nodes
+  network maintainers, and normally should consist of 4–16 nodes.
+
+!!! note
+    The operability of the network with 4-16 validators has been verified by
+    our research team. See section 7.3 of our [whitepaper][whitepaper] on the
+    Exonum consensus algorithm. Meanwhile, the system may operate with a
+    larger number of validators.
 
 ### Light Clients
 
@@ -151,3 +157,4 @@ to be unique within a specific Exonum blockchain.
     which is specified as a part of the URL path.
 
 [tokio-lib]: https://tokio.rs/
+[whitepaper]: https://bitfury.com/content/downloads/wp_consensus_181227.pdf
