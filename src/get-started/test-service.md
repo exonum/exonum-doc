@@ -385,7 +385,7 @@ streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
 [integration-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
-[java-testkit]: /java-binding.md#testing
+[java-testkit]: ../get-started/java-binding.md#testing
 [tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
