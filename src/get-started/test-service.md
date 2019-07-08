@@ -3,6 +3,10 @@ title: Service testing tutorial
 ---
 # Service Testing Tutorial
 
+!!! note
+    TestKit is also available in Java language.  
+    Please refer to the [documentation][] for details.
+
 As blockchain technology is focused on security, a natural desire after
 [creating an Exonum service](create-service.md) is to test it. This tutorial
 shows how to accomplish this task with the help of
@@ -381,6 +385,7 @@ streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
 [integration-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
+[java-testkit]: /java-binding.md#testing
 [tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
