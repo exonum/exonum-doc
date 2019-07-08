@@ -5,7 +5,7 @@ title: Service testing tutorial
 
 !!! note
     TestKit is also available in Java language.  
-    Please refer to the [documentation][] for details.
+    Please refer to the [documentation][java-testkit] for details.
 
 As blockchain technology is focused on security, a natural desire after
 [creating an Exonum service](create-service.md) is to test it. This tutorial
