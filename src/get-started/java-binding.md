@@ -449,7 +449,7 @@ For more information on using Guice, see the [project wiki][guice-wiki].
 
 ## Testing
 
-You can test Exonum services with the help of the [`exonum-testkit`][TODO: link to maven central]
+You can test Exonum services with the help of the [`exonum-testkit`][testkit-maven]
 library. TestKit allows to test transaction execution in the synchronous environment
 by offering simple network emulation (that is, without consensus algorithm and
 network operation involved).
@@ -465,7 +465,7 @@ For using the library include the dependency in your `pom.xml`:
     </dependency>
 ```
 
-`exonum-testkit` will be already included in projects generated with [`exonum-java-binding-service-archetype`][TODO: link to maven central].
+`exonum-testkit` will be already included in projects generated with [`exonum-java-binding-service-archetype`][archetype-maven].
 
 The plug-in for running tests should be configured to pass
 `java.library.path` system property to JVM:
@@ -495,84 +495,80 @@ as specified in [How to Run a Service section](#how-to-run-a-service).
 ### Creating Test Network
 
 To perform testing, we first need to create a network emulation – the instance of
-[`TestKit`][TODO: link]. TestKit allows recreating behavior of a
+[`TestKit`][testkit]. TestKit allows recreating behavior of a
 single full node (a validator or an auditor) in an emulated Exonum blockchain network.
 
-To instantiate a TestKit use [`TestKit.Builder`][TODO: link]. It allows configuration of:
+To instantiate a `TestKit` use [`TestKit.Builder`][testkit-builder]. It allows configuration of:
 
-- Type of emulated node (either [Validator][TODO: link] or [Auditor][TODO: link])
+- Type of emulated node (either [Validator][validator] or [Auditor][auditor])
 - Services with which the TestKit would be instantiated
-- [`TimeProvider`][TODO: link] if usage of [Time Oracle][TODO: link] is needed (see [Time Oracle Testing][#time-oracle-testing])
+- [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle](../advanced/time.md) is needed (see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in emulated network
 
 !!! note
     Note that regardless of the configured number of validators, only a single node will
     be emulated. This node will create the service instances, execute their operations
-    (e.g., [`afterCommit(BlockCommittedEvent)`][TODO: link] method logic),
+    (e.g., [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
     and provide access to its state.
 
 Default TestKit can be instantiated with a single validator as an emulated node,
 single service and without Time Oracle in the following way:
 
-??? note "Simple TestKit instantiation"
-    ```java
-    try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-      // Test logic
-    }
-    ```
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Test logic
+}
+```
 
 Or using a builder if different configuration is needed:
 
-??? note "TestKit instantiation with a builder"
-    ```java
-    try (TestKit testKit = TestKit.builder()
-        .withServices(MyServiceModule.class, MyServiceModule2.class)
-        .withValidators(2)
-        .build()) {
-      // Test logic
-    }
-    ```
+```java
+try (TestKit testKit = TestKit.builder()
+    .withServices(MyServiceModule.class, MyServiceModule2.class)
+    .withValidators(2)
+    .build()) {
+  // Test logic
+}
+```
 
 ### Transactions testing
 
 TestKit allows testing transaction execution by submitting blocks with given
-[transaction messages][TODO: link to transaction message - either documentation or Javadoc]:
+[transaction messages][transactions-messages]:
 
-??? note "Blocks creation with given transactions"
-    ```java
-    try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-      // Construct some transaction to be executed
-      TransactionMessage message = constructTransactionMessage();
-      // Commit block with this transaction
-      Block block = testKit.createBlockWithTransactions(message);
-      // Check the resulting block or blockchain state
-    }
-    ```
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Construct some transaction to be executed
+  TransactionMessage message = constructTransactionMessage();
+  // Commit block with this transaction
+  Block block = testKit.createBlockWithTransactions(message);
+  // Check the resulting block or blockchain state
+}
+```
 
-TestKit also allows creating blocks that contain [in-pool][TODO: link] transactions:
+TestKit also allows creating blocks that contain [in-pool][in-pool] transactions:
 
-??? note "Blocks creation with in-pool transactions"
-    ```java
-    try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-      // Put the transaction into TestKit transaction pool
-      MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Put the transaction into TestKit transaction pool
+  MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
 
-      TransactionMessage message = constructTransactionMessage();
-      RawTransaction rawTransaction = RawTransaction.fromMessage(message);
-      service.getNode().submitTransaction(rawTransaction);
-      Block block = testKit.createBlock();
-      // Check the resulting block or blockchain state
-    }
-    ```
+  TransactionMessage message = constructTransactionMessage();
+  RawTransaction rawTransaction = RawTransaction.fromMessage(message);
+  service.getNode().submitTransaction(rawTransaction);
+  Block block = testKit.createBlock();
+  // Check the resulting block or blockchain state
+}
+```
 
 Transactions that were submitted in `afterCommit` method will also be put into this pool.
 
 !!! note
     Note that blocks that are created with
-    [`TestKit.createBlockWithTransactions(List<TransactionMessage> transactionMessages)`][TODO: link]
+    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
     will ignore in-pool transactions. As of 0.7.0, there is no way to create a block
     that would contain both given and in-pool transactions - to do that, put given
-    transactions into TestKit transaction pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][TODO: link].
+    transactions into TestKit transaction pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
 
 #### Checking the blockchain state
 
@@ -612,7 +608,7 @@ See below an example of a complete TestKit test:
       @Test
       void testTransactionExecution() {
         // Create a TestKit for given service
-        try (TestKit testKit = TestKit.forService(ServiceModule.class)) {
+        try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
           // Retrieve the instance of created service
           MyService service = testKit.getService(MyService.ID, MyService.class);
 
@@ -629,11 +625,11 @@ See below an example of a complete TestKit test:
           assertThat(transactionResult).isEqualTo(TransactionResult.successful());
         }
       }
-  ```
+    ```
 
 ### Time Oracle Testing
 
-The testkit allows to use [Time Oracle][TODO: link] in your tests. To do that, TestKit should be provided with [`TimeProvider`][TODO: link].
+The testkit allows to use [Time Oracle](../advanced/time.md) in your tests. To do that, TestKit should be provided with [`TimeProvider`][testkit-time-provider].
 
 ```java
 ZonedDateTime initialTime = ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC);
@@ -648,8 +644,8 @@ try (TestKit testKit = TestKit.builder()
 
 ### TestKit JUnit extension
 
-[TestKit JUnit extension][TODO: link] simplifies writing tests that use TestKit. It allows defining a TestKit builder that would be used to inject TestKit objects into test cases as a parameter and delete them afterwards.
-To enable it, create a [TestKitExtension][TODO: link], annotated with [RegisterExtension][TODO: link]:
+TestKit JUnit extension simplifies writing tests that use TestKit. It allows defining a TestKit builder that would be used to inject TestKit objects into test cases as a parameter and delete them afterwards.
+To enable it, define a [`TestKitExtension`][testkit-extension] object, annotated with [`@RegisterExtension`][junit-register-extension]:
 
 ```java
 @RegisterExtension
@@ -665,9 +661,9 @@ TestKitExtension testKitExtension = new TestKitExtension(
 
 It is possible to configure injected TestKit instance with following annotations:
 
-- [`Validator`][TODO: link] sets emulated TestKit node type to validator
-- [`Auditor`][TODO: link] sets emulated TestKit node type to auditor
-- [`ValidatorCount`][TODO: link] sets number of validator nodes in the TestKit network
+- [`@Validator`][testkit-extension-validator] sets emulated TestKit node type to validator
+- [`@Auditor`][testkit-extension-auditor] sets emulated TestKit node type to auditor
+- [`@ValidatorCount`][testkit-extension-validatorcount] sets number of validator nodes in the TestKit network
 
 These annotations should be applied on TestKit parameter:
 
@@ -689,9 +685,9 @@ TestKitExtension testKitExtension = new TestKitExtension(
 ```
 
 !!! note
-    Note that after TestKit is instantiated in given test context, it is not possible to reconfigure it again. For example, if TestKit is injected in [`@BeforeEach`][TODO: link] method,
-    it can't be reconfigured in [`@Test`][TODO: link] or [`@AfterEach`][TODO: link] methods.
-    Also note that TestKit can't be injected in [`@BeforeAll`][TODO: link] and [`@AfterAll`][TODO: link] methods.
+    Note that after TestKit is instantiated in given test context, it is not possible to reconfigure it again. For example, if TestKit is injected in [`@BeforeEach`][junit-beforeeach] method,
+    it can't be reconfigured in [`@Test`][junit-test] or [`@AfterEach`][junit-aftereach] methods.
+    Also note that TestKit can't be injected in [`@BeforeAll`][junit-beforeall] and [`@AfterAll`][junit-afterall] methods.
 
 ### API
 
@@ -702,6 +698,31 @@ client.
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
+
+TODO: check links
+
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.7.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[archetype-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-java-binding-service-archetype/0.7.0
+[auditor]: ../glossary.md#auditor
+[in-pool]: https://exonum.com/doc/version/0.11/advanced/consensus/specification/#pool-of-unconfirmed-transactions
+[junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
+[junit-aftereach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterEach.html
+[junit-beforeall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeAll.html
+[junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
+[junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
+[junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.7.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[testkit]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html
+[testkit-builder]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.Builder.html
+[testkit-create-block]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
+[testkit-extension]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKitExtension.html
+[testkit-extension-auditor]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Auditor.html
+[testkit-extension-validator]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Validator.html
+[testkit-extension-validatorcount]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/ValidatorCount.html
+[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.7.0
+[testkit-time-provider]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TimeProvider.html
+[validator]: ../glossary.md#validator
+[vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 
 ## Using Libraries
 
@@ -879,7 +900,6 @@ For using the library just include the dependency in your `pom.xml`:
 - [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
@@ -905,7 +925,6 @@ For using the library just include the dependency in your `pom.xml`:
 [transactions-messages]: ../architecture/transactions.md#messages
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
-[vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
