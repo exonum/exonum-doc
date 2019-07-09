@@ -56,8 +56,8 @@ You should also set the paths to libraries of these packages in the
 environment variables:
 
 ```shell
-export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
-export SNAPPY_LIB_DIR=/usr/lib
+export ROCKSDB_LIB_DIR=/usr/lib
+export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
 ```  
 
 !!! note
@@ -114,7 +114,7 @@ export SNAPPY_LIB_DIR=/usr/local/lib
 ### Linux
 
 ```shell
-export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export ROCKSDB_LIB_DIR=/usr/lib
 export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
 ```
 
