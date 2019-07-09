@@ -495,9 +495,9 @@ as specified in [How to Run a Service section](#how-to-run-a-service).
 
 ### Creating Test Network
 
-To perform testing, we first need to create a network emulation – the instance of
-[TestKit][testkit]. TestKit allows recreating behavior of a
-single full node (a validator or an auditor) in an emulated Exonum blockchain network.
+To perform testing, we first need to create a network emulation – the instance
+of [TestKit][testkit]. TestKit allows recreating behavior of a single full
+node (a validator or an auditor) in an emulated Exonum blockchain network.
 
 To instantiate a TestKit use [`TestKit.Builder`][testkit-builder]. It allows
 configuration of:
@@ -509,9 +509,10 @@ is needed (for details see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in emulated network
 
 !!! note
-    Note that regardless of the configured number of validators, only a single node will
-    be emulated. This node will create the service instances, execute their operations
-    (e.g., [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
+    Note that regardless of the configured number of validators, only a single
+    node will be emulated. This node will create the service instances, execute
+    their operations (e.g.,
+    [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
     and provide access to its state.
 
 Default TestKit can be instantiated with a single validator as an emulated node,
@@ -576,9 +577,9 @@ transactions submitted in `afterCommit` method, as those are put into the pool.
     Note that blocks that are created with
     [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
     will ignore in-pool transactions. As of 0.7.0, there is no way to create a block
-    that would contain both given and in-pool transactions with a single method - to do
-    that, put given transactions into TestKit transaction pool with
-    [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
+    that would contain both given and in-pool transactions with a single
+    method - to do that, put given transactions into TestKit transaction pool
+    with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
 
 #### Checking the blockchain state
 
@@ -595,17 +596,18 @@ committed block). There are several ways to access it:
   Returns a snapshot of the current database state
 
 !!! note
-    Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot once
-    the passed closure completes, compared to `getSnapshot`, which disposes created
-    snapshots only when TestKit is closed.
+    Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
+    once the passed closure completes, compared to `getSnapshot`, which
+    disposes created snapshots only when TestKit is closed.
     Therefore it is recommended to use first two methods if a large number
     (e.g. more than a hundred) of snapshots needs to be created.
 
 ### Time Oracle Testing
 
-The TestKit allows to use [Time Oracle](../advanced/time.md) in your tests. To do that,
-TestKit should be created with [`TimeProvider`][testkit-time-provider], which allows
-to manually manipulate time that is returned by TestKit time service.
+The TestKit allows to use [Time Oracle](../advanced/time.md) in your tests.
+To do that, TestKit should be created with
+[`TimeProvider`][testkit-time-provider], which allows to manually manipulate
+time that is returned by TestKit time service.
 
 ```java
 ZonedDateTime initialTime = ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC);
@@ -632,10 +634,11 @@ try (TestKit testKit = TestKit.builder()
 ### TestKit JUnit extension
 
 TestKit JUnit extension simplifies writing tests that use TestKit. It allows to
-inject TestKit objects into test cases as a parameter and delete them afterwards.
-To enable it, define a [`TestKitExtension`][testkit-extension] object
-annotated with [`@RegisterExtension`][junit-register-extension] and provided
-with a builder that would be used to construct injected TestKit objects:
+inject TestKit objects into test cases as a parameter and delete them
+afterwards. To enable it, define a [`TestKitExtension`][testkit-extension]
+object annotated with [`@RegisterExtension`][junit-register-extension] and
+provided with a builder that would be used to construct injected TestKit
+objects:
 
 ```java
 @RegisterExtension
@@ -651,10 +654,12 @@ TestKitExtension testKitExtension = new TestKitExtension(
 
 It is possible to configure injected TestKit instance with following annotations:
 
-- [`@Validator`][testkit-extension-validator] sets emulated TestKit node type to validator
-- [`@Auditor`][testkit-extension-auditor] sets emulated TestKit node type to auditor
-- [`@ValidatorCount`][testkit-extension-validatorcount] sets number of validator nodes
-  in the TestKit network
+- [`@Validator`][testkit-extension-validator] sets emulated TestKit node type
+  to validator
+- [`@Auditor`][testkit-extension-auditor] sets emulated TestKit node type to
+  auditor
+- [`@ValidatorCount`][testkit-extension-validatorcount] sets number of
+  validator nodes in the TestKit network
 
 These annotations should be applied on TestKit parameter:
 
