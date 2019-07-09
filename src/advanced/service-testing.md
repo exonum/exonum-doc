@@ -1,5 +1,9 @@
 # Service Testing
 
+!!! note
+    TestKit is also available in Java language.  
+    Please refer to the [documentation][java-testkit] for details.
+
 You can test Exonum services with the help of the [**exonum-testkit**][exonum-testkit]
 crate. The crate allows to test transaction execution and APIs in the synchronous
 environment (that is, without consensus algorithm and network operation involved).
@@ -268,6 +272,7 @@ assert_eq!(
 
 [exonum-testkit]: https://crates.io/crates/exonum-testkit
 [dev-dep]: http://doc.crates.io/specifying-dependencies.html#development-dependencies
+[java-testkit]: ../get-started/java-binding.md#testing
 [Transaction.execute]: ../architecture/transactions.md#execute
 [integration-tests]: https://doc.rust-lang.org/book/second-edition/ch11-03-test-organization.html#integration-tests
 [exonum-btc-anchoring]: https://github.com/exonum/exonum-btc-anchoring
