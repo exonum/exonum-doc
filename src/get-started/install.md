@@ -57,8 +57,12 @@ environment variables:
 
 ```shell
 export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
-export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib
 ```  
+
+!!! note
+    The mentioned paths refer to Ubuntu 18.04 and may differ for other Linux
+    distributives.
 
 For `protobuf` installation add the following dependencies:
 
