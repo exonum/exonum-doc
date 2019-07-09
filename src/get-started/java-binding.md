@@ -619,9 +619,9 @@ try (TestKit testKit = TestKit.builder()
   Snapshot view = testKit.getSnapshot();
   TimeSchema timeSchema = TimeSchema.newInstance(view);
 
-  // Commit two blocks for time oracle to update consolidated time. Two blocks are needed as
-  // after the first block time transactions are generated and after the second one they are
-  // processed
+  // Commit two blocks for time oracle to update consolidated time. Two blocks
+  // are needed as after the first block time transactions are generated and
+  // after the second one they are processed
   testKit.createBlock();
   testKit.createBlock();
 
@@ -676,7 +676,8 @@ TestKitExtension testKitExtension = new TestKitExtension(
 
  @Test
  void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
-   // Injected TestKit has altered configuration - auditor as emulated node and 8 validator nodes
+   // Injected TestKit has altered configuration - auditor as emulated node
+   // and 8 validator nodes
  }
 ```
 
@@ -729,7 +730,8 @@ An Exonum service can use any third-party library as its dependency.
 At the same time, Exonum comes with its own dependencies.
 Classes of these dependencies are used in Exonum public APIs:
 
-- Exonum (exonum-java-binding-core, exonum-java-binding-common, exonum-time-oracle, exonum-testkit)
+- Exonum (exonum-java-binding-core, exonum-java-binding-common,
+  exonum-time-oracle, exonum-testkit)
 - [Guice][guice-home]
 - [Gson][gson]
 - [Vertx][vertx-web-docs] (vertx-web)
