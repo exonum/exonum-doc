@@ -44,10 +44,25 @@ For distributives with `deb`-based package managers (such as Debian or Ubuntu),
 use
 
 ```shell
-add-apt-repository ppa:exonum/rocksdb
-apt-get install build-essential libsodium-dev libsnappy-dev \
-    librocksdb5.17 pkg-config libprotobuf-dev protobuf-compiler
+apt-get install libsodium-dev libsnappy-dev \
+    librocksdb-dev libssl-dev pkg-config
 ```
+
+`libsodium-dev`, `libsnappy-dev` and `librocksdb-dev` are optional libraries
+for installation. Meanwhile, as these packages reduce the build time, their
+installation is highly recommended.
+
+You should also set the paths to libraries of these packages in the
+environment variables:
+
+```shell
+export ROCKSDB_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SNAPPY_LIB_DIR=/usr/lib
+```  
+
+!!! note
+    The mentioned paths refer to Ubuntu 18.04 and may differ for other Linux
+    distributives.
 
 For `protobuf` installation add the following dependencies:
 
