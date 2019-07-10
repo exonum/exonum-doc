@@ -1,14 +1,14 @@
 # Service Testing
 
-!!! note
-    TestKit is also available in Java language.  
-    Please refer to the [documentation][java-testkit] for details.
+You can test Exonum services with the help of the Exonum TestKit. It allows to
+test transaction execution and APIs in the synchronous environment (that is,
+without consensus algorithm and network operation involved). Tests are executed
+in the same system process as the service code itself, allowing to more easily
+debug service business logic (for example, panics).
 
-You can test Exonum services with the help of the [**exonum-testkit**][exonum-testkit]
-crate. The crate allows to test transaction execution and APIs in the synchronous
-environment (that is, without consensus algorithm and network operation involved).
-Tests are executed in the same system process as the service code itself, allowing
-to more easily debug service business logic (for example, panics).
+This document describes testing of Rust services with
+[**exonum-testkit**][exonum-testkit] crate, for Java instructions please refer
+to the [documentation][java-testkit].
 
 ## Installation
 

@@ -3,14 +3,13 @@ title: Service testing tutorial
 ---
 # Service Testing Tutorial
 
-!!! note
-    TestKit is also available in Java language.  
-    Please refer to the [documentation][java-testkit] for details.
-
 As blockchain technology is focused on security, a natural desire after
 [creating an Exonum service](create-service.md) is to test it. This tutorial
 shows how to accomplish this task with the help of
 [the testkit library](../advanced/service-testing.md).
+
+This document describes testing of Rust services, for Java instructions please
+refer to the [documentation][java-testkit].
 
 ## Preparing for Integration Testing
 

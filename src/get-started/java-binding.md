@@ -449,12 +449,20 @@ For more information on using Guice, see the [project wiki][guice-wiki].
 
 ## Testing
 
-You can test Exonum services with the help of the [`exonum-testkit`][testkit-maven]
-library. TestKit allows to test transaction execution in the synchronous environment
-by offering simple network emulation (that is, without consensus algorithm and
-network operation involved).
+Exonum Java Binding provides a powerful testing toolkit -
+[`exonum-testkit`][testkit-maven] library. TestKit allows testing transaction
+execution in the synchronous environment by offering simple network emulation
+(that is, without consensus algorithm and network operation involved).
 
-For using the library include the dependency in your `pom.xml`:
+### Project Configuration
+
+!!! note "New projects"
+    `exonum-testkit` is already included in projects generated with
+    [`exonum-java-binding-service-archetype`](#creating-project) and
+    following instructions can be skipped.
+
+For existing projects the following dependency should be included in your
+`pom.xml`:
 
 ``` xml
 <dependency>
@@ -464,9 +472,6 @@ For using the library include the dependency in your `pom.xml`:
   <scope>test</scope>
 </dependency>
 ```
-
-`exonum-testkit` will be already included in projects generated with
-[`exonum-java-binding-service-archetype`][archetype-maven].
 
 As TestKit uses a library with the implementation of native methods,
 `java.library.path` system property should be passed to JVM:
@@ -483,7 +488,7 @@ as specified in [How to Run a Service section](#how-to-run-a-service).
 ```xml
 <plugin>
     <!-- You can also configure a failsafe to run integration tests during
-         'validate' phase of a Maven build to separate unit tests and ITs. -->
+         'verify' phase of a Maven build to separate unit tests and ITs. -->
     <artifactId>maven-surefire-plugin</artifactId>
     <configuration>
         <argLine>
@@ -504,7 +509,7 @@ configuration of:
 
 - Type of emulated node (either [Validator][validator] or [Auditor][auditor])
 - Services with which the TestKit would be instantiated
-- [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle](../advanced/time.md)
+- [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
 is needed (for details see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in emulated network
 
@@ -538,15 +543,37 @@ try (TestKit testKit = TestKit.builder()
 ### Transactions testing
 
 TestKit allows testing transaction execution by submitting blocks with given
-[transaction messages][transactions-messages]:
+[transaction messages][transactions-messages]. Here is an example of verifying
+the execution results of submitted transactions:
 
 ```java
 try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-  // Construct some transaction to be executed
-  TransactionMessage message = constructTransactionMessage();
-  // Commit block with this transaction
-  Block block = testKit.createBlockWithTransactions(message);
-  // Check the resulting block or blockchain state
+  // Construct a valid transaction
+  TransactionMessage validTx = constructValidTransaction();
+
+  // Construct a transaction that throws `TransactionExecutionException` during
+  // execution
+  byte errorCode = 1;
+  String errorDescription = "Test";
+  TransactionMessage errorTx =
+      constructErrorTransaction(errorCode, errorDescription);
+
+  // Commit block with these transactions
+  Block block = testKit.createBlockWithTransactions(validTx, errorTx);
+
+  // Check that one transaction was executed successfully and another failed
+  Snapshot view = testKit.getSnapshot();
+  Blockchain blockchain = Blockchain.newInstance(view);
+
+  Optional<TransactionResult> validTxResult =
+      blockchain.getTxResult(validTx.hash());
+  assertThat(validTxResult).hasValue(TransactionResult.successful());
+
+  Optional<TransactionResult> errorTxResult =
+      blockchain.getTxResult(errorTx.hash());
+  TransactionResult expectedTransactionResult =
+      TransactionResult.error(errorCode, errorDescription);
+  assertThat(errorTxResult).hasValue(expectedTransactionResult);
 }
 ```
 
@@ -571,7 +598,8 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
 TestKit provides [`getTransactionPool()`][testkit-get-pool] and
 [`findTransactionsInPool(Predicate<TransactionMessage> predicate)`][testkit-find-in-pool]
 methods to inspect transaction pool. It is useful when there is a need to verify
-transactions submitted in `afterCommit` method, as those are put into the pool.
+transactions that the service submitted itself (e.g., in `afterCommit` method),
+as those are put into the pool.
 
 !!! note
     Note that blocks that are created with
@@ -583,17 +611,18 @@ transactions submitted in `afterCommit` method, as those are put into the pool.
 
 #### Checking the blockchain state
 
-In order to verify changes in blockchain state TestKit provides a snapshot of
-the current database state (i.e., the one that corresponds to the latest
-committed block). There are several ways to access it:
+In order to test service read operations and verify changes in blockchain state
+TestKit provides a snapshot of the current database state (i.e., the one that
+corresponds to the latest committed block). There are several ways to access
+it:
 
+- `Snapshot getSnapshot()`
+  Returns a snapshot of the current database state
 - `void withSnapshot(Consumer<Snapshot> snapshotFunction)`
   Performs a given function with a snapshot of the current database state
 - `<ResultT> ResultT applySnapshot(Function<Snapshot, ResultT> snapshotFunction)`
   Performs a given function with a snapshot of the current database state and
   returns a result of its execution
-- `Snapshot getSnapshot()`
-  Returns a snapshot of the current database state
 
 !!! note
     Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
@@ -604,36 +633,64 @@ committed block). There are several ways to access it:
 
 ### Time Oracle Testing
 
-The TestKit allows to use [Time Oracle](../advanced/time.md) in your tests.
-To do that, TestKit should be created with
-[`TimeProvider`][testkit-time-provider], which allows to manually manipulate
-time that is returned by TestKit time service.
+The TestKit allows to use [Time Oracle][time-oracle] in integration tests if
+your service depends on it. To do that, TestKit should be created with
+[`TimeProvider`][testkit-time-provider].
+Its implementation [`FakeTimeProvider`][testkit-fake-time-provider] mocks the
+source of external data (current time) and therefore allows to manually
+manipulate time that is returned by time service. Note that it only supports
+time in UTC.
 
-```java
-ZonedDateTime initialTime = ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneOffset.UTC);
-TimeProvider timeProvider = FakeTimeProvider.create(initialTime);
-try (TestKit testKit = TestKit.builder()
-      .withService(MyServiceModule.class)
-      .withTimeService(timeProvider)
-      .build()) {
-  Snapshot view = testKit.getSnapshot();
-  TimeSchema timeSchema = TimeSchema.newInstance(view);
+??? note "Test example"
+    ```java
+    @Test
+    void timeOracleTest() {
+      ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
+      FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
+      try (TestKit testKit = TestKit.builder()
+          .withService(MyServiceModule.class)
+          .withTimeService(timeProvider)
+          .build()) {
+        // Create an empty block
+        testKit.createBlock();
+        // The time service have submitted its first transaction in `afterCommit`
+        // method, but it has not been executed yet
+        Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
+        // No time available till the time service transaction is processed
+        assertThat(consolidatedTime1).isEmpty();
 
-  // Commit two blocks for time oracle to update consolidated time. Two blocks
-  // are needed as after the first block time transactions are generated and
-  // after the second one they are processed
-  testKit.createBlock();
-  testKit.createBlock();
+        // Advance the time
+        ZonedDateTime time1 = initialTime.plusSeconds(1);
+        timeProvider.setTime(time1);
+        testKit.createBlock();
+        // The time service has submitted its second transaction. The first must
+        // have been executed, with consolidated time now available and equal to
+        // initialTime
+        Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
+        assertThat(consolidatedTime2).hasValue(initialTime);
 
-  // Check that time service returns time provided by user
-  Optional<ZonedDateTime> consolidatedTime = timeSchema.getTime().toOptional();
-  assertThat(consolidatedTime).hasValue(initialTime);
-}
-```
+        // Advance the time
+        ZonedDateTime time2 = initialTime.plusSeconds(1);
+        timeProvider.setTime(time2);
+        testKit.createBlock();
+        // The time service have submitted its third transaction, and processed the
+        // second. The consolidated time must be equal to time1
+        Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
+        assertThat(consolidatedTime3).hasValue(time1);
+      }
+    }
 
-### TestKit JUnit extension
+    private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
+      return testKit.applySnapshot(s -> {
+        TimeSchema timeSchema = TimeSchema.newInstance(s);
+        return timeSchema.getTime().toOptional();
+      });
+    }
+    ```
 
-TestKit JUnit extension simplifies writing tests that use TestKit. It allows to
+### TestKit JUnit 5 extension
+
+TestKit JUnit 5 extension simplifies writing tests that use TestKit. It allows to
 inject TestKit objects into test cases as a parameter and delete them
 afterwards. To enable it, define a [`TestKitExtension`][testkit-extension]
 object annotated with [`@RegisterExtension`][junit-register-extension] and
@@ -646,10 +703,10 @@ TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
     .withService(MyServiceModule.class));
 
- @Test
- void test(TestKit testKit) {
-   // Test logic
- }
+@Test
+void test(TestKit testKit) {
+  // Test logic
+}
 ```
 
 It is possible to configure injected TestKit instance with following annotations:
@@ -670,15 +727,15 @@ TestKitExtension testKitExtension = new TestKitExtension(
     .withService(MyServiceModule.class));
 
 @Test
- void validatorTest(TestKit testKit) {
-   // Injected TestKit has default configuration, specified in builder above
- }
+void validatorTest(TestKit testKit) {
+  // Injected TestKit has default configuration, specified in builder above
+}
 
- @Test
- void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
-   // Injected TestKit has altered configuration - auditor as emulated node
-   // and 8 validator nodes
- }
+@Test
+void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
+  // Injected TestKit has altered configuration - auditor as emulated node
+  // and 8 validator nodes
+}
 ```
 
 !!! note
@@ -692,7 +749,7 @@ TestKitExtension testKitExtension = new TestKitExtension(
 ### API
 
 To test API implemented with Vertx tools, use the tools described in the
-[project documentation](https://vertx.io/docs/vertx-unit/java/#_introduction).
+[project documentation](https://vertx.io/docs/vertx-junit5/java).
 You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
 client.
 
@@ -700,7 +757,6 @@ An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.7.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
-[archetype-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-java-binding-service-archetype/0.7.0
 [auditor]: ../glossary.md#auditor
 [in-pool]: https://exonum.com/doc/version/0.11/advanced/consensus/specification/#pool-of-unconfirmed-transactions
 [junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
@@ -717,6 +773,7 @@ An example of API service tests can be found in
 [testkit-extension-auditor]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Auditor.html
 [testkit-extension-validator]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Validator.html
 [testkit-extension-validatorcount]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/ValidatorCount.html
+[testkit-fake-time-provider]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/FakeTimeProvider.html
 [testkit-find-in-pool]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
 [testkit-get-pool]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
 [testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.7.0
@@ -812,7 +869,7 @@ Currently Java Binding includes the following built-in services:
   authenticated by a supermajority of validators using digital signature tools
   available in Bitcoin.
 
-- [**Time Oracle.**](../advanced/time.md)
+- [**Time Oracle.**][time-oracle]
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
@@ -920,6 +977,7 @@ For using the library just include the dependency in your `pom.xml`:
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/indices/package-summary.html
+[time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/Transaction.html
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
