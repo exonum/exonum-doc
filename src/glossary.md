@@ -543,7 +543,7 @@ which contains public keys of all validators in the network. The set of
 validators
 can be changed by changing the global configuration. Usually, the set of
 validators
-is reasonably small, consisting of 4–15 nodes.
+is reasonably small, consisting of 4–16 nodes.
 
 [wiki:linked-ts]: https://en.wikipedia.org/wiki/Linked_timestamping
 [wiki:pkc]: https://en.wikipedia.org/wiki/Public-key_cryptography

@@ -103,6 +103,12 @@ one Exonum instance. The necessary set of services should be activated together
 with initialization of the blockchain. This feature serves as a prerequisite for
 dynamic Java services that will be implemented further.
 
+### Java Benchmarking
+
+Collection of metrics that allow to monitor efficiency of the Java Binding tool
+in the frame of the application; also to make application profiling and
+determine its weak spots.
+
 ## Third Quarter of 2019
 
 ### Base for Dynamic Services
@@ -113,38 +119,13 @@ without further possibility to adjust the list of applied services. The present
 milestone provides an opportunity to turn on/off the services present in the
 executable Exonum file without restarting the network.
 
+## Fourth Quarter of 2019
+
 ### Service Migration
 
 An extension to the above-mentioned functionality on dynamic services. The
 service migration will enable a smooth update to new versions of the services,
 running in the blockchain, without service data loss.
-
-## Fourth Quarter of 2019
-
-### Merkle DB - Full-fledged Implementation
-
-In the final implementation of this functionality the nested data collections
-stored in Exonum will receive a hierarchical pattern. The hierarchy of the
-Merkelized collections will allow to implement proofs of availability of the
-whole collections or their leaves in the blockchain. A user-friendly API of the
-Merkle DB will serve this purpose.
-
-### Communication between Services within the Blockchain
-
-As a method of improving the modularity of services and expanding the
-possibilities for their reuse, we will introduce the ability for
-services to communicate with one another within one blockchain. Services will
-be able to issue and process transactions from other services and can, thus, be
-reused in a variety of scenarios.
-
-### Save Points and Old Blocks Clean-up
-
-Introduction of save points, which are snapshots of the blockchain at a
-certain moment in time, will let a node quickly catch up with the rest of the
-network in case of downtime.
-
-This feature is also considered as a basis to solve the problem of storing the
-blockchain when its history becomes to long and space-consuming.
 
 ### New Storage API Support in Java
 
@@ -162,19 +143,41 @@ The introduction of dynamic Java services will enable adding Java services to
 a running blockchain without the need to restart nodes. In other words, new
 services will be included into the network on the go.
 
-### Java Benchmarking
-
-Collection of metrics that allow to monitor efficiency of the Java Binding tool
-in the frame of the application; also to make application profiling and
-determine its weak spots.
-
 ## First Quarter of 2020
 
-### Implementation of gRPC
+<!--### Implementation of gRPC
 
 Exonum intends to shift from REST API to gRPC. Just like Exonum, gRPC supports
 Protobuf as an instrument for description and serialization of data types.
-Besides, gRPC is a potentially quicker communication protocol compared to REST.
+Besides, gRPC is a potentially quicker communication protocol compared to
+REST.-->
+
+### Save Points and Old Blocks Clean-up
+
+Introduction of save points, which are snapshots of the blockchain at a
+certain moment in time, will let a node quickly catch up with the rest of the
+network in case of downtime.
+
+This feature is also considered as a basis to solve the problem of storing the
+blockchain when its history becomes to long and space-consuming.
+
+## Second Quarter of 2020
+
+### Exonum MerkleDB - Full-fledged Implementation
+
+In the final implementation of this functionality the nested data collections
+stored in Exonum will receive a hierarchical pattern. The hierarchy of the
+Merkelized collections will allow to implement proofs of availability of the
+whole collections or their leaves in the blockchain. A user-friendly API of the
+Exonum MerkleDB will serve this purpose.
+
+### Communication between Services within the Blockchain
+
+As a method of improving the modularity of services and expanding the
+possibilities for their reuse, we will introduce the ability for
+services to communicate with one another within one blockchain. Services will
+be able to issue and process transactions from other services and can, thus, be
+reused in a variety of scenarios.
 
 As you may have noticed, the new features are to be released quarterly. You are
 welcome to contribute to Exonum development and improvement (see our
