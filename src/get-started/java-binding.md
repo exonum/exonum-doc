@@ -661,57 +661,57 @@ source of the external data (current time) and, therefore, allows to manually
 manipulate time that is returned by the time service. Note that the time must
 be set in UTC time zone.
 
-??? note "Test example"
-    ```java
-    @Test
-    void timeOracleTest() {
-      ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
-      FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
-      try (TestKit testKit = TestKit.builder()
-          .withService(MyServiceModule.class)
-          .withTimeService(timeProvider)
-          .build()) {
-        // Create an empty block
-        testKit.createBlock();
-        // The time service submitted its first transaction in `afterCommit`
-        // method, but it has not been executed yet
-        Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
-        // No time is available till the time service transaction is processed
-        assertThat(consolidatedTime1).isEmpty();
 
-        // Advance the time
-        ZonedDateTime time1 = initialTime.plusSeconds(1);
-        timeProvider.setTime(time1);
-        testKit.createBlock();
-        // The time service submitted its second transaction. The first must
-        // have been executed, with consolidated time now available and equal to
-        // initialTime
-        Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
-        assertThat(consolidatedTime2).hasValue(initialTime);
+```java
+@Test
+void timeOracleTest() {
+  ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
+  FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
+  try (TestKit testKit = TestKit.builder()
+      .withService(MyServiceModule.class)
+      .withTimeService(timeProvider)
+      .build()) {
+    // Create an empty block
+    testKit.createBlock();
+    // The time service submitted its first transaction in `afterCommit`
+    // method, but it has not been executed yet
+    Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
+    // No time is available till the time service transaction is processed
+    assertThat(consolidatedTime1).isEmpty();
 
-        // Advance the time
-        ZonedDateTime time2 = initialTime.plusSeconds(1);
-        timeProvider.setTime(time2);
-        testKit.createBlock();
-        // The time service submitted its third transaction, and processed the
-        // second one. The consolidated time must be equal to time1
-        Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
-        assertThat(consolidatedTime3).hasValue(time1);
-      }
-    }
+    // Advance the time
+    ZonedDateTime time1 = initialTime.plusSeconds(1);
+    timeProvider.setTime(time1);
+    testKit.createBlock();
+    // The time service submitted its second transaction. The first must
+    // have been executed, with consolidated time now available and equal to
+    // initialTime
+    Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
+    assertThat(consolidatedTime2).hasValue(initialTime);
 
-    private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
-      return testKit.applySnapshot(s -> {
-        TimeSchema timeSchema = TimeSchema.newInstance(s);
-        return timeSchema.getTime().toOptional();
-      });
-    }
-    ```
+    // Advance the time
+    ZonedDateTime time2 = initialTime.plusSeconds(1);
+    timeProvider.setTime(time2);
+    testKit.createBlock();
+    // The time service submitted its third transaction, and processed the
+    // second one. The consolidated time must be equal to time1
+    Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
+    assertThat(consolidatedTime3).hasValue(time1);
+  }
+}
+
+private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
+  return testKit.applySnapshot(s -> {
+    TimeSchema timeSchema = TimeSchema.newInstance(s);
+    return timeSchema.getTime().toOptional();
+  });
+}
+```
 
 ### TestKit JUnit 5 Extension
 
-The TestKit JUnit 5 extension simplifies writing tests that use TestKit. It allows to
-inject TestKit objects into test cases as a parameter and delete them
+The TestKit JUnit 5 extension simplifies writing tests that use TestKit. It
+allows to inject TestKit objects into test cases as a parameter and delete them
 afterwards. To enable it, define a [`TestKitExtension`][testkit-extension]
 object annotated with [`@RegisterExtension`][junit-register-extension] and
 provided with a builder. The builder would be used to construct the injected
