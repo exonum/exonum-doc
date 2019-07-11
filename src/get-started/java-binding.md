@@ -516,9 +516,9 @@ configuration of:
 !!! note
     Note that regardless of the configured number of validators, only a single
     node will be emulated. This node will create the service instances, execute
-    their operations (e.g.,
+    operations of those instances (e.g.,
     [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
-    and provide access to its state.
+    and provide access to their state.
 
 Default TestKit can be instantiated with a single validator as an emulated
 node, a single service and without Time Oracle in the following way:
@@ -617,9 +617,9 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
 
 The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
 [`findTransactionsInPool(Predicate<TransactionMessage> predicate)`][testkit-find-in-pool]
-methods to inspect the transaction pool. It is useful when there is a need to verify
-transactions that the service instance submitted itself (e.g., in `afterCommit`
-method), as those are put into the pool.
+methods to inspect the transaction pool. These methods are useful when there is
+a need to verify transactions that the service instance submitted itself (e.g.,
+in `afterCommit` method) into the transaction pool.
 
 !!! note
     Note that blocks that are created with
@@ -647,7 +647,8 @@ access it:
 !!! note
     Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
     once the passed closure completes. When using `getSnapshot`, created
-    snapshots are only disposed when the TestKit is closed. Therefore, it is
+    snapshots are only disposed when the TestKit is closed. That might cause
+    excessive memory usage if many snapshots are created. Therefore, it is
     recommended to use the first two methods if a large number (e.g. more than
     a hundred) of snapshots needs to be created.
 
@@ -656,7 +657,7 @@ access it:
 The TestKit allows to use [Time Oracle][time-oracle] in integration tests if
 your service depends on it. To do that, the TestKit should be created with
 [`TimeProvider`][testkit-time-provider].
-Its implementation [`FakeTimeProvider`][testkit-fake-time-provider] mocks the
+Its implementation, [`FakeTimeProvider`][testkit-fake-time-provider], mocks the
 source of the external data (current time) and, therefore, allows to manually
 manipulate time that is returned by the time service. Note that the time must
 be set in UTC time zone.
@@ -678,7 +679,7 @@ void timeOracleTest() {
     // No time is available till the time service transaction is processed
     assertThat(consolidatedTime1).isEmpty();
 
-    // Advance the time
+    // Increase the time value
     ZonedDateTime time1 = initialTime.plusSeconds(1);
     timeProvider.setTime(time1);
     testKit.createBlock();
@@ -688,7 +689,7 @@ void timeOracleTest() {
     Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
     assertThat(consolidatedTime2).hasValue(initialTime);
 
-    // Advance the time
+    // Increase the time value
     ZonedDateTime time2 = initialTime.plusSeconds(1);
     timeProvider.setTime(time2);
     testKit.createBlock();
