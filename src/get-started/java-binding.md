@@ -661,7 +661,6 @@ source of the external data (current time) and, therefore, allows to manually
 manipulate time that is returned by the time service. Note that the time must
 be set in UTC time zone.
 
-
 ```java
 @Test
 void timeOracleTest() {
