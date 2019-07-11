@@ -458,11 +458,10 @@ execution in the synchronous environment by offering simple network emulation
 
 !!! note "New projects"
     `exonum-testkit` is already included in projects generated with
-    [`exonum-java-binding-service-archetype`](#creating-project) and
-    following instructions can be skipped.
+    [`exonum-java-binding-service-archetype`](#creating-project) and you can
+    skip the following instructions:
 
-For existing projects the following dependency should be included in your
-`pom.xml`:
+For existing projects include the following dependency into your `pom.xml`:
 
 ``` xml
 <dependency>
@@ -473,8 +472,8 @@ For existing projects the following dependency should be included in your
 </dependency>
 ```
 
-As TestKit uses a library with the implementation of native methods,
-`java.library.path` system property should be passed to JVM:
+As the TestKit uses a library with the implementation of native methods,
+pass `java.library.path` system property to JVM:
 
 ``` none
 -Djava.library.path=$EXONUM_JAVA/lib/native
@@ -504,14 +503,15 @@ To perform testing, we first need to create a network emulation – the instance
 of [TestKit][testkit]. TestKit allows recreating behavior of a single full
 node (a validator or an auditor) in an emulated Exonum blockchain network.
 
-To instantiate a TestKit use [`TestKit.Builder`][testkit-builder]. It allows
+To instantiate the TestKit, use [`TestKit.Builder`][testkit-builder]. It allows
 configuration of:
 
-- Type of emulated node (either [Validator][validator] or [Auditor][auditor])
+- Type of the emulated node (either [Validator][validator] or
+  [Auditor][auditor])
 - Services with which the TestKit would be instantiated
 - [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
-is needed (for details see [Time Oracle Testing](#time-oracle-testing))
-- Number of validators in emulated network
+  is needed (for details see [Time Oracle Testing](#time-oracle-testing))
+- Number of validators in the emulated network
 
 !!! note
     Note that regardless of the configured number of validators, only a single
@@ -520,8 +520,8 @@ is needed (for details see [Time Oracle Testing](#time-oracle-testing))
     [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
     and provide access to its state.
 
-Default TestKit can be instantiated with a single validator as an emulated node,
-single service and without Time Oracle in the following way:
+Default TestKit can be instantiated with a single validator as an emulated
+node, a single service and without Time Oracle in the following way:
 
 ```java
 try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
@@ -529,7 +529,8 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
 }
 ```
 
-Or using a builder if different configuration is needed:
+The TestKit can be also instantiated using a builder, if different
+configuration is needed:
 
 ```java
 try (TestKit testKit = TestKit.builder()
@@ -540,17 +541,40 @@ try (TestKit testKit = TestKit.builder()
 }
 ```
 
-### Transactions testing
+### Transactions Testing
 
-TestKit allows testing transaction execution by submitting blocks with given
-[transaction messages][transactions-messages]. Here is an example of verifying
-the execution results of submitted transactions:
+The TestKit allows testing transaction execution by submitting blocks with the
+given [transaction messages][transactions-messages]. Here is an example of a
+test that verifies the execution result of a valid transaction and the changes
+it made in service schema:
 
 ```java
 try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
   // Construct a valid transaction
   TransactionMessage validTx = constructValidTransaction();
 
+  // Commit block with this transaction
+  Block block = testKit.createBlockWithTransactions(validTx);
+
+  // Retrieve a snapshot of the current database state
+  Snapshot view = testkit.getSnapshot();
+  // It can be used to access the core schema, for example to check the
+  // transaction execution result:
+  Blockchain blockchain = Blockchain.newInstance(view);
+  Optional<TransactionResult> validTxResult =
+        blockchain.getTxResult(validTx.hash());
+  assertThat(validTxResult).hasValue(TransactionResult.successful());
+  // And also to verify the changes the transaction made to the service state:
+  MySchema schema = new MySchema(view);
+  // Perform assertions on the data in the service schema
+}
+```
+
+And a test that verifies that a transaction that throws an exception during its
+execution will fail:
+
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
   // Construct a transaction that throws `TransactionExecutionException` during
   // execution
   byte errorCode = 1;
@@ -558,16 +582,12 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
   TransactionMessage errorTx =
       constructErrorTransaction(errorCode, errorDescription);
 
-  // Commit block with these transactions
-  Block block = testKit.createBlockWithTransactions(validTx, errorTx);
+  // Commit block with this transaction
+  Block block = testKit.createBlockWithTransactions(errorTx);
 
-  // Check that one transaction was executed successfully and another failed
+  // Check that transaction failed
   Snapshot view = testKit.getSnapshot();
   Blockchain blockchain = Blockchain.newInstance(view);
-
-  Optional<TransactionResult> validTxResult =
-      blockchain.getTxResult(validTx.hash());
-  assertThat(validTxResult).hasValue(TransactionResult.successful());
 
   Optional<TransactionResult> errorTxResult =
       blockchain.getTxResult(errorTx.hash());
@@ -577,69 +597,69 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
 }
 ```
 
-TestKit also allows creating blocks that contain all current [in-pool][in-pool]
+The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
 transactions:
 
 ```java
 try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-  // Put the transaction into TestKit transaction pool
+  // Put the transaction into the TestKit transaction pool
   MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
 
   TransactionMessage message = constructTransactionMessage();
   RawTransaction rawTransaction = RawTransaction.fromMessage(message);
   service.getNode().submitTransaction(rawTransaction);
 
-  // This block will contain transaction submitted above
+  // This block will contain the transaction submitted above
   Block block = testKit.createBlock();
   // Check the resulting block or blockchain state
 }
 ```
 
-TestKit provides [`getTransactionPool()`][testkit-get-pool] and
+The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
 [`findTransactionsInPool(Predicate<TransactionMessage> predicate)`][testkit-find-in-pool]
-methods to inspect transaction pool. It is useful when there is a need to verify
-transactions that the service submitted itself (e.g., in `afterCommit` method),
-as those are put into the pool.
+methods to inspect the transaction pool. It is useful when there is a need to verify
+transactions that the service instance submitted itself (e.g., in `afterCommit`
+method), as those are put into the pool.
 
 !!! note
     Note that blocks that are created with
     [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
     will ignore in-pool transactions. As of 0.7.0, there is no way to create a block
     that would contain both given and in-pool transactions with a single
-    method - to do that, put given transactions into TestKit transaction pool
-    with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
+    method. To do that, put the given transactions into the TestKit transaction
+    pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
 
-#### Checking the blockchain state
+#### Checking the Blockchain State
 
-In order to test service read operations and verify changes in blockchain state
-TestKit provides a snapshot of the current database state (i.e., the one that
-corresponds to the latest committed block). There are several ways to access
-it:
+In order to test service read operations and verify changes in the blockchain
+state, the TestKit provides a snapshot of the current database state (i.e., the
+one that corresponds to the latest committed block). There are several ways to
+access it:
 
 - `Snapshot getSnapshot()`
   Returns a snapshot of the current database state
 - `void withSnapshot(Consumer<Snapshot> snapshotFunction)`
-  Performs a given function with a snapshot of the current database state
+  Performs the given function with a snapshot of the current database state
 - `<ResultT> ResultT applySnapshot(Function<Snapshot, ResultT> snapshotFunction)`
-  Performs a given function with a snapshot of the current database state and
+  Performs the given function with a snapshot of the current database state and
   returns a result of its execution
 
 !!! note
     Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
-    once the passed closure completes, compared to `getSnapshot`, which
-    disposes created snapshots only when TestKit is closed.
-    Therefore it is recommended to use first two methods if a large number
-    (e.g. more than a hundred) of snapshots needs to be created.
+    once the passed closure completes. When using `getSnapshot`, created
+    snapshots are only disposed when the TestKit is closed. Therefore, it is
+    recommended to use the first two methods if a large number (e.g. more than
+    a hundred) of snapshots needs to be created.
 
 ### Time Oracle Testing
 
 The TestKit allows to use [Time Oracle][time-oracle] in integration tests if
-your service depends on it. To do that, TestKit should be created with
+your service depends on it. To do that, the TestKit should be created with
 [`TimeProvider`][testkit-time-provider].
 Its implementation [`FakeTimeProvider`][testkit-fake-time-provider] mocks the
-source of external data (current time) and therefore allows to manually
-manipulate time that is returned by time service. Note that it only supports
-time in UTC.
+source of the external data (current time) and, therefore, allows to manually
+manipulate time that is returned by the time service. Note that the time must
+be set in UTC time zone.
 
 ??? note "Test example"
     ```java
@@ -653,17 +673,17 @@ time in UTC.
           .build()) {
         // Create an empty block
         testKit.createBlock();
-        // The time service have submitted its first transaction in `afterCommit`
+        // The time service submitted its first transaction in `afterCommit`
         // method, but it has not been executed yet
         Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
-        // No time available till the time service transaction is processed
+        // No time is available till the time service transaction is processed
         assertThat(consolidatedTime1).isEmpty();
 
         // Advance the time
         ZonedDateTime time1 = initialTime.plusSeconds(1);
         timeProvider.setTime(time1);
         testKit.createBlock();
-        // The time service has submitted its second transaction. The first must
+        // The time service submitted its second transaction. The first must
         // have been executed, with consolidated time now available and equal to
         // initialTime
         Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
@@ -673,8 +693,8 @@ time in UTC.
         ZonedDateTime time2 = initialTime.plusSeconds(1);
         timeProvider.setTime(time2);
         testKit.createBlock();
-        // The time service have submitted its third transaction, and processed the
-        // second. The consolidated time must be equal to time1
+        // The time service submitted its third transaction, and processed the
+        // second one. The consolidated time must be equal to time1
         Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
         assertThat(consolidatedTime3).hasValue(time1);
       }
@@ -688,14 +708,14 @@ time in UTC.
     }
     ```
 
-### TestKit JUnit 5 extension
+### TestKit JUnit 5 Extension
 
-TestKit JUnit 5 extension simplifies writing tests that use TestKit. It allows to
+The TestKit JUnit 5 extension simplifies writing tests that use TestKit. It allows to
 inject TestKit objects into test cases as a parameter and delete them
 afterwards. To enable it, define a [`TestKitExtension`][testkit-extension]
 object annotated with [`@RegisterExtension`][junit-register-extension] and
-provided with a builder that would be used to construct injected TestKit
-objects:
+provided with a builder. The builder would be used to construct the injected
+TestKit objects:
 
 ```java
 @RegisterExtension
@@ -709,16 +729,16 @@ void test(TestKit testKit) {
 }
 ```
 
-It is possible to configure injected TestKit instance with following annotations:
+It is possible to configure the injected TestKit instance with the following annotations:
 
-- [`@Validator`][testkit-extension-validator] sets emulated TestKit node type
-  to validator
-- [`@Auditor`][testkit-extension-auditor] sets emulated TestKit node type to
+- [`@Validator`][testkit-extension-validator] sets an emulated TestKit node
+  type to validator
+- [`@Auditor`][testkit-extension-auditor] sets an emulated TestKit node type to
   auditor
-- [`@ValidatorCount`][testkit-extension-validatorcount] sets number of
+- [`@ValidatorCount`][testkit-extension-validatorcount] sets a number of the
   validator nodes in the TestKit network
 
-These annotations should be applied on TestKit parameter:
+These annotations should be applied on the TestKit parameter:
 
 ```java
 @RegisterExtension
@@ -728,30 +748,31 @@ TestKitExtension testKitExtension = new TestKitExtension(
 
 @Test
 void validatorTest(TestKit testKit) {
-  // Injected TestKit has default configuration, specified in builder above
+  // Injected TestKit has a default configuration, specified in the builder
+  // above
 }
 
 @Test
 void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
-  // Injected TestKit has altered configuration - auditor as emulated node
-  // and 8 validator nodes
+  // Injected TestKit has an altered configuration - "auditor" as an emulated
+  // node and 8 validator nodes
 }
 ```
 
 !!! note
-    Note that after TestKit is instantiated in given test context, it is not
-    possible to reconfigure it again. For example, if TestKit is injected in
-    [`@BeforeEach`][junit-beforeeach] method, it can't be reconfigured in
-    [`@Test`][junit-test] or [`@AfterEach`][junit-aftereach] methods. Also
-    note that TestKit can't be injected in [`@BeforeAll`][junit-beforeall]
-    and [`@AfterAll`][junit-afterall] methods.
+    Note that after the TestKit is instantiated in the given test context, it
+    is not possible to reconfigure it again. For example, if the TestKit is
+    injected in [`@BeforeEach`][junit-beforeeach] method, it can't be
+    reconfigured in [`@Test`][junit-test] or [`@AfterEach`][junit-aftereach]
+    methods. Also note that the TestKit cannot be injected in
+    [`@BeforeAll`][junit-beforeall] and [`@AfterAll`][junit-afterall] methods.
 
 ### API
 
 To test API implemented with Vertx tools, use the tools described in the
 [project documentation](https://vertx.io/docs/vertx-junit5/java).
-You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
-client.
+You can use [Vertx Web Client][vertx-web-client] as a client or a different
+HTTP client.
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
