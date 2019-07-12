@@ -724,7 +724,8 @@ status of the blockchain node, including information about the block
 commitment and the consensus status.
 
 Rust logs are disabled by default and controlled by the `RUST_LOG`
-environment variable. It is recommended to set `info` logging level:
+environment variable. It is recommended to set `info` logging level
+for Exonum modules and `warn` level for all other modules:
 
 ```bash
 export RUST_LOG=warn,exonum=info,exonum-java=info
@@ -740,11 +741,12 @@ on possible configuration options.
 Java logs are produced by Java Binding internal code and can also be
 used to monitor Java services internal logic.
 
-Java logging configuration is controlled by configuration file. Example
-file named `log4j-fallback.xml` is included into the Exonum Java package.
-`ejb-log-config-path` parameter is used to set the pass to the current
-log configuration file. If no file was provided, the logs are disabled.
-See [Application Guide][app-tutorial] for more information on
+Java logging configuration is controlled by the configuration file
+specified by the `ejb-log-config-path` parameter. If no file was
+provided, the logs are disabled. Exonum Java package provides an
+example `log4j-fallback.xml` configuration file that can be found
+at the installation directory.
+Also, see [Application Guide][app-tutorial] for more information on
 configuring the Exonum Java App.
 
 Default `log4j-fallback.xml` file outputs `INFO`-level messages to
@@ -793,7 +795,7 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
-[env_logger-docs]: https://docs.rs/env_logger
+[env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
