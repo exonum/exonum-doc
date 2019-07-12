@@ -712,6 +712,47 @@ service_name1 = "/path/to/service1_artifact.jar"
 service_name2 = "/path/to/service2_artifact.jar"
 ```
 
+## Logging Configuration
+
+Java Binding uses two different methods for logging - [`log4j`][log4j-home]
+in Java modules and [`env_logger`][env_logger-home] in Rust modules.
+
+### Rust Logging
+
+Rust logs are produced by Exonum Core and can be used to monitor the
+status of the blockchain node, including information about the block
+commitment and the consensus status.
+
+Rust logs are disabled by default and controlled by the `RUST_LOG`
+environment variable. It is recommended to set `info` logging level:
+
+```bash
+export RUST_LOG=warn,exonum=info,exonum-java=info
+```
+
+Log entries go to `stderr` by default.
+
+See [`env_logger` documentation][env_logger-docs] for more information
+on possible configuration options.
+
+### Java Logging
+
+Java logs are produced by Java Binding internal code and can also be
+used to monitor Java services internal logic.
+
+Java logging configuration is controlled by configuration file. Example
+file named `log4j-fallback.xml` is included into the Exonum Java package.
+`ejb-log-config-path` parameter is used to set the pass to the current
+log configuration file. If no file was provided, the logs are disabled.
+See [Application Guide][app-tutorial] for more information on
+configuring the Exonum Java App.
+
+Default `log4j-fallback.xml` file outputs `INFO`-level messages to
+stdout.
+
+See [`log4j` documentation][log4j-docs] for more information on
+possible configuration options.
+
 ## Common Library
 
 Java Binding includes a library module that can be useful for Java client
@@ -752,6 +793,8 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[env_logger-docs]: https://docs.rs/env_logger
+[env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
@@ -759,6 +802,8 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/CONTRIBUTING.md#how-to-build
 [libsodium]: https://download.libsodium.org/doc/
+[log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
+[log4j-home]: https://logging.apache.org/log4j
 [Memorydb]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Schema.html
