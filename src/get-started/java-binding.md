@@ -714,7 +714,7 @@ service_name2 = "/path/to/service2_artifact.jar"
 
 ## Logging Configuration
 
-Java Binding uses two different methods for logging - [`log4j`][log4j-home]
+Java Binding uses two different methods for logging - [`Log4J`][log4j-home]
 in Java modules and [`env_logger`][env_logger-home] in Rust modules.
 
 ### Rust Logging
@@ -740,7 +740,8 @@ on possible configuration options.
 
 Logs produced by Java code (the framework and its dependencies,
 and the deployed services) are handled by Log4J framework.
-The services can use either Log4J or SLF4J logging APIs.
+The services can use either [`Log4J`][log4j-home] or
+[`SLF4J`][slf4j-home] logging APIs.
 
 Java logging configuration is controlled by the configuration file
 specified by the `ejb-log-config-path` parameter. If no file was
@@ -751,7 +752,7 @@ are output to stdout.
 Also, see [Application Guide][app-tutorial] for more information on
 configuring the Exonum Java App.
 
-See [`log4j` documentation][log4j-docs] for more information on
+See [`Log4J` documentation][log4j-docs] for more information on
 possible configuration options.
 
 ## Common Library
@@ -811,6 +812,7 @@ For using the library just include the dependency in your `pom.xml`:
 [service]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/indices/package-summary.html
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/Transaction.html
