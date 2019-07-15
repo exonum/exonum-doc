@@ -8,6 +8,9 @@ As blockchain technology is focused on security, a natural desire after
 shows how to accomplish this task with the help of
 [the testkit library](../advanced/service-testing.md).
 
+This document describes testing of Rust services, for Java instructions please
+refer to the [documentation][java-testkit].
+
 ## Preparing for Integration Testing
 
 Recall that an Exonum service is typically packaged as a Rust crate.
@@ -381,6 +384,7 @@ streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
 [integration-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
+[java-testkit]: ../get-started/java-binding.md#testing
 [tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
