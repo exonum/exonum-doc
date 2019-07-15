@@ -745,12 +745,10 @@ Java logging configuration is controlled by the configuration file
 specified by the `ejb-log-config-path` parameter. If no file was
 provided, the logs are disabled. Exonum Java package provides an
 example `log4j-fallback.xml` configuration file that can be found
-at the installation directory.
+at the installation directory. With this file `INFO`-level messages
+are output to stdout.
 Also, see [Application Guide][app-tutorial] for more information on
 configuring the Exonum Java App.
-
-Default `log4j-fallback.xml` file outputs `INFO`-level messages to
-stdout.
 
 See [`log4j` documentation][log4j-docs] for more information on
 possible configuration options.
