@@ -449,25 +449,31 @@ For more information on using Guice, see the [project wiki][guice-wiki].
 
 ## Testing
 
-### Schema and Operations with Storage
+Exonum Java Binding provides a powerful testing toolkit -
+[`exonum-testkit`][testkit-maven] library. TestKit allows testing transaction
+execution in the synchronous environment by offering simple network emulation
+(that is, without consensus algorithm and network operation involved).
 
-To test the schema and operations with the storage, Exonum provides a
-database that stores the values in the RAM — [`MemoryDb`][Memorydb].
-Before using it in integration tests, it is necessary to load
-a library with the implementation of native methods:
+### Project Configuration
 
-```java
-public class MySchemaIntegrationTest {
-  static {
-    LibraryLoader.load();
-  }
+!!! note "New projects"
+    `exonum-testkit` is already included in projects generated with
+    [`exonum-java-binding-service-archetype`](#creating-project) and you can
+    skip the following instructions:
 
-  // Tests.
-}
+For existing projects include the following dependency into your `pom.xml`:
+
+``` xml
+<dependency>
+  <groupId>com.exonum.binding</groupId>
+  <artifactId>exonum-testkit</artifactId>
+  <version>0.7.0</version>
+  <scope>test</scope>
+</dependency>
 ```
 
-The plug-in for running tests should be configured to pass
-`java.library.path` system property to JVM:
+As the TestKit uses a library with the implementation of native methods,
+pass `java.library.path` system property to JVM:
 
 ``` none
 -Djava.library.path=$EXONUM_JAVA/lib/native
@@ -481,7 +487,7 @@ as specified in [How to Run a Service section](#how-to-run-a-service).
 ```xml
 <plugin>
     <!-- You can also configure a failsafe to run integration tests during
-         'validate' phase of a Maven build to separate unit tests and ITs. -->
+         'verify' phase of a Maven build to separate unit tests and ITs. -->
     <artifactId>maven-surefire-plugin</artifactId>
     <configuration>
         <argLine>
@@ -491,85 +497,310 @@ as specified in [How to Run a Service section](#how-to-run-a-service).
 </plugin>
 ```
 
-Each test can create `Snapshot` and/or `Fork`, using `MemoryDb`, and also apply
-changes made to `Fork` to the database state:
+### Creating Test Network
 
-??? note "MySchemaTest"
-    ```java
-    package com.exonum.binding.qaservice;
+To perform testing, we first need to create a network emulation – the instance
+of [TestKit][testkit]. TestKit allows recreating behavior of a single full
+node (a validator or an auditor) in an emulated Exonum blockchain network.
 
-    import com.exonum.binding.proxy.Cleaner;
-    import com.exonum.binding.storage.database.Fork;
-    import com.exonum.binding.storage.database.MemoryDb;
-    import com.exonum.binding.storage.database.Snapshot;
-    import org.junit.After;
-    import org.junit.Before;
-    import org.junit.Test;
+To instantiate the TestKit, use [`TestKit.Builder`][testkit-builder]. It allows
+configuration of:
 
-    public class MySchemaTest {
+- Type of the emulated node (either [Validator][validator] or
+  [Auditor][auditor])
+- Services with which the TestKit would be instantiated
+- [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
+  is needed (for details see [Time Oracle Testing](#time-oracle-testing))
+- Number of validators in the emulated network
 
-      MemoryDb db;
-      Cleaner cleaner;
+!!! note
+    Note that regardless of the configured number of validators, only a single
+    node will be emulated. This node will create the service instances, execute
+    operations of those instances (e.g.,
+    [`afterCommit(BlockCommittedEvent)`][service-after-commit] method logic),
+    and provide access to their state.
 
-      @Before
-      public void setUp() {
-        db = MemoryDb.newInstance();
-        cleaner = new Cleaner();
-      }
+Default TestKit can be instantiated with a single validator as an emulated
+node, a single service and without Time Oracle in the following way:
 
-      @After
-      public void tearDown() throws Exception {
-        cleaner.close();
-        db.close();
-      }
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Test logic
+}
+```
 
-      @Test
-      public void testCreatingSnapshot() {
-        Snapshot snapshot = db.createSnapshot(cleaner);
-        // Use the Snapshot to test the schema.
-      }
+The TestKit can be also instantiated using a builder, if different
+configuration is needed:
 
-      @Test
-      public void testMergingSomeChanges() {
-        Fork fork = db.createFork(cleaner);
-        // Make some changes to Fork.
-        // …
+```java
+try (TestKit testKit = TestKit.builder()
+    .withServices(MyServiceModule.class, MyServiceModule2.class)
+    .withValidators(2)
+    .build()) {
+  // Test logic
+}
+```
 
-        // Merge the changes made to the database Fork into the database.
-        db.merge(fork);
+### Transactions Testing
 
-        // Create a Snapshot of the database state. Must include the changes
-        // made above.
-        Snapshot snapshot = db.createSnapshot(cleaner);
-        // Use the Snapshot to test the schema/transaction
-        // with a certain database state.
-        // …
-      }
-    }
-    ```
+The TestKit allows testing transaction execution by submitting blocks with the
+given [transaction messages][transactions-messages]. Here is an example of a
+test that verifies the execution result of a valid transaction and the changes
+it made in service schema:
 
-### Transactions
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Construct a valid transaction
+  TransactionMessage validTx = constructValidTransaction();
 
-To test transactions execution, you can use `MemoryDb`, as in the previous
-section.
+  // Commit block with this transaction
+  Block block = testKit.createBlockWithTransactions(validTx);
 
-### Read Requests
+  // Retrieve a snapshot of the current database state
+  Snapshot view = testkit.getSnapshot();
+  // It can be used to access the core schema, for example to check the
+  // transaction execution result:
+  Blockchain blockchain = Blockchain.newInstance(view);
+  Optional<TransactionResult> validTxResult =
+        blockchain.getTxResult(validTx.hash());
+  assertThat(validTxResult).hasValue(TransactionResult.successful());
+  // And also to verify the changes the transaction made to the service state:
+  MySchema schema = new MySchema(view);
+  // Perform assertions on the data in the service schema
+}
+```
 
-To test read requests for service data, you can use a fake that implements
-`Node` interface and uses `MemoryDb` to create `Snapshot`:
-[`NodeFake`][nodefake].
-The `MemoryDb` contents can be filled in by executing `MemoryDb#merge(Fork)`
-operation as in the section above.
+And a test that verifies that a transaction that throws an exception during its
+execution will fail:
+
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Construct a transaction that throws `TransactionExecutionException` during
+  // execution
+  byte errorCode = 1;
+  String errorDescription = "Test";
+  TransactionMessage errorTx =
+      constructErrorTransaction(errorCode, errorDescription);
+
+  // Commit block with this transaction
+  Block block = testKit.createBlockWithTransactions(errorTx);
+
+  // Check that transaction failed
+  Snapshot view = testKit.getSnapshot();
+  Blockchain blockchain = Blockchain.newInstance(view);
+
+  Optional<TransactionResult> errorTxResult =
+      blockchain.getTxResult(errorTx.hash());
+  TransactionResult expectedTransactionResult =
+      TransactionResult.error(errorCode, errorDescription);
+  assertThat(errorTxResult).hasValue(expectedTransactionResult);
+}
+```
+
+The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
+transactions:
+
+```java
+try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+  // Put the transaction into the TestKit transaction pool
+  MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
+
+  TransactionMessage message = constructTransactionMessage();
+  RawTransaction rawTransaction = RawTransaction.fromMessage(message);
+  service.getNode().submitTransaction(rawTransaction);
+
+  // This block will contain the transaction submitted above
+  Block block = testKit.createBlock();
+  // Check the resulting block or blockchain state
+}
+```
+
+The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
+[`findTransactionsInPool(Predicate<TransactionMessage> predicate)`][testkit-find-in-pool]
+methods to inspect the transaction pool. These methods are useful when there is
+a need to verify transactions that the service instance submitted itself (e.g.,
+in `afterCommit` method) into the transaction pool.
+
+!!! note
+    Note that blocks that are created with
+    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
+    will ignore in-pool transactions. As of 0.7.0, there is no way to create a block
+    that would contain both given and in-pool transactions with a single
+    method. To do that, put the given transactions into the TestKit transaction
+    pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
+
+#### Checking the Blockchain State
+
+In order to test service read operations and verify changes in the blockchain
+state, the TestKit provides a snapshot of the current database state (i.e., the
+one that corresponds to the latest committed block). There are several ways to
+access it:
+
+- `Snapshot getSnapshot()`
+  Returns a snapshot of the current database state
+- `void withSnapshot(Consumer<Snapshot> snapshotFunction)`
+  Performs the given function with a snapshot of the current database state
+- `<ResultT> ResultT applySnapshot(Function<Snapshot, ResultT> snapshotFunction)`
+  Performs the given function with a snapshot of the current database state and
+  returns a result of its execution
+
+!!! note
+    Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
+    once the passed closure completes. When using `getSnapshot`, created
+    snapshots are only disposed when the TestKit is closed. That might cause
+    excessive memory usage if many snapshots are created. Therefore, it is
+    recommended to use the first two methods if a large number (e.g. more than
+    a hundred) of snapshots needs to be created.
+
+### Time Oracle Testing
+
+The TestKit allows to use [Time Oracle][time-oracle] in integration tests if
+your service depends on it. To do that, the TestKit should be created with
+[`TimeProvider`][testkit-time-provider].
+Its implementation, [`FakeTimeProvider`][testkit-fake-time-provider], mocks the
+source of the external data (current time) and, therefore, allows to manually
+manipulate time that is returned by the time service. Note that the time must
+be set in UTC time zone.
+
+```java
+@Test
+void timeOracleTest() {
+  ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
+  FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
+  try (TestKit testKit = TestKit.builder()
+      .withService(MyServiceModule.class)
+      .withTimeService(timeProvider)
+      .build()) {
+    // Create an empty block
+    testKit.createBlock();
+    // The time service submitted its first transaction in `afterCommit`
+    // method, but it has not been executed yet
+    Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
+    // No time is available till the time service transaction is processed
+    assertThat(consolidatedTime1).isEmpty();
+
+    // Increase the time value
+    ZonedDateTime time1 = initialTime.plusSeconds(1);
+    timeProvider.setTime(time1);
+    testKit.createBlock();
+    // The time service submitted its second transaction. The first must
+    // have been executed, with consolidated time now available and equal to
+    // initialTime
+    Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
+    assertThat(consolidatedTime2).hasValue(initialTime);
+
+    // Increase the time value
+    ZonedDateTime time2 = initialTime.plusSeconds(1);
+    timeProvider.setTime(time2);
+    testKit.createBlock();
+    // The time service submitted its third transaction, and processed the
+    // second one. The consolidated time must be equal to time1
+    Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
+    assertThat(consolidatedTime3).hasValue(time1);
+  }
+}
+
+private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
+  return testKit.applySnapshot(s -> {
+    TimeSchema timeSchema = TimeSchema.newInstance(s);
+    return timeSchema.getTime().toOptional();
+  });
+}
+```
+
+### TestKit JUnit 5 Extension
+
+The TestKit JUnit 5 extension simplifies writing tests that use TestKit. It
+allows to inject TestKit objects into test cases as a parameter and delete them
+afterwards. To enable it, define a [`TestKitExtension`][testkit-extension]
+object annotated with [`@RegisterExtension`][junit-register-extension] and
+provided with a builder. The builder would be used to construct the injected
+TestKit objects:
+
+```java
+@RegisterExtension
+TestKitExtension testKitExtension = new TestKitExtension(
+  TestKit.builder()
+    .withService(MyServiceModule.class));
+
+@Test
+void test(TestKit testKit) {
+  // Test logic
+}
+```
+
+It is possible to configure the injected TestKit instance with the following annotations:
+
+- [`@Validator`][testkit-extension-validator] sets an emulated TestKit node
+  type to validator
+- [`@Auditor`][testkit-extension-auditor] sets an emulated TestKit node type to
+  auditor
+- [`@ValidatorCount`][testkit-extension-validatorcount] sets a number of the
+  validator nodes in the TestKit network
+
+These annotations should be applied on the TestKit parameter:
+
+```java
+@RegisterExtension
+TestKitExtension testKitExtension = new TestKitExtension(
+  TestKit.builder()
+    .withService(MyServiceModule.class));
+
+@Test
+void validatorTest(TestKit testKit) {
+  // Injected TestKit has a default configuration, specified in the builder
+  // above
+}
+
+@Test
+void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
+  // Injected TestKit has an altered configuration - "auditor" as an emulated
+  // node and 8 validator nodes
+}
+```
+
+!!! note
+    Note that after the TestKit is instantiated in the given test context, it
+    is not possible to reconfigure it again. For example, if the TestKit is
+    injected in [`@BeforeEach`][junit-beforeeach] method, it can't be
+    reconfigured in [`@Test`][junit-test] or [`@AfterEach`][junit-aftereach]
+    methods. Also note that the TestKit cannot be injected in
+    [`@BeforeAll`][junit-beforeall] and [`@AfterAll`][junit-afterall] methods.
 
 ### API
 
 To test API implemented with Vertx tools, use the tools described in the
-[project documentation](https://vertx.io/docs/vertx-unit/java/#_introduction).
-You can use [Vertx Web Client][vertx-web-client] as a client or another HTTP
-client.
+[project documentation](https://vertx.io/docs/vertx-junit5/java).
+You can use [Vertx Web Client][vertx-web-client] as a client or a different
+HTTP client.
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
+
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.7.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[auditor]: ../glossary.md#auditor
+[in-pool]: https://exonum.com/doc/version/0.11/advanced/consensus/specification/#pool-of-unconfirmed-transactions
+[junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
+[junit-aftereach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterEach.html
+[junit-beforeall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeAll.html
+[junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
+[junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
+[junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding-core/0.7.0/com/exonum/binding/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[testkit]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html
+[testkit-builder]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.Builder.html
+[testkit-create-block]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
+[testkit-extension]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKitExtension.html
+[testkit-extension-auditor]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Auditor.html
+[testkit-extension-validator]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/Validator.html
+[testkit-extension-validatorcount]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/ValidatorCount.html
+[testkit-fake-time-provider]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/FakeTimeProvider.html
+[testkit-find-in-pool]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
+[testkit-get-pool]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
+[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.7.0
+[testkit-time-provider]: https://exonum.com/doc/api/exonum-testkit/0.7.0/com/exonum/binding/testkit/TimeProvider.html
+[validator]: ../glossary.md#validator
+[vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 
 ## Using Libraries
 
@@ -577,7 +808,8 @@ An Exonum service can use any third-party library as its dependency.
 At the same time, Exonum comes with its own dependencies.
 Classes of these dependencies are used in Exonum public APIs:
 
-- Exonum (exonum-java-binding-core, exonum-java-binding-common)
+- Exonum (exonum-java-binding-core, exonum-java-binding-common,
+  exonum-time-oracle, exonum-testkit)
 - [Guice][guice-home]
 - [Gson][gson]
 - [Vertx][vertx-web-docs] (vertx-web)
@@ -658,7 +890,7 @@ Currently Java Binding includes the following built-in services:
   authenticated by a supermajority of validators using digital signature tools
   available in Bitcoin.
 
-- [**Time Oracle.**](../advanced/time.md)
+- [**Time Oracle.**][time-oracle]
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
@@ -790,7 +1022,6 @@ For using the library just include the dependency in your `pom.xml`:
 - [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/AbstractService.html
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.6.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
 [blockchain]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
@@ -815,13 +1046,13 @@ For using the library just include the dependency in your `pom.xml`:
 [slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/storage/indices/package-summary.html
+[time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/Transaction.html
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
 [transactionconvererter]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
-[vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding-common/0.6.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding-core/0.6.0/com/exonum/binding/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
