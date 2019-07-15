@@ -738,8 +738,9 @@ on possible configuration options.
 
 ### Java Logging
 
-Java logs are produced by Java Binding internal code and can also be
-used to monitor Java services internal logic.
+Logs produced by Java code (the framework and its dependencies,
+and the deployed services) are handled by Log4J framework.
+The services can use either Log4J or SLF4J logging APIs.
 
 Java logging configuration is controlled by the configuration file
 specified by the `ejb-log-config-path` parameter. If no file was
