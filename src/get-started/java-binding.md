@@ -31,8 +31,7 @@ deployment.
   ```
 
 - Install [Libsodium][libsodium] as the necessary runtime dependency.
-  For Mac OS also install RocksDB library:
-  
+
 ??? example "Linux (Ubuntu)"
     ```bash
     sudo apt-get update && sudo apt-get install libsodium-dev
@@ -40,7 +39,7 @@ deployment.
   
 ??? example "Mac OS"
     ```bash
-    brew install libsodium rocksdb
+    brew install libsodium
     ```
 
 - Follow the steps in the [After Install](#after-install) section below
