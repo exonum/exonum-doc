@@ -1,4 +1,4 @@
-{
+﻿{
   "version": "0.1",
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
@@ -46,6 +46,8 @@
     "keypair",
     "leveldb",
     "LGTM",
+    "librocksdb",
+    "libsnappy",
     "libsodium",
     "lifecycle",
     "markdownlint",
