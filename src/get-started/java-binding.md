@@ -943,6 +943,49 @@ service_name1 = "/path/to/service1_artifact.jar"
 service_name2 = "/path/to/service2_artifact.jar"
 ```
 
+## Logging Configuration
+
+Java Binding uses two different methods for logging - [`Log4J`][log4j-home]
+in Java modules and [`env_logger`][env_logger-home] in Rust modules.
+
+### Rust Logging
+
+Rust logs are produced by Exonum Core and can be used to monitor the
+status of the blockchain node, including information about the block
+commitment and the consensus status.
+
+Rust logs are disabled by default and controlled by the `RUST_LOG`
+environment variable. It is recommended to set `info` logging level
+for Exonum modules and `warn` level for all other modules:
+
+```bash
+export RUST_LOG=warn,exonum=info,exonum-java=info
+```
+
+Log entries go to `stderr` by default.
+
+See [`env_logger` documentation][env_logger-docs] for more information
+on possible configuration options.
+
+### Java Logging
+
+Logs produced by Java code (the framework and its dependencies,
+and the deployed services) are handled by Log4J framework.
+The services can use either [`Log4J`][log4j-home] or
+[`SLF4J`][slf4j-home] logging APIs.
+
+Java logging configuration is controlled by the configuration file
+specified by the `ejb-log-config-path` parameter. If no file was
+provided, the logs are disabled. Exonum Java package provides an
+example `log4j-fallback.xml` configuration file that can be found
+at the installation directory. With this file `INFO`-level messages
+are printed to stdout.
+Also, see [Application Guide][app-tutorial] for more information on
+configuring the Exonum Java App.
+
+See [`Log4J` documentation][log4j-docs] for more information on
+possible configuration options.
+
 ## Common Library
 
 Java Binding includes a library module that can be useful for Java client
@@ -982,6 +1025,8 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.7.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
+[env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
 [github-releases]: https://github.com/exonum/exonum-java-binding/releases
 [guice-home]: https://github.com/google/guice
@@ -989,12 +1034,15 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.7.0/CONTRIBUTING.md#how-to-build
 [libsodium]: https://download.libsodium.org/doc/
+[log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
+[log4j-home]: https://logging.apache.org/log4j
 [Memorydb]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/storage/indices/package-summary.html
 [time-oracle]: ../advanced/time.md
