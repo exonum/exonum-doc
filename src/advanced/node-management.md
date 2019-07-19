@@ -930,11 +930,11 @@ will contain the following fields:
 - **status.type**: string  
   Execution status kind:
 
-  - `"success"` denotes a successfully completed transaction
-  - `"error"` denotes a transaction that has returned an error (for example,
-    because of transaction parameters not satisfying context-dependent checks)
-  - `"panic"` denotes a transaction that has raised a runtime exception
-    (for example, attempted to divide by zero).
+    - `"success"` denotes a successfully completed transaction
+    - `"error"` denotes a transaction that has returned an error (for example,
+      because of transaction parameters not satisfying context-dependent checks)
+    - `"panic"` denotes a transaction that has raised a runtime exception
+      (for example, attempted to divide by zero).
 
 - **location**: TransactionLocation  
   Transaction position in the blockchain.
