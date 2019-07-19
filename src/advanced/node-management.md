@@ -125,7 +125,8 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 `TransactionInfo` is a JSON object with the following fields:
 
 - **tx_hash**: Hash  
-  Array of bytes of a transaction serialized according to the Protobuf serialization format.
+  Array of bytes of a transaction serialized according to the Protobuf
+  serialization format.
 - **service_id**: integer  
   ID of the service where belongs the transaction.
 
@@ -600,7 +601,7 @@ Response JSON has the same fields as
 
 Response is a JSON object with the following fields:
 
-- **type**: string    
+- **type**: string  
   Always equals to `committed`.
 - **content**: Content  
   Transaction data in the serialized and deserialized formats.
@@ -611,7 +612,7 @@ Response is a JSON object with the following fields:
   block.
 - **status**: Object  
   [Transaction execution](../architecture/transactions.md#execute) status
-- **status.type**: string    
+- **status.type**: string  
   Execution status kind:
 
     - `"success"` denotes a successfully completed transaction
@@ -756,6 +757,7 @@ order
 according to their heights. Height of any block in the array is greater than or
 equal to `start` and is less than `end`.
 
+<!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
     Assume the following request
 
@@ -825,6 +827,7 @@ equal to `start` and is less than `end`.
       ]
     }
     ```
+<!-- markdownlint-enable MD013 -->
 
     That is, to collect `5` non-empty blocks from the tail of the blockchain,
     range from `43` to `25` has been traversed.
@@ -916,15 +919,15 @@ block starting from the height when the client connected to the socket.
 Each notification is a string which can be deserialized into a JSON object that
 will contain the following fields:
 
-- **type**: string
+- **type**: string  
   Type of the committed object. Is always equal to `"transaction"`.
-- **tx_hash**: Hash
+- **tx_hash**: Hash  
   Hash of the committed transaction.
-- **service_id**: integer
+- **service_id**: integer  
   ID of the service where belongs the current transaction.
-- **message_id**: integer
+- **message_id**: integer  
   ID of the transaction type.
-- **status.type**: string    
+- **status.type**: string  
   Execution status kind:
 
   - `"success"` denotes a successfully completed transaction
