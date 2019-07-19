@@ -5,7 +5,8 @@ connected via peer-to-peer connections, and
 [light clients](../glossary.md#light-client).
 Full nodes communicate with each other
 using [Exonum binary serialization format](../glossary.md#binary-serialization)
-over TCP, and clients interact with full nodes via REST service interface.
+over TCP, and clients interact with full nodes via REST service interface and
+WebSockets.
 
 ## Network Structure
 
@@ -36,8 +37,9 @@ to full nodes for several purposes:
 
 - to [retrieve](node-management.md#explorer-api-endpoints) information they are
   interested in from the blockchain
-- to [subscribe](node-management.md#explorer-api-sockets) to block commit events
-  and be aware of every new accepted block
+- to [subscribe](node-management.md#explorer-api-sockets) to events like block
+  commits and transaction commits and be aware of new accepted blocks and
+  transactions
 - to send transactions.
 
 Exonum also provides a [“proofs mechanism”](../glossary.md#merkle-proof),
@@ -52,7 +54,8 @@ Full nodes use the
 over TCP to communicate with each other.
 [The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
-the external network, timeouts, and new transactions received via REST API.
+the external network, timeouts, and new transactions sent via REST API and/or
+WebSocket.
 
 Messages exchanged by full nodes include consensus messages and transactions.
 
@@ -115,9 +118,9 @@ signatures, which are the part of JSON serialization of transactions. Read
 requests are generally not authenticated.
 
 Full nodes use [Actix-web framework](https://actix.rs) to implement REST
-HTTP API. Addresses for public and private API endpoints are specified in the
-[`api`](../architecture/configuration.md#api) section of the local
-configuration.
+HTTP API and WebSockets. Addresses for public and private API endpoints are
+specified in the [`api`](../architecture/configuration.md#api) section of the
+local configuration.
 
 ### Service Endpoints
 

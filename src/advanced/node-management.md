@@ -1,4 +1,4 @@
-# Node management
+# Node Management
 
 <!-- cspell:ignore nanos -->
 
@@ -33,6 +33,10 @@ an optional type.
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
 appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex
 digits). `Signature` is 64 bytes (that is, 128 hex digits).
+
+### Map
+
+`Map` is a collection use for storing key-value pairs.
 
 ### PeerAddress
 
@@ -116,10 +120,21 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 `SerializedTransaction` is an array of bytes in the Protobuf
 [serialization format](../architecture/serialization.md#principles-of-using-protobuf-serialization).
 
+### TransactionInfo
+
+`TransactionInfo` is a JSON object with the following fields:
+
+- **tx_hash**: Hash  
+  Array of bytes of a transaction serialized according to the Protobuf serialization format.
+- **service_id**: integer  
+  ID of the service where belongs the transaction.
+
 ### Content
 
 `Content` is a JSON object with the following fields:
 
+- **service_id**: integer  
+  ID of the service where belongs the transaction.
 - **debug**: object  
   Transaction in the deserialized format.  
 - **message**: SerializedTransaction  
@@ -145,7 +160,7 @@ All system API endpoints share the same base path, denoted
 ### Number of Unconfirmed Transactions
 
 ```none
-GET {system_base_path}/mempool
+GET {system_base_path}/stats
 ```
 
 Returns the number of transactions in the node pool of unconfirmed transactions.
@@ -158,14 +173,17 @@ None.
 
 A JSON object with the following fields:
 
-- **size**: integer  
+- **tx_pool_size**: integer  
   Amount of unconfirmed transactions.
+- **tx_count**: integer  
+  Total number of transactions in the blockchain.
 
 #### Response Example
 
 ```JSON
 {
-  "size": 0
+  "tx_pool_size": 0,
+  "tx_count": 2
 }
 ```
 
@@ -229,6 +247,42 @@ Returns a string containing information about Exonum, Rust and OS version.
 
 ```None
 "exonum 0.10.2/rustc 1.32.0 (9fda7c223 2019-01-16)\n\n/Mac OS10.14.3"
+```
+
+### Services Info
+
+```none
+GET {system_base_path}/services
+```
+
+Returns information on the available services.
+
+#### Parameters
+
+None.
+
+#### Response
+
+A JSON object with the following fields:
+
+- **services**: Array<ServiceInfo\>  
+  Information on the available service.
+
+#### Response Example
+
+```JSON
+{
+  "services": [
+    {
+      "name": "cryptocurrency",
+      "id": 128
+    },
+    {
+      "name": "configuration",
+      "id": 1
+    }
+  ]
+}
 ```
 
 ## Private Endpoints
@@ -546,7 +600,7 @@ Response JSON has the same fields as
 
 Response is a JSON object with the following fields:
 
-- **type**: `"committed"`  
+- **type**: string    
   Always equals to `committed`.
 - **content**: Content  
   Transaction data in the serialized and deserialized formats.
@@ -557,7 +611,7 @@ Response is a JSON object with the following fields:
   block.
 - **status**: Object  
   [Transaction execution](../architecture/transactions.md#execute) status
-- **status.type**: `"success"` | `"error"` | `"panic"`  
+- **status.type**: string    
   Execution status kind:
 
     - `"success"` denotes a successfully completed transaction
@@ -572,6 +626,9 @@ Response is a JSON object with the following fields:
 - **status.description**: string=  
   Optional human-readable error description. Only relevant for erroneous and
   panicking transactions.
+- **time**: Time Object  
+  Time when the block with the current transaction was committed to the
+  blockchain.
 
 <!-- markdownlint-disable MD013 -->
 ??? example "Response Example"
@@ -579,14 +636,12 @@ Response is a JSON object with the following fields:
     {
       "type": "committed",
       "content": {
+        "service_id": 128,
         "debug": {
-          "to": {
-            "data": [174, 116, 3, 32, 153, 158, 51, 93, 212, 245, 253, 192, 70, 143, 52, 235, 70, 84, 74, 161, 153, 91, 108, 172, 252, 237, 200, 36, 40, 189, 113, 221]
-          },
           "amount": 10,
-          "seed": 2084648087298472854
-        },
-        "message": "41c453a7f45cb0dd73644aa376d3802bb7da4c6797bcf6749211fbcabb5aa8710000800000000a220a20ae740320999e335dd4f5fdc0468f34eb46544aa1995b6cacfcedc82428bd71dd100a1896f7fda8bf8c8af71cfccd80d4c0d5d6f82955cf7c081969282604d3f7e416274a4319484ceea947981b8d337bd170210acd62508f3663acba395bd131456c0b6cd7f09690aec68a05"
+          "seed": 6009769846001868842
+          },
+        "message": "c3b06b072c2179e0e3965062a2c10df1cd37e9dd4c190688848d28ecc78b9093000080000100080a10aac0aea6d7babfb3539a6f6be22350109a134a162d78ee73bcf3035487a224d865f86d835b2e8e979b7af5200762dece6116ad2744eba5a6422c3f052a61a6d12caaef1431842dc403"
       },
       "location": {
         "block_height": 11,
@@ -597,7 +652,8 @@ Response is a JSON object with the following fields:
       },
       "status": {
         "type": "success"
-      }
+      },
+      "time": "2019-07-17T13:02:41.520395Z"
     }
     ```
 <!-- markdownlint-enable MD013 -->
@@ -622,10 +678,10 @@ A JSON object with the following fields:
 - **block**: BlockHeader  
   Header of the specified block.
 - **precommits**: Array<Hash\>  
-  List of hashes of the 'Precommit' messages supporting the block.
-- **txs**: Array<SerializedTransaction\>  
+  List of hashes of the precommit messages supporting the block.
+- **txs**: Array<TransactionInfo\>  
   List of the transactions included into the block.
-- **time**: time object  
+- **time**: Time Object  
   Time when the block was committed to the blockchain.
 
 <!-- markdownlint-disable MD013 -->
@@ -634,17 +690,18 @@ A JSON object with the following fields:
     {
       "block": {
         "proposer_id": 3,
-        "height": 1,
+        "height": 2,
         "tx_count": 1,
-        "prev_hash": "fd510fc923683a4bb77af8278cd51676fbd0fcb25e2437bd69513d468b874bbb",
-        "tx_hash": "336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13",
-        "state_hash": "79a6f0fa233cc2d7d2e96855ec14bdcc4c0e0bb1a99ccaa912a555441e3b7512"
+        "prev_hash": "14830ace613b0e241de189663e7020c4868d20f47f1e0ad22403b6ff04625ca5",
+        "tx_hash": "8df18a9dbb12e7d6eb37ed4804f2c09dd4bf8f55ca9cd0b49668fbf1a6a55d47",
+        "state_hash": "fd09172b5945b5b1e2fda94570938897e7205ade1baffffc3af958fbe9e5ef4f"
       },
-      "precommits": ["a410964c2c21199b48e278b64bb72e2b8b20374df1ba5c8a846d34de9254a706010008031001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510f09da312b91820e1a9b0132c32d608e5206bf5fe119c54c17424ef6f6c70b13490761ddd36f855e2c74e37c7aa7e1ac648893164a07ed413c2c0065738d6bea8825bbf04",
-      "0776a07b194e1a9b918205331e0c1f62de82d5b23efccb5922624cb928b620c901001001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510e8bfe11105fcd4562131756c6f6c64d0e63f4cca67bf718fb43a1ca45161ee3328c97c2582ab70f40406d4b2aa5fc967e2b177b897a3cf2dc0a674df4eccb45f75db8900",
-      "57b745d4e157299ede29129ba039a039e6f145aae3852481937ac1972b2ed131010008011001180222220a2017ba87030093c7f27a73d7f987f36d0b731c015a1fdefe9d2799e45eaa26148f2a220a202e2c737dc5e902084b252991dbcd7c978565bb76b271d27681a675c81bdbbfae320b08e4ee95e30510d8eee11143e792e3c8a72403fc3dc259f3e8e0c3de867be4555fb809e7c8f79ce9449d15020b9060eb6d41efb5079bd25147dc2a5f3071b9bb7ed2fc8751468e750b310d"],
-      "txs": ["336a4acbe2ff0dd18989316f4bc8d17a4bfe79985424fe483c45e8ac92963d13"],
-      "time": "2019-02-14T14:12:52.037255Z"
+      "precommits": ["bca4a60d751d9d93205f1997a83fadb492b3eb70d1d987ead73f6a090efbe122010008021002180122220a208037a5fb4808279b5305c44ded205b6d551ec6d255dee15f60235fef3505acf92a220a209416efdec8f26f0abff8c006c64c67ef27c3724dc4b3a33ac852939e774b1c5d320c08f1b8bce90510f8b192f801664a4d93eca26fff5c1cc7854469ca457e60dd1de01dc9ec7e8da46e9bf196a84aa0996cc4b745879de5e6d907e193c52a7e06025e6c798c43fb32429c3df20a", "9b73b31c53c8345924b8a1cf58fa4abf84ff312446f6f7039c85e723655b1fe2010008011002180122220a208037a5fb4808279b5305c44ded205b6d551ec6d255dee15f60235fef3505acf92a220a209416efdec8f26f0abff8c006c64c67ef27c3724dc4b3a33ac852939e774b1c5d320c08f1b8bce90510f8b192f80170a245d73840d06e5b616674800494cee787bcff893e23c06ccfe06e4dd8125e601d357f6c944ff4ecaaa652ece3ad2b32198d868ee90bac2e5e3e828890fd0d", "8396227648fd116ff113d57d0efc971befc862f54126e4e251180a1c082f739801001002180122220a208037a5fb4808279b5305c44ded205b6d551ec6d255dee15f60235fef3505acf92a220a209416efdec8f26f0abff8c006c64c67ef27c3724dc4b3a33ac852939e774b1c5d320c08f1b8bce90510c0f69df801b4ed2af8189426ae7299ff03b4fe23f26063859ef372db3411727dca2170a7eebab26db5616ddc749a44dbb737f1d350fdc93d35c36a04bede84c52b4d94360c"],
+      "txs": [{
+        "tx_hash": "5820d0e94cb0c49d4991690c6ed61d1eab9351f8c54ed07a498275329efe8eda",
+        "service_id": 128
+      }],
+      "time": "2019-07-17T13:02:41.520395Z"
     }
     ```
 <!-- markdownlint-enable MD013 -->
@@ -652,7 +709,7 @@ A JSON object with the following fields:
 ### Blocks in Range
 
 ```none
-GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}&add_blocks_time={add}
+GET {explorer_base_path}/blocks?count={count}&skip_empty_blocks={skip}&latest={latest}&add_blocks_time={add}&add_precommits={add}
 ```
 
 Returns the block headers from the specified range. The range
@@ -672,10 +729,19 @@ blocks from the traversed range should not exceed `count` value.
   in reverse order, starting from the `latest` and at least up to the `latest -
   count + 1`. The default value is the height of the latest block in the
   blockchain.
+- **earliest**: integer=  
+  Minimum height of the returned blocks. The default value is `Height(0)` (the
+  genesis block). `earliest` has the least priority compared to `latest` and
+  `count`. It truncates the list of returned blocks if some of them have a
+  lesser height. The blocks are returned in reverse order, starting from the
+  `latest` and at least up to the `latest - count + 1`. The default maximum
+  height of the returned range of blocks is the latest block in the blockchain.
+- **add_precommits**: bool=  
+  If `true`, then returns and array of precommit hashes collected for every
+  returned block. The default value is `false`.
 - **add_blocks_time**: bool=  
-  If `true`, then returns an array of `time` objects. The time value
-  corresponds to the average time of submission of precommits by the
-  validators for every returned block. The default value is `false`.
+  If `true`, then returns the median precommit times for every returned block.
+  The default value is `false`.
 
 #### Response
 
@@ -694,7 +760,7 @@ equal to `start` and is less than `end`.
     Assume the following request
 
     ```none
-    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true&add_blocks_time=true
+    GET {explorer_base_path}/blocks?count=5&skip_empty_blocks=true&add_blocks_time=true&add_precommits=true
     ```
 
     and response
@@ -702,63 +768,66 @@ equal to `start` and is less than `end`.
     ```JSON
     {
       "range": {
-        "start": 6,
-        "end": 288
+        "start": 25,
+        "end": 43
       },
       "blocks": [
         {
-          "proposer_id": 3,
-          "height": 26,
-          "tx_count": 1,
-          "prev_hash": "932470a22d37a5a995519e01c50eab7db9e0e978f5b17f8342030ae3f066af82",
-          "tx_hash": "5cc41a2a7cf7c0d3a15ab6ca775b601208dba7d506e2f27368702b3334d37583",
-          "state_hash": "4d7bb34d7913e0784c24a1e440532e72900eb380129a54dbaac6ad9286f9d567"
-        },
-        {
-          "proposer_id": 2,
-          "height": 21,
-          "tx_count": 1,
-          "prev_hash": "aa4ec89740a4ec380e8bcab0aedd0f5449184eb33b65ede5bb67e5e55e2dd004",
-          "tx_hash": "dcb05a3bd61f9b637335472802d8ab6026c8486dae3b4062ce48d561949c49af",
-          "state_hash": "e4ea2c6118326c6b00cd14ec7b8fb4cbf198eb4e65149ef3a96761740fc516c6"
+          "proposer_id": 0,
+          "height": 29,
+          "tx_count": 31,
+          "prev_hash": "6aaeb7fbd1bd508543d9e47eafa2e6b7a4703a04f32b7867fec7ae0f3bb3a5f6",
+          "tx_hash": "00706409a70e1a33984a6c4ddcdcbc81b414c08c742be48610541f2d68f06f8c",
+          "state_hash": "4e3a346ac15da83bdbee8bd0a25f4cf965fccf23624e04a9ecffb079a4c66cbd",
+          "precommits": ["92ecef5261f479b54a16f46b1d6eaf62314de5ecb9f90fe73fd9967798f365b701000801101d180122220a20aabedaf381373218fba0f4890206a6d74eb9341e6a34dde0ac459ee9a50c87a32a220a20d661d9482723822cd4416f12abcc47e1d1d31942db6467b1ebfde8e3c9fe48e5320c08fd86c2e90510e0a4a79a030e619127965433bccee70c726f347add72333a1092116f08784705b849d349acc9f91b353a8e3a99dc72d71b5b018b0d68ac02487232a9d2f7ae9e56eada1503", "3cb840294aea3dce704470e3361f88b4bef5d9de16702532cdfab81ece4f4f110100101d180122220a20aabedaf381373218fba0f4890206a6d74eb9341e6a34dde0ac459ee9a50c87a32a220a20d661d9482723822cd4416f12abcc47e1d1d31942db6467b1ebfde8e3c9fe48e5320c08fd86c2e90510c0ca909a03227efa56e175f1714b8998efe942087c97890cd1c6b040f16fec3a74436c0ad4b8db38e488c22d2a6ba57323a300f9a153f076a941dca98f62f1936960884901"],
+          "time": "2019-07-18T14:34:37.860476Z"
         },
         {
           "proposer_id": 1,
-          "height": 16,
-          "tx_count": 1,
-          "prev_hash": "7183517c34e94ecc10a3e13269da2bfadb6e87eea86453a1946ebdfa9c4dae83",
-          "tx_hash": "362bc50ed56d33944a0d33fbac2a25fc08ceb8dc1aced1f38147b3da3d022bc1",
-          "state_hash": "00cca5682b677d4b4ac644d2ddae09ca5e260fb67c735df22774f2e983d24ef5"
+          "height": 28,
+          "tx_count": 47,
+          "prev_hash": "0c7af586be70af3d70ff7b22ce44bb9024fd99e8bdb27d2a35b676fa2fe208b1",
+          "tx_hash": "6127e72c21301ce2bba07b3c28b9bb2811ceaef629f545c559080206d217de88",
+          "state_hash": "1d72b4ab756cd49cf7386638bb29173c3a725d2059de8ac1339e0e75398ecb4f",
+          "precommits": ["92ecef5261f479b54a16f46b1d6eaf62314de5ecb9f90fe73fd9967798f365b701000801101c180122220a207eb780465f7130f3ad0a11903b2b3c02ababf58dda2c3830d84b87fd95edcc3e2a220a206aaeb7fbd1bd508543d9e47eafa2e6b7a4703a04f32b7867fec7ae0f3bb3a5f6320c08fd86c2e90510b8b69bb30262c7abc8b67808f831f9b9c5bdf42071acb23f1937800bc6df60b845b007047937290de22fefc50fb6ab8bbe427900c30921e89346ee237ff1e4f0719a468600", "3cb840294aea3dce704470e3361f88b4bef5d9de16702532cdfab81ece4f4f110100101c180122220a207eb780465f7130f3ad0a11903b2b3c02ababf58dda2c3830d84b87fd95edcc3e2a220a206aaeb7fbd1bd508543d9e47eafa2e6b7a4703a04f32b7867fec7ae0f3bb3a5f6320c08fd86c2e90510b8a9ccb20273f6e3dca17d0c47a68ecac6133b5b7fd2f88a29f386d5a0257d5727c5280218a51944afb518139a2252e9bb16a6c41cb790e16cb89d278df89ef1538e50f906"],
+          "time": "2019-07-18T14:34:37.644275Z"
         },
         {
           "proposer_id": 0,
-          "height": 11,
-          "tx_count": 1,
-          "prev_hash": "9297ef66d1d9ec286c00aec779f2dc273b3371e792bbc9c6635d00f9c4a6fa80",
-          "tx_hash": "c7aa20695380846e3f274d3d51c68e864e66e46f2618aa5fbd55d597675b9e6a",
-          "state_hash": "deb57ff0f82c9d2514dc51785675544e27b3054512ea62dce2c8e30ce6d91e77"
+          "height": 27,
+          "tx_count": 46,
+          "prev_hash": "34bb6716f3c7827f4f1e765fd264907ed64891f10a00d8a6de7d934f2394db20",
+          "tx_hash": "20ad61210e5d6b86e8ec821164ebf344d55dc37d5492f3057e55483fdfed11a6",
+          "state_hash": "4556595a466e1954e6d2aea9561ee9104de24946fb899bbd9f8d84858ce616b4",
+          "precommits": ["92ecef5261f479b54a16f46b1d6eaf62314de5ecb9f90fe73fd9967798f365b701000801101b180122220a20cd6e730e1f63d3ea820512ac060c5f4037741dec3dffe1c13335aabff56305162a220a200c7af586be70af3d70ff7b22ce44bb9024fd99e8bdb27d2a35b676fa2fe208b1320c08fd86c2e90510c8ecdbcd01e8a8bb3eea01a09d2240badb10a2609383cd7abf43198616b751ac1c42181d8887120ac885d75d1d6cb6e2668524382bf34ac3169149adb6fe260b89b5a2e104", "3cb840294aea3dce704470e3361f88b4bef5d9de16702532cdfab81ece4f4f110100101b180122220a20cd6e730e1f63d3ea820512ac060c5f4037741dec3dffe1c13335aabff56305162a220a200c7af586be70af3d70ff7b22ce44bb9024fd99e8bdb27d2a35b676fa2fe208b1320c08fd86c2e90510f8f3fdcd011d7bd0d74f768e3da47110b6ea572a91a2b280920cdfa5d1b2790fbe29955734e1b2d89be6122f5cf616d38dde23de7ec2128d59f47750601c819e358c4acf0a"],
+          "time": "2019-07-18T14:34:37.431979Z"
         },
         {
-          "proposer_id": 3,
-          "height": 6,
-          "tx_count": 1,
-          "prev_hash": "dbec8f64a85ab56985c7ab7e63a191764f4d5c373c677f719c2f9ddf13b9d5a1",
-          "tx_hash": "ffee3d630f137aecff95aece36cfe4dc1b42f688d474219cb30d44c85cf36b1f",
-          "state_hash": "8ac9f2af6266b8e9b61fa7f3fcdd170375fb1bf8cc8d474904abe3672b44906e"
+          "proposer_id": 1,
+          "height": 26,
+          "tx_count": 43,
+          "prev_hash": "629d81e20c407e1e952be134a6c1b94ef561922750984fa9aeb4eeba26315856",
+          "tx_hash": "467f92426ee4ba949a66dacce935c4f952fb16fe0fc2efd9ff3c21c4c518cc68",
+          "state_hash": "5d5aa9e28d6beb6bc5000aefb740c03f76e9e9e7968f6cf35b9b75486d165aa8",
+          "precommits": ["92ecef5261f479b54a16f46b1d6eaf62314de5ecb9f90fe73fd9967798f365b701000801101a180122220a2034ffd65e01d03de260a3c0048f6a9728094626a29e1b209e290af7d87c4705ff2a220a2034bb6716f3c7827f4f1e765fd264907ed64891f10a00d8a6de7d934f2394db20320b08fd86c2e90510e0dfe56998b127ed046588f39f780368bd7b99d15ad73b39a1f79540f518ed23572de6f41cf020f0701f4c5f6aa96fcfc0f933a4caca91c663a88a3e7ac8e02fbab51607", "3cb840294aea3dce704470e3361f88b4bef5d9de16702532cdfab81ece4f4f110100101a180122220a2034ffd65e01d03de260a3c0048f6a9728094626a29e1b209e290af7d87c4705ff2a220a2034bb6716f3c7827f4f1e765fd264907ed64891f10a00d8a6de7d934f2394db20320b08fd86c2e90510b0eb93695ef80a36b7d1c82aa463bad29b460de9f9c24382349b1ecfc11a9d3881ff4c1f51add31fd4737bcc65ecd32488b54522a7e678b37aed21f5c29427c0d3672c09"],
+          "time": "2019-07-18T14:34:37.221868Z"
+        },
+        {
+          "proposer_id": 0,
+          "height": 25,
+          "tx_count": 43,
+          "prev_hash": "08f2e65419ca13d2efc4cb45023aeb8958f8790a75e8f5675bd09ab7439f0f2f",
+          "tx_hash": "897b59be8fcf32143b494e52e56466ef71c2966f8c17a9016d778bb4639c7808",
+          "state_hash": "2eb845825ac3bf5fb5b4d45c49ff9b6624a67efee97fa76f3156e029e5038d8a",
+          "precommits": ["92ecef5261f479b54a16f46b1d6eaf62314de5ecb9f90fe73fd9967798f365b7010008011019180122220a20b922b31d3e253da7ceefce189fc72caa45c85279f8f0fdf2f437f9aab90422ff2a220a20629d81e20c407e1e952be134a6c1b94ef561922750984fa9aeb4eeba26315856320b08fd86c2e905108090bc06d14727b1ed37d5bfc19e1ffc8d5c298470b3748f814278c771cfdf6656ab8479dd6d011906e708e1fcfe85de21ac3ae59de07f8d2afe5f8eb65e2c9d536bbf02", "3cb840294aea3dce704470e3361f88b4bef5d9de16702532cdfab81ece4f4f1101001019180122220a20b922b31d3e253da7ceefce189fc72caa45c85279f8f0fdf2f437f9aab90422ff2a220a20629d81e20c407e1e952be134a6c1b94ef561922750984fa9aeb4eeba26315856320b08fd86c2e9051098cef806519681b3b6bac8d5fbf24e595ebd2b9488d810f617fa5c6bdf658f2bc4d9885d5ccf6d74a5aa296c229d0faf8ee77e41996a0f8a64aedc3f646f9e511dd9ba0f"],
+          "time": "2019-07-18T14:34:37.014559Z"
         }
-      ],
-      "times": [
-        "2019-02-21T13:01:44.321051Z",
-        "2019-02-21T13:01:43.287648Z",
-        "2019-02-21T13:01:42.251382Z",
-        "2019-02-21T13:01:41.228900Z",
-        "2019-02-21T13:01:40.199265Z"
       ]
     }
     ```
 
     That is, to collect `5` non-empty blocks from the tail of the blockchain,
-    range from `288` to `6` has been traversed.
+    range from `43` to `25` has been traversed.
 
 ## Explorer API Sockets
 
@@ -812,12 +881,12 @@ will contain the following fields:
 
 ```JSON
 {  
-   "height":13002,
-   "prev_hash":"03d19b9821a5336d3be63840ccdfa119269bd7671672a1715a71a745770f025a",
-   "proposer_id":3,
-   "state_hash":"2d5bc93ec12ab46b5197281da7557d58e438d2aac24e58c784815f4ad77a2d24",
-   "tx_count":3,
-   "tx_hash":"9135c961f53c16d791daf1d9180d34eefcd23e50c5a02f915153493d4a905fbb"
+  "height":13002,
+  "prev_hash":"03d19b9821a5336d3be63840ccdfa119269bd7671672a1715a71a745770f025a",
+  "proposer_id":3,
+  "state_hash":"2d5bc93ec12ab46b5197281da7557d58e438d2aac24e58c784815f4ad77a2d24",
+  "tx_count":3,
+  "tx_hash":"9135c961f53c16d791daf1d9180d34eefcd23e50c5a02f915153493d4a905fbb"
 }
 ```
 
@@ -833,7 +902,11 @@ client via the socket.
 
 #### Parameters
 
-None.
+- **service_id**: integer  
+  ID of the service whose transactions are tracked.
+- **message_id**: integer  
+  ID of the tracked transaction type. `message_ID` parameter is applicable
+  only in combination with the `service_ID` parameter.
 
 #### Response
 
@@ -844,14 +917,14 @@ Each notification is a string which can be deserialized into a JSON object that
 will contain the following fields:
 
 - **type**: string
-  Type of the committed object.
+  Type of the committed object. Is always equal to `"transaction"`.
 - **tx_hash**: Hash
-  <!--Hash of the committed transactions.-->
+  Hash of the committed transaction.
 - **service_id**: integer
-  ID of the service to which belongs the current transaction.
+  ID of the service where belongs the current transaction.
 - **message_id**: integer
   ID of the transaction type.
-- **status.type**: "success" | "error" | "panic"  
+- **status.type**: string    
   Execution status kind:
 
   - `"success"` denotes a successfully completed transaction
@@ -863,8 +936,8 @@ will contain the following fields:
 - **location**: TransactionLocation  
   Transaction position in the blockchain.
 - **proof**: ListProof  
-  <!-- Ties transaction to the root hash of the transactions Merkle tree in
-  the block.-->
+  Ties transaction to the root hash of the transactions Merkle tree in
+  the block.
 
 #### Response Example
 
@@ -887,7 +960,112 @@ will contain the following fields:
 }
 ```
 
+### Subscribe to Multiple Commits
 
+```none
+ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+```
+
+Connects to a socket and receives notices on new committed blocks and the
+selected transaction types
+starting from the moment of connection. The notices are sent to the light
+client via the socket.
+
+#### Request
+
+In order to subscribe to multiple commits, it is necessary to send a request
+message with the list of filters to the socket. The request message is a text
+message in JSON format. The request contains the following fields:
+
+- **type**: string  
+  Indicates the type of subscription.
+- **payload.type**: string  
+  Type of the tracked object. Can be `"blocks"` or `"transactions"`.
+- **payload.filter.service_id**: integer  
+  ID of the service whose transactions are tracked.
+- **payload.filter.message_id**: integer  
+  ID of the tracked transaction type. `message_ID` parameter is applicable
+  only in combination with the `service_ID` parameter.
+
+To update the filter, it is necessary to send a new request message to the
+socket.
+
+#### Request Example
+
+```JSON
+{
+  "type": "set-subscriptions",
+  "payload": [
+    {
+      "type": "blocks"
+    },
+    {
+      "type": "transactions",
+      "filter":
+      {
+        "service_id": 1,
+        "message_id": 2
+      }
+    }
+  ]
+}
+```
+
+#### Response
+
+Returns notifications that a new block or a transaction has been committed to
+the blockchain starting from the height when the client connected to the
+socket.
+
+The notifications are the same as in the
+[block commit](#subscribe-to-block-commit) and
+[transaction commit](#subscribe-to-transaction-commit) subscriptions.
+
+### Sending a Transaction
+
+```none
+ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+```
+
+Allows sending transactions to the blockchain in the same way as through the
+[blockchain explorer](../glossary.md#blockchain-explorer).
+
+#### Request
+
+In order to send a transaction through the WebSocket, it is necessary to send a
+text message in JSON format with the transaction hex as through the blockchain
+explorer. The message contains the following fields:
+
+- **type**: string  
+  Type of the sent object. Always equals to `"transaction"`.
+- **payload.tx_body**: SerializedTransaction  
+  Body of the sent transaction as hex.
+
+#### Request Example
+
+```JSON
+{
+  "type": "transaction",
+  "payload":
+    {
+      "tx_body":"838ecb3afdf79011d4bf19b20e2d3accdb12779349182dec73a3c8a709df18430000800002000a05416c6963656f4f0e70c58106aa3a5abded258597e5435b47c75ce34867f3efe795315c7b247b15e70cac34ae2fa1379cc2e46c60597378214ffff0bbb0eeb483836e293700"
+    }
+}
+```
+
+#### Response
+
+Returns notification on inclusion of the transaction to the pool of unconfirmed
+transaction.
+
+The notification is a string which can be deserialized into a JSON object that
+will contain the following fields:
+
+- **result**: string  
+  Always equal to `"success"`. Denotes validity of the transaction for
+  inclusion into the pool of unconfirmed transactions.
+- **response.tx_hash**: Hash  
+  Hash of the transaction as hex.
 
 [closure]: https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
 [explorer]: https://docs.rs/exonum/0.10.3/exonum/api/node/public/explorer/constant.MAX_BLOCKS_PER_REQUEST.html

@@ -83,7 +83,8 @@ parties
 
 ## Blockchain Explorer
 
-A [module][explorer] that provides REST API for monitoring blocks and
+A [module][explorer] that provides REST API and Websockets for monitoring blocks
+and
 transactions in Exonum blockchain. The explorer allows obtaining the following
 information and executing the following actions via its endpoints:
 
@@ -92,7 +93,7 @@ information and executing the following actions via its endpoints:
 - information on a transaction specified by a hash
 - sending a transaction into the pool of uncommitted transactions and
   broadcasting it to other nodes
-- subscribing to block commit events.
+- subscribing to block and / or transaction commit events.
 
 ## Blockchain State
 
@@ -478,7 +479,8 @@ endpoints:
 - [Private APIs](#private-api) allow configuring the service locally.
 
 External entities such as [light clients](#light-client) can access endpoints
-via REST API. The configuration for REST API is specified in the service.
+via REST API and WebSockets. The configuration for REST API and WebSockets is
+specified in the service.
 
 ## Stored Datatype
 
