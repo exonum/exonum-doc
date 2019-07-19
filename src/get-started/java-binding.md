@@ -1036,7 +1036,6 @@ For using the library just include the dependency in your `pom.xml`:
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
-[Memorydb]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/storage/database/MemoryDb.html
 [nodefake]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.7.0/com/exonum/binding/core/service/Service.html
