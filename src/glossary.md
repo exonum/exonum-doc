@@ -479,8 +479,7 @@ endpoints:
 - [Private APIs](#private-api) allow configuring the service locally.
 
 External entities such as [light clients](#light-client) can access endpoints
-via REST API and WebSockets. The configuration for REST API and WebSockets is
-specified in the service.
+via REST API. The configuration for REST API is specified in the service.
 
 ## Stored Datatype
 

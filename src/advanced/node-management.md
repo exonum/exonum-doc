@@ -125,8 +125,7 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 `TransactionInfo` is a JSON object with the following fields:
 
 - **tx_hash**: Hash  
-  Array of bytes of a transaction serialized according to the Protobuf
-  serialization format.
+  Hash of a transaction as hex.
 - **service_id**: integer  
   ID of the service where belongs the transaction.
 
@@ -938,7 +937,7 @@ will contain the following fields:
 
 - **location**: TransactionLocation  
   Transaction position in the blockchain.
-- **proof**: ListProof  
+- **location_proof**: ListProof  
   Ties transaction to the root hash of the transactions Merkle tree in
   the block.
 
@@ -957,13 +956,13 @@ will contain the following fields:
     "block_height": 317,
     "position_in_block": 0
   },
-  "proof": {
+  "location_proof": {
     "val": "fe59d6e5bbf493c4ebc112d6241a871671aa238f1c93e2726cf96fea9cb88cdd"
   }
 }
 ```
 
-### Subscribe to Multiple Commits
+### Subscribe to Multiple Events
 
 ```none
 ws://${URL}{explorer_base_path}/api/explorer/v1/ws
@@ -976,7 +975,7 @@ client via the socket.
 
 #### Request
 
-In order to subscribe to multiple commits, it is necessary to send a request
+In order to subscribe to multiple events, it is necessary to send a request
 message with the list of filters to the socket. The request message is a text
 message in JSON format. The request contains the following fields:
 

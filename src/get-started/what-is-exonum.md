@@ -151,8 +151,7 @@ in enterprise platforms; they have the same principal components.
 
 #### Endpoints
 
-A service has a set of endpoints (realized as REST APIs and WebSockets) using
-which
+A service has a set of endpoints (realized as REST APIs) using which
 the service can communicate with the outside world. The Exonum framework acts
 as middleware, dispatching requests among services and abstracting the
 intricacies of data (de)serialization, access control, and other typical
