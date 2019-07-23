@@ -342,6 +342,7 @@ objects that they index.
 [database]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L452
 [snapshot]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L500
 [fork]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L394
+[patch]: https://github.com/exonum/exonum/blob/b88171f8efa12e92cc1f1b958d53139a5f0e0ae6/components/merkledb/src/db.rs#L272
 [col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families
 [service-name]: services.md#service-identifiers
 [index-metadata]: https://github.com/exonum/exonum/blob/c6ccae1ab43584b67110cbf95146cedfe4b7ea02/components/merkledb/src/views/metadata.rs#L94
