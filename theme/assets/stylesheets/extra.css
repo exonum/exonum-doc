@@ -58,10 +58,16 @@
 [data-md-color-primary="light-green"] .md-typeset a,
 [data-md-color-primary="light-green"] .md-nav__link--active,
 [data-md-color-accent="lime"] .md-typeset a:active {
-  color: #f6be00;
+  color: #2BE187;
 }
 
 [data-md-color-accent="lime"] .md-typeset a:hover,
 [data-md-color-accent="lime"] .md-nav__link:hover {
-  color: #ffc500;
+  color: #2BE187;
+}
+
+[data-md-color-primary="light-green"] .md-typeset a, [data-md-color-primary="light-green"] .md-nav__link--active, [data-md-color-accent="lime"]
+.md-typeset a:active {
+  color: #26D07C;
+  font-weight: 700;
 }
