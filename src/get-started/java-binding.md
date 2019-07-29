@@ -66,33 +66,15 @@ follow the instructions in [Contribution Guide][how-to-build].
 ### After Install
 
 - Create an environment variable `EXONUM_HOME` pointing at installation
-  location. You should also add an entry to the `PATH` variable.
+  location.
 
   ```bash
   export EXONUM_HOME=~/bin/exonum-java-0.7.0-release
-  export PATH="$PATH:$EXONUM_HOME"
+  export PATH="$PATH:$EXONUM_HOME/bin"
   ```
 
 - Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
-
-- This step is not necessary during installation, but is required to configure
-  the JVM to use by the application. Add a path to your JVM library to the
-  `LD_LIBRARY_PATH` environment variable. You can use the following script:
-
-  <!-- cspell:disable -->
-
-  ```bash
-  JAVA_HOME="${JAVA_HOME:-$(java -XshowSettings:properties -version \
-    2>&1 > /dev/null |\
-    grep 'java.home' |\
-    awk '{print $3}')}"
-  LIBJVM_PATH="$(find ${JAVA_HOME} -type f -name libjvm.* | xargs -n1 dirname)"
-
-  export LD_LIBRARY_PATH="${LIBJVM_PATH}"
-  ```
-
-  <!-- cspell:enable -->
 
 ## Creating Project
 
