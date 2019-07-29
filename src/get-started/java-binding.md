@@ -32,6 +32,11 @@ deployment.
 
 - Install [Libsodium][libsodium] as the necessary runtime dependency.
 
+!!! note
+    Exonum Java is built with Libsodium 23, which means it will not work
+    on some older Linux distributions, like Ubuntu 16.04. Libsodium 23 is
+    available in Ubuntu 18.04 or can be installed from a custom PPA.
+
 ??? example "Linux (Ubuntu)"
     ```bash
     sudo apt-get update && sudo apt-get install libsodium-dev
