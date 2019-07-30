@@ -60,10 +60,15 @@ Full nodes use the
 over TCP to communicate with each other.
 
 Starting with Exonum 0.8, all network connections are encrypted using
-[Noise Protocol][noise]. The Protocol starts with a handshake message exchange
-when the parties exchange [Diffie-Hellman (DH) public keys][DH], perform a
-series of DH operations and, as a result, receive a shared secret key. This
-key is then used to send encrypted messages.
+[Noise Protocol][noise]. The Protocol starts with a handshake message
+exchange. The handshake includes exchange of [public keys][DH] and
+[connect messages](#connect-messages) by the nodes. In order to authenticate 
+the  connection, the sender includes the receiver's public key into its
+handshake message.
+
+As a result of the Diffie-Hellman key agreement, the nodes receive a shared
+secret key. This key is then used to send encrypted messages between these
+nodes.
 
 Noise Protocol protects Exonum against a number of potential vulnerabilities,
 for example, traffic sniffing between nodes.
@@ -71,10 +76,6 @@ for example, traffic sniffing between nodes.
 !!! warning
     Nodes compiled with previous versions of Exonum will not connect to nodes
     updated to 0.8 and further.
-
-!!! note
-    The current implementation of connection encryption is not complete: the
-    Noise channels are encrypted, but not authenticated.
 
 [The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
