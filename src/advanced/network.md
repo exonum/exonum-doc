@@ -62,7 +62,7 @@ over TCP to communicate with each other.
 Starting with Exonum 0.8, all network connections are encrypted using
 [Noise Protocol][noise]. The Protocol starts with a handshake message
 exchange. The handshake includes exchange of [public keys][DH] and
-[connect messages](#connect-messages) by the nodes. In order to authenticate 
+[connect messages](#connect-messages) by the nodes. In order to authenticate
 the  connection, the sender includes the receiver's public key into its
 handshake message.
 
