@@ -58,6 +58,25 @@ full node has been really authorized by a supermajority of validators.
 Full nodes use the
 [Exonum binary serialization format](../glossary.md#binary-serialization)
 over TCP to communicate with each other.
+
+Starting with Exonum 0.8, all network connections are encrypted using
+[Noise Protocol][noise]. The Protocol starts with a handshake message
+exchange. The handshake includes exchange of [public keys][DH] and
+[connect messages](#connect-messages) by the nodes. In order to authenticate
+the  connection, the sender includes the receiver's public key into its
+handshake message.
+
+As a result of the Diffie-Hellman key agreement, the nodes receive a shared
+secret key. This key is then used to send encrypted messages between these
+nodes.
+
+Noise Protocol protects Exonum against a number of potential vulnerabilities,
+for example, traffic sniffing between nodes.
+
+!!! warning
+    Nodes compiled with previous versions of Exonum will not connect to nodes
+    updated to 0.8 and further.
+
 [The Tokio library][tokio-lib] is used for event multiplexing. Each node has
 an event loop, through which the node receives events about new messages from
 the external network, timeouts, and new transactions sent via REST API and/or
@@ -161,3 +180,5 @@ to be unique within a specific Exonum blockchain.
 
 [tokio-lib]: https://tokio.rs/
 [whitepaper]: https://bitfury.com/content/downloads/wp_consensus_181227.pdf
+[noise]: https://noiseprotocol.org/
+[DH]: https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
