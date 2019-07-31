@@ -331,11 +331,10 @@ A service may define 3 types of endpoints:
     services.
 
 External applications may communicate with service endpoints
-via HTTP REST API and WebSockets, using JSON as the serialization format.
+via HTTP REST API, using JSON as the serialization format.
 Exonum facilitates middleware tasks for services, such as listening to HTTP
-requests,
-dispatching incoming transactions and read requests to an appropriate service,
-performing conversion to and from JSON, etc.
+requests, dispatching incoming transactions and read requests to an
+appropriate service, performing conversion to and from JSON, etc.
 
 Exonum services are Rust or Java modules that can be easily
 reused across Exonum projects. To use Java modules you should apply
