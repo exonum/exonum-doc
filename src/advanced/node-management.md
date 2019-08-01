@@ -1,4 +1,4 @@
-# Node management
+# Node Management
 
 <!-- cspell:ignore nanos -->
 
@@ -32,6 +32,10 @@ an optional type.
 `Hash`, `PublicKey`, `Signature` types are hexadecimal strings of the
 appropriate length. `Hash` and `PublicKey` are 32 bytes (that is, 64 hex
 digits). `Signature` is 64 bytes (that is, 128 hex digits).
+
+### Map
+
+`Map` is a collection use for storing key-value pairs.
 
 ### PeerAddress
 
@@ -97,6 +101,13 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
   Number of transactions included into the block.
 - **tx_hash**: Hash  
   Root hash of the transactions Merkle tree.
+
+### ListProof
+
+`ListProof` is a JSON object with the following field:
+
+- **val**: Hash  
+  [Merkle proof](merkelized-list.md#merkle-tree-proofs) serialized as a hex.
 
 ### Time
 
@@ -542,18 +553,18 @@ Response JSON has the same fields as
 
 Response is a JSON object with the following fields:
 
-- **type**: `"committed"`  
+- **type**: string  
   Always equals to `committed`.
 - **content**: Content  
   Transaction data in the serialized and deserialized formats.
 - **location**: TransactionLocation  
   Transaction position in the blockchain.
 - **location_proof**: ListProof  
-  [Merkle proof](merkelized-list.md#merkle-tree-proofs) serialized as a hex
-  tying transaction to the `tx_hash` of the containing block.
+  Ties the transaction to the root hash of the transactions Merkle tree in the
+  block.
 - **status**: Object  
   [Transaction execution](../architecture/transactions.md#execute) status
-- **status.type**: `"success"` | `"error"` | `"panic"`  
+- **status.type**: string  
   Execution status kind:
 
     - `"success"` denotes a successfully completed transaction
@@ -618,10 +629,10 @@ A JSON object with the following fields:
 - **block**: BlockHeader  
   Header of the specified block.
 - **precommits**: Array<Hash\>  
-  List of hashes of the 'Precommit' messages supporting the block.
+  List of hashes of the precommit messages supporting the block.
 - **txs**: Array<SerializedTransaction\>  
   List of the transactions included into the block.
-- **time**: time object  
+- **time**: Time Object  
   Time when the block was committed to the blockchain.
 
 <!-- markdownlint-disable MD013 -->
