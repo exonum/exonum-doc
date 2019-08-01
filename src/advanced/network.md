@@ -5,7 +5,8 @@ connected via peer-to-peer connections, and
 [light clients](../glossary.md#light-client).
 Full nodes communicate with each other
 using [Exonum binary serialization format](../glossary.md#binary-serialization)
-over TCP, and clients interact with full nodes via REST service interface.
+over TCP, and clients interact with full nodes via REST service interface and
+WebSockets.
 
 ## Network Structure
 
@@ -113,7 +114,8 @@ names and IP addresses.
 
 Light clients use [JSON serialization](../glossary.md#json-serialization)
 to interact with full nodes via
-[service endpoints](../glossary.md#service-endpoint).
+[service REST API endpoints](../glossary.md#service-endpoint) and via
+WebSockets.
 Full nodes receive transactions from light clients via POST
 requests, and light clients get info from full nodes via GET requests.
 Transactions from light clients are authenticated with the help of
@@ -121,7 +123,8 @@ signatures, which are the part of JSON serialization of transactions. Read
 requests are generally not authenticated.
 
 Full nodes use [Actix-web framework](https://actix.rs) to implement REST
-HTTP API. Addresses for public and private API endpoints are specified in the
+HTTP API and WebSockets. Addresses for public and private API endpoints are
+specified in the
 [`node.api`](../architecture/configuration.md#nodeapi) section of the local
 configuration.
 

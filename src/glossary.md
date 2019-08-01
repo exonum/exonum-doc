@@ -84,7 +84,8 @@ parties
 ## Blockchain Explorer
 
 A [module][explorer] that provides REST API for monitoring blocks and
-transactions in Exonum blockchain. The explorer allows obtaining the following
+transactions in the Exonum blockchain and a WebSocket for monitoring blocks in
+the same. The explorer allows obtaining the following
 information and executing the following actions via its endpoints:
 
 - information on a specified range of blocks
