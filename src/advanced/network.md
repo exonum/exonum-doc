@@ -133,10 +133,9 @@ names and IP addresses.
 
 ## Communication with Light Clients
 
-Light clients use [JSON serialization](../glossary.md#json-serialization)
-to interact with full nodes via
-[service endpoints](../glossary.md#service-endpoint).
-Full nodes receive transactions from light clients via POST
+Light clients interact with full nodes via
+[service REST API endpoints](../glossary.md#service-endpoint) and via
+WebSockets. Full nodes receive transactions from light clients via POST
 requests, and light clients get info from full nodes via GET requests.
 Transactions from light clients are authenticated with the help of
 signatures, which are the part of JSON serialization of transactions. Read
@@ -144,7 +143,7 @@ requests are generally not authenticated.
 
 Full nodes use [Actix-web framework](https://actix.rs) to implement REST
 HTTP API and WebSockets. Addresses for public and private API endpoints are
-specified in the [`api`](../architecture/configuration.md#api) section of the
+specified in the [`API`](../architecture/configuration.md#api) section of the
 local configuration.
 
 ### Service Endpoints
