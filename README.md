@@ -70,7 +70,7 @@ for the front matter. Be advised for possible discrepancies.
 
 ## Build Instructions
 
-It is a good idea to preview your changes locally before sending a pull request. 
+It is a good idea to preview your changes locally before sending a pull request.
 
 ### Installation
 
@@ -128,7 +128,7 @@ Folder of the latest version will be named `latest`.
 
 ## License
 
-Copyright 2018, Exonum Team
+Copyright 2019, Exonum Team
 
 The Exonum documentation is licensed under the Creative Commons Non-Commercial
 Share-Alike International License (version 4.0). Code samples are licensed
