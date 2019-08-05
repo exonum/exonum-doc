@@ -479,5 +479,5 @@ for signing anchoring transactions in Bitcoin.
 [wiki:sha256]: https://en.wikipedia.org/wiki/SHA-2
 [wiki:ed25519]: https://en.wikipedia.org/wiki/EdDSA
 [libsodium]: https://download.libsodium.org/doc/
-[sodiumoxide]: https://dnaq.github.io/sodiumoxide/sodiumoxide/
+[sodiumoxide]: https://github.com/sodiumoxide/sodiumoxide
 [wiki:pubsub]: https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern
