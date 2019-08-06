@@ -157,13 +157,14 @@ All system API endpoints share the same base path, denoted
 
 ## Public Endpoints
 
-### Number of Unconfirmed Transactions
+### Transactions Statistics
 
 ```none
 GET {system_base_path}/stats
 ```
 
-Returns the number of transactions in the node pool of unconfirmed transactions.
+Returns transactions statistics for the cache, the pool of unconfirmed
+transactions and for the blockchain.
 
 #### Parameters
 
@@ -177,13 +178,16 @@ A JSON object with the following fields:
   Amount of unconfirmed transactions.
 - **tx_count**: integer  
   Total number of transactions in the blockchain.
+- **tx_cache_size**: integer  
+  Total number of unconfirmed transactions in the cache.
 
 #### Response Example
 
 ```JSON
 {
   "tx_pool_size": 0,
-  "tx_count": 2
+  "tx_count": 2,
+  "tx_cache_size": 3
 }
 ```
 
