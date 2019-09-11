@@ -766,7 +766,7 @@ An example of API service tests can be found in
 
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [auditor]: ../glossary.md#auditor
-[in-pool]: https://exonum.com/doc/version/0.11/advanced/consensus/specification/#pool-of-unconfirmed-transactions
+[in-pool]: ../advanced/consensus/specification/#pool-of-unconfirmed-transactions
 [junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
 [junit-aftereach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterEach.html
 [junit-beforeall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeAll.html
@@ -1042,5 +1042,5 @@ For using the library just include the dependency in your `pom.xml`:
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [createpublicapi]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
-[transaction-result]: https://docs.rs/exonum/0.11/exonum/blockchain/struct.TransactionResult.html
+[transaction-result]: https://docs.rs/exonum/0.12/exonum/blockchain/struct.TransactionResult.html
 [exonum-transaction]: ../advanced/node-management.md#transaction
