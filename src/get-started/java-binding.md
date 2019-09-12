@@ -76,6 +76,7 @@ follow the instructions in [Contribution Guide][how-to-build].
   ```bash
   # The path is provided in after-install message in case of Homebrew
   export EXONUM_HOME=~/bin/exonum-java-0.8.0-release
+  # Setting PATH variable is not needed in case of Homebrew
   export PATH="$PATH:$EXONUM_HOME/bin"
   ```
 
