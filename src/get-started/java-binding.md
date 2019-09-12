@@ -174,11 +174,11 @@ A set of named collections constitute a *service scheme*. For convenient access
 to service collections you can implement a factory of service collections.
 
 *The state of the service in the blockchain* is determined by the list of
-root hashes of its Merkelized collections. Said root hashes, when aggregated
-with root hashes of other Merkelized collections in the blockchain, form a
+index hashes of its Merkelized collections. Said index hashes, when aggregated
+with index hashes of other Merkelized collections in the blockchain, form a
 single
 blockchain state hash, which is included in each committed block. When using
-`AbstractService`, the root hash list must be defined in the schema class that
+`AbstractService`, the index hash list must be defined in the schema class that
 implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
 
