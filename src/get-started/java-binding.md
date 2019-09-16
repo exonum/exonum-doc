@@ -174,13 +174,11 @@ See [Serialization](#serialization) for details.
 A set of named collections constitute a *service scheme*. For convenient access
 to service collections you can implement a factory of service collections.
 
-*The state of the service in the blockchain* is determined by the list of
-index hashes of its Merkelized collections. Said index hashes, when aggregated
-with index hashes of other Merkelized collections in the blockchain, form a
-single
-blockchain state hash, which is included in each committed block. When using
-`AbstractService`, the index hash list must be defined in the schema class that
-implements [`Schema`][schema] interface; when implementing
+*The state of the service in the blockchain* is determined by the list of hashes.
+Usually, it is comprised of the hashes of its Merkelized collections. State hashes
+of each service are aggregated in a single blockchain state hash, which is included
+in each committed block. When using `AbstractService`, the hash list must be defined
+in the schema class that implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
 
 #### Serialization
