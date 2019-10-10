@@ -9,10 +9,10 @@ To run a node with your Java service you need to use Exonum Java application.
 
 There are several installation options:
 
-- [Manual installation](#manual-installation) - available for Mac OS and Linux
-- [Homebrew package](#homebrew-package) - available for Mac OS only,
+- [Manual installation](#manual-installation) — available for Mac OS and Linux
+- [Homebrew package](#homebrew-package) — available for Mac OS only,
   recommended for Mac users
-- [Build from source](#build-from-source) - available for Mac OS and Linux
+- [Build from source](#build-from-source) — available for Mac OS and Linux
 
 ### Manual Installation
 
@@ -435,7 +435,7 @@ For more information on using Guice, see the [project wiki][guice-wiki].
 
 ## Testing
 
-Exonum Java Binding provides a powerful testing toolkit -
+Exonum Java Binding provides a powerful testing toolkit —
 [`exonum-testkit`][testkit-maven] library. TestKit allows testing transaction
 execution in the synchronous environment by offering simple network emulation
 (that is, without consensus algorithm and network operation involved).
@@ -740,7 +740,7 @@ void validatorTest(TestKit testKit) {
 
 @Test
 void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
-  // Injected TestKit has an altered configuration - "auditor" as an emulated
+  // Injected TestKit has an altered configuration — "auditor" as an emulated
   // node and 8 validator nodes
 }
 ```
@@ -932,7 +932,7 @@ service_name2 = "/path/to/service2_artifact.jar"
 
 ## Logging Configuration
 
-Java Binding uses two different methods for logging - [`Log4J`][log4j-home]
+Java Binding uses two different methods for logging — [`Log4J`][log4j-home]
 in Java modules and [`env_logger`][env_logger-home] in Rust modules.
 
 ### Rust Logging
