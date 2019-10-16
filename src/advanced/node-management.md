@@ -969,7 +969,7 @@ will contain the following fields:
 ### Subscribe to Multiple Events
 
 ```none
-ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+ws://${URL}{explorer_base_path}/ws
 ```
 
 Connects to a socket and receives notices on new committed blocks and the
@@ -1030,7 +1030,7 @@ The notifications are the same as in the
 ### Sending a Transaction
 
 ```none
-ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+ws://${URL}{explorer_base_path}/ws
 ```
 
 Allows sending transactions to the blockchain in the same way as through the
