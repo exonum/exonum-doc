@@ -390,7 +390,7 @@ the REST-interface of the service.
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
-at `/api/cryptocurrency/balance/:walletId`.
+at `/api/services/cryptocurrency/balance/:walletId`.
 
 See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
