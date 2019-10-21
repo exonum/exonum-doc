@@ -36,7 +36,7 @@ digits). `Signature` is 64 bytes (that is, 128 hex digits).
 
 ### Map
 
-`Map` is a collection use for storing key-value pairs.
+`Map` is a collection used for storing key-value pairs.
 
 ### PeerAddress
 
@@ -57,15 +57,14 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `OutgoingConnectionState` is a JSON object with the following fields:
 
+- **delay**: integer=  
+  Interval between reconnect attempts (ms). Is present only if `type` is
+  `Reconnect`.  
 - **type**: string  
   Connection type, can be:
 
     - `Active` for established connections
     - `Reconnect` for yet unestablished connections.
-
-- **delay**: integer=  
-  Interval between reconnect attempts (ms). Is present only if `type` is
-  `Reconnect`.
 
 ### OutgoingConnectionInfo
 
@@ -469,8 +468,8 @@ A JSON object with the following fields:
       "name": "cryptocurrency"
     },
     {
-      "name": "configuration",
-      "id": 1
+      "id": 1,
+      "name": "configuration"
     }
   ]
 }
