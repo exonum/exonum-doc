@@ -108,8 +108,8 @@ message Timestamp {
 message TxTimestamp { Timestamp content = 1; }
 ```
 
-When the `.proto` file is ready, generate the `*.js` stub file with
-[pbjs][pbjs-lib] library as follows:
+When the `.proto` file is ready, generate the `*.js` stub file with the
+[protobufjs][protobufjs-lib] library as follows:
 
 ```bash
 pbjs --keep-case -t static-module timestamping.proto -o ./proto.js
@@ -554,7 +554,6 @@ support! At this the point you can build and run your application.
 [javascript-client]: https://github.com/exonum/exonum-client#getting-started
 [javascript-client-nested-types]: https://github.com/exonum/exonum-client#nested-data-types
 [protobufjs-lib]: https://github.com/dcodeIO/protobuf.js
-[pbjs-lib]: https://www.npmjs.com/package/pbjs
 [cryptocurrency-advanced]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced/frontend
 [timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping/frontend
 [lc-java]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-light-client

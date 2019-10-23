@@ -36,7 +36,7 @@ digits). `Signature` is 64 bytes (that is, 128 hex digits).
 
 ### Map
 
-`Map` is a collection use for storing key-value pairs.
+`Map` is a collection used for storing key-value pairs.
 
 ### PeerAddress
 
@@ -57,15 +57,14 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `OutgoingConnectionState` is a JSON object with the following fields:
 
+- **delay**: integer=  
+  Interval between reconnect attempts (ms). Is present only if `type` is
+  `Reconnect`.  
 - **type**: string  
   Connection type, can be:
 
     - `Active` for established connections
     - `Reconnect` for yet unestablished connections.
-
-- **delay**: integer=  
-  Interval between reconnect attempts (ms). Is present only if `type` is
-  `Reconnect`.
 
 ### OutgoingConnectionInfo
 
@@ -80,10 +79,10 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `ServiceInfo` is a JSON object with the following fields:
 
-- **id**: integer  
-  Unique service identifier.
 - **name**: string  
   Unique string service identifier.
+- **id**: integer  
+  Unique service identifier.
 
 ### BlockHeader
 
@@ -465,8 +464,8 @@ A JSON object with the following fields:
   "protocol_version": 1,
   "services": [
     {
-      "id": 128,
-      "name": "cryptocurrency"
+      "name": "cryptocurrency",
+      "id": 128
     },
     {
       "name": "configuration",
@@ -969,7 +968,7 @@ will contain the following fields:
 ### Subscribe to Multiple Events
 
 ```none
-ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+ws://${URL}{explorer_base_path}/ws
 ```
 
 Connects to a socket and receives notices on new committed blocks and the
@@ -1030,7 +1029,7 @@ The notifications are the same as in the
 ### Sending a Transaction
 
 ```none
-ws://${URL}{explorer_base_path}/api/explorer/v1/ws
+ws://${URL}{explorer_base_path}/ws
 ```
 
 Allows sending transactions to the blockchain in the same way as through the
