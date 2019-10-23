@@ -79,10 +79,10 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `ServiceInfo` is a JSON object with the following fields:
 
-- **id**: integer  
-  Unique service identifier.
 - **name**: string  
   Unique string service identifier.
+- **id**: integer  
+  Unique service identifier.
 
 ### BlockHeader
 
@@ -464,12 +464,12 @@ A JSON object with the following fields:
   "protocol_version": 1,
   "services": [
     {
-      "id": 128,
-      "name": "cryptocurrency"
+      "name": "cryptocurrency",
+      "id": 128
     },
     {
-      "id": 1,
-      "name": "configuration"
+      "name": "configuration",
+      "id": 1
     }
   ]
 }
