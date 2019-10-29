@@ -35,7 +35,7 @@ digits). `Signature` is 64 bytes (that is, 128 hex digits).
 
 ### Map
 
-`Map` is a collection use for storing key-value pairs.
+`Map` is a collection used for storing key-value pairs.
 
 ### PeerAddress
 
@@ -56,15 +56,14 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `OutgoingConnectionState` is a JSON object with the following fields:
 
+- **delay**: integer=  
+  Interval between reconnect attempts (ms). Is present only if `type` is
+  `Reconnect`.
 - **type**: string  
   Connection type, can be:
 
     - `Active` for established connections
     - `Reconnect` for yet unestablished connections.
-
-- **delay**: integer=  
-  Interval between reconnect attempts (ms). Is present only if `type` is
-  `Reconnect`.
 
 ### OutgoingConnectionInfo
 
@@ -79,10 +78,10 @@ or IPv6 address formatted as 4 octets separated by dots (for example,
 
 `ServiceInfo` is a JSON object with the following fields:
 
-- **id**: integer  
-  Unique service identifier.
 - **name**: string  
   Unique string service identifier.
+- **id**: integer  
+  Unique service identifier.
 
 ### BlockHeader
 
@@ -290,8 +289,8 @@ A JSON object with the following fields:
 - **incoming_connections**: Array<ConnectInfo\>  
   Information on the peers connected to the present node.
 - **outgoing_connections**: Map  
-  The keys of the map are addresses of peers the present node is connected to,
-  corresponding values of type `OutgoingConnectionInfo` contain info about
+  The keys of the map are addresses of peers the present node is connected to.
+  The corresponding values of type `OutgoingConnectionInfo` contain info about
   public keys and current connection status of peers.
 
 ??? example "Response Example"
@@ -410,8 +409,8 @@ A JSON object with the following fields:
   "protocol_version": 1,
   "services": [
     {
-      "id": 128,
-      "name": "cryptocurrency"
+      "name": "cryptocurrency",
+      "id": 128
     },
     {
       "name": "configuration",
