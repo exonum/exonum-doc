@@ -71,3 +71,13 @@
   color: #26D07C;
   font-weight: 700;
 }
+
+@media screen and (max-width: 76.1875em) {
+  [data-md-color-primary="light-green"] .md-nav--primary .md-nav__title--site {
+    background-color: #000000 !important;
+  }
+
+  [data-md-color-primary="light-green"] .md-nav__source {
+    background-color: #3a3a3a;
+  }
+}
