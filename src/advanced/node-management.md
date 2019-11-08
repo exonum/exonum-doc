@@ -752,8 +752,8 @@ The JSON object of the explored block range `range` and the array `blocks` of
 the `BlockHeader` objects. The range defines its largest and the smallest
 heights of blocks. The amount of collected blocks from the traversed range
 should not exceed `count` value.
-The largest height `end` equals to `latest + 1` if provided or to the height of
-the latest block in the blockchain, the smallest height `start` takes values
+The largest height `end` equals to `latest + 1`, the smallest height `start`
+takes values
 in `0..latest - count + 1`. Blocks in the array are sorted in the descending
 order
 according to their heights. Height of any block in the array is greater than or
