@@ -492,31 +492,7 @@ None.
 #### Example
 
 ```none
-curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api/system/v1/shutdown
-```
-
-#### Response
-
-```json
-null
-```
-
-### Rebroadcast
-
-```none
-POST {system_base_path}/rebroadcast
-```
-
-Rebroadcast all transactions from the pool to other validators.
-
-#### Parameters
-
-None.
-
-#### Example
-
-```none
-curl -H "Content-Type: application/json" --data 'null' http://127.0.0.1:7780/api/system/v1/rebroadcast
+curl -X POST http://127.0.0.1:7780/api/system/v1/shutdown
 ```
 
 #### Response
