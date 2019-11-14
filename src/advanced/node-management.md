@@ -659,7 +659,7 @@ A JSON object with the following fields:
 - **precommits**: Array<Hash\>  
   List of hashes of the precommit messages supporting the block.
 - **txs**: Array<TransactionInfo\>  
-  List of the transactions included into the block in order as its executed.
+  List of the transactions included into the block. The transactions are arranged according to the order of their execution.
 - **time**: Time Object  
   Time when the block was committed to the blockchain.
 
