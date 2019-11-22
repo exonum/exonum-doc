@@ -530,10 +530,10 @@ configuration is needed:
 
 ```java
 // This TestKit would be instantiated with two service instances of different services `ARTIFACT_ID` and `ARTIFACT_ID_2`
-// First service will be instantiated with some custom configuration
 try (TestKit testKit = TestKit testKit = TestKit.builder()
         .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
         .withDeployedArtifact(ARTIFACT_ID_2, ARTIFACT_FILENAME_2)
+        // First service will be instantiated with some custom configuration
         .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
         .withService(ARTIFACT_ID_2, SERVICE_NAME_2, SERVICE_ID_2)
         .withArtifactsDirectory(artifactsDirectory)
