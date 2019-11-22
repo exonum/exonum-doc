@@ -496,8 +496,9 @@ configuration of:
   [Auditor][auditor])
 - Service artifacts - their artifact id and filename
 - Directory, where service artifacts are to be found
-- Service instances with which the TestKit would be instantiated - their artifact id,
-  service instance name, service instance id and an optional service configuration
+- Service instances with which the TestKit would be instantiated - their
+  artifact id, service instance name, service instance id and an optional
+  service configuration
 - [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
   is needed (for details see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in the emulated network
@@ -529,7 +530,8 @@ The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 ```java
-// This TestKit would be instantiated with two service instances of different services `ARTIFACT_ID` and `ARTIFACT_ID_2`
+// This TestKit would be instantiated with two service instances of different
+// services `ARTIFACT_ID` and `ARTIFACT_ID_2`
 try (TestKit testKit = TestKit testKit = TestKit.builder()
         .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
         .withDeployedArtifact(ARTIFACT_ID_2, ARTIFACT_FILENAME_2)
