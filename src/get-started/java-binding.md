@@ -549,7 +549,8 @@ test that verifies the execution result of a valid transaction and the changes
 it made in service schema:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
   // Construct a valid transaction
   TransactionMessage validTx = constructValidTransaction();
 
@@ -574,7 +575,8 @@ And a test that verifies that a transaction that throws an exception during its
 execution will fail:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
   // Construct a transaction that throws `TransactionExecutionException` during
   // execution
   byte errorCode = 1;
@@ -601,15 +603,13 @@ The TestKit also allows creating blocks that contain all current [in-pool][in-po
 transactions:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-  // Put the transaction into the TestKit transaction pool
-  MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
+// Instantiate a service that submits a transaction in it's `afterCommit` method
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
+  // Create a block so that `afterCommit` method is invoked
+  testKit.createBlock();
 
-  TransactionMessage message = constructTransactionMessage();
-  RawTransaction rawTransaction = RawTransaction.fromMessage(message);
-  service.getNode().submitTransaction(rawTransaction);
-
-  // This block will contain the transaction submitted above
+  // This block will contain the transaction submitted in `afterCommit` method
   Block block = testKit.createBlock();
   // Check the resulting block or blockchain state
 }
@@ -626,8 +626,7 @@ in `afterCommit` method) into the transaction pool.
     [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
     will ignore in-pool transactions. As of 0.8.0, there is no way to create a block
     that would contain both given and in-pool transactions with a single
-    method. To do that, put the given transactions into the TestKit transaction
-    pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
+    method.
 
 #### Checking the Blockchain State
 
@@ -667,9 +666,13 @@ be set in UTC time zone.
 void timeOracleTest() {
   ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
   FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
+  String timeServiceName = "time-service";
+  int timeServiceId = 10;
   try (TestKit testKit = TestKit.builder()
-      .withService(MyServiceModule.class)
-      .withTimeService(timeProvider)
+      .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+      .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
+      .withTimeService(timeServiceName, timeServiceId, timeProvider)
+      .withArtifactsDirectory(artifactsDirectory)
       .build()) {
     // Create an empty block
     testKit.createBlock();
@@ -721,7 +724,9 @@ TestKit objects:
 @RegisterExtension
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
-    .withService(MyServiceModule.class));
+    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+    .withArtifactsDirectory(artifactsDirectory));
 
 @Test
 void test(TestKit testKit) {
@@ -744,7 +749,9 @@ These annotations should be applied on the TestKit parameter:
 @RegisterExtension
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
-    .withService(MyServiceModule.class));
+    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+    .withArtifactsDirectory(artifactsDirectory));
 
 @Test
 void validatorTest(TestKit testKit) {
