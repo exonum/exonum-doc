@@ -494,7 +494,10 @@ configuration of:
 
 - Type of the emulated node (either [Validator][validator] or
   [Auditor][auditor])
-- Services with which the TestKit would be instantiated
+- Service artifacts - their artifact id and filename
+- Directory, where service artifacts are to be found
+- Service instances with which the TestKit would be instantiated - their artifact id,
+  service instance name, service instance id and an optional service configuration
 - [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
   is needed (for details see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in the emulated network
@@ -507,10 +510,17 @@ configuration of:
     and provide access to their state.
 
 Default TestKit can be instantiated with a single validator as an emulated
-node, a single service and without Time Oracle in the following way:
+node, a single service with no configuration and without Time Oracle in the
+following way:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+ServiceArtifactId artifactId = ServiceArtifactId.newJavaId("com.exonum.binding:test-service:1.0.0");
+String artifactFilename = "test-service.jar";
+String serviceName = "test-service";
+int serviceId = 46;
+Path artifactsDirectory = Paths.get("target");
+try (TestKit testKit = TestKit.forService(artifactId, artifactFilename,
+        serviceName, serviceId, artifactsDirectory)) {
   // Test logic
 }
 ```
@@ -519,10 +529,14 @@ The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 ```java
-try (TestKit testKit = TestKit.builder()
-    .withServices(MyServiceModule.class, MyServiceModule2.class)
-    .withValidators(2)
-    .build()) {
+// This TestKit would be instantiated with two service instances of different services `ARTIFACT_ID` and `ARTIFACT_ID_2`
+try (TestKit testKit = TestKit testKit = TestKit.builder()
+        .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+        .withDeployedArtifact(ARTIFACT_ID_2, ARTIFACT_FILENAME_2)
+        .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+        .withService(ARTIFACT_ID_2, SERVICE_NAME_2, SERVICE_ID_2)
+        .withArtifactsDirectory(artifactsDirectory)
+        .build()) {
   // Test logic
 }
 ```
