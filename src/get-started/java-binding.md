@@ -562,9 +562,8 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
   // It can be used to access the core schema, for example to check the
   // transaction execution result:
   Blockchain blockchain = Blockchain.newInstance(view);
-  Optional<TransactionResult> validTxResult =
-        blockchain.getTxResult(validTx.hash());
-  assertThat(validTxResult).hasValue(TransactionResult.successful());
+  ExecutionStatus validTxResult = blockchain.getTxResults().get(validTx.hash());
+  assertThat(validTxResult).isEqualTo(ExecutionStatuses.success());
   // And also to verify the changes the transaction made to the service state:
   MySchema schema = new MySchema(view);
   // Perform assertions on the data in the service schema
@@ -591,10 +590,9 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
   Snapshot view = testKit.getSnapshot();
   Blockchain blockchain = Blockchain.newInstance(view);
 
-  Optional<TransactionResult> errorTxResult =
-      blockchain.getTxResult(errorTx.hash());
-  TransactionResult expectedTransactionResult =
-      TransactionResult.error(errorCode, errorDescription);
+  ExecutionStatus errorTxResult = blockchain.getTxResult(errorTx.hash());
+  ExecutionStatus expectedTransactionResult =
+      ExecutionStatuses.serviceError(errorCode, errorDescription);
   assertThat(errorTxResult).hasValue(expectedTransactionResult);
 }
 ```
@@ -725,7 +723,7 @@ TestKit objects:
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
     .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
     .withArtifactsDirectory(artifactsDirectory));
 
 @Test
@@ -750,7 +748,7 @@ These annotations should be applied on the TestKit parameter:
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
     .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
     .withArtifactsDirectory(artifactsDirectory));
 
 @Test
