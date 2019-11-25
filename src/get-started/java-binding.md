@@ -1,5 +1,7 @@
 # Java Binding User Guide
 
+<!-- cspell:ignore testnet,prepend,JDWP -->
+
 **Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
 
@@ -869,29 +871,32 @@ Currently Java Binding includes the following built-in services:
 
 ## Node Configuration
 
-Exonum offers a three-step way of node configuration process. It allows to setup a network
-of multiple nodes with multiple administrators without any risk of private keys leakage.
+Exonum offers a three-step way of node configuration process. It allows to setup
+a networkof multiple nodes with multiple administrators without any risk of
+private keys leakage.
 
-Exonum Java App offers the same configuration process as standard Exonum Rust services.
-In this guide, we will configure a network of a single node.
-For an example of multi-node network configuration, see [corresponding section of Timestamping Tutorial][start-the-blockchain-network].
+Exonum Java App offers the same configuration process as standard Exonum Rust
+services. In this guide, we will configure a network of a single node.
+For an example of multi-node network configuration, see
+[Timestamping Tutorial][start-the-blockchain-network].
 
-Exonum Java App provides an integrated helping information for each of available command
-and its options. Use `-h` flag for the short version of CLI documentation, `--help` flag
-for the detailed one. `exonum-java <command-name> --help` will print a detailed description
-of a specific command.
+Exonum Java App provides an integrated helping information for each of available
+command and its options. Use `-h` flag for the short version of CLI
+documentation, `--help` flag for the detailed one.
+`exonum-java <command-name> --help` will print a detailed description of a
+specific command.
 
-All paths in Exonum Java App CLI arguments are either absolute, or relative to the current
-working directory.
+All paths in Exonum Java App CLI arguments are either absolute, or relative to
+the current working directory.
 
 ### Step 1. Generate Template Config
 
-On first step, we generate a common (also known as "template") part of node configuration.
-This command is only needed to be run once per network, and the resulting file may be
-distributed among every node for the next step.
+On first step, we generate a common (also known as "template") part of node
+configuration. This command is only needed to be run once per network, and the
+resulting file may bedistributed among every node for the next step.
 
-We provide a path to resulting configuration file and a count of validator nodes in the
-network.
+We provide a path to resulting configuration file and a count of validator nodes
+in the network.
 
 ```$sh
 $ exonum-java generate-template \
@@ -901,18 +906,18 @@ $ exonum-java generate-template \
 
 ### Step 2. Generate Node Private and Public Configs
 
-**Note:** in this tutorial we do not provide a password for private node keys protection
-by passing `--no-password` flag. It is strictly recommended __not__ to use this flag in
-real-world scenarios. 
+**Note:** in this tutorial we do not provide a password for private node keys
+protection by passing `--no-password` flag. It is strictly recommended __not__
+to use this flag in real-world scenarios. 
 
-On second step, we generate both private and public parts of the node configuration.
-Public part of configuration must be distributed among every other administrator for
-the next step. Private parts must not be exposed to the outer world and are only needed
-to run the node.
+On second step, we generate both private and public parts of the node
+configuration. Public part of configuration must be distributed among every
+other administrator for the next step. Private parts must not be exposed to the
+outer world and are only needed to run the node.
 
-We provide a path to the common configuration file, a path to a directory for generated
-configuration files and an external IP address of the node, which will be used for
-communication between nodes.
+We provide a path to the common configuration file, a path to a directory for
+generated configuration files and an external IP address of the node, which will
+be used for communication between nodes.
 
 ```$sh
 $ exonum-java generate-config \
@@ -924,11 +929,12 @@ $ exonum-java generate-config \
 
 ### Step 3. Finalize Configuration
 
-On third, and the last step we combine private part of the node configuration and the
-public parts of each node of the network.
+On third, and the last step we combine private part of the node configuration
+and the public parts of each node of the network.
 
-We provide a path to a private part of the node configuration, a path to a resulting
-node configuration file and a list of paths to public configuration files of every node.
+We provide a path to a private part of the node configuration, a path to a
+resulting node configuration file and a list of paths to public configuration
+files of every node.
 
 ```$sh
 $ exonum-java finalize \
@@ -937,33 +943,42 @@ $ exonum-java finalize \
     --public-configs testnet/pub.toml
 ```
 
-After completing each of the steps, the `testnet/node.toml` file contains a final node
-configuration and can be used to run the node with specified parameters.
+After completing each of the steps, the `testnet/node.toml` file contains a
+final node configuration and can be used to run the node with specified
+parameters.
 
 ### Running the Node
 
-Unlike configuration process, `run` command of Exonum Java App is different from similar
-Exonum Rust command.
+Unlike configuration process, `run` command of Exonum Java App is different from
+similar Exonum Rust command.
 
 There are several required parameters here:
 
 - `--db-path` for a path to the database directory.
 - `--node-config` for a path to the final node configuration file.
-- `--artifacts-path` for a path to the directory containing compiled service artifacts.
+- `--artifacts-path` for a path to the directory containing compiled service
+  artifacts.
 - `--ejb-port` for port that your service will use for communication.
   Java Binding does not use Exonum Core API port directly.
-- `--public-api-address` and `--private-api-address` for IP addresses for node user API.
-  Public API address is used by users to send transactions and requests to the blockchain,
-  private one is used by node administrators to perform different maintenance actions.
-  Setting these addresses isn't strictly necessary for every node, but we will need available
-  API ports for deploying and starting service using `exonum-launcher`.
+- `--public-api-address` and `--private-api-address` for IP addresses for node
+  user API.
+  Public API address is used by users to send transactions and requests to the
+  blockchain, private one is used by node administrators to perform different
+  maintenance actions. Setting these addresses isn't strictly necessary for
+  every node, but we will need available API ports for deploying and starting
+  service using `exonum-launcher`.
 
-There are also optional parameters useful for debugging purposes, logging configuration and JVM fine tuning:
-- `--jvm-args-prepend` and `--jvm-args-append`: Additional parameters for JVM that prepend and
- append the rest of arguments. Must not have a leading dash. For example, `Xmx2G`.
-- `--jvm-debug`: Allows JVM being remotely debugged over the `JDWP` protocol. Takes a socket address as a parameter in form
- of `HOSTNAME:PORT`. For example, `localhost:8000`.
-- `--ejb-log-config-path` for path to `log4j` configuration file. Default config `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT.
+There are also optional parameters useful for debugging purposes, logging
+configuration and JVM fine tuning:
+
+- `--jvm-args-prepend` and `--jvm-args-append`: Additional parameters for JVM
+  that prepend and append the rest of arguments. Must not have a leading dash.
+  For example, `Xmx2G`.
+- `--jvm-debug`: Allows JVM being remotely debugged over the `JDWP` protocol.
+  Takes a socket address as a parameter in form of `HOSTNAME:PORT`. For example,
+  `localhost:8000`.
+- `--ejb-log-config-path` for path to `log4j` configuration file. Default config
+  `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT.
  
 ```$sh
 $ exonum-java run \
@@ -979,8 +994,9 @@ $ exonum-java run \
 
 #### Changing the used JVM
 
-By default, Exonum Java App automatically finds system JVM and uses it. To change this,
-the user can set `JAVA_HOME` environment variable pointing at the `jre` directory.
+By default, Exonum Java App automatically finds system JVM and uses it. To
+change this, the user can set `JAVA_HOME` environment variable pointing at the
+`jre` directory.
 
 #### Debugging the JVM
 
@@ -989,7 +1005,9 @@ pass `--jvm-debug` option with a socket address to connect to
 from a debugger:
 
 ```sh
-$ exonum-java run -d testnet/db -c testnet/node.toml --public-api-address 127.0.0.1:3000 \
+$ exonum-java run -d testnet/db -c testnet/node.toml \
+    --public-api-address 127.0.0.1:3000 \
+    --private-api-address 127.0.0.1:3010 \
     --ejb-log-config-path "log4j-fallback.xml" \
     --ejb-port 7000 \
     --jvm-debug localhost:8000
@@ -1004,35 +1022,37 @@ $ jdb -attach localhost:8000 -sourcepath /path/to/source
 
 ## Deploy and Start Service
 
-Exonum Java Binding provides a way to dynamically deploy and start multiple services without
-stopping the nodes in the network. This can be done by sending particular transactions to
-the built-in Supervisor service. To simplify this process for the users, `exonum-launcher`
-is recommended to be used.
+Exonum Java Binding provides a way to dynamically deploy and start multiple
+services without stopping the nodes in the network. This can be done by sending
+particular transactions to the built-in Supervisor service. To simplify this
+process for the users, `exonum-launcher` is recommended to be used.
 
 [`exonum-launcher`][exonum-launcher] is a Python application which
-is capable of forming and sending deploy transactions to the node, following provided
-deploy configuration in `YAML` file. `exonum-launcher` also has additional plugins for support
-for different runtimes and services.
+is capable of forming and sending deploy transactions to the node, following
+provided deploy configuration in `YAML` file. `exonum-launcher` also has
+additional plugins for support for different runtimes and services.
 
 Exonum Java Binding provides two plugins:
 
 - Exonum Java Runtime Plugin for Java services support.
-- Exonum Local Configuration Plugin for support of services with custom Protobuf-encoded
-  initial configuration arguments. Such arguments send to the service on its start and are
-  typically used to customize the behavior of particular service instance.
+- Exonum Local Configuration Plugin for support of services with custom
+  Protobuf-encoded initial configuration arguments. Such arguments send to the
+  service on its start and are typically used to customize the behavior of
+  particular service instance.
 
 ### Installation
 
 Follow the instructions in [plugins Readme][plugins-readme]
 
-To deploy and start a specific list of services, use the following command with the
-prepared `config.yml` file:
+To deploy and start a specific list of services, use the following command with
+the prepared `config.yml` file:
 
 ```bash
 python3 -m exonum_launcher -i config.yml
 ```
 
-See the following section for instructions on creating `config.yml` file for a specific service.
+See the following section for instructions on creating `config.yml` file for a
+specific service.
 
 ### Writing Configuration File
 
@@ -1046,29 +1066,33 @@ networks:
     private-api-port: 8081
 ```
 
-You need to specify every node for which you have an access to its private API port. If you
-do not have an access to every node in the network, the administrators of other nodes must
-run `exonum-launcher` with the same configuration file (with a different list of available nodes).
+You need to specify every node for which you have an access to its private API
+port. If you do not have an access to every node in the network, the
+administrators of other nodes must run `exonum-launcher` with the same
+configuration file (with a different list of available nodes).
 
-Deadline height describes the maximum blockchain height for the deployment process. Make sure to
-specify the value larger than the current blockchain height.
+Deadline height describes the maximum blockchain height for the deployment
+process. Make sure to specify the value larger than the current blockchain
+height.
 
 ```yaml
 deadline_height: 20000
 ```
 
-Enable Java runtime by specifying its identifier (`1`). Rust runtime is enabled by default:
+Enable Java runtime by specifying its identifier (`1`). Rust runtime is enabled
+by default:
 
 ```yaml
 runtimes:
   java: 1
 ```
 
-Add artifacts you want to deploy. For each artifact, you need to specify its name alias
-(as YAML key) and its runtime (using `runtime` field). Name aliases are used in other parts
-of configuration for readability and easier refactoring. Java artifacts also need name of the
-`jar` file in the `spec: artifact_filename` field. In our example we add the Java
-`cryptocurrency-demo` service, and two Rust services - the `timestamping` and `time` oracle services.
+Add artifacts you want to deploy. For each artifact, you need to specify its
+name alias (as YAML key) and its runtime (using `runtime` field). Name aliases
+are used in other parts of configuration for readability and easier refactoring.
+Java artifacts also need name of the `jar` file in the `spec: artifact_filename`
+field. In our example we add the Java `cryptocurrency-demo` service, and two
+Rust services - the `timestamping` and `time` oracle services.
 
 ```yaml
 artifacts:
@@ -1085,9 +1109,10 @@ artifacts:
     name: "exonum-timestamping:0.12.0"
 ```
 
-Add a `plugins` section to enable both Java Runtime plugin and Instance Configuration plugin.
-Runtime plugin is enabled for a specific runtime (`java` in our example), while Instance
-Configuration plugin is enabled for a specific artifact name alias (`timestamping` in our example).
+Add a `plugins` section to enable both Java Runtime plugin and Instance
+Configuration plugin. Runtime plugin is enabled for a specific runtime
+(`java` in our example), while Instance Configuration plugin is enabled for a
+specific artifact name alias (`timestamping` in our example).
 
 ```yaml
 plugins:
@@ -1097,9 +1122,10 @@ plugins:
     timestamping: "exonum_instance_configuration_plugin.InstanceSpecLoader"
 ```
 
-In our example we will use the Instance Configuration plugin to serialize initial configuration parameters of
-the `timestamping` service in Protobuf. We need to take a `service.proto` file with the message
-description from the service sources and place it inside some known directory.
+In our example we will use the Instance Configuration plugin to serialize
+initial configuration parameters of the `timestamping` service in Protobuf. We
+need to take a `service.proto` file with the message description from the
+service sources and place it inside some known directory.
 
   ```proto
   syntax = "proto3";
@@ -1111,18 +1137,19 @@ description from the service sources and place it inside some known directory.
   }
   ```
 
-Finally, add an `instances` section that describes the list of service instances you want to
-start in the blockchain. For each instance you need to specify its artifact name alias.
-Instance Configuration plugin also requires a list of additional parameters, which we
-provide for the `timestamping` instance:
+Finally, add an `instances` section that describes the list of service instances
+you want to start in the blockchain. For each instance you need to specify its
+artifact name alias. Instance Configuration plugin also requires a list of
+additional parameters, which we provide for the `timestamping` instance:
 
-- `sources`. Points to a directory with the Protobuf sources of the service configuration 
-message. We use the `proto_sources` directory.
+- `sources`. Points to a directory with the Protobuf sources of the service
+  configuration message. We use the `proto_sources` directory.
 - `config_message_source`. A file name where the `message_name` message 
-is located. In our example we use the `service.proto` file.
-- `message_name`. A name of the Protobuf message used to represent the service configuration.
-  Optional, defaults to `Config`.
-- `data`. Your actual configuration in the format corresponding to the `message_name` message.
+  is located. In our example we use the `service.proto` file.
+- `message_name`. A name of the Protobuf message used to represent the service
+  configuration. Optional, defaults to `Config`.
+- `data`. Your actual configuration in the format corresponding to the
+  `message_name` message.
 
 ```yaml
 instances:
@@ -1140,7 +1167,8 @@ instances:
         time_service_name: "time"
 ```
 
-See [sample-config.yml][launcher-sample-config] for the final state of the configuration file.
+See [sample-config.yml][launcher-sample-config] for the final state of the
+configuration file.
 
 [start-the-blockchain-network]: ./timestamping-tutorial.md#start-the-blockchain-network
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
