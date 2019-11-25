@@ -468,18 +468,27 @@ pass `java.library.path` system property to JVM:
 `$EXONUM_JAVA` environment variable should point at installation location,
 as specified in [How to Run a Service section](#how-to-run-a-service).
 
-`Surefire/Failsafe` for Maven should be configured as follows:
+Packaged artifact should be available for integration tests that use TestKit,
+so `Failsafe` for Maven should be configured as follows:
 
 ```xml
 <plugin>
-    <!-- You can also configure a failsafe to run integration tests during
-         'verify' phase of a Maven build to separate unit tests and ITs. -->
-    <artifactId>maven-surefire-plugin</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
     <configuration>
         <argLine>
             -Djava.library.path=${path-to-java-bindings-library}
         </argLine>
     </configuration>
+    <executions>
+      <execution>
+        <id>integration-test</id>
+        <goals>
+          <goal>integration-test</goal>
+          <goal>verify</goal>
+        </goals>
+      </execution>
+    </executions>
 </plugin>
 ```
 
@@ -494,10 +503,10 @@ configuration of:
 
 - Type of the emulated node (either [Validator][validator] or
   [Auditor][auditor])
-- Service artifacts - their artifact id and filename
-- Directory, where service artifacts are to be found
-- Service instances with which the TestKit would be instantiated - their
-  artifact id, service instance name, service instance id and an optional
+- Service artifacts - artifact ID and filename
+- Directory that stores service artifacts
+- Service instances with which the TestKit is instantiated - their
+  artifact ID, service instance name, service instance ID and an optional
   service configuration
 - [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
   is needed (for details see [Time Oracle Testing](#time-oracle-testing))
@@ -511,8 +520,8 @@ configuration of:
     and provide access to their state.
 
 Default TestKit can be instantiated with a single validator as an emulated
-node, a single service with no configuration and without Time Oracle in the
-following way:
+node, a single service with no configuration and without Time Oracle. To
+instantiate the TestKit do the following:
 
 ```java
 ServiceArtifactId artifactId = ServiceArtifactId.newJavaId("com.exonum.binding:test-service:1.0.0");
@@ -530,7 +539,7 @@ The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 ```java
-// This TestKit would be instantiated with two service instances of different
+// This TestKit will be instantiated with two service instances of different
 // services `ARTIFACT_ID` and `ARTIFACT_ID_2`
 try (TestKit testKit = TestKit testKit = TestKit.builder()
         .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
@@ -568,7 +577,7 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
   ExecutionStatus validTxResult = blockchain.getTxResults().get(validTx.hash());
   assertThat(validTxResult).isEqualTo(ExecutionStatuses.success());
   // And also to verify the changes the transaction made to the service state:
-  MySchema schema = new MySchema(view);
+  MySchema schema = new MySchema(view, SERVICE_NAME);
   // Perform assertions on the data in the service schema
 }
 ```
@@ -593,7 +602,7 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
   Snapshot view = testKit.getSnapshot();
   Blockchain blockchain = Blockchain.newInstance(view);
 
-  ExecutionStatus errorTxResult = blockchain.getTxResult(errorTx.hash());
+  Optional<ExecutionStatus> errorTxResult = blockchain.getTxResult(errorTx.hash());
   ExecutionStatus expectedTransactionResult =
       ExecutionStatuses.serviceError(errorCode, errorDescription);
   assertThat(errorTxResult).hasValue(expectedTransactionResult);
@@ -604,13 +613,14 @@ The TestKit also allows creating blocks that contain all current [in-pool][in-po
 transactions:
 
 ```java
-// Instantiate a service that submits a transaction in it's `afterCommit` method
+// Instantiate a service that submits a transaction pool txs, e.g., submitted
+// by a service in its `afterCommit` method
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
         SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
-  // Create a block so that `afterCommit` method is invoked
+  // Create a block so that the `afterCommit` method is invoked
   testKit.createBlock();
 
-  // This block will contain the transaction submitted in `afterCommit` method
+  // This block will contain the transaction submitted in the `afterCommit` method
   Block block = testKit.createBlock();
   // Check the resulting block or blockchain state
 }
@@ -644,6 +654,8 @@ access it:
   Performs the given function with a snapshot of the current database state and
   returns a result of its execution
 
+Read operations can also be tested through service web [API](#api).
+
 !!! note
     Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
     once the passed closure completes. When using `getSnapshot`, created
@@ -660,7 +672,8 @@ your service depends on it. To do that, the TestKit should be created with
 Its implementation, [`FakeTimeProvider`][testkit-fake-time-provider], mocks the
 source of the external data (current time) and, therefore, allows to manually
 manipulate time that is returned by the time service. Note that the time must
-be set in UTC time zone.
+be set in UTC time zone. When tests do not need to control the current time,
+[system time provider][system-time-provider] might be used.
 
 ```java
 @Test
@@ -679,7 +692,8 @@ void timeOracleTest() {
     testKit.createBlock();
     // The time service submitted its first transaction in `afterCommit`
     // method, but it has not been executed yet
-    Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime1 =
+      getConsolidatedTime(testKit, timeServiceName);
     // No time is available till the time service transaction is processed
     assertThat(consolidatedTime1).isEmpty();
 
@@ -690,7 +704,8 @@ void timeOracleTest() {
     // The time service submitted its second transaction. The first must
     // have been executed, with consolidated time now available and equal to
     // initialTime
-    Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime2 =
+      getConsolidatedTime(testKit, timeServiceName);
     assertThat(consolidatedTime2).hasValue(initialTime);
 
     // Increase the time value
@@ -699,14 +714,16 @@ void timeOracleTest() {
     testKit.createBlock();
     // The time service submitted its third transaction, and processed the
     // second one. The consolidated time must be equal to time1
-    Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime3 =
+      getConsolidatedTime(testKit, timeServiceName);
     assertThat(consolidatedTime3).hasValue(time1);
   }
 }
 
-private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
+private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit,
+  String timeServiceName) {
   return testKit.applySnapshot(s -> {
-    TimeSchema timeSchema = TimeSchema.newInstance(s);
+    TimeSchema timeSchema = TimeSchema.newInstance(s, timeServiceName);
     return timeSchema.getTime().toOptional();
   });
 }
@@ -781,6 +798,10 @@ To test API implemented with Vertx tools, use the tools described in the
 [project documentation](https://vertx.io/docs/vertx-junit5/java).
 You can use [Vertx Web Client][vertx-web-client] as a client or a different
 HTTP client.
+API can be tested with either unit tests with mocks of services (no TestKit
+required), or with integration tests that use TestKit. For that, TestKit
+provides [`getPort()`][testkit-get-port] method to retrieve a TCP port on
+which the service REST API is mounted for a server to listen on.
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
@@ -795,6 +816,7 @@ An example of API service tests can be found in
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[system-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TimeProvider.html#systemTime
 [testkit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html
 [testkit-builder]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.Builder.html
 [testkit-create-block]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
@@ -805,6 +827,7 @@ An example of API service tests can be found in
 [testkit-fake-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/FakeTimeProvider.html
 [testkit-find-in-pool]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
 [testkit-get-pool]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
+[testkit-get-port]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#getPort()
 [testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.8.0
 [testkit-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TimeProvider.html
 [validator]: ../glossary.md#validator
