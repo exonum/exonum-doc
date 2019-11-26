@@ -796,16 +796,17 @@ void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
 
 ### API
 
-API can be tested with either unit tests with mocks of services (no TestKit
-required), or with integration tests that use TestKit. For that, TestKit
-provides [`getPort()`][testkit-get-port] method to retrieve a TCP port on
-which the service REST API is mounted for a server to listen on.
-To test API implemented with Vertx tools, use the tools described in the
-[project documentation](https://vertx.io/docs/vertx-junit5/java).
-You can use [Vertx Web Client][vertx-web-client] as a client or a different
-HTTP client.
+There are two ways to test API. First, API can be tested with unit tests by
+means of service mocks. TestKit is not required for these tests. Second, API
+can be tested with integration tests that use TestKit. For these tests TestKit
+provides the [`getPort()`][testkit-get-port] method that retrieves a TCP port
+to interact with the service REST API.
 
-An example of API service tests with service mocks can be found in
+To test API implemented with Vertx tools, use the tools described in the 
+[project documentation](https://vertx.io/docs/vertx-junit5/java). You can use
+any HTTP client at your discretion.
+
+An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
