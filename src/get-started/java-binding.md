@@ -610,17 +610,19 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
 ```
 
 The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
-transactions:
+transactions. In the example below, a service that submits a transaction in its
+`afterCommit` method is instantiated. Such transactions are placed into the
+transaction pool and submitted with [`createBlock()`][testkit-create-block]
+method:
 
 ```java
-// Instantiate a service that submits a transaction pool txs, e.g., submitted
-// by a service in its `afterCommit` method
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
         SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
   // Create a block so that the `afterCommit` method is invoked
   testKit.createBlock();
 
-  // This block will contain the transaction submitted in the `afterCommit` method
+  // This block will contain the in-pool transactions - namely, the transaction
+  // submitted in the `afterCommit` method
   Block block = testKit.createBlock();
   // Check the resulting block or blockchain state
 }
@@ -634,7 +636,7 @@ in `afterCommit` method) into the transaction pool.
 
 !!! note
     Note that blocks that are created with
-    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
+    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block-with-transactions]
     will ignore in-pool transactions. As of 0.8.0, there is no way to create a block
     that would contain both given and in-pool transactions with a single
     method.
@@ -794,16 +796,16 @@ void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
 
 ### API
 
-To test API implemented with Vertx tools, use the tools described in the
-[project documentation](https://vertx.io/docs/vertx-junit5/java).
-You can use [Vertx Web Client][vertx-web-client] as a client or a different
-HTTP client.
 API can be tested with either unit tests with mocks of services (no TestKit
 required), or with integration tests that use TestKit. For that, TestKit
 provides [`getPort()`][testkit-get-port] method to retrieve a TCP port on
 which the service REST API is mounted for a server to listen on.
+To test API implemented with Vertx tools, use the tools described in the
+[project documentation](https://vertx.io/docs/vertx-junit5/java).
+You can use [Vertx Web Client][vertx-web-client] as a client or a different
+HTTP client.
 
-An example of API service tests can be found in
+An example of API service tests with service mocks can be found in
 [`ApiControllerTest`][apicontrollertest].
 
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
@@ -819,7 +821,8 @@ An example of API service tests can be found in
 [system-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TimeProvider.html#systemTime
 [testkit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html
 [testkit-builder]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.Builder.html
-[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
+[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#createBlock()
+[testkit-create-block-with-transactions]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
 [testkit-extension]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKitExtension.html
 [testkit-extension-auditor]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/Auditor.html
 [testkit-extension-validator]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/Validator.html
