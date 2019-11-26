@@ -612,7 +612,7 @@ try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
 The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
 transactions. In the example below, a service that submits a transaction in its
 `afterCommit` method is instantiated. Such transactions are placed into the
-transaction pool and submitted with [`createBlock()`][testkit-create-block]
+transaction pool and committed with [`createBlock()`][testkit-create-block]
 method:
 
 ```java
