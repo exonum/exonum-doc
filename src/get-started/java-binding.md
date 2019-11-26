@@ -916,7 +916,7 @@ $ exonum-java generate-template \
 
 **Note:** in the following examples we do not provide a password for private
 node keys protection by passing `--no-password` flag. It is strictly recommended
-__not__ to use this flag in real-world scenarios. 
+__not__ to use this flag in real-world scenarios.
 
 On second step, we generate both private and public parts of the node
 configuration. Public part of configuration must be distributed among every
@@ -986,7 +986,7 @@ configuration and JVM fine tuning:
   `localhost:8000`.
 - `--ejb-log-config-path` for path to Log4j 2 configuration file. Default config
   `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT.
- 
+
 ```$sh
 $ exonum-java run \
     --db-path testnet/db \
@@ -1007,7 +1007,7 @@ JVM installation directory.
 
 #### Debugging the JVM
 
-To enable remote debugging of Java code on a running Exonum node, 
+To enable remote debugging of Java code on a running Exonum node,
 pass `--jvm-debug` option with a socket address to connect to
 from a debugger:
 
@@ -1033,9 +1033,9 @@ services without stopping the nodes in the network. This can be done by sending
 particular transactions to the built-in Supervisor service. To simplify this
 process for the users, `exonum-launcher` is recommended to be used.
 
-Compiled services JAR files must be placed into the directory `artifacts-path`
-argument points to. Service files are needed for the whole time of their
-execution and cannot be replaced with the files with the same names.
+Compiled services JAR files must be placed into the artifacts directory
+(configured with`artifacts-path` argument). Service files are needed for the
+whole time of their execution and cannot be moved or modified once deployed.
 
 [`exonum-launcher`][exonum-launcher] is a Python application which
 is capable of forming and sending deploy transactions to the node, following
@@ -1048,7 +1048,7 @@ Exonum Java Binding provides two plugins:
 - Exonum Local Configuration Plugin for support of services with custom
   Protobuf-encoded initial configuration arguments. Such arguments are sent to
   the service on its start and typically used to customize the behavior of
-  particular service instance.
+  a particular service instance.
 
 ### Installation
 
@@ -1100,9 +1100,10 @@ runtimes:
 Add artifacts you want to deploy. For each artifact, you need to specify its
 name alias (as YAML key) and its runtime (using `runtime` field). Name aliases
 are used in other parts of configuration for readability and easier refactoring.
-Java artifacts also need name of the JAR file in the `spec: artifact_filename`
-field. In our example we add the Java `cryptocurrency-demo` service, and two
-Rust services - the `timestamping` and `time` oracle services.
+Java artifacts also need name of the JAR file in the artifacts directory
+in the `spec: artifact_filename` field. In our example we add the Java
+`cryptocurrency-demo` service, and two Rust services - the `timestamping` and
+`time` oracle services.
 
 ```yaml
 artifacts:
@@ -1184,7 +1185,7 @@ configuration file.
 [start-the-blockchain-network]: ./timestamping-tutorial.md#start-the-blockchain-network
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
 [plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0/exonum-java-binding/exonum_launcher_java_plugins/README.md
-[launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/v0.9.0/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
+[launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
 
 ## Logging Configuration
 
@@ -1290,7 +1291,7 @@ For using the library just include the dependency in your `pom.xml`:
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/storage/indices/package-summary.html
 <!-- TODO: use the version-specific link for supervisor -->
-[supervisor-service]: https://github.com/exonum/exonum/tree/master/services/supervisor
+[supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0/
 [time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/Transaction.html
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/TransactionContext.html
