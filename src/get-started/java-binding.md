@@ -1035,7 +1035,7 @@ particular transactions to the built-in Supervisor service. To simplify this
 process for the users, `exonum-launcher` is recommended to be used.
 
 Compiled services JAR files must be placed into the artifacts directory
-(configured with`artifacts-path` argument). Service files are needed for the
+(configured with `artifacts-path` argument). Service files are needed for the
 whole time of their execution and cannot be moved or modified once deployed.
 
 [`exonum-launcher`][exonum-launcher] is a Python application which
@@ -1220,10 +1220,10 @@ The services can use either [`Log4J`][log4j-home] or
 [`SLF4J`][slf4j-home] logging APIs.
 
 Java logging configuration is controlled by the configuration file
-specified by the `ejb-log-config-path` parameter. If no file was
-provided, the logs are disabled. Exonum Java package provides an
-example `log4j-fallback.xml` configuration file that can be found
-at the installation directory. With this file `INFO`-level messages
+specified by the [`ejb-log-config-path`](#running-the-node) parameter.
+If no file was provided, the logs are disabled. Exonum Java package
+provides an example `log4j-fallback.xml` configuration file that can be
+found at the installation directory. With this file `INFO`-level messages
 are printed to stdout.
 
 See [`Log4J` documentation][log4j-docs] for more information on
@@ -1265,6 +1265,7 @@ For using the library just include the dependency in your `pom.xml`:
 - [Rust instruction](create-service.md)
 
 [abstractservice]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/AbstractService.html
+[blockchain]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
@@ -1286,7 +1287,7 @@ For using the library just include the dependency in your `pom.xml`:
 [slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/serialization/StandardSerializers.html
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/storage/indices/package-summary.html
-<!-- TODO: use the version-specific link for supervisor -->
+<!-- TODO: link to the documentation page for supervisor -->
 [supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0/
 [time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/Transaction.html
