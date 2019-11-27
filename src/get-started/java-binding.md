@@ -553,6 +553,10 @@ try (TestKit testKit = TestKit testKit = TestKit.builder()
 }
 ```
 
+Here and elsewhere, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and other constants are
+either hardcoded or retrieved from system properties, e.g.
+`<systemPropertyVariables>` parameter of `maven-failsafe-plugin` plugin.
+
 ### Transactions Testing
 
 The TestKit allows testing transaction execution by submitting blocks with the
@@ -802,9 +806,10 @@ can be tested with integration tests that use TestKit. For these tests TestKit
 provides the [`getPort()`][testkit-get-port] method that retrieves a TCP port
 to interact with the service REST API.
 
-To test API implemented with Vertx tools, use the tools described in the 
-[project documentation](https://vertx.io/docs/vertx-junit5/java). You can use
-any HTTP client at your discretion.
+With either approach, you can use any HTTP client to send requests.
+
+To unit test API implemented with Vertx tools, use the tools described in the
+[project documentation](https://vertx.io/docs/vertx-junit5/java).
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
