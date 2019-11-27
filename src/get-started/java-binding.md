@@ -547,15 +547,18 @@ try (TestKit testKit = TestKit testKit = TestKit.builder()
         // First service will be instantiated with some custom configuration
         .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
         .withService(ARTIFACT_ID_2, SERVICE_NAME_2, SERVICE_ID_2)
-        .withArtifactsDirectory(artifactsDirectory)
+        .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
         .build()) {
   // Test logic
 }
 ```
 
-Here and elsewhere, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and other constants are
-either hardcoded or retrieved from system properties, e.g.
-`<systemPropertyVariables>` parameter of `maven-failsafe-plugin` plugin.
+In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
+`ARTIFACTS_DIRECTORY` correspond to constants defining the corresponding
+properties of the artifact and the environment. As the values of these
+properties are usually defined in the build configuration, it is recommended
+to pass them to the test from the build configuration (e.g., via system
+properties set in `maven-failsafe-plugin`).
 
 ### Transactions Testing
 
@@ -566,7 +569,7 @@ it made in service schema:
 
 ```java
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
   // Construct a valid transaction
   TransactionMessage validTx = constructValidTransaction();
 
@@ -591,7 +594,7 @@ execution will fail:
 
 ```java
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
   // Construct a transaction that throws `TransactionExecutionException` during
   // execution
   byte errorCode = 1;
@@ -621,7 +624,7 @@ method:
 
 ```java
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, artifactsDirectory)) {
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
   // Create a block so that the `afterCommit` method is invoked
   testKit.createBlock();
 
@@ -692,7 +695,7 @@ void timeOracleTest() {
       .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
       .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
       .withTimeService(timeServiceName, timeServiceId, timeProvider)
-      .withArtifactsDirectory(artifactsDirectory)
+      .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
       .build()) {
     // Create an empty block
     testKit.createBlock();
@@ -750,7 +753,7 @@ TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
     .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
     .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
-    .withArtifactsDirectory(artifactsDirectory));
+    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
 
 @Test
 void test(TestKit testKit) {
@@ -775,7 +778,7 @@ TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
     .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
     .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
-    .withArtifactsDirectory(artifactsDirectory));
+    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
 
 @Test
 void validatorTest(TestKit testKit) {
