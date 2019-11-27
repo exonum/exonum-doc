@@ -1023,8 +1023,8 @@ $ exonum-java run -d testnet/db -c testnet/node.toml \
 Now you can debug the service using any JDWP client, such as command line
 JDB or a debugger built in your IDE:
 
-```$sh
-$ jdb -attach localhost:8000 -sourcepath /path/to/source
+```sh
+jdb -attach localhost:8000 -sourcepath /path/to/source
 ```
 
 ## Deploy and Start Service
