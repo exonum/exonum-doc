@@ -985,7 +985,8 @@ configuration and JVM fine tuning:
   Takes a socket address as a parameter in form of `HOSTNAME:PORT`. For example,
   `localhost:8000`.
 - `--ejb-log-config-path` for path to Log4j 2 configuration file. Default config
-  `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT.
+  `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT. See
+  [Logging Configuration](#logging-configuration) for more information.
 
 ```$sh
 $ exonum-java run \
@@ -1011,7 +1012,7 @@ To enable remote debugging of Java code on a running Exonum node,
 pass `--jvm-debug` option with a socket address to connect to
 from a debugger:
 
-```sh
+```$sh
 $ exonum-java run -d testnet/db -c testnet/node.toml \
     --public-api-address 127.0.0.1:3000 \
     --private-api-address 127.0.0.1:3010 \
@@ -1022,7 +1023,7 @@ $ exonum-java run -d testnet/db -c testnet/node.toml \
 Now you can debug the service using any JDWP client, such as command line
 JDB or a debugger built in your IDE:
 
-```sh
+```$sh
 $ jdb -attach localhost:8000 -sourcepath /path/to/source
 ```
 
@@ -1156,7 +1157,7 @@ parameters, which we provide for the `timestamping` instance:
 
 - `sources`. Points to a directory with the Protobuf sources of the service
   configuration message. We use the `proto_sources` directory.
-- `config_message_source`. A file name where the `message_name` message 
+- `config_message_source`. A file name where the `message_name` message
   is located. In our example we use the `service.proto` file.
 - `message_name`. A name of the Protobuf message used to represent the service
   configuration. Optional, defaults to `Config`.
@@ -1224,8 +1225,6 @@ provided, the logs are disabled. Exonum Java package provides an
 example `log4j-fallback.xml` configuration file that can be found
 at the installation directory. With this file `INFO`-level messages
 are printed to stdout.
-Also, see [Application Guide][app-tutorial] for more information on
-configuring the Exonum Java App.
 
 See [`Log4J` documentation][log4j-docs] for more information on
 possible configuration options.
@@ -1264,11 +1263,8 @@ For using the library just include the dependency in your `pom.xml`:
 ## See Also
 
 - [Rust instruction](create-service.md)
-- [Exonum Java App tutorial][app-tutorial]
 
 [abstractservice]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/AbstractService.html
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
-[blockchain]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
