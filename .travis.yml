@@ -10,6 +10,7 @@ cache:
 branches:
   only:
     - master
+    - update-mkdocs
     # Any develop (pre-release) branches, such as 'develop' or 'develop-ejb-0.4'
     - /^develop(-.*)?$/
     # Tags
