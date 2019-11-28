@@ -1,6 +1,6 @@
 # Main requirements
 Jinja2==2.10
-mkdocs==0.17.5
+mkdocs==1.0.4
 Pygments==2.3.1
 pygments-github-lexers==0.0.5
 mkdocs-material==2.9.4
