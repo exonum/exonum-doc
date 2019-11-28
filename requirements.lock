@@ -15,4 +15,4 @@ pymdown-extensions==4.12
 PyYAML==3.13
 singledispatch==3.4.0.3
 six==1.11.0
-tornado==4.5.3
+tornado==5.0
