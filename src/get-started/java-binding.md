@@ -905,7 +905,7 @@ We provide a path to resulting configuration file and a number of validator
 nodes in the network.
 
 ```sh
-$ exonum-java generate-template \
+exonum-java generate-template \
     testnet/common.toml \
     --validators-count=1
 ```
@@ -928,7 +928,7 @@ generated configuration files and an external socket address of the node, which
 will be used for communication between nodes.
 
 ```sh
-$ exonum-java generate-config \
+exonum-java generate-config \
     testnet/common.toml \
     testnet \
     --no-password \
@@ -945,7 +945,7 @@ resulting node configuration file and a list of paths to public configuration
 files of every node.
 
 ```sh
-$ exonum-java finalize \
+exonum-java finalize \
     testnet/sec.toml \
     testnet/node.toml \
     --public-configs testnet/pub.toml
@@ -989,7 +989,7 @@ configuration and JVM fine tuning:
   [Logging Configuration](#logging-configuration) for more information.
 
 ```sh
-$ exonum-java run \
+exonum-java run \
     --db-path testnet/db \
     --node-config testnet/node.toml \
     --artifacts-path artifacts \
@@ -1013,7 +1013,7 @@ pass `--jvm-debug` option with a socket address to connect to
 from a debugger:
 
 ```sh
-$ exonum-java run -d testnet/db -c testnet/node.toml \
+exonum-java run -d testnet/db -c testnet/node.toml \
     --public-api-address 127.0.0.1:3000 \
     --private-api-address 127.0.0.1:3010 \
     --ejb-port 7000 \
@@ -1024,7 +1024,7 @@ Now you can debug the service using any JDWP client, such as command line
 JDB or a debugger built in your IDE:
 
 ```sh
-$ jdb -attach localhost:8000 -sourcepath /path/to/source
+jdb -attach localhost:8000 -sourcepath /path/to/source
 ```
 
 ## Deploy and Start Service
@@ -1059,7 +1059,7 @@ To deploy and start a specific list of services, use the following command with
 the prepared `config.yml` file:
 
 ```sh
-$ python3 -m exonum_launcher -i config.yml
+python3 -m exonum_launcher -i config.yml
 ```
 
 See the following section for instructions on creating `config.yml` file for a
