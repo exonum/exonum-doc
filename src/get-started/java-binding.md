@@ -880,7 +880,7 @@ setting up a network of multiple nodes with multiple administrators without any
 risk of private keys leakage.
 
 Exonum Java App offers the same configuration process as standard Exonum Rust
-services. In this guide we will desctibe how to configure a network of a single
+services. In this guide we will describe how to configure a network of a single
 node. For an example of multi-node network configuration, see
 [Timestamping Tutorial][start-the-blockchain-network].
 
