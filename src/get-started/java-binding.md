@@ -904,7 +904,7 @@ distribute the file.
 We provide a path to resulting configuration file and a number of validator
 nodes in the network.
 
-```$sh
+```sh
 $ exonum-java generate-template \
     testnet/common.toml \
     --validators-count=1
@@ -927,7 +927,7 @@ We provide a path to the common configuration file, a path to a directory for
 generated configuration files and an external socket address of the node, which
 will be used for communication between nodes.
 
-```$sh
+```sh
 $ exonum-java generate-config \
     testnet/common.toml \
     testnet \
@@ -944,7 +944,7 @@ We provide a path to a private part of the node configuration, a path to a
 resulting node configuration file and a list of paths to public configuration
 files of every node.
 
-```$sh
+```sh
 $ exonum-java finalize \
     testnet/sec.toml \
     testnet/node.toml \
@@ -988,7 +988,7 @@ configuration and JVM fine tuning:
   `log4j-fallback.xml` provided with Exonum Java app prints to STDOUT. See
   [Logging Configuration](#logging-configuration) for more information.
 
-```$sh
+```sh
 $ exonum-java run \
     --db-path testnet/db \
     --node-config testnet/node.toml \
@@ -1012,7 +1012,7 @@ To enable remote debugging of Java code on a running Exonum node,
 pass `--jvm-debug` option with a socket address to connect to
 from a debugger:
 
-```$sh
+```sh
 $ exonum-java run -d testnet/db -c testnet/node.toml \
     --public-api-address 127.0.0.1:3000 \
     --private-api-address 127.0.0.1:3010 \
@@ -1024,7 +1024,7 @@ Now you can debug the service using any JDWP client, such as command line
 JDB or a debugger built in your IDE:
 
 ```sh
-jdb -attach localhost:8000 -sourcepath /path/to/source
+$ jdb -attach localhost:8000 -sourcepath /path/to/source
 ```
 
 ## Deploy and Start Service
@@ -1058,8 +1058,8 @@ Follow the instructions in [plugins Readme][plugins-readme]
 To deploy and start a specific list of services, use the following command with
 the prepared `config.yml` file:
 
-```bash
-python3 -m exonum_launcher -i config.yml
+```sh
+$ python3 -m exonum_launcher -i config.yml
 ```
 
 See the following section for instructions on creating `config.yml` file for a
