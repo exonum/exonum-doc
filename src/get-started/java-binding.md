@@ -1005,8 +1005,8 @@ exonum-java run \
 #### Changing the Used JVM
 
 By default, Exonum Java App automatically finds the system JVM and uses it. To
-change this, set the `JAVA_HOME` environment variable to the
-JVM installation directory.
+change this, set the JVM installation directory as the value for the
+`JAVA_HOME` environment variable.
 
 #### Debugging the JVM
 
