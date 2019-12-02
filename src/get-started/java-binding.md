@@ -983,7 +983,7 @@ configuration and JVM fine tuning:
   JVM that prepend and append the rest of arguments. Must not have a leading
   dash. For example, `Xmx2G`.
 - `--jvm-debug` allows remotely debugging the JVM over the JDWP protocol.
-  Takes a socket address as a parameter in the following form - `HOSTNAME:PORT`.
+  Takes a socket address as a parameter in the following form — `HOSTNAME:PORT`.
   For example, `localhost:8000`.
 - `--ejb-log-config-path` for a path to Log4j two configuration files. The
   default config `log4j-fallback.xml` provided with Exonum Java app prints to
@@ -1107,7 +1107,7 @@ name alias (as a YAML key) and its runtime (using the `runtime` field). Name
 aliases are used in other parts of the configuration for readability and easier
 refactoring. Java artifacts also need the name of the JAR file in the
 `spec: artifact_filename` field of the artifacts directory. The present example
-shows how to add the Java `cryptocurrency-demo` service, and two Rust services -
+shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
 the `timestamping` and `time` oracle services.
 
 ```yaml
