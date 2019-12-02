@@ -916,7 +916,7 @@ exonum-java generate-template \
 
 **Note:** the following examples omit setting up a password for private
 node keys protection and pass a `--no-password` flag. It is strictly recommended
-__not__ to use this flag in real-world scenarios.
+__not__ to use this flag in production.
 
 Second, we generate both private and public parts of the node
 configuration. Public part of the configuration must be distributed among every
@@ -1127,7 +1127,7 @@ artifacts:
 
 Add a `plugins` section to enable both Java Runtime plugin and Instance
 Configuration plugin. The runtime plugin is enabled for a specific runtime
-(`java` in the present example). While the Instance Configuration plugin is
+(`java` in the present example). The Instance Configuration plugin is
 enabled for a specific artifact name alias (`timestamping` in the present
 example).
 
@@ -1226,10 +1226,9 @@ The services can use either [`Log4J`][log4j-home] or
 [`SLF4J`][slf4j-home] logging APIs.
 
 Java logging configuration is controlled by the configuration file
-specified by the [`ejb-log-config-path`](#running-the-node) parameter.
-If no file is provided, the logs are disabled. The Exonum Java package
-provides an example `log4j-fallback.xml` configuration file that can be
-found at the installation directory. This file allows printing `INFO`-level
+specified by the optional [`ejb-log-config-path`](#running-the-node) parameter.
+If no file is provided, the default `log4j-fallback.xml` configuration file from
+the installation directory is used. This file allows printing `INFO`-level
 messages to STDOUT.
 
 See [`Log4J` documentation][log4j-docs] for more information on
