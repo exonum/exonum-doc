@@ -1143,6 +1143,7 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[configurable]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Configurable.html
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1162,6 +1163,7 @@ For using the library just include the dependency in your `pom.xml`:
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/serialization/StandardSerializers.html
+[standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/storage/indices/package-summary.html
 [time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/Transaction.html
