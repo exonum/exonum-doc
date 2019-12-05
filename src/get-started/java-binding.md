@@ -1267,6 +1267,7 @@ For using the library just include the dependency in your `pom.xml`:
 
 ## See Also
 
+- [Javadocs](https://exonum.com/doc/api/java-binding/0.8.0/index.html)
 - [Rust instruction](create-service.md)
 
 [abstractservice]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/AbstractService.html
