@@ -277,6 +277,7 @@ rules – see the corresponding section of our [documentation][transactions].
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
 A transaction message contains:
+
 - a header with the identifying information, such as a numeric ID
 of the service instance which shall process this transaction
 and a transaction ID within that service;
@@ -353,6 +354,7 @@ The `Transaction#execute` method describes the operations that are applied to th
 current storage state when the transaction is executed. Exonum passes
 an [execution context][transaction-execution-context] as an argument.
 The context provides:
+
 - a `Fork` – a view that allows performing modifying operations;
 - the service instance name and numeric ID;
 - some information about the corresponding transaction message:
