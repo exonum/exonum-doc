@@ -554,7 +554,7 @@ try (TestKit testKit = TestKit testKit = TestKit.builder()
 ```
 
 In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
-`ARTIFACTS_DIRECTORY` correspond to constants defining the corresponding
+`ARTIFACTS_DIRECTORY` are constants defining the corresponding
 properties of the artifact and the environment. As the values of these
 properties are usually defined in the build configuration, it is recommended
 to pass them to the test from the build configuration (e.g., via system
