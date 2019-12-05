@@ -174,9 +174,9 @@ See [Serialization](#serialization) for details.
 A set of named collections constitute a *service schema*. Collections shall be
 defined in a unique to all service instances namespace to avoid name collisions;
 that is usually achieved by adding a prefix to the name of each collection, 
-declared in the service (e.g., an assigned service name or numeric id:
-"timestamping.timestamps"). For convenient access to service collections
-you can implement a factory of service collections.
+declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`). 
+For convenient access to service collections you can implement a factory
+of service collections.
 
 *The state of the service in the blockchain* is determined by the list of hashes.
 Usually, it is comprised of the hashes of its Merkelized collections. State hashes
@@ -185,7 +185,7 @@ in each committed block. When using `AbstractService`, the hash list must be def
 in the schema class that implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
 
-!!! note "Example of a Service Schema with a single Merklized collection"
+!!! note "Example of a Service Schema with a single Merkelized collection"
 
     ```java
     class FooSchema implements Schema {
@@ -276,10 +276,12 @@ rules – see the corresponding section of our [documentation][transactions].
 
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
-A transaction message contains a header with the identifying information,
-such as a numeric ID of the service this transaction belongs to 
-and a transaction ID within that service; a payload containing transaction 
-parameters; a public key of the author and a signature that authenticates them.
+A transaction message contains: 
+- a header with the identifying information, such as a numeric ID
+of the service instance which shall process this transaction
+and a transaction ID within that service;
+- a payload containing transaction parameters; 
+- a public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
@@ -349,11 +351,13 @@ rule for the transaction in `execute` method.
 
 The `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes
-an [execution context][transaction-execution-context] as an argument,
-which provides a `Fork` – a view that allows performing modifying
-operations; the service instance name and numeric ID; and some information
-about the corresponding transaction message: its SHA-256 hash that uniquely 
-identifies it, and the author’s public key.
+an [execution context][transaction-execution-context] as an argument.
+The context provides:
+- a `Fork` – a view that allows performing modifying operations;
+- the service instance name and numeric ID;
+- some information about the corresponding transaction message: 
+its SHA-256 hash that uniquely identifies it, and the author’s public key.
+
 A service schema object can be used to access data collections of this service.
 
 Also, `Transaction#execute` method may throw `TransactionExecutionException`
@@ -380,7 +384,7 @@ state hash, or an execution exception.
 <!-- todo: Shall we put under "Transactions" (as a modifying operation)
 or under "Blockchain Events" (as a handler of 'before commit' event)? -->
 
-#### Block Commit Handler
+#### After Transactions Handler
 
 Services can receive a notification after all transactions in a block has been
 processed but before the block has been committed, allowing inspecting
@@ -393,10 +397,11 @@ It may make any changes to the service state, which will be included
 in the block. As transactions, the implementations must produce
 the same observable result on all nodes of the system. 
 If exceptions occur in this handler, Exonum will roll back any changes made
-to the persistent storage in it. 
-<!-- todo: Shall we specify that: -->
-Unlike transactions, the execution result
-of `beforeCommit` is not saved in the database.
+to the persistent storage in it.
+
+<!-- Mind that it will change in 1.0, see exonum/exonum#1576 -->
+Unlike transactions, the execution result of `beforeCommit` is not saved
+in the database.
 
 ### Blockchain Events
 
@@ -470,9 +475,8 @@ framework.
 
 #### Initialization and Initial Configuration
 
-If a service needs to initialize its persistent state when it is started,
-potentially, using some configuration parameters, it shall
-do that in [`Service#initialize`][service-initialize].
+Service can initialize its persistent state on its start using 
+[`Service#initialize`][service-initialize].
 
 <!-- TODO: Link to the sections on starting new services -->
 
@@ -509,7 +513,7 @@ This protocol includes the following steps:
 
 The protocol of the _proposal_ and _approval_ steps is determined by the installed 
 supervisor service.
-The service must implement _verification_ and _application_ of the parameters by
+The service can implement _verification_ and _application_ of the parameters by
 implementing [`Configurable`][configurable] interface.
 
 <!-- TODO: Example of Configurable service -->
