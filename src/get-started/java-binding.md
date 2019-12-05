@@ -41,7 +41,7 @@ deployment.
     ```bash
     sudo apt-get update && sudo apt-get install libsodium-dev
     ```
-  
+
 ??? example "Mac OS"
     ```bash
     brew install libsodium
@@ -173,8 +173,8 @@ See [Serialization](#serialization) for details.
 
 A set of named collections constitute a *service schema*. Collections shall be
 defined in a unique to all service instances namespace to avoid name collisions;
-that is usually achieved by adding a prefix to the name of each collection, 
-declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`). 
+that is usually achieved by adding a prefix to the name of each collection,
+declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`).
 For convenient access to service collections you can implement a factory
 of service collections.
 
@@ -191,42 +191,42 @@ in the schema class that implements [`Schema`][schema] interface; when implement
     class FooSchema implements Schema {
       private final String namespace;
       private final View view;
-      
+
       /**
        * Creates a schema belonging to the service instance with the given name.
        * The database state is determined by the given view.
        */
-      FooSchema(String serviceName, View view) {        
-        /* Use a service name as a namespace to distinguish 
+      FooSchema(String serviceName, View view) {
+        /* Use a service name as a namespace to distinguish
            collections of this service instance from other instances
            and enable multiple services of the same type. */
         this.namespace = serviceName;
         this.view = view;
       }
-      
+
       @Override
       public List<HashCode> getStateHashes() {
-        /* This schema has a single Merklized map which contents
+        /* This schema has a single Merkelized map which contents
            must be verified by the consensus algorithm to be the same
            on each node. Hence we return the index hash of this collection. */
         return Collections.singletonList(testMap().getIndexHash());
       }
-      
+
       /**
-       * Creates a test ProofMap. 
-       * 
+       * Creates a test ProofMap.
+       *
        * <p>Such factory methods may be used in transactions and read requests
        * to create a collection of a certain type and name. Here,
-       * a ProofMap with String keys and values is created with a full name 
+       * a ProofMap with String keys and values is created with a full name
        * "<service name>.test-map".
-       */ 
+       */
       ProofMapIndexProxy<String, String> testMap() {
         var fullName = fullIndexName("test-map");
-        return ProofMapIndexProxy.newInstance(fullName, view, string(), 
+        return ProofMapIndexProxy.newInstance(fullName, view, string(),
             string());
       }
-      
-      /** Creates a full index name given its simple name. */ 
+
+      /** Creates a full index name given its simple name. */
       private String fullIndexName(String name) {
         return namespace + "." + name;
       }
@@ -276,11 +276,11 @@ rules – see the corresponding section of our [documentation][transactions].
 
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
-A transaction message contains: 
+A transaction message contains:
 - a header with the identifying information, such as a numeric ID
 of the service instance which shall process this transaction
 and a transaction ID within that service;
-- a payload containing transaction parameters; 
+- a payload containing transaction parameters;
 - a public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
@@ -355,7 +355,7 @@ an [execution context][transaction-execution-context] as an argument.
 The context provides:
 - a `Fork` – a view that allows performing modifying operations;
 - the service instance name and numeric ID;
-- some information about the corresponding transaction message: 
+- some information about the corresponding transaction message:
 its SHA-256 hash that uniquely identifies it, and the author’s public key.
 
 A service schema object can be used to access data collections of this service.
@@ -365,8 +365,8 @@ which contains a transaction error report. This feature allows users to notify
 Exonum about an error in a transaction execution whenever one occurs.
 It may check the preconditions before executing a transaction and either
 accepts it or throws an exception that is further transformed into an Exonum
-<!-- fixme: Shall we reference the new core enum (ExecutionStatus + ExecutionError)?
-Or a protobuf message? -->
+<!-- fixme: Shall we reference the new core enum (ExecutionStatus + 
+ExecutionError)? Or a protobuf message? -->
 core [TransactionResult enum][transaction-result] containing an error code and
 a message with error data.
 If transaction execution fails, the changes made by the transaction are
@@ -395,7 +395,7 @@ of [`Service#beforeCommit`][service-before-commit] method. The method will see
 the state of the database after all transactions have been applied.
 It may make any changes to the service state, which will be included
 in the block. As transactions, the implementations must produce
-the same observable result on all nodes of the system. 
+the same observable result on all nodes of the system.
 If exceptions occur in this handler, Exonum will roll back any changes made
 to the persistent storage in it.
 
@@ -475,23 +475,23 @@ framework.
 
 #### Initialization and Initial Configuration
 
-Service can initialize its persistent state on its start using 
+Service can initialize its persistent state on its start using
 [`Service#initialize`][service-initialize].
 
 <!-- TODO: Link to the sections on starting new services -->
 
 Exonum invokes this method when a new service instance is added
 to the blockchain. Administrators, initiating this action,
-may pass some initialization parameters. A service is responsible for 
+may pass some initialization parameters. A service is responsible for
 validation of these parameters. If they are incorrect, it shall throw
 an Exception, which will abort the start of this service instance.
- 
+
 A service shall also update its _persistent_ state based on these parameters.
-It shall not derive the `Service` _object_ state from them, as 
-Exonum may instantiate multiple `Service` objects for a single 
+It shall not derive the `Service` _object_ state from them, as
+Exonum may instantiate multiple `Service` objects for a single
 service instance (e.g., when a node is stopped and then restarted).
 
-For example, a service may set some initial values in its collections, 
+For example, a service may set some initial values in its collections,
 or save all or some configuration parameters as is for later retrieval in transactions
 and/or read requests.
 
@@ -504,15 +504,16 @@ especially in terms of its invocation by administrators -->
 
 Exonum supervisor service provides a mechanism to reconfigure
 the started service instances. The re-configuration protocol for _services_
-is similar to the one for consensus configuration. 
+is similar to the one for consensus configuration.
 This protocol includes the following steps:
-1. a proposal of a new configuration; 
-2. verification of its correctness; 
+
+1. a proposal of a new configuration;
+2. verification of its correctness;
 3. approval of the proposal; and
 4. application of the new approved configuration.
 
-The protocol of the _proposal_ and _approval_ steps is determined by the installed 
-supervisor service.
+The protocol of the _proposal_ and _approval_ steps is determined
+by the installed supervisor service.
 The service can implement _verification_ and _application_ of the parameters by
 implementing [`Configurable`][configurable] interface.
 
