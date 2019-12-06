@@ -336,7 +336,7 @@ For a more detailed description of transaction processing,
 see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
 section.
 
-##### Transaction Execution
+#### Transaction Execution
 
 When the framework receives a transaction message, it must transform it into
 an *executable transaction* to process. As every service has several transaction
@@ -362,29 +362,37 @@ its SHA-256 hash that uniquely identifies it, and the author’s public key.
 
 A service schema object can be used to access data collections of this service.
 
-Also, `Transaction#execute` method may throw `TransactionExecutionException`
-which contains a transaction error report. This feature allows users to notify
-Exonum about an error in a transaction execution whenever one occurs.
-It may check the preconditions before executing a transaction and either
-accepts it or throws an exception that is further transformed into an Exonum
-<!-- fixme: Shall we reference the new core enum (ExecutionStatus + 
-ExecutionError)? Or a protobuf message? -->
-core [TransactionResult enum][transaction-result] containing an error code and
-a message with error data.
-If transaction execution fails, the changes made by the transaction are
-rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the
-[transaction][exonum-transaction] execution result
-(which may be either success or failure) to their users.
-
 An implementation of the `Transaction#execute` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
 for the given transaction. An observable result is the one that affects the
 blockchain state hash: a modification of a collection that affects the service
 state hash, or an execution exception.
 
-<!-- todo: Shall we put under "Transactions" (as a modifying operation)
-or under "Blockchain Events" (as a handler of 'before commit' event)? -->
+##### Exceptions
+
+Transaction methods may throw `TransactionExecutionException`
+to notify Exonum about an error in a transaction execution.
+
+The `TransactionExecutionException` contains an integer error code and
+a message with error description. The error code allows the clients
+of this method to distinguish the different types of errors that
+may occur in it. For example, a transaction transferring tokens
+from one account to another might have the following error conditions
+that the client needs to distinguish:
+
+- Unknown receiver ID
+- Unknown sender ID
+- Insufficient balance
+- Same sender and receiver.
+
+An exception of any other type will be recorded with _no_ error code
+as an "unexpected" execution error.
+
+If transaction execution fails, the changes made by the transaction are
+rolled back, while the error data is stored in the database for further user
+reference. Light clients also provide access to information on the
+[transaction][exonum-transaction-endpoint] execution result
+(which may be either success or failure) to their users.
 
 #### After Transactions Handler
 
@@ -1179,4 +1187,4 @@ For using the library just include the dependency in your `pom.xml`:
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
 [transaction-result]: https://docs.rs/exonum/0.12/exonum/blockchain/struct.TransactionResult.html
-[exonum-transaction]: ../advanced/node-management.md#transaction
+[exonum-transaction-endpoint]: ../advanced/node-management.md#transaction
