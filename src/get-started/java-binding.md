@@ -164,8 +164,8 @@ See [Serialization](#serialization) for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
-    void updateBalance(Fork fork) {
-      var name = "balanceById";
+    void updateBalance(Fork fork, String serviceInstanceName) {
+      var name = serviceInstanceName + ".balanceById";
       var balanceById = ProofMapIndexProxy.newInstance(name, fork,
           StandardSerializers.hash(),
           StandardSerializers.longs());
@@ -173,8 +173,12 @@ See [Serialization](#serialization) for details.
     }
     ```
 
-A set of named collections constitute a *service scheme*. For convenient access
-to service collections you can implement a factory of service collections.
+A set of named collections constitute a *service schema*. Collections shall be
+defined in a unique to all service instances namespace to avoid name collisions;
+that is usually achieved by adding a prefix to the name of each collection,
+declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`).
+For convenient access to service collections you can implement a factory
+of service collections.
 
 *The state of the service in the blockchain* is determined by the list of hashes.
 Usually, it is comprised of the hashes of its Merkelized collections. State hashes
@@ -182,6 +186,54 @@ of each service are aggregated in a single blockchain state hash, which is inclu
 in each committed block. When using `AbstractService`, the hash list must be defined
 in the schema class that implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
+
+!!! note "Example of a Service Schema with a single Merkelized collection"
+
+    ```java
+    class FooSchema implements Schema {
+      private final String namespace;
+      private final View view;
+
+      /**
+       * Creates a schema belonging to the service instance with the given name.
+       * The database state is determined by the given view.
+       */
+      FooSchema(String serviceName, View view) {
+        /* Use a service name as a namespace to distinguish
+           collections of this service instance from other instances
+           and enable multiple services of the same type. */
+        this.namespace = serviceName;
+        this.view = view;
+      }
+
+      @Override
+      public List<HashCode> getStateHashes() {
+        /* This schema has a single Merkelized map which contents
+           must be verified by the consensus algorithm to be the same
+           on each node. Hence we return the index hash of this collection. */
+        return Collections.singletonList(testMap().getIndexHash());
+      }
+
+      /**
+       * Creates a test ProofMap.
+       *
+       * <p>Such factory methods may be used in transactions and read requests
+       * to create a collection of a certain type and name. Here,
+       * a ProofMap with String keys and values is created with a full name
+       * "<service name>.test-map".
+       */
+      ProofMapIndexProxy<String, String> testMap() {
+        var fullName = fullIndexName("test-map");
+        return ProofMapIndexProxy.newInstance(fullName, view, string(),
+            string());
+      }
+
+      /** Creates a full index name given its simple name. */
+      private String fullIndexName(String name) {
+        return namespace + "." + name;
+      }
+    }
+    ```
 
 #### Serialization
 
@@ -226,10 +278,13 @@ rules – see the corresponding section of our [documentation][transactions].
 
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
-A transaction message contains a header with the identifying information,
-such as an ID of the service this transaction belongs to and a transaction ID
-within that service; a payload containing transaction parameters;
-a public key of the author and a signature that authenticates them.
+A transaction message contains:
+
+- a header with the identifying information, such as a numeric ID
+of the service instance which shall process this transaction
+and a transaction ID within that service;
+- a payload containing transaction parameters;
+- a public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
@@ -265,19 +320,16 @@ Exonum service:
 3. The node verifies the correctness of the message: its header,
   including the service ID, and its cryptographic signature
   against the author’s public key included into it.
-4. The node verifies that the transaction payload can be correctly decoded
-  by the service into an *executable transaction*.
-5. If all checks pass, the node that received the message adds it to its
+4. If all checks pass, the node that received the message adds it to its
   local transaction pool and broadcasts the message to all the other nodes
   in the network.
-6. Other nodes, having received the transaction message, perform all
+5. Other nodes, having received the transaction message, perform all
   the previous verification steps, and, if they pass, add the message to
   the local transaction pool.
-7. When majority of validator nodes agree to include this transaction
+6. When majority of validator nodes agree to include this transaction
   into the next block, they take the message from the transaction pool and
-  convert it into an executable transaction,
-  and [execute](#transaction-execution) it.
-8. When all transactions in the block are executed, all changes are atomically
+  request the service to [execute](#transaction-execution) it.
+7. When all transactions in the block are executed, all changes are atomically
   applied to the database state and a new block is committed.
 
 The transaction messages are preserved in the database regardless of
@@ -286,13 +338,12 @@ For a more detailed description of transaction processing,
 see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
 section.
 
-##### Transaction Execution
+#### Transaction Execution
 
 When the framework receives a transaction message, it must transform it into
 an *executable transaction* to process. As every service has several transaction
 types each with its own parameters, it must provide
-a [`TransactionConverter`][transactionconvererter] for this purpose (see also
-`Service#convertToTransaction`).
+a [`TransactionConverter`][transactionconvererter] for this purpose.
 When the framework requests a service to convert a transaction,
 its message is guaranteed to have a correct cryptographic signature.
 
@@ -303,30 +354,66 @@ rule for the transaction in `execute` method.
 
 The `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes
-an [execution context][transaction-execution-context] as an argument,
-which provides a `Fork` – a view that allows performing modifying
-operations; and some information about the corresponding transaction message:
-its SHA-256 hash that uniquely identifies it, and the author’s public key.
-A service schema object can be used to access data collections of this service.
+an [execution context][transaction-execution-context] as an argument.
+The context provides:
 
-Also, `Transaction#execute` method may throw `TransactionExecutionException`
-which contains a transaction error report. This feature allows users to notify
-Exonum about an error in a transaction execution whenever one occurs.
-It may check the preconditions before executing a transaction and either
-accepts it or throws an exception that is further transformed into an Exonum
-core [TransactionResult enum][transaction-result] containing an error code and
-a message with error data.
-If transaction execution fails, the changes made by the transaction are
-rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the
-[transaction][exonum-transaction] execution result
-(which may be either success or failure) to their users.
+- a `Fork` – a view that allows performing modifying operations;
+- the service instance name and numeric ID;
+- some information about the corresponding transaction message:
+its SHA-256 hash that uniquely identifies it, and the author’s public key.
+
+A service schema object can be used to access data collections of this service.
 
 An implementation of the `Transaction#execute` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
 for the given transaction. An observable result is the one that affects the
 blockchain state hash: a modification of a collection that affects the service
 state hash, or an execution exception.
+
+##### Exceptions
+
+Transaction methods may throw `TransactionExecutionException`
+to notify Exonum about an error in a transaction execution.
+
+The `TransactionExecutionException` contains an integer error code and
+a message with error description. The error code allows the clients
+of this method to distinguish the different types of errors that
+may occur in it. For example, a transaction transferring tokens
+from one account to another might have the following error conditions
+that the client needs to distinguish:
+
+- Unknown receiver ID
+- Unknown sender ID
+- Insufficient balance
+- Same sender and receiver.
+
+An exception of any other type will be recorded with _no_ error code
+as an "unexpected" execution error.
+
+If transaction execution fails, the changes made by the transaction are
+rolled back, while the error data is stored in the database for further user
+reference. Light clients also provide access to information on the
+[transaction][exonum-transaction-endpoint] execution result
+(which may be either success or failure) to their users.
+
+#### After Transactions Handler
+
+Services can receive a notification after all transactions in a block has been
+processed but before the block has been committed, allowing inspecting
+the changes made by the transactions and modifying any service state.
+
+Exonum delivers this notification to implementations
+of [`Service#beforeCommit`][service-before-commit] method. The method will see
+the state of the database after all transactions have been applied.
+It may make any changes to the service state, which will be included
+in the block. As transactions, the implementations must produce
+the same observable result on all nodes of the system.
+If exceptions occur in this handler, Exonum will roll back any changes made
+to the persistent storage in it.
+
+<!-- Mind that it will change in 1.0, see exonum/exonum#1576 -->
+Unlike transactions, the execution result of `beforeCommit` is not saved
+in the database.
 
 ### Blockchain Events
 
@@ -365,7 +452,7 @@ available:
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
   committed and in-pool (not yet processed) transactions are returned
-- `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
+- `getTxResults: ProofMapIndexProxy<HashCode, ExecutionStatus>`
   The map of transaction execution results identified by the corresponding
   transaction SHA-256 hashes
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
@@ -375,9 +462,8 @@ available:
   The map of block objects identified by the corresponding block hashes
 - `getLastBlock: Block`
   The latest committed block
-- `getActualConfiguration: StoredConfiguration`
-  The configuration for the latest height of the blockchain, including services
-  and their parameters
+- `getConsensusConfiguration: Config`
+  The consensus configuration for the latest height of the blockchain.
 
 ### External Service API
 
@@ -388,7 +474,7 @@ for the blockchain data with the provision of the corresponding cryptographic
 proof. Exonum provides an embedded web framework for implementing
 the REST-interface of the service.
 
-[`Service#createPublicApiHandlers`][createpublicapi] method is used to
+[`Service#createPublicApiHandlers`][service-create-public-api] method is used to
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
@@ -396,6 +482,62 @@ at `/api/services/cryptocurrency/balance/:walletId`.
 
 See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
+
+### Configuration
+
+#### Initialization and Initial Configuration
+
+Service can initialize its persistent state on its start using
+[`Service#initialize`][service-initialize].
+
+<!-- TODO: Link to the sections on starting new services -->
+
+Exonum invokes this method when a new service instance is added
+to the blockchain. Administrators, initiating this action,
+may pass some initialization parameters. A service is responsible for
+validation of these parameters. If they are incorrect, it shall throw
+an Exception, which will abort the start of this service instance.
+
+A service shall also update its _persistent_ state based on these parameters.
+It shall not derive the `Service` _object_ state from them, as
+Exonum may instantiate multiple `Service` objects for a single
+service instance (e.g., when a node is stopped and then restarted).
+
+For example, a service may set some initial values in its collections,
+or save all or some configuration parameters as is for later retrieval in transactions
+and/or read requests.
+
+<!-- TODO: example -->
+
+#### Reconfiguration
+
+<!-- TODO: link the complete documentation on reconfiguration,
+especially in terms of its invocation by administrators -->
+
+Exonum supervisor service provides a mechanism to reconfigure
+the started service instances. The re-configuration protocol for _services_
+is similar to the one for consensus configuration.
+This protocol includes the following steps:
+
+1. a proposal of a new configuration;
+2. verification of its correctness;
+3. approval of the proposal; and
+4. application of the new approved configuration.
+
+The protocol of the _proposal_ and _approval_ steps is determined
+by the installed supervisor service.
+The service can implement _verification_ and _application_ of the parameters by
+implementing [`Configurable`][configurable] interface.
+
+<!-- TODO: Example of Configurable service -->
+
+Exonum includes a [standard implementation][standard-supervisor-rustdoc]
+of the supervisor service.
+See its documentation to learn how to invoke the re-configuration process
+of a started service instance.
+
+A service that does not need the same protocol for its reconfiguration as
+for consensus reconfiguration may implement it itself as a set of transactions.
 
 ### Dependencies Management
 
@@ -1239,7 +1381,7 @@ possible configuration options.
 Java Binding includes a library module that can be useful for Java client
 applications that interact with an Exonum service. The module does not
 have the dependency on Java Binding Core, but it contains Java classes
-obligatory for the core that can now as well be easily used in clients,
+obligatory for the core that can as well be easily used in clients,
 if necessary.
 The library provides the ability to create transaction messages, check proofs,
 serialize/deserialize data and perform cryptographic operations.
@@ -1274,6 +1416,7 @@ For using the library just include the dependency in your `pom.xml`:
 [blockchain]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[configurable]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Configurable.html
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1289,9 +1432,11 @@ For using the library just include the dependency in your `pom.xml`:
 [schema]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
+[service-before-commit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#beforeCommit(com.exonum.binding.core.storage.database.Fork)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/serialization/StandardSerializers.html
+[standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/storage/indices/package-summary.html
 <!-- TODO: link to the documentation page for supervisor -->
 [supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0/
@@ -1304,6 +1449,6 @@ For using the library just include the dependency in your `pom.xml`:
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[createpublicapi]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
+[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
 [transaction-result]: https://docs.rs/exonum/0.12/exonum/blockchain/struct.TransactionResult.html
-[exonum-transaction]: ../advanced/node-management.md#transaction
+[exonum-transaction-endpoint]: ../advanced/node-management.md#transaction
