@@ -970,7 +970,6 @@ An example of API service tests can be found in
 [junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TimeProvider.html#systemTime
 [testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html
 [testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.Builder.html
