@@ -1505,6 +1505,6 @@ For using the library just include the dependency in your `pom.xml`:
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
+[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
 [transaction-result]: https://docs.rs/exonum/0.13.0-rc.2/exonum/blockchain/struct.TransactionResult.html
 [exonum-transaction-endpoint]: ../advanced/node-management.md#transaction
