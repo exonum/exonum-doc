@@ -788,8 +788,8 @@ in `afterCommit` method) into the transaction pool.
 !!! note
     Note that blocks that are created with
     [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block-with-transactions]
-    will ignore in-pool transactions. As of 0.9.0-rc1, there is no way to create a block
-    that would contain both given and in-pool transactions with a single
+    will ignore in-pool transactions. As of 0.9.0-rc1, there is no way to create
+    a block that would contain both given and in-pool transactions with a single
     method.
 
 #### Checking the Blockchain State
