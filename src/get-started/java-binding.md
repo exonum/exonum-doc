@@ -1,5 +1,7 @@
 # Java Binding User Guide
 
+<!-- cspell:ignore testnet,prepend,JDWP -->
+
 **Exonum Java App** is an application that includes the Exonum framework
 and Java services runtime environment.
 
@@ -27,7 +29,7 @@ deployment.
   ```bash
   mkdir -p ~/bin
   cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.8.0-release.zip
+  unzip /path/to/downloaded/exonum-java-0.9.0-rc1-release.zip
   ```
 
 - Install [Libsodium][libsodium] as the necessary runtime dependency.
@@ -41,7 +43,7 @@ deployment.
     ```bash
     sudo apt-get update && sudo apt-get install libsodium-dev
     ```
-  
+
 ??? example "Mac OS"
     ```bash
     brew install libsodium
@@ -75,7 +77,7 @@ follow the instructions in [Contribution Guide][how-to-build].
 
   ```bash
   # The path is provided in after-install message in case of Homebrew
-  export EXONUM_HOME=~/bin/exonum-java-0.8.0-release
+  export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc1-release
   # Setting PATH variable is not needed in case of Homebrew
   export PATH="$PATH:$EXONUM_HOME/bin"
   ```
@@ -93,7 +95,7 @@ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.8.0 \
+    -DarchetypeVersion=0.9.0-rc1 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0.0
@@ -105,7 +107,7 @@ You can also use the interactive mode:
 mvn archetype:generate \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.8.0
+    -DarchetypeVersion=0.9.0-rc1
 ```
 
 The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
@@ -162,8 +164,8 @@ See [Serialization](#serialization) for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
-    void updateBalance(Fork fork) {
-      var name = "balanceById";
+    void updateBalance(Fork fork, String serviceInstanceName) {
+      var name = serviceInstanceName + ".balanceById";
       var balanceById = ProofMapIndexProxy.newInstance(name, fork,
           StandardSerializers.hash(),
           StandardSerializers.longs());
@@ -171,8 +173,12 @@ See [Serialization](#serialization) for details.
     }
     ```
 
-A set of named collections constitute a *service scheme*. For convenient access
-to service collections you can implement a factory of service collections.
+A set of named collections constitute a *service schema*. Collections shall be
+defined in a unique to all service instances namespace to avoid name collisions;
+that is usually achieved by adding a prefix to the name of each collection,
+declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`).
+For convenient access to service collections you can implement a factory
+of service collections.
 
 *The state of the service in the blockchain* is determined by the list of hashes.
 Usually, it is comprised of the hashes of its Merkelized collections. State hashes
@@ -180,6 +186,54 @@ of each service are aggregated in a single blockchain state hash, which is inclu
 in each committed block. When using `AbstractService`, the hash list must be defined
 in the schema class that implements [`Schema`][schema] interface; when implementing
 `Service` directly – in the service itself.
+
+!!! note "Example of a Service Schema with a single Merkelized collection"
+
+    ```java
+    class FooSchema implements Schema {
+      private final String namespace;
+      private final View view;
+
+      /**
+       * Creates a schema belonging to the service instance with the given name.
+       * The database state is determined by the given view.
+       */
+      FooSchema(String serviceName, View view) {
+        /* Use a service name as a namespace to distinguish
+           collections of this service instance from other instances
+           and enable multiple services of the same type. */
+        this.namespace = serviceName;
+        this.view = view;
+      }
+
+      @Override
+      public List<HashCode> getStateHashes() {
+        /* This schema has a single Merkelized map which contents
+           must be verified by the consensus algorithm to be the same
+           on each node. Hence we return the index hash of this collection. */
+        return Collections.singletonList(testMap().getIndexHash());
+      }
+
+      /**
+       * Creates a test ProofMap.
+       *
+       * <p>Such factory methods may be used in transactions and read requests
+       * to create a collection of a certain type and name. Here,
+       * a ProofMap with String keys and values is created with a full name
+       * "<service name>.test-map".
+       */
+      ProofMapIndexProxy<String, String> testMap() {
+        var fullName = fullIndexName("test-map");
+        return ProofMapIndexProxy.newInstance(fullName, view, string(),
+            string());
+      }
+
+      /** Creates a full index name given its simple name. */
+      private String fullIndexName(String name) {
+        return namespace + "." + name;
+      }
+    }
+    ```
 
 #### Serialization
 
@@ -224,10 +278,13 @@ rules – see the corresponding section of our [documentation][transactions].
 
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
-A transaction message contains a header with the identifying information,
-such as an ID of the service this transaction belongs to and a transaction ID
-within that service; a payload containing transaction parameters;
-a public key of the author and a signature that authenticates them.
+A transaction message contains:
+
+- a header with the identifying information, such as a numeric ID
+of the service instance which shall process this transaction
+and a transaction ID within that service;
+- a payload containing transaction parameters;
+- a public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
@@ -263,19 +320,16 @@ Exonum service:
 3. The node verifies the correctness of the message: its header,
   including the service ID, and its cryptographic signature
   against the author’s public key included into it.
-4. The node verifies that the transaction payload can be correctly decoded
-  by the service into an *executable transaction*.
-5. If all checks pass, the node that received the message adds it to its
+4. If all checks pass, the node that received the message adds it to its
   local transaction pool and broadcasts the message to all the other nodes
   in the network.
-6. Other nodes, having received the transaction message, perform all
+5. Other nodes, having received the transaction message, perform all
   the previous verification steps, and, if they pass, add the message to
   the local transaction pool.
-7. When majority of validator nodes agree to include this transaction
+6. When majority of validator nodes agree to include this transaction
   into the next block, they take the message from the transaction pool and
-  convert it into an executable transaction,
-  and [execute](#transaction-execution) it.
-8. When all transactions in the block are executed, all changes are atomically
+  request the service to [execute](#transaction-execution) it.
+7. When all transactions in the block are executed, all changes are atomically
   applied to the database state and a new block is committed.
 
 The transaction messages are preserved in the database regardless of
@@ -284,13 +338,12 @@ For a more detailed description of transaction processing,
 see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
 section.
 
-##### Transaction Execution
+#### Transaction Execution
 
 When the framework receives a transaction message, it must transform it into
 an *executable transaction* to process. As every service has several transaction
 types each with its own parameters, it must provide
-a [`TransactionConverter`][transactionconvererter] for this purpose (see also
-`Service#convertToTransaction`).
+a [`TransactionConverter`][transactionconvererter] for this purpose.
 When the framework requests a service to convert a transaction,
 its message is guaranteed to have a correct cryptographic signature.
 
@@ -301,30 +354,66 @@ rule for the transaction in `execute` method.
 
 The `Transaction#execute` method describes the operations that are applied to the
 current storage state when the transaction is executed. Exonum passes
-an [execution context][transaction-execution-context] as an argument,
-which provides a `Fork` – a view that allows performing modifying
-operations; and some information about the corresponding transaction message:
-its SHA-256 hash that uniquely identifies it, and the author’s public key.
-A service schema object can be used to access data collections of this service.
+an [execution context][transaction-execution-context] as an argument.
+The context provides:
 
-Also, `Transaction#execute` method may throw `TransactionExecutionException`
-which contains a transaction error report. This feature allows users to notify
-Exonum about an error in a transaction execution whenever one occurs.
-It may check the preconditions before executing a transaction and either
-accepts it or throws an exception that is further transformed into an Exonum
-core [TransactionResult enum][transaction-result] containing an error code and
-a message with error data.
-If transaction execution fails, the changes made by the transaction are
-rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the
-[transaction][exonum-transaction] execution result
-(which may be either success or failure) to their users.
+- a `Fork` – a view that allows performing modifying operations;
+- the service instance name and numeric ID;
+- some information about the corresponding transaction message:
+its SHA-256 hash that uniquely identifies it, and the author’s public key.
+
+A service schema object can be used to access data collections of this service.
 
 An implementation of the `Transaction#execute` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
 for the given transaction. An observable result is the one that affects the
 blockchain state hash: a modification of a collection that affects the service
 state hash, or an execution exception.
+
+##### Exceptions
+
+Transaction methods may throw `TransactionExecutionException`
+to notify Exonum about an error in a transaction execution.
+
+The `TransactionExecutionException` contains an integer error code and
+a message with error description. The error code allows the clients
+of this method to distinguish the different types of errors that
+may occur in it. For example, a transaction transferring tokens
+from one account to another might have the following error conditions
+that the client needs to distinguish:
+
+- Unknown receiver ID
+- Unknown sender ID
+- Insufficient balance
+- Same sender and receiver.
+
+An exception of any other type will be recorded with _no_ error code
+as an "unexpected" execution error.
+
+If transaction execution fails, the changes made by the transaction are
+rolled back, while the error data is stored in the database for further user
+reference. Light clients also provide access to information on the
+[transaction][exonum-transaction-endpoint] execution result
+(which may be either success or failure) to their users.
+
+#### After Transactions Handler
+
+Services can receive a notification after all transactions in a block has been
+processed but before the block has been committed, allowing inspecting
+the changes made by the transactions and modifying any service state.
+
+Exonum delivers this notification to implementations
+of [`Service#beforeCommit`][service-before-commit] method. The method will see
+the state of the database after all transactions have been applied.
+It may make any changes to the service state, which will be included
+in the block. As transactions, the implementations must produce
+the same observable result on all nodes of the system.
+If exceptions occur in this handler, Exonum will roll back any changes made
+to the persistent storage in it.
+
+<!-- Mind that it will change in 1.0, see exonum/exonum#1576 -->
+Unlike transactions, the execution result of `beforeCommit` is not saved
+in the database.
 
 ### Blockchain Events
 
@@ -363,7 +452,7 @@ available:
 - `getTxMessages: MapIndex<HashCode, TransactionMessage>`
   The map of transaction messages identified by their SHA-256 hashes. Both
   committed and in-pool (not yet processed) transactions are returned
-- `getTxResults: ProofMapIndexProxy<HashCode, TransactionResult>`
+- `getTxResults: ProofMapIndexProxy<HashCode, ExecutionStatus>`
   The map of transaction execution results identified by the corresponding
   transaction SHA-256 hashes
 - `getTxLocations: MapIndex<HashCode, TransactionLocation>`
@@ -373,9 +462,8 @@ available:
   The map of block objects identified by the corresponding block hashes
 - `getLastBlock: Block`
   The latest committed block
-- `getActualConfiguration: StoredConfiguration`
-  The configuration for the latest height of the blockchain, including services
-  and their parameters
+- `getConsensusConfiguration: Config`
+  The consensus configuration for the latest height of the blockchain.
 
 ### External Service API
 
@@ -386,7 +474,7 @@ for the blockchain data with the provision of the corresponding cryptographic
 proof. Exonum provides an embedded web framework for implementing
 the REST-interface of the service.
 
-[`Service#createPublicApiHandlers`][createpublicapi] method is used to
+[`Service#createPublicApiHandlers`][service-create-public-api] method is used to
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
 handler for balance requests in the "cryptocurrency" service will be available
@@ -394,6 +482,62 @@ at `/api/services/cryptocurrency/balance/:walletId`.
 
 See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
+
+### Configuration
+
+#### Initialization and Initial Configuration
+
+Service can initialize its persistent state on its start using
+[`Service#initialize`][service-initialize].
+
+<!-- TODO: Link to the sections on starting new services -->
+
+Exonum invokes this method when a new service instance is added
+to the blockchain. Administrators, initiating this action,
+may pass some initialization parameters. A service is responsible for
+validation of these parameters. If they are incorrect, it shall throw
+an Exception, which will abort the start of this service instance.
+
+A service shall also update its _persistent_ state based on these parameters.
+It shall not derive the `Service` _object_ state from them, as
+Exonum may instantiate multiple `Service` objects for a single
+service instance (e.g., when a node is stopped and then restarted).
+
+For example, a service may set some initial values in its collections,
+or save all or some configuration parameters as is for later retrieval in transactions
+and/or read requests.
+
+<!-- TODO: example -->
+
+#### Reconfiguration
+
+<!-- TODO: link the complete documentation on reconfiguration,
+especially in terms of its invocation by administrators -->
+
+Exonum supervisor service provides a mechanism to reconfigure
+the started service instances. The re-configuration protocol for _services_
+is similar to the one for consensus configuration.
+This protocol includes the following steps:
+
+1. a proposal of a new configuration;
+2. verification of its correctness;
+3. approval of the proposal; and
+4. application of the new approved configuration.
+
+The protocol of the _proposal_ and _approval_ steps is determined
+by the installed supervisor service.
+The service can implement _verification_ and _application_ of the parameters by
+implementing [`Configurable`][configurable] interface.
+
+<!-- TODO: Example of Configurable service -->
+
+Exonum includes a [standard implementation][standard-supervisor-rustdoc]
+of the supervisor service.
+See its documentation to learn how to invoke the re-configuration process
+of a started service instance.
+
+A service that does not need the same protocol for its reconfiguration as
+for consensus reconfiguration may implement it itself as a set of transactions.
 
 ### Dependencies Management
 
@@ -431,7 +575,7 @@ metadata and is used by the framework to instantiate services.
 
 For more information on using Guice, see the [project wiki][guice-wiki].
 
-[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/AbstractServiceModule.html
+[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/AbstractServiceModule.html
 
 ## Testing
 
@@ -453,7 +597,7 @@ For existing projects include the following dependency into your `pom.xml`:
 <dependency>
   <groupId>com.exonum.binding</groupId>
   <artifactId>exonum-testkit</artifactId>
-  <version>0.8.0</version>
+  <version>0.9.0-rc1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -468,18 +612,27 @@ pass `java.library.path` system property to JVM:
 `$EXONUM_JAVA` environment variable should point at installation location,
 as specified in [How to Run a Service section](#how-to-run-a-service).
 
-`Surefire/Failsafe` for Maven should be configured as follows:
+Packaged artifact should be available for integration tests that use TestKit,
+so `Failsafe` for Maven should be configured as follows:
 
 ```xml
 <plugin>
-    <!-- You can also configure a failsafe to run integration tests during
-         'verify' phase of a Maven build to separate unit tests and ITs. -->
-    <artifactId>maven-surefire-plugin</artifactId>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
     <configuration>
         <argLine>
             -Djava.library.path=${path-to-java-bindings-library}
         </argLine>
     </configuration>
+    <executions>
+      <execution>
+        <id>integration-test</id>
+        <goals>
+          <goal>integration-test</goal>
+          <goal>verify</goal>
+        </goals>
+      </execution>
+    </executions>
 </plugin>
 ```
 
@@ -494,7 +647,11 @@ configuration of:
 
 - Type of the emulated node (either [Validator][validator] or
   [Auditor][auditor])
-- Services with which the TestKit would be instantiated
+- Service artifacts - artifact ID and filename
+- Directory that stores service artifacts
+- Service instances with which the TestKit is instantiated - their
+  artifact ID, service instance name, service instance ID and an optional
+  service configuration
 - [`TimeProvider`][testkit-time-provider] if usage of [Time Oracle][time-oracle]
   is needed (for details see [Time Oracle Testing](#time-oracle-testing))
 - Number of validators in the emulated network
@@ -507,10 +664,17 @@ configuration of:
     and provide access to their state.
 
 Default TestKit can be instantiated with a single validator as an emulated
-node, a single service and without Time Oracle in the following way:
+node, a single service with no configuration and without Time Oracle. To
+instantiate the TestKit do the following:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+ServiceArtifactId artifactId = ServiceArtifactId.newJavaId("com.exonum.binding:test-service:1.0.0");
+String artifactFilename = "test-service.jar";
+String serviceName = "test-service";
+int serviceId = 46;
+Path artifactsDirectory = Paths.get("target");
+try (TestKit testKit = TestKit.forService(artifactId, artifactFilename,
+        serviceName, serviceId, artifactsDirectory)) {
   // Test logic
 }
 ```
@@ -519,13 +683,26 @@ The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 ```java
-try (TestKit testKit = TestKit.builder()
-    .withServices(MyServiceModule.class, MyServiceModule2.class)
-    .withValidators(2)
-    .build()) {
+// This TestKit will be instantiated with two service instances of different
+// services `ARTIFACT_ID` and `ARTIFACT_ID_2`
+try (TestKit testKit = TestKit testKit = TestKit.builder()
+        .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+        .withDeployedArtifact(ARTIFACT_ID_2, ARTIFACT_FILENAME_2)
+        // First service will be instantiated with some custom configuration
+        .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
+        .withService(ARTIFACT_ID_2, SERVICE_NAME_2, SERVICE_ID_2)
+        .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
+        .build()) {
   // Test logic
 }
 ```
+
+In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
+`ARTIFACTS_DIRECTORY` are constants defining the corresponding
+properties of the artifact and the environment. As the values of these
+properties are usually defined in the build configuration, it is recommended
+to pass them to the test from the build configuration (e.g., via system
+properties set in `maven-failsafe-plugin`).
 
 ### Transactions Testing
 
@@ -535,7 +712,8 @@ test that verifies the execution result of a valid transaction and the changes
 it made in service schema:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
   // Construct a valid transaction
   TransactionMessage validTx = constructValidTransaction();
 
@@ -547,11 +725,10 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
   // It can be used to access the core schema, for example to check the
   // transaction execution result:
   Blockchain blockchain = Blockchain.newInstance(view);
-  Optional<TransactionResult> validTxResult =
-        blockchain.getTxResult(validTx.hash());
-  assertThat(validTxResult).hasValue(TransactionResult.successful());
+  ExecutionStatus validTxResult = blockchain.getTxResults().get(validTx.hash());
+  assertThat(validTxResult).isEqualTo(ExecutionStatuses.success());
   // And also to verify the changes the transaction made to the service state:
-  MySchema schema = new MySchema(view);
+  MySchema schema = new MySchema(view, SERVICE_NAME);
   // Perform assertions on the data in the service schema
 }
 ```
@@ -560,7 +737,8 @@ And a test that verifies that a transaction that throws an exception during its
 execution will fail:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
   // Construct a transaction that throws `TransactionExecutionException` during
   // execution
   byte errorCode = 1;
@@ -575,27 +753,27 @@ try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
   Snapshot view = testKit.getSnapshot();
   Blockchain blockchain = Blockchain.newInstance(view);
 
-  Optional<TransactionResult> errorTxResult =
-      blockchain.getTxResult(errorTx.hash());
-  TransactionResult expectedTransactionResult =
-      TransactionResult.error(errorCode, errorDescription);
+  Optional<ExecutionStatus> errorTxResult = blockchain.getTxResult(errorTx.hash());
+  ExecutionStatus expectedTransactionResult =
+      ExecutionStatuses.serviceError(errorCode, errorDescription);
   assertThat(errorTxResult).hasValue(expectedTransactionResult);
 }
 ```
 
 The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
-transactions:
+transactions. In the example below, a service that submits a transaction in its
+`afterCommit` method is instantiated. Such transactions are placed into the
+transaction pool and committed with [`createBlock()`][testkit-create-block]
+method:
 
 ```java
-try (TestKit testKit = TestKit.forService(MyServiceModule.class)) {
-  // Put the transaction into the TestKit transaction pool
-  MyService service = testKit.getService(MyService.SERVICE_ID, MyService.class);
+try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
+        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
+  // Create a block so that the `afterCommit` method is invoked
+  testKit.createBlock();
 
-  TransactionMessage message = constructTransactionMessage();
-  RawTransaction rawTransaction = RawTransaction.fromMessage(message);
-  service.getNode().submitTransaction(rawTransaction);
-
-  // This block will contain the transaction submitted above
+  // This block will contain the in-pool transactions - namely, the transaction
+  // submitted in the `afterCommit` method
   Block block = testKit.createBlock();
   // Check the resulting block or blockchain state
 }
@@ -609,11 +787,10 @@ in `afterCommit` method) into the transaction pool.
 
 !!! note
     Note that blocks that are created with
-    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block]
-    will ignore in-pool transactions. As of 0.8.0, there is no way to create a block
-    that would contain both given and in-pool transactions with a single
-    method. To do that, put the given transactions into the TestKit transaction
-    pool with [`Node.submitTransaction(RawTransaction rawTransaction)`][node-submit-transaction].
+    [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block-with-transactions]
+    will ignore in-pool transactions. As of 0.9.0-rc1, there is no way to create
+    a block that would contain both given and in-pool transactions with a single
+    method.
 
 #### Checking the Blockchain State
 
@@ -629,6 +806,8 @@ access it:
 - `<ResultT> ResultT applySnapshot(Function<Snapshot, ResultT> snapshotFunction)`
   Performs the given function with a snapshot of the current database state and
   returns a result of its execution
+
+Read operations can also be tested through service web [API](#api).
 
 !!! note
     Note that `withSnapshot` and `applySnapshot` methods destroy the snapshot
@@ -646,22 +825,28 @@ your service depends on it. To do that, the TestKit should be created with
 Its implementation, [`FakeTimeProvider`][testkit-fake-time-provider], mocks the
 source of the external data (current time) and, therefore, allows to manually
 manipulate time that is returned by the time service. Note that the time must
-be set in UTC time zone.
+be set in UTC time zone. When tests do not need to control the current time,
+[system time provider][system-time-provider] might be used.
 
 ```java
 @Test
 void timeOracleTest() {
   ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
   FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
+  String timeServiceName = "time-service";
+  int timeServiceId = 10;
   try (TestKit testKit = TestKit.builder()
-      .withService(MyServiceModule.class)
-      .withTimeService(timeProvider)
+      .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+      .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
+      .withTimeService(timeServiceName, timeServiceId, timeProvider)
+      .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
       .build()) {
     // Create an empty block
     testKit.createBlock();
     // The time service submitted its first transaction in `afterCommit`
     // method, but it has not been executed yet
-    Optional<ZonedDateTime> consolidatedTime1 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime1 =
+      getConsolidatedTime(testKit, timeServiceName);
     // No time is available till the time service transaction is processed
     assertThat(consolidatedTime1).isEmpty();
 
@@ -672,7 +857,8 @@ void timeOracleTest() {
     // The time service submitted its second transaction. The first must
     // have been executed, with consolidated time now available and equal to
     // initialTime
-    Optional<ZonedDateTime> consolidatedTime2 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime2 =
+      getConsolidatedTime(testKit, timeServiceName);
     assertThat(consolidatedTime2).hasValue(initialTime);
 
     // Increase the time value
@@ -681,14 +867,16 @@ void timeOracleTest() {
     testKit.createBlock();
     // The time service submitted its third transaction, and processed the
     // second one. The consolidated time must be equal to time1
-    Optional<ZonedDateTime> consolidatedTime3 = getConsolidatedTime(testKit);
+    Optional<ZonedDateTime> consolidatedTime3 =
+      getConsolidatedTime(testKit, timeServiceName);
     assertThat(consolidatedTime3).hasValue(time1);
   }
 }
 
-private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit) {
+private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit,
+  String timeServiceName) {
   return testKit.applySnapshot(s -> {
-    TimeSchema timeSchema = TimeSchema.newInstance(s);
+    TimeSchema timeSchema = TimeSchema.newInstance(s, timeServiceName);
     return timeSchema.getTime().toOptional();
   });
 }
@@ -707,7 +895,9 @@ TestKit objects:
 @RegisterExtension
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
-    .withService(MyServiceModule.class));
+    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
+    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
 
 @Test
 void test(TestKit testKit) {
@@ -730,7 +920,9 @@ These annotations should be applied on the TestKit parameter:
 @RegisterExtension
 TestKitExtension testKitExtension = new TestKitExtension(
   TestKit.builder()
-    .withService(MyServiceModule.class));
+    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
+    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
+    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
 
 @Test
 void validatorTest(TestKit testKit) {
@@ -755,15 +947,21 @@ void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
 
 ### API
 
-To test API implemented with Vertx tools, use the tools described in the
+There are two ways to test API. First, API can be tested with unit tests by
+means of service mocks. TestKit is not required for these tests. Second, API
+can be tested with integration tests that use TestKit. For these tests TestKit
+provides the [`getPort()`][testkit-get-port] method that retrieves a TCP port
+to interact with the service REST API.
+
+With either approach, you can use any HTTP client to send requests.
+
+To unit test API implemented with Vertx tools, use the tools described in the
 [project documentation](https://vertx.io/docs/vertx-junit5/java).
-You can use [Vertx Web Client][vertx-web-client] as a client or a different
-HTTP client.
 
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [auditor]: ../glossary.md#auditor
 [in-pool]: ../advanced/consensus/specification/#pool-of-unconfirmed-transactions
 [junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
@@ -772,19 +970,21 @@ An example of API service tests can be found in
 [junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
-[testkit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html
-[testkit-builder]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.Builder.html
-[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
-[testkit-extension]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKitExtension.html
-[testkit-extension-auditor]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/Auditor.html
-[testkit-extension-validator]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/Validator.html
-[testkit-extension-validatorcount]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/ValidatorCount.html
-[testkit-fake-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/FakeTimeProvider.html
-[testkit-find-in-pool]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
-[testkit-get-pool]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
-[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.8.0
-[testkit-time-provider]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/testkit/TimeProvider.html
+[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TimeProvider.html#systemTime
+[testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html
+[testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.Builder.html
+[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#createBlock()
+[testkit-create-block-with-transactions]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
+[testkit-extension]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKitExtension.html
+[testkit-extension-auditor]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/Auditor.html
+[testkit-extension-validator]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/Validator.html
+[testkit-extension-validatorcount]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/ValidatorCount.html
+[testkit-fake-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/FakeTimeProvider.html
+[testkit-find-in-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
+[testkit-get-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
+[testkit-get-port]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#getPort()
+[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.9.0-rc1
+[testkit-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TimeProvider.html
 [validator]: ../glossary.md#validator
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 
@@ -826,7 +1026,7 @@ like to specify them explicitly.
 
 [gson]: https://github.com/google/gson
 [log4j2]: https://logging.apache.org/log4j/2.x/
-[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/bom/pom.xml
+[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/bom/pom.xml
 [maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
 
 ## How to Build a Service Artifact
@@ -853,22 +1053,13 @@ the following required metadata is present in the service artifact JAR:
   in "META-INF/extensions.idx" file. This file is automatically generated
   by the annotation processor of `@Extension`.
 
-## How to Run a Service
-
-- Make sure you followed the steps mentioned in [Installation section](#installation).
-- Follow the instructions in the [Application Guide][app-tutorial] to configure
-  and start an Exonum node with your service. The guide is provided inside the archive
-  as well.
-
 ## Built-In Services
 
 Currently Java Binding includes the following built-in services:
 
-- [**Configuration Update Service.**](../advanced/configuration-updater.md)
-  Although every node has its own configuration file, some settings should be
-  changed for all nodes simultaneously. This service allows updating global
-  configuration parameters of the network without stopping the nodes. The
-  changes are agreed upon through the consensus mechanism.
+- [**Supervisor Service.**][supervisor-service]
+  The Supervisor service is the main service of Exonum. It is capable of
+  deploying and starting new services.
 
 - [**Anchoring Service.**](../advanced/bitcoin-anchoring.md)
   The anchoring service writes the hash of the current Exonum blockchain state
@@ -880,55 +1071,326 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
-## Services Activation
+## Node Configuration
 
-No services are enabled on the node by default. To enable services,
-define them in the `services.toml` configuration file.
-This file is required for a running node. `services.toml`
-should be located in the **working directory** of your project,
-where you run commands.
-It consists of two sections:
-`system_services` and `user_services`.
+Exonum offers a three-step way of the node configuration process. It allows
+setting up a network of multiple nodes with multiple administrators without any
+risk of private keys leakage.
 
-The `user_services` section enumerates services in the form of
-`name = artifact`, where `name` is a one-word description of the service
-and `artifact` is a full path to the service's artifact. It must be absolute
-unless you want to depend on the application working directory.
+Exonum Java App offers the same configuration process as standard Exonum Rust
+services. In this guide we will describe how to configure a network of a single
+node. For an example of multi-node network configuration, see
+[Timestamping Tutorial][start-the-blockchain-network].
 
-!!! note
-    At least one service must be defined
-    in the `[user_services]` section.
+Exonum Java App includes help for each of the available commands and its
+options. Use a `-h` flag for the short version of the CLI documentation, a
+`--help` flag for the detailed one. `exonum-java <command-name> --help` will
+print a detailed description of a specific command.
 
-```toml
-[user_services]
-service_name1 = "/path/to/service1_artifact.jar"
+All paths in Exonum Java App CLI arguments are either absolute, or relative to
+the current working directory.
+
+### Step 1. Generate Template Config
+
+First, we generate a common (also known as "template") part of the node
+configuration. Run this command only once per network, and distribute the
+resulting file among every node for the next step. However,
+the resulting file is not machine-specific and depends on the passed arguments
+only. Therefore, each administrator can run this command locally without
+distributing the file.
+
+Provide a path to the resulting configuration file and a number of validator
+nodes in the network.
+
+```sh
+exonum-java generate-template \
+    testnet/common.toml \
+    --validators-count=1
 ```
 
-The optional `system_services` section is used to enable built-in Exonum services.
+### Step 2. Generate Node Private and Public Configs
 
-```toml
-system_services = ["service-name"]
+<!-- TODO: add a link to Exonum docs for passwords passing -->
+
+**Note:** the following examples omit setting up a password for private
+node keys protection and pass a `--no-password` flag. It is strictly recommended
+__not__ to use this flag in production.
+
+Second, we generate both private and public parts of the node
+configuration. Public part of the configuration must be distributed among every
+other administrator for the next step. Private parts must not be exposed to the
+outer world and are node-specific.
+
+Provide a path to the common configuration file, a path to the directory for the
+generated configuration files and an external socket address of the node to
+use them for communication between the nodes.
+
+```sh
+exonum-java generate-config \
+    testnet/common.toml \
+    testnet \
+    --no-password \
+    --peer-address 127.0.0.1:5400
 ```
 
-where possible values for `service-name` are:
+### Step 3. Finalize Configuration
 
-- `configuration` for Configuration Update Service
-- `btc-anchoring` for Anchoring Service
-- `time` for Time Oracle
+Third, combine private part of the node configuration
+and the public parts of the configuration of each node in the network.
 
-!!! note
-    In case there is no such section,
-    only Configuration Service will be activated.
+Provide a path to the private part of the node configuration, a path to the
+resulting node configuration file and a list of paths to the public
+configuration files of every node.
 
-Below is the sample of the `services.toml` file that enables
-all possible built-in Exonum services and two user services:
-
-```toml
-system_services = ["configuration", "btc-anchoring", "time"]
-[user_services]
-service_name1 = "/path/to/service1_artifact.jar"
-service_name2 = "/path/to/service2_artifact.jar"
+```sh
+exonum-java finalize \
+    testnet/sec.toml \
+    testnet/node.toml \
+    --public-configs testnet/pub.toml
 ```
+
+After completing each of the steps, the `testnet/node.toml` file contains the
+final node configuration. Use this file to run the node with the specified
+parameters.
+
+### Running the Node
+
+Unlike configuration process, `run` command of Exonum Java App is different from
+the similar Exonum Rust command.
+
+There are several required parameters here:
+
+- `--db-path` for a path to the database directory.
+- `--node-config` for a path to the final node configuration file.
+- `--artifacts-path` for a path to the directory with the compiled service
+  artifacts.
+- `--ejb-port` for a port that Java services will use for communication.
+  Java Binding does not use the public API address directly.
+- `--public-api-address` and `--private-api-address` for the socket addresses
+  for the node user API. The public API address is used by users to send
+  transactions and requests to the blockchain, the private one is used by node
+  administrators to
+  perform different maintenance actions. Setting these addresses is not strictly
+  necessary for every node, but you will need available API ports for deploying
+  and starting a service using `exonum-launcher`.
+
+There are also optional parameters useful for debugging purposes, logging
+configuration and JVM fine tuning:
+
+- `--jvm-args-prepend` and `--jvm-args-append` are additional parameters for the
+  JVM that prepend and append the rest of arguments. Must not have a leading
+  dash. For example, `Xmx2G`.
+- `--jvm-debug` allows remotely debugging the JVM over the JDWP protocol.
+  Takes a socket address as a parameter in the following form — `HOSTNAME:PORT`.
+  For example, `localhost:8000`.
+- `--ejb-log-config-path` for a path to Log4j two configuration files. The
+  default config `log4j-fallback.xml` provided with Exonum Java app prints to
+  STDOUT. See [Logging Configuration](#logging-configuration) for more
+  information.
+
+```sh
+exonum-java run \
+    --db-path testnet/db \
+    --node-config testnet/node.toml \
+    --artifacts-path artifacts \
+    --ejb-port 7000 \
+    --ejb-log-config-path "log4j.xml" \
+    --master-key-pass pass \
+    --public-api-address 127.0.0.1:3000 \
+    --private-api-address 127.0.0.1:3010
+```
+
+#### Changing the Used JVM
+
+By default, Exonum Java App automatically finds the system JVM and uses it. To
+change this, set the JVM installation directory as the value for the
+`JAVA_HOME` environment variable.
+
+#### Debugging the JVM
+
+To enable remote debugging of the Java code on a running Exonum node,
+pass the `--jvm-debug` option with a socket address. This address will be used
+to connect a debugger:
+
+```sh
+exonum-java run -d testnet/db -c testnet/node.toml \
+    --public-api-address 127.0.0.1:3000 \
+    --private-api-address 127.0.0.1:3010 \
+    --ejb-port 7000 \
+    --jvm-debug localhost:8000
+```
+
+Now you can debug the service using any JDWP client, such as command line
+JDB or a debugger built into your IDE:
+
+```sh
+jdb -attach localhost:8000 -sourcepath /path/to/source
+```
+
+## Deploy and Start the Service
+
+Exonum Java Binding provides a way to dynamically deploy and start multiple
+services without stopping the nodes in the network. This can be done by sending
+particular transactions to the built-in Supervisor service. To simplify this
+process for the users, it is recommended to use `exonum-launcher`.
+
+Place the compiled service JAR files into the artifacts directory
+(configured with the `artifacts-path` argument). The service files are needed
+for the
+whole time of their execution and cannot be moved or modified once deployed.
+
+[`exonum-launcher`][exonum-launcher] is a Python application which
+is capable of forming and sending deploy transactions to the node, following
+the provided deploy configuration in the `YAML` file. `exonum-launcher` also has
+additional plugins for support of different runtimes and services.
+
+Exonum Java Binding provides two plugins:
+
+- Exonum Java Runtime Plugin for Java services support.
+- Exonum Local Configuration Plugin for support of services with custom
+  initial configuration arguments encoded with Protobuf. Such arguments are sent
+  to the service on its start and are typically used to customize the behavior
+  of a particular service instance.
+
+### Installation
+
+Follow the instructions in the [plugins Readme][plugins-readme]
+
+To deploy and start a specific list of services, use the following command with
+the prepared `config.yml` file:
+
+```sh
+python3 -m exonum_launcher -i config.yml
+```
+
+See the following section for instructions on creating the `config.yml` file for
+a specific service.
+
+### Writing the Configuration File
+
+Start with specifying IP addresses of the blockchain nodes:
+
+```yaml
+networks:
+  - host: "127.0.0.1"
+    ssl: false
+    public-api-port: 8080
+    private-api-port: 8081
+```
+
+Specify every node for which you have access to its private API
+port. If you do not have access to every node in the network, the
+administrators of other nodes must run `exonum-launcher` with the same
+configuration file. The list of available nodes must be adjusted by every
+administrator accordingly.
+
+The deadline height describes the maximum blockchain height for the deployment
+process. Make sure to specify the value larger than the current blockchain
+height.
+
+```yaml
+deadline_height: 20000
+```
+
+Enable the Java runtime by specifying its identifier (`1`). The Rust runtime is
+enabled by default:
+
+```yaml
+runtimes:
+  java: 1
+```
+
+Add artifacts you want to deploy. For each artifact specify its
+name alias (as a YAML key) and its runtime (using the `runtime` field). Name
+aliases are used in other parts of the configuration for readability and easier
+refactoring. Java artifacts also need the name of the JAR file in the
+`spec: artifact_filename` field of the artifacts directory. The present example
+shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
+the `timestamping` and `time` oracle services.
+
+```yaml
+artifacts:
+  cryptocurrency:
+    runtime: java
+    name: "com.exonum.examples:cryptocurrency-demo:0.9.0-rc1-SNAPSHOT"
+    spec:
+      artifact_filename: "cryptocurrency-demo-0.9.0-rc1-SNAPSHOT-artifact.jar"
+  time:
+    runtime: rust
+    name: "exonum-time:0.13.0-rc.2"
+  timestamping:
+    runtime: rust
+    name: "exonum-timestamping:0.13.0-rc.2"
+```
+
+Add a `plugins` section to enable both Java Runtime plugin and Instance
+Configuration plugin. The runtime plugin is enabled for a specific runtime
+(`java` in the present example). The Instance Configuration plugin is
+enabled for a specific artifact name alias (`timestamping` in the present
+example).
+
+```yaml
+plugins:
+  runtime:
+    java: "exonum_java_runtime_plugin.JavaDeploySpecLoader"
+  artifact:
+    timestamping: "exonum_instance_configuration_plugin.InstanceSpecLoader"
+```
+
+The present example uses the Instance Configuration plugin to serialize
+initial configuration parameters of the `timestamping` service in Protobuf.
+Take a `service.proto` file with the message description from the
+service sources and place it inside some known directory.
+
+  ```proto
+  syntax = "proto3";
+
+  package exonum.examples.timestamping;
+
+  message Config {
+      string time_service_name = 1;
+  }
+  ```
+
+Finally, add an `instances` section that describes the list of service instances
+you want to start in the blockchain. For each instance specify its
+artifact name alias in the `artifact` field. Instance names are the keys in the
+YAML dictionary. The Instance Configuration plugin also requires a list of
+additional parameters. In the present example the parameters refer to the
+`timestamping` instance:
+
+- `sources`. Points to a directory with the Protobuf sources of the service
+  configuration message. The `proto_sources` directory is used.
+- `config_message_source`. A file name where the `message_name` message
+  is located. In the present example the `service.proto` file is used.
+- `message_name`. A name of the Protobuf message used to represent the service
+  configuration. Optional, defaults to `Config`.
+- `data`. Your actual configuration in the format corresponding to the
+  `message_name` message.
+
+```yaml
+instances:
+  xnm-token:
+    artifact: cryptocurrency
+  time-oracle:
+    artifact: time
+  timestamping:
+    artifact: timestamping
+    config:
+      sources: "proto_sources"
+      config_message_source: "service.proto"
+      message_name: "Config"
+      data:
+        time_service_name: "time"
+```
+
+See [sample-config.yml][launcher-sample-config] for the final state of the
+configuration file.
+
+[start-the-blockchain-network]: ./timestamping-tutorial.md#start-the-blockchain-network
+[exonum-launcher]: https://github.com/exonum/exonum-launcher
+[plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/exonum_launcher_java_plugins/README.md
+[launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
 
 ## Logging Configuration
 
@@ -962,13 +1424,10 @@ The services can use either [`Log4J`][log4j-home] or
 [`SLF4J`][slf4j-home] logging APIs.
 
 Java logging configuration is controlled by the configuration file
-specified by the `ejb-log-config-path` parameter. If no file was
-provided, the logs are disabled. Exonum Java package provides an
-example `log4j-fallback.xml` configuration file that can be found
-at the installation directory. With this file `INFO`-level messages
-are printed to stdout.
-Also, see [Application Guide][app-tutorial] for more information on
-configuring the Exonum Java App.
+specified by the optional [`ejb-log-config-path`](#running-the-node) parameter.
+If no file is provided, the default `log4j-fallback.xml` configuration file from
+the installation directory is used. This file allows printing `INFO`-level
+messages to STDOUT.
 
 See [`Log4J` documentation][log4j-docs] for more information on
 possible configuration options.
@@ -978,7 +1437,7 @@ possible configuration options.
 Java Binding includes a library module that can be useful for Java client
 applications that interact with an Exonum service. The module does not
 have the dependency on Java Binding Core, but it contains Java classes
-obligatory for the core that can now as well be easily used in clients,
+obligatory for the core that can as well be easily used in clients,
 if necessary.
 The library provides the ability to create transaction messages, check proofs,
 serialize/deserialize data and perform cryptographic operations.
@@ -988,7 +1447,7 @@ For using the library just include the dependency in your `pom.xml`:
     <dependency>
       <groupId>com.exonum.binding</groupId>
       <artifactId>exonum-java-binding-common</artifactId>
-      <version>0.8.0</version>
+      <version>0.9.0-rc1</version>
     </dependency>
 ```
 
@@ -998,20 +1457,22 @@ For using the library just include the dependency in your `pom.xml`:
   service data (collections and their elements) are available only in a "raw"
   form – without deserialization of the content, which makes their use somewhat
   difficult.
+- Exonum Java App supports only the `simple` mode of the
+  [Supervisor service][supervisor-service].
 - Custom Rust services can be added to the application only by modifying and
   rebuilding thereof.
 - Exonum Java application does not support Windows yet.
 
 ## See Also
 
+- [Javadocs](https://exonum.com/doc/api/java-binding/0.9.0-rc1/index.html)
 - [Rust instruction](create-service.md)
-- [Exonum Java App tutorial][app-tutorial]
 
-[abstractservice]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/AbstractService.html
-[app-tutorial]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/core/rust/exonum-java/TUTORIAL.md
-[blockchain]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/blockchain/Blockchain.html
+[abstractservice]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/AbstractService.html
+[blockchain]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[configurable]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Configurable.html
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1019,27 +1480,30 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [homebrew]: https://github.com/Homebrew/brew#homebrew
-[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.8.0/CONTRIBUTING.md#how-to-build
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/CONTRIBUTING.md#how-to-build
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
-[nodefake]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/NodeFake.html
-[schema]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Schema.html
-[service]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html
-[service-after-commit]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[nodefake]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/NodeFake.html
+[schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Schema.html
+[service]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html
+[service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
+[service-before-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#beforeCommit(com.exonum.binding.core.storage.database.Fork)
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
-[standardserializers]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/serialization/StandardSerializers.html
-[storage-indices]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/storage/indices/package-summary.html
+[standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/common/serialization/StandardSerializers.html
+[standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
+[storage-indices]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/storage/indices/package-summary.html
+<!-- TODO: link to the documentation page for supervisor -->
+[supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/
 [time-oracle]: ../advanced/time.md
-[transaction]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/Transaction.html
-[transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/transaction/TransactionContext.html
+[transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/transaction/Transaction.html
+[transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
-[transactionconvererter]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/TransactionConverter.html
+[transactionconvererter]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[createpublicapi]: https://exonum.com/doc/api/java-binding/0.8.0/com/exonum/binding/core/service/Service.html#createPublicApiHandlers-com.exonum.binding.service.Node-io.vertx.ext.web.Router-
-[transaction-result]: https://docs.rs/exonum/0.12/exonum/blockchain/struct.TransactionResult.html
-[exonum-transaction]: ../advanced/node-management.md#transaction
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
+[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
+[exonum-transaction-endpoint]: ../advanced/node-management.md#transaction
