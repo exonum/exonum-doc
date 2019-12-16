@@ -29,7 +29,7 @@ deployment.
   ```bash
   mkdir -p ~/bin
   cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.9.0-rc1-release.zip
+  unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
   ```
 
 - Install [Libsodium][libsodium] as the necessary runtime dependency.
@@ -77,7 +77,7 @@ follow the instructions in [Contribution Guide][how-to-build].
 
   ```bash
   # The path is provided in after-install message in case of Homebrew
-  export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc1-release
+  export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc2-release
   # Setting PATH variable is not needed in case of Homebrew
   export PATH="$PATH:$EXONUM_HOME/bin"
   ```
@@ -95,7 +95,7 @@ mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.9.0-rc1 \
+    -DarchetypeVersion=0.9.0-rc2 \
     -DgroupId=com.example.myservice \
     -DartifactId=my-service \
     -Dversion=1.0.0
@@ -107,7 +107,7 @@ You can also use the interactive mode:
 mvn archetype:generate \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.9.0-rc1
+    -DarchetypeVersion=0.9.0-rc2
 ```
 
 The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
@@ -575,7 +575,7 @@ metadata and is used by the framework to instantiate services.
 
 For more information on using Guice, see the [project wiki][guice-wiki].
 
-[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/AbstractServiceModule.html
+[abstract-service-module-javadoc]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/AbstractServiceModule.html
 
 ## Testing
 
@@ -597,7 +597,7 @@ For existing projects include the following dependency into your `pom.xml`:
 <dependency>
   <groupId>com.exonum.binding</groupId>
   <artifactId>exonum-testkit</artifactId>
-  <version>0.9.0-rc1</version>
+  <version>0.9.0-rc2</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -788,7 +788,7 @@ in `afterCommit` method) into the transaction pool.
 !!! note
     Note that blocks that are created with
     [`TestKit.createBlockWithTransactions(Iterable<TransactionMessage> transactionMessages)`][testkit-create-block-with-transactions]
-    will ignore in-pool transactions. As of 0.9.0-rc1, there is no way to create
+    will ignore in-pool transactions. As of 0.9.0-rc2, there is no way to create
     a block that would contain both given and in-pool transactions with a single
     method.
 
@@ -961,7 +961,7 @@ To unit test API implemented with Vertx tools, use the tools described in the
 An example of API service tests can be found in
 [`ApiControllerTest`][apicontrollertest].
 
-[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
+[apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [auditor]: ../glossary.md#auditor
 [in-pool]: ../advanced/consensus/specification/#pool-of-unconfirmed-transactions
 [junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
@@ -970,21 +970,21 @@ An example of API service tests can be found in
 [junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
-[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TimeProvider.html#systemTime
-[testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html
-[testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.Builder.html
-[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#createBlock()
-[testkit-create-block-with-transactions]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
-[testkit-extension]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKitExtension.html
-[testkit-extension-auditor]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/Auditor.html
-[testkit-extension-validator]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/Validator.html
-[testkit-extension-validatorcount]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/ValidatorCount.html
-[testkit-fake-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/FakeTimeProvider.html
-[testkit-find-in-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
-[testkit-get-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
-[testkit-get-port]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TestKit.html#getPort()
-[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.9.0-rc1
-[testkit-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/testkit/TimeProvider.html
+[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html#systemTime
+[testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html
+[testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.Builder.html
+[testkit-create-block]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#createBlock()
+[testkit-create-block-with-transactions]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#createBlockWithTransactions(java.lang.Iterable)
+[testkit-extension]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKitExtension.html
+[testkit-extension-auditor]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/Auditor.html
+[testkit-extension-validator]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/Validator.html
+[testkit-extension-validatorcount]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/ValidatorCount.html
+[testkit-fake-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/FakeTimeProvider.html
+[testkit-find-in-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#findTransactionsInPool(java.util.function.Predicate)
+[testkit-get-pool]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#getTransactionPool()
+[testkit-get-port]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#getPort()
+[testkit-maven]: https://mvnrepository.com/artifact/com.exonum.binding/exonum-testkit/0.9.0-rc2
+[testkit-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html
 [validator]: ../glossary.md#validator
 [vertx-web-client]: https://vertx.io/docs/vertx-web-client/java
 
@@ -1026,7 +1026,7 @@ like to specify them explicitly.
 
 [gson]: https://github.com/google/gson
 [log4j2]: https://logging.apache.org/log4j/2.x/
-[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/bom/pom.xml
+[bom]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/bom/pom.xml
 [maven-provided-scope]: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope
 
 ## How to Build a Service Artifact
@@ -1312,9 +1312,9 @@ the `timestamping` and `time` oracle services.
 artifacts:
   cryptocurrency:
     runtime: java
-    name: "com.exonum.examples:cryptocurrency-demo:0.9.0-rc1-SNAPSHOT"
+    name: "com.exonum.examples:cryptocurrency-demo:0.9.0-rc2"
     spec:
-      artifact_filename: "cryptocurrency-demo-0.9.0-rc1-SNAPSHOT-artifact.jar"
+      artifact_filename: "cryptocurrency-demo-0.9.0-rc2-artifact.jar"
   time:
     runtime: rust
     name: "exonum-time:0.13.0-rc.2"
@@ -1389,8 +1389,8 @@ configuration file.
 
 [start-the-blockchain-network]: ./timestamping-tutorial.md#start-the-blockchain-network
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
-[plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/exonum_launcher_java_plugins/README.md
-[launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
+[plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/README.md
+[launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
 
 ## Logging Configuration
 
@@ -1447,7 +1447,7 @@ For using the library just include the dependency in your `pom.xml`:
     <dependency>
       <groupId>com.exonum.binding</groupId>
       <artifactId>exonum-java-binding-common</artifactId>
-      <version>0.9.0-rc1</version>
+      <version>0.9.0-rc2</version>
     </dependency>
 ```
 
@@ -1465,14 +1465,14 @@ For using the library just include the dependency in your `pom.xml`:
 
 ## See Also
 
-- [Javadocs](https://exonum.com/doc/api/java-binding/0.9.0-rc1/index.html)
+- [Javadocs](https://exonum.com/doc/api/java-binding/0.9.0-rc2/index.html)
 - [Rust instruction](create-service.md)
 
-[abstractservice]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/AbstractService.html
-[blockchain]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/blockchain/Blockchain.html
+[abstractservice]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/AbstractService.html
+[blockchain]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
-[configurable]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Configurable.html
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[configurable]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Configurable.html
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1480,30 +1480,30 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-home]: https://github.com/google/guice
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [homebrew]: https://github.com/Homebrew/brew#homebrew
-[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc1/CONTRIBUTING.md#how-to-build
+[how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
-[nodefake]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/NodeFake.html
-[schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Schema.html
-[service]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html
-[service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[service-before-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#beforeCommit(com.exonum.binding.core.storage.database.Fork)
-[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
+[nodefake]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/NodeFake.html
+[schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Schema.html
+[service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html
+[service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
+[service-before-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#beforeCommit(com.exonum.binding.core.storage.database.Fork)
+[node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
-[standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/common/serialization/StandardSerializers.html
+[standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
 [standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
-[storage-indices]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/storage/indices/package-summary.html
+[storage-indices]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/storage/indices/package-summary.html
 <!-- TODO: link to the documentation page for supervisor -->
 [supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/
 [time-oracle]: ../advanced/time.md
-[transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/transaction/Transaction.html
-[transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/transaction/TransactionContext.html
+[transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/Transaction.html
+[transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
-[transactionconvererter]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/TransactionConverter.html
+[transactionconvererter]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
-[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc1/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
+[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
+[service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
 [exonum-transaction-endpoint]: ../advanced/node-management.md#transaction
