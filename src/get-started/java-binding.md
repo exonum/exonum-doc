@@ -2,8 +2,9 @@
 
 <!-- cspell:ignore testnet,prepend,JDWP -->
 
-**Exonum Java App** is an application that includes the Exonum framework
-and Java services runtime environment.
+**Exonum Java Binding** is a framework for building blockchain applications in Java, powered by Exonum.
+
+With Exonum Java Binding you can define stateful Exonum Services in Java, configure a network of nodes and run your services in it.
 
 ## Installation
 
