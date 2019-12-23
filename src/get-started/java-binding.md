@@ -8,6 +8,13 @@
 With Exonum Java Binding you can define stateful Exonum Services in Java,
  configure a network of nodes and run your services in it.
 
+Exonum Java Binding provides:
+
+- [SDK](https://exonum.com/doc/api/java-binding/0.9.0-rc2/index.html) for
+  service development as a number of Java libraries.
+- Exonum Java Application - a precompiled Exonum node with built-in support
+  for running Java services.
+
 ## Installation
 
 To run a node with your Java service you need to use Exonum Java application.
