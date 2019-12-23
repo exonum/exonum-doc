@@ -12,7 +12,7 @@ Exonum Java Binding provides:
 
 - [SDK](https://exonum.com/doc/api/java-binding/0.9.0-rc2/index.html) for
   service development as a number of Java libraries.
-- Exonum Java Application - a precompiled Exonum node with built-in support
+- Exonum Java Application — an Exonum node with built-in support
   for running Java services.
 
 ## Installation
