@@ -103,6 +103,7 @@
     "serialization",
     "serializers",
     "sodiumoxide",
+    "stateful",
     "strawman",
     "struct",
     "structs",
