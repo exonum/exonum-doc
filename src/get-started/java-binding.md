@@ -493,6 +493,12 @@ at `/api/services/cryptocurrency/balance/:walletId`.
 See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
 framework.
 
+!!! note
+    Java services use a _separate_ server from Rust services.
+    The TCP ports of Java and Rust servers are specified
+    when a node is started, see [«Running the node»](#running-the-node)
+    section for details.
+
 ### Configuration
 
 #### Initialization and Initial Configuration
@@ -1175,7 +1181,8 @@ There are several required parameters here:
 - `--artifacts-path` for a path to the directory with the compiled service
   artifacts.
 - `--ejb-port` for a port that Java services will use for communication.
-  Java Binding does not use the public API address directly.
+  Java Binding does not use the public API address directly. Only Java services
+  are accessible via this port.
 - `--public-api-address` and `--private-api-address` for the socket addresses
   for the node user API. The public API address is used by users to send
   transactions and requests to the blockchain, the private one is used by node
