@@ -494,9 +494,10 @@ See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a w
 framework.
 
 !!! note
-    Exonum Java uses separate port for the external service API. It is used for
-    Java services only. Exonum and Rust endpoints are accessible via different
-    port that is configured separately.
+    Java services use a _separate_ server from Rust services.
+    The TCP ports of Java and Rust servers are specified
+    when a node is started, see [«Running the node»](#running-the-node)
+    section for details.
 
 ### Configuration
 
