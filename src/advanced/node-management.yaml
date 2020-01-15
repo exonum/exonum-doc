@@ -1,0 +1,371 @@
+openapi: 3.0.0
+info:
+  title: Node Management
+  version: 0.9.0
+  description: >
+    Exonum nodes can be controlled using RPC implemented via REST API.
+    Managing endpoints are handled by Exonum core and are mainly purposed to
+    receive information about the current node and blockchain states as well as to change node
+    [local configuration](https://exonum.com/doc/architecture/configuration/#local-parameters).
+
+    Endpoints are divided into two types: private and public endpoints.
+    Each endpoint type is hosted at a separate address,
+    which is specified in the
+    [`api` section](https://exonum.com/doc/architecture/configuration/#api)
+    of the local configuration.
+
+servers:
+- url: http://example.com/api/system/v1
+
+tags:
+- name: Read Requests
+  description: Public read-only API available to everybody.
+- name: Private API
+  description: Maintenance API for Exonum node administrators.
+
+paths:
+  /mempool:
+    get:
+      tags: [Read Requests]
+      summary: Get number of unconfirmed transactions
+      description: >
+        Returns the number of transactions in the node pool of unconfirmed transactions.
+      responses:
+        200:
+          description: Amount of unconfirmed transactions as a JSON object.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  size:
+                    type: integer
+                    minimum: 0
+
+  /healthcheck:
+    get:
+      tags: [Read Requests]
+      summary: Healthcheck
+      description: >
+        Returns a boolean value representing if the node is connected to other peers.
+      responses:
+        200:
+          description: >
+            Information about whether the node is connected to other peers
+            and its consensus status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - consensus_status
+                  - connectivity
+                properties:
+                  consensus_status:
+                    type: string
+                    description: >
+                      Information about the possibility to achieve the consensus between
+                      validators in the current state.
+
+                      - **Disabled**: consensus disabled on this node.
+
+                      - **Enabled**: consensus enabled on this node.
+
+                      - **Active**: consensus enabled and the node has enough connected peers.
+                    enum:
+                    - Disabled
+                    - Enabled
+                    - Active
+                  connectivity:
+                    type: string
+                    description: >
+                      Information about whether the node is connected to other peers.
+
+                      - **NotConnected**: the node has no connected peers.
+
+                      - **Connected**: the node has connected peers.
+                        Amount of connected peers is stored within this variant.
+                    enum:
+                    - NotConnected
+                    - Connected
+                  amount:
+                    type: integer
+                    minimum: 0
+                    description: >
+                      Amount of connected peers.
+
+                      Present only if **connectivity** is `Connected`.
+                example:
+                  consensus_status: Active
+                  connectivity: NotConnected
+
+  /user_agent:
+    get:
+      tags: [Read Requests]
+      summary: Get User Agent information
+      responses:
+        200:
+          description: A string containing information about Exonum, Rust and OS version.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "exonum 0.9.0/rustc 1.27.2 (58cc626de 2018-07-18)\n\n/Mac OS10.12.6"
+
+  /peers:
+    post:
+      tags: [Private API]
+      summary: Add a new peer
+      description: >
+        Adds new Exonum node to the list of peers for the current node.
+        The latter will attempt to connect to the new node asynchronously.
+        If the public key of the new node is not in the whitelist,
+        the connection between said nodes will not be established.
+      requestBody:
+        required: true
+        description: JSON object with IP address of the peer to add.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  allOf:
+                    - $ref: "#/components/schemas/PeerAddress"
+                    - description: IP address and port of the peer to add.
+                public_key:
+                  allOf:
+                    - $ref: "#/components/schemas/PublicKey"
+                    - description: Public key of the peer to add.
+              example:
+                address: "127.0.0.1:6334"
+                public_key: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+      responses:
+        200:
+          description: >
+            Successfully initiated peer addition.
+
+            Note that peer connection is performed asynchronously,
+            so this reply does not mean that the peer has been added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NullObject"
+    get:
+      tags: [Private API]
+      summary: Get list of peers
+      description: >
+        Get the list of current peers.
+      responses:
+        200:
+          description: JSON object describing current peers.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  incoming_connections:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PeerAddress"
+                    description: >
+                      List of addresses of peers connected to this node.
+                  outgoing_connections:
+                    type: object
+                    additionalProperties:
+                      $ref: "#/components/schemas/OutgoingConnectionInfo"
+                    description: >
+                      The keys of the map are addresses of peers this node is connected to.
+                      Corresponding values of type `OutgoingConnectionInfo` contain info
+                      about public keys and current connection status of peers.
+                example:
+                  incoming_connections:
+                    - "127.0.0.1:58635"
+                    - "127.0.0.1:58656"
+                  outgoing_connections:
+                    "127.0.0.1:6334":
+                      public_key: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+                      state:
+                        type: Active
+                    "127.0.0.1:6335":
+                      public_key: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+                      state:
+                        delay: 4000
+                        type: Reconnect
+                    "127.0.0.1:6336":
+                      public_key: null
+                      state:
+                        type: Active
+                    "127.0.0.1:6337":
+                      public_key: null
+                      state:
+                        delay: 4000
+                        type: Reconnect
+
+  /consensus_enabled:
+    get:
+      tags: [Private API]
+      summary: Check if consensus is enabled
+      description: >
+        Returns a boolean value representing if the node participates in consensus.
+      responses:
+        200:
+          description: JSON boolean with current consensus state.
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+    post:
+      tags: [Private API]
+      summary: Enable/disable consensus interaction
+      description: >
+        Switches consensus interaction of the node on or off.
+      requestBody:
+        required: true
+        description: JSON object indicating the desired consensus state.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              example:
+                enabled: false
+      responses:
+        200:
+          description: Successfully changed consensus state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NullObject"
+
+  /network:
+    get:
+      tags: [Private API]
+      summary: Get network information
+      description: >
+        Get information about the serialization protocol
+        and the services functioning on the network.
+      responses:
+        200:
+          description: JSON object with network information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  core_version:
+                    type: string
+                    nullable: true
+                    description: Version of the `exonum` crate.
+                  protocol_version:
+                    type: integer
+                    minimum: 0
+                    maximum: 255
+                    description: Major version of the Exonum serialization protocol.
+                  services:
+                    type: array
+                    description: Information about services functioning on the network.
+                    items:
+                      $ref: "#/components/schemas/ServiceInfo"
+                example:
+                  core_version: "0.9.0"
+                  protocol_version: 0
+                  services:
+                    - id: 128
+                      name: "cryptocurrency"
+
+  /shutdown:
+    post:
+      tags: [Private API]
+      summary: Shutdown node
+      description: >
+        After receiving a shutdown message, the node stops processing transactions,
+        participating in consensus and terminates after all messages in the event queue
+        are processed.
+      requestBody:
+        required: true
+        description: >
+          `null` JSON object.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NullObject"
+      responses:
+        200:
+          description: Successfully initiated node shutdown.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NullObject"
+
+components:
+  schemas:
+    NullObject:
+      type: object
+      nullable: true
+      example: null
+    PeerAddress:
+      # TODO: in 0.10.0 this will support hostnames and IPv6 addresses
+      type: string
+      example: "198.51.100.4:8080"
+      description: >
+        PeerAddress is a string containing address in `IP:port` format.
+        IP is IPv4 address formatted as 4 octets separated by dots.
+    Hash:
+      type: string
+      pattern: "^[0-9a-f]{64}$"
+      example: "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76"
+      description: >
+        Hexadecimal string representing a hash (64 hex digits).
+    PublicKey:
+      type: string
+      pattern: "^[0-9a-f]{64}$"
+      example: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+      description: >
+        Hexadecimal string representing a public key (64 hex digits).
+    OutgoingConnectionInfo:
+      type: object
+      properties:
+        public_key:
+          allOf:
+            - $ref: "#/components/schemas/PublicKey"
+            - nullable: true
+              description: The public key of the peer or `null` if the public key is unknown.
+        state:
+          $ref: "#/components/schemas/OutgoingConnectionState"
+    OutgoingConnectionState:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: >
+            Connection type, can be one of:
+
+            - `Active` for established connections
+
+            - `Reconnect` for yet unestablished connections
+          enum:
+            - Active
+            - Reconnect
+        delay:
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
+          description: >
+            Interval between reconnect attempts (ms).
+            Is present only if **type** is `Reconnect`.
+    ServiceInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          maximum: 65535
+          description: Unique service identifier.
+        name:
+          type: string
+          description: Unique string service identifier.
