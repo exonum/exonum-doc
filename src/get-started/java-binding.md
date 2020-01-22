@@ -143,7 +143,7 @@ abstract class [`AbstractService`][abstractservice].
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
 collections is arranged in two ways – ordinary collections and
-[Merkelized collections](../architecture/storage.md#merkelized-indices);
+[Merkelized collections](../architecture/merkledb.md#merkelized-indices);
 the latter allow
 providing cryptographic evidence of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
@@ -151,7 +151,7 @@ certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.
 
 For the detailed description of all Exonum collection types see the
-corresponding [documentation section](../architecture/storage.md#table-types).
+corresponding [documentation section](../architecture/merkledb.md#table-types).
 In Java, implementations of collections are located in
 [a separate package][storage-indices]. Said package documentation
 describes their use.

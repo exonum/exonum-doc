@@ -489,7 +489,7 @@ Stored datatypes use [binary serialization](#binary-serialization)
 logic to convert data to a platform-independent representation.
 
 !!! tip
-    See [*Storage*](architecture/storage.md) for more details.
+    See [*Storage*](architecture/merkledb.md) for more details.
 
 ## Table
 

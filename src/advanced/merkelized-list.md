@@ -2,7 +2,7 @@
 
 <!-- cspell:ignore proofnode -->
 
-[**Merkelized list**](../architecture/storage.md#prooflistindex) is a version
+[**Merkelized list**](../architecture/merkledb.md#prooflistindex) is a version
 of a typed list that supports compact proofs of existence for its elements using
 Merkle trees. Merkelized lists in Exonum are designed as classic binary Merkle trees
 within the persistence module, but can also be viewed as append-only lists
@@ -57,7 +57,7 @@ parameters as a key for each element: `height` and `index`.
 !!! note
     To distinguish values from different lists in Exonum, an additional prefix is
     used for every key. Consult
-    [storage section](../architecture/storage.md) for more details.
+    [storage section](../architecture/merkledb.md) for more details.
 
 1. Each Merkle tree element is addressed by an 8-byte `key = height || index`,
   where:

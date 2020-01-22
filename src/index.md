@@ -85,7 +85,7 @@ The following 2 topics provide valuable insights on how to develop with Exonum:
 
 Exonum documentation contains in-depth discussions on numerous other aspects
 of the framework, such as [binary serialization](architecture/serialization.md),
-[storage](architecture/storage.md) and [networking](advanced/network.md).
+[storage](architecture/merkledb.md) and [networking](advanced/network.md).
 
 ## Contributing
 

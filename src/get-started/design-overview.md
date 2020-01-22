@@ -222,7 +222,7 @@ which more than 1/3 (but less than 2/3) of the validators are compromised.
 ## Data Storage
 
 !!! tip
-    See the [*Data Storage*](../architecture/storage.md) article
+    See the [*Data Storage*](../architecture/merkledb.md) article
     for more details.
 
 ### MerkleDB and RocksDB
@@ -304,16 +304,19 @@ functionality for sending and receiving transactions and blocks,
 services implement all business logic of the blockchain
 and are the main point to extend Exonum functionality.
 
-Exonum services interact with the external world with the help of *endpoints*.
-A service may define 3 types of endpoints:
+Exonum services interact with the external world with the help of interfaces.
+All services may define **transactions**, which correspond to `POST` / `PUT`
+methods of REST web services. Transactions transform the blockchain state.
+All transactions within the blockchain are completely ordered as described
+above, and the result of their execution is agreed among the full nodes
+in the blockchain network.
 
-- **Transactions** correspond to `POST`/`PUT` methods for
-  REST web services. They transform the blockchain state. All transactions
-  within the blockchain are completely ordered as described above,
-  and the result of their execution is agreed among the full nodes in the
-  blockchain network
-- **Read requests** correspond to `GET` methods for web services.
-  They
+Depending on the [runtime](#runtime) enclosing the service, it may
+also have other interfaces. In particular, both Rust and Java runtimes
+allow services to define HTTP APIs, which can be categorized into
+two groups:
+
+- **Read requests** correspond to `GET` methods of web services. They
   retrieve information from the blockchain, possibly together with proofs.
   Read requests are executed locally, are not globally ordered,
   and cannot modify the blockchain state
@@ -323,18 +326,6 @@ A service may define 3 types of endpoints:
   Private endpoints are executed locally, are not globally ordered, and
   cannot modify the blockchain state directly (although they
   can generate transactions and push them to the network).
-
-!!! note
-    Another type of endpoints, *events*, [is coming soon](../roadmap.md).
-    Events will implement the [pub/sub architecture pattern][wiki:pubsub],
-    allowing light clients and services to subscribe to events emitted by
-    services.
-
-External applications may communicate with service endpoints
-via HTTP REST API, using JSON as the serialization format.
-Exonum facilitates middleware tasks for services, such as listening to HTTP
-requests, dispatching incoming transactions and read requests to an
-appropriate service, performing conversion to and from JSON, etc.
 
 Exonum services are Rust or Java modules that can be easily
 reused across Exonum projects. To use Java modules you should apply
@@ -346,7 +337,7 @@ open your service for other uses.
 
 ### Smart Contracting
 
-Endpoints defined by services fulfill the same role as smart contracts
+Interfaces defined by services fulfill the same role as smart contracts
 in other blockchain platforms. They define business logic of the blockchain,
 allow to retrieve data from the blockchain, and can be reused across
 different projects. Partial analogies for this execution model are
@@ -356,53 +347,50 @@ systems.
 The key points differentiating Exonum smart contracts from other models
 used in blockchains are as follows:
 
-- **Restricted environment.** Exonum executes only predefined
-  request types,
+- **First-class upgreadability.** Exonum supports complete service lifecycle,
+  including service upgrades, asynchronous data migrations (following
+  the basic workflow for RDBMS migrations), stopping a service
+  temporarily, etc. The core ensures invariants during lifecycle events,
+  making service updates easy and safe.
+- **Restricted execution environment.** With the default configuration,
+  Exonum executes only predefined request types,
   not allowing to execute untrusted code received from a client. This
   results in a more controlled environment, and makes it easier to argue about
-  smart contract safety
-- **No isolation.** Request processing is performed
-  in the same execution context as the core of the system. This is beneficial
-  for performance while at the same time such approach requires particular
-  attention when creating and testing smart-contracts.
+  smart contract safety. At the same time, the logic to update the blockchain
+  contracts is encapsulated in the supervisor service and is fully customizable.
+  Thus, it *is* possible to deploy client code on an Exonum blockchain, provided
+  that it matches restrictions set by the blockchain config.
+- **Flexible API support.** It is possible to add support of entirely new APIs
+  in runtimes without the core needing to support it (or even know about it!).
+- **Flexible runtime isolation.** Runtimes are not isolated from the system core,
+  but isolation can be achieved *within* the runtime. (For example, via
+  the use of a virtual machine, as in the Java runtime.) This makes it
+  possible to have both high-performance business logic and execute contracts
+  in the sandbox. Since multiple runtimes may be present on the same blockchain,
+  Exonum makes it possible to have both at the same time!
 - **Local state.** Exonum services may define a local state, which
   is specific to the node on which the service is running. The local state
   can be used to manage secret information (e.g., private keys). The local
   state may be managed by private service endpoints. By utilizing
   the local state, services can be more proactive than their counterparts
   in other blockchains. For example, [the anchoring service](#anchoring-service)
-  uses the local state to fully automate anchoring transaction signing
-- **Split transaction processing.** Transaction verification is
-  a separate step
-  of transaction processing. It is performed immediately after receiving
-  the transaction, before applying the transaction to the blockchain state.
-  Verification
-  may include authentication checks (for example, verifying the transaction
-  signature),
-  as well as other structural checks over the transaction contents.
-  At the same time, transaction verification has no access to the current
-  blockchain state.
+  uses the local state to fully automate anchoring transaction signing.
 
 ### Existing Services
 
-#### Configuration Update Service
+#### Supervisor Service
 
 !!! tip
-    See the
-    [*Configuration Update Service*](../advanced/configuration-updater.md)
+    See the [*Supervisor*](../advanced/configuration-updater.md)
     article for more details.
 
-Although every node has its own configuration file, some settings should
-be changed for all nodes simultaneously. This service allows updating
-configuration through the blockchain itself.
+Supervisor is an Exonum service controlling the service lifecycle
+and network administration:
 
-Using the configuration update service, any validator may propose new
-configuration and other validators may vote for it. A proposal needs approval
-from a supermajority of the validators to become accepted;
-however, it is still inactive and
-current settings are still used. New configuration includes
-`actual_from` parameter pointing to the blockchain height, upon reaching
-which the new configuration activates.
+- service artifact deployment
+- service instances creation
+- changing consensus configuration
+- changing service instances configuration
 
 #### Anchoring Service
 
@@ -442,8 +430,7 @@ and mapping keys for Merkle Patricia trees to fixed-length byte buffers.
 
 Both transactions and consensus messages are authenticated with the help
 of [Ed25519 digital signatures][wiki:ed25519] implemented using
-[sodiumoxide][sodiumoxide]
-(a [libsodium][libsodium] wrapper for Rust).
+[sodiumoxide][sodiumoxide] (a [libsodium][libsodium] wrapper for Rust).
 In most cases, transactions are created by the external entities
 (such as light clients); these entities are assumed to manage the corresponding
 signing keys. Keys can also be managed by full nodes themselves. In this case,
@@ -454,29 +441,15 @@ to manage such keys locally via private APIs of the corresponding service.
 The Exonum core defines two pairs of Ed25519 keys for full nodes:
 
 - **Consensus key** is used for signing consensus messages (for
-  validators) and
-  signing network messages (for validators and auditors)
-- **Administrative key** is specific to validators and is used for
-  administrative tasks (such as voting for configuration updates).
+  validators) and signing network messages (for validators and auditors).
+- **Service key** may be used by the service code to sign transactions.
+  The semantics of such a transaction is that it is endorsed by the node
+  or the node owner. Such authorization may be used in blockchain
+  administration or in oracle services.
 
 Services may utilize additional key pairs, including from other cryptosystems.
 For example, the anchoring service defines an additional secp256k1 key pair
 for signing anchoring transactions in Bitcoin.
-
-!!! warning
-    Presently, the local configuration of the node (which includes all
-    its private keys, both used in consensus and by the services) is stored in
-    plaintext.
-    This is going to be fixed soon.
-
-!!! note
-    Presently, the administrative keys are hot (i.e., stored in the unencrypted
-    form during the node operation). In future releases, it will be possible
-    to manage them as externally stored cold keys (i.e., the node would not have
-    access to the administrative key at all). Additionally, the 1-to-1
-    correspondence
-    between consensus and administrative keys will be generalized to support
-    various administrative settings.
 
 [arch-guide]: https://github.com/exonum/exonum/blob/master/ARCHITECTURE.md
 [wiki:oltp]: https://en.wikipedia.org/wiki/Online_transaction_processing

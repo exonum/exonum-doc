@@ -133,11 +133,6 @@ second (tps). During test benchmarks, Exonum handles up to 7,000 tps, with a
 2.5 sec. clearing delay (the interval between transaction generation and its
 inclusion into a block).
 
-<!--TODO: I would like to see a link to a blog post
-> which illustrates the benchmarks
-> and explains their results.
-> It will greatly increase credibility of such statements.-->
-
 ## Main Components
 
 ### Services
@@ -149,20 +144,21 @@ play the same role as smart contracts in some other blockchains.
 Developing Exonum services is similar to service development in Web or
 in enterprise platforms; they have the same principal components.
 
-#### Endpoints
+#### Service Interfaces
 
-A service has a set of endpoints (realized as REST APIs) using which
+A service has a set of interfaces using which
 the service can communicate with the outside world. The Exonum framework acts
 as middleware, dispatching requests among services and abstracting the
 intricacies of data (de)serialization, access control, and other typical
 middleware tasks away from service developers.
 
-There are 3 types of service endpoints:
-
-- **Transactions** correspond to `PUT` or `POST` requests in REST
-- **Read requests** correspond to `GET` requests in REST
-- **Private APIs** represent administrative and maintenance endpoints,
-  generally not accessible to the outside world
+Out of the box, the Exonum framework supports only **transactions**
+as an external service interface. Transactions correspond to `PUT` or `POST`
+requests in the REST paradigm. However, services may also have
+[runtime]-specific interfaces. As an example, both Rust and Java services
+provide abilities for the service to define REST API. This API can
+be used to retrieve data from the blockchain (corresponding to
+`GET` requests in REST), or to administer the service.
 
 #### Persistence
 

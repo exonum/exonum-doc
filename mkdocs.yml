@@ -68,12 +68,12 @@ pages:
     - 'Services': 'architecture/services.md'
     # What is transaction? (purity, sequential consistency, non-replayability, signatures)
     - 'Transactions': 'architecture/transactions.md'
+    # Includes guidelines for services
+    - 'Service Lifecycle': 'architecture/service-lifecycle.md'
     # How to make Public API communication (both server and client side)
     - 'Clients': 'architecture/clients.md'
     # Local configuration - how to roughly configure a node (make it ready to run)
     - 'Configuration': 'architecture/configuration.md'
-    # Includes storage overview and system objects
-    - 'Storage': 'architecture/storage.md'
     # MerkledDB documentation
     - 'MerkleDB': 'architecture/merkledb.md'
     # How the data is serialised and deserialised to be transfered through the network

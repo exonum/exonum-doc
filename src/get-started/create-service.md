@@ -15,7 +15,7 @@ You can view and download the full source code of this tutorial
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
-the client part and does not use [Merkelized data collections](../architecture/storage.md#merkelized-indices).
+the client part and does not use [Merkelized data collections](../architecture/merkledb.md#merkelized-indices).
 You can find a tutorial containing these features
 [here](data-proofs.md).
 
@@ -214,7 +214,7 @@ of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
-Schema is a structured view of [the key-value storage](../architecture/storage.md)
+Schema is a structured view of [the key-value storage](../architecture/merkledb.md)
 used in Exonum.
 To access the storage, however, we will not use the storage directly, but
 rather `Snapshot`s and `Fork`s. `Snapshot` represents an immutable view
@@ -234,7 +234,7 @@ pub struct CurrencySchema<T> {
 
 For access to the objects inside the storage we need to declare the layout of
 the data. As we want to keep the wallets in the storage, we will
-use an instance of [`MapIndex`](../architecture/storage.md#mapindex),
+use an instance of [`MapIndex`](../architecture/merkledb.md#mapindex),
 a map abstraction.
 Keys of the index will correspond to public keys of the wallets.
 Index values will be serialized `Wallet` structs.
