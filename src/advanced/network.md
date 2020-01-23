@@ -57,7 +57,7 @@ full node has been really authorized by a supermajority of validators.
 
 Full nodes use Protobuf over TCP to communicate with each other.
 All network connections are encrypted using [Noise Protocol][noise].
-The Moise Protocol starts with a handshake message exchange.
+The Noise Protocol starts with a handshake message exchange.
 The handshake includes exchange of [public keys][DH] and
 [connect messages](#connect-messages) by the nodes. In order to authenticate
 the  connection, the sender includes the receiver's public key into its

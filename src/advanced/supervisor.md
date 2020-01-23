@@ -3,7 +3,7 @@
 **Supervisor** is an Exonum [service](../architecture/services.md)
 controlling the [service lifecycle](../architecture/service-lifecycle.md).
 In the reference implementation, supervisor actions are authorized
-by the supermajority of node administators.
+by the supermajority of node administrators.
 
 More precisely, the supervisor service is controlling
 the following activities:
@@ -39,7 +39,7 @@ while the supervisor is responsible for *authorizing* these events.
 This loose coupling allows to develop the supervisor independently
 of the core, vary authorization depending on the use case (for example,
 simple Exonum blockchains may have a single party authorizing all events,
-while more complex blockchains may utilize decentalized workflow).
+while more complex blockchains may utilize decentralized workflow).
 
 Another benefit of implementing supervisor as a service is that
 the transaction log provides fully auditable log of the service lifecycle.
@@ -128,7 +128,7 @@ two operations:
 - Validation of a configuration
 - Application of a configuration
 
-Here, configuration is defined as a sequence of bytes; its inerpretation
+Here, configuration is defined as a sequence of bytes; its interpretation
 is the responsibility of the service. By convention, configuration
 should be serialized as a Protobuf message.
 

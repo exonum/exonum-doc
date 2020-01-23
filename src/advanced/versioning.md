@@ -117,7 +117,7 @@ from a schema (for services) or [system API](other-services.md#system-api)
 For transactions, clients may use the middleware service in order to
 make [checked calls](other-services.md#checked-call) to the service.
 A checked call is executed only if the targeted service has an expected
-artifact name and version requirement (for exmample, `some.Token@^1.2.0`).
+artifact name and version requirement (for example, `some.Token@^1.2.0`).
 
 For schemas, Rust code may use safe data access provided
 by the `SnapshotExt` and `BlockchainData` types. This access checks

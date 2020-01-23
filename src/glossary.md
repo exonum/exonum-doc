@@ -610,7 +610,7 @@ logic to convert data to a platform-independent representation.
 
 Exonum [service](#service) controlling the [service lifecycle](#service-lifecycle).
 Supervisor is responsible for authorizing lifecycle events
-and thus reflects the will of system [maintainters](#maintainers).
+and thus reflects the will of system [maintainers](#maintainer).
 
 !!! tip
     See [*Supervisor*](advanced/supervisor.md) for more details.

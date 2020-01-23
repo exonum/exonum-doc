@@ -64,6 +64,8 @@ transactions in the batch are authorized in the same way as the batch itself.
 
 ### Checked call
 
+<!-- cspell:ignore toctou -->
+
 Checked call is a way to ensure that the called service corresponds to a
 specific artifact with an expected version range. Unlike alternatives (e.g.,
 finding out this information via the `services` endpoint

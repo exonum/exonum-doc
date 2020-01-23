@@ -345,7 +345,7 @@ systems.
 The key points differentiating Exonum smart contracts from other models
 used in blockchains are as follows:
 
-- **First-class upgreadability.** Exonum supports complete service lifecycle,
+- **Evolution as first-class concern.** Exonum supports complete service lifecycle,
   including service upgrades, asynchronous data migrations (following
   the basic workflow for RDBMS migrations), stopping a service
   temporarily, etc. The core ensures invariants during lifecycle events,
@@ -384,7 +384,7 @@ used in blockchains are as follows:
 
 Supervisor is a service controlling the service lifecycle.
 Supervisor actions are generally authorized by the supermajority
-of the administators of the blockchain framework.
+of the administrators of the blockchain framework.
 
 More precisely, the supervisor service is controlling
 the following activities:

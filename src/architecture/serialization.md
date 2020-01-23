@@ -133,7 +133,7 @@ implement `#[derive(ProtobufConvert)]` for them. If required, users can
 implement the [`ProtobufConvert`][convert] trait for any other structure they
 need to add that cannot be described using Protobuf IDL.
 
-For example, the protobuf description of the `SignedMesage` in
+For example, the protobuf description of the `SignedMessage` in
 Exonum is as follows:
 
 ```protobuf

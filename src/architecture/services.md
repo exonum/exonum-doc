@@ -44,7 +44,7 @@ During blockchain operation, services may be instantiated, stopped and resumed,
 and migrated to a newer version (which may include asynchronous data migration).
 The lifecycle events are managed by the core, but controlled by the supervisor
 service. In the reference supervisor implementation, the lifecycle events are
-authorized by the administators of the blockchain nodes.
+authorized by the administrators of the blockchain nodes.
 
 !!! tip
     See [Service Lifecycle](service-lifecycle.md) for more details.
@@ -76,7 +76,7 @@ Out of the box, Exonum provides two runtimes:
   steal secrets or otherwise break invariants regarding blockchain operation.
 - **The Java runtime** uses JVM to containerize services. Unlike with Rust,
   Java artifacts may be deployed during blockchain operation. On the downside,
-  Java services are less performant than their Rust counterparts.
+  Java services are slower than their Rust counterparts.
 
 ## Service Interface
 
@@ -132,7 +132,7 @@ in every block are processed and after all transactions in it are processed.
 All these service handlers may modify the blockchain state.
 
 Depending on the runtime implementation, services may also receive
-a notification after eeach block is been committed.
+a notification after each block is been committed.
 
 ### Read Requests
 
@@ -231,7 +231,7 @@ and the changes will be merged atomically by the core, or the script
 will just restart from scratch after failure. This approach, however,
 may lead to out-of-memory errors for large migrations.
 
-To handle more avanced cases, MerkleDB provides tools to contract the number
+To handle more advanced cases, MerkleDB provides tools to contract the number
 of initial states for the script, such as *persistent iterators*.
 A persistent iterator is an iterator over a MerkleDB index with the position
 stored in the database. A typical pattern involving persistent iterators
@@ -293,7 +293,7 @@ on when and how these limitations are going to be lifted.
 
 #### Interaction Among Services
 
-Services may call each other's transactions, but the support of such
+Services may call each other’s transactions, but the support of such
 *internal calls* is limited so far. In particular, the internal calls
 are not isolated, meaning that the changes made to the database state
 in an internal call cannot be rolled back on an error unless the entire
@@ -304,7 +304,7 @@ interaction among services written in different languages rather clunky.
 
 #### No Unified Read Requests
 
-Services may read each other's schemas via publicly declared schema
+Services may read each other’s schemas via publicly declared schema
 descriptions. For external clients, a different mechanism is used;
 a service may provide runtime-specific APIs to get service data.
 The unification of these two interfaces is one of roadmap goals.
