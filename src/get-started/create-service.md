@@ -956,7 +956,6 @@ with two wallets and transferred some money between them. Next,
 [we are going to test it](test-service.md).
 
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
-[explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
 [rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
 [curry-fn]: https://en.wikipedia.org/wiki/Currying

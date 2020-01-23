@@ -40,12 +40,13 @@ Full nodes are further subdivided into 2 categories:
 **Light clients** represent clients in the client-server paradigm; they connect
 to full nodes for several purposes:
 
-- to [retrieve](node-management.md#explorer-api-endpoints) information they are
-  interested in from the blockchain
-- to [subscribe](node-management.md#explorer-api-sockets) to events like block
-  commits and transaction commits and be aware of new accepted blocks and
-  transactions
+- to retrieve information they are interested in from the blockchain
+- to subscribe to events like block commits and transaction commits
+  and be aware of new accepted blocks and transactions
 - to send transactions.
+
+Note that this functionality may require certain services to be instantiated
+on the blockchain, such as the [explorer service](other-services.md#explorer).
 
 Exonum also provides a [“proofs mechanism”](../glossary.md#merkle-proof),
 based on cryptographic commitments via Merkle / Merkle Patricia

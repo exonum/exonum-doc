@@ -403,8 +403,8 @@ as an "unexpected" execution error.
 If transaction execution fails, the changes made by the transaction are
 rolled back, while the error data is stored in the database for further user
 reference. Light clients also provide access to information on the
-[transaction][exonum-transaction-endpoint] execution result
-(which may be either success or failure) to their users.
+transaction execution result (which may be either success or failure)
+to their users.
 
 #### After Transactions Handler
 
@@ -1523,4 +1523,3 @@ For using the library just include the dependency in your `pom.xml`:
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
-[exonum-transaction-endpoint]: ../advanced/node-management.md#transaction

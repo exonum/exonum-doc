@@ -83,9 +83,7 @@ pages:
   - 'Advanced':
     # How the network module works: peer discovery, p2p connections
     - 'Network': 'advanced/network.md'
-    # Managing node through managing API ("RPC")
-    - 'Node Management': 'advanced/node-management.md'
-    # What is sandbox testing and simple example of one of sandbox tests
+    # Testing Rust services with testkit
     - 'Service Testing': 'advanced/service-testing.md'
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
