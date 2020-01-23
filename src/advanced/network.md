@@ -125,7 +125,7 @@ provides HTTP servers used by the Rust runtime. This design leads to
 greater flexibility and modularity.
 
 Full nodes can receive transactions from light clients using
-the [explorer service](explorer.md) via POST requests.
+the [explorer service](other-services.md#explorer) via POST requests.
 Transactions from light clients are authenticated with the help of
 signatures, which are the part of JSON serialization of transactions.
 Light clients can also get info from full nodes via GET endpoints
