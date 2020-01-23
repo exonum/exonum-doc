@@ -10,6 +10,19 @@ Here, these terms are condensed to a single page.
     in Exonum. Generally speaking, *transaction* may have many other
     meanings, but they are not covered in this document.
 
+## Artifact
+
+**Aka** service artifact
+
+Factory for [service](#service) instantiation. Artifacts are similar
+to classes in object-oriented programming while services are similar
+to objects. A single artifact may be used to instantiate zero
+or more services.
+
+An artifact is identified by a name and a semantic version. Like services,
+artifacts are attached to a [runtime](#runtime), and their lifecycle
+events are controlled via [the supervisor](#supervisor).
+
 ## Auditor
 
 **Aka** auditing node
@@ -43,12 +56,10 @@ and withstand attacks by [Byzantine](#byzantine-node) [validators](#validator).
 
 Serialization of [data stored in the blockchain](#stored-datatype) and
 [messages](#message) into a platform-independent sequence of bytes
-according to the set of rules defined by the Protobuf serialization format.
+using the [Protobuf](https://developers.google.com/protocol-buffers/)
+serialization format.
 Binary serialization is used in Exonum for cryptographic operations, such as
-computing
-[hashes](#hash) and [digital signing](#digital-signature).
-It is implemented both in [the core](#core)
-and in [the light client library](#light-client).
+computing [hashes](#hash) and [digital signing](#digital-signature).
 
 !!! tip
     See [*Serialization*](architecture/serialization.md) for more details.
@@ -83,10 +94,12 @@ parties
 
 ## Blockchain Explorer
 
-A [module][explorer] that provides REST API and Websockets for monitoring blocks
-and
-transactions in Exonum blockchain. The explorer allows obtaining the following
-information and executing the following actions via its endpoints:
+**Aka** explorer, explorer service
+
+A service that provides REST API and Websockets for monitoring blocks
+and transactions in Exonum blockchain. The explorer service allows
+obtaining the following information and executing the following actions
+via its endpoints:
 
 - information on a specified range of blocks
 - information on a block at a specific height
@@ -95,19 +108,21 @@ information and executing the following actions via its endpoints:
   broadcasting it to other nodes
 - subscribing to block and / or transaction commit events.
 
+!!! tip
+    See [*Other Services*](advanced/other-services.md#explorer)
+    for more details.
+
 ## Blockchain State
 
 The persistent state maintained by each [full node](#full-node) in the
-blockchain
-network, to which [transactions](#transaction) are applied.
+blockchain network, to which [transactions](#transaction) are applied.
 [The consensus algorithm](#consensus) ensures that the blockchain state (not
-only
-the transactions log) is identical for all full nodes.
+only the transactions log) is identical for all full nodes.
 
 In Exonum, the blockchain state is implemented as a key-value storage. It is
 persisted using [RocksDB][rocksdb]. The parts of the
-storage correspond to
-[tables](#table) used by [the core](#core) and [services](#service).
+storage correspond to [tables](#table) used by [the core](#core)
+and [services](#service).
 
 ## Byzantine Node
 
@@ -117,10 +132,8 @@ may be caused by a malicious intent, malfunctioning software/hardware, or
 network connectivity problems.
 
 Consensus algorithms that are able to withstand Byzantine behavior are called
-Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by
-[PBFT][pbft].
-Exonum is able to tolerate up to 1/3 of [validators](#validator) acting
-Byzantine,
+Byzantine fault-tolerant (BFT). Exonum uses BFT consensus inspired by [PBFT][pbft].
+Exonum is able to tolerate up to 1/3 of [validators](#validator) acting Byzantine,
 which is the best possible number under the security model that Exonum uses.
 
 ## Configuration
@@ -128,8 +141,7 @@ which is the best possible number under the security model that Exonum uses.
 A set of configurable parameters that determine the behavior of a
 [full node](#full-node).
 Configuration consists of 2 parts: [global configuration](#global-configuration)
-and [local configuration](#local-configuration). Certain configuration
-parameters
+and [local configuration](#local-configuration). Certain configuration parameters
 are defined by [the core](#core), e.g., the maximum number of transactions
 in a [block](#block). [Services](#service) can define and manage additional
 configuration parameters too.
@@ -184,6 +196,28 @@ repository.
 
 For example, the core includes a collection of system [tables](#table) (such as
 a set of all transactions ever committed to the blockchain).
+
+## Data Migration
+
+Preparing the [data](#blockchain-state) of an Exonum [service](#service)
+for use with an updated version of the service business logic.
+Fulfil the same role as migrations in traditional database management
+systems.
+
+Migrations are defined in [service artifacts](#artifact), managed by
+[the core](#core) and controlled by [the supervisor](#supervisor).
+From the point of a service developer, migrations are represented
+by [migration scripts](#migration-script).
+
+## Data Schema
+
+Structured presentation of a portion of the [blockchain state](#blockchain-state).
+Similar to [object-relational mapping][ORM]. Data schemas may be
+used by [services](#service) to access and modify their data.
+A schema can also be made public, allowing other services
+on the same blockchain to safely read service data, and for
+[light clients](#light-client) to check [Merkle proofs](#merkle-proof)
+returned by the service.
 
 ## Decentralization
 
@@ -277,6 +311,31 @@ Hashes are also used to create [Merkle trees](#merkle-tree) and their variants.
     to calculate hashes on [full nodes](#full-node) and [sha.js][sha.js] to do
     the same on [light clients](#light-client).
 
+## Interface
+
+**Aka** service interface
+
+Collection of [transactions](#transaction) that a [service](#service)
+is capable of handling. Fulfil the same role as interfaces in
+programming languages (e.g., `interface` in Java or `trait` in Rust):
+a service can declare that it implements one or more interfaces,
+thus allowing other services and [light clients](#light-client)
+to interact with the service through these interfaces.
+
+!!! warning
+    Interfaces are an unstable feature of the Exonum framework; their
+    specification may change in future releases.
+
+## Java Service
+
+Exonum [service](#service) implemented within the Java [runtime](#runtime).
+Java services implement [read requests](#read-request)
+as REST APIs with the help of the `vert.x` Web framework.
+
+Unlike [Rust services](#rust-service), execution of Java services
+is isolated within JVM, and their artifacts can be deployed
+on nodes at any time. This comes with the performance trade-off.
+
 ## JSON Serialization
 
 Serialization of [data stored in the blockchain](#stored-datatype) and
@@ -303,8 +362,8 @@ the client against a range of attacks.
 A part of [configuration](#configuration) local to every
 [full node](#full-node). The local configuration is not a part of
 [the blockchain state](#blockchain-state);
-instead, it is maintained as a local TOML file, which is read during the node
-startup.
+instead, it is maintained as a local TOML file,
+which is read during the node startup.
 [The core](#core) defines several local configuration parameters,
 such as [the private key](#private-key) used to sign
 [consensus and network messages](#consensus-message) created by the node.
@@ -316,22 +375,19 @@ in a blockchain.
 
 In [permissioned blockchains](#permissioned-blockchain), maintainers
 have known real-world identities, which are reflected in the blockchain
-protocol.
-The maintainers set up and administer
+protocol. The maintainers set up and administer
 [validator nodes](#validator) in the network, and agree on the changes in
 the transaction processing rules.
 
 !!! note "Example"
-    Consider an Exonum blockchain that implements a public registry in a
-    particular
-    country. In this case, the maintainer of the blockchain is a government
-    agency
-    or agencies, which are tasked with maintaining public registries by law.
+    Consider an Exonum blockchain that implements a public registry
+    in a particular country. In this case, the maintainer of the blockchain
+    is a government agency or agencies, which are tasked with maintaining
+    public registries by law.
 
 In contrast, in permissionless blockchains (e.g., Bitcoin), maintainers are not
 reflected within the blockchain protocol. Validators in such networks are
-usually
-pseudonymous.
+usually pseudonymous.
 
 ## Merkle Proof
 
@@ -387,6 +443,18 @@ through an Exonum network. There are 2 major kinds of messages:
   [blockchain state](#blockchain-state)
   changes and usually come from [external clients](#light-client).
 
+## Migration Script
+
+Encapsulation of [data migration](#data-migration) in a service
+[artifact](#artifact). Defines logic to transform data of
+the old version of the service to a specific newer version.
+The output of a migration script is atomically applied to the database
+on every node in the network, provided that it is the same
+for all nodes. (This check is ensured by [the supervisor](#supervisor).)
+
+!!! tip
+    See [*MerkleDB*](architecture/merkledb.md#migrations) for more details.
+
 ## Permissioned Blockchain
 
 A blockchain in which [maintainers](#maintainer) are a limited set of
@@ -402,19 +470,19 @@ Permissioned blockchains usually use variations of
 
 ## Private API
 
-A [service endpoint](#service-endpoint) that can be used to administer a local
+An endpoint of a [Rust service](#rust-service)
+that is hosted on a private web server. Can be used to administer a local
 instance of the service. As an example, private API can be used to change the
 local configuration of a service.
 
 ## Private Key
 
 Private key as per the [Ed25519][ed25519] specification. Each private key
-corresponds
-to a specific [public key](#public-key). The knowledge of a private key
-is necessary to create [digital signatures](#digital-signature) over
-[messages](#message),
-which could be later verified against the message and the corresponding public
-key.
+corresponds to a specific [public key](#public-key).
+The knowledge of a private key is necessary to create
+[digital signatures](#digital-signature) over [messages](#message),
+which could be later verified against the message and
+the corresponding public key.
 
 !!! summary "Implementation details"
     As per [`libsodium`][libsodium], private keys occupy 64 bytes in the binary
@@ -443,6 +511,32 @@ A [service endpoint](#service-endpoint) that can be used to retrieve data from
 a [proof](#merkle-proof) that the data is indeed a part of the blockchain state
 and has been authorized by a supermajority of [validators](#validator).
 
+The implementation of read requests is [runtime](#runtime)-specific.
+For example, read requests can be implemented via HTTP GET.
+
+## Runtime
+
+Container for [services](#service) and [artifacts](#artifact), providing
+a single interface for the core to interact with. A runtime provides
+to the core service logic by executing it in a certain environment,
+such as a virtual machine.
+
+Exonum currently supports [Rust](#rust-service) and [Java](#java-service)
+runtimes, but a runtime can be implemented for any environment provided
+that it can interact with the Rust interface provided by the core.
+
+## Rust Service
+
+Exonum [service](#service) implemented within the Rust [runtime](#runtime).
+Rust services implement [read requests](#read-request)
+and [private endpoints](#private-endpoint) as REST APIs
+with the help of the `actix` Web framework.
+
+Rust services have high performance, but are executed in the same
+context as the core, which may lead to security risks. Another
+peculiarity is that new Rust [artifacts](#artifact) may only be
+deployed via node recompilation.
+
 ## Serialization
 
 A process of converting Exonum data structures to a language-independent
@@ -456,8 +550,7 @@ representations:
 
 The main extension point of the Exonum framework, similar in its design
 to a web service. Services define all [transaction](#transaction) processing
-logic
-in any Exonum blockchain.
+logic in any Exonum blockchain.
 
 Externally, a service is essentially a collection of
 [endpoints](#service-endpoint)
@@ -466,20 +559,42 @@ and retrieving it, possibly with [proofs](#merkle-proof). Internally, a service
 may define various entities, including [table](#table) schema,
 [configurable parameters](#configuration), etc.
 
+Currently, services can be implemented in [Rust](#rust-service)
+or [Java](#java-service).
+
 !!! tip
     See [*Services*](architecture/services.md) for more details.
 
 ## Service Endpoint
 
-A point of communication with [a service](#service). There are two kinds of
-endpoints:
+A point of communication with [a service](#service). There are several
+kinds of endpoints:
 
+- [Transactions](#transaction) allow modifying the service state.
+- [Service schemas](#data-schema) allow to read service information from
+  the database, which can be used by other services
 - [Read requests](#read-request) allow reading data from the blockchain state,
-  usually together with [a proof](#merkle-proof);
+  usually together with [a proof](#merkle-proof).
 - [Private APIs](#private-api) allow configuring the service locally.
 
 External entities such as [light clients](#light-client) can access endpoints
-via REST API. The configuration for REST API is specified in the service.
+via [runtime](#runtime)-specific interfaces. The primary interface currently
+is REST-ful HTTP.
+
+## Service Lifecycle
+
+Lifecycle for [artifacts](#artifact) and [services](#service) defined
+in the [Exonum core](#core). It defines artifact / service states
+and allowed transitions among these states, together with the preconditions
+that must apply for the transition to occur.
+
+For example, services may be instantiated, stopped, resumed, with
+zero or more [data migrations](#data-migration) occurring between
+stopping and resuming.
+
+!!! tip
+    See [*Service Lifecycle*](architecture/service-lifecycle.md)
+    for more details.
 
 ## Stored Datatype
 
@@ -491,7 +606,18 @@ logic to convert data to a platform-independent representation.
 !!! tip
     See [*Storage*](architecture/merkledb.md) for more details.
 
+## Supervisor
+
+Exonum [service](#service) controlling the [service lifecycle](#service-lifecycle).
+Supervisor is responsible for authorizing lifecycle events
+and thus reflects the will of system [maintainters](#maintainers).
+
+!!! tip
+    See [*Supervisor*](advanced/supervisor.md) for more details.
+
 ## Table
+
+**Aka** index
 
 A structured collection of data (e.g., a map, set or a list) that provides a
 high-level
@@ -513,13 +639,7 @@ be generated by various entities in the blockchain network, such as
 
 Transactions are ordered and grouped into [blocks](#block) in the course of
 [the consensus algorithm](#consensus). Thus, transactions are applied in the
-same
-order on all [full nodes](#full-node) in the blockchain network.
-
-In Exonum, transactions are a subtype of
-[blockchain explorer endpoints](#blockchain-explorer). It allows sending
-transactions into the pool of unconfirmed transactions and broadcasting them to
-other nodes in the network.
+same order on all [full nodes](#full-node) in the blockchain network.
 
 All transactions are templated and defined within [services](#service),
 acting similarly to [stored procedures][mysql-stored] in database management
@@ -564,4 +684,4 @@ is reasonably small, consisting of 4–16 nodes.
 [wiki:hash]: https://en.wikipedia.org/wiki/Cryptographic_hash_function
 [sha-256]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
 [sha.js]: https://www.npmjs.com/package/sha.js
-[explorer]: https://github.com/exonum/blockchain-explorer
+[ORM]: https://en.wikipedia.org/wiki/Object-relational_mapping

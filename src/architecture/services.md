@@ -167,13 +167,13 @@ is as secure as if the client queried a supermajority of blockchain validators.
 
 ### Data Migrations
 
-The goal of a **data migration** is to prepare data of a Exonum service
+The goal of a **data migration** is to prepare data of an Exonum service
 for use with an updated version of the service business logic.
 In this sense, migrations fulfil the same role as migrations
 in traditional database management systems.
 
 Migrations are performed via *migration scripts*. A script takes data
-of a service and uses the [MerkleDB capabilities](merkledb.md#migrations)
+of a service and uses the [MerkleDB tools](merkledb.md#migrations)
 to transform it to a new version. Migration is non-destructive,
 i.e., does not remove the old versions of migrated indexes.
 Instead, new indexes are created in a separate namespace, and atomically
