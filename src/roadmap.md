@@ -57,7 +57,7 @@ immutable, but the immutable handlers (e.g., HTTP API) remain active.
 ### Finalizing Service Interfaces
 
 Exonum 1.0 ships with the [*interfaces*](glossary.md#interface)
-as a way of two services to interact with each other. 
+as a way of two services to interact with each other.
 As an example, this is used by the supervisor service
 to [configure other services](advanced/supervisor.md#service-configuration).)
 However, interface specification is not yet stabilized, and so far
@@ -95,12 +95,12 @@ and widen the supported service interactions.
 ### More Runtimes and Programming Languages
 
 Exonum 1.0 allows to write services in Rust and Java. We plan to widen
-language support in the future. Two low-haning fruits in this regard
+language support in the future. Two low-hanging fruits in this regard
 are:
 
 - Supporting other JVM languages (e.g., Scala, Kotlin)
 - Supporting WASM (and thus, any language compiling to WASM)
-  via the existing Rust toolset
+  via the existing Rust tools
 
 ### Save Points and Old Blocks Clean-up
 
@@ -111,7 +111,7 @@ network in case of downtime.
 This feature is also considered as a basis to solve the problem of storing the
 blockchain when its history becomes to long and space-consuming.
 
-### Mirrorring Data to External DB
+### Mirroring Data to External DB
 
 In many use cases, data should be copied from the blockchain to an external
 storage that supports more complex analytical queries. Integrating
