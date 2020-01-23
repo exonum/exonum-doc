@@ -258,7 +258,7 @@ Here is a list of things to figure out when developing an Exonum service:
 - What types of actions will the service perform? What variable parameters
   do these actions have? (Determines the endpoints the service will have.)
 - Who will authorize each of these actions? (You might want to use some kind
-  of [public key infrastructure][wiki:pki] 
+  of [public key infrastructure][wiki:pki]
   in order to make the security of the blockchain fully decentralized.)
 - What data will the service persist? What are the main persisted entities?
   How are these entities organized into data collections (maps
@@ -300,7 +300,7 @@ in an internal call cannot be rolled back on an error unless the entire
 enclosing transaction errors.
 
 Additionally, there is no IDL to describe service interface, which makes
-interaction among services written in different languages rather clunky. 
+interaction among services written in different languages rather clunky.
 
 #### No Unified Read Requests
 

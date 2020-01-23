@@ -47,7 +47,7 @@ should be included into a set of [built-in services](../glossary.md#built-in-ser
 with the default identifiers. Note that the explorer will refuse
 to instantiate more than once. Unlike other Rust services,
 the explorer APIs do not have `/api/services/$serviceName` prefix,
-but rather `/api/explorer`. 
+but rather `/api/explorer`.
 
 ## Middleware
 

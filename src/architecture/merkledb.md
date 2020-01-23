@@ -233,7 +233,7 @@ address consists of 2 parts:
   `wallets` is the own name of the index
 - **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust
   terms). Prefixes allow to group logically related indexes. They allow to obtain
-  a particular subset of items marked by the prefix from the index. 
+  a particular subset of items marked by the prefix from the index.
 
 ### Key Sorting and Iterators
 
@@ -341,16 +341,16 @@ change index type, create new indexes, and package these changes in a way that t
 can be atomically committed or rolled back. Accumulating changes in the migration,
 on the other hand, can be performed iteratively, including after a process shutdown.
 
-Each migration is confined to a *namespace*, defined in a similar way as 
-namespaces for [fine-grained accesses](#accesses). 
+Each migration is confined to a *namespace*, defined in a similar way as
+namespaces for [fine-grained accesses](#accesses).
 
 Migration is non-destructive, i.e., does not remove the old versions
 of migrated indexes. Instead, new indexes are created in a separate namespace,
 which can be accessed via `Migration`.
 For example, index `foo` in the migration namespace `test` and the original
-`test.foo` index can peacefully coexist and have separate data and even different types.
-The movement of data is performed only when the migration is flushed.
-A migration can also store temporary data in a `Scratchpad`.
+`test.foo` index can peacefully coexist and have separate data and even
+different types. The movement of data is performed only when the migration
+is flushed. A migration can also store temporary data in a `Scratchpad`.
 
 Indexes created within a migration are not [aggregated](#state-aggregation)
 in the default state hash. Instead, they are placed in a separate namespace,

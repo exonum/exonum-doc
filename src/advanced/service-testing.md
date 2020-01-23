@@ -236,7 +236,7 @@ a mock object that would generate said external data to accomplish testing.
 ```rust
 // Provide a mock object for the service.
 let mut cruel_world = ExternalApiMock::new();
-let service_factory = 
+let service_factory =
     MyOracleService::with_client(cruel_world.client());
 let mut testkit = TestKitBuilder::validator()
     .with_default_rust_service(service_factory)

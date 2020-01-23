@@ -290,11 +290,11 @@ Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
 A transaction message contains:
 
-- a header with the identifying information, such as a numeric ID
-of the service instance which shall process this transaction
-and a transaction ID within that service;
-- a payload containing transaction parameters;
-- a public key of the author, and a signature that authenticates them.
+- A header with the identifying information, such as a numeric ID
+  of the service instance which shall process this transaction
+  and a transaction ID within that service;
+- A payload containing transaction parameters;
+- A public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
@@ -367,10 +367,10 @@ current storage state when the transaction is executed. Exonum passes
 an [execution context][transaction-execution-context] as an argument.
 The context provides:
 
-- a `Fork` – a view that allows performing modifying operations;
-- the service instance name and numeric ID;
-- some information about the corresponding transaction message:
-its SHA-256 hash that uniquely identifies it, and the author’s public key.
+- A `Fork` – a view that allows performing modifying operations;
+- The service instance name and numeric ID;
+- Some information about the corresponding transaction message:
+  its SHA-256 hash that uniquely identifies it, and the author’s public key.
 
 A service schema object can be used to access data collections of this service.
 
