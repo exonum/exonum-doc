@@ -276,8 +276,8 @@ ones.
 Additionally, as the anchoring Bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. The pub-keys list
 is stored in the global configuration; it can be updated by out-of-band
-means, for example, using
-[Configuration Update service](configuration-updater.md). The following
+means, for example, using the
+[upervisor service](supervisor.md). The following
 properties should be taken into account:
 
 1. New configuration is spread over nodes. At this point it is not active yet.

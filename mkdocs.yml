@@ -87,8 +87,8 @@ pages:
     - 'Node Management': 'advanced/node-management.md'
     # What is sandbox testing and simple example of one of sandbox tests
     - 'Service Testing': 'advanced/service-testing.md'
-    # Configuration change service documentation
-    - 'Configuration Updater': 'advanced/configuration-updater.md'
+    # Supervisor service documentation
+    - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation without Segwit
     - 'Bitcoin Anchoring (without SegWit)': 'advanced/bitcoin-anchoring-without-segwit.md'
     # Anchoring service documentation with Segwit

@@ -194,7 +194,7 @@ validators;
 eventually, all honestly acting validators will agree on the same new block.
 
 Validators can be changed during the blockchain operation by
-[updating](#configuration-update-service)
+[updating](#supervisor-service)
 the global blockchain configuration. This mechanism can be used to rotate
 validators’ keys, and to add, replace or remove validator nodes without
 having to start a blockchain anew.
@@ -379,16 +379,21 @@ used in blockchains are as follows:
 #### Supervisor Service
 
 !!! tip
-    See the [*Supervisor*](../advanced/configuration-updater.md)
+    See the [*Supervisor*](../advanced/supervisor.md)
     article for more details.
 
-Supervisor is an Exonum service controlling the service lifecycle
-and network administration:
+Supervisor is a service controlling the service lifecycle.
+Supervisor actions are generally authorized by the supermajority
+of the administators of the blockchain framework.
 
-- service artifact deployment
-- service instances creation
-- changing consensus configuration
-- changing service instances configuration
+More precisely, the supervisor service is controlling
+the following activities:
+
+- Service artifact deployment
+- Service instances creation
+- Changing consensus configuration
+- Changing service instances configuration
+- Migrating service data
 
 #### Anchoring Service
 

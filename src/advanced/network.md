@@ -135,8 +135,11 @@ defined in specific services. These requests are generally not authenticated.
 
 Organization of service endpoints is dependent on the runtime.
 For example, Rust services define API endpoints via
-`Service::wire_api` hook. Endpoints for a Rust service
-are prefixed with `/api/services/{service_name}`,
+`Service::wire_api` hook. The Rust runtime provides two HTTP servers,
+a *public* one and a *private* one; the endpoints for each are separate.
+The idea is that public endpoints can be universally accessed, and
+private endpoints could be used for more delicate tasks, such as administration.
+Endpoints for a Rust service are prefixed with `/api/services/{service_name}`,
 where `service_name` is a string service identifier.
 
 !!! note
