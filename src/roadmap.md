@@ -35,6 +35,19 @@ For any questions on the upcoming implementations feel free to contact us in
 - In a practical sense, the Exonum core was split from a single massive crate
   into multiple loosely coupled components, ensuring flexibility and code reuse.
 
+## Versioning Policy
+
+Exonum strives to provide stable APIs for the core library (i.e., `exonum` crate)
+and its re-exported upstream dependencies (e.g., `exonum-crypto`). The downstream
+crates (e.g., the supervisor service) or crates unrelated to the core
+(e.g., the HTTP API wrapper) are **not** necessarily versioned in the lockstep
+with the core library. Thus, they may have breaking changes even if the core
+library does not.
+
+Since Exonum is still in active development, the core library is expected
+to have quite fast release cycle – a major release once every 6–9 months,
+with minor releases each 1.5–2 months.
+
 ## Nearest Milestones
 
 ### Artifact Unloading
