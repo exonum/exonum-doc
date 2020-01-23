@@ -10,11 +10,6 @@ Even in the case of validators collusion, transaction history cannot be
 falsified. The discrepancy between the actual Exonum blockchain state and the
 one written to the Bitcoin blockchain will be found instantly.
 
-This document describes the **anchoring service operable with Exonum v0.10+**.
-For information on the anchoring service compatible with all previous versions
-of the framework, please refer to a
-[separate document](bitcoin-anchoring-without-segwit.md).
-
 !!! note
     This page mostly describes how the service functions. There is a
     separate page, describing how the service should be
