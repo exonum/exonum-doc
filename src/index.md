@@ -78,7 +78,7 @@ The following 2 topics provide valuable insights on how to develop with Exonum:
   are the main way for third-party applications to interact with the services.
 
 !!! tip
-    See [the anchoring][anchoring] and [configuration update][config] services
+    See the [anchoring][anchoring] and [supervisor][supervisor] services
     for the examples of real-world Exonum services.
 
 ### Specifications
@@ -102,4 +102,4 @@ what features are coming soon.
 [testkit]: https://crates.io/crates/exonum-testkit
 [tutorials]: https://github.com/exonum/exonum/tree/master/examples
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
-[config]: https://github.com/exonum/exonum/tree/master/services/configuration
+[supervisor]: https://github.com/exonum/exonum/tree/master/services/supervisor
