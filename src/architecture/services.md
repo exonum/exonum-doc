@@ -194,6 +194,8 @@ by the core logic, but are controlled by the supervisor service.
 
 ## Implementation Details
 
+### Service Data
+
 Usually, a service needs to persist some data. For example, the sample
 cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
@@ -214,6 +216,34 @@ the items of the collection. Merkelized versions of maps and lists are
 Naturally, the items of collections (and keys, in case of maps) need to be
 serializable. Exonum uses Protobuf for (de)serialization and conversion of
 Exonum datatypes to JSON for communication with light clients.
+
+### Fault Tolerance in Migration Scripts
+
+Migration scripts may be stopped at any time, simply because
+a node executing the script may be stopped by the admin or crash because of
+unrelated reasons. It is important to ensure that migration scripts
+are *fault-tolerant* under these conditions, that is, if a node is restarted
+and the script is resumed, it still arrives at a correct outcome.
+
+The simplest way to ensure fault tolerance is to never merge changes to
+the database within the script. In this case, the script will either complete
+and the changes will be merged atomically by the core, or the script
+will just restart from scratch after failure. This approach, however,
+may lead to out-of-memory errors for large migrations.
+
+To handle more avanced cases, MerkleDB provides tools to contract the number
+of initial states for the script, such as *persistent iterators*.
+A persistent iterator is an iterator over a MerkleDB index with the position
+stored in the database. A typical pattern involving persistent iterators
+is to process elements in the index in chunks of reasonable size
+and merge changes to the database after each chunk. In this case, if the script
+crashes during processing, it will resume from the latest chunk.
+If the script has finished processing the index, processing will be skipped
+on restart since the iterator position is still persisted.
+
+!!! tip
+    [The testkit](../advanced/service-testing.md) provides automated tools
+    to test script fault tolerance for the Rust runtime.
 
 ## Service Development
 

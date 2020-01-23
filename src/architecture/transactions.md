@@ -144,7 +144,7 @@ All transactions in Exonum are serialized using Protobuf. See the
 ## Interface
 
 How transaction handlers are expressed, depends on
-the [service runtime](sevices.md#runtimes). For example, in the Rust runtime
+the [service runtime](services.md#runtimes). For example, in the Rust runtime
 transactions are defined within traits and their handlers are defined
 within a trait implementation for the service.
 

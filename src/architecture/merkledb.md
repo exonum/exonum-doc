@@ -1,6 +1,6 @@
 # Exonum MerkleDB
 
-Exonum MerkleDB is a persistent storage implementation based on
+**Exonum MerkleDB** is a persistent storage implementation based on
 [RocksDB][rocks-db]. MerkleDB provides APIs to work with merkelized data
 structures.
 
@@ -275,7 +275,7 @@ shared reference to the fork. Moreover, there may be different forks of
 the same database snapshot.
 
 Forks are used during transaction and block processing. A fork
-[is successively passed](transactions.md#execute)
+[is successively passed](transactions.md#interface)
 to each transaction in the block to accumulate changes produced by the
 transactions. If one of the transactions in the block
 quits with an unhandled exception during execution, its

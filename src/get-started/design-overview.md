@@ -71,7 +71,7 @@ atomically. If a transaction has not been written to any block yet, it is
 not regarded as accepted. After a block is approved, every transaction in it is
 executed sequentially, with changes applied to the data storage.
 
-Exonum blocks consist of the following parts:
+Exonum blocks contain the following parts:
 
 - The hash of the previous Exonum block
 - The list of the approved transactions. When the nodes execute the block,
@@ -242,16 +242,16 @@ Exonum MerkleDB supports several types of data objects. All objects fall into
 
 - `ListIndex` implements an array list
 - `MapIndex` represents a map / key-value storage
+- `SparseListIndex` represents a `ListIndex` that may
+  contain "gaps". It provides the possibility to delete items not only from
+  the end of the list, but from any part thereof. Such deletions do not break
+  the order of the indices inside the list
 - [`ProofListIndex`](../architecture/merkledb.md#prooflistindex)
   is an enhanced version of an array store. It implements a balanced (but not
   necessarily full) binary Merkle tree. Leaves of the tree keep the
   actual array items, while the intermediate nodes keep the hashes from
   concatenated children data. `ProofListIndex` only allows to append the data
   or update the already stored items
-- [`SparseListIndex`][sparse-list-index] represents a `ListIndex` that may
-  contain "gaps". It provides the possibility to delete items not only from
-  the end of the list, but from any part thereof. Such deletions do not break
-  the order of the indices inside the list
 - [`ProofMapIndex`](../architecture/merkledb.md#proofmapindex) extends the
   map. It is based on a Merkle Patricia tree, implemented as a binary tree.
   Leaves of the tree keep the actual values from the map. Intermediate nodes
@@ -270,11 +270,11 @@ Exonum MerkleDB supports several types of data objects. All objects fall into
   short serialization and need to be iterated in a deterministic order.
   `ValueSetIndex` is a better match for complex items or items that need to be
   looked up by a hash.
-- `Entry` represents an optional single item (i.e., `Option<T>` in Rust terms).
+- `Entry` and `ProofEntry` represent an optional single item
+  (i.e., `Option<T>` in Rust terms).
 
-Both `ListIndex` and `ProofListIndex` support updating by index and
-extending the lists. However, only `ListIndex` supports truncation from the
-tail. `MapIndex` and `ProofMapIndex` allow inserting,
+Both `ListIndex` and `ProofListIndex` support updating by index, extending and
+truncating. `MapIndex` and `ProofMapIndex` allow inserting,
 updating or deleting key-value pairs. `KeySetIndex` and `ValueSetIndex`
 support adding and removing elements from the set. Finally, all collections
 support iterations over items (or keys, values, and key-value pairs in the
@@ -304,6 +304,9 @@ functionality for sending and receiving transactions and blocks,
 services implement all business logic of the blockchain
 and are the main point to extend Exonum functionality.
 
+Exonum services can be written in Rust or Java. To implement services in Java,
+you should use [Exonum Java Binding](java-binding.md) tool.
+
 Exonum services interact with the external world with the help of interfaces.
 All services may define **transactions**, which correspond to `POST` / `PUT`
 methods of REST web services. Transactions transform the blockchain state.
@@ -326,11 +329,6 @@ two groups:
   Private endpoints are executed locally, are not globally ordered, and
   cannot modify the blockchain state directly (although they
   can generate transactions and push them to the network).
-
-Exonum services are Rust or Java modules that can be easily
-reused across Exonum projects. To use Java modules you should apply
-[Exonum Java Binding](java-binding.md) tool that realizes Exonum interface
-in Java.
 
 You may use open source services already written by the community, or
 open your service for other uses.

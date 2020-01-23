@@ -232,3 +232,4 @@ authenticity of data stored in light clients could still be verified.
 [wiki:tx]: https://en.wikipedia.org/wiki/Database_transaction
 [rust-mut]: https://doc.rust-lang.org/book/mutability.html
 [rust-ref]: https://doc.rust-lang.org/book/references-and-borrowing.html
+[runtime]: ../architecture/services.md#runtimes
