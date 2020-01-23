@@ -13,144 +13,94 @@ our [Medium blog](https://medium.com/@ExonumPlatform).
     This document is provided for informational purposes only. It is subject
     to changes at any time without specific notifications and approvals.
 
-## Fourth Quarter of 2018
+You are welcome to contribute to Exonum development and improvement (see our
+[contribution policy](https://github.com/exonum/exonum/blob/master/CONTRIBUTING.md)).
+For any questions on the upcoming implementations feel free to contact us in
+[Gitter](https://gitter.im/exonum) or [Reddit](https://www.reddit.com/r/Exonum/).
 
-### Separation of Transactions and Messages
+## Previous Accomplishments
 
-The separation of transactions and messages into two individual entities will
-lay the foundation for other crucial features such as standardization of
-interfaces of services, communication between services within the blockchain and
-other. This separation will also prove extremely useful in the efforts of
-changing the serialization format of Exonum to a more common one.
+- A major milestone for Exonum was transition to *dynamic* services, that is,
+  services that can be instantiated after the blockchain is launched.
+- Together with dynamic services, we have implemented first-class support
+  of [runtimes](glossary.md#runtime). Runtimes allow to write Exonum services
+  in multiple programming languages, and new languages may be added without
+  any changes to the Exonum core. For now, Exonum supports Rust and Java services
+  with more languages in the pipeline.
+- Exonum now supports [service lifecycle](glossary.md#service-lifeycle),
+  allowing to evolve any given service during blockchain lifetime. For example,
+  service data can be safely [migrated](glossary.md#data-migration) to
+  match newer business logic, with Exonum ensuring atomicity, agreement among
+  nodes and other invariants.
+- In a practical sense, the Exonum core was split from a single massive crate
+  into multiple loosely coupled components, ensuring flexibility and code reuse.
 
-### Protobuf as the Serialization Format in Exonum
+## Nearest Milestones
 
-[Protobuf](https://developers.google.com/protocol-buffers/) is the industry
-accepted serialization format supported in multiple
-programming languages. Use of Protobuf will ease the integration of Exonum with
-applications in other languages. It will also enable the development of light
-clients in other languages with less effort required.
+### Artifact Unloading
 
-Protobuf has already been used in several applications of [Exonum Java Binding](https://github.com/exonum/exonum-java-binding).
+In 1.0, artifacts cannot be unloaded from a runtime; once an artifact is loaded,
+it must forever be available. Naturally, we want to change this situation and
+allow to unload artifacts by implementing the corresponding workflow
+in the core and [supervisor](glossary.md#supervisor).
 
-## First Quarter of 2019
+### Freezing Services
 
-### Secure Storage for Private Keys of the Node
+In 1.0, services may be *stopped*, which requires from the runtime to unload
+all ways for a service to interact with the external world. For example,
+both Rust and Java runtimes need to remove HTTP API handlers of the service.
+We plan to implement service *freezing*, after which the service state is
+immutable, but the immutable handlers (e.g., HTTP API) remain active.
 
-A separate and secured storage for private keys of the nodes will enhance the
-safety of the
-system. Even in the case of unauthorized users gaining access to a node,
-they will not have access to its private key and will not be able to
-intervene into the consensus process.
+## Intermediate Term
 
-### Java Binding: Protobuf Support and Separation of Transactions and Messages
+### Finalizing Service Interfaces
 
-As we develop Java Binding alongside with Exonum Core, to equalize their
-functionality it is required to implement Protobuf support and separate the
-transactions and messages for Java Binding too. This step will promote all the
-corresponding [benefits](#protobuf-as-the-serialization-format-in-exonum)
-discussed above.
+Exonum 1.0 ships with the [*interfaces*](glossary.md#interface)
+as a way of two services to interact with each other. 
+As an example, this is used by the supervisor service
+to [configure other services](advanced/supervisor.md#service-configuration).)
+However, interface specification is not yet stabilized, and so far
+there is no interface description language to express them. With finalization,
+interfaces can provide a powerful tool to compose service functionality.
 
-### Java Binding: Time Service
+### Deferred Calls
 
-We add another built-in Exonum service into the array of services that can be
-easily launched with an Exonum blockchain in Java –
-[the Time Oracle](advanced/time.md). The Time
-Oracle allows user services to access the calendar time that validators supply
-to the blockchain.
+A *deferred call* is a call to a service executing after the invoking call
+has returned (cf. `defer` in Golang). Deferred calls can provide
+an easy way to isolate internal calls to the services without requiring
+changes to the storage engine. (In Exonum 1.0, only upper-level calls are
+isolated, internal calls are not. Cf. inability to catch exceptions
+in Solidity.)
 
-## Second Quarter of 2019
+### Service Authorization with Data
 
-### Secure Workflow for Node Administration
+As of 1.0, it is possible to authorize an [internal call](glossary.md#internal-call)
+with the service authority, but the caller ID is the only information
+provided to the handler. If this is augmented with the caller-defined data,
+this kind of authorization can be applied to a significantly wider range
+of scenarios. For example, a single multisig service will be able to
+serve an unlimited number of user groups, thus maximizing code reuse
+and reducing storage / compute overhead.
 
-The introduction of a workflow for administrative operations, such as the
-deployment of services, is aimed at improving the security of the system.
-The exact details of the workflow are being currently discussed. One of the
-promising ideas is devising a service through which all the administrative
-processes will be conducted.
+## Long Term
 
-### Exonum MerkleDB - Minimal Profile
+### Unified Read Requests
 
-The first step within the global initiative to introduce MerkleDB in Exonum.
-This step will result in implementation of a more intuitive storage API
-interface. Such interface will simplify interaction with the storage for service
-developers.
+As of 1.0, [read requests](glossary.md#read-request) are runtime-specific
+and are usually implemented via HTTP API. Unifying read requests and allowing
+interfaces to specify read requests would allow to deduplicate much code
+and widen the supported service interactions.
 
-### Java Application Package
+### More Runtimes and Programming Languages
 
-This usability achievement allows shipping Exonum as a ready-to-install
-application package. The package is targeted at Java developers
-who plan to develop Exonum-based services. The application will have Rust and
-other related libraries pre-installed. This means that no compilation of the
-application will be required.
+Exonum 1.0 allows to write services in Rust and Java. We plan to widen
+language support in the future. Two low-haning fruits in this regard
+are:
 
-### Java Light Client
-
-With this step we expand the range of clients available for the framework.
-Apart from the [light client library](https://github.com/exonum/exonum-client)
-in JavaScript, we add a light client in Java – one of the most popular
-programming languages. Java client allows to send transaction of both Rust and
-Java services into the blockchain. It also supports functionality of the
-[blockchain explorer](https://github.com/exonum/blockchain-explorer)
-available in Exonum. Namely, it allows to obtain information on blocks,
-transactions, network nodes (a number of transactions in pool, Exonum version,
-etc.).
-
-### Multiple Java Services
-
-We enable support of several client services written in Java within
-one Exonum instance. The necessary set of services should be activated together
-with initialization of the blockchain. This feature serves as a prerequisite for
-dynamic Java services that will be implemented further.
-
-### Java Benchmarking
-
-Collection of metrics that allow to monitor efficiency of the Java Binding tool
-in the frame of the application; also to make application profiling and
-determine its weak spots.
-
-## Third Quarter of 2019
-
-### Base for Dynamic Services
-
-The executable file of Exonum instance contains a number of built-in services.
-Initially, developers launched the required services at the start of the network
-without further possibility to adjust the list of applied services. The present
-milestone provides an opportunity to turn on/off the services present in the
-executable Exonum file without restarting the network.
-
-## Fourth Quarter of 2019
-
-### Service Migration
-
-An extension to the above-mentioned functionality on dynamic services. The
-service migration will enable a smooth update to new versions of the services,
-running in the blockchain, without service data loss.
-
-### New Storage API Support in Java
-
-Following implementation of MerkleDB in Exonum Core, the Java Binding tool will
-also have to update its storage API to make it compatible with MerkleDB.
-
-### Java Light Client Enhancements
-
-A full-fledged version of Java light client featuring support of cryptographic
-proofs of availability/absence of certain data in the blockchain.
-
-### Dynamic Java Services
-
-The introduction of dynamic Java services will enable adding Java services to
-a running blockchain without the need to restart nodes. In other words, new
-services will be included into the network on the go.
-
-## First Quarter of 2020
-
-<!--### Implementation of gRPC
-
-Exonum intends to shift from REST API to gRPC. Just like Exonum, gRPC supports
-Protobuf as an instrument for description and serialization of data types.
-Besides, gRPC is a potentially quicker communication protocol compared to
-REST.-->
+- Supporting other JVM languages (e.g., Scala, Kotlin)
+- Supporting WASM (and thus, any language compiling to WASM)
+  via the existing Rust toolset
 
 ### Save Points and Old Blocks Clean-up
 
@@ -161,26 +111,9 @@ network in case of downtime.
 This feature is also considered as a basis to solve the problem of storing the
 blockchain when its history becomes to long and space-consuming.
 
-## Second Quarter of 2020
+### Mirrorring Data to External DB
 
-### Exonum MerkleDB - Full-fledged Implementation
-
-In the final implementation of this functionality the nested data collections
-stored in Exonum will receive a hierarchical pattern. The hierarchy of the
-Merkelized collections will allow to implement proofs of availability of the
-whole collections or their leaves in the blockchain. A user-friendly API of the
-Exonum MerkleDB will serve this purpose.
-
-### Communication between Services within the Blockchain
-
-As a method of improving the modularity of services and expanding the
-possibilities for their reuse, we will introduce the ability for
-services to communicate with one another within one blockchain. Services will
-be able to issue and process transactions from other services and can, thus, be
-reused in a variety of scenarios.
-
-As you may have noticed, the new features are to be released quarterly. You are
-welcome to contribute to Exonum development and improvement (see our
-[contribution policy](https://github.com/exonum/exonum/blob/master/CONTRIBUTING.md)).
-For any questions on the upcoming implementations feel free to contact us in
-[Gitter](https://gitter.im/exonum) or [Reddit](https://www.reddit.com/r/Exonum/).
+In many use cases, data should be copied from the blockchain to an external
+storage that supports more complex analytical queries. Integrating
+this functionality within the node would allow to automate the process
+and make it more fault-tolerant.
