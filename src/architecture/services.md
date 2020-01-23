@@ -83,7 +83,7 @@ Out of the box, Exonum provides two runtimes:
 In order to communicate with external entities, services may employ
 various kinds of interfaces. The core defines a single service interface
 for communication with the external clients: [**transactions**](#transactions).
-The core also defines and calls [**service hooks**](#service hooks)
+The core also defines and calls [**service hooks**](#hooks)
 corresponding to different events in service lifecycle.
 
 Besides core-provided interfaces, a runtime may define service interfaces
