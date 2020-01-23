@@ -85,6 +85,8 @@ pages:
     - 'Network': 'advanced/network.md'
     # Testing Rust services with testkit
     - 'Service Testing': 'advanced/service-testing.md'
+    # Artifact versioning
+    - 'Artifact Versioning': 'advanced/versioning.md'
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit
