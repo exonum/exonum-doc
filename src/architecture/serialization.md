@@ -1,6 +1,6 @@
 # Serialization in Exonum
 
-Exonum uses [Protocol Buffers][protobuf] as its serialization format
+Exonum uses [Protocol Buffers][protobuf] (aka Protobuf) as its serialization format
 for communication among full nodes, cryptographic operations on
 [light clients](../architecture/clients.md)
 and storage of data. Protobuf is the industry accepted language-neutral and

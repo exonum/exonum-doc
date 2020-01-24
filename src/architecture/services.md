@@ -131,7 +131,7 @@ A service also receives notifications before any transactions
 in every block are processed and after all transactions in it are processed.
 All these service handlers may modify the blockchain state.
 
-Depending on the runtime implementation, services may also receive
+Depending on the runtime implementation, a service may also receive
 a notification after each block is been committed.
 
 ### Read Requests
@@ -150,8 +150,7 @@ other services) may read service state via a public part of its schema.
 One of distinguishing features of the Exonum framework is that it provides
 a rich set of tools to bundle responses to reads with cryptographic proofs.
 Proofs allow light clients
-to minimize their trust to the responding node. Essentially, a retrieved
-response
+to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
 !!! summary "Trivia"
@@ -160,10 +159,22 @@ is as secure as if the client queried a supermajority of blockchain validators.
     in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
     allows to make proofs compact enough to be processed by light clients.
 
-!!! note "Example"
+!!! example
     Retrieving information on a particular wallet (e.g., the current
     wallet balance) is implemented as a read request in the cryptocurrency
     tutorial.
+
+### Private API
+
+The Rust runtime provides services with another interface – private HTTP API.
+This API is hosted on a separate web server, which can be configured to
+be inaccessible to the external world. Private API can be used for
+administrative tasks.
+
+!!! example
+    The [supervisor](../advanced/supervisor.md) uses private API to generate
+    and broadcast service transactions logically authorized by node
+    administrators.
 
 ### Data Migrations
 
@@ -273,12 +284,12 @@ Here is a list of things to figure out when developing an Exonum service:
   read request endpoints.)
 - Are there any maintenance tasks needed for the service? Do the tasks need
   to be invoked automatically, or authorized by system administrators?
-  (These tasks could be implemented in the commit event handler of the service,
+  (These tasks could be implemented in the block commit handler of the service,
   or as private API endpoints.)
 - What parameters do maintenance tasks require? Are these parameters local
   to each node that the service runs on, or do they need to be agreed
   by the blockchain maintainers? (The answer determines whether a parameter
-  should be a part of the local configuration or stored in the blockchain.)
+  should be provided to the the service locally or stored in the blockchain.)
 
 !!! tip
     [The Cryptocurrency Tutorial](../get-started/create-service.md)
@@ -314,13 +325,13 @@ The unification of these two interfaces is one of roadmap goals.
 ### Communication with External World
 
 Services may access the external world (read and write files from the
-filesystem, send/receive data on the network, and so on), but should do it only
-in the non-consensus code (i.e., code that is not executed during transaction
-execution). A good place for such code is event handlers.
+filesystem, send / receive data on the network, and so on), but should do it
+only in the non-consensus code (i.e., code that is not executed during transaction
+execution). A good place for such code is the block commit handler.
 
 !!! note "Example"
     [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
-    uses the commit event handler extensively to communicate with the Bitcoin
+    uses the block commit handler extensively to communicate with the Bitcoin
     Blockchain network.
 
 ### Services vs Smart Contracts

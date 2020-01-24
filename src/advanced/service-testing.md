@@ -18,7 +18,7 @@ to the `dev-dependencies` section of the `Cargo.toml` file of your project:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "0.13.0"
+exonum-testkit = "0.13.0-rc.2"
 ```
 
 !!! note

@@ -199,8 +199,8 @@ If either of these verifications fails, the proof is deemed invalid.
 
 !!! note
     One could think of proofs as of Merkle trees pruning. That is, a proof is
-    produced by "collapsing" some intermediate nodes in the Merkle tree.
-    Another point of view - from the light client perspective - is that a proof
+    produced by “collapsing” some intermediate nodes in the Merkle tree.
+    Another point of view – from the light client perspective – is that a proof
     is essentially a limited view of a list, for which the Merkle tree is
     constructed. This view allows to calculate the hash of the whole list and
     contains some of its elements.
@@ -217,7 +217,6 @@ list are 3-byte buffers `[u8; 3]`.
 This proof corresponds to the following JSON representation:
 
 ```JSON
-
 {
   "left": {
     "left": "fcb40354a7aff5ad066b19ae2f1818a78a77f93715f493881c7d57cbcaeb25c9",

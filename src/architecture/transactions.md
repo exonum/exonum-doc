@@ -32,7 +32,7 @@ in the same order transactions are placed into the blockchain.
     correspond to the order of their processing. To maintain the logical order
     of processing, it is useful to
     adhere to the following pattern: send the next transaction only after
-    the previous one was processed. This behavior is already
+    the previous one was processed. This behavior is
     implemented in the [JS light client](https://github.com/exonum/exonum-client).
 
 All transactions are authenticated with the help of public-key digital
@@ -172,11 +172,19 @@ of the transaction author.
     account state can be verified by light clients.
 
 A handler can signal that a transaction should be aborted
-by returning an error. The error contains a transaction-specific error code
+by returning an error. The error contains a service-specific error code
 (an unsigned 1-byte integer), and an optional string description. If the handler
 returns an error, all changes made in the blockchain state by the transaction
 are discarded; instead, the error code and description are saved to the
 blockchain.
+
+!!! note
+    Besides service-specific errors, the service may reuse some common errors
+    (e.g., “unauthorized”), which are defined in the core library.
+    Non-service code (i.e., runtimes and core itself) may also emit errors
+    during execution of service calls; for example, the core will emit
+    an error if a non-existent service is called. Consult core documentation
+    on [`ExecutionError`][ExecutionError] for more details.
 
 Erroneous transactions are still considered committed.
 Such transactions can be and are included into the blockchain provided they
@@ -318,3 +326,4 @@ at the verification step.
 [rust-result]: https://doc.rust-lang.org/book/first-edition/error-handling.html
 [execute-demo]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency-advanced/backend/src/transactions.rs
 [Protobuf]: https://developers.google.com/protocol-buffers
+[ExecutionError]: https://docs.rs/exonum/latest/exonum/runtime/struct.ExecutionError.html

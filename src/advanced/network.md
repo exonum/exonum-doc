@@ -34,8 +34,8 @@ Full nodes are further subdivided into 2 categories:
 ### Light Clients
 
 !!! tip
-    See [separate article](../architecture/clients.md) for more details on
-    _light clients_.
+    See the [separate article](../architecture/clients.md) for more details on
+    light clients.
 
 **Light clients** represent clients in the client-server paradigm; they connect
 to full nodes for several purposes:
@@ -56,12 +56,11 @@ full node has been really authorized by a supermajority of validators.
 ## Peer-to-Peer Full Node Network
 
 Full nodes use Protobuf over TCP to communicate with each other.
+Messages exchanged by full nodes include consensus messages and transactions.
 All network connections are encrypted using [Noise Protocol][noise].
 The Noise Protocol starts with a handshake message exchange.
 The handshake includes exchange of [public keys][DH] and
-[connect messages](#connect-messages) by the nodes. In order to authenticate
-the  connection, the sender includes the receiver's public key into its
-handshake message.
+[connect messages](#connect-messages) by the nodes.
 
 As a result of the Diffie-Hellman key agreement, the nodes receive a shared
 secret key. This key is then used to send encrypted messages between these
@@ -70,13 +69,11 @@ nodes.
 Noise Protocol protects Exonum against a number of potential vulnerabilities,
 for example, traffic sniffing between nodes.
 
-Messages exchanged by full nodes include consensus messages and transactions.
-
 ### Transaction Broadcasting
 
-A node broadcasts transactions obtained via API or created by the node itself,
-but does not broadcast transactions received from other nodes (via
-broadcasting or [requests mechanism](consensus/requests.md)).
+A node broadcasts transactions obtained via HTTP API or created
+by the node itself, but does not broadcast transactions received
+from other nodes (via broadcasting or [requests mechanism](consensus/requests.md)).
 
 ### Consensus Messages and Requests
 
@@ -100,7 +97,7 @@ to exchange messages.
 Each node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest)
 to a random known node with the timeout `peers_timeout` defined in the
 [global configuration](../architecture/configuration.md#genesisconsensus).
-[In response](consensus/requests.md#peersrequest-1), the addressee sends its
+[In response](consensus/requests.md#peersrequest), the addressee sends its
 list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the
 entire network.
@@ -141,7 +138,7 @@ a *public* one and a *private* one; the endpoints for each are separate.
 The idea is that public endpoints can be universally accessed, and
 private endpoints could be used for more delicate tasks, such as administration.
 Endpoints for a Rust service are prefixed with `/api/services/{service_name}`,
-where `service_name` is a string service identifier.
+where `{service_name}` is a string service identifier.
 
 !!! note
     There is no unified format for naming endpoints (e.g., passing parameters

@@ -37,12 +37,12 @@ In the supervisor – core relations,
 the core is responsible for *implementing* service lifecycle events,
 while the supervisor is responsible for *authorizing* these events.
 This loose coupling allows to develop the supervisor independently
-of the core, vary authorization depending on the use case (for example,
+of the core and vary authorization depending on the use case (for example,
 simple Exonum blockchains may have a single party authorizing all events,
 while more complex blockchains may utilize decentralized workflow).
 
 Another benefit of implementing supervisor as a service is that
-the transaction log provides fully auditable log of the service lifecycle.
+transactions provide a fully auditable log of the service lifecycle.
 Since service lifecycle is controlled via transactions, we can
 guarantee out of the box that it is replicated among all nodes in
 the network and has the same outcome.
