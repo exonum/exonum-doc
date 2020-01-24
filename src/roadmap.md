@@ -96,6 +96,17 @@ of scenarios. For example, a single multisig service will be able to
 serve an unlimited number of user groups, thus maximizing code reuse
 and reducing storage / compute overhead.
 
+### Capabilities for Services
+
+In 1.0, the supervisor service is determined by its numerical ID, which
+is quite inflexible. To amend, we plan to implement a [capabilities framework]
+for services. The capabilities would be assigned by the network maintainers.
+
+Besides service lifecycle management, other capabilities can be implemented.
+For example, a capability to write to schemas of other services
+would be helpful in implementing a transparent and secure way
+to amend data mistakes, which are inevitable in real-world blockchain apps.
+
 ## Long Term
 
 ### Unified Read Requests
@@ -130,3 +141,5 @@ In many use cases, data should be copied from the blockchain to an external
 storage that supports more complex analytical queries. Integrating
 this functionality within the node would allow to automate the process
 and make it more fault-tolerant.
+
+[capabilities framework]: https://en.wikipedia.org/wiki/Capability-based_security
