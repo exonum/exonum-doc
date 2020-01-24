@@ -287,5 +287,5 @@ scripts are [fault-tolerant], that is, properly process aborts.
 [java-testkit]: ../get-started/java-binding.md#testing
 [integration-tests]: https://doc.rust-lang.org/book/second-edition/ch11-03-test-organization.html#integration-tests
 [exonum-btc-anchoring]: https://github.com/exonum/exonum-btc-anchoring
-[supervosir]: ../architecture/supervisor.md
+[supervisor]: supervisor.md
 [fault-tolerant]: ../architecture/services.md#fault-tolerance-in-migration-scripts
