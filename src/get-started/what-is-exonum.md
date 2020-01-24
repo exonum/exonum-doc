@@ -203,6 +203,44 @@ such as [Merkle trees][wiki:mt] and [linked timestamping][wiki:linked-ts],
 to ensure that the full nodes cannot misguide the client, even if there is a
 collusion among the blockchain maintainers.
 
+## How Exonum is Different
+
+### Business Logic Lifecycle
+
+Business logic in Exonum is subject to well-defined
+[lifecycle](../advanced/service-lifecycle.md), meaning that you
+know exactly how the blockchain will behave at all times.
+The lifecycle encompasses necessary, but often neglected in blockchain space
+tasks, such as versioning and data migration. The latter is fully asynchronous
+and safe by construction – all nodes in the network are guaranteed to arrive
+at the same migration outcome.
+
+### Transparent Administration
+
+The [supervisor](../advanced/supervisor.md) encapsulates blockchain
+adminstration. Being fully customizable, the supervisor can fit vastly
+different setups – from a test project to a decentralized consortium network.
+
+### Multiple Runtimes
+
+Exonum supports services written in multiple programming languages with
+seamless integration between them. This means that it is unnecessary to
+choose between performance and ease of support – a single blockchain
+can host high-performance Rust services and enterprise-grade services in Java.
+Moreover, if performance becomes a bottleneck, a Java service can be
+migrated to Rust using standard migration tooling.
+
+### Advanced Storage
+
+Beyond key-value containers provided by other blockchain frameworks,
+Exonum allows to [build hierarchies of collections](../architecture/merkledb.md#index-groups)
+with full support of hierarchical [authenticity proofs](../glossary.md#merkle-proof).
+Each data collection in Exonum storage supports a rich set of operations,
+such as iteration and `O(1)` clearing. [Data migrations](../glossary.md#data-migration)
+are a first-class entity for the database backend, which provides
+various helpers for them, such as automatically cleared temporary data storage
+and persistent iterators.
+
 ### Bitcoin Anchoring
 
 Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)

@@ -232,8 +232,17 @@ address consists of 2 parts:
   `cryptocurrency.wallets`, where `cryptocurrency` is the service name, and
   `wallets` is the own name of the index
 - **Optional prefix** presented as a sequence of bytes (`Vec<u8>` in Rust
-  terms). Prefixes allow to group logically related indexes. They allow to obtain
-  a particular subset of items marked by the prefix from the index.
+  terms). Prefixes allow to group logically related indexes.
+
+### Index Groups
+
+**Index groups** – indexes with the same string name but different
+address prefixes – can be used to store collections keyed by an identifier.
+For example, a group of list indexes may be used to store transaction histories
+for wallets; in this case, an identifier could be the public key of the wallet.
+
+Any index in the group can be accessed using a usual API. It is also possible
+to iterate over prefixes in a group.
 
 ### Key Sorting and Iterators
 
