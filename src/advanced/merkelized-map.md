@@ -13,7 +13,7 @@ a hash digest; digests are computed recursively from leaves to the tree root.
 Thus, the *root hash* of the tree commits to all key–value pairs in the tree.
 
 !!! note
-    Unlike some map merkelization techniques used in other blockchains
+    Unlike some map hashing techniques used in other blockchains
     (e.g., AVL trees), Merkle Patricia trees and their root hashes are not
     dependent on the order in which elements are added or removed from the map,
     only on the map contents. Also, small number of children for tree nodes
@@ -21,7 +21,7 @@ Thus, the *root hash* of the tree commits to all key–value pairs in the tree.
 
 ## `ProofMapIndex` Insights
 
-Since paths in MPTs need to have fixed length, keys in the original map
+Since paths in an MPT need to have fixed length, keys in the original map
 need to be transformed to the corresponding format.
 `ProofMapIndex` provides two ways to accomplish this:
 
@@ -42,7 +42,7 @@ are always performed on the original keys.
 
 ### Redefining Tree Root
 
-Because of implementation reasons, nodes in MPTs used in MerkleDB can have
+Because of implementation reasons, nodes in an MPT used in MerkleDB can have
 0 or 2 children, never 1. This requirement naturally follows for leaves
 and intermediate nodes in a generic binary trie; it can only be violated
 for the root node (e.g., if all paths in the trie start with `0` bit).
