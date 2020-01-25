@@ -153,6 +153,14 @@ is essentially a limited view of a map, for which the MPT is
 constructed. This view allows to calculate the map hash and
 contains some of its elements.
 
+### Proof Example
+
+![Example of a Proof](../images/map-proof.png)
+
+This figure illustrates a map proof for the 4th element in a map
+with 7 elements. Intermediate MPT nodes included in the proof are highlighted.
+Pruned nodes are faded and have dashed contours.
+
 ### Format
 
 The proofs returned by the Exonum storage engine are non-recursive,
