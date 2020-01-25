@@ -208,7 +208,7 @@ collusion among the blockchain maintainers.
 ### Business Logic Lifecycle
 
 Business logic in Exonum is subject to well-defined
-[lifecycle](../advanced/service-lifecycle.md), meaning that you
+[lifecycle](../architecture/service-lifecycle.md), meaning that you
 know exactly how the blockchain will behave at all times.
 The lifecycle encompasses necessary, but often neglected in blockchain space
 tasks, such as versioning and data migration. The latter is fully asynchronous
