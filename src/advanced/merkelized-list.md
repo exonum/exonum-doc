@@ -126,7 +126,8 @@ h = sha-256( HashTag::ListNode || u64_LE(len) || root_hash )
 Here,
 
 - `HashTag::ListNode = 2` is a tag separating lists from other hashed objects.
-- `u64_LE` is an 8-byte little-endian serialization of a value.
+  (Here and elsewhere, tags are serialized as a single byte.)
+- `u64_LE` is an 8-byte little-endian serialization of an integer.
 
 ### Computing Root Hash
 

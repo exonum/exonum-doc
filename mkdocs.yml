@@ -95,8 +95,10 @@ pages:
     - 'Time Oracle': 'advanced/time.md'
     # Other useful services
     - 'Other Services': 'advanced/other-services.md'
-    # Merkle index overview
+    # `ProofListIndex` / `ListProof` overview
     - 'Merkelized List': 'advanced/merkelized-list.md'
+    # `ProofMapIndex` / `MapProof` overview
+    - 'Merkelized Map': 'advanced/merkelized-map.md'
     - 'Consensus':
       # Consensus specification
       - 'Consensus Specification': 'advanced/consensus/specification.md'
