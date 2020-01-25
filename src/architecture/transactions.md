@@ -3,13 +3,13 @@
 A **transaction** in Exonum,
 [as in usual databases](https://en.wikipedia.org/wiki/Database_transaction),
 is a group of sequential operations with the data (i.e., the Exonum
-[key-value storage](storage.md)).
+[key-value storage](merkledb.md)).
 Transaction processing rules are defined in [services](services.md);
 these rules determine business logic of any Exonum-powered blockchain.
 
-Exonum transactions are wrapped in [messages](#messages). Except for the
-transaction, a message also contains a public key of the message author, a type
-and class of the message and a message signature. This approach allows
+Exonum transactions are wrapped in [messages](#messages). Besides the
+transaction payload, a message also contains a public key
+of the message author and a message signature. This approach allows
 the separation of the business logic and information related to authorization
 within a message.
 
@@ -32,8 +32,8 @@ in the same order transactions are placed into the blockchain.
     correspond to the order of their processing. To maintain the logical order
     of processing, it is useful to
     adhere to the following pattern: send the next transaction only after
-    the previous one was processed. This behavior is already
-    implemented in the [light client library](https://github.com/exonum/exonum-client#send-multiple-transactions).
+    the previous one was processed. This behavior is
+    implemented in the [JS light client](https://github.com/exonum/exonum-client).
 
 All transactions are authenticated with the help of public-key digital
 signatures. The message containing the transaction includes the signature
@@ -62,51 +62,54 @@ on this key.
 
 Messages are digitally signed pieces of data transmitted through the Exonum
 framework. The core of the framework validates the signature over the message.
-All messages have a uniform structure with which they should comply:
+All messages have a uniform structure defined as a [Protobuf] message:
 
-| Position (bytes) | Stored data      |
-|:----------|:------------------------|
-| `0..32`   | author’s public key     |
-| `32`      | message class           |
-| `33`      | message type            |
-| `34..N`   | payload                 |
-| `N..N+64` | signature               |
+```protobuf
+message SignedMessage {
+  bytes payload = 1;
+  exonum.crypto.PublicKey author = 2;
+  exonum.crypto.Signature signature = 3;
+}
+```
 
-Exonum utilizes the following message classes and types:
+The `payload` field varies for different messages. In general, it conforms
+to the following Protobuf:
 
-| Class ID | Type ID | Message Class            | Message Type        |
-|:---------|:--------|:-------------------------|:--------------------|
-| 0        | 0       | Service message          | Transaction         |
-| 0        | 1       | Service message          | Status message      |
-| 0        | 2       | Service message          | Connect message     |
-| 1        | 0       | Consensus message        | Precommit message   |
-| 1        | 1       | Consensus message        | Propose message     |
-| 1        | 2       | Consensus message        | Prevote message     |
-| 2        | 0       | Request response message | TransactionsBatch   |
-| 2        | 1       | Request response message | BlockResponse       |
-| 3        | 0       | Request message          | TransactionsRequest |
-| 3        | 1       | Request message          | PrevotesRequest     |
-| 3        | 2       | Request message          | PeersRequest        |
-| 3        | 3       | Request message          | BlockRequest        |
+```protobuf
+message CoreMessage {
+  oneof kind {
+    // Transaction message.
+    exonum.runtime.AnyTx any_tx = 1;
+    // (other message types...)
+  }
+}
 
-The payload varies for different messages, depending on their class and type.
+message AnyTx {
+  // Dispatch info, see below.
+  CallInfo call_info = 1;
+  // Information specific for the transaction type.
+  bytes arguments = 2;
+}
 
-A transaction is a payload of the message. The message payload constituting
-a transaction has the following fields:
+message CallInfo {
+  // Unique service instance identifier. This identifier is used to
+  // find the corresponding runtime to execute a transaction.
+  uint32 instance_id = 1;
+  // Identifier of the method in the service interface required
+  // for the call.
+  uint32 method_id = 2;
+}
+```
+
+To summarize, the transaction payload carries the following
+information:
 
 - ID of the service for which the transaction is intended
-- ID of the transaction
+- ID of the method within the service
 - Service transaction payload
 
-When defining a new transaction using the `Transaction` macro, users need to
-define only the fields which are to constitute the message payload. All the
-other fields (e.g. signature, public key, etc.) are automatically added and
-handled by the Exonum Core. Transaction payload includes data specific for a
-given transaction type. Format of the payload is specified by the
-service identified by `service_id`.
-
 For example, the `TxTransfer` transaction type in the sample Cryptocurrency
-Service is represented as follows using the Protobuf description:
+Service is represented using the following Protobuf description:
 
 ```protobuf
 message TxTransfer {
@@ -119,11 +122,11 @@ message TxTransfer {
  }
 ```
 
-This transaction is then included into a message which includes the public
-key of the transaction author, the binary representation of the transaction
-as described above and the message signature. The transaction does not
-need to include information about who is transferring funds, the sender is
-defined by the public key of the message author.
+This transaction payload is then serialized into `AnyTx.arguments`,
+wrapped in `CoreMessage`, and finally into `SignedMessage`.
+Note that `TxTransfer` does not need to include information about
+who is transferring funds because the sender is defined
+by `SignedMessage.author`.
 
 ## Serialization
 
@@ -140,41 +143,25 @@ All transactions in Exonum are serialized using Protobuf. See the
 
 ## Interface
 
-Transaction interface defines a single method – [`execute`](#execute).
+How transaction handlers are expressed, depends on
+the [service runtime](services.md#runtimes). For example, in the Rust runtime
+transactions are defined within traits and their handlers are defined
+within a trait implementation for the service.
 
-An extended version of the `verify` method, which was available in Exonum <0.10,
-is scheduled for implementation. Currently, the verification of the
-transaction signature is performed automatically by the core of the framework.
-Additional verifications might be implemented in
-the `execute` method.
+A transaction handler in the service receives the current blockchain state
+and can modify it (but can choose not to do so if certain conditions
+are not met). Technically handlers operate on a fork of the blockchain state,
+which is merged to the persistent storage [under certain conditions](consensus.md).
+Handlers are performed during the `Precommit` stage of the consensus.
 
-!!! tip
-    From the Rust perspective, `Transaction` is a [trait][rust-trait].
-    See [Exonum core code][core-tx] for more details.
-
-### Execute
-
-```rust
-fn execute<'a>(&self, context: TransactionContext<'a>) -> ExecutionResult;
-```
-
-The `execute` method takes the current blockchain state and can modify it (but
-can choose not to do so if certain conditions are not met). Technically `execute`
-operates on a fork of the blockchain state, which is merged to the persistent
-storage [under certain conditions](consensus.md). `execute` is performed during
-the `Precommit` stage of the consensus and when the block with the given
-transaction is committed into the blockchain.
-
-`execute` operates solely with the payload of the message, any additional
-information besides the payload is included into the `TransactionContext` which
-is passed into `execute`. `TransactionContext` includes a fork of the
-blockchain, ID of the service for which the transaction is intended, the hash
-of the message containing the transaction and the public key of the transaction
-author. For an example of `execute` implementation, refer to our
-[Cryptocurrency Advanced service][execute-demo].
+Any additional information besides the payload is included into
+the *execution context*. Besides a fork, the context provides
+information about the executing service (e.g., its ID), the hash
+of the message containing the transaction, and the public key
+of the transaction author.
 
 !!! note "Example"
-    In the sample Cryptocurrency Service, `TxTransfer.execute` verifies
+    In the sample Cryptocurrency Service, handler for `TxTransfer` verifies
     that the sender’s and recipient’s accounts exist and the sender has enough
     coins to complete the transfer. If these conditions hold, the sender’s
     balance of coins is decreased and the recipient’s one is increased by the
@@ -184,25 +171,27 @@ author. For an example of `execute` implementation, refer to our
     sender has insufficient number of coins). Logging helps to ensure that
     account state can be verified by light clients.
 
-The `execute` method can signal that a transaction should be aborted
-by returning an error. The error contains a transaction-specific error code
-(an unsigned 1-byte integer), and an optional string description. If `execute`
+A handler can signal that a transaction should be aborted
+by returning an error. The error contains a service-specific error code
+(an unsigned 1-byte integer), and an optional string description. If the handler
 returns an error, all changes made in the blockchain state by the transaction
 are discarded; instead, the error code and description are saved to the
 blockchain.
 
-If the `execute` method of a transaction raises an unhandled exception (panics
-in the Rust terms), the changes made by the transactions are similarly
-discarded.
+!!! note
+    Besides service-specific errors, the service may reuse some common errors
+    (e.g., “unauthorized”), which are defined in the core library.
+    Non-service code (i.e., runtimes and core itself) may also emit errors
+    during execution of service calls; for example, the core will emit
+    an error if a non-existent service is called. Consult core documentation
+    on [`ExecutionError`][ExecutionError] for more details.
 
-Erroneous and panicking transactions are still considered committed.
+Erroneous transactions are still considered committed.
 Such transactions can be and are included into the blockchain provided they
 lead to the same result (panic or return an identical error code)
 for at least 2/3 of the validators.
-
-<!--Side note: maybe we could explain what happens
-if transactions behave differently on different nodes. It may be useful to
-emphasize the importance of identical behavior among nodes.-->
+If transaction results differ among node in the network, the transaction
+may not be included into the blockchain.
 
 ## Lifecycle
 
@@ -219,7 +208,7 @@ Usually, this is performed by a light client connecting to a full node
 via [an appropriate transaction endpoint](services.md#transactions).
 
 !!! note
-    As transactions use universally verified cryptography (digital signatures)
+    As transactions use universally verifiable cryptography (digital signatures)
     for authentication, a transaction theoretically can be submitted to the
     network by anyone aware of the transaction. There is no intrinsic upper
     bound on the transaction lifetime, either.
@@ -240,32 +229,16 @@ among committed transactions, using the transaction hash as the unique
 identifier. If the transaction has been committed previously, it is
 discarded, and the following steps are skipped.
 
-The transaction implementation is then looked up
-using the `(service_id, message_id)` type identifier.
+On the next step, the transaction is deserialized from Protobuf and
+its signature is checked. If the signature is invalid, the transaction
+is discarded.
 
-If the transaction is absent in the blockchain, the
-`SignedMessage::from_raw_buffer` method then checks that the byte array
-constituting the transaction message contains the author’s public key and
-signature and that the signature corresponds to the indicated public key.
+The core then searches for the service capable of executing the transaction.
+If such a service does not exist or is not active, the transaction
+is ignored.
 
-Next, if `SignedMessage::from_raw_buffer` is successful, the byte array is
-converted into a `SignedMessage` structure. This structure contains all the
-fields of the message in the deserialized form, except for the message payload
-which is still presented as a byte array. This structure helps us avoid
-verifying the signature repeatedly during the next steps, as every
-`SignedMessage` is guaranteed to contain the correct signature.
-
-The `SignedMessage` is then passed to the `deserialize` method, which can
-deserialize the message body and convert the `SignedMessage` into the
-`Signed<T>` structure. `Signed<T>` contains both the `SignedMessage` and the
-deserialized payload.
-
-Finally, the `Signed<T>` is passed to the `NodeHandler::handle_message` method,
-which concludes the transaction processing mechanism.
-
-If the verification is successful, the transaction is added to the pool
-of unconfirmed transactions; otherwise, it is discarded, and the following
-steps are skipped.
+If all above steps are successful, the transaction is added to the pool
+of unconfirmed transactions.
 
 ### 4. Broadcasting
 
@@ -288,9 +261,8 @@ into a block proposal (or multiple proposals).
     with the smallest hashes when building a proposal. This behavior shouldn’t
     be relied upon; it is likely to change in the future.
 
-The transaction `execute`s during the
-lock step of the consensus algorithm. This happens when a validator
-has collected all
+The transaction executes during the lock step of the consensus algorithm.
+This happens when a validator has collected all
 transactions for a block proposal and certain conditions are met, which imply
 that the proposal is going to be accepted in the near future.
 The results of execution are reflected in `Precommit` consensus messages and
@@ -300,9 +272,9 @@ transactions are executed in the same way on all nodes.
 ### 6. Commitment
 
 When a certain block proposal and the result of its execution gather
-sufficient approvals among validators, the block with the transaction is committed
+sufficient approval among validators, the block with the transaction is committed
 to the blockchain. All transactions from the committed block are sequentially
-applied to the persistent blockchain state by invoking their `execute` method
+applied to the persistent blockchain state by invoking their handlers
 in the same order the transactions appear in the block.
 Hence, the order of application is the same for every node in the network.
 
@@ -323,14 +295,12 @@ Non-replayability means that an attacker cannot take an old legitimate
 transaction from the blockchain and apply it to the blockchain state again.
 
 !!! note "Example"
-    Assume Alice pays Bob 10 coins using
-    [Cryptocurrency Service][cryptocurrency].
+    Assume Alice pays Bob 10 coins using [Cryptocurrency Service][cryptocurrency].
     Non-replayability prevents Bob from taking Alice’s transaction and
     submitting it to the network again to get extra coins.
 
-Non-replayability is
-also a measure against DoS attacks; it prevents an attacker from spamming the
-network with his own or others’ transactions.
+Non-replayability is also a measure against DoS attacks; it prevents an attacker
+from spamming the network with his own or others’ transactions.
 
 Non-replayability in Exonum is guaranteed by discarding transactions already
 included into the blockchain (which is determined by the transaction hash),
@@ -355,3 +325,5 @@ at the verification step.
 [wiki:currying]: https://en.wikipedia.org/wiki/Currying
 [rust-result]: https://doc.rust-lang.org/book/first-edition/error-handling.html
 [execute-demo]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency-advanced/backend/src/transactions.rs
+[Protobuf]: https://developers.google.com/protocol-buffers
+[ExecutionError]: https://docs.rs/exonum/latest/exonum/runtime/struct.ExecutionError.html

@@ -296,7 +296,7 @@ impl TimestampEntry {
 ## Create Schema
 
 Schema is a structured view of
-[the key-value storage](../architecture/storage.md) used in Exonum.
+[the key-value storage](../architecture/merkledb.md) used in Exonum.
 For convenience, we have separated the code that configures the schema for our
 Timestamping Service into a separate file - [src/schema.rs][src/schema.rs]. We
 have also included the Rust descriptions of the `Timestamp` and
@@ -326,7 +326,7 @@ efficiently process errors during the debugging process.
 To access the objects inside the storage, we need to declare the layout of
 the data. As we want to keep the timestamps in the storage and be able to
 construct proofs for timestamping transactions, we will use an instance of
-[`ProofMapIndex`](../architecture/storage.md#proofmapindex). A `ProofMapIndex`
+[`ProofMapIndex`](../architecture/merkledb.md#proofmapindex). A `ProofMapIndex`
 implements a key-value storage and offers the ability to create proofs of
 existence for its key-value pairs.
 

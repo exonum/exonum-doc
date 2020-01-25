@@ -18,11 +18,11 @@ The client functions are divided into the following submodules:
   checking the proofs for [Merkle][mt-index]
   and [Merkle Patricia][mpt-index] indices
 - **Blockchain integrity checks**. Function for checking the
-  validity of a block (its compliance with [consensus algorithm](consensus.md))
+  validity of a block, that is, its compliance with [consensus algorithm](consensus.md)
 
 !!! note
     A hash of the entire blockchain state is a part of each block
-    (see [data storage](storage.md)). This hash is formed using Merkle
+    (see [data storage](merkledb.md)). This hash is formed using Merkle
     and Merkle Patricia indices. Thus, using functions for proof verification,
     one can verify the commitment of any blockchain data in a block. The block
     itself can be verified using blockchain integrity verification.
@@ -173,7 +173,8 @@ The presence of light clients in a blockchain-based system leads to certain
 difficulties during development:
 
 - Backend developers should agree with client developers on API requests and
-  the format of cryptographic proofs
+  the format of cryptographic proofs. (This is largely taken care by
+  using Protobuf as the serialization format.)
 - Changes in blockchain data model should be accompanied by relevant
   changes in the logic of proof verification performed by light clients
 
@@ -183,5 +184,5 @@ largely remove the necessity of trust to third parties.
 
 [wiki:tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
 [wiki:mitm]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
-[mt-index]: storage.md#prooflistindex
-[mpt-index]: storage.md#proofmapindex
+[mt-index]: merkledb.md#prooflistindex
+[mpt-index]: merkledb.md#proofmapindex

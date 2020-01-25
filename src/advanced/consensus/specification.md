@@ -107,7 +107,7 @@ message processing.
 
 !!! tip
     These parameters are a part of [the global configuration](../../architecture/configuration.md).
-    They can be adjusted with the help of [the configuration update service](../configuration-updater.md).
+    They can be adjusted with the help of [the supervisor service](../supervisor.md).
 
 ## Node State Variables
 

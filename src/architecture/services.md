@@ -15,17 +15,17 @@ encapsulate business logic of the blockchain application.
 - A service specifies **the rules of transaction processing**, namely, how
   [transactions](transactions.md) influence the state of the service
 - The state transformed by transactions is **persisted** as a part of the
-  overall [blockchain key-value storage](storage.md)
+  overall [blockchain key-value storage](merkledb.md)
 - A service may also allow [external clients](clients.md) to
-  **read the relevant data** from the blockchain state
+  **read the relevant data** from the blockchain state using auxiliary
+  APIs (for example, REST API).
 
-Each service has a well-defined interface for communication with the external
-world – essentially, a set of endpoints – and the implementation of said
+Each service has an interface for communication with the external
+world – essentially, a set of methods – and the implementation of said
 interface.
 The implementation may read and write data from the blockchain state
 (usually using the schema helper for the underlying key-value storage
-in order to simplify data management) and can also access the local node
-configuration.
+in order to simplify data management).
 
 Services are executed on each validator and each auditing node of the
 blockchain network. The order of transaction processing and the resulting
@@ -35,36 +35,60 @@ They are guaranteed to be the same for all nodes in the blockchain network.
 
 !!! tip
     When developing a service, you should keep in mind that
-    calls to service endpoints must produce an identical result
+    calls to service methods must produce an identical result
     on all nodes in the network given the same blockchain
     state. If the call results differ, the consensus algorithm may stall,
     or an audit of the blockchain by auditing nodes may fail.
 
-!!! note
-    Unlike smart contracts in certain blockchains, services in Exonum
-    are not isolated in a virtual machine environment and are not containerized.
-    This makes Exonum services more efficient and flexible in their
-    capabilities,
-    but at the same time requires more careful service programming.
+During blockchain operation, services may be instantiated, stopped and resumed,
+and migrated to a newer version (which may include asynchronous data migration).
+The lifecycle events are managed by the core, but controlled by the supervisor
+service. In the reference supervisor implementation, the lifecycle events are
+authorized by the administrators of the blockchain nodes.
+
+!!! tip
+    See [Service Lifecycle](service-lifecycle.md) for more details.
+
+## Artifacts
+
+Services are created from the *artifacts*. Artifacts are similar
+to classes in object-oriented programming while services are similar to objects.
+A single artifact may be used to instantiate zero or more services.
+
+An artifact is identified by a name and a semantic version. Like services,
+artifacts are attached to a [runtime](#runtimes), and their lifecycle
+events are controlled via the supervisor.
+
+## Runtimes
+
+Services and artifacts are encapsulated in *runtimes*. Runtime provides
+a single interface for the core to interact with. A runtime provides
+to the core service logic by executing it in a certain environment.
+
+Out of the box, Exonum provides two runtimes:
+
+- **The Rust runtime** allows to implement services in Rust. These services
+  are good for high-performance apps, but the runtime has some limitations.
+  New artifacts may be added only by recompiling the node binary, and this
+  process requires coordination among all nodes in the network. Additionally,
+  service execution is not isolated from the framework core (except via API
+  design), meaning that using `unsafe` code, it is possible to crash the node,
+  steal secrets or otherwise break invariants regarding blockchain operation.
+- **The Java runtime** uses JVM to containerize services. Unlike with Rust,
+  Java artifacts may be deployed during blockchain operation. On the downside,
+  Java services are slower than their Rust counterparts.
 
 ## Service Interface
 
-In order to communicate with external entities, services employ three kinds of
-endpoints:
+In order to communicate with external entities, services may employ
+various kinds of interfaces. The core defines a single service interface
+for communication with the external clients: [**transactions**](#transactions).
+The core also defines and calls [**service hooks**](#hooks)
+corresponding to different events in service lifecycle.
 
-- [Transactions](#transactions)
-- [Read requests](#read-requests) (together with transactions, form public API)
-- [Private API](#private-api)
-
-Service endpoints are automatically aggregated and dispatched by the Exonum
-middleware layer.
-
-!!! note
-    Exonum uses [the `actix-web` framework][actix-web] to specify service
-    endpoints,
-    both public and private. Public and private API endpoints are served on
-    different
-    sockets, which allows to specify stricter firewall rules for private APIs.
+Besides core-provided interfaces, a runtime may define service interfaces
+of its own. For example, both Rust and Java services may define HTTP APIs,
+despite the core knowing nothing about this kind of interface.
 
 ### Transactions
 
@@ -93,65 +117,104 @@ with other transactions in a block.
     [Cryptocurrency Tutorial](../get-started/create-service.md)
     for more details.
 
+### Hooks
+
+A service may react to the following events of [its lifecycle](#lifecycle):
+
+- Service initialization
+- Service being resumed
+
+Both these events accept service-specific arguments, which can be
+used for service (re-)configuration.
+
+A service also receives notifications before any transactions
+in every block are processed and after all transactions in it are processed.
+All these service handlers may modify the blockchain state.
+
+Depending on the runtime implementation, a service may also receive
+a notification after each block is been committed.
+
 ### Read Requests
 
 Read requests, or simply reads, are analogous to constant methods in C++ or
-`GET`
-requests in the REST paradigm. They cannot modify the blockchain state
+`GET` requests in the REST paradigm. They cannot modify the blockchain state
 and are not recorded in the blockchain. Unlike transactions, reads are not a
-part
-of the consensus algorithm; they are processed locally by the node that
+part of the consensus algorithm; they are processed locally by the node that
 received the request.
+
+The core does not presently provide a unified mechanism for read requests
+accessible to external clients. However, both Rust and Java runtime
+provide such a mechanism via HTTP API. *Internal* clients (that is,
+other services) may read service state via a public part of its schema.
 
 One of distinguishing features of the Exonum framework is that it provides
 a rich set of tools to bundle responses to reads with cryptographic proofs.
 Proofs allow light clients
-to minimize their trust to the responding node. Essentially, a retrieved
-response
+to minimize their trust to the responding node. Essentially, a retrieved response
 is as secure as if the client queried a supermajority of blockchain validators.
 
 !!! summary "Trivia"
     In cryptographic terms, a proof opens a [commitment][wiki:crypto-commit]
-    to data in the blockchain, where the commitment is stored in the block
-    header
-    in the form of a state hash. The use of Merkle trees and Merkle Patricia
-    trees
+    to data in the blockchain, where the commitment is stored in the block header
+    in the form of a state hash. The use of Merkle trees and Merkle Patricia trees
     allows to make proofs compact enough to be processed by light clients.
 
-!!! note "Example"
+!!! example
     Retrieving information on a particular wallet (e.g., the current
     wallet balance) is implemented as a read request in the cryptocurrency
     tutorial.
 
 ### Private API
 
-Unlike transactions and read requests, private API calls denote the interaction
-of the service not with external clients, but rather with the administrator
-of the Exonum node, on which the service is running. Private API should not
-be accessible from the outside world.
+The Rust runtime provides services with another interface – private HTTP API.
+This API is hosted on a separate web server, which can be configured to
+be inaccessible to the external world. Private API can be used for
+administrative tasks.
 
-Similar to read requests, private APIs cannot change the blockchain state;
-however, they can create transactions and broadcast them to the network.
+!!! example
+    The [supervisor](../advanced/supervisor.md) uses private API to generate
+    and broadcast service transactions logically authorized by node
+    administrators.
 
-!!! note "Example"
-    In [the configuration update service](../advanced/configuration-updater.md),
-    private API is used to obtain the information about the current
-    configuration
-    and update proposals.
+### Data Migrations
+
+The goal of a **data migration** is to prepare data of an Exonum service
+for use with an updated version of the service business logic.
+In this sense, migrations fulfil the same role as migrations
+in traditional database management systems.
+
+Migrations are performed via *migration scripts*. A script takes data
+of a service and uses the [MerkleDB tools](merkledb.md#migrations)
+to transform it to a new version. Migration is non-destructive,
+i.e., does not remove the old versions of migrated indexes.
+Instead, new indexes are created in a separate namespace, and atomically
+replace the old data when the migration is flushed.
+
+The problems solved by the migration workflow are:
+
+- Allowing for migration to be performed in background, while
+  the node continues to process transactions and other requests.
+- Ensuring that migrations finish at finite time (i.e., at some
+  blockchain height).
+- Allowing concurrent migrations for different services.
+- Ensuring that all nodes in the network have arrived at the same data
+  after migration is completed.
+
+Similar to other service lifecycle events, data migrations are managed
+by the core logic, but are controlled by the supervisor service.
 
 ## Implementation Details
 
-### Data Schema
+### Service Data
 
 Usually, a service needs to persist some data. For example, the sample
 cryptocurrency service persists account balances, which are changed by transfer
 and issuance transactions.
 
 Exonum persists blockchain state in a global key-value storage implemented with
-[RocksDB][rocksdb]. Each service needs to define a
-set of data collections
-(*tables*), in which the service persists the service-specific data;
-these tables abstract away the need for the service to deal with the blockchain
+[RocksDB][rocksdb]. Each service needs to define a set of data collections
+(*indexes*), in which the service persists the service-specific data;
+these indexes abstract away the need for the service to deal with the blockchain
 key-value storage directly. The built-in collections supported by Exonum are
 maps (`MapIndex`), sets (`ValueSetIndex`, `KeySetIndex`) and lists
 (`ListIndex`).
@@ -162,103 +225,36 @@ the items of the collection. Merkelized versions of maps and lists are
 `ProofMapIndex` and `ProofListIndex`, respectively.
 
 Naturally, the items of collections (and keys, in case of maps) need to be
-serializable. Exonum uses `protobuf` for (de)serialization and conversion of
+serializable. Exonum uses Protobuf for (de)serialization and conversion of
 Exonum datatypes to JSON for communication with light clients.
 
-### Configuration
+### Fault Tolerance in Migration Scripts
 
-Services may use [configuration](configuration.md)
-to store parameters that will be received by the service constructor during
-[node initialization](#initialization). Configuration consists of two parts:
-*global configuration*, which is stored on the blockchain, and
-*local configuration*,
-which is specific to each node instance.
+Migration scripts may be stopped at any time, simply because
+a node executing the script may be stopped by the admin or crash because of
+unrelated reasons. It is important to ensure that migration scripts
+are *fault-tolerant* under these conditions, that is, if a node is restarted
+and the script is resumed, it still arrives at a correct outcome.
 
-#### Global Configuration
+The simplest way to ensure fault tolerance is to never merge changes to
+the database within the script. In this case, the script will either complete
+and the changes will be merged atomically by the core, or the script
+will just restart from scratch after failure. This approach, however,
+may lead to out-of-memory errors for large migrations.
 
-Global configuration is common for all nodes in the blockchain network.
-An example of a global configuration parameter is the anchoring address
-in [the anchoring service](../advanced/bitcoin-anchoring.md). The anchoring
-address
-is common for all nodes in the blockchain network, its changes should be
-auditable
-and authorized by specific nodes, etc.
+To handle more advanced cases, MerkleDB provides tools to contract the number
+of initial states for the script, such as *persistent iterators*.
+A persistent iterator is an iterator over a MerkleDB index with the position
+stored in the database. A typical pattern involving persistent iterators
+is to process elements in the index in chunks of reasonable size
+and merge changes to the database after each chunk. In this case, if the script
+crashes during processing, it will resume from the latest chunk.
+If the script has finished processing the index, processing will be skipped
+on restart since the iterator position is still persisted.
 
-Global configuration is managed by the system maintainers via
-[the configuration update service](../advanced/configuration-updater.md).
-From the point of view of a service, global configuration is *volatile*;
-it can be changed without touching service endpoints.
-A service may view the current global configuration via
-[dedicated methods][core-schema.rs]
-of the core API.
-
-#### Local Configuration
-
-Local configuration is specific to each node instance.
-An example of a local configuration parameter is a private anchoring key
-used in [the anchoring service](../advanced/bitcoin-anchoring.md);
-naturally, nodes have different private keys and they cannot be put on the
-blockchain for security reasons.
-
-Local configuration can be changed via editing the local configuration file
-of the node instance. The only
-way for a service to read its local configuration is to retain it after it is
-passed
-to the service constructor during [service initialization](#initialization).
-
-## Lifecycle
-
-Service lifecycle contains the following remarkable events.
-
-### Deployment
-
-At the very beginning of the lifecycle, the service is registered
-with the blockchain. During deployment, the service creates an initial
-service configuration and initializes its persistent storage.
-
-!!! note
-    Services may be deployed only during the blockchain
-    initialization (i.e., before the blockchain network starts creating any
-    blocks).
-    In the future releases services will be able to be deployed dynamically as
-    shared libraries.
-
-### Initialization
-
-Each time a validating or auditing node is started, it initializes all
-deployed services. Initialization passes local and global blockchain
-configuration
-to the service, so it can properly initialize its state.
-If the configuration is updated, the services are automatically restarted.
-
-### Transaction Processing
-
-A service is responsible for verifying the structural integrity of incoming
-transactions
-and executing transactions (i.e., applying them to the blockchain state).
-Transactions are executed during [the precommit stage](consensus.md)
-of the consensus (this concerns validators only) or when a node receives a
-block.
-
-### Event Handling
-
-Services may subscribe to events (such as a block being committed) and perform
-some work in the event handlers. Some event handlers cannot modify the
-blockchain state, while some handlers can. See
-[Commit Handler](#commit-handler) section for more information on the applied
-handlers.
-
-The handlers can be used for various tasks such as logging, data migrations,
-updating local parameters, and/or generating and broadcasting transactions to
-the blockchain network.
-
-!!! note
-    Currently, the only built-in event for services subscription is block
-    commit. The handlers operable with this event are `before_commit` and
-    `after_commit`. More events
-    will be added in the future, including possibility for services to define
-    and emit events and for services and light clients to subscribe to events
-    emitted by the services.
+!!! tip
+    [The testkit](../advanced/service-testing.md) provides automated tools
+    to test script fault tolerance for the Rust runtime.
 
 ## Service Development
 
@@ -273,7 +269,7 @@ Here is a list of things to figure out when developing an Exonum service:
 - What types of actions will the service perform? What variable parameters
   do these actions have? (Determines the endpoints the service will have.)
 - Who will authorize each of these actions? (You might want to use some kind
-  of [public key infrastructure][wiki:pki] for serious applications
+  of [public key infrastructure][wiki:pki]
   in order to make the security of the blockchain fully decentralized.)
 - What data will the service persist? What are the main persisted entities?
   How are these entities organized into data collections (maps
@@ -288,12 +284,12 @@ Here is a list of things to figure out when developing an Exonum service:
   read request endpoints.)
 - Are there any maintenance tasks needed for the service? Do the tasks need
   to be invoked automatically, or authorized by system administrators?
-  (These tasks could be implemented in the commit event handler of the service,
+  (These tasks could be implemented in the block commit handler of the service,
   or as private API endpoints.)
 - What parameters do maintenance tasks require? Are these parameters local
   to each node that the service runs on, or do they need to be agreed
   by the blockchain maintainers? (The answer determines whether a parameter
-  should be a part of the local configuration or stored in the blockchain.)
+  should be provided to the the service locally or stored in the blockchain.)
 
 !!! tip
     [The Cryptocurrency Tutorial](../get-started/create-service.md)
@@ -306,222 +302,46 @@ There are some temporary limitations on what you can do
 with Exonum services. Please consult [the Exonum roadmap](../roadmap.md)
 on when and how these limitations are going to be lifted.
 
-#### Interaction among Services
+#### Interaction Among Services
 
-There is no unified API for services to
-access other services’ endpoints. As an example, a service cannot call a
-transaction
-defined in another service, and cannot read data from another service
-via its read endpoint.
+Services may call each other’s transactions, but the support of such
+*internal calls* is limited so far. In particular, the internal calls
+are not isolated, meaning that the changes made to the database state
+in an internal call cannot be rolled back on an error unless the entire
+enclosing transaction errors.
 
-#### Authentication Middleware
+Additionally, there is no IDL to describe service interface, which makes
+interaction among services written in different languages rather clunky.
 
-Unlike common web frameworks, Exonum does not provide authentication
-middleware
-for service endpoints. Implementing authentication and authorization is thus
-the responsibility of a service developer.
+#### No Unified Read Requests
 
-## Interface with Exonum Framework
-
-Internally, services communicate with the Exonum framework via an interface
-established in the [`Service`][service.rs] trait.
-This trait defines the following methods that need to be implemented by
-a service developer.
-
-<!-- link docs.rs page for the `Service` trait rather than its source code-->
-
-### Service Identifiers
-
-```rust
-fn service_id(&self) -> u16;
-fn service_name(&self) -> &str;
-```
-
-`service_id` returns a 2-byte service identifier, which needs to be unique
-within a specific Exonum blockchain. `service_name` is similarly a unique
-identifier,
-only it is a string instead of an integer.
-
-`service_id` is used:
-
-- To identify [transactions](transactions.md) handled by the service
-- Within the blockchain state. See [`state_hash`](#state-hash) below and
-  [*Storage*](storage.md)
-
-`service_name` is used:
-
-- In [the configuration](configuration.md). Service configuration
-  is stored in the overall configuration under the key `service_name`
-  in the `services_configs` variable
-- To compute API endpoints for the service. All service endpoints
-  are mounted on `/api/services/{service_name}`
-- In naming service [tables](../glossary.md#table). By convention, table names
-  should start with `service_name` followed by a period `.`
-
-!!! note "Example"
-    [The Bitcoin anchoring service](../advanced/bitcoin-anchoring.md)
-    defines `service_name` as `"btc_anchoring"`. Thus, API endpoints of the
-    service
-    are available on `/api/services/btc_anchoring/`, its configuration is
-    stored in the `services.btc_anchoring` section of the overall configuration,
-    and its tables have names starting with `"btc_anchoring."`.
-
-### State Hash
-
-```rust
-fn state_hash(&self, snapshot: &Snapshot) -> Vec<Hash>;
-```
-
-The `state_hash` method returns a list of hashes for all
-Merkelized tables defined by the service. Hashes are calculated based on the
-current blockchain state `snapshot`.
-The core uses this list to aggregate
-hashes of tables defined by all services into a single Merkelized meta-map.
-The hash of this meta-map is considered the hash of the entire blockchain state
-and is recorded as such in blocks and [`Precommit` messages](consensus.md).
-
-In the case when a service does not have any Merkelized tables, it should
-return an empty list.
-
-!!! note
-    The keys of the meta-map are defined as pairs `(service_id, table_id)`,
-    where `service_id` is a 2-byte [service identifier](#service-identifiers)
-    and `table_id` is a 2-byte index of a table within the vector returned
-    by the `state_hash` method.
-    Keys are then hashed in order to provide
-    a more even key distribution, which results in a more balanced
-    Merkle Patricia tree.
-
-### Parse Raw Transaction
-
-```rust
-fn tx_from_raw(&self, raw: RawTransaction)
-               -> Result<Box<Transaction>, MessageError>;
-```
-
-The `tx_from_raw` method is used to parse raw transactions received from the
-network
-into specific transaction types handled by the service. The core calls this
-method
-for all incoming transactions at the beginning of transaction processing.
-The service, which `tx_from_raw` method
-will be called for a particular transaction, is chosen
-based on the `service_id` field in the transaction serialization.
-
-### Initialization Handler
-
-```rust
-use serde_json::Value;
-
-fn initialize(&self, fork: &mut Fork) -> Value {
-    Value::Null
-}
-```
-
-`initialize` returns an initial
-[global configuration](#global-configuration)
-of the service in the JSON format.
-This method is invoked for all deployed services during
-the blockchain initialization. A result of the method call for each service
-is recorded under [the string service identifier](#service-identifiers)
-in the configuration. The resulting initial configuration is augmented
-by non-service parameters (such as public keys of the validators) and is
-recorded in the genesis block.
-
-The default trait implementation returns `null` (i.e., no configuration).
-It must be redefined for services that have global configuration parameters.
-
-### Commit Handler
-
-Currently Exonum provides two [event handlers](#event-handling).
-
-- `before_commit` method:
-
-```rust
-fn before_commit(&self, fork: &mut Fork) { }
-```
-
-This method is invoked for every deployed service each time a new block
-is formed but before it is committed to the blockchain. The method analyses the
-results of a new block execution and adds some information into this block in
-accordance with the expected new blockchain state. For example, such
-information may be
-some statistical data. In this way the handler may affect the blockchain state.
-
-The order of invoking `before_commit` method for every service depends on the
-service ID. `before_commit` for the service with the smallest ID is invoked
-first up to the largest one.
-
-- `after_commit` method:
-
-```rust
-fn after_commit(&self, context: &ServiceContext) { }
-```
-
-This method is invoked for every deployed service each time a block
-is committed in the blockchain locally. `after_commit` receives the
-service context, which can be used to inspect the blockchain state, create
-transactions and push them into the queue for broadcasting, etc. Unlike
-`before_commit` the operations of this handler do not affect the blockchain
-state.
-
-!!! note
-    Keep in mind that `after_commit` is sequentially invoked for each block
-    in the blockchain during the initial full node synchronization.
-
-### REST API Initialization
-
-```rust
-use exonum::api::ServiceApiBuilder;
-
-fn wire_api(&self, builder: &mut ServiceApiBuilder) {
-
-}
-```
-
-`wire_api` provides hooks for defining public and private API endpoints
-of the service. This method receives a `ServiceApiBuilder`, which allows
-binding custom handlers to REST API.
-
-The default trait implementation does not define any public or private
-endpoints.
+Services may read each other’s schemas via publicly declared schema
+descriptions. For external clients, a different mechanism is used;
+a service may provide runtime-specific APIs to get service data.
+The unification of these two interfaces is one of roadmap goals.
 
 ## Tips and Tricks
 
 ### Communication with External World
 
 Services may access the external world (read and write files from the
-filesystem,
-send/receive data on the network, and so on), but should do it only
-in the non-consensus code (i.e., code that is not executed during transaction
-execution).
-A good place for such code is event handlers.
+filesystem, send / receive data on the network, and so on), but should do it
+only in the non-consensus code (i.e., code that is not executed during transaction
+execution). A good place for such code is the block commit handler.
 
 !!! note "Example"
     [The anchoring service implementation](https://github.com/exonum/exonum-btc-anchoring)
-    uses the commit event handler extensively to communicate with the Bitcoin
+    uses the block commit handler extensively to communicate with the Bitcoin
     Blockchain network.
 
 ### Services vs Smart Contracts
 
 Services are “larger” than smart contracts in Ethereum. For example, in
-Ethereum
-multi-signature contracts are instantiated for each specific configuration of
-participants;
-in Exonum, all multi-signature functionality can be contained within a single
-service.
+Ethereum multi-signature contracts are instantiated for each specific configuration
+of participants; in Exonum, all multi-signature functionality can be contained
+within a single service.
 This makes services more manageable and improves performance and access control
 management.
-
-### Transaction Interface
-
-Transactions in Exonum are separate entities, rather than datatypes consumed
-by the methods of the service object. This may seem complicated at first, but
-makes
-transaction handling more flexible. For example, it could be possible
-(and there are plans) to add management of transaction ordering in an
-unconfirmed
-transactions pool via an extra method of the transaction interface.
 
 ### Transaction Processing Peculiarities
 
@@ -532,13 +352,10 @@ use non-blockchain data sources in the transaction processing code – it could
 be difficult to keep them synchronized at all times.
 
 Furthermore, keep in mind that services may run on both validators and auditing
-nodes.
-Hence, a good idea is to make all secret information used in the local
-configuration
-(e.g., private keys) optional; then, it is kept in mind that a node
+nodes. Hence, a good idea is to make all secret information used in the local
+configuration (e.g., private keys) optional; then, it is kept in mind that a node
 running the service might not know this information.
 
-[actix-web]: https://actix.rs/
 [wiki:atomicity]: https://en.wikipedia.org/wiki/Atomicity_(database_systems)
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [rocksdb]: http://rocksdb.org

@@ -11,7 +11,7 @@ which allows the following operations:
 - creating a wallet
 - replenishing the wallet balance
 - transferring money between wallets
-- obtaining [cryptographic proofs](../architecture/storage.md#merkelized-indices)
+- obtaining [cryptographic proofs](../architecture/merkledb.md#merkelized-indices)
   of executed transactions
 - reviewing wallets history.
 
@@ -284,7 +284,7 @@ fn main() {
 ### Create Schema
 
 As we already mentioned in the simple Cryptocurrency Tutorial schema is a
-structured view of the [key-value storage](../architecture/storage.md)
+structured view of the [key-value storage](../architecture/merkledb.md)
 used in Exonum. We will use the same `Snapshot` and `Fork` abstractions – for
 read requests and transactions
 correspondingly – to interact with the schema.

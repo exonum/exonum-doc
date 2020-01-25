@@ -133,11 +133,6 @@ second (tps). During test benchmarks, Exonum handles up to 7,000 tps, with a
 2.5 sec. clearing delay (the interval between transaction generation and its
 inclusion into a block).
 
-<!--TODO: I would like to see a link to a blog post
-> which illustrates the benchmarks
-> and explains their results.
-> It will greatly increase credibility of such statements.-->
-
 ## Main Components
 
 ### Services
@@ -149,20 +144,21 @@ play the same role as smart contracts in some other blockchains.
 Developing Exonum services is similar to service development in Web or
 in enterprise platforms; they have the same principal components.
 
-#### Endpoints
+#### Service Interfaces
 
-A service has a set of endpoints (realized as REST APIs) using which
+A service has a set of interfaces using which
 the service can communicate with the outside world. The Exonum framework acts
 as middleware, dispatching requests among services and abstracting the
 intricacies of data (de)serialization, access control, and other typical
 middleware tasks away from service developers.
 
-There are 3 types of service endpoints:
-
-- **Transactions** correspond to `PUT` or `POST` requests in REST
-- **Read requests** correspond to `GET` requests in REST
-- **Private APIs** represent administrative and maintenance endpoints,
-  generally not accessible to the outside world
+Out of the box, the Exonum framework supports only **transactions**
+as an external service interface. Transactions correspond to `PUT` or `POST`
+requests in the REST paradigm. However, services may also have
+[runtime]-specific interfaces. As an example, both Rust and Java services
+provide abilities for the service to define REST API. This API can
+be used to retrieve data from the blockchain (corresponding to
+`GET` requests in REST), or to administer the service.
 
 #### Persistence
 
@@ -207,6 +203,44 @@ such as [Merkle trees][wiki:mt] and [linked timestamping][wiki:linked-ts],
 to ensure that the full nodes cannot misguide the client, even if there is a
 collusion among the blockchain maintainers.
 
+## How Exonum is Different
+
+### Business Logic Lifecycle
+
+Business logic in Exonum is subject to well-defined
+[lifecycle](../architecture/service-lifecycle.md), meaning that you
+know exactly how the blockchain will behave at all times.
+The lifecycle encompasses necessary, but often neglected in blockchain space
+tasks, such as versioning and data migration. The latter is fully asynchronous
+and safe by construction – all nodes in the network are guaranteed to arrive
+at the same migration outcome.
+
+### Transparent Administration
+
+The [supervisor](../advanced/supervisor.md) encapsulates blockchain
+adminstration. Being fully customizable, the supervisor can fit vastly
+different setups – from a test project to a decentralized consortium network.
+
+### Multiple Runtimes
+
+Exonum supports services written in multiple programming languages with
+seamless integration between them. This means that it is unnecessary to
+choose between performance and ease of support – a single blockchain
+can host high-performance Rust services and enterprise-grade services in Java.
+Moreover, if performance becomes a bottleneck, a Java service can be
+migrated to Rust using standard migration tooling.
+
+### Advanced Storage
+
+Beyond key-value containers provided by other blockchain frameworks,
+Exonum allows to [build hierarchies of collections](../architecture/merkledb.md#index-groups)
+with full support of hierarchical [authenticity proofs](../glossary.md#merkle-proof).
+Each data collection in Exonum storage supports a rich set of operations,
+such as iteration and `O(1)` clearing. [Data migrations](../glossary.md#data-migration)
+are a first-class entity for the database backend, which provides
+various helpers for them, such as automatically cleared temporary data storage
+and persistent iterators.
+
 ### Bitcoin Anchoring
 
 Exonum provides [an anchoring service](../advanced/bitcoin-anchoring.md)
@@ -236,3 +270,4 @@ authenticity of data stored in light clients could still be verified.
 [wiki:tx]: https://en.wikipedia.org/wiki/Database_transaction
 [rust-mut]: https://doc.rust-lang.org/book/mutability.html
 [rust-ref]: https://doc.rust-lang.org/book/references-and-borrowing.html
+[runtime]: ../architecture/services.md#runtimes

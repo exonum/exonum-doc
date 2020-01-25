@@ -103,20 +103,18 @@ tests are always welcome.
 A separate nightly Rust toolchain is required if you want to run
 the [clippy][clippy] linter locally. Clippy is used
 in CI builds of Exonum and other repositories to detect common Rust anti-patterns.
-In general, clippy supports the latest nightly version of Rust. It can be installed
-with
+It can be installed with
 
 ```shell
-rustup toolchain install <nightly-rust-version>
+rustup component add clippy
 ```
 
-where `<nightly-rust-version>` is the nightly Rust version supported by clippy.
 Consult the clippy installation guide for more details.
 
 After installing nightly Rust, clippy checks can be run with
 
 ```shell
-cargo +<nightly-rust-version> clippy
+cargo clippy --all --tests --examples --benches
 ```
 
 #### Rustfmt
@@ -125,28 +123,24 @@ cargo +<nightly-rust-version> clippy
 style checks in CI builds. Note that Exonum repositories pin the version
 of rustfmt in order to get consistent formatting.
 
-You can install rustfmt locally with
+You can install the formatter locally with
 
 ```shell
-cargo install rustfmt --vers <rustfmt-version> --force
+rustup component add rustfmt
 ```
-
-where `<rustfmt-version>` is the supported version of the formatter.
-You may find the supported version in
-[the Travis configuration of Exonum core repository][core-travis].
 
 After installing the formatter, its checks can be run with
 
 ```shell
-cargo fmt --write-mode=diff
+cargo fmt --all -- --check
 ```
 
-Consult the rustfmt readme for more details.
+Consult the `rustfmt` readme for more details.
 
 ### Pull Request Naming and Descriptions
 
 If a pull request is specifically not to be considered for merging (yet),
-please prefix its title with `WIP:`.
+please mark it with a “Work in Progress” label.
 You may use [task lists][gh:task-lists]
 in the body of the pull request to indicate pending tasks.
 
@@ -170,24 +164,9 @@ from pull request to pull request.
     to amend changes. This preserves the discussion and review that happened earlier
     for the respective change set.
 
-### Preparations for Merge
+### Merge Strategy
 
-If your pull request is accepted for merging, you may be asked by a maintainer
-to squash and/or [rebase](https://git-scm.com/docs/git-rebase) your commits
-before it will be merged. The basic squashing workflow is shown below.
-
-```shell
-git checkout your_branch_name
-git rebase --interactive HEAD~n
-# n is normally the number of commits in the pull
-
-# Set commits from 'pick' to 'squash', save and quit;
-# on the next screen, edit/refine commit messages;
-# save and quit.
-
-# Force-push to GitHub
-git push --force
-```
+We use “squash and merge” strategy to merge PRs.
 
 ## Pull Request Philosophy
 
@@ -312,8 +291,8 @@ must contain its license header with the original author(s) and source.
 [gh:local-pr]: https://help.github.com/articles/checking-out-pull-requests-locally/
 [git:messages]: http://chris.beams.io/posts/git-commit/
 [travis]: https://docs.travis-ci.com/
-[clippy]: https://github.com/Manishearth/rust-clippy
-[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
+[clippy]: https://github.com/rust-lang/rust-clippy
+[rustfmt]: https://github.com/rust-lang/rustfmt
 [core-travis]: https://github.com/exonum/exonum/blob/master/.travis.yml
 [gitter]: https://gitter.im/exonum
 [reddit]: https://www.reddit.com/r/Exonum/
