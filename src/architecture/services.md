@@ -90,6 +90,11 @@ Besides core-provided interfaces, a runtime may define service interfaces
 of its own. For example, both Rust and Java services may define HTTP APIs,
 despite the core knowing nothing about this kind of interface.
 
+!!! tip
+    See [*Service Interaction*](../advanced/service-interaction.md)
+    for details how services may interact with each other within
+    a single blockchain.
+
 ### Transactions
 
 Transactions come from the entities external to the blockchain, e.g.,
