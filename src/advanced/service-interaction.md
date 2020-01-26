@@ -173,8 +173,8 @@ Top-level calls within a block are authorized as follows:
 - [Hooks](../architecture/services.md#hooks) executing before and
   after transactions are authorized by a special *blockchain* authority
 
-Information about call auth has a forward-compatible uniform representation
-(cf. addresses in Ethereum).
+Information about call auth has a forward-compatible uniform representation –
+**caller address** (cf. addresses in Ethereum).
 Services may use this representation to compare or index callers
 without the necessity to care about all possible kinds of authorization
 supported by the framework.
@@ -188,6 +188,29 @@ supported by the framework.
     Another qualitatively new feature enabled by this kind of auth is
     PKI / identity, that is, authorization like “User with name Alice
     as currently defined in the identity service with ID 1000.”
+
+### Authorization Info Specification
+
+Authorization info is encapsulated in the `Caller` Protobuf message
+exported by the Exonum core:
+
+```protobuf
+message Caller {
+  oneof caller {
+    // The caller is identified by the specified Ed25519 public key.
+    exonum.crypto.PublicKey transaction_author = 1;
+    // The call is invoked with the authority of a blockchain service
+    // with the specified identifier.
+    uint32 instance_id = 2;
+    // The call is invoked by one of the blockchain lifecycle events.
+    google.protobuf.Empty blockchain = 3;
+  }
+}
+```
+
+Caller address is derived from a `Caller` message as a SHA-256 digest
+of its canonical Protobuf serialization. `oneof` serialization
+provides domain separation of addresses for different authorization types.
 
 [PKI]: https://en.wikipedia.org/wiki/Public_key_infrastructure
 [ERC-20]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
