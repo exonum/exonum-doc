@@ -107,6 +107,10 @@ For example, a capability to write to schemas of other services
 would be helpful in implementing a transparent and secure way
 to amend data mistakes, which are inevitable in real-world blockchain apps.
 
+### Service Dependencies
+
+FIXME
+
 ## Long Term
 
 ### Unified Read Requests
