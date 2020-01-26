@@ -109,7 +109,16 @@ to amend data mistakes, which are inevitable in real-world blockchain apps.
 
 ### Service Dependencies
 
-FIXME
+In Exonum 1.0, dependencies among services are built *ad hoc*. A service
+may check the existence and artifact requirements of its dependencies
+on initialization and bail out if the requirements are not satisfied.
+However, there is nothing preventing network maintainers
+from [stopping](architecture/service-lifecycle.md) the dependency or
+updating it to an incompatible version.
+
+In the future releases, the [supervisor](advanced/supervisor.md) will take
+dependencies into account, making service lifecycle safer and some tasks
+(e.g., deploying dependencies) more streamlined.
 
 ## Long Term
 
