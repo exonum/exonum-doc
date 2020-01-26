@@ -131,7 +131,7 @@ where
 - [LEB128] is a compact serialization format for unsigned integers
 - `bit_length` is the number of bits in the path
 - `bytes` is the path serialized as the minimum necessary number of bytes,
-  with zero padding if necessary.
+  with zero padding at the end if necessary.
 
 Hashes associated with child nodes are computed recursively:
 
@@ -168,9 +168,11 @@ thus minimizing overhead (i.e., heap allocations) and allowing to use
 them in environments not allowing recursive data types. A proof
 consists of three principal parts:
 
-- Entries proven to exist in the map (i.g., values together with respective keys)
+- Entries proven to exist in the map (i.e., values together with respective keys)
 - Keys proven to not exist in the map
-- Intermediate MPT nodes that together with entries allow to restore map hash
+- Intermediate MPT nodes that together with entries allow to restore map hash.
+  Intermediate nodes are identified by the complete path to a node
+  from the [true MPT root](#redefining-tree-root).
 
 ??? note "Protobuf spec"
     ```protobuf

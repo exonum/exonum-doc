@@ -203,11 +203,11 @@ contains some of its elements.
 ### Format
 
 The proofs returned by the Exonum storage engine are non-recursive,
-thus minimizing overhead (i.e., heap allocations) and allowing to use
+thus minimizing overhead (e.g., heap allocations) and allowing to use
 them in environments not allowing recursive data types. A proof
 consists of three principal parts:
 
-- Entries proven to exist in the list (i.g., values together with their indexes)
+- Entries proven to exist in the list (i.e., values together with their indexes)
 - Intermediate tree nodes (i.e., `T(height, ..)` values at `height > 0`)
   that together with entries allow to restore `root_hash` of the Merkle tree
   for the list
@@ -283,9 +283,9 @@ Restoring `root_hash` can be performed as per [above section](#computing-root-ha
 To make the above procedure more effective, the proofs returned by MerkleDB
 have entries ordered by increasing index and intermediate nodes ordered by
 increasing `(height, index)` tuple. This allows to combine layers on step 4
-and lift them on step 5 more effectively. If the client wants to use
-the ordering, the client must check it in advance (which takes linear time
-w.r.t. the proof size).
+and lift them on step 5 more effectively. If the client wants to take
+the ordering into account during verification, the client must check it
+in advance (which takes linear time w.r.t. the proof size).
 
 ## See Also
 
