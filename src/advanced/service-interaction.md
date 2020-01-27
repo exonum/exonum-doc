@@ -14,11 +14,11 @@ and used.
 
 ## Problem Overview
 
-The problem solved by the techniques described in this article
-is as follows. Service A wants to get information from service B
-instantiated on the same blockchain, or to modify its data using
-an interface provided by service B. A couple of scenarios covered
-by this are:
+Given multiple services in the blockchain, some of them may want to interact
+with other services. The interaction can include either reading the data
+of other service, or modifying its data using a service public interface.
+
+A couple of scenarios involving service interaction are:
 
 - The dependent service wants to read the current time from
   a [time oracle](time.md), e.g., in order to implement a time-lock
@@ -135,7 +135,7 @@ message Transfer {
 ```
 
 !!! warning
-    The options in the IDL are for illustrative purposes only; Exonum
+    The options in the IDL are for illustrative purposes only. Exonum
     does not (yet) have a well-specified IDL for interfaces.
 
 In this case, the information necessary to perform a call to the service
