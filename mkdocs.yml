@@ -21,7 +21,7 @@ site_url: 'https://exonum.com/doc'
 site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 
-copyright: © 2018 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2020 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
   og_image: 'assets/images/logo-docs.png'
@@ -87,6 +87,8 @@ pages:
     - 'Service Testing': 'advanced/service-testing.md'
     # Artifact versioning
     - 'Artifact Versioning': 'advanced/versioning.md'
+    # Interaction among services
+    - 'Service Interaction': 'advanced/service-interaction.md'
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit

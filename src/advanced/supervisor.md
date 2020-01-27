@@ -138,7 +138,8 @@ should be serialized as a Protobuf message.
     implementing the configuration interface should be performed at your
     risk.
 
-The service should check that both these operations are authorized
+The service should check that both these operations
+are [authorized](service-interaction.md#authorization-via-services)
 by the supervisor service. The supervisor guarantees that it will only apply
 previously successfully verified configs.
 
