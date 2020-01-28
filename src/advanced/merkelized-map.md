@@ -85,7 +85,7 @@ Root hash for a map with a single entry is computed as follows:
 ```text
 root_hash = hash(
     HashTag::MapBranchNode ||
-    0x01 || key_path || 0x00 ||
+    key_path ||
     value_hash
 );
 value_hash = hash(HashTag::Blob || value),
@@ -98,7 +98,19 @@ where
 - `value_hash` is the domain-separated hash of the entry value
   with tag `HashTag::Blob = 0`.
 
-`0x01` and `0x00` are single bytes present for historic reasons.
+`key_path` serialization follows the generic format:
+
+```text
+LEB128(bit_length) || bytes,
+```
+
+where
+
+- [LEB128] is a compact serialization format for unsigned integers
+- `bit_length` is the number of bits in the path (i.e., 256 in this case)
+- `bytes` is the path serialized as the minimum necessary number of bytes,
+  with zero padding at the end if necessary. (In this case, `bytes` has
+  length 32 and contains no padding.)
 
 ### Map With More Than One Element
 
@@ -115,23 +127,10 @@ root_hash = hash(
 
 Here
 
-- `left_path` and `right_path` are serialized paths to the child nodes;
-  their serialization format is described below.
+- `left_path` and `right_path` are serialized paths to the child nodes.
+  The same serialization format is used as in the previous case.
 - `left_hash` and `right_hash` are 32-byte hashes associated with the
   child nodes.
-
-Paths are serialized in this case as
-
-```text
-LEB128(bit_length) || bytes,
-```
-
-where
-
-- [LEB128] is a compact serialization format for unsigned integers
-- `bit_length` is the number of bits in the path
-- `bytes` is the path serialized as the minimum necessary number of bytes,
-  with zero padding at the end if necessary.
 
 Hashes associated with child nodes are computed recursively:
 
@@ -151,7 +150,7 @@ produced by “collapsing” some intermediate nodes in the MPT.
 Another point of view – from the light client perspective – is that a proof
 is essentially a limited view of a map, for which the MPT is
 constructed. This view allows to calculate the map hash and
-contains some of its elements.
+proves that certain elements are contained in the map.
 
 ### Proof Example
 
@@ -192,10 +191,16 @@ consists of three principal parts:
 
     // Proof path and corresponding hash value.
     message MapProofEntry {
-      // `proof_path` 34-byte serialization; see MerkleDB docs
-      // for details.
-      bytes proof_path = 1;
+      // Path to the node, expressed with the minimum necessary number of bytes.
+      // Bits within each byte are indexed from the least significant to
+      // the most significant.
+      // The last byte may be padded with zeros if necessary.
+      bytes path = 1;
+      // Hash associated with the node.
       exonum.crypto.Hash hash = 2;
+      // Number of zero bit padding at the end of the path.
+      // Must be in the `0..8` interval.
+      uint32 path_padding = 3;
     }
     ```
 
