@@ -163,6 +163,10 @@ contents.
 
 #### ProofListIndex
 
+!!! tip
+    See [*Merkelized List*](../advanced/merkelized-list.md) for more technical
+    details on `ProofListIndex` and related proofs.
+
 `ProofListIndex` implements a Merkle tree, which is a merkelized version of an
 array list. It implements the same methods as `ListIndex` except for
 truncation of the list. `ProofListIndex` adds an
@@ -184,6 +188,10 @@ The following additional procedures are implemented:
     the Merkle tree after operations on the list.
 
 #### ProofMapIndex
+
+!!! tip
+    See [*Merkelized Map*](../advanced/merkelized-map.md) for more technical
+    details on `ProofMapIndex` and related proofs.
 
 `ProofMapIndex` is a merkelized version of a map based on a binary
 Merkle Patricia tree.
