@@ -198,7 +198,7 @@ produced by “collapsing” some intermediate nodes in the Merkle tree.
 Another point of view – from the light client perspective – is that a proof
 is essentially a limited view of a list, for which the Merkle tree is
 constructed. This view allows to calculate the hash of the whole list and
-contains some of its elements.
+proves that specific elements are present in the list.
 
 ### Format
 
