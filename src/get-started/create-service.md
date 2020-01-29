@@ -146,7 +146,8 @@ As a third step, in the `build.rs` file we introduce the `main` function that
 generates Rust files from their Protobuf descriptions.
 
 !!! note
-    Make sure that at this stage you have `protoc` installed.
+    Make sure that at this stage you have `protoc` installed. See the
+    [install](install.md) page for details.
 
 ```rust
 use exonum_build::ProtobufGenerator;
@@ -219,10 +220,11 @@ database access types like `Snapshot`s and `Fork`s.
 !!! tip
     `Snapshot` represents an immutable view of the storage,
     and `Fork` is a mutable one, where the changes can be easily
-    rolled back. For more details see [MerkleDB docs](../architecture/merkledb.md)
+    rolled back. For more details see
+    [MerkleDB docs](../architecture/merkledb.md).
 
 As the schema should work with both types of storage views, we declare it as
-a generic wrapper over `Access`:
+a generic structure with a template parameter that implements `Access` trait:
 
 ```rust
 #[derive(Debug, FromAccess)]
@@ -276,7 +278,7 @@ message TxCreateWallet {
 }
 ```
 
-The transaction to transfer coins between different wallets (`TxTransfer`)
+The transaction to transfer tokens between different wallets (`TxTransfer`)
 has a public key of the receiver (`to`). It also contains the amount of money
 to move between the wallets. We add the `seed` field to make sure that our
 transaction is [impossible to replay](../architecture/transactions.md#non-replayability).
@@ -345,7 +347,7 @@ invoke a certain method.
 
 !!! note
     All the transactions numeric IDs should be unique. An attempt to create two methods
-    with the same numeric ID will result in a failure.
+    with the same numeric ID will result in a compile error.
 
 ### Reporting Errors
 
@@ -367,24 +369,14 @@ Let’s define the codes of the above errors:
 #[derive(Debug, ExecutionFail)]
 pub enum Error {
     /// Wallet already exists.
-    ///
-    /// Can be emitted by `TxCreateWallet`.
     WalletAlreadyExists = 0,
     /// Sender doesn't exist.
-    ///
-    /// Can be emitted by `TxTransfer`.
     SenderNotFound = 1,
     /// Receiver doesn't exist.
-    ///
-    /// Can be emitted by `TxTransfer`.
     ReceiverNotFound = 2,
     /// Insufficient currency amount.
-    ///
-    /// Can be emitted by `TxTransfer`.
     InsufficientCurrencyAmount = 3,
     /// Sender same as receiver.
-    ///
-    /// Can be emitted by `TxTransfer`.
     SenderSameAsReceiver = 4,
 }
 ```
@@ -400,7 +392,7 @@ has no implementation. Thus, there is no actual business logic attached to
 them. To fix this situation, we should declare our service, and then implement
 the `CryptocurrencyInterface` trait for it.
 
-The service declaration is similar to the usual structure declaration:
+Service is a `struct` which implements several certain traits:
 
 ```rust
 /// Cryptocurrency service implementation.
@@ -458,6 +450,11 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
 }
 ```
 
+!!! note
+    Calling `expect` in the code above is not really suitable for production use.
+    In actual services consider using `CallerAddress` for better forward
+    compatibility.
+
 This transaction also sets the wallet balance to 100. To work with database,
 we instantiate `CurrencySchema` using `service_data` method of `ExecutionContext`.
 
@@ -468,10 +465,10 @@ we instantiate `CurrencySchema` using `service_data` method of `ExecutionContext
 
 `TxTransfer` transaction gets two wallets for both sides of the transfer
 transaction. If they are found, we check the balance of the sender. If
-the sender has enough coins, then we decrease the sender’s balance
+the sender has enough tokens, then we decrease the sender’s balance
 and increase the receiver’s balance.
 
-We also need to check that the sender does not send the coins to himself.
+We also need to check that the sender does not send the tokens to himself.
 Otherwise, if the sender is equal to the receiver, the implementation below will
 create money out of thin air.
 
@@ -523,9 +520,7 @@ following signature:
 fn my_method(state: &ServiceApiState<'_>, query: MyQuery) -> api::Result<MyResponse>
 ```
 
-The `state` contains a channel, i.e. a connection to the blockchain node
-instance.
-Besides the channel, it also contains an interface to access blockchain data, which
+The `state` contains an interface to access blockchain data, which
 is needed to implement [read requests](../architecture/services.md#read-requests).
 
 ```rust
@@ -651,7 +646,7 @@ place it into [`examples/demo.rs`][demo.rs].
 
 ### Additional Dependencies
 
-Since services themselves aren't require the Exonum node, in this example we
+Since services themselves do not require the Exonum node, in this example we
 want to create one, and interact with it as well. Thus, we have to add several
 additional dependencies in our `Cargo.toml`:
 
@@ -790,6 +785,8 @@ and add the `Explorer` and our `Cryptocurrency` services.
 
 `Explorer` service is capable of sending transactions to the blockchain, so
 without this service we won't be able to interact with the `Cryptocurrency` service.
+For details about `Explorer` service see the
+[Other Services](../advanced/other-services.md) article.
 
 ### Run Node
 
@@ -914,7 +911,7 @@ Create `transfer-funds.json` and add the following code to this file:
 }
 ```
 
-This transaction transfers 15 coins from the first wallet to the second.
+This transaction transfers 5 tokens from the first wallet to the second.
 Send it to the node with:
 
 ```sh
