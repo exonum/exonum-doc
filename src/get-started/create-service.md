@@ -314,9 +314,10 @@ pub struct TxTransfer {
 }
 ```
 
-To make the service support the transactions defined above, we need to declare a service
-*interface*. A service interface is basically a trait with methods that correspond
-to the transactions processing logic. In our case the interface will look as follows:
+To make the service support the transactions defined above, we need to declare
+a service *interface*. A service interface is basically a trait with methods
+that correspond to the transactions processing logic. In our case the interface
+will look as follows:
 
 ```rust
 /// Cryptocurrency service transactions.
@@ -818,8 +819,8 @@ fn main() {
 That is, we:
 
 1. Initialize logging in the Exonum core library.
-2. Create a node with the non-persistent database (`TemporaryDB`), Rust runtime (which is
-  required to run services written in Rust programming language),
+2. Create a node with the non-persistent database (`TemporaryDB`), Rust runtime
+  (which is required to run services written in Rust programming language),
   two services (`CryptocurrencyService` and `Explorer`), and the
   configuration we have specified earlier.
 3. Run the created node.
