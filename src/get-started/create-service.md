@@ -415,7 +415,6 @@ the service lifecycle, like wiring the API. Currently we can skip them and
 leave the implementation empty.
 
 Now, when we have the structure, we can implement the actual business logic.
-
 We will do it in two steps, one step for each transaction we have.
 
 For creating a wallet, we check that the wallet does not exist and add a new
@@ -450,7 +449,7 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
 }
 ```
 
-!!! note
+!!! warning
     Calling `expect` in the code above is not really suitable for production use.
     In actual services consider using `CallerAddress` for better forward
     compatibility.
@@ -513,36 +512,14 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
 ## Implement API
 
 Next, we need to implement the node API.
-With this aim we declare a blank struct that includes a set of methods with the
-following signature:
-
-```rust
-fn my_method(state: &ServiceApiState<'_>, query: MyQuery) -> api::Result<MyResponse>
-```
-
-The `state` contains an interface to access blockchain data, which
-is needed to implement [read requests](../architecture/services.md#read-requests).
+With this aim we declare a blank struct that includes a set of methods that
+correspond to different types of requests:
 
 ```rust
 struct CryptocurrencyApi;
 ```
 
-### API for Transactions
-
-The core processing logic is essentially the same for all types of transactions
-and is implemented by `exonum`. Therefore, there is no need to implement a
-separate API for transactions management within the service. To send a
-transaction you have to create a transaction message according to the
-[uniform structure](../architecture/transactions.md#messages) developed by
-`exonum`.
-
-The transaction ID is a method numeric identifier in the interface trait
-and can be set by `interface_method` macro. As we've mentioned earlier,
-user has to set method IDs manually to the every method.
-
-### API for Read Requests
-
-We want to implement 2 read requests:
+For `CryptocurrencyService`, we want to implement 2 read requests:
 
 - Return the information about all wallets in the system
 - Return the information about a specific wallet identified by the public key.
@@ -585,6 +562,9 @@ impl CryptocurrencyApi {
     }
 }
 ```
+
+The `state` contains an interface to access blockchain data, which
+is needed to implement [read requests](../architecture/services.md#read-requests).
 
 As with the transaction endpoint, the methods have an idiomatic signature
 `fn(&ServiceApiState, MyQuery) -> api::Result<MyResponse>`.
@@ -652,6 +632,7 @@ additional dependencies in our `Cargo.toml`:
 
 ```toml
 # Dependencies required for example.
+[dev-dependencies]
 exonum-explorer-service = "1.0"
 exonum-node = "1.0"
 exonum-system-api = "1.0"
