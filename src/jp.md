@@ -46,7 +46,7 @@ Exonumを使用して簡単な仮想通貨アプリケーションを構築す�
 
 ### 仕様
 
-Exonumのドキュメントには、[シリアル化](architecture/serialization.md)、[ストレージ](architecture/storage.md)、
+Exonumのドキュメントには、[シリアル化](architecture/serialization.md)、[ストレージ](architecture/merkledb.md)、
 [ネットワークについて等](advanced/network.md)、フレームワークやその他様々な側面に関する詳細な説明が含まれています。
 
 ## 貢献・寄付する

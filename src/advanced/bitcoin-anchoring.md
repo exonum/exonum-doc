@@ -10,11 +10,6 @@ Even in the case of validators collusion, transaction history cannot be
 falsified. The discrepancy between the actual Exonum blockchain state and the
 one written to the Bitcoin blockchain will be found instantly.
 
-This document describes the **anchoring service operable with Exonum v0.10+**.
-For information on the anchoring service compatible with all previous versions
-of the framework, please refer to a
-[separate document](bitcoin-anchoring-without-segwit.md).
-
 !!! note
     This page mostly describes how the service functions. There is a
     separate page, describing how the service should be
@@ -276,8 +271,7 @@ ones.
 Additionally, as the anchoring Bitcoin address is a derivative from the list of
 anchoring public keys, it should be changed accordingly. The pub-keys list
 is stored in the global configuration; it can be updated by out-of-band
-means, for example, using
-[Configuration Update service](configuration-updater.md). The following
+means, for example, using the [supervisor service](supervisor.md). The following
 properties should be taken into account:
 
 1. New configuration is spread over nodes. At this point it is not active yet.

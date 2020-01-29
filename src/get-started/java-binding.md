@@ -143,7 +143,7 @@ abstract class [`AbstractService`][abstractservice].
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
 collections is arranged in two ways – ordinary collections and
-[Merkelized collections](../architecture/storage.md#merkelized-indices);
+[Merkelized collections](../architecture/merkledb.md#merkelized-indices);
 the latter allow
 providing cryptographic evidence of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
@@ -151,7 +151,7 @@ certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.
 
 For the detailed description of all Exonum collection types see the
-corresponding [documentation section](../architecture/storage.md#table-types).
+corresponding [documentation section](../architecture/merkledb.md#table-types).
 In Java, implementations of collections are located in
 [a separate package][storage-indices]. Said package documentation
 describes their use.
@@ -290,11 +290,11 @@ Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
 A transaction message contains:
 
-- a header with the identifying information, such as a numeric ID
-of the service instance which shall process this transaction
-and a transaction ID within that service;
-- a payload containing transaction parameters;
-- a public key of the author, and a signature that authenticates them.
+- A header with the identifying information, such as a numeric ID
+  of the service instance which shall process this transaction
+  and a transaction ID within that service;
+- A payload containing transaction parameters;
+- A public key of the author, and a signature that authenticates them.
 
 The transaction payload in the message can be serialized
 using an arbitrary algorithm supported by both the service client
@@ -367,10 +367,10 @@ current storage state when the transaction is executed. Exonum passes
 an [execution context][transaction-execution-context] as an argument.
 The context provides:
 
-- a `Fork` – a view that allows performing modifying operations;
-- the service instance name and numeric ID;
-- some information about the corresponding transaction message:
-its SHA-256 hash that uniquely identifies it, and the author’s public key.
+- A `Fork` – a view that allows performing modifying operations;
+- The service instance name and numeric ID;
+- Some information about the corresponding transaction message:
+  its SHA-256 hash that uniquely identifies it, and the author’s public key.
 
 A service schema object can be used to access data collections of this service.
 
@@ -403,8 +403,8 @@ as an "unexpected" execution error.
 If transaction execution fails, the changes made by the transaction are
 rolled back, while the error data is stored in the database for further user
 reference. Light clients also provide access to information on the
-[transaction][exonum-transaction-endpoint] execution result
-(which may be either success or failure) to their users.
+transaction execution result (which may be either success or failure)
+to their users.
 
 #### After Transactions Handler
 
@@ -1523,4 +1523,3 @@ For using the library just include the dependency in your `pom.xml`:
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
-[exonum-transaction-endpoint]: ../advanced/node-management.md#transaction

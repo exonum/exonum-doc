@@ -68,7 +68,7 @@ con Exonum:
 La documentación de Exonum contiene información detallada de muchos otros
 aspectos del marco como la
 [serialización binaria](architecture/serialization.md),
-el [almacenamiento](architecture/storage.md)
+el [almacenamiento](architecture/merkledb.md)
 y el [networking](advanced/network.md).
 
 ## Contribución

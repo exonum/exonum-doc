@@ -21,7 +21,7 @@ site_url: 'https://exonum.com/doc'
 site_author: 'Exonum Team'
 site_description: Exonum is a blockchain framework that allows to build secure permissioned blockchain applications.
 
-copyright: © 2018 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
+copyright: © 2020 Exonum Team. Available under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a> license
 
 extra:
   og_image: 'assets/images/logo-docs.png'
@@ -68,12 +68,12 @@ pages:
     - 'Services': 'architecture/services.md'
     # What is transaction? (purity, sequential consistency, non-replayability, signatures)
     - 'Transactions': 'architecture/transactions.md'
+    # Includes guidelines for services
+    - 'Service Lifecycle': 'architecture/service-lifecycle.md'
     # How to make Public API communication (both server and client side)
     - 'Clients': 'architecture/clients.md'
     # Local configuration - how to roughly configure a node (make it ready to run)
     - 'Configuration': 'architecture/configuration.md'
-    # Includes storage overview and system objects
-    - 'Storage': 'architecture/storage.md'
     # MerkledDB documentation
     - 'MerkleDB': 'architecture/merkledb.md'
     # How the data is serialised and deserialised to be transfered through the network
@@ -83,20 +83,24 @@ pages:
   - 'Advanced':
     # How the network module works: peer discovery, p2p connections
     - 'Network': 'advanced/network.md'
-    # Managing node through managing API ("RPC")
-    - 'Node Management': 'advanced/node-management.md'
-    # What is sandbox testing and simple example of one of sandbox tests
+    # Testing Rust services with testkit
     - 'Service Testing': 'advanced/service-testing.md'
-    # Configuration change service documentation
-    - 'Configuration Updater': 'advanced/configuration-updater.md'
-    # Anchoring service documentation without Segwit
-    - 'Bitcoin Anchoring (without SegWit)': 'advanced/bitcoin-anchoring-without-segwit.md'
+    # Artifact versioning
+    - 'Artifact Versioning': 'advanced/versioning.md'
+    # Interaction among services
+    - 'Service Interaction': 'advanced/service-interaction.md'
+    # Supervisor service documentation
+    - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit
     - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'    
     # Time service
     - 'Time Oracle': 'advanced/time.md'
-    # Merkle index overview
+    # Other useful services
+    - 'Other Services': 'advanced/other-services.md'
+    # `ProofListIndex` / `ListProof` overview
     - 'Merkelized List': 'advanced/merkelized-list.md'
+    # `ProofMapIndex` / `MapProof` overview
+    - 'Merkelized Map': 'advanced/merkelized-map.md'
     - 'Consensus':
       # Consensus specification
       - 'Consensus Specification': 'advanced/consensus/specification.md'

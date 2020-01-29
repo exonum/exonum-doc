@@ -90,7 +90,7 @@ To put it *very* simply, rounds proceed as follows:
    of other validators, it applies transactions specified in the voted
    proposal,
    and broadcasts a *precommit* message. This message contains the result of
-   the proposal execution in the form of [a new state hash](storage.md).
+   the proposal execution in the form of [a new state hash](merkledb.md).
    The precommit expresses that the sender is ready to commit the corresponding
    proposed block to the blockchain, but needs to see what other validators
    have to say on the matter just to be sure.

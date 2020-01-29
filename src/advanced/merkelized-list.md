@@ -1,8 +1,6 @@
 # Merkelized List
 
-<!-- cspell:ignore proofnode -->
-
-[**Merkelized list**](../architecture/storage.md#prooflistindex) is a version
+[**Merkelized list**](../architecture/merkledb.md#prooflistindex) is a version
 of a typed list that supports compact proofs of existence for its elements using
 Merkle trees. Merkelized lists in Exonum are designed as classic binary Merkle trees
 within the persistence module, but can also be viewed as append-only lists
@@ -57,37 +55,45 @@ parameters as a key for each element: `height` and `index`.
 !!! note
     To distinguish values from different lists in Exonum, an additional prefix is
     used for every key. Consult
-    [storage section](../architecture/storage.md) for more details.
+    [*MerkleDB*](../architecture/merkledb.md) for more details.
 
-1. Each Merkle tree element is addressed by an 8-byte `key = height || index`,
-  where:
-    - `height < 58` is height of element in the tree, where `0` is leaf, and is
-      represented as `6` bits
-    - `index` is index of element at the given height consisting of `58` bits
-    - `height` and `index` are serialized within `key` as
-      [big-endian][wiki:big-endian]
-2. The elements of the underlying list are stored in `(height = 0, index)`
-  cells, where `index` is in interval `[0, list.len())` and
-  `list.len()` is the number of leaves in the tree (or, equivalently, the
-  number of elements in the underlying list).
-3. Hash of a tree leaf is stored in `(height = 1, index)`.
-  It corresponds to the tree leaf stored in `(height = 0, index)`.
-4. Some of the rightmost intermediate nodes may have a single child; it is not
-  required that the obtained tree is full binary. Appending an element to the
-  list corresponds to writing it to the cell `(0, list.len())` and updating
-  `O(log list.len())` nodes of the tree with `height > 0`.
-5. A node at `(height > 1, index)` stores hashes of 1 or 2 child nodes.
-    - If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
-      nodes are present, the node `(height, index)` has 2 children hashes.
-    - If only `(height - 1, index * 2)` node is present, the
-      node at `(height, index)` has single child hash.
-6. `max_height` is the minimal height at which only a single hash is stored at
-  `index = 0`.
-    - `max_height = pow + 1`, where `pow` is the smallest integer such that
-      `2^pow >= list.len()`
-    - `(max_height, 0)` defines *the root hash* of the Merkle tree.
+Each Merkle tree element is addressed by an 8-byte `key = height || index`,
+where:
 
-An example of `key -> value` mappings in database.
+- `height < 58` is height of element in the tree, where `0` is leaf, and is
+  represented as `6` bits
+- `index` is index of element at the given height consisting of `58` bits
+- `height` and `index` are serialized within `key` as
+  [big-endian][wiki:big-endian]
+
+The elements of the underlying list are stored in `(height = 0, index)`
+cells, where `index` is in interval `[0, list.len())` and
+`list.len()` is the number of leaves in the tree (or, equivalently, the
+number of elements in the underlying list).
+
+Hash of a tree leaf is stored in `(height = 1, index)`.
+It corresponds to the tree leaf stored in `(height = 0, index)`.
+
+Some of the rightmost intermediate nodes may have a single child; it is not
+required that the obtained tree is full binary. Appending an element to the
+list corresponds to writing it to the cell `(0, list.len())` and updating
+`O(log list.len())` nodes of the tree with `height > 0`.
+
+A node at `(height > 1, index)` stores hashes of 1 or 2 child nodes.
+
+- If both `(height - 1, index * 2)` and `(height - 1, index * 2 + 1)`
+  nodes are present, the node `(height, index)` has 2 children hashes.
+- If only `(height - 1, index * 2)` node is present, the
+  node at `(height, index)` has single child hash.
+
+`max_height` is the minimal height at which only a single hash is stored at
+`index = 0`.
+
+- `max_height = pow + 1`, where `pow` is the smallest integer such that
+  `2^pow >= list.len()`
+- `(max_height, 0)` defines *the root hash* of the Merkle tree.
+
+An example of key–value mappings in database:
 
 Key | Height | Index | Value
 ------------|-------------:|-------------:|-------------
@@ -98,154 +104,188 @@ Key | Height | Index | Value
 ### Logical Representation
 
 Below is an illustration of the logical representation of a Merkle tree,
-containing `6` values `v0...v5`.
+containing 6 values `v0...v5`:
 
 ![Tree Structure](../images/merkle-tree-example.png)
 
-### Hashing Rules
+## Computing List Hash
+
+Hashing a Merkelized list consists of two logical operations:
+
+1. Computing the *root hash* of the tree
+2. Computing the *list hash* using the root hash and the list length.
+
+Since the second component is easier, we will define it first.
+Given the list length `len` and the `root_hash` of a Merkle tree corresponding
+to the list, the list hash is defined as
+
+```text
+h = sha-256( HashTag::ListNode || u64_LE(len) || root_hash )
+```
+
+Here,
+
+- `HashTag::ListNode = 2` is a tag separating lists from other hashed objects.
+  (Here and elsewhere, tags are serialized as a single byte.)
+- `u64_LE` is an 8-byte little-endian serialization of an integer.
+
+### Computing Root Hash
 
 Let `T(height, index)` be a value at tree node for element `index` at height
-`height`. Elements `T(0, index)` contain serialized values of the underlying list
-according to [the Exonum binary serialization spec](../architecture/serialization.md).
+`height`. Elements `T(0, index)` contain serialized values of the underlying list.
 Elements `T(height, index)` for `height > 0` are hashes corresponding the following
 rules.
 
 #### Rule 1. Empty Tree
 
-Hash of an empty tree is defined as 32 zero bytes.
+Root hash of an empty tree is defined as 32 zero bytes.
 
-#### Rule 2. `height=1`
+#### Rule 2. `height = 1`
 
 Hash of a value contained in `(height = 0, index)` is defined as
 
-```none
-T(1, index) = hash(T(0, index)).
+```text
+T(1, index) = hash(HashTag::Blob || T(0, index)),
 ```
+
+where `HashTag::Blob = 0` is a domain separation tag for values.
 
 #### Rule 3. `height > 1`, Two Children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist, then
 
-```none
-T(height, index) = hash(T(height-1, index*2) || T(height-1, index*2+1)).
+```text
+T(height, index) = hash(
+    HashTag::ListBranchNode ||
+    T(height - 1, index * 2) ||
+    T(height - 1, index * 2 + 1)
+),
 ```
+
+where `HashTag::ListBranchNode = 1` is a domain separation tag
+for intermediate Merkle tree nodes.
 
 #### Rule 4. `height > 1`, Single Child
 
 If `height > 1`, node `T(height - 1, index * 2)` exists and
 node `(height - 1, index * 2 + 1)` is absent in the tree, then
 
-```none
-T(height, index) = hash(T(height - 1, index * 2)).
+```text
+T(height, index) = hash(
+    HashTag::ListBranchNode ||
+    T(height - 1, index * 2)
+).
 ```
+
+#### Getting Root Hash
+
+```text
+root_hash = T(max_height, 0),
+```
+
+where `max_height` is the tree height as defined previously.
 
 ## Merkle Tree Proofs
 
-### General Description
+**Proofs** allow to efficiently and compactly verify that one or more
+elements are present at specific indexes in a Merkelized list.
+The proof also commits to the list length, so that it can be used
+to prove that the list *does not* contain elements with certain indexes.
 
-`Proofnode` is a recursively defined structure that is designed to provide
-evidence to the client that a certain set of values is contained in a contiguous
-range of indices. One could use several `Proofnode`s to get a proof for
-a non-contiguous set of indices.
-
-For a given range of indices `[start_index, end_index)` the proof
-has a binary-tree-like structure, which contains values of elements from
-the leaves with requested indices and hashes of all neighbor tree nodes
-on the way up to the root of tree (excluding the root itself). `Proofnode` does not
-contain the indices themselves, as they can be deduced from the structure
-form.
+One could think of proofs as of Merkle trees pruning. That is, a proof is
+produced by “collapsing” some intermediate nodes in the Merkle tree.
+Another point of view – from the light client perspective – is that a proof
+is essentially a limited view of a list, for which the Merkle tree is
+constructed. This view allows to calculate the hash of the whole list and
+proves that specific elements are present in the list.
 
 ### Format
 
-A `Proofnode<Value>` is defined to be one of the following (in terms of JSON values):
+The proofs returned by the Exonum storage engine are non-recursive,
+thus minimizing overhead (e.g., heap allocations) and allowing to use
+them in environments not allowing recursive data types. A proof
+consists of three principal parts:
 
-Variant | Child indices | Hashing rule
------------- | ------------- | -------------
-{ "left": `Proofnode`, "right": `Proofnode` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
-{ "left": `Proofnode`, "right": `Hash` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
-{ "left": `Proofnode` } | `left_i = 2*i` | [4](#hashing-rules)
-{ "left": `Hash`, "right": `Proofnode` } | `left_i = 2*i`, `right_i = 2*i + 1` | [3](#hashing-rules)
-{ "val": `ValueJson` } | `val_i = i` | [2](#hashing-rules)
+- Entries proven to exist in the list (i.e., values together with their indexes)
+- Intermediate tree nodes (i.e., `T(height, ..)` values at `height > 0`)
+  that together with entries allow to restore `root_hash` of the Merkle tree
+  for the list
+- List length
 
-1. `Hash` is a hexadecimal encoded string representing a hash.
-2. An option without the right hash `{"left": Proofnode}` is present due to how
-  trees, which are not full binary, are handled in this implementation.
-3. `i` is the index of a `Proofnode` itself. `left_i`, `right_i` and
-  `val_i` are the indices of the nested (child) `Proofnode`(s).
-4. `i` for the outmost `Proofnode` is 0.
-5. Custom functions to compute `val` hash for each individual entity type are
-  required on client. Each function should construct a byte array from
-  `ValueJson` fields using [Exonum serialization spec](../architecture/serialization.md)
-  and compute the hash of `val` according to [2](#hashing-rules).
+Entries and/or intermediate tree nodes may be empty.
+
+??? note "Protobuf spec"
+    ```protobuf
+    message ListProof {
+      repeated HashedEntry proof = 1;
+      repeated ListProofEntry entries = 2;
+      uint64 length = 3;
+    }
+
+    // Represents list key and corresponding hash value.
+    message HashedEntry {
+      ProofListKey key = 1;
+      exonum.crypto.Hash hash = 2;
+    }
+
+    // Index of the list element and its value.
+    message ListProofEntry {
+      uint64 index = 1;
+      bytes value = 2;
+    }
+
+    // Represents list node position in the merkle tree.
+    message ProofListKey {
+      uint64 index = 1;
+      uint32 height = 2;
+    }
+    ```
+
+<!-- markdownlint-disable MD033 -->
+??? note "TypeScript spec of JSON serialization"
+    ```typescript
+    interface ListProof<V> {
+      proof: HashedEntry[],
+      // first element in a tuple is element index,
+      // the second one is the JSON-serialized value
+      entries: [number, V][],
+      length: number,
+    }
+
+    interface HashedEntry {
+      height: number,
+      index: number,
+      hash: string, // 64 hex digits
+    }
+    ```
+<!-- markdownlint-enable  -->
 
 ### Proof Verification
 
-While validating the proof a client is required to verify the following conditions:
+While validating the proof, a client restores `root_hash` and
+computes the list hash. Depending on the use case, the list hash
+can be compared to a trusted reference or participate in further aggregation.
 
-1. All of the `{"val": ...}` variants are located at the same depth in the
-  retrieved JSON.
-2. If a node contains a right child (i.e., matches either of
-  `{"left": ..., "right": ...}` variants), then its left child, nor any of its
-  children may have a single child (i.e., match the `{"left": ...}` variant).
-  This means that the left child must be a result of pruning a full binary
-  tree.
-3. Collected indices of `ValueJson`(s) in proof correspond to the requested
-  range of indices `[start_index, end_index)`.
-4. The root hash of the proof evaluates to the root hash of the `ProofListIndex`
-  in question.
+Restoring `root_hash` can be performed as per [above section](#computing-root-hash):
 
-If either of these verifications fails, the proof is deemed invalid.
+1. Compute `T(height = 1, ..)` for entries according to [rule 2](#rule-2-height-1).
+  Let `layer` denote the obtained values.
+2. Compute Merkle tree height `max_height` given length of the list.
+3. For `height = 1, 2, ..., max_height - 1` perform steps 4–5.
+4. Combine `layer` with intermediate tree nodes from the proof at the same height
+  into a single list, `combined_layer`.
+5. “Lift” the nodes in `combined_layer` to the next height according to
+  [rules 3](#rule-3-height-gt-1-two-children) and [4](#rule-4-height-gt-1-single-child).
+  Assign `layer` to be the resulting list.
+6. `root_hash = layer[0]`. At this point, `layer` must contain exactly one item.
 
-!!! note
-    One could think of proofs as of Merkle trees pruning. That is, a proof is
-    produced by "collapsing" some intermediate nodes in the Merkle tree.
-    Another point of view - from the light client perspective - is that a proof
-    is essentially a limited view of a list, for which the Merkle tree is
-    constructed. This view allows to calculate the hash of the whole list and
-    contains some of its elements.
-
-#### Example
-
-Depicted below is a Merkle tree with 6 elements (i.e., not a full binary one) with
-elements that are a saved inside a proof for range `[3, 5)` in
-**bold\_and\_underscored** on the bottom. The elements of the underlying Merkelized
-list are 3-byte buffers `[u8; 3]`.
-
-![Proof_Structure](../images/merkle-tree-example-2.png)
-
-This proof corresponds to the following JSON representation:
-
-```JSON
-
-{
-  "left": {
-    "left": "fcb40354a7aff5ad066b19ae2f1818a78a77f93715f493881c7d57cbcaeb25c9",
-    "right": {
-      "left": "1e6175315920374caa0a86b45d862dee3ddaa28257652189fc1dfbe07479436a",
-      "right": {
-        "val": [
-          3,
-          4,
-          5
-        ]
-      }
-    }
-  },
-  "right": {
-    "left": {
-      "left": {
-        "val": [
-          4,
-          5,
-          6
-        ]
-      },
-      "right": "b7e6094605808a34fc79c72986555c84db28a8be33a7ff20ac35745eaddd683a"
-    }
-  }
-}
-```
+To make the above procedure more effective, the proofs returned by MerkleDB
+have entries ordered by increasing index and intermediate nodes ordered by
+increasing `(height, index)` tuple. This allows to combine layers on step 4
+and lift them on step 5 more effectively. If the client wants to take
+the ordering into account during verification, the client must check it
+in advance (which takes linear time w.r.t. the proof size).
 
 ## See Also
 

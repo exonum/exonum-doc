@@ -15,7 +15,7 @@ You can view and download the full source code of this tutorial
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
-the client part and does not use [Merkelized data collections](../architecture/storage.md#merkelized-indices).
+the client part and does not use [Merkelized data collections](../architecture/merkledb.md#merkelized-indices).
 You can find a tutorial containing these features
 [here](data-proofs.md).
 
@@ -210,7 +210,7 @@ of the wallet and produce a new instance with the modified `balance` field.
 
 ## Create Schema
 
-Schema is a structured view of [the key-value storage](../architecture/storage.md)
+Schema is a structured view of [the key-value storage](../architecture/merkledb.md)
 used in Exonum.
 To access the storage, however, we will not use the storage directly, but
 rather a generic `Access` abstraction. `Access` is a trait that wraps underlying
@@ -991,7 +991,6 @@ with two wallets and transferred some money between them. Next,
 [we are going to test it](test-service.md).
 
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
-[explorer]: ../advanced/node-management.md#transaction
 [tx-info]: ../architecture/transactions.md#info
 [rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
 [curry-fn]: https://en.wikipedia.org/wiki/Currying

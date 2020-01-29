@@ -2,9 +2,13 @@
 
 <!-- cspell:ignore tlsdate,roughtime -->
 
-Time Oracle allows user services to access the calendar time supplied by
-validator nodes to the blockchain. Its implementations for Exonum are available
-in [Rust][rust-time-oracle] and [Java][java-time-oracle].
+**Time Oracle** allows user services to access the calendar time supplied by
+validator nodes to the blockchain. Time oracle is implemented
+as a [Rust service][rust-time-oracle], which has a [Java proxy][java-time-oracle].
+
+!!! tip
+    Consult [service crate docs](https://docs.rs/exonum-time/) for details
+    about interfaces provided by the service.
 
 ## The Problem
 
@@ -109,112 +113,6 @@ is:
 For practical reasons, we always choose the timestamp with index `f + 1`,
 since this value is reliable and, at the same time, the most recent one.
 
-## REST API
-
-All REST endpoints share the same base path, denoted **{base_path}**,
-equal to `api/services/exonum_time/v1`.
-
-The service exposes the following API endpoint for the
-[public API](#public-apis):
-
-- [Get the current consolidated time](#current-time)
-
-The following endpoints are exposed for the [private API](#private-apis):
-
-- [Retrieve timestamps of the current validators](#timestamps-of-current-validators)
-- [Dump timestamps of all validators](#timestamps-of-all-validators)
-
-### Public APIs
-
-#### Current Time
-
-```none
-GET {base_path}/current_time
-```
-
-Returns the current consolidated time.
-
-##### Parameters
-
-None.
-
-##### Response
-
-Example of response:
-
-```none
-"2018-05-17T10:43:59.404962Z"
-```
-
-The response is combined date and time in UTC as per [ISO 8601][ISO8601].
-`null` is returned if there is no consolidated time.
-
-### Private APIs
-
-#### Timestamps of Current Validators
-
-```none
-GET {base_path}/validators_times
-```
-
-Returns the latest timestamps indicated by current validator nodes.
-
-##### Parameters
-
-None.
-
-##### Response
-
-Example of JSON response:
-
-```json
-[
-  {
-    "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
-    "time": "2018-05-17T10:45:56.057753Z"
-  },
-  {
-    "public_key": "52baa9d4c4029b925cedf1a1515c874a68e9133102d0823a6de88eb9c6694a59",
-    "time": null
-  }
-]
-```
-
-The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
-`null` is returned if the validator time is unknown.
-
-#### Timestamps of All Validators
-
-```none
-GET {base_path}/validators_times/all
-```
-
-Returns the latest timestamps indicated by all validator nodes
-for which time is known.
-
-##### Parameters
-
-None.
-
-##### Response
-
-Example of JSON response:
-
-```json
-[
-  {
-    "public_key": "83955565ee605f68fe334132b5ae33fe4ae9be2d85fbe0bd9d56734ad4ffdebd",
-    "time": "2018-05-17T10:47:08.161549Z"
-  },
-  {
-    "public_key": "f6753f4b130ce098b1322a6aac6accf2d5770946c6db273eab092197a5320717",
-    "time": "2018-05-17T10:47:08.161549Z"
-  }
-]
-```
-
-The time field is combined date and time in UTC as per [ISO 8601][ISO8601].
-
 ## Discussion
 
 ### Transaction Generation
@@ -255,9 +153,7 @@ Advantages:
 
 Disadvantages:
 
-- The consensus code would become more complex. (Time would be included
-  into the consensus logic while [anchoring](bitcoin-anchoring.md) and
-  [configuration](configuration-updater.md) are not.)
+- The consensus code would become more complex.
 - Time updates would be tied to the creation of `Precommit` messages. In the
   case of a large delay in block acceptance, all the transactions therein would
   be executed with the same outdated time value.
