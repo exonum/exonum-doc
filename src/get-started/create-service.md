@@ -540,7 +540,7 @@ transaction you have to create a transaction message according to the
 [uniform structure](../architecture/transactions.md#messages) developed by
 `exonum`.
 
-The transaction ID is a transaction number in the interface trait
+The transaction ID is a method numeric identifier in the interface trait
 and can be set by `interface_method` macro. As we've mentioned earlier,
 user has to set method IDs manually to the every method.
 
@@ -818,7 +818,7 @@ fn main() {
 That is, we:
 
 1. Initialize logging in the Exonum core library.
-2. Create a node with in-memory database (`MemoryDB`), Rust runtime (which is
+2. Create a node with the non-persistent database (`TemporaryDB`), Rust runtime (which is
   required to run services written in Rust programming language),
   two services (`CryptocurrencyService` and `Explorer`), and the
   configuration we have specified earlier.
