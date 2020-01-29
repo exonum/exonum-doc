@@ -99,7 +99,7 @@ message processing.
   Interval between the first and the second rounds of the consensus algorithm.
   This parameter is used to estimate timeouts for further consensus rounds.
   The estimation formula is
-  `first_round_timeout + (r-1)*round_timeout_increase`, where
+  `first_round_timeout + (r - 1) * round_timeout_increase`, where
   `round_timeout_increase` is 10% of the `first_round_timeout`.
 
 - `status_timeout`  
