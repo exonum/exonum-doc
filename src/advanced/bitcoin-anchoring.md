@@ -168,7 +168,7 @@ anchoring transaction only if the previous anchoring chain failed
   anchoring transaction and the hash of the corresponding Exonum block. The
   first anchoring transaction in the chain uses the UTXO of the funding
   transaction
-- Every validator node has an external sync [util][btc_anchoring_sync] that
+- Every validator has an external sync [util][btc_anchoring_sync] that
   creates containing a new proposed anchoring transaction and its vote for
   said transaction. The validators commit these transactions to
   the Exonum blockchain
@@ -215,17 +215,17 @@ secured.
 
 #### Synchronization with Bitcoin Blockchain
 
-A separate [btc_anchoring_sync][btc_anchoring_sync] utility periodically performs
+A separate [utility][btc_anchoring_sync] periodically performs
 two actions:
 
-- Creation of a signature for a new anchoring transaction. It takes the actual
-  anchoring transaction proposal by the node private API, signs this proposal by
-  the corresponding Bitcoin key and sends this signature back to the validator
-  node. Validator node creates a new vote transaction from this signature and
-  broadcasts it to the other nodes.
+- Creation of a signature for a new anchoring transaction. The utility takes the
+  actual anchoring transaction proposal by the node private API, signs this
+  proposal by the corresponding Bitcoin key and sends this signature back to the
+  validator node. Validator node creates a new vote transaction from this signature
+  and broadcasts it to the other nodes.
 
 - Synchronization of the list of Exonum anchoring transactions with those committed
-  to the Bitcoin Blockchain. It takes the latest anchoring transaction and checks
+  to the Bitcoin Blockchain. The utility the latest anchoring transaction and checks
   whether it is present in Bitcoin.
   If not, the handler checks the previous anchoring transactions one by one in the
   same manner until it finds the last anchoring transaction committed to Bitcoin
@@ -275,7 +275,7 @@ provided funding transaction; it is the administrators’ duty.
 
 ## Maintenance
 
-Fresh and full maintenance guide you can alway find [here][maintenance-guide].
+The maintenance guide is [here][maintenance-guide].
 
 ## Recovering Broken Anchoring
 
