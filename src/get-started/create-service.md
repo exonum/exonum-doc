@@ -240,7 +240,7 @@ Since we want to keep the wallets in the storage, we will
 use an instance of [`MapIndex`](../architecture/merkledb.md#mapindex),
 a map abstraction.
 Keys of the index will correspond to public keys of the wallets.
-Index values will be serialized `Wallet` structures.
+Index values will be stored as serialized `Wallet` structures.
 
 To initialize our `CurrencySchema`, `FromAccess` trait provides a convenient
 method `from_root`. Using this method, we can implement a constructor to
@@ -314,9 +314,9 @@ pub struct TxTransfer {
 }
 ```
 
-To make service support transactions defined above, we need to declare service
-*interface*. Service interface is basically a trait with methods that correspond
-to the transactions processing logic. In our case interface will look as follows:
+To make the service support the transactions defined above, we need to declare a service
+*interface*. A service interface is basically a trait with methods that correspond
+to the transactions processing logic. In our case the interface will look as follows:
 
 ```rust
 /// Cryptocurrency service transactions.
@@ -336,14 +336,14 @@ pub trait CryptocurrencyInterface<Ctx> {
 
 `exonum_interface` macro generates a glue to dispatch transactions and
 deserialize their payload within service. `interface_method` macro assigns
-the numeric IDs to the transactions. This is required, since call information
+the numeric IDs to the transactions. This is required, since a call information
 in transactions contains the transaction ID rather than the method name.
 
 With that, target users will know which transaction ID they should set to
 invoke a certain method.
 
 !!! note
-    All the transactions numeric IDs should be unique. Attempt to create two methods
+    All the transactions numeric IDs should be unique. An attempt to create two methods
     with the same numeric ID will result in a failure.
 
 ### Reporting Errors
@@ -394,12 +394,12 @@ is similar to the `failure::Fail`.
 
 ### Transaction Execution
 
-Above we defined the interface of our service, but currently this interface
+Above we've defined the interface of our service, but currently this interface
 has no implementation. Thus, there is no actual business logic attached to
 them. To fix this situation, we should declare our service, and then implement
 the `CryptocurrencyInterface` trait for it.
 
-Service declaration is similar to the usual structure declaration:
+The service declaration is similar to the usual structure declaration:
 
 ```rust
 /// Cryptocurrency service implementation.
@@ -417,7 +417,7 @@ of our service, similarly to the [Factory method design pattern][factory-method]
 
 [factory-method]: https://en.wikipedia.org/wiki/Factory_method_pattern
 
-The implementation of `Service` trait can contain the additional elements of
+The implementation of the `Service` trait can contain the additional elements of
 the service lifecycle, like wiring the API. Currently we can skip them and
 leave the implementation empty.
 
@@ -541,8 +541,8 @@ transaction you have to create a transaction message according to the
 `exonum`.
 
 The transaction ID is a transaction number in the interface trait
-and can be set by `interface_method` macro. As we mentioned earlier,
-user has to set method IDs manually to every method.
+and can be set by `interface_method` macro. As we've mentioned earlier,
+user has to set method IDs manually to the every method.
 
 ### API for Read Requests
 
@@ -594,7 +594,7 @@ As with the transaction endpoint, the methods have an idiomatic signature
 `fn(&ServiceApiState, MyQuery) -> api::Result<MyResponse>`.
 
 Also we will declare a helper method to wire API, which later can be invoked
-by service:
+by the service:
 
 ```rust
 impl CryptocurrencyApi {
@@ -765,12 +765,12 @@ NodeConfig {
 
 ## Create Genesis Configuration
 
-`NodeConfig` we created earlier defines the configuration for the **node**,
+`NodeConfig` that we created earlier defines the configuration for the **node**,
 but we also need a configuration for the **blockchain**. To initialize
-blockchain, we need `GenesisConfig` structure.
+the blockchain, we need `GenesisConfig` structure.
 
 Let's create a function which will generate `GenesisConfig` based on
-created `NodeConfig`:
+the created `NodeConfig`:
 
 ```rust
 fn genesis_config(node_config: &NodeConfig) -> GenesisConfig {
@@ -788,7 +788,7 @@ In the code above we create `GenesisConfig` from the consensus configuration,
 and add the `Explorer` and our `Cryptocurrency` services.
 
 `Explorer` service is capable of sending transactions to the blockchain, so
-without this service we won't be able to interact with `Cryptocurrency` service.
+without this service we won't be able to interact with the `Cryptocurrency` service.
 
 ### Run Node
 
