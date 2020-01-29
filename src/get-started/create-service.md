@@ -237,7 +237,7 @@ don't need to create any glue code to connect this structure to the database.
 This code is generated automatically by deriving `FromAccess`.
 
 As we want to keep the wallets in the storage, for it we will
-use an instance of [`MapIndex`](../architecture/meerkledb.md#mapindex),
+use an instance of [`MapIndex`](../architecture/merkledb.md#mapindex),
 a map abstraction.
 Keys of the index will correspond to public keys of the wallets.
 Index values will be serialized `Wallet` structures.
