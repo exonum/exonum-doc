@@ -141,7 +141,7 @@ We added `serde_pb_convert` to have JSON representation of our structure
 similar to Protobuf declarations, it helps the light client handle proofs
 that contain the `Wallet` structure.
 
-We also implement a couple of auxiliary methods for `Wallet`: a counstructor
+We also implement a couple of auxiliary methods for `Wallet`: a constructor
 and a balance setter.
 
 ??? "Wallet methods"
@@ -299,7 +299,7 @@ where
 Note the `T::Base: RawAccessMut` bound. `T::Base` denotes the *base*
 or [raw access](../architecture/merkledb.md#accesses) to the storage, which
 underpins `Access`. The bound expresses the requirement that this underlying
-access (and thus, `T` itself) is mutable. 
+access (and thus, `T` itself) is mutable.
 
 ## Define Transactions
 
@@ -432,7 +432,11 @@ is similar to their predecessors.
 
 ??? "CreateWallet transaction"
     ```rust
-    fn create_wallet(&self, context: ExecutionContext<'_>, arg: CreateWallet) -> Self::Output {
+    fn create_wallet(
+        &self,
+        context: ExecutionContext<'_>,
+        arg: CreateWallet,
+    ) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
 
         let mut schema = SchemaImpl::new(context.service_data());
@@ -463,7 +467,11 @@ is similar to their predecessors.
 
 ??? "Transfer transaction"
     ```rust
-    fn transfer(&self, context: ExecutionContext<'_>, arg: Transfer) -> Self::Output {
+    fn transfer(
+        &self,
+        context: ExecutionContext<'_>,
+        arg: Transfer,
+    ) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
 
