@@ -33,8 +33,8 @@ The following table shows three possible parameter categories.
 | Global  | Validators’ public keys | Anchoring address |
 | Local   | Validator’s private key | (N/A) |
 
-Note that there is no unified mechanism for local service configuration.
-If necessary, local configuration may be injected into the service
+Note that there is no unified mechanism for changing local configuration
+for services. If necessary, local configuration may be injected into the service
 using a parameterized service artifact, or by separating
 the config-dependent part into a component executing separately
 and communicating with the service using a secure communication
@@ -54,7 +54,7 @@ is supplied from a file, too, since the blockchain is absent at this point.
 
 ## Genesis Configuration
 
-**Genesis configuration** is the global configuration necessary to start
+**Genesis configuration** is the global configuration which is necessary to start
 a new node. While nodes update the global configuration using
 the supervisor service, a node need to get the genesis configuration from
 a trusted source. Indeed, at the point the genesis config is used, the node
