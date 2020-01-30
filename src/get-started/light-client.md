@@ -336,8 +336,8 @@ while we will be further conducting the proof analyses.
 
 Thus, first of all, we check that the block containing our data is correct and
 bears the state hash indicated in the proof. For this purpose we load the actual
-list of public keys of validator nodes stored in the network
-[configuration](../architecture/configuration.md). The keys
+list of public keys of validator nodes stored in the
+[global configuration](../architecture/configuration.md). The keys
 are applied to assert that the data received from the
 blockchain was indeed agreed upon by all the member nodes in the network:
 

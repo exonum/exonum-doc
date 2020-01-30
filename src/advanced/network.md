@@ -96,7 +96,7 @@ to exchange messages.
 
 Each node regularly sends [`PeersRequest`](consensus/requests.md#peersrequest)
 to a random known node with the timeout `peers_timeout` defined in the
-[global configuration](../architecture/configuration.md#genesisconsensus).
+[global configuration](../architecture/configuration.md).
 [In response](consensus/requests.md#peersrequest), the addressee sends its
 list of known peers. Thus, it is enough to connect to one node at the start and
 after some time it will be possible to collect `Connect` messages from the

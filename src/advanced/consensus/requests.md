@@ -96,10 +96,6 @@ in the system.
 
 ### `ProposeRequest`
 
-<!--here and further change the description format of the messages. Insert code
-snippets and comment them. This task requires new UI due to some large field
-descriptions. Same story with ../architecture/configuration.md-->
-
 Requests a `Propose` message from a node. It has the following fields:
 
 - **to**: exonum.PublicKey  
@@ -136,7 +132,7 @@ Requests `Prevote` messages from a node. It has the following fields:
   the corresponding validator (if the bit value is 1, `Prevote` is requested;
   otherwise, `Prevote` is not needed). Indexing of the `validator` bits
   corresponds to indexing of validator public keys in the
-  [actual configuration][config#genesis].
+  [actual configuration][config#validator-keys].
 
 ### `BlockRequest`
 
@@ -151,7 +147,7 @@ Requests a committed block from a node. It has the following fields:
 
 Requests `Connect` messages from a node.
 `PeersRequest` message is sent regularly with the timeout `peers_timeout`
-defined in [the global configuration][config#global-parameters].
+defined in [the global configuration][config#consensus].
 It has the following fields:
 
 - **to**: PublicKey  
@@ -239,7 +235,7 @@ as the validator’s height.
 ### Peers Timeout
 
 Send a `PeersRequest` request to a random peer (auditor or validator) from the
-list of known peers specified in [local configuration][config#local-parameters].
+list of known peers specified in [local configuration][config#peers].
 
 ### Move to New Height
 
@@ -294,7 +290,7 @@ Send all the saved `Connect` messages from peers to the requestor.
 [consensus]: ../../architecture/consensus.md
 [consensus#messages]: ../../architecture/consensus.md#messages
 [consensus#locks]: ../../architecture/consensus.md#locks
-[config#genesis]: ../../architecture/configuration.md#genesis
-[config#global-parameters]: ../../architecture/configuration.md#global-parameters
-[config#local-parameters]: ../../architecture/configuration.md#local-parameters
+[config#validator-keys]: ../../architecture/configuration.md#validator-keys
+[config#consensus]: ../../architecture/configuration.md#consensus-algorithm-parameters
+[config#peers]: ../../architecture/configuration.md#local-configuration
 [#learning]: #learning-from-consensus-messages
