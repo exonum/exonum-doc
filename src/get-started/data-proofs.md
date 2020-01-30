@@ -687,6 +687,41 @@ We now have a complete proof for availability of a block in the blockchain, of a
 certain wallet in the database and
 said wallet’s history aggregated under the `WalletInfo` structure.
 
+### Initialize Service Data
+
+The endpoint handler above relies on the fact that the `wallets` index
+exists, which is reflected in the `unwrap()` here:
+
+```rust
+state.data().proof_for_service_index("wallets").unwrap()
+```
+
+However, the index will not exist if no transactions to the service were
+executed!
+Without the index, we cannot retrieve a proof for its existence.
+We *could* return a proof of absence of the index from the endpoint handler,
+but this would complicate the endpoint design and the corresponding
+client checks.
+
+We will use another option: initialize the index in the service constructor,
+which is a part of the `Service` trait.
+
+```rust
+impl Service for CryptocurrencyService {
+    fn initialize(
+        &self,
+        context: ExecutionContext<'_>,
+        _params: Vec<u8>,
+    ) -> Result<(), ExecutionError> {
+        SchemaImpl::new(context.service_data());
+        Ok(())
+    }
+}
+```
+
+With this explicit constructor, the `wallets` index is guaranteed to exist
+during API calls.
+
 ### Wire API
 
 We implement the `wire` method in `PublicApi` and define a single endpoint
@@ -710,6 +745,8 @@ for our service to actually wire the API when the service is started:
 
 ```rust
 impl Service for CryptocurrencyService {
+    // `initilize` method snipped...
+
     fn wire_api(&self, builder: &mut ServiceApiBuilder) {
         CryptocurrencyApi.wire(builder);
     }
