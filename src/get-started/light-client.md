@@ -416,8 +416,12 @@ const verifiedTransactions = new exonum.ListProof(
   exonum.Hash,
 )
 
+// Convert the history hash from the Protobuf-compatible format
+// returned by the endpoint, to a hex string.
+let expectedHash = new Uint8Array(wallet.history_hash.data)
+expectedHash = exonum.uint8ArrayToHexadecimal(expectedHash)
 // Check that the proof is tied to the previous level.
-if (verifiedTransactions.merkleRoot !== wallet.history_hash) {
+if (verifiedTransactions.merkleRoot !== expectedHash) {
   throw new Error('Transactions proof is corrupted')
 }
 ```
