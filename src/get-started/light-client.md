@@ -1,13 +1,8 @@
 # Exonum Light Client Tutorial
 
-!!! note
-    Light client is also available in Java language.  
-    Please refer to the [readme][lc-java] for details.
-
 In this tutorial we describe how to use the light client to interact with
-Exonum services. The tutorial extends other tutorials:
-[Cryptocurrency Advanced](data-proofs.md)
-and, partly, [Timestamping][timestamping-demo].
+Exonum services. The tutorial extends the
+[*Cryptocurrency Advanced*](data-proofs.md) tutorial.
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -18,6 +13,10 @@ Light client is a JavaScript library used for a number of purposes:
 
 Below we will provide you with the detailed description of how said
 functionality is executed in Exonum light client.
+
+!!! note
+    Light client is also available in Java language.
+    Please refer to its [readme][lc-java] for details.
 
 ## Before You Start
 
@@ -35,271 +34,211 @@ service vary depending on the business logic of each service.
 The general algorithm of executing a transaction in Exonum includes several
 stages:
 
-- define a schema of the transaction payload with Protobuf
-- generate a signing key pair (if required)
-- define a transaction schema
-- define transaction data
-- sign the transaction
-- send transaction to the blockchain.
+1. Define a schema of the transaction payload with Protobuf
+2. Generate a signing key pair, or load it from local storage
+3. Define transaction type
+4. Define transaction payload
+5. Sign the transaction
+6. Send transaction to the blockchain.
 
-Below we provide two peculiar examples of transaction execution in Exonum
-services based on the
-[Cryptocurrency Advanced Service][cryptocurrency-advanced] and
-the [Timestamping Service][timestamping].
+Exonum light client uses Protobuf as the data serialization
+format. This is enabled by the [`protobufjs`][protobufjs-lib] library.
+With this library you can describe data either through `.proto` files or using
+reflection:
 
-As mentioned above, Exonum light client uses Protobuf as data serialization
-format. For this purpose [protobufjs][protobufjs-lib] library is applied. With
-this library you can describe data either through `.proto` files or with the
-help of the built-in reflection methods.
+- The first method assumes that the transaction schema is defined
+  in a `.proto` file. Then a corresponding `.js` file (a *stub*) is generated
+  out of the `.proto` file. This method is more common for large-scale projects,
+  since Protobuf declarations are shared with the backend (that is, services
+  written in Rust or Java).
 
-The first method presupposes that the transaction schema is initially defined
-in a `.proto` file. And then a corresponding `.js` file called stub is generated
-out of said `.proto` file.
+- In the reflection method the `.proto` definitions are specified directly
+  in JavaScript. This method may be applicable for quick-and-dirty testing,
+  but is less maintainable.
 
-In the reflection method the .proto definitions are directly reflected in
-JavaScript.
+Below we provide a complete workflow of transaction execution
+based on the transfer transaction from
+the [*Advanced Cryptocurrency Tutorial*][cryptocurrency-advanced].
 
-Below, with the demonstration purpose we define the data schema of the
-timestamping transaction with the help of both methods. For the transfer funds
-transaction from the Cryptocurrency Advanced Service, only `.proto` files are
-used as this method is more common for Exonum services.
+### Define Transaction Schema
 
-### Example of the Timestamping Transaction
+The `Transfer` transaction has the following Protobuf Declaration:
 
-#### Define a Schema of the Transaction Payload with Protobuf
-
-As stated in our [Guide for the Light Client][javascript-client-nested-types],
-a custom data type can be a field of other custom data type without limitation
-as to the depth of the nested data.
-
-In the Timestamping Service we start defining the transaction with the data
-types used within the `TxTimestamp` entity. Said entity is further
-applied as a custom type within `CreateTimestamp` transaction schema.
-
-In our Timestamping Service we have the following structures:
-
-- `Hash` is an object type with the following field:
-    - `data` is an object with SHA-256 hash of some timestamped file
-- `Timestamp` is an object of timestamp itself, which contains two fields:
-    - `content_hash` is an object of `Hash` type
-    - `metadata` is an optional description of the timestamped file
-- `TxTimestamp` is a custom object type with the following field:
-    - `content` is an object of `Timestamp` type.
-
-##### `.proto` Files Method
-
-Below is an example of the `timestamping.proto` file describing the data
-schema of the timestamping transaction in the Protobuf format:
-
-```proto
-package timestamping;
-
-import "google/protobuf/timestamp.proto";
-
-message Hash { bytes data = 1; }
-
-// Stores content hash and some optional content metadata.
-message Timestamp {
-  Hash content_hash = 1;
-  string metadata = 2;
-}
-
-// Timestamping transaction.
-message TxTimestamp { Timestamp content = 1; }
-```
-
-When the `.proto` file is ready, generate the `*.js` stub file with the
-[protobufjs][protobufjs-lib] library as follows:
-
-```bash
-pbjs --keep-case -t static-module timestamping.proto -o ./proto.js
-```
-
-This command can be added into `scripts` section of your `package.json`
-for further build automatization.
-
-##### Reflection Method
-
-The same schema, as produced above, is represented below with the help of
-JavaScript reflections of .proto definitions:
-
-```javascript
-const { Root, Type, Field } = protobuf
-
-const root = new Root().define("timestamping")
-
-const Hash = new Type("Hash").add(new Field("data", 1, "bytes"))
-root.add(Hash)
-
-const Timestamp = new Type("Timestamp")
-  .add(new Field("content_hash", 1, "timestamping.Hash"))
-Timestamp.add(new Field("metadata", 2, "string"))
-root.add(Timestamp)
-
-const TxTimestamp = new Type("TxTimestamp")
-  .add(new Field("content", 1, "timestamping.Timestamp"))
-root.add(TxTimestamp)
-```
-
-#### Generate a Signing Key Pair
-
-Generate a signing key pair for signing and sending the transaction. The public
-key forms a separate field in the transaction header.
-
-```javascript
-const keyPair = Exonum.keyPair()
-```
-
-!!! note
-    In our Timestamping Service we generate a new signing key pair for each new
-    timestamp. On the contrary, in the Cryptocurrency Advanced Service we
-    generate only
-    one key pair that corresponds to a certain wallet and its user and, thus, is
-    applied for signing all transactions made on its behalf.
-
-#### Define a Transaction Schema
-
-Define `CreateTimestamp` transaction schema and its field types:
-
-```javascript
-const CreateTimestamp = Exonum.newTransaction({
-   author: keyPair.publicKey,
-   service_id: 130,
-   message_id: 0,
-   schema: timestamping.TxTimestamp
-})
-```
-
-- `author` is author’s public key
-- `service_id` represents the identifier of the service. Check the identifier
-  in the source code of the service (the smart-contract designed in Rust or
-  Java)
-- `message_id` represents the identifier of the transaction type in the
-  service. Corresponds to the index number of the transaction in the service
-  source code. Enumeration starts with `0`
-- `schema` schema of the `TxTimestamp` type defined above.
-
-#### Define Transaction Data
-
-Prepare transaction data according to the above-defined schema:
-
-```javascript
-const data = {
-  content: {
-    content_hash: { data: Exonum.hexadecimalToUint8Array(hash) },
-    metadata: metadata
-  }
+```protobuf
+message Transfer {
+  // Address of receiver's wallet.
+  exonum.crypto.Hash to = 1;
+  // Amount of currency to transfer.
+  uint64 amount = 2;
+  // Auxiliary number to guarantee non-idempotence of transactions.
+  uint64 seed = 3;
 }
 ```
 
-#### Sign the Transaction
-
-Sign the transaction with the secret key from the key pair generated above:
-
-```javascript
-const signature = CreateTimestamp.sign(keyPair.secretKey, data)
-```
-
-#### Send the Transaction
-
-Finally, send the resulting transaction into the blockchain using the built-in
-`send` method which returns a `Promise`:
-
-```javascript
-const transactionHash = await CreateTimestamp.send(
-  transactionEndpoint, data, keyPair.secretKey)
-```
-
-- `transactionEndpoint` represents API address of the transaction handler in the
-  blockchain explorer of a node. Example:
-
-    ```none
-    http://127.0.0.1:8200/api/explorer/v1/transactions
-    ```
-
-### Example of the Transfer Funds Transaction
-
-To execute this type of transaction you need to have two wallets
-created in advance: a sender and a receiver. You should also generate a separate
-key pair for each wallet, so that these keys could be used for defining and
-signing the transfer transactions between the wallets.
-
-Now, define `TransferFunds` transaction schema and data types as we did in the
-example above.
-
-#### Define a Schema of the Transaction Payload with Protobuf
-
-In the transfer funds transaction we have only one entity - `TransferFunds` -
-that has two fields:
-
-- `amount` which represents the amount of transferred tokens
-- `seed` which represents a random number that guarantees non-idempotence of
-  transactions.
-
 !!! note
-    As you might know from our very first tutorial
-    [Cryptocurrency Tutorial](create-service.md),
-    in order to transfer funds from one wallet to another, a `seed` is included
-    into each such transaction. This prevents transactions from being hacked by
-    a third person. You can generate `seed` as follows:
+    `seed` allows to execute the transfer with the same parameters
+    (e.g., “transfer 50 tokens to Bob”) multiple times.
+    You can generate `seed` as follows:
 
       ```javascript
-      const seed = Exonum.randomUint64()
+      const seed = exonum.randomUint64()
       ```
 
-Below is an example of the `example.proto` file describing the data schema of
-the transfer funds transaction in the Protobuf format:
+As the `.proto` file is ready, generate the JavaScript module as follows:
 
-```proto
-package examples;
-
-message TransferFunds {
-  uint64 amount = 1;
-  // Auxiliary number to guarantee non-idempotence of transactions.
-  uint64 seed = 2;
-}
+```sh
+pbjs --keep-case \
+  --target static-module \
+  --path node_modules/exonum-client/proto \
+  example.proto \
+  --out ./proto.js
 ```
 
-As the `.proto` file is ready, generate the `*.js` file as follows:
+Here:
 
-```shell
-pbjs --keep-case -t static-module example.proto -o ./proto.js
-```
+- `--keep-case` opts out of transforming field names
+- `--target` specifies the output type (in our case, we want a standalone
+  JS module)
+- `--path` adds a directory to the include path (we specify a path
+  to the Protobuf declarations bundled with the client library)
+- `example.proto` specifies an input file
+- `--out` specifies the name of the output module
 
-#### Define a Transaction Schema
+### Define Transaction Type
 
-Define `TransferFunds` transaction schema and its field types:
+Define `Transfer` transaction schema and its fields:
 
 ```javascript
 import * as proto from 'stubs.js'
+const { cryptocurrency_advanced } = proto.exonum.examples
 
-const TransferFunds = Exonum.newTransaction({
-   author: publicKey,
-   service_id: 128,
-   message_id: 1,
-   schema: proto.exonum.examples.cryptocurrency_advanced.Transfer
+// Numeric identifier of the cryptocurrency service
+const SERVICE_ID = 101
+
+const Transfer = new exonum.Transaction({
+   schema: cryptocurrency_advanced.Transfer,
+   serviceId: SERVICE_ID,
+   methodId: 1,
 })
 ```
 
-The fields are the same as for the `CreateTimestamp` transaction. You can find
-their description in the corresponding [section above](#define-a-transaction-schema).
+Besides schema, `serviceId` and `methodId` fields specify information necessary
+to dispatch transaction to the service. `serviceId` is assigned
+during [service instantiation](../architecture/service-lifecycle.md);
+you can find it out via an endpoint in
+the [system API plugin](../advanced/other-services.md#system-api).
+Method identifiers are specified in the [service interface](../glossary.md#interface).
 
-#### Define Transaction Data
+### Specify Transaction Payload
 
-Prepare the transaction data according to the above-defined schema. Note that we
-identify the sender by the public key of his wallet. The wallet keys must be
-generated in advance, when creating said wallet:
+Prepare the transaction payload according to the above-defined schema:
 
 ```javascript
-const data = { amount, seed }
+// Assume keys for both wallets are specified as follows:
+const alice = exonum.keyPair()
+const bob = exonum.keyPair()
+// Recall that we use addresses in the service, not public keys!
+const bobAddress = exonum.publicKeyToAddress(bob.publicKey)
+
+const transferPayload = {
+  to: { data: exonum.hexadecimalToUint8Array(bobAddress) },
+  amount: 50,
+  seed: exonum.randomUint64()
+}
 ```
 
-#### Sign and Send the Transaction
+`publicKeyToAddress` function provides a handy way to convert
+a hex-encoded public key to
+an [address](../advanced/service-interaction.md#authorization-via-services).
 
-Now you can sign the transaction with the sender’s secret key and send the
-resulting
-transaction into the blockchain. The methods applied in this case are identical
-to those shown in the `CreateTimestamp` transaction described above.
+### Sign Transaction
+
+Now, the transaction can be signed using a static method in `Transfer`:
+
+```javascript
+const transaction = Transfer.create(transferPayload, alice)
+```
+
+This will create a transaction object conforming to the following
+generic TypeScript interface:
+
+```typescript
+interface Verified<T> {
+  // Schema of the payload defined as a `protobufjs` type.
+  schema: protobufjs.Type;
+  // Parametric payload.
+  payload: T;
+  // Hex-encoded Ed25519 public key (64 hex digits).
+  author: string;
+  // Hex-encoded Ed25519 signature (128 hex digits).
+  signature: string;
+  // Serialized Protobuf message in the format defined by Exonum.
+  bytes: Uint8Array;
+
+  // Returns serialized message.
+  serialize(): Uint8Array;
+  // Returns hex-encoded SHA-256 digest of the serialized message.
+  hash(): string;
+}
+```
+
+In case of `Transfer`, type param `T` is the transaction payload
+we have specified above, which roughly corresponds to the following type:
+
+```typescript
+type TransferPayload = {
+  to?: { data: Uint8Array },
+  amount?: number | string,
+  seed?: number | string,
+}
+```
+
+### Send Transaction
+
+Finally, send the resulting transaction into the blockchain.
+This can be performed with the help of `send` async function:
+
+```javascript
+const serialized = transaction.serialize()
+const transactionHash = await exonum.send(explorerPath, serialized)
+```
+
+`explorerPath` represents API address of the transaction handler in the
+[explorer service](../advanced/other-services.md#explorer), such as
+
+```javascript
+const explorerPath = 'http://127.0.0.1:8200/api/explorer/v1/transactions'
+```
+
+### Alternative: Define Schema with Reflection
+
+`protobufjs` package allows to define Protobuf types in runtime.
+Beware that this is more prone to errors and should only be used
+as a last resort.
+
+```javascript
+import { Root, Type, Field } from 'protobufjs'
+
+const root = new Root().define('cryptocurrency')
+const Hash = new Type('Hash').add(new Field('data', 1, 'bytes'))
+root.add(Hash)
+
+const TransferSchema = new Type('Transfer')
+  .add(new Field('to', 1, 'cryptocurrency.Hash'))
+  .add(new Field('amount', 2, 'uint64'))
+  .add(new Field('seed', 3, 'uint64'))
+root.add(TransferSchema)
+```
+
+In this case, the transaction type will be specified as
+
+```javascript
+const Transfer = new exonum.Transaction({
+   schema: TransferSchema,
+   serviceId: SERVICE_ID,
+   methodId: 1,
+})
+```
 
 ## Cryptographic Proofs
 
@@ -312,118 +251,135 @@ corresponding error, if such data is absent in the blockchain for some reason.
 In other words, a [cryptographic proof](../glossary.md#merkle-proof)
 is a response to the read request made through the light client that:
 
-- validates authenticity of the data included therein
+- validates authenticity of the included data
 - certifies that said data is safely stored in the blockchain.
 
 In the same way as transactions, data proofs provided by Exonum light client
-have a general common structure and comprise several parts. Meanwhile,
-depending on the service business logic some extra custom parts may be included
-therein.
+have a general common structure but, depending on service business logic,
+some extra custom parts may be included in the proof.
 
-Below, we will discuss the proof from the Service with Data Proofs which in its
-structure repeats the proofs from the Timestamping Demo service plus contains
-some custom parts.
-
-The proof itself comprises several levels and, when executed, unfolds from the
+The proof itself comprises several levels and, when checked, unfolds from the
 highest level down to the lowest one. These levels are represented by the
-requested data. The highest level, evidently, corresponds to the blockchain
-state hash.
-
-Below is the proof chart representing the proof structure. You can refer to it
-while we will be further conducting the proof analyses.
+requested data. The highest level corresponds to the blockchain
+state hash included into the block header returned by the node:
 
 ![proof-chart](../images/proof-chart.png)
 
-Thus, first of all, we check that the block containing our data is correct and
-bears the state hash indicated in the proof. For this purpose we load the actual
-list of public keys of validator nodes stored in the
-[global configuration](../architecture/configuration.md). The keys
-are applied to assert that the data received from the
-blockchain was indeed agreed upon by all the member nodes in the network:
+### Getting Validator Keys
+
+First of all, we check that the block containing our data is correct.
+For this purpose, we can load the actual
+list of public keys of the [validator nodes](../glossary.md#validator)
+stored in the [global configuration](../architecture/configuration.md).
+These keys will be used to assert that the data received from the
+blockchain was indeed agreed upon by all the member nodes in the network.
 
 ```javascript
-const response = await axios.get(
-  '/api/services/configuration/v1/configs/actual')
-const validators = response.data.config.validator_keys.map(
-  validator => validator.consensus_key)
+const { data } = await axios.get(
+  '/api/services/supervisor/consensus-config',
+)
+const validatorKeys = data
+  .validator_keys
+  .map(({ consensus_key }) => consensus_key)
 ```
+
+### Getting Proof
 
 Now make a request for the data on a particular wallet together with its proof.
 Note, that we identify the wallet by its public key which is in fact the public
 key of its holder:
 
 ```javascript
-const response = await axios.get(
-  `/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`)
-// response.data contains the wallet together with its proof
+const { data } = await axios.get(
+  `/api/services/cryptocurrency/v1/wallets/info?pub_key=${publicKey}`,
+)
 ```
 
-- `publicKey` - public key of the wallet of interest.
+Here, `publicKey` is the public key of the wallet we are interested in.
 
-As soon as we get the data, as mentioned above, we verify the block where it is
-stored, in particular block precommits according to the downloaded set of
-keys of the validators:
+### Verifying Block Authenticity
+
+As soon as we get the data, we verify the block authenticity
+according to the downloaded set of keys of the validators:
 
 ```javascript
-if (!Exonum.verifyBlock(data.block_info, validators)) {
-  throw new Error('Block can not be verified')
+const { block } = data.block_proof
+try {
+  // Will throw if an error during verification occurs
+  exonum.verifyBlock(block, validatorKeys))
+} catch(e) {
+  console.error(e)
 }
 ```
 
-Next, we need to obtain the root hash of the table that bears all the
-registered wallets. This root hash is stored in the table of hashes of
-all the tables defined in the service (state hash aggregator). Thus, we check
-the presence of the wallets table in the service:
+### Verifying Table Proof
+
+Next, we need to obtain the hash of the wallets table.
+The table hash is [automatically aggregated](../architecture/merkledb.md#state-aggregation)
+into the state hash mentioned in the block header. Thus, we check
+the presence of the wallets table in the service like this:
 
 ```javascript
-const tableRootHash = Exonum.verifyTable(data.wallet_proof.to_table,
-  data.block_proof.block.state_hash, SERVICE_ID, TABLE_INDEX)
+const tableRootHash = exonum.verifyTable(
+  // Proof of table inclusion
+  data.wallet_proof.to_table,
+  // State hash in the verified block
+  block.state_hash,
+  // Full name of the wallets table, including the name
+  // of the cryptocurrency service (`crypto`)
+  'crypto.wallets',
+)
 ```
 
-The next proof level is devoted to the validation of existence of a particular
-wallet inside the system.
+### Verifying Wallet Proof
 
-First, we define the structure that we search for in the proof in the Protobuf
-format. In this case, it is a wallet.
+The next proof level verifies the existence of a particular
+wallet in the blockchain state.
+
+First, recall the `Wallet` type declaration from
+[the tutorial](data-proofs.md#declare-persistent-data):
 
 ```proto
-package examples;
-
-message Hash { bytes data = 1; }
-
-message PublicKey { bytes data = 1; }
-
-// Wallet information stored in the database.
 message Wallet {
-  // Public key of the wallet.
-  PublicKey pub_key = 1;
-  // Name of the wallet.
+  exonum.crypto.Hash owner = 1;
   string name = 2;
-  // Current balance of the wallet.
   uint64 balance = 3;
-  // Length of the transactions history.
   uint64 history_len = 4;
-  // Hash of the transactions history.
-  Hash history_hash = 5;
+  exonum.crypto.Hash history_hash = 5;
 }
 ```
+
+We can use the `pbjs` binary from the `protobufjs` module
+to translate it to a JS module, like we did for `Transfer`
+above. We then wrap the generated JS type into an Exonum helper:
 
 ```javascript
 const { cryptocurrency_advanced } = proto.exonum.examples
-const Wallet = Exonum.newType(cryptocurrency_advanced.Wallet)
+const Wallet = exonum.newType(cryptocurrency_advanced.Wallet)
 ```
 
-We then obtain the proof down to the required wallet:
+Then, we verify the proof down to the requested wallet:
 
 ```javascript
-
-const walletProof = new Exonum.MapProof(data.wallet_proof.to_wallet,
-  Exonum.PublicKey, Wallet)
+const walletProof = new exonum.MapProof(
+  // JSON proof data
+  data.wallet_proof.to_wallet,
+  // Type of keys in the wallets map
+  exonum.MapProof.rawKey(exonum.Hash),
+  // Type of values in the wallets map
+  Wallet,
+)
 ```
 
-Here we also check that `merkleRoot`, which is now the root hash of the wallets
-table, coincides with `tableRootHash` we obtained at the previous level. In this
-way we can link two parts of the proof:
+Note the use of `MapProof.rawKey`; as mentioned in
+the [advanced tutorial](data-proofs.md), we use
+[the raw key transform](../advanced/merkelized-map.md#proofmapindex-insights)
+for keys in the wallets table.
+
+We also need to check that `walletProof.merkleRoot` – the root hash
+of the wallets table restored from the proof – coincides with `tableRootHash`
+we obtained at the previous level. In this way we can link two parts
+of the proof together:
 
 ```javascript
 if (walletProof.merkleRoot !== tableRootHash) {
@@ -431,113 +387,82 @@ if (walletProof.merkleRoot !== tableRootHash) {
 }
 ```
 
-If the above is the case, we can safely extract wallet data from the proof:
+If the above checks are passed, we can safely extract wallet data
+from the proof:
 
 ```javascript
-const wallet = walletProof.entries.get(publicKey)
-
-if (typeof wallet === 'undefined') {
+const address = exonum.publicKeyToAddress(publicKey)
+const wallet = walletProof.entries.get(address)
+if (!wallet) {
   throw new Error('Wallet not found')
 }
 ```
 
-Basically, the proof from the Timestamping Service comprises the same validation
-levels as described above. Specifically, to obtain confirmation for the
-timestamp data, the proof validates the block, the root table and the table of
-timestamps. The data on the timestamp can then be extracted from the validated
-timestamps table.
+### Verifying Wallet Transactions
 
-Meanwhile, the proof we presently investigate contains another level. This level
-refers to the validation of transactions concerning a specific wallet (wallet
-history).  
-
-First, we obtain a proof for all transactions in the wallet. It will contain
-transactions hashes as well as statuses thereof. In our example we obtain
-information for the whole wallet history. However, any suitable
-range of the history may be selected:
+The proof we are investigating contains another level:
+transactions concerning a specific wallet (aka *wallet history*).
+The wallet history is stored in a [merkelized list](../advanced/merkelized-list.md)
+and the list hash is saved to `Wallet` as the `history_hash` field.
+Notably, the list does not contain transactions themselves, but
+only their hashes; because of collision resistance, hashes uniquely
+determine transactions.
 
 ```javascript
-
-const transactionsMetaData = Exonum.merkleProof(
-  Exonum.uint8ArrayToHexadecimal(new Uint8Array(wallet.history_hash.data)),
-  wallet.history_len,
+const verifiedTransactions = new exonum.ListProof(
+  // JSON proof data
   data.wallet_history.proof,
-  [0, wallet.history_len],
-  Exonum.Hash
+  // Type of values in the proof
+  exonum.Hash,
 )
-```
 
-Upon obtainment of the proof, make sure that the number of transactions in the
-wallet history, that we extracted earlier together with other information on the
-wallet, is equal to the number of transactions in the array of the proof.
-Otherwise, transactions cannot be verified against the proof:
-
-```javascript
-if (data.wallet_history.transactions.length !==
-    transactionsMetaData.length)
-{
-  throw new Error('Transactions cannot be verified')
+// Check that the proof is tied to the previous level.
+if (verifiedTransactions.merkleRoot !== wallet.history_hash) {
+  throw new Error('Transactions proof is corrupted')
 }
 ```
 
-Next, we validate each transaction. For this purpose we iterate them in the
-array and check their structure in several steps. This check allows us
+In our example, the endpoint should return *all* transactions
+for the wallet. Since we rely on this fact in the following code,
+we will check this first:
+
+```javascript
+const validIndexes = verifiedTransactions
+  .entries
+  .every(({ index }, i) => i === index)
+if (!validIndexes) {
+  throw new Error('Invalid transaction indexes in the proof')
+}
+```
+
+Next, we validate each transaction. For this purpose we iterate over them
+and check their structure in several steps. This check allows us
 to confirm that a transaction of a certain type is present at a definite place
 in the array.
 
 In our example, for the sake of brevity, we provide structure
-definition of only one transaction type. This type is a transaction of token
-issuance from our [Cryptocurrency Advanced Service][cryptocurrency-advanced].
-However, note that to perform a real check, all the transaction types of the
-service should be defined.
-
-The check of the transaction structure comprises the following steps:
-
-- calculate a hash from the transaction buffer with the `Exonum.hash`
-  method. Compare it with the corresponding hash from the array of transaction
-  hashes in the proof
-- serialize the transaction in its explicit view and compare it with the
-  serialized version of the transaction body (buffer without signature). The
-  explicit view of the transaction is stored in the `debug` field thereof, while
-  the serialized view thereof is stored in the `message` field in the hex format
-- validate each transaction signature with the `Transaction.verifySignature`
-  method. The required data for validation are signature and author of the
-  transaction in the hex format and the transaction data in its explicit view.
-
-Below is an example of the proof check for the transaction history of a wallet:
+definition of only one transaction type, `Transfer`.
 
 ```javascript
+// Transfer transaction definition (same as previously)
+const Transfer = new exonum.Transaction({
+   schema: cryptocurrency_advanced.Transfer,
+   serviceId: SERVICE_ID,
+   methodId: 1,
+})
+
+let index = 0
 for (let transaction of data.wallet_history.transactions) {
-  const hash = transactionsMetaData[index++]
-  const buffer = Exonum.hexadecimalToUint8Array(transaction.message)
-  const bufferWithoutSignature = buffer.subarray(0, buffer.length - 64)
-  const author = Exonum.uint8ArrayToHexadecimal(buffer.subarray(0, 32))
-  const signature = Exonum.uint8ArrayToHexadecimal(
-    buffer.subarray(buffer.length - 64, buffer.length))
-
-  const Transaction = new Exonum.newTransaction({
-    author: author,
-    service_id: SERVICE_ID,
-    message_id: TX_WALLET_ID,
-    schema: proto.exonum.examples.cryptocurrency_advanced.Issue
-  })
-
-  // Calculate a hash from the transaction body and compare it with the
+  // Deserialize a transaction from bytes. This will also check
+  // transaction signature.
+  const bytes = exonum.hexadecimalToUint8Array(transaction)
+  const parsed = Transfer.deserialize(bytes)
+  
+  // Calculate a hash of the transaction and compare it with the
   // corresponding hash in the array of transaction hashes.
-  if (Exonum.hash(buffer) !== hash) {
+  const expectedHash = verifiedTransactions.entries[index++]
+  if (parsed.hash() !== expectedHash) {
      throw new Error('Invalid transaction hash')
-  }
-
-  // Serialize transaction from the debug view and compare it with the
-  // `bufferWithoutSignature` obtained above.
-  if (!Transaction.serialize(transaction.debug)
-    .every((el, i) => el === bufferWithoutSignature[i])) {
-    throw new Error('Invalid transaction message')
-  }
-
-  // Validate the transaction signature.
-  if (!Transaction.verifySignature(signature, author, transaction.debug)) {
-     throw new Error('Invalid transaction signature')
   }
 }
 ```
@@ -548,7 +473,7 @@ We have described all the functionality required to interact with an Exonum
 service through the light client so far.
 
 Well done! You have now equipped your application with a full-stack Exonum-based
-support! At this the point you can build and run your application.
+support!
 
 [timestamping-demo]: https://github.com/exonum/exonum/tree/master/examples/timestamping
 [javascript-client]: https://github.com/exonum/exonum-client#getting-started
