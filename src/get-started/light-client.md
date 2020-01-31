@@ -15,8 +15,9 @@ Below we will provide you with the detailed description of how said
 functionality is executed in Exonum light client.
 
 !!! note
-    Light client is also available in Java language.
-    Please refer to its [readme][lc-java] for details.
+    Light clients are also available in other languages:
+    [Java][lc-java] and [Python][lc-python]. See their readmes
+    for more details.
 
 ## Before You Start
 
@@ -486,3 +487,4 @@ support!
 [cryptocurrency-advanced]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency-advanced/frontend
 [timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping/frontend
 [lc-java]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-light-client
+[lc-python]: https://github.com/exonum/exonum-python-client
