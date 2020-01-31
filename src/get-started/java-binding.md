@@ -1095,8 +1095,7 @@ risk of private keys leakage.
 
 Exonum Java App offers the same configuration process as standard Exonum Rust
 services. In this guide we will describe how to configure a network of a single
-node. For an example of multi-node network configuration, see
-[Timestamping Tutorial][start-the-blockchain-network].
+node.
 
 Exonum Java App includes help for each of the available commands and its
 options. Use a `-h` flag for the short version of the CLI documentation, a
@@ -1404,7 +1403,6 @@ instances:
 See [sample-config.yml][launcher-sample-config] for the final state of the
 configuration file.
 
-[start-the-blockchain-network]: ./timestamping-tutorial.md#start-the-blockchain-network
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
 [plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/README.md
 [launcher-sample-config]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/sample-config.yml
