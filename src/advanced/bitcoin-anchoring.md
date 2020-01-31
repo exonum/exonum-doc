@@ -213,15 +213,15 @@ secured.
 #### Synchronization with Bitcoin Blockchain
 
 A separate [utility][btc_anchoring_sync] periodically performs
-two actions:
+the following actions:
 
-- Creation of a signature for a new anchoring transaction. The utility takes the
+1. Creates a signature for a new anchoring transaction. The utility takes the
   actual anchoring transaction proposal by the node private API, signs this
   proposal by the corresponding Bitcoin key and sends this signature back to the
   validator node. Validator node creates a new vote transaction from this signature
   and broadcasts it to the other nodes.
 
-- Synchronization of the list of Exonum anchoring transactions with those committed
+2. Synchronizes the list of Exonum anchoring transactions with those committed
   to the Bitcoin Blockchain. The utility the latest anchoring transaction and checks
   whether it is present in Bitcoin.
   If not, the handler checks the previous anchoring transactions one by one in the
