@@ -2,7 +2,7 @@
 
 In this tutorial we describe how to use the light client to interact with
 Exonum services. The tutorial extends the
-[*Cryptocurrency Advanced*](data-proofs.md) tutorial.
+[Advanced Cryptocurrency](data-proofs.md) tutorial.
 
 Light client is a JavaScript library used for a number of purposes:
 
@@ -16,7 +16,7 @@ functionality is executed in Exonum light client.
 
 !!! note
     Light clients are also available in other languages:
-    [Java][lc-java] and [Python][lc-python]. See their readmes
+    [Java][lc-java] and [Python][lc-python]. See their readme files
     for more details.
 
 ## Before You Start
@@ -59,7 +59,7 @@ reflection:
 
 Below we provide a complete workflow of transaction execution
 based on the transfer transaction from
-the [*Advanced Cryptocurrency Tutorial*][cryptocurrency-advanced].
+the [Advanced Cryptocurrency][cryptocurrency-advanced] tutorial.
 
 ### Define Transaction Schema
 
@@ -90,6 +90,7 @@ As the `.proto` file is ready, generate the JavaScript module as follows:
 ```sh
 pbjs --keep-case \
   --target static-module \
+  --root cryptocurrency \
   --path node_modules/exonum-client/proto \
   example.proto \
   --out ./proto.js
@@ -100,6 +101,9 @@ Here:
 - `--keep-case` opts out of transforming field names
 - `--target` specifies the output type (in our case, we want a standalone
   JS module)
+- `--root` specifies a namespace for the generated types. Without this
+  option, the types may clash with the Protobuf types used by
+  the light client library, which will lead to errors
 - `--path` adds a directory to the include path (we specify a path
   to the Protobuf declarations bundled with the client library)
 - `example.proto` specifies an input file
