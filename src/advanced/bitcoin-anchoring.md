@@ -51,21 +51,27 @@ that is spent on transaction fees.
 Decentralization during the anchoring process is built over the internal
 Bitcoin multisignature address architecture.
 
+Nodes performing anchoring are not strictly associated with the validator nodes.
+It means that there may exist a validator node that does not perform anchoring,
+and vice versa an anchoring node that is not a validator.
+But we strongly recommend to keep one to one relationship between the anchoring
+and validator nodes.
+
 When the Exonum network should be anchored, an anchoring transaction is built
 based on a [deterministic algorithm](#creating-anchoring-transaction).
-Its results are guaranteed to match for every honest validator. This
+Its results are guaranteed to match for every honest anchoring node. This
 anchoring transaction spends one or more UTXOs from the current anchoring
-multisig address. Every validator can sign this transaction without regard for
-other validators, as it is allowed by Bitcoin. All signatures are
+multisig address. Every anchoring node can sign this transaction without regard for
+other anchoring nodes, as it is allowed by Bitcoin. All signatures are
 published into the Exonum blockchain.
 
 Exonum uses `M-of-N` multisig addresses, where `N` is a number of
-anchoring validators (`N <= 20` because of Bitcoin restrictions) and `M`
+anchoring nodes (`N <= 20` because of Bitcoin restrictions) and `M`
 is the necessary amount of signatures. In the Exonum consensus, `M =
 floor(2/3*N) + 1` is used as a supermajority.
 
 !!! note
-    If there are `N=10` validators, then `M=7` represents a supermajority.
+    If there are `N=10` anchoring nodes, then `M=7` represents a supermajority.
     That means, 7 signatures are required to build an anchoring transaction.
     If `N=4`, then `M=3` signatures are required.
 
@@ -74,7 +80,7 @@ commits a signed anchoring transaction to the Bitcoin blockchain.
 
 ### Transaction Malleability and SegWit
 
-Validators signatures over anchoring transactions are openly written in the
+Anchoring nodes signatures over anchoring transactions are openly written in the
 Exonum blockchain; more than `M` signatures can be published (it is a common
 case).
 
@@ -114,8 +120,7 @@ An anchoring transaction proposal is constructed as follows:
   anchored data. Such data consist of multiple [data
   chunks](#data-chunks)
 - Its change output reroutes funds to the next anchoring address if the
-  anchoring address [should be changed](#changing-validators-list).
-  Otherwise, the current address is used.
+  anchoring address should be changed. Otherwise, the current address is used.
 
 ### Data Chunks
 
@@ -163,10 +168,10 @@ anchoring transaction only if the previous anchoring chain failed
   anchoring transaction and the hash of the corresponding Exonum block. The
   first anchoring transaction in the chain uses the UTXO of the funding
   transaction
-- Every validator has an external synchronization [utility][btc_anchoring_sync] that
-  creates containing a new proposed anchoring transaction and its vote for
-  said transaction. The validators commit these transactions to
-  the Exonum blockchain
+- Every anchoring node has an external synchronization [utility][btc_anchoring_sync]
+  that creates containing a new proposed anchoring transaction and its vote for
+  said transaction. The anchoring nodes commit these transactions to the Exonum
+  blockchain
 - When such transaction is executed, its signature is stored in the
   corresponding anchoring service table. When the number of signatures for the
   same anchoring proposal reaches `+2/3` value, said anchoring transaction
@@ -199,12 +204,12 @@ The following settings need to be specified to access the bitcoind node:
 
 !!! tip
     It is strongly advised to have a separate bitcoind node for more than one
-    validator; otherwise, the single bitcoind node is a
+    anchoring node; otherwise, the single bitcoind node is a
     centralization point and presents a weakness in the anchoring process.
 
 #### Bitcoin Private Keys
 
-Every validator should possess its own secp256k1 EC keypair in order to
+Every anchoring node should possess its own secp256k1 EC keypair in order to
 participate in the anchoring process. The private key should be strongly
 secured.
 
@@ -216,7 +221,7 @@ the following actions:
 1. Creates a signature for a new anchoring transaction. The utility takes the
   actual anchoring transaction proposal by the node private API, signs this
   proposal by the corresponding Bitcoin key and sends this signature back to the
-  validator node. Validator node creates a new vote transaction from this signature
+  anchoring node. Anchoring node creates a new vote transaction from this signature
   and broadcasts it to the other nodes.
 
 2. Synchronizes the list of Exonum anchoring transactions with those committed
@@ -231,7 +236,7 @@ the following actions:
 
 #### Bitcoin Public Keys
 
-As written earlier, every validator should store its own
+As written earlier, every anchoring should store its own
 [private key](#bitcoin-private-keys).
 Corresponding public keys are stored in the global configuration.
 
