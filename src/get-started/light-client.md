@@ -239,9 +239,9 @@ In this case, the transaction type will be specified as
 
 ```javascript
 const Transfer = new exonum.Transaction({
-   schema: TransferSchema,
-   serviceId: SERVICE_ID,
-   methodId: 1,
+  schema: TransferSchema,
+  serviceId: SERVICE_ID,
+  methodId: 1,
 })
 ```
 
@@ -455,9 +455,9 @@ definition of only one transaction type, `Transfer`.
 ```javascript
 // Transfer transaction definition (same as previously)
 const Transfer = new exonum.Transaction({
-   schema: cryptocurrency_advanced.Transfer,
-   serviceId: SERVICE_ID,
-   methodId: 1,
+  schema: cryptocurrency_advanced.Transfer,
+  serviceId: SERVICE_ID,
+  methodId: 1,
 })
 
 let index = 0
@@ -471,7 +471,7 @@ for (let transaction of data.wallet_history.transactions) {
   // corresponding hash in the array of transaction hashes.
   const expectedHash = verifiedTransactions.entries[index++]
   if (parsed.hash() !== expectedHash) {
-     throw new Error('Invalid transaction hash')
+    throw new Error('Invalid transaction hash')
   }
 }
 ```
