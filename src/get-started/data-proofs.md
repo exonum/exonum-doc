@@ -113,8 +113,8 @@ which act similarly to addresses in Ethereum.
 Since an address is the SHA-256 hash
 of the authorization info, it is represented as `Hash` in Protobuf.
 
-After that we provide the description of said type in Rust language in the
-`src/wallet.rs` file. The service will require this Rust definition to
+After that we provide the `Wallet` description in Rust in
+`src/wallet.rs`. The service will require this Rust definition to
 [validate](../architecture/serialization.md#additional-validation-for-protobuf-generated-structures)
 the type generated from the above Protobuf declaration:
 
@@ -256,7 +256,24 @@ Several things to note here:
   its keys, which is appropriate for `Address` keys because they are essentially
   hash digests.
 
-We also declare some helpers to modify schema data more efficiently:
+We also declare some helpers to access schema data more efficiently:
+
+```rust
+impl<T: Access> SchemaImpl<T> {
+    pub fn new(access: T) -> Self {
+        Self::from_root(access).unwrap()
+    }
+
+    pub fn wallet(&self, address: Address) -> Option<Wallet> {
+        self.public.wallets.get(&address)
+    }
+}
+```
+
+Besides the `new` constructor copied from the previous tutorial,
+we define the `wallet` getter.
+
+Finally, we define some method to *modify* schema data:
 
 ```rust
 impl<T> SchemaImpl<T>
@@ -284,7 +301,7 @@ where
         // actual implementation skipped
     }
 
-    /// Creates a new wallet and append first record to its history.
+    /// Creates a new wallet and appends the first record to its history.
     pub fn create_wallet(
         &mut self,
         key: Address,
@@ -440,7 +457,7 @@ is similar to their predecessors.
         let (from, tx_hash) = extract_info(&context)?;
 
         let mut schema = SchemaImpl::new(context.service_data());
-        if schema.public.wallets.get(&from).is_none() {
+        if schema.wallet(from).is_none() {
             let name = &arg.name;
             schema.create_wallet(from, name, tx_hash);
             Ok(())
@@ -475,22 +492,13 @@ is similar to their predecessors.
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
 
-        let to = arg.to;
         let amount = arg.amount;
-        if from == to {
+        if from == arg.to {
             return Err(Error::SenderSameAsReceiver.into());
         }
 
-        let sender = schema
-            .public
-            .wallets
-            .get(&from)
-            .ok_or(Error::SenderNotFound)?;
-        let receiver = schema
-            .public
-            .wallets
-            .get(&to)
-            .ok_or(Error::ReceiverNotFound)?;
+        let sender = schema.wallet(from).ok_or(Error::SenderNotFound)?;
+        let receiver = schema.wallet(arg.to).ok_or(Error::ReceiverNotFound)?;
         if sender.balance < amount {
             Err(Error::InsufficientCurrencyAmount.into())
         } else {
@@ -516,7 +524,7 @@ fn issue(&self, context: ExecutionContext<'_>, arg: Issue) -> Self::Output {
     let (from, tx_hash) = extract_info(&context)?;
 
     let mut schema = SchemaImpl::new(context.service_data());
-    if let Some(wallet) = schema.public.wallets.get(&from) {
+    if let Some(wallet) = schema.wallet(from) {
         let amount = arg.amount;
         schema.increase_wallet_balance(wallet, amount, tx_hash);
         Ok(())
@@ -604,7 +612,6 @@ pub struct PublicApi;
 
 impl PublicApi {
     pub fn wallet_info(
-        self,
         state: &ServiceApiState<'_>,
         query: WalletQuery,
     ) -> api::Result<WalletInfo> {
@@ -640,8 +647,8 @@ let wallet_proof = WalletProof {
 };
 ```
 
-As a final step of this action we extract the proof for the wallet history.
-Note, that the proof contains transaction hashes
+As the final step, we extract the proof for the wallet history.
+Note that the proof contains transaction hashes
 rather than the transactions themselves. The transactions are stored
 separately and are returned together with
 the proof for user’s reference. This allows user to check correctness of the
@@ -655,8 +662,8 @@ let wallet_history = wallet.map(|_| {
     let proof = history.get_range_proof(..);
 ```
 
-Next, we obtain transaction data for each history hash, transform them into the
-readable format and output them in the form of an array:
+Next, we obtain transaction data for each history hash and output transactions
+in an array:
 
 ```rust
     let transactions = state.data().for_core().transactions();
@@ -697,8 +704,7 @@ state.data().proof_for_service_index("wallets").unwrap()
 ```
 
 However, the index will not exist if no transactions to the service were
-executed!
-Without the index, we cannot retrieve a proof for its existence.
+executed! Without the index, we cannot retrieve a proof for its existence.
 We *could* return a proof of absence of the index from the endpoint handler,
 but this would complicate the endpoint design and the corresponding
 client checks.
@@ -729,13 +735,10 @@ within it:
 
 ```rust
 impl PublicApi {
-    pub fn wire(self, builder: &mut ServiceApiBuilder) {
-        builder.public_scope().endpoint(
-            "v1/wallets/info",
-            move |state: &ServiceApiState<'_>, query: WalletQuery| {
-                self.wallet_info(state, query.pub_key)
-            },
-        );
+    pub fn wire(builder: &mut ServiceApiBuilder) {
+        builder
+            .public_scope()
+            .endpoint("v1/wallets/info", Self::wallet_info);
     }
 }
 ```
@@ -748,7 +751,7 @@ impl Service for CryptocurrencyService {
     // `initilize` method snipped...
 
     fn wire_api(&self, builder: &mut ServiceApiBuilder) {
-        CryptocurrencyApi.wire(builder);
+        CryptocurrencyApi::wire(builder);
     }
 }
 ```
