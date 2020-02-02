@@ -38,11 +38,11 @@ install the library together with its prerequisites.
 can be used to build a simple cryptocurrency app step by step.
 
 [Cryptocurrency Advanced Tutorial](get-started/data-proofs.md)
-also explains how to obtain proofs of data presence in the blockchain.  
+explains how to obtain cryptographic proofs of data presence
+in the blockchain.  
 
-[Timestamping Service Tutorial](get-started/timestamping-tutorial.md)
-demonstrates how to build one of the most demanded blockchain services and
-start up a four-node network that will process requests to this service.
+[Service Testing Tutorial](get-started/test-service.md) will teach you how to
+test your services with the help of the [testkit library][testkit].
 
 The source code of the tutorials [is available on GitHub][tutorials].
 
@@ -52,10 +52,7 @@ a JavaScript library intended for client-side verification of blockchain
 information and for performing cryptographic operations (such as digital
 signing).
 
-[Service Testing Tutorial](get-started/test-service.md) will teach you how to
-test your services with the help of the [testkit library][testkit].
-
-And finally, the [Java Binding User Guide](get-started/java-binding.md) will
+Finally, the [Java Binding User Guide](get-started/java-binding.md) will
 teach you how to start a Java project on the Exonum framework.
 
 ## Going Deeper
