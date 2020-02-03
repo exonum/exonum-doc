@@ -1,7 +1,7 @@
 # Advanced Cryptocurrency Tutorial: Service with Data Proofs
 
 This tutorial is an extended version of the
-[*Cryptocurrency Tutorial*](create-service.md).
+[Cryptocurrency Tutorial](create-service.md).
 It shows how to create cryptographic proofs for data in Exonum
 and how to organize the corresponding data layout.
 
@@ -93,17 +93,17 @@ message Wallet {
   uint64 balance = 3;
   
   // Additional fields:
-  // Number of transactions concerning the wallet.
+  // Number of transactions related to the wallet.
   uint64 history_len = 4;
   // `Hash` of the Merkelized list of the transactions
-  // concerning the wallet.
+  // related to the wallet.
   exonum.crypto.Hash history_hash = 5;
 }
 ```
 
 These additional fields allow to prove to a light client that specific
-transactions (and no other transactions) concern the wallet, that is,
-have changed its balance.
+transactions (and no other transactions) are related to the wallet,
+that is, have changed its balance.
 
 Note that the `owner` field has a different type compared to the simple
 cryptocurrency. This is because we will use the general way to associate
