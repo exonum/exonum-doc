@@ -23,7 +23,7 @@ You can find a tutorial containing these features
 
 Exonum is written in Rust and you have to install the stable Rust
 compiler to build this tutorial. If you do not have the environment set up,
-follow [the installation guide](./install.md).
+follow [the installation guide](install.md).
 
 Let’s create a minimal crate with the **exonum** crate as a dependency.
 
@@ -132,7 +132,6 @@ module:
 pub use self::service::*;
 
 include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
-
 use exonum::crypto::proto::*;
 ```
 
@@ -166,7 +165,8 @@ for further operations with data schema and to [validate](../architecture/serial
 the corresponding `.rs` Protobuf-generated file with this structure:
 
 ```rust
-#[derive(Serialize, Deserialize, Clone, Debug, ProtobufConvert, BinaryValue, ObjectHash)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(ProtobufConvert, BinaryValue, ObjectHash)]
 #[protobuf_convert(source = "proto::Wallet")]
 pub struct Wallet {
     pub pub_key: PublicKey,
@@ -347,7 +347,7 @@ invoke a certain method.
 
 !!! note
     All the transactions numeric IDs should be unique. An attempt to create two methods
-    with the same numeric ID will result in a compile error.
+    with the same numeric ID will result in a compilation error.
 
 ### Reporting Errors
 
@@ -382,8 +382,8 @@ pub enum Error {
 ```
 
 Deriving the `ExecutionFail` trait here will make our errors generic and
-compatible with other error kinds used within Exonum blockchain, this macro
-is similar to the `failure::Fail`.
+compatible with other error kinds used within Exonum blockchain; this trait
+is similar to `failure::Fail`.
 
 ### Transaction Execution
 
@@ -392,7 +392,8 @@ has no implementation. Thus, there is no actual business logic attached to
 them. To fix this situation, we should declare our service, and then implement
 the `CryptocurrencyInterface` trait for it.
 
-Service is a `struct` which implements several certain traits:
+Service is a `struct` which implements specific traits
+defined by the Rust runtime:
 
 ```rust
 /// Cryptocurrency service implementation.
@@ -406,7 +407,7 @@ impl Service for CryptocurrencyService {}
 
 `service_dispatcher` macro collects information about interfaces implemented
 by service, and `service_factory` macro generates a code to create instances
-of our service, similarly to the [Factory method design pattern][factory-method].
+of our service, similarly to the [factory method pattern][factory-method].
 
 [factory-method]: https://en.wikipedia.org/wiki/Factory_method_pattern
 
@@ -427,7 +428,7 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
     fn create_wallet(
         &self,
         context: ExecutionContext<'_>,
-        arg: TxCreateWallet
+        arg: TxCreateWallet,
     ) -> Self::Output {
         let author = context
             .caller()
@@ -437,7 +438,7 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
         let mut schema = CurrencySchema::new(context.service_data());
         if schema.wallets.get(&author).is_none() {
             let wallet = Wallet::new(&author, &arg.name, INIT_BALANCE);
-            println!("Create the wallet: {:?}", wallet);
+            println!("Created wallet: {:?}", wallet);
             schema.wallets.put(&author, wallet);
             Ok(())
         } else {
@@ -445,7 +446,7 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
         }
     }
 
-    // Implementation for the `transfer` transaction will be in the next step.
+    // `transfer` transaction will be implemented on the next step.
 }
 ```
 
@@ -459,8 +460,8 @@ we instantiate `CurrencySchema` using `service_data` method of `ExecutionContext
 
 !!! tip
     `ExecutionContext` structure provides an interface to interact with blockchain
-    and service data (for our service, we can obtain both mutable and immutable
-    access, for any other kind of data, only read-only access is available).
+    and service data. For our service, we can obtain both mutable and immutable
+    access to data; for any other kind of data, only read-only access is available.
 
 `TxTransfer` transaction gets two wallets for both sides of the transfer
 transaction. If they are found, we check the balance of the sender. If
@@ -480,7 +481,7 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
     fn transfer(
         &self,
         context: ExecutionContext<'_>,
-        arg: TxTransfer
+        arg: TxTransfer,
     ) -> Self::Output {
         let author = context
             .caller()
@@ -492,7 +493,10 @@ impl CryptocurrencyInterface<ExecutionContext<'_>> for CryptocurrencyService {
 
         let mut schema = CurrencySchema::new(context.service_data());
         let sender = schema.wallets.get(&author).ok_or(Error::SenderNotFound)?;
-        let receiver = schema.wallets.get(&arg.to).ok_or(Error::ReceiverNotFound)?;
+        let receiver = schema
+            .wallets
+            .get(&arg.to)
+            .ok_or(Error::ReceiverNotFound)?;
 
         let amount = arg.amount;
         if sender.balance >= amount {
@@ -516,6 +520,7 @@ With this aim we declare a blank struct that includes a set of methods that
 correspond to different types of requests:
 
 ```rust
+#[derive(Debug, Clone, Copy)]
 struct CryptocurrencyApi;
 ```
 
@@ -541,7 +546,6 @@ pub struct WalletQuery {
 impl CryptocurrencyApi {
     /// Endpoint for getting a single wallet.
     pub fn get_wallet(
-        self,
         state: &ServiceApiState<'_>,
         pub_key: PublicKey,
     ) -> api::Result<Wallet> {
@@ -554,8 +558,8 @@ impl CryptocurrencyApi {
 
     /// Endpoint for dumping all wallets from the storage.
     pub fn get_wallets(
-        self,
-        state: &ServiceApiState<'_>
+        state: &ServiceApiState<'_>,
+        _query: (),
     ) -> api::Result<Vec<Wallet>> {
         let schema = CurrencySchema::new(state.service_data());
         Ok(schema.wallets.values().collect())
@@ -567,27 +571,25 @@ The `state` contains an interface to access blockchain data, which
 is needed to implement [read requests](../architecture/services.md#read-requests).
 
 As with the transaction endpoint, the methods have an idiomatic signature
-`fn(&ServiceApiState, MyQuery) -> api::Result<MyResponse>`.
 
-Also we will declare a helper method to wire API, which later can be invoked
+```rust
+type Handle<Query, Response> =
+    fn(&ServiceApiState<'_>, Query) -> api::Result<Response>;
+```
+
+We also declare a helper method to wire the API, which later can be invoked
 by the service:
 
 ```rust
 impl CryptocurrencyApi {
-    /// 'ServiceApiBuilder' facilitates conversion between read requests and REST
-    /// endpoints.
-    pub fn wire(self, builder: &mut ServiceApiBuilder) {
+    /// `ServiceApiBuilder` facilitates conversion between read requests
+    /// and REST endpoints.
+    pub fn wire(builder: &mut ServiceApiBuilder) {
         // Binds handlers to specific routes.
         builder
             .public_scope()
-            .endpoint("v1/wallet", {
-                move |state: &ServiceApiState<'_>, query: WalletQuery| {
-                    self.get_wallet(state, query.pub_key)
-                }
-            })
-            .endpoint("v1/wallets", {
-                move |state: &ServiceApiState<'_>, _query: ()| self.get_wallets(state)
-            });
+            .endpoint("v1/wallet", Self::get_wallet)
+            .endpoint("v1/wallets", Self::get_wallets);
     }
 }
 ```
@@ -604,7 +606,7 @@ to the implementation:
 ```rust
 impl Service for CryptocurrencyService {
     fn wire_api(&self, builder: &mut ServiceApiBuilder) {
-        CryptocurrencyApi.wire(builder);
+        CryptocurrencyApi::wire(builder);
     }
 }
 ```
@@ -696,7 +698,8 @@ let validator_keys = ValidatorKeys {
     consensus_key: consensus_public_key,
     service_key: service_public_key,
 };
-let consensus = ConsensusConfig::default().with_validator_keys(vec![validator_keys]);
+let consensus = ConsensusConfig::default()
+    .with_validator_keys(vec![validator_keys]);
 ```
 
 !!! note
@@ -721,7 +724,7 @@ in the Exonum network.
 ```rust
 let peer_address = "0.0.0.0:2000";
 
-// Returns the value of the `NodeConfig` object from the `node_config` function
+// Returns the value of the `NodeConfig` object from `node_config`.
 NodeConfig {
     listen_address: peer_address.parse().unwrap(),
     consensus,
@@ -750,9 +753,9 @@ Let's create a function which will generate `GenesisConfig` based on
 the created `NodeConfig`:
 
 ```rust
-fn genesis_config(node_config: &NodeConfig) -> GenesisConfig {
+fn genesis_config(config: &NodeConfig) -> GenesisConfig {
     let artifact_id = CryptocurrencyService.artifact_id();
-    GenesisConfigBuilder::with_consensus_config(node_config.consensus.clone())
+    GenesisConfigBuilder::with_consensus_config(config.consensus.clone())
         .with_artifact(ExplorerFactory.artifact_id())
         .with_instance(ExplorerFactory.default_instance())
         .with_artifact(artifact_id.clone())
@@ -777,10 +780,11 @@ function:
 ```rust
 fn main() {
     exonum::helpers::init_logger().unwrap();
-    let node_config = node_config();
-    let genesis_config = genesis_config(&node_config);
+    let db = TemporaryDB::new();
+    let node_cfg = node_config();
+    let genesis_cfg = genesis_config(&node_cfg);
 
-    let node = NodeBuilder::new(TemporaryDB::new(), node_config, genesis_config)
+    let node = NodeBuilder::new(db, node_cfg, genesis_cfg)
         .with_plugin(SystemApiPlugin)
         .with_runtime_fn(|channel| {
             RustRuntime::builder()
@@ -829,8 +833,10 @@ Create `create-wallet-1.json` file and insert the following code into it:
 Use the `curl` command to send this transaction to the node by HTTP:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @create-wallet-1.json \
-    http://127.0.0.1:8000/api/explorer/v1/transactions
+curl -H "Content-Type: application/json" \
+  -X POST \
+  -d @create-wallet-1.json \
+  http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 This transaction creates the first wallet associated with user Alice.
@@ -862,8 +868,10 @@ To create the second wallet put the code into `create-wallet-2.json` file:
 Send it with `curl` to the node:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @create-wallet-2.json \
-    http://127.0.0.1:8000/api/explorer/v1/transactions
+curl -H "Content-Type: application/json" \
+  -X POST \
+  -d @create-wallet-2.json \
+  http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 It returns the hash of the second transaction:
@@ -896,8 +904,10 @@ This transaction transfers 5 tokens from the first wallet to the second.
 Send it to the node with:
 
 ```sh
-curl -H "Content-Type: application/json" -X POST -d @transfer-funds.json \
-    http://127.0.0.1:8000/api/explorer/v1/transactions
+curl -H "Content-Type: application/json" \
+  -X POST \
+  -d @transfer-funds.json \
+  http://127.0.0.1:8000/api/explorer/v1/transactions
 ```
 
 This request returns the transaction hash:
@@ -975,7 +985,7 @@ with two wallets and transferred some money between them. Next,
 [curry-fn]: https://en.wikipedia.org/wiki/Currying
 [arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
 [ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
-[cargo-example]: http://doc.crates.io/manifest.html#examples
+[cargo-example]: https://doc.rust-lang.org/cargo/reference/manifest.html#examples
 [lib.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/lib.rs
 [demo.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/examples/demo.rs
 [std-asref]: https://doc.rust-lang.org/std/convert/trait.AsRef.html
