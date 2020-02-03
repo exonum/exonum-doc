@@ -250,13 +250,13 @@ Several things to note here:
   that public and private schemas cannot diverge.
 - `Group` declares an [index group](../architecture/merkledb.md#index-groups).
   In our case, indexes in the group are keyed by the `Address`
-  (previously mentioned unified authorization info).
+  (previously mentioned as unified authorization info).
 - `RawProofMapIndex` denotes that the index
   [does not transform](../advanced/merkelized-map.md#proofmapindex-insights)
   its keys, which is appropriate for `Address` keys because they are essentially
   hash digests.
 
-We also declare some helpers to access schema data more efficiently:
+We also declare some helper methods to access schema data more efficiently:
 
 ```rust
 impl<T: Access> SchemaImpl<T> {
@@ -273,7 +273,7 @@ impl<T: Access> SchemaImpl<T> {
 Besides the `new` constructor copied from the previous tutorial,
 we define the `wallet` getter.
 
-Finally, we define some method to *modify* schema data:
+Finally, we define some methods to *modify* schema data:
 
 ```rust
 impl<T> SchemaImpl<T>
@@ -281,7 +281,7 @@ where
     T: Access,
     T::Base: RawAccessMut,
 {
-    /// Increases balance of the wallet and append new record to its history.
+    /// Increases balance of the wallet and appends new record to its history.
     pub fn increase_wallet_balance(
         &mut self,
         wallet: Wallet,
@@ -291,7 +291,7 @@ where
         // actual implementation skipped
     }
 
-    /// Decreases balance of the wallet and append new record to its history.
+    /// Decreases balance of the wallet and appends new record to its history.
     pub fn decrease_wallet_balance(
         &mut self,
         wallet: Wallet,
@@ -325,7 +325,7 @@ access (and thus, `T` itself) is mutable.
 We need three types of transactions; apart from
 [the old ones](create-service.md#define-transactions)
 (“create a new wallet” and “transfer money between wallets”)
-we add a new transaction type that reimburses wallet balance.
+we add a new transaction type that reimburses a wallet balance.
 We start with describing these transactions in Protobuf:
 
 ```protobuf
@@ -511,8 +511,8 @@ is similar to their predecessors.
 
 Note that we no longer extract a public key from `context.caller()` and panic
 if the caller is not authenticated by a key.
-Instead, we convert the caller to an address. This will never panic
-and is thus applicable to any kind of authorization (e.g., via a service).
+Instead, we convert the caller to an address. This approach will never panic
+and thus is applicable to any kind of authorization (e.g., via a service).
 
 The remaining transaction, `Issue`, is responsible for replenishment
 of the wallet balance.  We use `increase_wallet_balance`
@@ -703,7 +703,7 @@ exists, which is reflected in the `unwrap()` here:
 state.data().proof_for_service_index("wallets").unwrap()
 ```
 
-However, the index will not exist if no transactions to the service were
+However, the index will not exist if no transactions of the service were
 executed! Without the index, we cannot retrieve a proof for its existence.
 We *could* return a proof of absence of the index from the endpoint handler,
 but this would complicate the endpoint design and the corresponding
