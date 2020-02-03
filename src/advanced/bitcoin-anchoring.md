@@ -1,6 +1,6 @@
 # Anchoring Service
 
-<!-- cspell:ignore bitcoind,blockhash,satoshis,txid,utxo,utxos -->
+<!-- cspell:ignore bitcoind,satoshis,txid,utxo,utxos -->
 
 The anchoring service is developed to increase product security and
 provide non-repudiation for Exonum applications. This service periodically
@@ -192,15 +192,15 @@ The service uses a third-party Bitcoin node to communicate with the
 Bitcoin blockchain network. Currently, only [Bitcoin Core][bitcoind]
 (aka `bitcoind`) is supported.
 
-The following settings need to be specified to access the bitcoind node:
+The following settings need to be specified to access a `bitcoind` node:
 
 - RPC host
 - RPC username
 - RPC password
 
 !!! tip
-    It is strongly advised to have a separate `bitcoind` node for each
-    anchoring node. Otherwise, a single `bitcoind` node becomes
+    It is strongly advised to have a separate Bitcoin node for each
+    anchoring node. Otherwise, a single Bitcoin node becomes
     a centralization point and presents a weakness in the anchoring process.
 
 #### Bitcoin Private Keys
