@@ -119,11 +119,13 @@ const { cryptocurrency_advanced } = proto.exonum.examples
 
 // Numeric identifier of the cryptocurrency service
 const SERVICE_ID = 101
+// Numeric ID of the `Transfer` transaction within the service
+const TRANSFER_ID = 0
 
 const Transfer = new exonum.Transaction({
    schema: cryptocurrency_advanced.Transfer,
    serviceId: SERVICE_ID,
-   methodId: 1,
+   methodId: TRANSFER_ID,
 })
 ```
 
@@ -241,7 +243,7 @@ In this case, the transaction type will be specified as
 const Transfer = new exonum.Transaction({
   schema: TransferSchema,
   serviceId: SERVICE_ID,
-  methodId: 1,
+  methodId: TRANSFER_ID,
 })
 ```
 
@@ -311,7 +313,7 @@ according to the downloaded set of keys of the validators:
 const { block } = data.block_proof
 try {
   // Will throw if an error during verification occurs
-  exonum.verifyBlock(block, validatorKeys))
+  exonum.verifyBlock(block, validatorKeys)
 } catch(e) {
   console.error(e)
 }
@@ -457,7 +459,7 @@ definition of only one transaction type, `Transfer`.
 const Transfer = new exonum.Transaction({
   schema: cryptocurrency_advanced.Transfer,
   serviceId: SERVICE_ID,
-  methodId: 1,
+  methodId: TRANSFER_ID,
 })
 
 let index = 0
