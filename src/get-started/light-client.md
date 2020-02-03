@@ -40,7 +40,7 @@ stages:
 3. Define transaction type
 4. Define transaction payload
 5. Sign the transaction
-6. Send transaction to the blockchain.
+6. Send the transaction to the blockchain.
 
 Exonum light client uses Protobuf as the data serialization
 format. This is enabled by the [`protobufjs`][protobufjs-lib] library.
