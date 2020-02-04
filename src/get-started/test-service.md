@@ -99,13 +99,13 @@ To perform testing, we first need to create a network emulation – the eponymou
 Since `TestKit` will be used by all tests, it is natural to move its
 constructor to a separate function:
 
-<!-- markdownlint-disable MD013 -->
 ```rust
 fn init_testkit() -> TestKit {
-    TestKit::for_rust_service(CryptocurrencyService, INSTANCE_NAME, INSTANCE_ID, ())
+    TestKit::for_rust_service(
+        CryptocurrencyService, INSTANCE_NAME, INSTANCE_ID, ()
+    )
 }
 ```
-<!-- markdownlint-enable -->
 
 That is, we create a network emulation, in which there is a single validator
 node, and a single `CurrencyService`. `TestKit` supports
@@ -306,7 +306,7 @@ fn get_wallet(&self, pub_key: PublicKey) -> Wallet {
 ```
 
 That is, the method performs an HTTP GET request with the URL address
-corresponding to a service with the specified name and a `v1/wallet/…`
+corresponding to a service with the specified name and a `v1/wallet`
 path within the service API. When we created the service,
 we [defined](create-service.md#wire-api) that invoking such a request
 would return information about a specific wallet.
@@ -335,8 +335,9 @@ fn assert_no_wallet(&self, pub_key: PublicKey) {
 ```
 
 Note that this method uses the `unwrap_err` method instead of
-`unwrap`. While `unwrap` will panic if the returned value will contain
-an error, what is expectedly in this case.
+`unwrap`. While `unwrap` will panic if the returned value is
+erroneous, `unwrap_err` acts in the opposite way, panicking if
+the response does not contain an error.
 
 ### Creating Blocks
 
