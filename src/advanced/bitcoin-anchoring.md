@@ -239,8 +239,8 @@ of the anchoring nodes.
 
 Transaction fee represents a value in satoshis that is set as a fee for
 every anchoring transaction. It is recommended to set a 2x-3x times bigger
-transaction fee than the average market fee to ensure that the anchoring
-transaction does not hang if the Bitcoin network is congested.
+transaction fee than the average market fee to ensure that anchoring
+is not stalled if the Bitcoin network is overloaded.
 
 #### Anchoring Schedule
 
