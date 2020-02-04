@@ -114,7 +114,7 @@ Here:
 Define `Transfer` transaction schema and its fields:
 
 ```javascript
-import * as proto from 'stubs.js'
+import * as proto from './stubs'
 const { cryptocurrency_advanced } = proto.exonum.examples
 
 // Numeric identifier of the cryptocurrency service
@@ -135,6 +135,12 @@ during [service instantiation](../architecture/service-lifecycle.md);
 you can find it out via an endpoint in
 the [system API plugin](../advanced/other-services.md#system-api).
 Method identifiers are specified in the [service interface](../glossary.md#interface).
+
+!!! note
+    As of Exonum 1.0, service interfaces do not have a language-independent form,
+    so there is no easy way to get correspondence between method IDs
+    and Protobuf messages. Implementing an [IDL] for interfaces
+    is in the [project roadmap](../roadmap.md#finalizing-service-interfaces).
 
 ### Specify Transaction Payload
 
@@ -494,3 +500,4 @@ support!
 [timestamping]: https://github.com/exonum/exonum/tree/master/examples/timestamping/frontend
 [lc-java]: https://github.com/exonum/exonum-java-binding/tree/master/exonum-light-client
 [lc-python]: https://github.com/exonum/exonum-python-client
+[IDL]: https://en.wikipedia.org/wiki/Interface_description_language
