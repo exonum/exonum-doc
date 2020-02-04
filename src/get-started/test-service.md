@@ -81,6 +81,21 @@ use crate::{
 };
 ```
 
+### Declaring constants
+
+In this step we need to declare some constants which we will use in the manual:
+
+```rust
+// Alice's wallets name.
+const ALICE_NAME: &str = "Alice";
+// Bob's wallet name.
+const BOB_NAME: &str = "Bob";
+// Service instance id.
+const INSTANCE_ID: u32 = 1010;
+// Service instance name.
+const INSTANCE_NAME: &str = "nnm-token";
+```
+
 ### Creating Test Network
 
 To perform testing, we first need to create a network emulation – the eponymous
