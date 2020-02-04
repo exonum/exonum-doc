@@ -259,7 +259,8 @@ on the Exonum blockchain.
 
 To refill the anchoring address balance, a Bitcoin funding transaction that
 sends money to the current anchoring address should be generated.
-Such transaction should be manually added to the service configuration.
+Such transaction should added to the service via
+a [private API](../glossary.md#private-api) endpoint.
 
 The funding UTXO should get enough confirmations before it can be used.
 However, the anchoring service does not check the number of confirmations
