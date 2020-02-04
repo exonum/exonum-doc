@@ -58,7 +58,7 @@ We cover both kinds of testing in separate sections below.
 
 ## Testing Transaction Logic
 
-Let’s create [`tests/tx_logic.rs`][tests-tx_logic.rs], a file which will
+Let’s create [`src/tx_tests.rs`][tests-tx_logic.rs], a file which will
 contain the tests for transaction business logic.
 
 ### Imports
@@ -66,20 +66,34 @@ contain the tests for transaction business logic.
 We need to import the types we will use:
 
 ```rust
-use assert_matches::assert_matches;
 use exonum::{
-    api::Error,
-    crypto::{gen_keypair, PublicKey, SecretKey},
-    messages::{to_hex_string, RawTransaction, Signed},
+    crypto::{KeyPair, PublicKey},
+    runtime::SnapshotExt,
 };
-use exonum_testkit::{txvec, ApiKind, TestKit, TestKitApi, TestKitBuilder};
-use serde_json::json;
-// Imports datatypes from the crate where the service is defined.
-use exonum_cryptocurrency::{
-    schema::{CurrencySchema, Wallet, WalletQuery},
-    service::CurrencyService,
-    transactions::{TxCreateWallet, TxTransfer},
+use exonum_merkledb::{access::Access, Snapshot};
+use exonum_testkit::TestKit;
+
+// Import data types used in tests from the crate where the service is defined.
+use crate::{
+    contracts::{CryptocurrencyInterface, CryptocurrencyService},
+    schema::{CurrencySchema, Wallet},
+    transactions::{CreateWallet, TxTransfer},
 };
+```
+
+### Declaring constants
+
+In this step we need to declare some constants which we will use in the manual:
+
+```rust
+// Alice's wallets name.
+const ALICE_NAME: &str = "Alice";
+// Bob's wallet name.
+const BOB_NAME: &str = "Bob";
+// Service instance id.
+const INSTANCE_ID: u32 = 1010;
+// Service instance name.
+const INSTANCE_NAME: &str = "nnm-token";
 ```
 
 ### Creating Test Network
@@ -102,9 +116,9 @@ constructor to a separate function:
 
 ```rust
 fn init_testkit() -> TestKit {
-    TestKitBuilder::validator()
-        .with_service(CurrencyService)
-        .create()
+    TestKit::for_rust_service(
+        CryptocurrencyService, INSTANCE_NAME, INSTANCE_ID, ()
+    )
 }
 ```
 
@@ -125,17 +139,14 @@ persisted by the blockchain.
 #[test]
 fn test_create_wallet() {
     let mut testkit = init_testkit();
-    let (pub_key, sec_key) = gen_keypair();
-    testkit.create_block_with_transactions(txvec![
-        TxCreateWallet::sign("Alice", &pub_key, &sec_key),
-    ]);
-    let snapshot = testkit.snapshot();
-    let wallet = CurrencySchema::new(snapshot)
-        .wallet(&pub_key)
-        .expect("No wallet");
+    let keypair = KeyPair::random();
+    let tx = keypair.create_wallet(INSTANCE_ID, CreateWallet::new(ALICE_NAME));
+    testkit.create_block_with_transaction(tx.clone());
 
-    assert_eq!(wallet.pub_key, pub_key);
-    assert_eq!(wallet.name, "Alice");
+    // Check that the user indeed is persisted by the service
+    let wallet = get_wallet(&testkit, &tx.author());
+    assert_eq!(wallet.pub_key, tx.author());
+    assert_eq!(wallet.name, ALICE_NAME);
     assert_eq!(wallet.balance, 100);
 }
 ```
@@ -179,7 +190,7 @@ failures:
 > **Test:** `test_transfer`
 
 Let’s test a transfer between two wallets. To do this, first, we need
-to initialize the testkit. Then we need to create the wallets and
+to initialize the `TestKit`. Then we need to create the wallets and
 transfer funds between them. As per the code of the
 Cryptocurrency Service, the wallets are created with the initial
 balance set to `100`.
@@ -188,17 +199,18 @@ The mentioned three transactions will be included into the block:
 
 ```rust
 let mut testkit = init_testkit();
-let (alice_pubkey, alice_key) = gen_keypair();
-let (bob_pubkey, bob_key) = gen_keypair();
-testkit.create_block_with_transactions(txvec![
-    TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
-    TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
-    TxTransfer::sign(
-        &bob_pubkey,    // receiver
-        10,             // amount
-        0,              // seed
-        &alice_pubkey,  // sender
-        &alice_key,     // private key used to sign the transaction
+let alice = KeyPair::random();
+let bob = KeyPair::random();
+testkit.create_block_with_transactions(vec![
+    alice.create_wallet(INSTANCE_ID, CreateWallet::new(ALICE_NAME)),
+    bob.create_wallet(INSTANCE_ID, CreateWallet::new(BOB_NAME)),
+    alice.transfer(
+        INSTANCE_ID,
+        TxTransfer {
+            amount: 10,
+            seed: 0,
+            to: bob.public_key(),
+        },
     ),
 ]);
 ```
@@ -206,18 +218,10 @@ testkit.create_block_with_transactions(txvec![
 Check that wallets are committed to the blockchain and have expected balances:
 
 ```rust
-let wallets = {
-    let snapshot = testkit.snapshot();
-    let schema = CurrencySchema::new(&snapshot);
-    (schema.wallet(&alice_pubkey), schema.wallet(&bob_pubkey))
-};
-
-if let (Some(alice_wallet), Some(bob_wallet)) = wallets {
-    assert_eq!(alice_wallet.balance, 90);
-    assert_eq!(bob_wallet.balance, 110);
-} else {
-    panic!("Wallets not persisted");
-}
+let alice_wallet = get_wallet(&testkit, &alice.public_key());
+assert_eq!(alice_wallet.balance, 90);
+let bob_wallet = get_wallet(&testkit, &bob.public_key());
+assert_eq!(bob_wallet.balance, 110);
 ```
 
 ### Transfer to Non-Existing Wallet
@@ -235,10 +239,19 @@ exception of how the created transactions are placed into the block.
 Namely, the `create_block_with_transactions` call is replaced with
 
 ```rust
-testkit.create_block_with_transactions(txvec![
-    TxCreateWallet::sign("Alice", &alice_pubkey, &alice_key),
-    TxTransfer::sign(&bob_pubkey, 10, 0, &alice_pubkey, &alice_key),
-    TxCreateWallet::sign("Bob", &bob_pubkey, &bob_key),
+let mut testkit = init_testkit();
+let alice = KeyPair::random();
+let bob = KeyPair::random();
+testkit.create_block_with_transactions(vec![
+    bob.create_wallet(INSTANCE_ID, CreateWallet::new(BOB_NAME)),
+    alice.transfer(
+        INSTANCE_ID,
+        TxTransfer {
+            amount: 10,
+            seed: 0,
+            to: bob.public_key(),
+        },
+    ),
 ]);
 ```
 
@@ -248,7 +261,8 @@ executed.
 We should check that Alice did not send her tokens to nowhere:
 
 ```rust
-assert_eq!(alice_wallet.balance, 100);
+assert!(try_get_wallet(&testkit, &alice.public_key()).is_none());
+let bob_wallet = get_wallet(&testkit, &bob.public_key());
 assert_eq!(bob_wallet.balance, 100);
 ```
 
@@ -271,15 +285,15 @@ corresponding to service endpoints:
 
 ```rust
 struct CryptocurrencyApi {
-    inner: TestKitApi,
+    pub inner: TestKitApi,
 }
 
 impl CryptocurrencyApi {
-    fn create_wallet(&self, name: &str) -> (Signed<RawTransaction>, SecretKey) {
+    fn create_wallet(&self, name: &str) -> (Verified<AnyTx>, KeyPair) {
         // Code skipped...
     }
 
-    fn transfer(&self, tx: &Signed<RawTransaction>) {
+    fn transfer(&self, tx: &Verified<AnyTx>) {
         // Code skipped...
     }
 
@@ -289,17 +303,17 @@ impl CryptocurrencyApi {
 }
 ```
 
-`create_wallet` returns a secret key along with the created transaction
+`create_wallet` returns a key pair along with the created transaction
 because it may be needed to sign other transactions authorized by the wallet
 owner.
 
-Inside, all wrapper methods call the `inner` API instance; for example,
-`get_wallet` is implemented as:
+Inside, all wrapper methods invoke methods of the `inner` API instance;
+for example, `get_wallet` is implemented as:
 
 ```rust
 fn get_wallet(&self, pub_key: PublicKey) -> Wallet {
     self.inner
-        .public(ApiKind::Service("cryptocurrency"))
+        .public(ApiKind::Service(INSTANCE_NAME))
         .query(&WalletQuery { pub_key })
         .get("v1/wallet")
         .unwrap()
@@ -307,9 +321,8 @@ fn get_wallet(&self, pub_key: PublicKey) -> Wallet {
 ```
 
 That is, the method performs an HTTP GET request with the URL address
-corresponding to a service
-[with the specified name](../architecture/services.md#service-identifiers)
-and a `v1/wallet/…` path within the service API. When we created the service,
+corresponding to a service with the specified name and a `v1/wallet`
+path within the service API. When we created the service,
 we [defined](create-service.md#wire-api) that invoking such a request
 would return information about a specific wallet.
 
@@ -322,19 +335,24 @@ with a specified public key:
 fn assert_no_wallet(&self, pub_key: PublicKey) {
     let err = self
         .inner
-        .public(ApiKind::Service("cryptocurrency"))
+        .public(ApiKind::Service(INSTANCE_NAME))
         .query(&WalletQuery { pub_key })
         .get::<Wallet>("v1/wallet")
         .unwrap_err();
 
-    assert_matches!(err, Error::NotFound(ref body) if body == "Wallet not found");
+    assert_eq!(err.http_code, api::HttpStatusCode::NOT_FOUND);
+    assert_eq!(err.body.title, "Wallet not found");
+    assert_eq!(
+        err.body.source,
+        format!("{}:{}", INSTANCE_ID, INSTANCE_NAME)
+    );
 }
 ```
 
-Note that this method uses the `TestKitApi::get_err` method instead of
-`TestKitApi::get`. While `get` will panic if the returned response is erroneous
-(that is, has non-20x HTTP status), `get_err` acts in the opposite way,
-panicking if the response *does not* have a 40x status.
+Note that this method uses the `unwrap_err` method instead of
+`unwrap`. While `unwrap` will panic if the returned value is
+erroneous, `unwrap_err` acts in the opposite way, panicking if
+the response does not contain an error.
 
 ### Creating Blocks
 
@@ -349,10 +367,15 @@ as follows:
 
 ```rust
 let (mut testkit, api) = create_testkit();
-let (tx, _) = api.create_wallet("Alice");
+// Create and send a transaction via API
+let (tx, _) = api.create_wallet(ALICE_NAME);
 testkit.create_block();
+api.assert_tx_status(tx.object_hash(), &json!({ "type": "success" }));
+
+// Check that the user indeed is persisted by the service.
 let wallet = api.get_wallet(tx.author());
 assert_eq!(wallet.pub_key, tx.author());
+assert_eq!(wallet.name, ALICE_NAME);
 assert_eq!(wallet.balance, 100);
 ```
 
@@ -367,9 +390,11 @@ tokens from a non-existing wallet:
 
 ```rust
 let (mut testkit, api) = create_testkit();
-let (tx_alice, key_alice) = api.create_wallet("Alice");
-let (tx_bob, _) = api.create_wallet("Bob");
-testkit.create_block_with_tx_hashes(&[tx_bob.hash()]);
+let (tx_alice, alice) = api.create_wallet(ALICE_NAME);
+let (tx_bob, _) = api.create_wallet(BOB_NAME);
+// Do not commit Alice's transaction, so Alice's wallet does not exist
+// when a transfer occurs.
+testkit.create_block_with_tx_hashes(&[tx_bob.object_hash()]);
 api.assert_no_wallet(tx_alice.author());
 ```
 
