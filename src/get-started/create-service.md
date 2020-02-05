@@ -41,11 +41,11 @@ edition = "2018"
 authors = ["Your Name <your@email.com>"]
 
 [dependencies]
-exonum = "1.0"
-exonum-crypto = "1.0"
-exonum-derive = "1.0"
-exonum-proto = "1.0"
-exonum-rust-runtime = "1.0"
+exonum = "1.0.0-rc.1"
+exonum-crypto = "1.0.0-rc.1"
+exonum-derive = "1.0.0-rc.1"
+exonum-proto = "1.0.0-rc.1"
+exonum-rust-runtime = "1.0.0-rc.1"
 
 failure = "0.1.5"
 protobuf = "2.8.0"
@@ -54,7 +54,7 @@ serde_derive = "1.0"
 serde_json = "1.0"
 
 [build-dependencies]
-exonum-build = "0.10.0"
+exonum-build = "1.0.0-rc.1"
 ```
 
 ## Imports
@@ -638,9 +638,9 @@ additional dependencies in our `Cargo.toml`:
 ```toml
 # Dependencies required for example.
 [dev-dependencies]
-exonum-explorer-service = "1.0"
-exonum-node = "1.0"
-exonum-system-api = "1.0"
+exonum-explorer-service = "1.0.0-rc.1"
+exonum-node = "1.0.0-rc.1"
+exonum-system-api = "1.0.0-rc.1"
 ```
 
 ### Imports
