@@ -8,15 +8,16 @@ As blockchain technology is focused on security, a natural desire after
 shows how to accomplish this task with the help of
 [the testkit library](../advanced/service-testing.md).
 
-This document describes testing of Rust services, for Java instructions please
-refer to the [documentation][java-testkit].
+!!! tip
+    This document describes testing of Rust services. For Java instructions,
+    please refer to the [documentation][java-testkit].
 
-## Preparing for Integration Testing
+## Preparing for Testing
 
 Recall that an Exonum service is typically packaged as a Rust crate.
 Correspondingly,
 service testing could be performed with the help
-of [integration tests][integration-testing],
+of [integration tests][cargo-testing],
 in which the service is treated like a black or gray box. In the case of
 the cryptocurrency service, which we created in the previous tutorial, it
 would be natural to test
@@ -30,8 +31,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-assert_matches = "1.3.0"
-exonum-testkit = "0.10.2"
+exonum-testkit = "1.0"
 ```
 
 ## Testing Kinds
@@ -47,7 +47,7 @@ There are two major kinds of testing enabled by **exonum-testkit**:
   its HTTP APIs to process transactions and read requests. A good idea
   is to use this kind of testing to verify the API-specific code.
 
-In both cases tests generally follow the same pattern:
+In both cases, tests generally follow the same pattern:
 
 - Initialize the testkit
 - Introduce changes to the blockchain via transactions
@@ -59,7 +59,9 @@ We cover both kinds of testing in separate sections below.
 ## Testing Transaction Logic
 
 Let’s create [`src/tx_tests.rs`][tests-tx_logic.rs], a file which will
-contain the tests for transaction business logic.
+contain the tests for transaction business logic. Since we have defined
+service schema as crate-private, we need to place the testing module within
+the service crate, rather than as an [integration test].
 
 ### Imports
 
@@ -81,9 +83,9 @@ use crate::{
 };
 ```
 
-### Declaring constants
+### Declaring Constants
 
-In this step we need to declare some constants which we will use in the manual:
+We also need to declare some constants we will use later:
 
 ```rust
 // Alice's wallets name.
@@ -103,13 +105,10 @@ To perform testing, we first need to create a network emulation – the eponymou
 (a validator or an auditor) in an imaginary Exonum blockchain network.
 
 !!! note
-    Unlike real Exonum nodes, the testkit does not actually start a web server
+    Unlike real Exonum nodes, the testkit does not actually start servers
     in order to process requests from external clients.
     Instead, transactions and read requests are processed synchronously,
-    in the same process as the test code itself. For example, once
-    a new block is created with a `TxCreateWallet` transaction, it is
-    executed
-    [as defined by the service](create-service.md#transaction-execution).
+    in the same process as the test code itself.
 
 Since `TestKit` will be used by all tests, it is natural to move its
 constructor to a separate function:
@@ -117,7 +116,10 @@ constructor to a separate function:
 ```rust
 fn init_testkit() -> TestKit {
     TestKit::for_rust_service(
-        CryptocurrencyService, INSTANCE_NAME, INSTANCE_ID, ()
+        CryptocurrencyService, // service instance
+        INSTANCE_NAME, // name of the instance
+        INSTANCE_ID, // numerical ID of the instance
+        (), // Initialization arguments (none)
     )
 }
 ```
@@ -127,12 +129,56 @@ node, and a single `CurrencyService`. `TestKit` supports
 testing several services at once, as well as more complex network
 configurations, but this functionality is not needed in our case.
 
+### Other Helper Functions
+
+We need a way to obtain [the service schema](create-service.md#create-schema)
+from the testkit. The testkit allows to obtain a snapshot of the blockchain
+state, using which we construct the schema:
+
+```rust
+fn get_schema<'a>(
+    snapshot: &'a dyn Snapshot,
+) -> CurrencySchema<impl Access + 'a> {
+    CurrencySchema::new(snapshot.for_service(INSTANCE_NAME).unwrap())
+}
+```
+
+Here, `for_service` method of the `SnapshotExt` extension trait
+provides access to the data of a specific service. Since we do not care
+about the exact access type, we use generic `impl Access + 'a` as the
+type parameter of the resulting schema.
+
+!!! note
+    Use of lifetime `'a` indicates that the access type cannot outlive
+    the snapshot it is created from.
+
+Finally, we define getters to obtain wallet info from the blockchain
+state:
+
+```rust
+/// Returns the wallet identified by the given public key
+/// or `None` if such a wallet doesn't exist.
+fn try_get_wallet(
+    testkit: &TestKit,
+    pubkey: &PublicKey,
+) -> Option<Wallet> {
+    let snapshot = testkit.snapshot();
+    let schema = get_schema(&snapshot);
+    schema.wallets.get(pubkey)
+}
+
+/// Returns the wallet identified by the given public key.
+fn get_wallet(testkit: &TestKit, pubkey: &PublicKey) -> Wallet {
+    try_get_wallet(testkit, pubkey).expect("No wallet persisted")
+}
+```
+
 ### Wallet Creation
 
 > **Test:** `test_create_wallet`
 
 Our first test is very simple: we want to create a single wallet with the help
-of the corresponding API call and make sure that the wallet is actually
+of the corresponding transaction and make sure that the wallet is actually
 persisted by the blockchain.
 
 ```rust
@@ -160,6 +206,14 @@ We use one of `create_block*` methods defined by `TestKit` to send a
 transaction to the testkit node and create a block with it (and only it).
 Then, we use the service schema to check that the transaction has led to
 the expected changes in the storage.
+
+Note that we call `create_wallet` method
+of the [service interface](create-service.md#service-interface) directly
+on a generated `keypair`. This is enabled by the glue code
+generated by the `exonum_interface` proc macro; it effectively implements
+the interface for some *stub* types, including `KeyPair`. As a result
+of applying the method to the keypair, we get a transaction with the
+specified contents signed by the keypair.
 
 To run the test, execute `cargo test` in the shell:
 
@@ -243,7 +297,7 @@ let mut testkit = init_testkit();
 let alice = KeyPair::random();
 let bob = KeyPair::random();
 testkit.create_block_with_transactions(vec![
-    bob.create_wallet(INSTANCE_ID, CreateWallet::new(BOB_NAME)),
+    alice.create_wallet(INSTANCE_ID, CreateWallet::new(ALICE_NAME)),
     alice.transfer(
         INSTANCE_ID,
         TxTransfer {
@@ -252,26 +306,53 @@ testkit.create_block_with_transactions(vec![
             to: bob.public_key(),
         },
     ),
+    bob.create_wallet(INSTANCE_ID, CreateWallet::new(BOB_NAME)),
 ]);
 ```
 
-That is, although Bob's wallet is created, this occurs after the transfer is
+That is, although Bob’s wallet is created, this occurs after the transfer is
 executed.
 
-We should check that Alice did not send her tokens to nowhere:
+We then check that Alice did not send her tokens to nowhere:
 
 ```rust
-assert!(try_get_wallet(&testkit, &alice.public_key()).is_none());
+let alice_wallet = get_wallet(&testkit, &alice.public_key());
+assert_eq!(alice_wallet.balance, 100);
 let bob_wallet = get_wallet(&testkit, &bob.public_key());
 assert_eq!(bob_wallet.balance, 100);
 ```
 
 ## Testing API
 
-API-focused tests are placed in a separate file,
-[`tests/api.rs`][tests-api.rs].
-It is structurally similar to the integration test file we have considered
-previously (including tests), so we will concentrate on differences only.
+API-focused tests are placed in a separate file, [`tests/api.rs`][tests-api.rs].
+It is structurally similar to the transaction testing module
+we have considered previously (including tests),
+so we will concentrate on differences only.
+
+### Setup
+
+Exonum provides a standalone component to submit transactions
+to the blockchain via HTTP:
+the [explorer service](../advanced/other-services.md#explorer).
+To add it to the testkit, we need to declare the corresponding
+crate (`exonum-explorer-service`) as a dev dependency of our crate,
+and use the following logic to initialize the testkit:
+
+> **Method:** `create_testkit`
+
+```rust
+let artifact = CryptocurrencyService.artifact_id();
+let mut testkit = TestKitBuilder::validator()
+    // Add the explorer service to the testkit
+    .with_default_rust_service(ExplorerFactory)
+    // Add the tested service
+    .with_rust_service(CryptocurrencyService)
+    .with_artifact(artifact.clone())
+    .with_instance(
+        artifact.into_default_instance(INSTANCE_ID, INSTANCE_NAME)
+    )
+    .build();
+```
 
 ### API Wrapper
 
@@ -303,7 +384,7 @@ impl CryptocurrencyApi {
 }
 ```
 
-`create_wallet` returns a key pair along with the created transaction
+`create_wallet` returns a keypair along with the created transaction
 because it may be needed to sign other transactions authorized by the wallet
 owner.
 
@@ -325,6 +406,22 @@ corresponding to a service with the specified name and a `v1/wallet`
 path within the service API. When we created the service,
 we [defined](create-service.md#wire-api) that invoking such a request
 would return information about a specific wallet.
+
+Out of the three methods, only the `get_wallet` method uses the HTTP API
+of the cryptocurrency service. Both `create_wallet` and `transfer`
+use the `transactions` endpoint of the previously mentioned explorer service:
+
+```rust
+fn transfer(&self, tx: &Verified<AnyTx>) {
+    let tx_info: serde_json::Value = self
+        .inner
+        .public(ApiKind::Explorer) // Not `ApiKind::Service(_)`!
+        .query(&json!({ "tx_body": tx }))
+        .post("v1/transactions")
+        .unwrap();
+    assert_eq!(tx_info, json!({ "tx_hash": tx.object_hash() }));
+}
+```
 
 ### Waiting for Errors
 
@@ -353,6 +450,11 @@ Note that this method uses the `unwrap_err` method instead of
 `unwrap`. While `unwrap` will panic if the returned value is
 erroneous, `unwrap_err` acts in the opposite way, panicking if
 the response does not contain an error.
+
+Errors returned by Rust services conform to the data format
+defined in [RFC 7807]. This is reflected in the internal structure
+of `err`; it consists of an HTTP code and a body decoded from JSON
+according to the schema defined in the RFC.
 
 ### Creating Blocks
 
@@ -401,6 +503,43 @@ api.assert_no_wallet(tx_alice.author());
 This code results in the testkit not committing Alice’s transaction,
 so Alice’s wallet does not exist when the transfer occurs later.
 
+Exonum framework retains helpful information about the possible error cause,
+such the human-readable error description, a service-specific code
+and the identifier of the service / method in which the error has occurred:
+
+```rust
+let tx = alice.transfer(
+    INSTANCE_ID,
+    TxTransfer {
+        to: tx_bob.author(),
+        amount: 10,
+        seed: 0,
+    },
+);
+
+api.transfer(&tx);
+testkit.create_block_with_tx_hashes(&[tx.object_hash()]);
+api.assert_tx_status(
+    tx.object_hash(),
+    &json!({
+        "type": "service_error",
+        "code": 1,
+        // Description shortened for readability
+        "description": "Sender doesn\'t exist.",
+        "runtime_id": 0,
+        "call_site": {
+            "call_type": "method",
+            "instance_id": INSTANCE_ID,
+            "method_id": 1,
+        },
+    }),
+);
+```
+
+In the code above, `assert_tx_status` method uses an endpoint
+of the explorer service to get the execution status for a transaction
+specified by its hash.
+
 ## Conclusion
 
 Testing is arguably just as important in software development as coding,
@@ -408,9 +547,11 @@ especially in typical blockchain applications. The testkit framework allows
 streamlining the testing process for Exonum services and testing both business
 logic and HTTP API.
 
-[integration-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
+[cargo-testing]: https://doc.rust-lang.org/cargo/reference/manifest.html#tests
+[integration test]: https://doc.rust-lang.org/cargo/reference/manifest.html#integration-tests
 [java-testkit]: ../get-started/java-binding.md#testing
-[tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/tx_logic.rs
+[tests-tx_logic.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/tx_tests.rs
 [tests-api.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/tests/api.rs
 [TestKitApi]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKitApi.html
 [TestKit-snapshot]: https://docs.rs/exonum-testkit/0.10.2/exonum_testkit/struct.TestKit.html#method.snapshot
+[RFC 7807]: https://tools.ietf.org/html/rfc7807

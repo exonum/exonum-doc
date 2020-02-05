@@ -316,8 +316,11 @@ pub struct TxTransfer {
 }
 ```
 
+### Service Interface
+
 To make the service support the transactions defined above, we need to declare
-a service *interface*. A service interface is basically a trait with methods
+a [service interface](../glossary.md#interface).
+A service interface is basically a trait with methods
 that correspond to the transactions processing logic. In our case the interface
 will look as follows:
 
