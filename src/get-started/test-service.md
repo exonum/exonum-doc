@@ -157,7 +157,7 @@ state:
 
 ```rust
 /// Returns the wallet identified by the given public key
-/// or `None` such wallet doesn't exist.
+/// or `None` if such a wallet doesn't exist.
 fn try_get_wallet(
     testkit: &TestKit,
     pubkey: &PublicKey,
