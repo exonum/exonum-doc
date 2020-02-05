@@ -60,11 +60,11 @@ parameters as a key for each element: `height` and `index`.
 Each Merkle tree element is addressed by an 8-byte `key = height || index`,
 where:
 
-- `height < 58` is height of element in the tree, where `0` is leaf, and is
-  represented as `6` bits
-- `index` is index of element at the given height consisting of `58` bits
-- `height` and `index` are serialized within `key` as
-  [big-endian][wiki:big-endian]
+- `height <= 56` is height of element in the tree, where `height = 0` is a leaf.
+  `height` is represented as 8 bits (i.e., 1 byte)
+- `index` is index of element at the given height consisting of the other 56 bits
+  (7 bytes)
+- `index` are serialized within `key` as [big-endian][wiki:big-endian] values
 
 The elements of the underlying list are stored in `(height = 0, index)`
 cells, where `index` is in interval `[0, list.len())` and
