@@ -128,7 +128,7 @@ Folder of the latest version will be named `latest`.
 
 ## License
 
-Copyright 2018, Exonum Team
+Copyright 2020, Exonum Team
 
 The Exonum documentation is licensed under the Creative Commons Non-Commercial
 Share-Alike International License (version 4.0). Code samples are licensed
