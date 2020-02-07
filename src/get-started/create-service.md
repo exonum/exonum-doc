@@ -645,8 +645,8 @@ place it into [`examples/demo.rs`][demo.rs].
 ### Additional Dependencies
 
 Since services themselves do not require the Exonum node, in this example we
-want to create one, and interact with it as well. Thus, we have to add
-additional dependencies in our `Cargo.toml`:
+want to create one, and interact with it as well. Thus, we have to more
+dependencies in our `Cargo.toml`:
 
 ```toml
 # Dependencies required for the example.
