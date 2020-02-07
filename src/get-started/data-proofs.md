@@ -793,14 +793,14 @@ nodes, etc. The service will be instantiated with the default identifiers
 defined as per [`DefaultInstance` implementation](#default-instantiation-params).
 
 Note that unlike the previous tutorial, we use `NodeBuilder::new()` rather
-than `NodeBuilder::development_node`. The `new` constructor takes arguments
+than `NodeBuilder::development_node()`. The `new` constructor takes arguments
 from the command line to determine what exactly the node should do: run,
 create initial node configuration, etc. That is, `NodeBuilder::new()` is
 more flexible and fit for full-scale applications. For example, it can be used
 to set up and launch a multi-node network.
 
 !!! tip
-    To run a single-node development network, you may supply the executable with
+    To run a single-node development network, launch the executable with
     the `run-dev` command:
 
     ```sh
