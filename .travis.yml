@@ -1,12 +1,5 @@
-dist: trusty
-sudo: false
-language: python # for mkdocs
-python:
-  - "2.7"
-cache:
-  npm: true
-  directories:
-    - $HOME/.cache/pip
+os: linux
+dist: bionic
 branches:
   only:
     - master
@@ -14,6 +7,15 @@ branches:
     - /^develop(-.*)?$/
     # Tags
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
+language: python # for mkdocs
+python:
+  - "2.7"
+cache:
+  npm: true
+  directories:
+    - $HOME/.cache/pip
+
 before_install:
   # Lock dependencies for branch builds
   - |
@@ -24,7 +26,7 @@ before_install:
     fi
 install:
   - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
-  - nvm install 8 && nvm use 8
+  - nvm install 12 && nvm use 12
   - npm install
   # Dirty hack for what seems like a bug in linkchecker
   - |
