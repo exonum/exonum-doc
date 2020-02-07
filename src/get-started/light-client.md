@@ -22,9 +22,16 @@ functionality is executed in Exonum light client.
 ## Before You Start
 
 To start using Exonum light client, include [exonum-client][javascript-client]
-into your JavaScript application. Please refer to this detailed guide
-for instructions on how to customize your client. The present tutorial will
-show you the ready-made examples of the client use.
+into your JavaScript application:
+
+```shell
+# using NPM
+npm i --save exonum-client@latest
+```
+
+Note that different versions of the client support different releases
+of the Exonum framework. The compatibility table can be found
+in the readme file of the client.
 
 ## Execute a Transaction
 
@@ -114,6 +121,7 @@ Here:
 Define `Transfer` transaction schema and its fields:
 
 ```javascript
+import * as exonum from 'exonum-client'
 import * as proto from './stubs'
 const { cryptocurrency_advanced } = proto.exonum.examples
 
