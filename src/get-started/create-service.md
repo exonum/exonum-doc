@@ -614,7 +614,7 @@ impl Service for CryptocurrencyService {
 }
 ```
 
-### Define Default Instantiation Params
+### Default Instantiation Params
 
 Let’s define default instantiation parameters for the service in order to
 simplify its instantiation (for example, in [creating a test node](#run-node)

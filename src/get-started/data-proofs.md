@@ -756,6 +756,18 @@ impl Service for CryptocurrencyService {
 }
 ```
 
+### Default Instantiation Params
+
+Similar to the [previous tutorial](create-service.md#default-instantiation-params),
+we define default identifiers for the service to aid with its instantiation:
+
+```rust
+impl DefaultInstance for CryptocurrencyService {
+    const INSTANCE_ID: InstanceId = 3;
+    const INSTANCE_NAME: &'static str = "crypto";
+}
+```
+
 ## Running Service
 
 We have now described all the structural parts of our demo. The last step is to
@@ -769,7 +781,7 @@ use exonum_cryptocurrency_advanced as cryptocurrency;
 fn main() -> Result<(), failure::Error> {
     exonum::helpers::init_logger().unwrap();
     NodeBuilder::new()
-        .with_service(cryptocurrency::CryptocurrencyService)
+        .with_default_rust_service(CryptocurrencyService)
         .run()
 }
 ```
@@ -777,12 +789,26 @@ fn main() -> Result<(), failure::Error> {
 As soon as you launch the demo with the `cargo run` command, the `NodeBuilder`
 will start to configure the network,
 i.e. generate nodes, create their public and private keys, exchange keys between
-nodes, etc.
+nodes, etc. The service will be instantiated with the default identifiers
+defined as per [`DefaultInstance` implementation](#default-instantiation-params).
 
-!!! warning
-    The service artifact will be available for deployment, but
-    the cryptocurrency service will not be instantiated. To instantiate
-    the service, you may use external utilities, such as the [launcher].
+Note that unlike the previous tutorial, we use `NodeBuilder::new()` rather
+than `NodeBuilder::development_node`. The `new` constructor takes arguments
+from the command line to determine what exactly the node should do: run,
+create initial node configuration, etc. That is, `NodeBuilder::new()` is
+more flexible and fit for full-scale applications. For example, it can be used
+to set up and launch a multi-node network.
+
+!!! tip
+    To run a single-node development network, you may supply the executable with
+    the `run-dev` command:
+
+    ```sh
+    cargo run -- run-dev
+    ```
+
+    Use the `--help` option to find out other commands, and `<command> --help` to
+    get help on a specific command.
 
 ## Conclusion
 
