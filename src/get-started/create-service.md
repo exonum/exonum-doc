@@ -614,6 +614,19 @@ impl Service for CryptocurrencyService {
 }
 ```
 
+### Default Instantiation Params
+
+Let’s define default instantiation parameters for the service in order to
+simplify its instantiation (for example, in [creating a test node](#run-node)
+below).
+
+```rust
+impl DefaultInstance for CryptocurrencyService {
+    const INSTANCE_ID: u32 = 101;
+    const INSTANCE_NAME: &'static str = "cryptocurrency";
+}
+```
+
 ## Create Demo Blockchain
 
 The service is ready. You can verify that the library code compiles by running
@@ -626,21 +639,19 @@ The code we are going to write is logically separate from the service itself.
 The service library could be connected to an Exonum-powered blockchain
 together with other services,
 while the demo blockchain is a specific example of its usage. For this reason,
-we will position the blockchain code as an [*example*][cargo-example] and
+we will position the blockchain code as an [example][cargo-example] and
 place it into [`examples/demo.rs`][demo.rs].
 
 ### Additional Dependencies
 
 Since services themselves do not require the Exonum node, in this example we
-want to create one, and interact with it as well. Thus, we have to add several
-additional dependencies in our `Cargo.toml`:
+want to create a node and interact with it. Thus, we need to add more
+dependencies to our `Cargo.toml`:
 
 ```toml
-# Dependencies required for example.
+# Dependencies required for the example.
 [dev-dependencies]
-exonum-explorer-service = "1.0.0-rc.1"
-exonum-node = "1.0.0-rc.1"
-exonum-system-api = "1.0.0-rc.1"
+exonum-cli = "1.0.0-rc.1"
 ```
 
 ### Imports
@@ -648,170 +659,40 @@ exonum-system-api = "1.0.0-rc.1"
 Add imports to `example/demo.rs` file:
 
 ```rust
-use exonum::{
-    blockchain::{
-        config::{GenesisConfig, GenesisConfigBuilder},
-        ConsensusConfig, ValidatorKeys,
-    },
-    keys::Keys,
-    merkledb::TemporaryDB,
-};
-use exonum_explorer_service::ExplorerFactory;
-use exonum_node::{NodeApiConfig, NodeBuilder, NodeConfig};
-use exonum_rust_runtime::{DefaultInstance, RustRuntime, ServiceFactory};
-use exonum_system_api::SystemApiPlugin;
+use exonum_cli::NodeBuilder;
+use failure::Error;
 
-use cryptocurrency::CryptocurrencyService;
+use exonum_cryptocurrency::contracts::CryptocurrencyService;
 ```
 
-### Configure Node
-
-For launching a blockchain node, we need to specify its configuration.
-We will create this configuration in a separate `node_config` function:
-
-```rust
-fn node_config() -> NodeConfig {
-    // Code goes here
-}
-```
-
-[Node configuration](../architecture/configuration.md) consists of two
-parts:
-
-- Local configuration which includes:
-
-    - Node configuration (e.g., IP settings and other configuration parts)
-    - API configuration (e.g., settings of REST API)
-
-- Global configuration or genesis configuration (all parameters
-  that need to be the same for all the nodes in the network)
-
-Consensus configuration contains a list of public keys of
-[validators](../glossary.md#validator), i.e., nodes that can vote for block
-acceptance. Our demo blockchain network has only one validator (our node).
-Fill this list with the public keys we generate randomly:
-
-```rust
-let (consensus_public_key, consensus_secret_key) =
-    exonum::crypto::gen_keypair();
-let (service_public_key, service_secret_key) =
-    exonum::crypto::gen_keypair();
-
-let validator_keys = ValidatorKeys {
-    consensus_key: consensus_public_key,
-    service_key: service_public_key,
-};
-let consensus = ConsensusConfig::default()
-    .with_validator_keys(vec![validator_keys]);
-```
-
-!!! note
-    In real applications, keys would be stored in the configuration file so
-    that the node can be safely restarted.
-
-Let’s configure REST API to open the node for external web requests.
-Our node will expose API on port 8000 of every network interface.
-
-```rust
-let api_address = "0.0.0.0:8000".parse().unwrap();
-let api_cfg = NodeApiConfig {
-    public_api_address: Some(api_address),
-    ..Default::default()
-};
-```
-
-We also configure our node to listen to peer-to-peer connections on port 2000
-for all network interfaces. This port is used for interactions among full nodes
-in the Exonum network.
-
-```rust
-let peer_address = "0.0.0.0:2000";
-
-// Returns the value of the `NodeConfig` object from `node_config`.
-NodeConfig {
-    listen_address: peer_address.parse().unwrap(),
-    consensus,
-    external_address: peer_address.to_owned(),
-    network: Default::default(),
-    connect_list: Default::default(),
-    api: api_cfg,
-    mempool: Default::default(),
-    thread_pool_size: Default::default(),
-    keys: Keys::from_keys(
-        consensus_public_key,
-        consensus_secret_key,
-        service_public_key,
-        service_secret_key,
-    ),
-}
-```
-
-## Create Genesis Configuration
-
-`NodeConfig` that we created earlier defines the configuration for the **node**,
-but we also need a configuration for the **blockchain**. To initialize
-the blockchain, we need `GenesisConfig` structure.
-
-Let's create a function which will generate `GenesisConfig` based on
-the created `NodeConfig`:
-
-```rust
-fn genesis_config(config: &NodeConfig) -> GenesisConfig {
-    let artifact_id = CryptocurrencyService.artifact_id();
-    GenesisConfigBuilder::with_consensus_config(config.consensus.clone())
-        .with_artifact(ExplorerFactory.artifact_id())
-        .with_instance(ExplorerFactory.default_instance())
-        .with_artifact(artifact_id.clone())
-        .with_instance(artifact_id.into_default_instance(101, "cryptocurrency"))
-        .build()
-}
-```
-
-In the code above we create `GenesisConfig` from the consensus configuration,
-and add the `Explorer` and our `Cryptocurrency` services.
-
-`Explorer` service is capable of sending transactions to the blockchain, so
-without this service we won't be able to interact with the `Cryptocurrency` service.
-For details about `Explorer` service see the
-[Other Services](../advanced/other-services.md) article.
+That is, we import our service and the builder for an Exonum nodes.
 
 ### Run Node
 
-Finally, we need to implement the entry point to our demo network – `main`
+We need to implement the entry point to our demo network – `main`
 function:
 
 ```rust
-fn main() {
-    exonum::helpers::init_logger().unwrap();
-    let db = TemporaryDB::new();
-    let node_cfg = node_config();
-    let genesis_cfg = genesis_config(&node_cfg);
-
-    let node = NodeBuilder::new(db, node_cfg, genesis_cfg)
-        .with_plugin(SystemApiPlugin)
-        .with_runtime_fn(|channel| {
-            RustRuntime::builder()
-                .with_factory(CryptocurrencyService)
-                .with_factory(ExplorerFactory)
-                .build(channel.endpoints_sender())
-        })
-        .build();
-
-    node.run().unwrap();
+fn main() -> Result<(), Error> {
+    exonum::helpers::init_logger()?;
+    NodeBuilder::development_node()?
+        .with_default_rust_service(CryptocurrencyService)
+        .run()
 }
 ```
 
 That is, we:
 
 1. Initialize logging in the Exonum core library.
-2. Create a node with the non-persistent database (`TemporaryDB`), Rust runtime
-  (which is required to run services written in Rust programming language),
-  two services (`CryptocurrencyService` and `Explorer`), and the
-  configuration we have specified earlier.
+2. Create a single-node development network with our service.
+  The node will store its database files in a temporary directory,
+  which will be automatically cleaned up on exit.
 3. Run the created node.
 
 The demo blockchain can now be executed with the
 `RUST_LOG=info cargo run --example demo` command.
+The node will expose public and [private](../glossary.md#private-api)
+HTTP APIs on `localhost:8080` and `localhost:8081` respectively.
 
 ## Interact With Blockchain
 
@@ -839,7 +720,7 @@ Use the `curl` command to send this transaction to the node by HTTP:
 curl -H "Content-Type: application/json" \
   -X POST \
   -d @create-wallet-1.json \
-  http://127.0.0.1:8000/api/explorer/v1/transactions
+  http://127.0.0.1:8080/api/explorer/v1/transactions
 ```
 
 This transaction creates the first wallet associated with user Alice.
@@ -874,7 +755,7 @@ Send it with `curl` to the node:
 curl -H "Content-Type: application/json" \
   -X POST \
   -d @create-wallet-2.json \
-  http://127.0.0.1:8000/api/explorer/v1/transactions
+  http://127.0.0.1:8080/api/explorer/v1/transactions
 ```
 
 It returns the hash of the second transaction:
@@ -910,7 +791,7 @@ Send it to the node with:
 curl -H "Content-Type: application/json" \
   -X POST \
   -d @transfer-funds.json \
-  http://127.0.0.1:8000/api/explorer/v1/transactions
+  http://127.0.0.1:8080/api/explorer/v1/transactions
 ```
 
 This request returns the transaction hash:
@@ -937,7 +818,7 @@ Let’s check that the defined read endpoints indeed work.
 #### Info on All Wallets
 
 ```sh
-curl http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallets
+curl http://127.0.0.1:8080/api/services/cryptocurrency/v1/wallets
 ```
 
 This request expectedly returns information on both wallets in the system:
@@ -962,7 +843,7 @@ This request expectedly returns information on both wallets in the system:
 The second read endpoint also works:
 
 ```sh
-curl "http://127.0.0.1:8000/api/services/cryptocurrency/v1/wallet?\
+curl "http://127.0.0.1:8080/api/services/cryptocurrency/v1/wallet?\
 pub_key=070122b6eb3f63a14b25aacd7a1922c418025e04b1be9d1febdfdbcf67615799"
 ```
 
@@ -974,6 +855,15 @@ The response is:
   "name": "Alice",
   "balance": 95
 }
+```
+
+### Graceful Shutdown
+
+To gracefully shut down the node, you can send the corresponding command via
+private API:
+
+```sh
+curl -X POST "http://127.0.0.1:8081/api/system/v1/shutdown"
 ```
 
 ## Conclusion

@@ -41,7 +41,9 @@ markdown_extensions:
   - meta
   - pymdownx.superfences
   - pymdownx.details
-pages:
+  - toc:
+      permalink: true
+nav:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
   - 'Get Started':
