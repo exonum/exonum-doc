@@ -979,7 +979,7 @@ An example of API service tests can be found in
 
 [apicontrollertest]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/cryptocurrency-demo/src/test/java/com/exonum/binding/cryptocurrency/ApiControllerTest.java
 [auditor]: ../glossary.md#auditor
-[in-pool]: ../advanced/consensus/specification/#pool-of-unconfirmed-transactions
+[in-pool]: ../advanced/consensus/specification.md#pool-of-unconfirmed-transactions
 [junit-afterall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterAll.html
 [junit-aftereach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/AfterEach.html
 [junit-beforeall]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeAll.html
