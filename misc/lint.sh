@@ -43,7 +43,9 @@ lint_html () {
     '"(autocorrect|autocapitalize)" not allowed on element "input"' \
     '"autocomplete" is only allowed when the input type is' \
     '"align" attribute on the "(td|th)" element is obsolete' \
-    'Document uses.* Unicode Private Use Area';
+    'Document uses.* Unicode Private Use Area' \
+    '"main" role is unnecessary for element "main"' \
+    'Consider using "lang=';
 }
 
 lint_links () {
