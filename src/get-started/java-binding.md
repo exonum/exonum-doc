@@ -1263,7 +1263,7 @@ additional plugins for support of different runtimes and services.
 Exonum Java Binding provides two plugins:
 
 - Exonum Java Runtime Plugin for Java services support.
-- Exonum Local Configuration Plugin for support of services with custom
+- Exonum Instance Configuration Plugin for support of services with custom
   initial configuration arguments encoded with Protobuf. Such arguments are sent
   to the service on its start and are typically used to customize the behavior
   of a particular service instance.
@@ -1375,6 +1375,35 @@ YAML dictionary. The Instance Configuration plugin also requires a list of
 additional parameters. In the present example the parameters refer to the
 `timestamping` instance:
 
+- `format`. Describes the format of the configuration string. Possible values
+  are: `text`, `json` and `properties` (see [java.util.Properties]).
+- `value`. A configuration string, may be used instead of `from_file`. If both
+  `value` and `from_file` are present, `value` takes higher priority.
+- `from_file`. A path to a file containing configuration string. May be absolute
+  or relative to the working directory.
+
+```yaml
+instances:
+  xnm-token:
+    artifact: cryptocurrency
+  time-oracle:
+    artifact: time
+  timestamping:
+    artifact: timestamping
+    config:
+      format: "properties"
+      value: "time_service_name=time"
+```
+
+See [sample-config.yml][launcher-sample-config] for the final state of the
+configuration file.
+
+#### Custom Configuration Message
+
+Exonum Instance Configuration plugin also supports arbitrary protobuf messages
+as a serialization format for the service configuration. To use this feature,
+a set of parameters must be supplied instead of `format` and `value` parameters:
+
 - `sources`. Points to a directory with the Protobuf sources of the service
   configuration message. The `proto_sources` directory is used.
 - `config_message_source`. A file name where the `message_name` message
@@ -1399,9 +1428,6 @@ instances:
       data:
         time_service_name: "time"
 ```
-
-See [sample-config.yml][launcher-sample-config] for the final state of the
-configuration file.
 
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
 [plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/README.md
@@ -1496,6 +1522,7 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
+[java.util.Properties]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html#load(java.io.Reader)
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
