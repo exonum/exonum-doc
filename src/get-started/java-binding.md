@@ -1371,9 +1371,27 @@ service sources and place it inside some known directory.
 Finally, add an `instances` section that describes the list of service instances
 you want to start in the blockchain. For each instance specify its
 artifact name alias in the `artifact` field. Instance names are the keys in the
-YAML dictionary. The Instance Configuration plugin also requires a list of
-additional parameters. In the present example the parameters refer to the
-`timestamping` instance:
+YAML dictionary. 
+
+```yaml
+instances:
+  xnm-token:
+    artifact: cryptocurrency
+  time-oracle:
+    artifact: time
+```
+
+To instantiate a service which requires configuration parameters,
+`config` dictionary must be supplied.
+
+The Instance Configuration plugin supports several configuration formats:
+
+- Standard text formats: text, JSON, [java.util.Properties].
+- Arbitrary Protocol Buffers messages.
+
+#### Text Configuration Formats
+
+Requires the following parameters:
 
 - `format`. Describes the format of the configuration string. Possible values
   are: `text`, `json` and `properties` (see [java.util.Properties]).
@@ -1384,10 +1402,6 @@ additional parameters. In the present example the parameters refer to the
 
 ```yaml
 instances:
-  xnm-token:
-    artifact: cryptocurrency
-  time-oracle:
-    artifact: time
   timestamping:
     artifact: timestamping
     config:
@@ -1395,14 +1409,9 @@ instances:
       value: "time_service_name=time"
 ```
 
-See [sample-config.yml][launcher-sample-config] for the final state of the
-configuration file.
-
 #### Custom Configuration Message
 
-Exonum Instance Configuration plugin also supports arbitrary protobuf messages
-as a serialization format for the service configuration. To use this feature,
-a set of parameters must be supplied instead of `format` and `value` parameters:
+Requires the following parameters:
 
 - `sources`. Points to a directory with the Protobuf sources of the service
   configuration message. The `proto_sources` directory is used.
@@ -1415,10 +1424,6 @@ a set of parameters must be supplied instead of `format` and `value` parameters:
 
 ```yaml
 instances:
-  xnm-token:
-    artifact: cryptocurrency
-  time-oracle:
-    artifact: time
   timestamping:
     artifact: timestamping
     config:
@@ -1428,6 +1433,9 @@ instances:
       data:
         time_service_name: "time"
 ```
+
+See [sample-config.yml][launcher-sample-config] for the final state of the
+configuration file.
 
 [exonum-launcher]: https://github.com/exonum/exonum-launcher
 [plugins-readme]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/exonum_launcher_java_plugins/README.md
