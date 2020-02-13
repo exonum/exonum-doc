@@ -136,7 +136,7 @@ software model of services in the [corresponding section][Exonum-services].
 
 In Java, the abstraction of a service is represented by
 [`Service`][service] interface. Implementations can use the
-abstract class [`AbstractService`][abstractservice].
+abstract class [`AbstractService`][abstract-service].
 
 <!-- todo: Add an example of a bare-bones Service -->
 
@@ -233,12 +233,12 @@ section of MerkleDB documentation for details.
 As Exonum storage accepts data in the form of byte arrays,
 storing user data requires serialization.
 Java Binding provides a set of built-in *serializers* that you can find
-in the [`StandardSerializers`][standardserializers] utility class.
+in the [`StandardSerializers`][standard-serializers] utility class.
 The list of serializers covers the most often-used entities and includes:
 
 - Standard types: `boolean`, `float`, `double`, `byte[]` and `String`.
   Integers with various encoding types,
-  see [`StandardSerializers`][standardserializers] Java documentation
+  see [`StandardSerializers`][standard-serializers] Java documentation
   and the table below.
 - Exonum types: `PrivateKey`, `PublicKey` and `HashCode`.
 - Any Protobuf messages using `StandardSerializers#protobuf`.
@@ -1519,7 +1519,7 @@ For using the library just include the dependency in your `pom.xml`:
 - [Javadocs](https://exonum.com/doc/api/java-binding/0.9.0-rc2/index.html)
 - [Rust instruction](create-service.md)
 
-[abstractservice]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/AbstractService.html
+[abstract-service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/AbstractService.html
 [blockchain]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
@@ -1535,7 +1535,6 @@ For using the library just include the dependency in your `pom.xml`:
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
-[nodefake]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/NodeFake.html
 [schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
@@ -1543,7 +1542,7 @@ For using the library just include the dependency in your `pom.xml`:
 [service-after-transactions]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html#afterTransactions(com.exonum.binding.core.blockchain.BlockchainData)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
-[standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
+[standard-serializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
 [standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/storage/indices/package-summary.html
 <!-- TODO: link to the documentation page for supervisor -->
