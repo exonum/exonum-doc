@@ -641,7 +641,7 @@ execution in the synchronous environment by offering simple network emulation
 !!! note "New projects"
     `exonum-testkit` is already included in projects generated with
     [`exonum-java-binding-service-archetype`](#creating-project) and you can
-    skip the following instructions:
+    skip the following instructions.
 
 For existing projects include the following dependency into your `pom.xml`:
 
@@ -658,11 +658,11 @@ As the TestKit uses a library with the implementation of native methods,
 pass `java.library.path` system property to JVM:
 
 ``` none
--Djava.library.path=$EXONUM_JAVA/lib/native
+-Djava.library.path="${EXONUM_HOME}/lib/native"
 ```
 
-`$EXONUM_JAVA` environment variable should point at installation location,
-as specified in [How to Run a Service section](#how-to-run-a-service).
+`EXONUM_HOME` environment variable should point at installation location,
+as specified in [<<After Install>>](#after-install) section.
 
 Packaged artifact should be available for integration tests that use TestKit,
 so `Failsafe` for Maven should be configured as follows:
@@ -673,7 +673,7 @@ so `Failsafe` for Maven should be configured as follows:
     <artifactId>maven-failsafe-plugin</artifactId>
     <configuration>
         <argLine>
-            -Djava.library.path=${path-to-java-bindings-library}
+            -Djava.library.path=${env.EXONUM_HOME}/lib/native
         </argLine>
     </configuration>
     <executions>
