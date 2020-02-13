@@ -120,7 +120,7 @@ mvn archetype:generate \
     -DarchetypeVersion=0.9.0-rc2
 ```
 
-The build definition files for other build systems (e.g., [Gradle](https://gradle.org/))
+The build definition files for other build systems (e.g., Gradle)
 can be created similarly to the
 template. For more information see an [example][build-description].
 
@@ -138,20 +138,21 @@ In Java, the abstraction of a service is represented by
 [`Service`][service] interface. Implementations can use the
 abstract class [`AbstractService`][abstractservice].
 
+<!-- todo: Add an example of a bare-bones Service -->
+
 ### Schema Description
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
-collections is arranged in two ways – ordinary collections and
-[Merkelized collections](../architecture/merkledb.md#merkelized-indices);
-the latter allow
-providing cryptographic evidence of the authenticity of data to the clients of
+collections is arranged in two ways – ordinary collections 
+and Merkelized collections; the latter allow providing cryptographic evidence 
+of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
 certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.
 
 For the detailed description of all Exonum collection types see the
-corresponding [documentation section](../architecture/merkledb.md#table-types).
+corresponding [documentation section](../architecture/merkledb.md#index-types).
 In Java, implementations of collections are located in
 [a separate package][storage-indices]. Said package documentation
 describes their use.
@@ -160,13 +161,15 @@ describes their use.
     `SparseListIndex` is not yet supported in Java. Let us know if it may be
     useful for you!
 
-Collections work with a database view – either `Snapshot`, which is read-only
-and represents the database state as of the latest committed block;
+Collections are instantiated using a database view. The database view
+works as an index factory. The views may be based on a `Snapshot` — a read-only
+view corresponding to the database state as of the latest committed block;
 or `Fork`, which is mutable and allows performing modifying operations. The
 database view is provided by the framework: `Snapshot` can be
 requested at any time, while `Fork` – only when the transaction is executed. The
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
+<!-- todo: Do we need to describe the Prefixed etc? -->
 
 Exonum stores elements in collections as byte arrays. Therefore,
 serializers for values stored in collections must be provided.
@@ -174,54 +177,40 @@ See [Serialization](#serialization) for details.
 
 !!! note "Example of ProofMapIndex Creation"
     ```java
-    void updateBalance(Fork fork, String serviceInstanceName) {
-      var name = serviceInstanceName + ".balanceById";
-      var balanceById = ProofMapIndexProxy.newInstance(name, fork,
-          StandardSerializers.hash(),
-          StandardSerializers.longs());
-      balanceById.put(id, newBalance);
+    void putEntry(Prefixed access, String key, String value) {
+      var indexAddress = IndexAddress.valueOf("entries");
+      var entries = access.getProofMap(indexAddress,
+          StandardSerializers.string(),
+          StandardSerializers.string());
+      entries.put(key, value);
     }
     ```
 
-A set of named collections constitute a *service schema*. Collections shall be
-defined in a unique to all service instances namespace to avoid name collisions;
-that is usually achieved by adding a prefix to the name of each collection,
-declared in the service (e.g., an assigned service name: `"timestamping.timestamps"`).
+A set of named collections constitute a *service schema*. A service schema
+may be created using a `Prefixed` database access object, which provides
+isolation of all service indexes from other instances.
+
 For convenient access to service collections you can implement a factory
 of service collections.
 
-*The state of the service in the blockchain* is determined by the list of hashes.
-Usually, it is comprised of the hashes of its Merkelized collections. State hashes
-of each service are aggregated in a single blockchain state hash, which is included
-in each committed block. When using `AbstractService`, the hash list must be defined
-in the schema class that implements [`Schema`][schema] interface; when implementing
-`Service` directly – in the service itself.
+*The state of the service in the blockchain* is determined by the index hashes
+of its Merkelized collections. Exonum performs the _state aggregation_ 
+of all non-grouped Merkelized collections automatically. See 
+the ["State Aggregation"](../architecture/merkledb.md#state-aggregation)
+section of MerkleDB documentation for details.
 
 !!! note "Example of a Service Schema with a single Merkelized collection"
 
     ```java
     class FooSchema implements Schema {
-      private final String namespace;
-      private final View view;
+      private final Prefixed view;
 
       /**
-       * Creates a schema belonging to the service instance with the given name.
-       * The database state is determined by the given view.
+       * Creates a schema given a prefixed database access object.
+       * The database state is determined by the access object.
        */
-      FooSchema(String serviceName, View view) {
-        /* Use a service name as a namespace to distinguish
-           collections of this service instance from other instances
-           and enable multiple services of the same type. */
-        this.namespace = serviceName;
-        this.view = view;
-      }
-
-      @Override
-      public List<HashCode> getStateHashes() {
-        /* This schema has a single Merkelized map which contents
-           must be verified by the consensus algorithm to be the same
-           on each node. Hence we return the index hash of this collection. */
-        return Collections.singletonList(testMap().getIndexHash());
+      FooSchema(Prefixed access) {
+        this.view = access;
       }
 
       /**
@@ -233,14 +222,8 @@ in the schema class that implements [`Schema`][schema] interface; when implement
        * "<service name>.test-map".
        */
       ProofMapIndexProxy<String, String> testMap() {
-        var fullName = fullIndexName("test-map");
-        return ProofMapIndexProxy.newInstance(fullName, view, string(),
-            string());
-      }
-
-      /** Creates a full index name given its simple name. */
-      private String fullIndexName(String name) {
-        return namespace + "." + name;
+        var address = IndexAddress.valueOf("test-map");
+        return view.getProofMap(address, string(), string());
       }
     }
     ```
@@ -286,6 +269,8 @@ rules – see the corresponding section of our [documentation][transactions].
 
 #### Messages
 
+<!-- todo: @ostrovski Shall we keep this overview, or just keep the link? -->
+
 Transactions are transmitted by external service clients to the framework as
 [Exonum messages][transactions-messages].
 A transaction message contains:
@@ -322,6 +307,9 @@ the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
 The lifecycle of a Java service transaction is the same as in any other
 Exonum service:
 
+<!-- TODO: Shall we just keep the link to ../architecture/transactions.md#lifecycle
+ and remove the rest? -->
+ 
 1. A service client creates a transaction message, including IDs of
   the service and this transaction, serialized transaction parameters
   as a payload, and signs the message with the author’s key pair.
@@ -337,8 +325,9 @@ Exonum service:
   the previous verification steps, and, if they pass, add the message to
   the local transaction pool.
 6. When majority of validator nodes agree to include this transaction
-  into the next block, they take the message from the transaction pool and
-  request the service to [execute](#transaction-execution) it.
+  into the next block, they take the message from the transaction pool,
+  extract the arguments and invoke the corresponding
+  [transaction method](#transaction-definition).
 7. When all transactions in the block are executed, all changes are atomically
   applied to the database state and a new block is committed.
 
@@ -348,33 +337,67 @@ For a more detailed description of transaction processing,
 see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
 section.
 
-#### Transaction Execution
+#### Transaction Definition
 
-When the framework receives a transaction message, it must transform it into
-an *executable transaction* to process. As every service has several transaction
-types each with its own parameters, it must provide
-a [`TransactionConverter`][transactionconvererter] for this purpose.
-When the framework requests a service to convert a transaction,
-its message is guaranteed to have a correct cryptographic signature.
+A transaction is a `Service` method that is annotated with
+the [`@Transaction`][transaction] annotation and defines the transaction
+business logic. The transaction method describes the operations that are applied to the
+current storage state when the transaction is executed. 
 
-An executable transaction is an instance of a class implementing
-the [`Transaction`][transaction] interface and defining transaction
-business logic. The interface implementations must define an execution
-rule for the transaction in `execute` method.
+A transaction method must accept two parameters:
 
-The `Transaction#execute` method describes the operations that are applied to the
-current storage state when the transaction is executed. Exonum passes
-an [execution context][transaction-execution-context] as an argument.
-The context provides:
+1. _arguments_ either as a protobuf message or as a `byte[]`.
+  Protobuf messages are deserialized using a `#parseFrom(byte[])` method of
+  the actual parameter type.
+2. _execution context_ as `TransactionContext`.
+  
+The [execution context][transaction-execution-context] provides:
 
-- A `Fork` – a view that allows performing modifying operations;
+- A mutable access to the blockchain data, which allows performing modifying
+  operations;
 - The service instance name and numeric ID;
 - Some information about the corresponding transaction message:
   its SHA-256 hash that uniquely identifies it, and the author’s public key.
 
 A service schema object can be used to access data collections of this service.
 
-An implementation of the `Transaction#execute` method must be a pure function,
+!!! note "Example of a simple transaction"
+
+    ```java
+    public final class FooService extends AbstractService {
+      
+      /** A numeric identifier of the "put" transaction. */
+      public static final int PUT_TX_ID = 0;
+    
+      @Inject
+      public FooService(ServiceInstanceSpec instanceSpec) {
+        super(instanceSpec);
+      }
+      
+      /**
+       * Puts an entry (a key-value pair) into the test proof map.
+       *
+       * <p>{@code Transactions.PutTransactionArgs} is a Protoc-generated
+       * class with the transaction method arguments.
+       */
+      @Transaction(PUT_TX_ID)
+      public void putEntry(Transactions.PutTransactionArgs arguments,
+          TransactionContext context) {
+        FooSchema schema = new FooSchema(context.getServiceData());
+        String key = arguments.getKey();
+        String value = arguments.getValue();
+        schema.testMap()
+            .put(key, value);
+      }
+      
+      @Override
+      public void createPublicApiHandlers(Node node, Router router) {
+        // No handlers
+      }
+    }
+    ```
+
+An implementation of the `Transaction` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
 for the given transaction. An observable result is the one that affects the
 blockchain state hash: a modification of a collection that affects the service
@@ -382,10 +405,10 @@ state hash, or an execution exception.
 
 ##### Exceptions
 
-Transaction methods may throw `TransactionExecutionException`
+Transaction methods may throw [`ExecutionException`][execution-exception] 
 to notify Exonum about an error in a transaction execution.
 
-The `TransactionExecutionException` contains an integer error code and
+The `ExecutionException` contains an integer error code and
 a message with error description. The error code allows the clients
 of this method to distinguish the different types of errors that
 may occur in it. For example, a transaction transferring tokens
@@ -401,29 +424,42 @@ An exception of any other type will be recorded with _no_ error code
 as an "unexpected" execution error.
 
 If transaction execution fails, the changes made by the transaction are
-rolled back, while the error data is stored in the database for further user
-reference. Light clients also provide access to information on the
-transaction execution result (which may be either success or failure)
+rolled back, while the error data is [stored in the database][call-errors-registry]
+for further user reference. Light clients also provide access to information
+on the transaction execution result (which may be either success or failure)
 to their users.
 
-#### After Transactions Handler
+<!-- todo: Replace everywhere 'file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/' with appropr. base URL -->
+[execution-exception]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/transaction/ExecutionException.html
+[call-errors-registry]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/blockchain/Blockchain.html#getCallErrors(long)
 
-Services can receive a notification after all transactions in a block has been
-processed but before the block has been committed, allowing inspecting
-the changes made by the transactions and modifying any service state.
+#### Before and After Transactions Handlers
 
-Exonum delivers this notification to implementations
-of [`Service#beforeCommit`][service-before-commit] method. The method will see
-the state of the database after all transactions have been applied.
-It may make any changes to the service state, which will be included
+Services can receive notifications:
+
+- before any transactions in a block has been processed
+- after all transactions in a block has been processed, but before the block 
+has been committed.
+
+Such notification allow inspecting the changes made by the transactions 
+and modifying any service state.
+
+Exonum delivers these notification to implementations
+of [`Service#beforeTransactions`][service-before-transactions] and 
+[`Service#afterTransactions`][service-after-transactions] methods. 
+The `beforeTransactions` method sees the state of the database
+as of the last committed block, possibly, modified by the previously
+invoked `beforeTransactions` handlers of other services.
+The `afterTransactions` handlers — after all transactions have been applied.
+
+Both methods may make any changes to the service state, which will be included
 in the block. As transactions, the implementations must produce
 the same observable result on all nodes of the system.
 If exceptions occur in this handler, Exonum will roll back any changes made
 to the persistent storage in it.
 
-<!-- Mind that it will change in 1.0, see exonum/exonum#1576 -->
-Unlike transactions, the execution result of `beforeCommit` is not saved
-in the database.
+The execution result of `before-`/`afterTransactions` is also saved in 
+the [database][call-errors-registry].
 
 ### Blockchain Events
 
@@ -431,9 +467,9 @@ A service can also handle a block commit event that occurs each time
 the framework commits a new block. The framework delivers this event to
 implementations of [`Service#afterCommit(BlockCommittedEvent)`][service-after-commit]
 callback in each deployed service. Each node in the network processes
-that event independently from other nodes. The event includes a `Snapshot`,
-allowing a read-only access to the database state _exactly_ after the commit
-of the corresponding block.
+that event independently from other nodes. The event includes a `BlockchainData`
+snapshot, allowing a read-only access to the database state _exactly_ after
+the commit of the corresponding block.
 
 As services can read the database state in the handler, they may detect
 any changes in it, e.g., that a certain transaction is executed;
@@ -755,7 +791,7 @@ execution will fail:
 ```java
 try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
         SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
-  // Construct a transaction that throws `TransactionExecutionException` during
+  // Construct a transaction that throws `ExecutionException` during
   // execution
   byte errorCode = 1;
   String errorDescription = "Test";
@@ -1503,7 +1539,8 @@ For using the library just include the dependency in your `pom.xml`:
 [schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[service-before-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#beforeCommit(com.exonum.binding.core.storage.database.Fork)
+[service-before-transactions]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html#beforeTransactions(com.exonum.binding.core.blockchain.BlockchainData)
+[service-after-transactions]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html#afterTransactions(com.exonum.binding.core.blockchain.BlockchainData)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
