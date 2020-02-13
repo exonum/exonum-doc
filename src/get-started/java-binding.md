@@ -142,6 +142,8 @@ abstract class [`AbstractService`][abstract-service].
 
 ### Schema Description
 
+<!-- todo: Rewrite the section — it lacks some structure -->
+
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
 collections is arranged in two ways – ordinary collections 
@@ -227,6 +229,23 @@ section of MerkleDB documentation for details.
       }
     }
     ```
+
+#### Blockchain Data
+
+[`BlockchainData`][blockchain-data] is the object providing access to blockchain data
+of a particular service instance.
+ 
+The service instance data is accessible via a `Prefixed` access which isolates
+the service data from all the other instances.
+ 
+On top of that, this class provides read-only access to persistent data of:
+ 
+- [Exonum Core][blockchain], containing information on blocks, transactions, 
+  execution results, consensus configuration, etc. 
+- Dispatcher Service, containing information on active service instances.
+- Other services.
+
+[blockchain-data]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/blockchain/BlockchainData.html
 
 #### Serialization
 
@@ -480,36 +499,6 @@ must pay attention to **not** perform any blocking operations such as
 synchronous I/O in this handler, as it is invoked synchronously in the same
 thread that handles transactions. Blocking that thread will delay transaction
 processing on the node.
-
-### Core Schema API
-
-Users can access information stored in the blockchain by the framework using
-methods of [`Blockchain`][blockchain] class. This API can be used both in
-transaction code and in read requests. The following functionality is
-available:
-
-- `getHeight: long`
-  The height of the latest committed block in the blockchain
-- `getBlockHashes: ListIndex<HashCode>`
-  The list of all block hashes, indexed by the block height
-- `getBlockTransactions: ProofListIndexProxy<HashCode>`
-  The proof list of transaction hashes committed in the block with the given
-  height or ID
-- `getTxMessages: MapIndex<HashCode, TransactionMessage>`
-  The map of transaction messages identified by their SHA-256 hashes. Both
-  committed and in-pool (not yet processed) transactions are returned
-- `getTxResults: ProofMapIndexProxy<HashCode, ExecutionStatus>`
-  The map of transaction execution results identified by the corresponding
-  transaction SHA-256 hashes
-- `getTxLocations: MapIndex<HashCode, TransactionLocation>`
-  The map of transaction positions inside the blockchain identified by
-  the corresponding transaction SHA-256 hashes
-- `getBlocks: MapIndex<HashCode, Block>`
-  The map of block objects identified by the corresponding block hashes
-- `getLastBlock: Block`
-  The latest committed block
-- `getConsensusConfiguration: Config`
-  The consensus configuration for the latest height of the blockchain.
 
 ### External Service API
 
