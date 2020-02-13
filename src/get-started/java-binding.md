@@ -537,7 +537,8 @@ Exonum invokes this method when a new service instance is added
 to the blockchain. Administrators, initiating this action,
 may pass some initialization parameters. A service is responsible for
 validation of these parameters. If they are incorrect, it shall throw
-an Exception, which will abort the start of this service instance.
+an [`ExecutionException`][execution-exception], which will abort the start
+of this service instance.
 
 A service shall also update its _persistent_ state based on these parameters.
 It shall not derive the `Service` _object_ state from them, as
@@ -545,8 +546,8 @@ Exonum may instantiate multiple `Service` objects for a single
 service instance (e.g., when a node is stopped and then restarted).
 
 For example, a service may set some initial values in its collections,
-or save all or some configuration parameters as is for later retrieval in transactions
-and/or read requests.
+or save all or some configuration parameters as is for later retrieval
+in transactions and/or read requests.
 
 <!-- TODO: example -->
 
@@ -555,8 +556,9 @@ and/or read requests.
 <!-- TODO: link the complete documentation on reconfiguration,
 especially in terms of its invocation by administrators -->
 
-Exonum supervisor service provides a mechanism to reconfigure
-the started service instances. The re-configuration protocol for _services_
+[Exonum supervisor service](../advanced/supervisor.md) 
+provides a mechanism to reconfigure the started service instances. 
+The re-configuration protocol for _services_
 is similar to the one for consensus configuration.
 This protocol includes the following steps:
 
@@ -575,7 +577,8 @@ implementing [`Configurable`][configurable] interface.
 Exonum includes a [standard implementation][standard-supervisor-rustdoc]
 of the supervisor service.
 See its documentation to learn how to invoke the re-configuration process
-of a started service instance.
+of a started service instance. Also, consider using the standard client
+application — [`exonum-launcher`][exonum-launcher].
 
 A service that does not need the same protocol for its reconfiguration as
 for consensus reconfiguration may implement it itself as a set of transactions.
