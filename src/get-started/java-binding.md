@@ -1371,7 +1371,7 @@ service sources and place it inside some known directory.
 Finally, add an `instances` section that describes the list of service instances
 you want to start in the blockchain. For each instance specify its
 artifact name alias in the `artifact` field. Instance names are the keys in the
-YAML dictionary. 
+YAML dictionary.
 
 ```yaml
 instances:
