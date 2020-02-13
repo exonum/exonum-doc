@@ -599,6 +599,7 @@ A service module shall:
 
 !!! note "Minimalistic Example of Service Module"
     ```java
+
     @Extension
     public class ServiceModule extends AbstractServiceModule {
 
@@ -606,10 +607,6 @@ A service module shall:
       protected void configure() {
         // Define the Service implementation.
         bind(Service.class).to(CryptocurrencyService.class).in(Singleton.class);
-
-        // Define the TransactionConverter implementation required
-        // by the CryptocurrencyService.
-        bind(TransactionConverter.class).to(CryptocurrencyTransactionConverter.class);
       }
     }
     ```
@@ -1544,7 +1541,6 @@ For using the library just include the dependency in your `pom.xml`:
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/TransactionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
-[transactionconvererter]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/TransactionConverter.html
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
