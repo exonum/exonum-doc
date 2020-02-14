@@ -18,7 +18,7 @@ Exonum Java Binding provides:
 ## Test Code Snippet
 
 <!--codeinclude-->
-[Hello World](./HelloWorld.java) block:main
+[createBlockProof](../code-examples/java/exonum-java-binding/integration-tests/src/test/java/com/exonum/binding/test/BlockchainIntegrationTest.java) block:createBlockProof
 <!--/codeinclude-->
 
 ## Installation
