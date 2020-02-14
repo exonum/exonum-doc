@@ -9,8 +9,7 @@ branches:
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 
 language: python # for mkdocs
-python:
-  - "2.7"
+python: "3.7"
 cache:
   npm: true
   directories:
@@ -28,12 +27,7 @@ install:
   - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
   - nvm install 12 && nvm use 12
   - npm install
-  # Dirty hack for what seems like a bug in linkchecker
-  - |
-    find "$VIRTUAL_ENV" -regex '.*/linkcheck/__init__.py' -print0 | \
-      xargs -0 sed -i -e "s/requests.__version__ <= '2.2.0'/map(int, requests.__version__.split('.')) <= [2, 2, 0]/"
   - python -m mkdocs --version
-  - linkchecker --version
   - html5validator --version
 
 script:
