@@ -1,0 +1,3 @@
+[submodule "exonum-java-binding"]
+	path = src/code-examples/java
+	url = https://github.com/exonum/exonum-java-binding.git
