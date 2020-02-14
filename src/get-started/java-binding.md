@@ -615,7 +615,7 @@ execution in the synchronous environment by offering simple network emulation
 
 For existing projects include the following dependency into your `pom.xml`:
 
-``` xml
+```xml
 <dependency>
   <groupId>com.exonum.binding</groupId>
   <artifactId>exonum-testkit</artifactId>
@@ -627,7 +627,7 @@ For existing projects include the following dependency into your `pom.xml`:
 As the TestKit uses a library with the implementation of native methods,
 pass `java.library.path` system property to JVM:
 
-``` none
+```none
 -Djava.library.path=$EXONUM_JAVA/lib/native
 ```
 
