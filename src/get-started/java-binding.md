@@ -650,11 +650,11 @@ pass `java.library.path` system property to JVM:
 -Djava.library.path="${EXONUM_HOME}/lib/native"
 ```
 
-`EXONUM_HOME` environment variable should point at installation location,
-as specified in [<<After Install>>](#after-install) section.
+`EXONUM_HOME` environment variable should point at the installation location,
+as specified in [«After Install»](#after-install) section.
 
 Packaged artifact should be available for integration tests that use TestKit,
-so `Failsafe` for Maven should be configured as follows:
+so Maven Failsafe Plugin should be configured as follows:
 
 ```xml
 <plugin>
@@ -709,7 +709,8 @@ node, a single service with no configuration and without Time Oracle. To
 instantiate the TestKit do the following:
 
 ```java
-ServiceArtifactId artifactId = ServiceArtifactId.newJavaId("com.exonum.binding:test-service:1.0.0");
+ServiceArtifactId artifactId = ServiceArtifactId
+    .newJavaId("com.exonum.binding/test-service", "1.0.0");
 String artifactFilename = "test-service.jar";
 String serviceName = "test-service";
 int serviceId = 46;
