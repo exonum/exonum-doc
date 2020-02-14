@@ -99,6 +99,14 @@ npm install
 
 (you will need Node 8+ installed).
 
+<!-- Todo: More appropriate place? -->
+
+Finally, initialize the Git submodules:
+
+```
+git submodule update --init --recursive
+```
+
 ### Viewing Documents Locally
 
 In order to run a local web server serving docs, use:
