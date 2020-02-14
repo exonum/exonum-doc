@@ -245,7 +245,7 @@ On top of that, this class provides read-only access to persistent data of:
 - Dispatcher Service, containing information on active service instances.
 - Other services.
 
-[blockchain-data]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/blockchain/BlockchainData.html
+[blockchain-data]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/BlockchainData.html
 
 #### Serialization
 
@@ -448,9 +448,8 @@ for further user reference. Light clients also provide access to information
 on the transaction execution result (which may be either success or failure)
 to their users.
 
-<!-- todo: Replace everywhere 'file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/' with appropr. base URL -->
-[execution-exception]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/transaction/ExecutionException.html
-[call-errors-registry]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/blockchain/Blockchain.html#getCallErrors(long)
+[execution-exception]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/transaction/ExecutionException.html
+[call-errors-registry]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/Blockchain.html#getCallErrors(long)
 
 #### Before and After Transactions Handlers
 
@@ -1522,8 +1521,8 @@ For using the library just include the dependency in your `pom.xml`:
 [schema]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Schema.html
 [service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html
 [service-after-commit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#afterCommit(com.exonum.binding.service.BlockCommittedEvent)
-[service-before-transactions]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html#beforeTransactions(com.exonum.binding.core.blockchain.BlockchainData)
-[service-after-transactions]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html#afterTransactions(com.exonum.binding.core.blockchain.BlockchainData)
+[service-before-transactions]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Service.html#beforeTransactions(com.exonum.binding.core.blockchain.BlockchainData)
+[service-after-transactions]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Service.html#afterTransactions(com.exonum.binding.core.blockchain.BlockchainData)
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
 [standard-serializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
