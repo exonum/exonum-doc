@@ -95,7 +95,7 @@ nav:
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit
-    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'    
+    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'
     # Time service
     - 'Time Oracle': 'advanced/time.md'
     # Other useful services
