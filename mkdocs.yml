@@ -9,6 +9,9 @@ theme:
     primary: 'light green'
     accent: 'lime'
 
+plugins:
+  - codeinclude
+
 extra_css:
   - assets/stylesheets/extra.css
 extra_javascript:
