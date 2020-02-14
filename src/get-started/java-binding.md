@@ -14,6 +14,12 @@ Exonum Java Binding provides:
   service development as a number of Java libraries.
 - Exonum Java Application — an Exonum node with built-in support
   for running Java services.
+  
+## Test Code Snippet
+
+<!--codeinclude-->
+[Hello World](./HelloWorld.java) block:main
+<!--/codeinclude-->
 
 ## Installation
 
