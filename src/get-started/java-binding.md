@@ -282,85 +282,20 @@ Exonum transactions allow you to perform modifying atomic operations with the
 storage. Transactions are executed sequentially, in the order determined by the
 consensus of the nodes in the network.
 
+Transactions are transmitted by external service clients to the framework as
+[Exonum messages][transactions-messages]. The transaction message includes
+the transaction arguments that can be serialized using an arbitrary algorithm
+supported by both the service client and the service itself.
+
 For more details about transactions in Exonum – their properties and processing
 rules – see the corresponding section of our [documentation][transactions].
-
-#### Messages
-
-<!-- todo: @ostrovski Shall we keep this overview, or just keep the link? -->
-
-Transactions are transmitted by external service clients to the framework as
-[Exonum messages][transactions-messages].
-A transaction message contains:
-
-- A header with the identifying information, such as a numeric ID
-  of the service instance which shall process this transaction
-  and a transaction ID within that service;
-- A payload containing transaction parameters;
-- A public key of the author, and a signature that authenticates them.
-
-The transaction payload in the message can be serialized
-using an arbitrary algorithm supported by both the service client
-and the service itself.
-
-If the service itself needs to create a transaction on a particular node,
-it can use the [`Node#submitTransaction`][node-submit-transaction] method.
-This method will create and sign a transaction message using
-the [service key][node-configuration-validator-keys]
-of _that particular node_ (meaning that the node will be the author
-of the transaction), and submit it to the network.
-Invoking this method on each node unconditionally will produce
-_N_ transactions that have the same payloads, but different
-authors’ public keys and signatures, where _N_ is the number of nodes
-in the network.
-
-Ed25519 is a standard cryptographic system for digital signing
-of Exonum messages. It is available through
-the [`CryptoFunctions#ed25519`][cryptofunctions-ed25519] method.
-
-[node-configuration-validator-keys]: ../architecture/configuration.md#validator-keys
-
-#### Transaction Lifecycle
-
-The lifecycle of a Java service transaction is the same as in any other
-Exonum service:
-
-<!-- TODO: Shall we just keep the link to ../architecture/transactions.md#lifecycle
- and remove the rest? -->
- 
-1. A service client creates a transaction message, including IDs of
-  the service and this transaction, serialized transaction parameters
-  as a payload, and signs the message with the author’s key pair.
-2. The client transmits the message to one of the Exonum nodes in the network.
-  The transaction is identified by the hash of the corresponding message.
-3. The node verifies the correctness of the message: its header,
-  including the service ID, and its cryptographic signature
-  against the author’s public key included into it.
-4. If all checks pass, the node that received the message adds it to its
-  local transaction pool and broadcasts the message to all the other nodes
-  in the network.
-5. Other nodes, having received the transaction message, perform all
-  the previous verification steps, and, if they pass, add the message to
-  the local transaction pool.
-6. When majority of validator nodes agree to include this transaction
-  into the next block, they take the message from the transaction pool,
-  extract the arguments and invoke the corresponding
-  [transaction method](#transaction-definition).
-7. When all transactions in the block are executed, all changes are atomically
-  applied to the database state and a new block is committed.
-
-The transaction messages are preserved in the database regardless of
-the execution result, and can be later accessed via `Blockchain` class.
-For a more detailed description of transaction processing,
-see the [Transaction Lifecycle](../architecture/transactions.md#lifecycle)
-section.
 
 #### Transaction Definition
 
 A transaction is a `Service` method that is annotated with
 the [`@Transaction`][transaction] annotation and defines the transaction
-business logic. The transaction method describes the operations that are applied to the
-current storage state when the transaction is executed. 
+business logic. The transaction method describes the operations that are applied
+to the current storage state when the transaction is executed. 
 
 A transaction method must accept two parameters:
 
@@ -449,6 +384,21 @@ to their users.
 
 [execution-exception]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/transaction/ExecutionException.html
 [call-errors-registry]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/Blockchain.html#getCallErrors(long)
+
+#### Submitting Transactions to Self
+
+If the service itself needs to create a transaction on a particular node,
+it can use the [`Node#submitTransaction`][node-submit-transaction] method.
+This method will create and sign a transaction message using
+the [service key][node-configuration-validator-keys]
+of _that particular node_ (meaning that the node will be the author
+of the transaction), and submit it to the network.
+Invoking this method on each node unconditionally will produce
+_N_ transactions that have the same payloads, but different
+authors’ public keys and signatures, where _N_ is the number of nodes
+in the network.
+
+[node-configuration-validator-keys]: ../architecture/configuration.md#validator-keys
 
 #### Before and After Transactions Handlers
 
@@ -1536,5 +1486,4 @@ For using the library just include the dependency in your `pom.xml`:
 [transactions-messages]: ../architecture/transactions.md#messages
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
-[cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
