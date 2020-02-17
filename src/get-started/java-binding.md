@@ -469,7 +469,7 @@ framework.
 !!! note
     Java services use a _separate_ server from Rust services.
     The TCP ports of Java and Rust servers are specified
-    when a node is started, see [«Running the node»](#running-the-node)
+    when a node is started, see [“Running the node”](#running-the-node)
     section for details.
 
 ### Configuration
@@ -599,7 +599,7 @@ pass `java.library.path` system property to JVM:
 ```
 
 `EXONUM_HOME` environment variable should point at the installation location,
-as specified in [«After Install»](#after-install) section.
+as specified in [“After Install”](#after-install) section.
 
 Packaged artifact should be available for integration tests that use TestKit,
 so Maven Failsafe Plugin should be configured as follows:
