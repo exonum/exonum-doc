@@ -94,7 +94,7 @@ follow the instructions in [Contribution Guide][how-to-build].
     export PATH="$PATH:$EXONUM_HOME/bin"
     ```
 
-2. Install [latest JDK][jdk].
+2. Install the [latest JDK][jdk].
 
 3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
