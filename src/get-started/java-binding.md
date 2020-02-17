@@ -37,33 +37,33 @@ all the necessary dependencies on [the Releases page][github-releases] on GitHub
 We suggest using `debug` version during development and `release` version for
 deployment.
 
-1. Download and unpack the archive from the [Releases page][github-releases]
-  into some known location. To install the latest release to `~/bin`:
-
-  ```bash
-  mkdir -p ~/bin
-  cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
-  ```
-
-2. Install [Libsodium][libsodium] as the necessary runtime dependency.
-
-!!! note
-    Exonum Java is built with Libsodium 23, which means it will not work
-    on some older Linux distributions, like Ubuntu 16.04. Libsodium 23 is
-    available in Ubuntu 18.04 or can be installed from a custom PPA.
-
-??? example "Linux (Ubuntu)"
+  1. Download and unpack the archive from the [Releases page][github-releases]
+    into some known location. To install the latest release to `~/bin`:
+  
     ```bash
-    sudo apt-get update && sudo apt-get install libsodium-dev
+    mkdir -p ~/bin
+    cd ~/bin
+    unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
     ```
-
-??? example "Mac OS"
-    ```bash
-    brew install libsodium
-    ```
-
-3. Follow the steps in the [After Install](#after-install) section below
+  
+  2. Install [Libsodium][libsodium] as the necessary runtime dependency.
+  
+  !!! note
+      Exonum Java is built with Libsodium 23, which means it will not work
+      on some older Linux distributions, like Ubuntu 16.04. Libsodium 23 is
+      available in Ubuntu 18.04 or can be installed from a custom PPA.
+  
+  ??? example "Linux (Ubuntu)"
+      ```bash
+      sudo apt-get update && sudo apt-get install libsodium-dev
+      ```
+  
+  ??? example "Mac OS"
+      ```bash
+      brew install libsodium
+      ```
+  
+  3. Follow the steps in the [After Install](#after-install) section below
 
 ### Homebrew Package
 
@@ -86,18 +86,18 @@ follow the instructions in [Contribution Guide][how-to-build].
 
 ### After Install
 
-1. Create an environment variable `EXONUM_HOME` pointing at installation
-  location.
-
-  ```bash
-  # The path is provided in after-install message in case of Homebrew
-  export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc2-release
-  # Setting PATH variable is not needed in case of Homebrew
-  export PATH="$PATH:$EXONUM_HOME/bin"
-  ```
-
-2. Install [Maven 3][maven-install] which is essential for developing and building
-  Java service.
+  1. Create an environment variable `EXONUM_HOME` pointing at installation
+    location.
+  
+    ```bash
+    # The path is provided in after-install message in case of Homebrew
+    export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc2-release
+    # Setting PATH variable is not needed in case of Homebrew
+    export PATH="$PATH:$EXONUM_HOME/bin"
+    ```
+  
+  2. Install [Maven 3][maven-install] which is essential for developing and building
+    Java service.
 
 ## Creating Project
 
