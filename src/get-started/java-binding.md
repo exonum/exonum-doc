@@ -146,8 +146,8 @@ abstract class [`AbstractService`][abstract-service].
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
-collections is arranged in two ways – ordinary collections 
-and Merkelized collections; the latter allow providing cryptographic evidence 
+collections is arranged in two ways – ordinary collections
+and Merkelized collections; the latter allow providing cryptographic evidence
 of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
 certain key). The [blockchain state](../glossary.md#blockchain-state) is
@@ -195,8 +195,8 @@ For convenient access to service collections you can implement a factory
 of service collections.
 
 *The state of the service in the blockchain* is determined by the index hashes
-of its Merkelized collections. Exonum performs the _state aggregation_ 
-of all non-grouped Merkelized collections automatically. See 
+of its Merkelized collections. Exonum performs the _state aggregation_
+of all non-grouped Merkelized collections automatically. See
 the ["State Aggregation"](../architecture/merkledb.md#state-aggregation)
 section of MerkleDB documentation for details.
 
@@ -233,14 +233,14 @@ section of MerkleDB documentation for details.
 
 [`BlockchainData`][blockchain-data] is the object providing access to blockchain
 data of a particular service instance.
- 
+
 The service instance data is accessible via a `Prefixed` access which isolates
 the service data from all the other instances.
- 
+
 On top of that, this class provides read-only access to persistent data of:
- 
-- [Exonum Core][blockchain], containing information on blocks, transactions, 
-  execution results, consensus configuration, etc. 
+
+- [Exonum Core][blockchain], containing information on blocks, transactions,
+  execution results, consensus configuration, etc.
 - Dispatcher, containing information on active service instances.
 - Other services.
 
@@ -295,7 +295,7 @@ rules – see the corresponding section of our [documentation][transactions].
 A transaction is a `Service` method that is annotated with
 the [`@Transaction`][transaction] annotation and defines the transaction
 business logic. The transaction method describes the operations that are applied
-to the current storage state when the transaction is executed. 
+to the current storage state when the transaction is executed.
 
 A transaction method must accept two parameters:
 
@@ -303,7 +303,7 @@ A transaction method must accept two parameters:
   Protobuf messages are deserialized using a `#parseFrom(byte[])` method of
   the actual parameter type.
 2. _execution context_ as `TransactionContext`.
-  
+
 The [execution context][transaction-execution-context] provides:
 
 - A mutable access to the blockchain data, which allows performing modifying
@@ -318,15 +318,15 @@ A service schema object can be used to access data collections of this service.
 
     ```java
     public final class FooService extends AbstractService {
-      
+
       /** A numeric identifier of the "put" transaction. */
       public static final int PUT_TX_ID = 0;
-    
+
       @Inject
       public FooService(ServiceInstanceSpec instanceSpec) {
         super(instanceSpec);
       }
-      
+
       /**
        * Puts an entry (a key-value pair) into the test proof map.
        *
@@ -342,7 +342,7 @@ A service schema object can be used to access data collections of this service.
         schema.testMap()
             .put(key, value);
       }
-      
+
       @Override
       public void createPublicApiHandlers(Node node, Router router) {
         // No handlers
@@ -358,7 +358,7 @@ state hash, or an execution exception.
 
 ##### Exceptions
 
-Transaction methods may throw [`ExecutionException`][execution-exception] 
+Transaction methods may throw [`ExecutionException`][execution-exception]
 to notify Exonum about an error in a transaction execution.
 
 The `ExecutionException` contains an integer error code and
@@ -405,15 +405,15 @@ in the network.
 Services can receive notifications:
 
 - before any transactions in a block has been processed
-- after all transactions in a block has been processed, but before the block 
+- after all transactions in a block has been processed, but before the block
   has been committed.
 
-Such notification allow inspecting the changes made by the transactions 
+Such notification allow inspecting the changes made by the transactions
 and modifying any service state.
 
 Exonum delivers these notification to implementations
-of [`Service#beforeTransactions`][service-before-transactions] and 
-[`Service#afterTransactions`][service-after-transactions] methods. 
+of [`Service#beforeTransactions`][service-before-transactions] and
+[`Service#afterTransactions`][service-after-transactions] methods.
 The `beforeTransactions` method sees the state of the database
 as of the last committed block, possibly, modified by the previously
 invoked `beforeTransactions` handlers of other services.
@@ -425,7 +425,7 @@ the same observable result on all nodes of the system.
 If exceptions occur in this handler, Exonum will roll back any changes made
 to the persistent storage in it.
 
-The execution result of `before-` / `afterTransactions` is also saved in 
+The execution result of `before-` / `afterTransactions` is also saved in
 the [database][call-errors-registry].
 
 ### Blockchain Events
@@ -504,8 +504,8 @@ in transactions and/or read requests.
 <!-- TODO: link the complete documentation on reconfiguration,
 especially in terms of its invocation by administrators -->
 
-[Exonum supervisor service](../advanced/supervisor.md) 
-provides a mechanism to reconfigure the started service instances. 
+[Exonum supervisor service](../advanced/supervisor.md)
+provides a mechanism to reconfigure the started service instances.
 The re-configuration protocol for _services_
 is similar to the one for consensus configuration.
 This protocol includes the following steps:
