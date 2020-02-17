@@ -21,10 +21,14 @@ To run a node with your Java service you need to use Exonum Java application.
 
 There are several installation options:
 
-- [Manual installation](#manual-installation) — available for Mac OS and Linux
+- [Manual installation](#manual-installation) — available for Mac OS and Linux,
+  _recommended for Linux users_
 - [Homebrew package](#homebrew-package) — available for Mac OS only,
-  recommended for Mac users
+  _recommended for Mac users_
 - [Build from source](#build-from-source) — available for Mac OS and Linux
+
+Windows is not supported by Java Binding at the moment, consider using
+[WSL] or [Docker][docker-for-windows].
 
 ### Manual Installation
 
@@ -33,7 +37,7 @@ all the necessary dependencies on [the Releases page][github-releases] on GitHub
 We suggest using `debug` version during development and `release` version for
 deployment.
 
-- Download and unpack the archive from the [Releases page][github-releases]
+1. Download and unpack the archive from the [Releases page][github-releases]
   into some known location. To install the latest release to `~/bin`:
 
   ```bash
@@ -42,7 +46,7 @@ deployment.
   unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
   ```
 
-- Install [Libsodium][libsodium] as the necessary runtime dependency.
+2. Install [Libsodium][libsodium] as the necessary runtime dependency.
 
 !!! note
     Exonum Java is built with Libsodium 23, which means it will not work
@@ -59,7 +63,7 @@ deployment.
     brew install libsodium
     ```
 
-- Follow the steps in the [After Install](#after-install) section below
+3. Follow the steps in the [After Install](#after-install) section below
 
 ### Homebrew Package
 
@@ -72,8 +76,8 @@ brew install exonum-java
 ```
 
 This will install `exonum-java` binary with all the necessary dependencies.
-However, you still need to install [Maven 3][maven-install] and follow the
-steps mentioned in [After Install](#after-install) section below.
+However, you still need to follow the steps mentioned in
+[After Install](#after-install) section below.
 
 ### Build from Source
 
@@ -82,7 +86,7 @@ follow the instructions in [Contribution Guide][how-to-build].
 
 ### After Install
 
-- Create an environment variable `EXONUM_HOME` pointing at installation
+1. Create an environment variable `EXONUM_HOME` pointing at installation
   location.
 
   ```bash
@@ -92,7 +96,7 @@ follow the instructions in [Contribution Guide][how-to-build].
   export PATH="$PATH:$EXONUM_HOME/bin"
   ```
 
-- Install [Maven 3][maven-install] which is essential for developing and building
+2. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
 
 ## Creating Project
@@ -1488,6 +1492,7 @@ For using the library just include the dependency in your `pom.xml`:
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [configurable]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Configurable.html
+[docker-for-windows]: https://docs.docker.com/docker-for-windows/
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1521,3 +1526,4 @@ For using the library just include the dependency in your `pom.xml`:
 [maven-install]: https://maven.apache.org/install.html
 [cryptofunctions-ed25519]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/crypto/CryptoFunctions.html#ed25519--
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
+[WSL]: https://docs.microsoft.com/en-us/windows/wsl/about
