@@ -425,7 +425,7 @@ the same observable result on all nodes of the system.
 If exceptions occur in this handler, Exonum will roll back any changes made
 to the persistent storage in it.
 
-The execution result of `before-`/`afterTransactions` is also saved in 
+The execution result of `before-` / `afterTransactions` is also saved in 
 the [database][call-errors-registry].
 
 ### Blockchain Events
