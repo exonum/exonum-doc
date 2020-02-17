@@ -1,6 +1,6 @@
 # Java Binding User Guide
 
-<!-- cspell:ignore testnet,prepend,JDWP -->
+<!-- cspell:ignore testnet,prepend,JDWP,Protoc -->
 
 **Exonum Java Binding** is a framework for building blockchain applications in
 Java, powered by Exonum.
@@ -231,8 +231,8 @@ section of MerkleDB documentation for details.
 
 #### Blockchain Data
 
-[`BlockchainData`][blockchain-data] is the object providing access to blockchain data
-of a particular service instance.
+[`BlockchainData`][blockchain-data] is the object providing access to blockchain
+data of a particular service instance.
  
 The service instance data is accessible via a `Prefixed` access which isolates
 the service data from all the other instances.
