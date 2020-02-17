@@ -96,7 +96,9 @@ follow the instructions in [Contribution Guide][how-to-build].
     export PATH="$PATH:$EXONUM_HOME/bin"
     ```
 
-2. Install [Maven 3][maven-install] which is essential for developing and building
+2. Install [latest JDK][jdk].
+
+3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
 
 ## Creating Project
@@ -1501,6 +1503,7 @@ For using the library just include the dependency in your `pom.xml`:
 [guice-wiki]: https://github.com/google/guice/wiki/GettingStarted
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
+[jdk]: https://jdk.java.net/
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
