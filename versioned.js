@@ -46,7 +46,8 @@ const generateVersionedDocs = async (versions) => {
     const configFile = `./version/${version}.yml`
     const newSrc = `./version/src_${version}`
     versionedMkdocs.extra.versions = extraVersions
-    versionedMkdocs.docs_dir = newSrc
+    versionedMkdocs.docs_dir = `./src_${version}`
+    versionedMkdocs.theme.custom_dir = '../theme'
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
     fse.copySync(`./src`, newSrc)
     await git.checkout(returnToBranch)
