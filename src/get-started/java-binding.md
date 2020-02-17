@@ -171,7 +171,6 @@ database view is provided by the framework: `Snapshot` can be
 requested at any time, while `Fork` – only when the transaction is executed. The
 lifetime of these objects is limited by the scope of the method to which they
 are passed to.
-<!-- todo: Do we need to describe the Prefixed etc? -->
 
 Exonum stores elements in collections as byte arrays. Therefore,
 serializers for values stored in collections must be provided.
@@ -242,7 +241,7 @@ On top of that, this class provides read-only access to persistent data of:
  
 - [Exonum Core][blockchain], containing information on blocks, transactions, 
   execution results, consensus configuration, etc. 
-- Dispatcher Service, containing information on active service instances.
+- Dispatcher, containing information on active service instances.
 - Other services.
 
 [blockchain-data]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/BlockchainData.html
