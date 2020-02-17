@@ -406,7 +406,7 @@ Services can receive notifications:
 
 - before any transactions in a block has been processed
 - after all transactions in a block has been processed, but before the block 
-has been committed.
+  has been committed.
 
 Such notification allow inspecting the changes made by the transactions 
 and modifying any service state.
