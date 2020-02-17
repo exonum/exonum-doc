@@ -3,3 +3,6 @@ threads=5
 timeout=20
 
 [AnchorCheck]
+
+[filtering]
+ignore=localhost
