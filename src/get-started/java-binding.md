@@ -46,7 +46,7 @@ deployment.
   unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
   ```
 
-2. Install [Libsodium][libsodium] as the necessary runtime dependency.
+1. Install [Libsodium][libsodium] as the necessary runtime dependency.
 
 !!! note
     Exonum Java is built with Libsodium 23, which means it will not work
@@ -63,7 +63,7 @@ deployment.
     brew install libsodium
     ```
 
-3. Follow the steps in the [After Install](#after-install) section below
+1. Follow the steps in the [After Install](#after-install) section below
 
 ### Homebrew Package
 
@@ -96,7 +96,7 @@ follow the instructions in [Contribution Guide][how-to-build].
   export PATH="$PATH:$EXONUM_HOME/bin"
   ```
 
-2. Install [Maven 3][maven-install] which is essential for developing and building
+1. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
 
 ## Creating Project
