@@ -25,7 +25,8 @@ Code examples are included from source using
 [`mkdocs-codeinclude-plugin`][codeinclude-plugin] to ensure they are
 always up-to-date and correct.
 
-<!-- todo: Replace the link to our fork with the upstream link once our PRs are integrated. -->
+<!-- todo: Replace the link to our fork with the upstream link once our PRs
+       are integrated: https://github.com/rnorth/mkdocs-codeinclude-plugin/pulls -->
 [codeinclude-plugin]: https://github.com/exonum/mkdocs-codeinclude-plugin/tree/develop#usage 
 
 ## Contributing
