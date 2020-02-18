@@ -660,14 +660,14 @@ node, a single service with no configuration and without Time Oracle. To
 instantiate the TestKit do the following:
 
 <!--codeinclude-->
-[Testkit instantiation for a single service](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationForSingleService
+[Testkit instantiation for a single service](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationForSingleService
 <!--/codeinclude-->
 
 The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 <!--codeinclude-->
-[Testkit instantiation with a builder](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationUsingBuilder
+[Testkit instantiation with a builder](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationUsingBuilder
 <!--/codeinclude-->
 
 In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
@@ -685,14 +685,14 @@ test that verifies the execution result of a valid transaction and the changes
 it made in service schema:
 
 <!--codeinclude-->
-[Valid tx execution test](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:validTransactionExecutionTest
+[Valid tx execution test](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:validTransactionExecutionTest
 <!--/codeinclude-->
 
 And a test that verifies that a transaction that throws an exception during its
 execution will fail:
 
 <!--codeinclude-->
-[Error tx execution test](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:errorTransactionExecutionTest
+[Error tx execution test](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:errorTransactionExecutionTest
 <!--/codeinclude-->
 
 The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
@@ -702,7 +702,7 @@ transaction pool and committed with [`createBlock()`][testkit-create-block]
 method:
 
 <!--codeinclude-->
-[Test creating blocks with in-pool txs](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:createInPoolTransactions
+[Test creating blocks with in-pool txs](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:createInPoolTransactions
 <!--/codeinclude-->
 
 The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
@@ -755,7 +755,7 @@ be set in UTC time zone. When tests do not need to control the current time,
 [system time provider][system-time-provider] might be used.
 
 <!--codeinclude-->
-[Controlling the current time of the Time Oracle](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_timeOracleTest
+[Controlling the current time of the Time Oracle](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_timeOracleTest
 <!--/codeinclude-->
 
 ### TestKit JUnit 5 Extension
@@ -768,7 +768,7 @@ provided with a builder. The builder would be used to construct the injected
 TestKit objects:
 
 <!--codeinclude-->
-[Injecting TestKit using TestKitExtension](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_registerExtension
+[Injecting TestKit using TestKitExtension](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_registerExtension
 <!--/codeinclude-->
 
 It is possible to configure the injected TestKit instance with the following annotations:
@@ -783,7 +783,7 @@ It is possible to configure the injected TestKit instance with the following ann
 These annotations should be applied on the TestKit parameter:
 
 <!--codeinclude-->
-[TestKit per-injection re-configuration](../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamples2Test.java) inside_block:TestkitExamples2Test
+[TestKit per-injection re-configuration](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamples2Test.java) inside_block:TestkitExamples2Test
 <!--/codeinclude-->
 
 !!! note
