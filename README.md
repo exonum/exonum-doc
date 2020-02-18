@@ -21,6 +21,13 @@ You can read about Markdown [here](https://guides.github.com/features/mastering-
 or [other](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 [places](http://www.mkdocs.org/user-guide/writing-your-docs/).
 
+Code examples are included from source using 
+[`mkdocs-codeinclude-plugin`][codeinclude-plugin] to ensure they are
+always up-to-date and correct.
+
+<!-- todo: Replace the link to our fork with the upstream link once our PRs are integrated. -->
+[codeinclude-plugin]: https://github.com/exonum/mkdocs-codeinclude-plugin/tree/develop#usage 
+
 ## Contributing
 
 In order to contribute, fork this repository, make some changes, and then submit
@@ -74,6 +81,14 @@ It is a good idea to preview your changes locally before sending a pull request.
 
 ### Installation
 
+Fetch and initialize the repository:
+
+```
+git clone https://github.com/exonum/exonum-doc
+cd exonum-doc
+git submodule update --init --recursive
+```
+
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
 Then, install the `mkdocs` theme together with its dependencies:
 
@@ -98,14 +113,6 @@ npm install
 ```
 
 (you will need Node 8+ installed).
-
-<!-- Todo: More appropriate place? -->
-
-Finally, initialize the Git submodules:
-
-```
-git submodule update --init --recursive
-```
 
 ### Viewing Documents Locally
 
