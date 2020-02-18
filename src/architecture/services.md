@@ -40,8 +40,9 @@ They are guaranteed to be the same for all nodes in the blockchain network.
     state. If the call results differ, the consensus algorithm may stall,
     or an audit of the blockchain by auditing nodes may fail.
 
-During blockchain operation, services may be instantiated, stopped and resumed,
-and migrated to a newer version (which may include asynchronous data migration).
+During blockchain operation, services may be instantiated, stopped,
+frozen, resumed, and migrated to a newer version
+(which may include asynchronous data migration).
 The lifecycle events are managed by the core, but controlled by the supervisor
 service. In the reference supervisor implementation, the lifecycle events are
 authorized by the administrators of the blockchain nodes.
@@ -256,7 +257,7 @@ Exonum datatypes to JSON for communication with light clients.
 
 ### Fault Tolerance in Migration Scripts
 
-Migration scripts may be stopped at any time, simply because
+Migration scripts may be terminated at any time, simply because
 a node executing the script may be stopped by the admin or crash because of
 unrelated reasons. It is important to ensure that migration scripts
 are *fault-tolerant* under these conditions, that is, if a node is restarted

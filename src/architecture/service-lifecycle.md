@@ -101,7 +101,7 @@ in the block with service instantiation.
 When the service is stopped or frozen, the reverse is true:
 
 - The service continues processing transactions until the end of the block
-  containing the stop command
+  containing the stop or freeze command
 - The service hooks *are* called for the service in this block
 
 ## Data Migrations

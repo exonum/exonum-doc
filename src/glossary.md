@@ -630,9 +630,9 @@ in the [Exonum core](#core). It defines artifact / service states
 and allowed transitions among these states, together with the preconditions
 that must apply for the transition to occur.
 
-For example, services may be instantiated, stopped, resumed, with
+For example, services may be instantiated, stopped, frozen, resumed, with
 zero or more [data migrations](#data-migration) occurring between
-stopping and resuming.
+stopping / freezing and resuming.
 
 !!! tip
     See [*Service Lifecycle*](architecture/service-lifecycle.md)
