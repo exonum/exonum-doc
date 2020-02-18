@@ -314,8 +314,8 @@ All transactions within the blockchain are completely ordered as described
 above, and the result of their execution is agreed among the full nodes
 in the blockchain network.
 
-Depending on the [runtime](#runtime) enclosing the service, it may
-also have other interfaces. In particular, both Rust and Java runtimes
+Depending on the [runtime](../glossary.md#runtime) enclosing the service,
+it may also have other interfaces. In particular, both Rust and Java runtimes
 allow services to define HTTP APIs, which can be categorized into
 two groups:
 

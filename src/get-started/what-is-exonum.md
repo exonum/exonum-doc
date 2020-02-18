@@ -189,7 +189,7 @@ Exonum supports [light clients](../architecture/clients.md),
 network nodes that replicate only a very small part of the blockchain,
 which the client is interested in. Light clients allow providing access to a
 blockchain through web or mobile apps. A light client communicates with one or
-more services on a full node with the help of [public APIs](#endpoints).
+more services on a full node with the help of public APIs.
 
 !!! note "Example"
     [In the Cryptocurrency Tutorial](create-service.md),

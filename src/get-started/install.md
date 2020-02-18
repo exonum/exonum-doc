@@ -185,5 +185,5 @@ guide on how to develop applications on top of the Exonum framework.
 [babel]: http://babeljs.io/
 [rel0.3.0]: https://github.com/exonum/exonum/releases/tag/v0.3
 [build_tools]: https://www.visualstudio.com/downloads/
-[powershell]: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
+[powershell]: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7
 [win-issue]: https://github.com/exonum/exonum/issues/new?title=Windows+support+problem

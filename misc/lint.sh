@@ -49,11 +49,7 @@ lint_html () {
 }
 
 lint_links () {
-  kill_server
-  python -m mkdocs serve &
-  sleep 10
-  linkchecker -f "$CFG_DIR/linkcheckerrc" http://localhost:8000/
-  kill_server
+  npm run links
 }
 
 spellcheck () {

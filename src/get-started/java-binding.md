@@ -146,9 +146,10 @@ abstract class [`AbstractService`][abstract-service].
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
-collections is arranged in two ways – ordinary collections
-and Merkelized collections; the latter allow providing cryptographic evidence
-of the authenticity of data to the clients of
+collections is arranged in two ways – ordinary collections and
+[Merkelized collections](../architecture/merkledb.md#merkelized-indexes);
+the latter allow
+providing cryptographic evidence of the authenticity of data to the clients of
 the system (for example, that an element is stored in the collection under a
 certain key). The [blockchain state](../glossary.md#blockchain-state) is
 influenced only by the Merkelized collections.

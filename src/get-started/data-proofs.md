@@ -11,7 +11,7 @@ which allows the following operations:
 - creating a wallet
 - replenishing the wallet balance
 - transferring money between wallets
-- obtaining [cryptographic proofs](../architecture/merkledb.md#merkelized-indices)
+- obtaining [cryptographic proofs](../architecture/merkledb.md#merkelized-indexes)
   of executed transactions
 - reviewing wallets history.
 
