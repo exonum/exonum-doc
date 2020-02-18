@@ -55,6 +55,7 @@ jobs:
     # Since external link checks may fail because of rate limits, unreliable
     # connection etc., we allow this job to fail.
     - name: external links
+      language: node_js
       node_js: "12"
       env: TESTSUITE=ext
       script: npm run ext-links
