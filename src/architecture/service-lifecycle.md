@@ -68,15 +68,26 @@ may diverge on different nodes of the network.
   is not immediate; see [*Service State Transitions*](#service-state-transitions)
   section below.
 
-4. Active service instances can be stopped by a corresponding request to the core.
-  A stopped service no longer participates in business logic, i.e.,
-  it does not process transactions or hooks, and does not interact with the users
-  in any way. Service data becomes unavailable for the other services,
-  but still exists. The service name and identifier remain reserved
-  for the stopped service and can't be used again for adding new services.
+4. Active service instances can be *stopped* or *frozen* by a corresponding request
+  to the core.
+
+A **stopped** service no longer participates in business logic, i.e.,
+it does not process transactions or hooks, and does not interact with the users
+in any way. Service data becomes unavailable for the other services,
+but still exists. The service name and identifier remain reserved
+for the stopped service and can't be used again for adding new services.
+
+**Frozen** service state is similar to the stopped one, except the service
+state can be read both by internal readers (other services) and external ones
+(HTTP API handlers).
 
 The core logic is responsible for persisting artifacts and services
 across node restarts.
+
+The transitions among possible service states (including data migrations
+we discuss [below](#data-migrations)) are as follows:
+
+![Service transitions](../images/service-states.png)
 
 ### Service State Transitions
 
@@ -87,7 +98,7 @@ cannot process transactions or internal calls in the block with instantiation,
 but can in the following block. Likewise, the service hooks are *not* called
 in the block with service instantiation.
 
-When the service is stopped, the reverse is true:
+When the service is stopped or frozen, the reverse is true:
 
 - The service continues processing transactions until the end of the block
   containing the stop command
@@ -99,9 +110,24 @@ Recall that [data migrations](services.md#data-migrations) are needed to
 make old service data work with the new version of service logic (that is,
 a new artifact version).
 
-For a migration to start, the targeted service must be stopped, and
+Exonum recognizes two kinds of migrations:
+
+- **Fast-forward migrations** synchronously change the version
+  of the artifact associated with the service. A fast-forward migration is performed
+  if the updated artifact signals that it is compatible with the old service data.
+- Migrations that require changing data layout via
+  [migration scripts](../glossary.md#migration-script) are referred
+  to as **async migrations**.
+
+For a migration to start, the targeted service must be stopped or frozen, and
 a newer version of the service artifact needs to be deployed
 across the network.
+
+Fast-forward migrations do not require any special workflow to agree migration
+outcome among nodes; indeed, the outcome is agreed upon via the consensus algorithm.
+The artifact associated with the service instance is changed instantly.
+
+In contrast, async migrations have the following dedicated workflow:
 
 1. Migration is *initiated* by a call from a supervisor. Once a block with
   this call is merged, all nodes in the network retrieve the migration script
