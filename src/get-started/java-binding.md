@@ -321,7 +321,7 @@ A service schema object can be used to access data collections of this service.
     public final class FooService extends AbstractService {
 
       /** A numeric identifier of the "put" transaction. */
-      public static final int PUT_TX_ID = 0;
+      private static final int PUT_TX_ID = 0;
 
       @Inject
       public FooService(ServiceInstanceSpec instanceSpec) {
