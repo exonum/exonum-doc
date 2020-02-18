@@ -410,7 +410,7 @@ Services can receive notifications:
   has been committed.
 
 Such notification allow inspecting the changes made by the transactions
-and modifying any service state.
+and modifying the service state.
 
 Exonum delivers these notification to implementations
 of [`Service#beforeTransactions`][service-before-transactions] and
