@@ -241,7 +241,8 @@ On top of that, this class provides read-only access to persistent data of:
 
 - [Exonum Core][blockchain], containing information on blocks, transactions,
   execution results, consensus configuration, etc.
-- Dispatcher, containing information on active service instances.
+- Dispatcher, containing information on deployed service artifacts and active
+  service instances.
 - Other services.
 
 [blockchain-data]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/BlockchainData.html
