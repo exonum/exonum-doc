@@ -142,7 +142,7 @@ abstract class [`AbstractService`][abstract-service].
 
 ### Schema Description
 
-<!-- todo: Rewrite the section — it lacks some structure -->
+<!-- todo: Rewrite the section — it lacks some structure: ECR-4262 -->
 
 Exonum provides several collection types to persist service data. The main
 types are sets, lists and maps. Data organization inside the
@@ -188,8 +188,8 @@ See [Serialization](#serialization) for details.
     ```
 
 A set of named collections constitute a *service schema*. A service schema
-may be created using a `Prefixed` database access object, which provides
-isolation of all service indexes from other instances.
+is usually created using a [`Prefixed`](#blockchain-data) database access
+object, which provides isolation of all service indexes from other instances.
 
 For convenient access to service collections you can implement a factory
 of service collections.
@@ -197,7 +197,7 @@ of service collections.
 *The state of the service in the blockchain* is determined by the index hashes
 of its Merkelized collections. Exonum performs the _state aggregation_
 of all non-grouped Merkelized collections automatically. See
-the ["State Aggregation"](../architecture/merkledb.md#state-aggregation)
+the [“State Aggregation”](../architecture/merkledb.md#state-aggregation)
 section of MerkleDB documentation for details.
 
 !!! note "Example of a Service Schema with a single Merkelized collection"
@@ -374,7 +374,7 @@ that the client needs to distinguish:
 - Same sender and receiver.
 
 An exception of any other type will be recorded with _no_ error code
-as an "unexpected" execution error.
+as an “unexpected” execution error.
 
 If transaction execution fails, the changes made by the transaction are
 rolled back, while the error data is [stored in the database][call-errors-registry]
@@ -460,7 +460,7 @@ the REST-interface of the service.
 [`Service#createPublicApiHandlers`][service-create-public-api] method is used to
 set the handlers for HTTP requests. These handlers are available at the
 common path corresponding to the service name. Thus, the `/balance/:walletId`
-handler for balance requests in the "cryptocurrency" service will be available
+handler for balance requests in the “cryptocurrency” service will be available
 at `/api/services/cryptocurrency/balance/:walletId`.
 
 See [documentation][vertx-web-docs] on the possibilities of `Vert.x` used as a web
