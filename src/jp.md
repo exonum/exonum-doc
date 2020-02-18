@@ -62,4 +62,4 @@ Exonumのドキュメントには、[シリアル化](architecture/serialization
 [client]: https://github.com/exonum/exonum-client
 [tutorial]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
 [anchoring]: https://github.com/exonum/exonum-btc-anchoring/
-[config]: https://github.com/exonum/exonum/tree/master/services/configuration
+[config]: https://github.com/exonum/exonum/tree/master/services/supervisor

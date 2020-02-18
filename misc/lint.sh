@@ -49,11 +49,7 @@ lint_html () {
 }
 
 lint_links () {
-  kill_server
-  python -m mkdocs serve &
-  sleep 10
   npm run links
-  kill_server
 }
 
 spellcheck () {

@@ -197,12 +197,6 @@ must be processed only during round `R`).
 
 ## Network Communication
 
-!!! tip
-    See [source code][src-messages] for more technical details on
-    consensus messages.
-
-<!--TODO: change a link to docs.rs-->
-
 ### Messages
 
 The consensus algorithm makes use of several types of messages. All messages
@@ -343,4 +337,3 @@ validators. This has a positive effect on system liveness.
 [wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
-[src-messages]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/protocol.rs

@@ -146,7 +146,7 @@ rules.
 
 Root hash of an empty tree is defined as 32 zero bytes.
 
-#### Rule 2. `height = 1`
+#### Rule 2. Bottommost Hashes
 
 Hash of a value contained in `(height = 0, index)` is defined as
 
@@ -156,7 +156,7 @@ T(1, index) = hash(HashTag::Blob || T(0, index)),
 
 where `HashTag::Blob = 0` is a domain separation tag for values.
 
-#### Rule 3. `height > 1`, Two Children
+#### Rule 3. Nodes with Two Children
 
 If `height > 1` and both nodes `T(height - 1, index * 2)` and
 `T(height - 1, index * 2 + 1)` exist, then
@@ -172,7 +172,7 @@ T(height, index) = hash(
 where `HashTag::ListBranchNode = 1` is a domain separation tag
 for intermediate Merkle tree nodes.
 
-#### Rule 4. `height > 1`, Single Child
+#### Rule 4. Nodes with Single Child
 
 If `height > 1`, node `T(height - 1, index * 2)` exists and
 node `(height - 1, index * 2 + 1)` is absent in the tree, then
@@ -275,14 +275,14 @@ can be compared to a trusted reference or participate in further aggregation.
 
 Restoring `root_hash` can be performed as per [above section](#computing-root-hash):
 
-1. Compute `T(height = 1, ..)` for entries according to [rule 2](#rule-2-height-1).
+1. Compute `T(height = 1, ..)` for entries according to [rule 2](#rule-2-bottommost-hashes).
   Let `layer` denote the obtained values.
 2. Compute Merkle tree height `max_height` given length of the list.
 3. For `height = 1, 2, ..., max_height - 1` perform steps 4–5.
 4. Combine `layer` with intermediate tree nodes from the proof at the same height
   into a single list, `combined_layer`.
 5. “Lift” the nodes in `combined_layer` to the next height according to
-  [rules 3](#rule-3-height-gt-1-two-children) and [4](#rule-4-height-gt-1-single-child).
+  [rules 3](#rule-3-nodes-with-two-children) and [4](#rule-4-nodes-with-single-child).
   Assign `layer` to be the resulting list.
 6. `root_hash = layer[0]`. At this point, `layer` must contain exactly one item.
 
