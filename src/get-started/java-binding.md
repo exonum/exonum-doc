@@ -1118,7 +1118,7 @@ Provide a path to the resulting configuration file and a number of validator
 nodes in the network.
 
 Optional `supervisor-mode` parameter denotes the mode of the
-[Supervisor service][supervisor-service]. Possible values are "simple" and
+[Supervisor service][supervisor-service]. Possible values are "simple" or
 "decentralized". If no parameter is supplied, "simple" is used.
 
 ```sh
