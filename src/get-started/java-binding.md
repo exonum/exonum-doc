@@ -1117,9 +1117,14 @@ distributing the file.
 Provide a path to the resulting configuration file and a number of validator
 nodes in the network.
 
+Optional `supervisor-mode` parameter denotes the mode of the
+[Supervisor service][supervisor-service]. Possible values are "simple" and
+"decentralized". If no parameter is supplied, "simple" is used.
+
 ```sh
 exonum-java generate-template \
     testnet/common.toml \
+    --supervisor-mode "simple" \
     --validators-count=1
 ```
 
@@ -1509,8 +1514,7 @@ For using the library just include the dependency in your `pom.xml`:
 [standardserializers]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/common/serialization/StandardSerializers.html
 [standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/storage/indices/package-summary.html
-<!-- TODO: link to the documentation page for supervisor -->
-[supervisor-service]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/
+[supervisor-service]: ../advanced/supervisor.md
 [time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/Transaction.html
 [transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/TransactionContext.html
