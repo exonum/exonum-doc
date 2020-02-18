@@ -15,7 +15,7 @@ You can view and download the full source code of this tutorial
 
 For didactic purposes, the
 tutorial is simplified compared to a real-life application; it does not feature
-the client part and does not use [Merkelized data collections](../architecture/merkledb.md#merkelized-indices).
+the client part and does not use [Merkelized data collections](../architecture/merkledb.md#merkelized-indexes).
 You can find a tutorial containing these features
 [here](data-proofs.md).
 
@@ -873,12 +873,6 @@ with two wallets and transferred some money between them. Next,
 [we are going to test it](test-service.md).
 
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
-[tx-info]: ../architecture/transactions.md#info
-[rust-closure]: https://doc.rust-lang.org/book/first-edition/closures.html
-[curry-fn]: https://en.wikipedia.org/wiki/Currying
-[arc]: https://doc.rust-lang.org/std/sync/struct.Arc.html
-[ref]: https://doc.rust-lang.org/std/cell/struct.Ref.html
 [cargo-example]: https://doc.rust-lang.org/cargo/reference/manifest.html#examples
 [lib.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/lib.rs
 [demo.rs]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/examples/demo.rs
-[std-asref]: https://doc.rust-lang.org/std/convert/trait.AsRef.html

@@ -95,6 +95,26 @@ despite the core knowing nothing about this kind of interface.
     for details how services may interact with each other within
     a single blockchain.
 
+### Identifiers
+
+Each service has two identifiers:
+
+- The **numerical ID** is a 4-byte unsigned integer that is encoded
+  into [transactions](#transactions) to provide information about the service
+  handling the transaction.
+- The **string ID** aka **service name** is a UTF-8 string used
+  in [storage namespaces](merkledb.md#accesses)
+  (for example, all indexes defined by the `token` service are located in the `token`
+  namespace). This ID is also used in runtime-specific interfaces;
+  both Rust and Java runtimes use the string ID to group service endpoints.
+
+The identifiers are set during service instantiation.
+Depending on the [supervisor](../advanced/supervisor.md) implementation,
+service identifiers may be set by the blockchain [maintainers](../glossary.md#maintainer)
+or set automatically by the supervisor service.
+The framework guarantees that the identifiers of all services on a blockchain
+are unique.
+
 ### Transactions
 
 Transactions come from the entities external to the blockchain, e.g.,
@@ -124,7 +144,8 @@ with other transactions in a block.
 
 ### Hooks
 
-A service may react to the following events of [its lifecycle](#lifecycle):
+A service may react to the following events of
+[its lifecycle](../architecture/service-lifecycle.md):
 
 - Service initialization
 - Service being resumed
@@ -365,6 +386,4 @@ running the service might not know this information.
 [wiki:crypto-commit]: https://en.wikipedia.org/wiki/Commitment_scheme
 [rocksdb]: http://rocksdb.org
 [wiki:pki]: https://en.wikipedia.org/wiki/Public_key_infrastructure
-[service.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/service.rs
-[core-schema.rs]: https://github.com/exonum/exonum/blob/master/exonum/src/blockchain/schema.rs
 [java-binding]: https://exonum.com/doc/version/latest/get-started/java-binding/

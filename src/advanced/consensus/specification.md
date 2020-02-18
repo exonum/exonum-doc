@@ -142,8 +142,6 @@ The consensus algorithm uses the following types of messages:
 [`Precommit`](../../architecture/consensus.md#precommit),
 [`Status`](../../architecture/consensus.md#status),
 [`BlockResponse`](../../architecture/consensus.md#blockresponse).
-Only a part of their fields is described here. See
-[source code][message_source] for more details.
 
 The following fields are present in all messages:
 
@@ -506,6 +504,5 @@ Then the algorithm described above has the following properties:
 
 [wiki_bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
-[message_source]: https://github.com/exonum/exonum/blob/master/exonum/src/messages/protocol.rs
 [tokio-lib]: https://tokio.rs/
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf

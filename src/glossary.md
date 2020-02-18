@@ -76,6 +76,9 @@ in the block). The compact block form, in which transactions are replaced
 by the root of their [Merkle tree](#merkle-tree),
 is used for communication with [light clients](#light-client).
 
+Besides transactions, applying a block to the blockchain state comprises
+executing [hooks](#service-hook) for the currently active services.
+
 ## Blockchain
 
 A [distributed ledger](#distributed-ledger), which uses
@@ -123,6 +126,15 @@ In Exonum, the blockchain state is implemented as a key-value storage. It is
 persisted using [RocksDB][rocksdb]. The parts of the
 storage correspond to [tables](#table) used by [the core](#core)
 and [services](#service).
+
+## Built-in Service
+
+[Service](#service) that is active at the blockchain initialization
+(that is, when the [genesis block](#genesis-block) is created).
+
+One example of built-in services is the [supervisor](#supervisor).
+Indeed, if a supervisor service is not instantiated on the genesis block,
+service lifecycle cannot be controlled in the future.
 
 ## Byzantine Node
 
@@ -264,8 +276,7 @@ used together with some form of timestamping to provide
 !!! note
     In a generic distributed ledger, the audit trail may be dispersed across
     the system participants. Thus, it may be difficult to argue about
-    consistency
-    of the whole system.
+    consistency of the whole system.
 
 [Blockchains](#blockchain) are a particular kind of distributed ledgers with a
 focus
@@ -315,7 +326,7 @@ Hashes are also used to create [Merkle trees](#merkle-tree) and their variants.
 
 **Aka** service interface
 
-Collection of [transactions](#transaction) that a [service](#service)
+Collection of [transaction types](#transaction) that a [service](#service)
 is capable of handling. Fulfil the same role as interfaces in
 programming languages (e.g., `interface` in Java or `trait` in Rust):
 a service can declare that it implements one or more interfaces,
@@ -324,6 +335,20 @@ to interact with the service through these interfaces.
 
 !!! warning
     Interfaces are an unstable feature of the Exonum framework; their
+    specification may change in future releases.
+
+## Internal Call
+
+Call from one [service instance](#service) to another during
+[transaction](#transaction) processing or other top-level calls
+in a [block](#block). Internal calls allow service to interact with each other
+and implement stateful call authorization (e.g., multi-signatures).
+
+!!! tip
+    See [Service Interaction](advanced/service-interaction.md) for more details.
+
+!!! warning
+    Internal calls are an unstable feature of the Exonum framework; their
     specification may change in future releases.
 
 ## Java Service
@@ -529,7 +554,7 @@ that it can interact with the Rust interface provided by the core.
 
 Exonum [service](#service) implemented within the Rust [runtime](#runtime).
 Rust services implement [read requests](#read-request)
-and [private endpoints](#private-endpoint) as REST APIs
+and [private endpoints](#private-api) as REST APIs
 with the help of the `actix` Web framework.
 
 Rust services have high performance, but are executed in the same
@@ -580,6 +605,23 @@ kinds of endpoints:
 External entities such as [light clients](#light-client) can access endpoints
 via [runtime](#runtime)-specific interfaces. The primary interface currently
 is REST-ful HTTP.
+
+## Service Hook
+
+Event that a [service](#service) may react to by changing
+the [blockchain state](#blockchain-state). The [core](#core) defines the following
+hooks:
+
+- service initialization
+- service being resumed
+- before any transactions in every [block](#block) are executed
+- after all transactions in every block are executed
+
+Together with transactions, before transactions / after transactions hooks
+constitute top-level calls performed within each block.
+
+!!! tip
+    See [*Services*](architecture/services.md#hooks) for more details.
 
 ## Service Lifecycle
 

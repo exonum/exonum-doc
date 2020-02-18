@@ -27,7 +27,7 @@ For any questions on the upcoming implementations feel free to contact us in
   in multiple programming languages, and new languages may be added without
   any changes to the Exonum core. For now, Exonum supports Rust and Java services
   with more languages in the pipeline.
-- Exonum now supports [service lifecycle](glossary.md#service-lifeycle),
+- Exonum now supports [service lifecycle](glossary.md#service-lifecycle),
   allowing to evolve any given service during blockchain lifetime. For example,
   service data can be safely [migrated](glossary.md#data-migration) to
   match newer business logic, with Exonum ensuring atomicity, agreement among
