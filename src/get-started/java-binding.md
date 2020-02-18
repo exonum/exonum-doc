@@ -419,7 +419,7 @@ of [`Service#beforeTransactions`][service-before-transactions] and
 The `beforeTransactions` method sees the state of the database
 as of the last committed block, possibly, modified by the previously
 invoked `beforeTransactions` handlers of other services.
-The `afterTransactions` handlers see the blockchain state after all transactions 
+The `afterTransactions` handlers see the blockchain state after all transactions
 in the block have been applied.
 
 Both methods may make any changes to the service state, which will be included
