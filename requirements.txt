@@ -7,3 +7,4 @@ mkdocs~=1.0
 Jinja2~=2.11
 Pygments~=2.5
 pygments-github-lexers~=0.0.5
+-e git+https://github.com/exonum/mkdocs-codeinclude-plugin@82454308#egg=mkdocs_codeinclude_plugin

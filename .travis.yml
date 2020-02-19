@@ -37,7 +37,7 @@ jobs:
             export REQUIREMENTS_FILE=requirements.txt
           fi
       install:
-        - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
+        - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt --src 3rd-party
         - nvm install 12 && nvm use 12
         - npm install
         - python -m mkdocs --version
@@ -51,7 +51,7 @@ jobs:
       after_script:
         # Kill mkdocs server if it's still running
         - bash ./misc/lint.sh kill
-    
+
     # Since external link checks may fail because of rate limits, unreliable
     # connection etc., we allow this job to fail.
     - name: external links
