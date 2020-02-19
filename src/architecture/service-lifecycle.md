@@ -64,7 +64,7 @@ may diverge on different nodes of the network.
   with the external users in other ways. Different services instantiated
   from the same artifact are independent and have separate blockchain storages.
   Users can distinguish services by their IDs; both numeric and string IDs
-  are unique within a blockchain. Note that the transition to the "active" state
+  are unique within a blockchain. Note that the transition to the “active” state
   is not immediate; see [*Service State Transitions*](#service-state-transitions)
   section below.
 
@@ -126,8 +126,11 @@ across the network.
 Fast-forward migrations do not require any special workflow to agree migration
 outcome among nodes; indeed, the outcome is agreed upon via the consensus algorithm.
 The artifact associated with the service instance is changed instantly.
+The service status is changed to “stopped,” regardless of the status before
+the migration. This is because a new artifact might want to prepare service data
+before the artifact can use it.
 
-In contrast, async migrations have the following dedicated workflow:
+Async migrations have the following dedicated workflow:
 
 1. Migration is *initiated* by a call from a supervisor. Once a block with
   this call is merged, all nodes in the network retrieve the migration script
@@ -156,12 +159,12 @@ In contrast, async migrations have the following dedicated workflow:
   (since at this point, we guarantee that the migration data is available
   and is the same on all nodes).
 
-6. After the migration is flushed, the service returns to the "stopped" status.
+6. After the migration is flushed, the service returns to the “stopped” status.
   The service can then be resumed with the new data, or more migrations
   could be applied to it.
 
 If the migration is rolled back on step 3, the migrated data is erased,
-and the service returns to the "stopped" status. The local migration result
+and the service returns to the “stopped” status. The local migration result
 is ignored; if the migration script has not completed locally, it is aborted.
 
 !!! note
