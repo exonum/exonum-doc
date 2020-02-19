@@ -170,3 +170,8 @@ is ignored; if the migration script has not completed locally, it is aborted.
     the migration once all validators have submitted identical migration results,
     and roll back a migration if at least one validator has reported an error
     during migration or there is divergence among reported migration results.
+
+## See Also
+
+- [Less formal article on service lifecycle](https://medium.com/meetbitfury/about-service-lifecycles-in-exonum-58c67678c6bb)
+  in the Exonum blog
