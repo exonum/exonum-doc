@@ -21,10 +21,14 @@ To run a node with your Java service you need to use Exonum Java application.
 
 There are several installation options:
 
-- [Manual installation](#manual-installation) — available for Mac OS and Linux
+- [Manual installation](#manual-installation) — available for Mac OS and Linux,
+  _recommended for Linux users_
 - [Homebrew package](#homebrew-package) — available for Mac OS only,
-  recommended for Mac users
+  _recommended for Mac users_
 - [Build from source](#build-from-source) — available for Mac OS and Linux
+
+Windows is not supported by Java Binding at the moment, consider using
+[WSL] or [Docker][docker-for-windows].
 
 ### Manual Installation
 
@@ -33,33 +37,31 @@ all the necessary dependencies on [the Releases page][github-releases] on GitHub
 We suggest using `debug` version during development and `release` version for
 deployment.
 
-- Download and unpack the archive from the [Releases page][github-releases]
+1. Download and unpack the archive from the [Releases page][github-releases]
   into some known location. To install the latest release to `~/bin`:
 
-  ```bash
-  mkdir -p ~/bin
-  cd ~/bin
-  unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
-  ```
-
-- Install [Libsodium][libsodium] as the necessary runtime dependency.
-
-!!! note
-    Exonum Java is built with Libsodium 23, which means it will not work
-    on some older Linux distributions, like Ubuntu 16.04. Libsodium 23 is
-    available in Ubuntu 18.04 or can be installed from a custom PPA.
-
-??? example "Linux (Ubuntu)"
     ```bash
-    sudo apt-get update && sudo apt-get install libsodium-dev
+    mkdir -p ~/bin
+    cd ~/bin
+    unzip /path/to/downloaded/exonum-java-0.9.0-rc2-release.zip
     ```
 
-??? example "Mac OS"
-    ```bash
-    brew install libsodium
+2. Install [Libsodium][libsodium] as the necessary runtime dependency.
+
+    !!! note
+        Exonum Java is built with Libsodium 23, which means it will not work
+        on some older Linux distributions, like Ubuntu 16.04. Libsodium 23 is
+        available in Ubuntu 18.04 or can be installed from a custom PPA.
+
+    ```bash tab="Linux (Ubuntu)"
+        sudo apt-get update && sudo apt-get install libsodium-dev
     ```
 
-- Follow the steps in the [After Install](#after-install) section below
+    ```bash tab="Mac OS"
+        brew install libsodium
+    ```
+
+3. Follow the steps in the [After Install](#after-install) section below
 
 ### Homebrew Package
 
@@ -72,8 +74,8 @@ brew install exonum-java
 ```
 
 This will install `exonum-java` binary with all the necessary dependencies.
-However, you still need to install [Maven 3][maven-install] and follow the
-steps mentioned in [After Install](#after-install) section below.
+However, you still need to follow the steps mentioned in
+[After Install](#after-install) section below.
 
 ### Build from Source
 
@@ -82,17 +84,19 @@ follow the instructions in [Contribution Guide][how-to-build].
 
 ### After Install
 
-- Create an environment variable `EXONUM_HOME` pointing at installation
+1. Create an environment variable `EXONUM_HOME` pointing at installation
   location.
 
-  ```bash
-  # The path is provided in after-install message in case of Homebrew
-  export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc2-release
-  # Setting PATH variable is not needed in case of Homebrew
-  export PATH="$PATH:$EXONUM_HOME/bin"
-  ```
+    ```bash
+    # The path is provided in after-install message in case of Homebrew
+    export EXONUM_HOME=~/bin/exonum-java-0.9.0-rc2-release
+    # Setting PATH variable is not needed in case of Homebrew
+    export PATH="$PATH:$EXONUM_HOME/bin"
+    ```
 
-- Install [Maven 3][maven-install] which is essential for developing and building
+2. Install the [latest JDK][jdk].
+
+3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
 
 ## Creating Project
@@ -1498,6 +1502,7 @@ For using the library just include the dependency in your `pom.xml`:
 [brew-install]: https://docs.brew.sh/Installation
 [build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
 [configurable]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Configurable.html
+[docker-for-windows]: https://docs.docker.com/docker-for-windows/
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
 [env_logger-home]: https://crates.io/crates/env_logger
 [Exonum-services]: ../architecture/services.md
@@ -1507,6 +1512,7 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
 [java.util.Properties]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html#load(java.io.Reader)
+[jdk]: https://jdk.java.net/
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
@@ -1529,3 +1535,4 @@ For using the library just include the dependency in your `pom.xml`:
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 [maven-install]: https://maven.apache.org/install.html
 [service-create-public-api]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#createPublicApiHandlers(com.exonum.binding.core.service.Node,io.vertx.ext.web.Router)
+[WSL]: https://docs.microsoft.com/en-us/windows/wsl/about
