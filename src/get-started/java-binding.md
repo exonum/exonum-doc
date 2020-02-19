@@ -1406,7 +1406,7 @@ instances:
     artifact: timestamping
     config:
       format: "properties"
-      value: "time_service_name=time"
+      from_file: "configs/timestamping.properties"
 ```
 
 #### Custom Configuration Message
