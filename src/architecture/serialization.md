@@ -101,7 +101,7 @@ use exonum::proto::schema::*;
 ```
 
 For example, the generated `Wallet` structure from the
-`cryptocurrency.proto` file, which resides in the [`proto`][module] module,
+`cryptocurrency.proto` file, which resides in the `proto` module,
 will be available using `proto::cryptocurrency::Wallet`.
 
 !!! tip
@@ -166,9 +166,8 @@ current structure refers, in the case above `messages::SignedMessage`.
 [protobuf]: https://developers.google.com/protocol-buffers/docs/overview
 [proto-files]: https://github.com/exonum/exonum/tree/master/exonum/src/proto/schema/exonum
 [language]: https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
-[cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency/src/proto/cryptocurrency.proto
+[cryptocurrency]: https://github.com/exonum/exonum/tree/master/examples/cryptocurrency/src/proto
 [convert]: https://github.com/exonum/exonum/blob/master/exonum/src/proto/mod.rs
-[module]:https://github.com/exonum/exonum/tree/master/examples/cryptocurrency/src/proto
 [derive]: https://crates.io/crates/exonum-derive
 [build]: https://crates.io/crates/exonum-build
 [anchoring-rs]: https://github.com/exonum/exonum-btc-anchoring/commit/40ab8246926780e61c45f0cb58e85dd28052a4b7#diff-bd54eeb91f53aed3cdb8f077921cae50

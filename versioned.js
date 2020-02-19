@@ -35,18 +35,28 @@ const generateVersionedDocs = async (versions) => {
   const extraVersions = [...versions]
   extraVersions[0] = 'latest'
   for (let version of versions) {
+    // Update to the revision tagged with the `version` tag,
+    // and initialize the submodules.
     const [, error] = await to(git.checkout(version))
     if (error) {
       console.error(`Checkout failed. Tag ${version} is not built.`)
       failed++
       continue
     }
+    const [, updateError] = await to(git.updateSubmodules(true, true))
+    if (updateError) {
+      console.error(`Failed to update submodules. Tag ${version} is not built.`)
+      failed++
+      continue
+    }
+
     version = versions.indexOf(version) === 0 ? 'latest' : version
     const versionedMkdocs = YAML.load('mkdocs.yml')
     const configFile = `./version/${version}.yml`
     const newSrc = `./version/src_${version}`
     versionedMkdocs.extra.versions = extraVersions
-    versionedMkdocs.docs_dir = newSrc
+    versionedMkdocs.docs_dir = `./src_${version}`
+    versionedMkdocs.theme.custom_dir = '../theme'
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
     fse.copySync(`./src`, newSrc)
     await git.checkout(returnToBranch)

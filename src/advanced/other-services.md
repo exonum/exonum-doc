@@ -18,7 +18,7 @@ blockchain in a structured way. For example, it allows to:
 - Return information about a transaction with a specific hash
   (such as whether the transaction is committed and if so,
   which execution status does it have)
-- Check execution status of a [service hook](../glossary.md#service-hook)
+- Check execution status of a [service hook](../architecture/services.md#hooks)
 - Submit signed transactions into the blockchain
 
 WebSocket API provided by the service allows to:

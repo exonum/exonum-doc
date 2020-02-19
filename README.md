@@ -21,6 +21,14 @@ You can read about Markdown [here](https://guides.github.com/features/mastering-
 or [other](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 [places](http://www.mkdocs.org/user-guide/writing-your-docs/).
 
+Code examples are included from source using 
+[`mkdocs-codeinclude-plugin`][codeinclude-plugin] to ensure they are
+always up-to-date and correct.
+
+<!-- todo: Replace the link to our fork with the upstream link once our PRs
+       are integrated: https://github.com/rnorth/mkdocs-codeinclude-plugin/pulls -->
+[codeinclude-plugin]: https://github.com/exonum/mkdocs-codeinclude-plugin/tree/develop#usage 
+
 ## Contributing
 
 In order to contribute, fork this repository, make some changes, and then submit
@@ -74,11 +82,20 @@ It is a good idea to preview your changes locally before sending a pull request.
 
 ### Installation
 
+Fetch and initialize the repository:
+
+```
+git clone https://github.com/exonum/exonum-doc
+cd exonum-doc
+git submodule update --init --recursive
+```
+
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
 Then, install the `mkdocs` theme together with its dependencies:
 
+<!-- Remove 3rd-party in ECR-4265 -->
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --src 3rd-party
 ```
 
 You may use [`requirements.lock`](requirements.lock) instead of [`requirements.txt`](requirements.txt)

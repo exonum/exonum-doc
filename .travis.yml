@@ -8,46 +8,54 @@ branches:
     # Tags
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 
-language: python # for mkdocs
-python:
-  - "2.7"
 cache:
   npm: true
   directories:
     - $HOME/.cache/pip
 
-before_install:
-  # Lock dependencies for branch builds
-  - |
-    if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
-      export REQUIREMENTS_FILE=requirements.lock
-    else
-      export REQUIREMENTS_FILE=requirements.txt
-    fi
-install:
-  - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt
-  - nvm install 12 && nvm use 12
-  - npm install
-  # Dirty hack for what seems like a bug in linkchecker
-  - |
-    find "$VIRTUAL_ENV" -regex '.*/linkcheck/__init__.py' -print0 | \
-      xargs -0 sed -i -e "s/requests.__version__ <= '2.2.0'/map(int, requests.__version__.split('.')) <= [2, 2, 0]/"
-  - python -m mkdocs --version
-  - linkchecker --version
-  - html5validator --version
-
-script:
-  - python -m mkdocs build
-  - bash ./misc/lint.sh md
-  - bash ./misc/lint.sh html
-  - bash ./misc/lint.sh links
-  - bash ./misc/lint.sh cspell
-
-after_script:
-  # Kill mkdocs server if it's still running
-  - bash ./misc/lint.sh kill
+env:
+  - TESTSUITE=main
 
 notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/36f1eecce4abd7708221
+
+jobs:
+  allow_failures:
+    - env: TESTSUITE=ext
+  include:
+    - name: main
+      language: python # for mkdocs
+      python: "3.7"
+      before_install:
+        # Lock dependencies for branch builds
+        - |
+          if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
+            export REQUIREMENTS_FILE=requirements.lock
+          else
+            export REQUIREMENTS_FILE=requirements.txt
+          fi
+      install:
+        - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt --src 3rd-party
+        - nvm install 12 && nvm use 12
+        - npm install
+        - python -m mkdocs --version
+        - html5validator --version
+      script:
+        - python -m mkdocs build
+        - bash ./misc/lint.sh md
+        - bash ./misc/lint.sh html
+        - bash ./misc/lint.sh links
+        - bash ./misc/lint.sh cspell
+      after_script:
+        # Kill mkdocs server if it's still running
+        - bash ./misc/lint.sh kill
+
+    # Since external link checks may fail because of rate limits, unreliable
+    # connection etc., we allow this job to fail.
+    - name: external links
+      language: node_js
+      node_js: "12"
+      env: TESTSUITE=ext
+      script: npm run ext-links

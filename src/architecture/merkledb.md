@@ -383,4 +383,4 @@ rolling back also clear the scratchpad associated with the migration.
 
 [rocks-db]: http://rocksdb.org/
 [col-family]: https://github.com/facebook/rocksdb/wiki/Column-Families
-[service-name]: services.md#service-identifiers
+[service-name]: services.md#identifiers
