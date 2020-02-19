@@ -660,14 +660,14 @@ node, a single service with no configuration and without Time Oracle. To
 instantiate the TestKit do the following:
 
 <!--codeinclude-->
-[Testkit instantiation for a single service](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationForSingleService
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationForSingleService
 <!--/codeinclude-->
 
 The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
 <!--codeinclude-->
-[Testkit instantiation with a builder](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationUsingBuilder
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationUsingBuilder
 <!--/codeinclude-->
 
 In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
@@ -702,7 +702,7 @@ transaction pool and committed with [`createBlock()`][testkit-create-block]
 method:
 
 <!--codeinclude-->
-[Test creating blocks with in-pool txs](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:createInPoolTransactions
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:createInPoolTransactions
 <!--/codeinclude-->
 
 The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
@@ -768,7 +768,7 @@ provided with a builder. The builder would be used to construct the injected
 TestKit objects:
 
 <!--codeinclude-->
-[Injecting TestKit using TestKitExtension](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_registerExtension
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:ci_registerExtension
 <!--/codeinclude-->
 
 It is possible to configure the injected TestKit instance with the following annotations:
@@ -783,7 +783,7 @@ It is possible to configure the injected TestKit instance with the following ann
 These annotations should be applied on the TestKit parameter:
 
 <!--codeinclude-->
-[TestKit per-injection re-configuration](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamples2Test.java) inside_block:TestkitExamples2Test
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamples2Test.java) inside_block:TestkitExamples2Test
 <!--/codeinclude-->
 
 !!! note
@@ -819,7 +819,7 @@ An example of API service tests can be found in
 [junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
-[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html#systemTime
+[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html#systemTime()
 [testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html
 [testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.Builder.html
 [testkit-create-block]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#createBlock()
