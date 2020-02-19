@@ -43,8 +43,9 @@ They are guaranteed to be the same for all nodes in the blockchain network.
 During blockchain operation, services may be instantiated, stopped,
 frozen, resumed, and migrated to a newer version
 (which may include asynchronous data migration).
-The lifecycle events are managed by the core, but controlled by the supervisor
-service. In the reference supervisor implementation, the lifecycle events are
+These lifecycle events are managed by the core, but controlled
+by the [supervisor service](../advanced/supervisor.md).
+In the reference supervisor implementation, the lifecycle events are
 authorized by the administrators of the blockchain nodes.
 
 !!! tip

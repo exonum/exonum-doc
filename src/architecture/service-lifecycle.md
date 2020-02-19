@@ -71,6 +71,9 @@ may diverge on different nodes of the network.
 4. Active service instances can be *stopped* or *frozen* by a corresponding request
   to the core.
 
+The core logic is responsible for persisting artifacts and services
+across node restarts.
+
 A **stopped** service no longer participates in business logic, i.e.,
 it does not process transactions or hooks, and does not interact with the users
 in any way. Service data becomes unavailable for the other services,
@@ -81,13 +84,17 @@ for the stopped service and can't be used again for adding new services.
 state can be read both by internal readers (other services) and external ones
 (HTTP API handlers).
 
-The core logic is responsible for persisting artifacts and services
-across node restarts.
-
 The transitions among possible service states (including data migrations
 we discuss [below](#data-migrations)) are as follows:
 
 ![Service transitions](../images/service-states.png)
+
+!!! tip
+    Besides preparing to a data migration,
+    stopping or freezing a service may make sense if a flaw was detected in
+    the service implementation. Freezing prevents changing the service
+    state, making it useful if only the transactional logic is affected,
+    but the read interfaces may remain functional.
 
 ### Service State Transitions
 
