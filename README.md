@@ -93,8 +93,9 @@ git submodule update --init --recursive
 First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
 Then, install the `mkdocs` theme together with its dependencies:
 
+<!-- Remove 3rd-party in ECR-4265 -->
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --src 3rd-party
 ```
 
 You may use [`requirements.lock`](requirements.lock) instead of [`requirements.txt`](requirements.txt)
