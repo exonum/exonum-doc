@@ -9,6 +9,9 @@ theme:
     primary: 'light green'
     accent: 'lime'
 
+plugins:
+  - codeinclude
+
 extra_css:
   - assets/stylesheets/extra.css
 extra_javascript:
@@ -92,7 +95,7 @@ nav:
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit
-    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'    
+    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'
     # Time service
     - 'Time Oracle': 'advanced/time.md'
     # Other useful services
