@@ -660,7 +660,8 @@ node, a single service with no configuration and without Time Oracle. To
 instantiate the TestKit do the following:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java) inside_block:testkitInstantiationForSingleService
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:testkitInstantiationForSingleService
 <!--/codeinclude-->
 
 The TestKit can be also instantiated using a builder, if different
