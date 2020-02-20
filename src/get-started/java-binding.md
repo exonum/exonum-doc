@@ -663,36 +663,18 @@ Default TestKit can be instantiated with a single validator as an emulated
 node, a single service with no configuration and without Time Oracle. To
 instantiate the TestKit do the following:
 
-```java
-ServiceArtifactId artifactId = ServiceArtifactId
-    .newJavaId("com.exonum.binding/test-service", "1.0.0");
-String artifactFilename = "test-service.jar";
-String serviceName = "test-service";
-int serviceId = 46;
-Path artifactsDirectory = Paths.get("target");
-try (TestKit testKit = TestKit.forService(artifactId, artifactFilename,
-        serviceName, serviceId, artifactsDirectory)) {
-  // Test logic
-}
-```
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:testkitInstantiationForSingleService
+<!--/codeinclude-->
 
 The TestKit can be also instantiated using a builder, if different
 configuration is needed:
 
-```java
-// This TestKit will be instantiated with two service instances of different
-// services `ARTIFACT_ID` and `ARTIFACT_ID_2`
-try (TestKit testKit = TestKit testKit = TestKit.builder()
-        .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-        .withDeployedArtifact(ARTIFACT_ID_2, ARTIFACT_FILENAME_2)
-        // First service will be instantiated with some custom configuration
-        .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID, SERVICE_CONFIGURATION)
-        .withService(ARTIFACT_ID_2, SERVICE_NAME_2, SERVICE_ID_2)
-        .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
-        .build()) {
-  // Test logic
-}
-```
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:testkitInstantiationUsingBuilder
+<!--/codeinclude-->
 
 In TestKit code examples, `ARTIFACT_ID`, `ARTIFACT_FILENAME`, and
 `ARTIFACTS_DIRECTORY` are constants defining the corresponding
@@ -708,54 +690,18 @@ given [transaction messages][transactions-messages]. Here is an example of a
 test that verifies the execution result of a valid transaction and the changes
 it made in service schema:
 
-```java
-try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
-  // Construct a valid transaction
-  TransactionMessage validTx = constructValidTransaction();
-
-  // Commit block with this transaction
-  Block block = testKit.createBlockWithTransactions(validTx);
-
-  // Retrieve a snapshot of the current database state
-  Snapshot view = testkit.getSnapshot();
-  // It can be used to access the core schema, for example to check the
-  // transaction execution result:
-  Blockchain blockchain = Blockchain.newInstance(view);
-  ExecutionStatus validTxResult = blockchain.getTxResults().get(validTx.hash());
-  assertThat(validTxResult).isEqualTo(ExecutionStatuses.success());
-  // And also to verify the changes the transaction made to the service state:
-  MySchema schema = new MySchema(view, SERVICE_NAME);
-  // Perform assertions on the data in the service schema
-}
-```
+<!--codeinclude-->
+[Valid tx execution test](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:validTransactionExecutionTest
+<!--/codeinclude-->
 
 And a test that verifies that a transaction that throws an exception during its
 execution will fail:
 
-```java
-try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
-  // Construct a transaction that throws `ExecutionException` during
-  // execution
-  byte errorCode = 1;
-  String errorDescription = "Test";
-  TransactionMessage errorTx =
-      constructErrorTransaction(errorCode, errorDescription);
-
-  // Commit block with this transaction
-  Block block = testKit.createBlockWithTransactions(errorTx);
-
-  // Check that transaction failed
-  Snapshot view = testKit.getSnapshot();
-  Blockchain blockchain = Blockchain.newInstance(view);
-
-  Optional<ExecutionStatus> errorTxResult = blockchain.getTxResult(errorTx.hash());
-  ExecutionStatus expectedTransactionResult =
-      ExecutionStatuses.serviceError(errorCode, errorDescription);
-  assertThat(errorTxResult).hasValue(expectedTransactionResult);
-}
-```
+<!--codeinclude-->
+[Error tx execution test](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:errorTransactionExecutionTest
+<!--/codeinclude-->
 
 The TestKit also allows creating blocks that contain all current [in-pool][in-pool]
 transactions. In the example below, a service that submits a transaction in its
@@ -763,18 +709,10 @@ transactions. In the example below, a service that submits a transaction in its
 transaction pool and committed with [`createBlock()`][testkit-create-block]
 method:
 
-```java
-try (TestKit testKit = TestKit.forService(ARTIFACT_ID, ARTIFACT_FILENAME,
-        SERVICE_NAME, SERVICE_ID, ARTIFACTS_DIRECTORY)) {
-  // Create a block so that the `afterCommit` method is invoked
-  testKit.createBlock();
-
-  // This block will contain the in-pool transactions - namely, the transaction
-  // submitted in the `afterCommit` method
-  Block block = testKit.createBlock();
-  // Check the resulting block or blockchain state
-}
-```
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:createInPoolTransactions
+<!--/codeinclude-->
 
 The TestKit provides [`getTransactionPool()`][testkit-get-pool] and
 [`findTransactionsInPool(Predicate<TransactionMessage> predicate)`][testkit-find-in-pool]
@@ -825,59 +763,10 @@ manipulate time that is returned by the time service. Note that the time must
 be set in UTC time zone. When tests do not need to control the current time,
 [system time provider][system-time-provider] might be used.
 
-```java
-@Test
-void timeOracleTest() {
-  ZonedDateTime initialTime = ZonedDateTime.now(ZoneOffset.UTC);
-  FakeTimeProvider timeProvider = FakeTimeProvider.create(initialTime);
-  String timeServiceName = "time-service";
-  int timeServiceId = 10;
-  try (TestKit testKit = TestKit.builder()
-      .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-      .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
-      .withTimeService(timeServiceName, timeServiceId, timeProvider)
-      .withArtifactsDirectory(ARTIFACTS_DIRECTORY)
-      .build()) {
-    // Create an empty block
-    testKit.createBlock();
-    // The time service submitted its first transaction in `afterCommit`
-    // method, but it has not been executed yet
-    Optional<ZonedDateTime> consolidatedTime1 =
-      getConsolidatedTime(testKit, timeServiceName);
-    // No time is available till the time service transaction is processed
-    assertThat(consolidatedTime1).isEmpty();
-
-    // Increase the time value
-    ZonedDateTime time1 = initialTime.plusSeconds(1);
-    timeProvider.setTime(time1);
-    testKit.createBlock();
-    // The time service submitted its second transaction. The first must
-    // have been executed, with consolidated time now available and equal to
-    // initialTime
-    Optional<ZonedDateTime> consolidatedTime2 =
-      getConsolidatedTime(testKit, timeServiceName);
-    assertThat(consolidatedTime2).hasValue(initialTime);
-
-    // Increase the time value
-    ZonedDateTime time2 = initialTime.plusSeconds(1);
-    timeProvider.setTime(time2);
-    testKit.createBlock();
-    // The time service submitted its third transaction, and processed the
-    // second one. The consolidated time must be equal to time1
-    Optional<ZonedDateTime> consolidatedTime3 =
-      getConsolidatedTime(testKit, timeServiceName);
-    assertThat(consolidatedTime3).hasValue(time1);
-  }
-}
-
-private Optional<ZonedDateTime> getConsolidatedTime(TestKit testKit,
-  String timeServiceName) {
-  return testKit.applySnapshot(s -> {
-    TimeSchema timeSchema = TimeSchema.newInstance(s, timeServiceName);
-    return timeSchema.getTime().toOptional();
-  });
-}
-```
+<!--codeinclude-->
+[Controlling the current time of the Time Oracle](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:ci_timeOracleTest
+<!--/codeinclude-->
 
 ### TestKit JUnit 5 Extension
 
@@ -888,19 +777,10 @@ object annotated with [`@RegisterExtension`][junit-register-extension] and
 provided with a builder. The builder would be used to construct the injected
 TestKit objects:
 
-```java
-@RegisterExtension
-TestKitExtension testKitExtension = new TestKitExtension(
-  TestKit.builder()
-    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
-    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
-
-@Test
-void test(TestKit testKit) {
-  // Test logic
-}
-```
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamplesTest.java)
+inside_block:ci_registerExtension
+<!--/codeinclude-->
 
 It is possible to configure the injected TestKit instance with the following annotations:
 
@@ -913,26 +793,10 @@ It is possible to configure the injected TestKit instance with the following ann
 
 These annotations should be applied on the TestKit parameter:
 
-```java
-@RegisterExtension
-TestKitExtension testKitExtension = new TestKitExtension(
-  TestKit.builder()
-    .withDeployedArtifact(ARTIFACT_ID, ARTIFACT_FILENAME)
-    .withService(ARTIFACT_ID, SERVICE_NAME, SERVICE_ID)
-    .withArtifactsDirectory(ARTIFACTS_DIRECTORY));
-
-@Test
-void validatorTest(TestKit testKit) {
-  // Injected TestKit has a default configuration, specified in the builder
-  // above
-}
-
-@Test
-void auditorTest(@Auditor @ValidatorCount(8) TestKit testKit) {
-  // Injected TestKit has an altered configuration — "auditor" as an emulated
-  // node and 8 validator nodes
-}
-```
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/site-examples/src/test/java/com/exonum/binding/example/testing/TestkitExamples2Test.java)
+inside_block:TestkitExamples2Test
+<!--/codeinclude-->
 
 !!! note
     Note that after the TestKit is instantiated in the given test context, it
@@ -967,7 +831,7 @@ An example of API service tests can be found in
 [junit-beforeeach]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/BeforeEach.html
 [junit-register-extension]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/extension/RegisterExtension.html
 [junit-test]: https://junit.org/junit5/docs/5.5.0/api/org/junit/jupiter/api/Test.html
-[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html#systemTime
+[system-time-provider]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TimeProvider.html#systemTime()
 [testkit]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html
 [testkit-builder]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.Builder.html
 [testkit-create-block]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/testkit/TestKit.html#createBlock()
@@ -1043,8 +907,8 @@ In case the service build definition needs to be configured, ensure that
 the following required metadata is present in the service artifact JAR:
 
 - Entries in the JAR manifest:
-    - "Plugin-Id": must be set to "groupId:artifactId:version", e.g.,
-    `com.exonum.example.timestamping:timestamping-demo:1.0.2`.
+    - "Plugin-Id": must be set to "1:groupId/artifactId:version", e.g.,
+    `1:com.exonum.example.timestamping/timestamping-demo:1.0.2`.
     - "Plugin-Version": must be set to the project version, e.g., `1.0.2`.
 - A fully-qualified name of the [service module](#dependencies-management) class
   in "META-INF/extensions.idx" file. This file is automatically generated
