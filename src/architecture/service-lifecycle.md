@@ -69,7 +69,9 @@ may diverge on different nodes of the network.
   section below.
 
 4. Active service instances can be *stopped* or *frozen* by a corresponding request
-  to the core.
+  to the core. Conversely, stopped or frozen services may be *resumed* to return
+  to the active state. Resuming a service has a similar interface to
+  service instantiation.
 
 The core logic is responsible for persisting artifacts and services
 across node restarts.
@@ -84,6 +86,12 @@ for the stopped service and can't be used again for adding new services.
 state can be read both by internal readers (other services) and external ones
 (HTTP API handlers).
 
+Service instantiation and resuming have associated [service hooks](services.md#hooks)
+which are called during the corresponding transition.
+In contrast, freezing and stopping do not propagate to the service,
+since these state transitions are logically infallible and should not modify
+service state.
+
 The transitions among possible service states (including data migrations
 we discuss [below](#data-migrations)) are as follows:
 
@@ -95,6 +103,18 @@ we discuss [below](#data-migrations)) are as follows:
     the service implementation. Freezing prevents changing the service
     state, making it useful if only the transactional logic is affected,
     but the read interfaces may remain functional.
+
+!!! note
+    Service resuming may be used for ad hoc data migrations. In this case,
+    migration is performed in the resume hook of the service (i.e., synchronously).
+    The service workflow guarantees that the migration is performed exactly
+    once before any other operations after the service is associated with
+    the newer version of the artifact.
+
+    This ad hoc workflow may be acceptable for small-scale migrations, but has
+    significant functionality limitations (e.g., the service cannot remove indexes
+    or change index types). [Data migrations](#data-migrations) provide
+    a superior framework with little to no downsides.
 
 ### Service State Transitions
 

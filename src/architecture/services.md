@@ -150,10 +150,14 @@ A service may react to the following events of
 [its lifecycle](../architecture/service-lifecycle.md):
 
 - Service initialization
-- Service being resumed
+- Service being resumed from the frozen or stopped state.
 
 Both these events accept service-specific arguments, which can be
 used for service (re-)configuration.
+The service can signal an error during instantiation or resuming;
+this means that the requested state transition is impossible,
+for example, due to failing constraints. In this case, the transition
+will not be performed.
 
 A service also receives notifications before any transactions
 in every block are processed and after all transactions in it are processed.
