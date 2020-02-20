@@ -4,7 +4,7 @@ mkdocs==1.0.4
 Pygments==2.5.2
 pygments-github-lexers==0.0.5
 mkdocs-material==4.6.0
--e git+https://github.com/exonum/mkdocs-codeinclude-plugin@82454308b085ad2e4488da5c28448434ea190c34#egg=mkdocs_codeinclude_plugin
+-e git+https://github.com/exonum/mkdocs-codeinclude-plugin@3b77dd2f5c36f8623e88cdce007d1c2ee80ea5d0#egg=mkdocs_codeinclude_plugin
 ## The following requirements were added by pip freeze:
 Click==7.0
 htmlmin==0.1.12
