@@ -445,6 +445,8 @@ in transactions and/or read requests.
 
 <!-- TODO: example -->
 
+[service-initialize]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/Service.html#initialize(com.exonum.binding.core.blockchain.BlockchainData,com.exonum.binding.core.service.Configuration)
+
 #### Reconfiguration
 
 <!-- TODO: link the complete documentation on reconfiguration,
