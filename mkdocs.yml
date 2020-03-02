@@ -3,7 +3,7 @@ docs_dir: src
 theme:
   name: material
   favicon: 'assets/images/favicon.ico'
-  logo: 'assets/images/logo.svg" alt="Exonum Logo'
+  logo: 'assets/images/logo.svg'
   custom_dir: theme
   palette:
     primary: 'light green'
