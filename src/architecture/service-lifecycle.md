@@ -44,6 +44,18 @@ may diverge on different nodes of the network.
   into the supervisor. Thus, it is reasonable to assume that a deployment failure
   at this stage is local to the node and could be fixed by the node admin.
 
+6. If the artifact is not associated with any services, it can be *unloaded*.
+  Unloading the artifact may free resources associated with it
+  in the corresponding runtime. Like other lifecycle events, unloading an artifact
+  is controlled by the supervisor service.
+
+!!! note
+    An artifact can become disassociated with services as a result of
+    [data migrations](#data-migrations). In this case, the artifact initially
+    associated with the service instance is replaced by the newer artifact
+    revision. In most cases, the old artifact can be safely unloaded after
+    the update.
+
 ## Service Instances
 
 1. Once the artifact is committed, it is possible to instantiate services
