@@ -8,11 +8,12 @@ by the supermajority of node administrators.
 More precisely, the supervisor service is controlling
 the following activities:
 
-- Service artifact deployment
-- Service instances creation
+- Deploying service artifacts and unloading unused artifacts
+- Instantiating services
+- Changing configuration of instantiated services
+- Changing a state of instantiated services: stopping, freezing, resuming,
+  and initiating data migrations
 - Changing consensus configuration
-- Changing service instances configuration
-- Migrating service data
 
 The remaining part of the article will mainly focus on the reference
 implementation of the supervisor, i.e., the `exonum-supervisor` crate.
