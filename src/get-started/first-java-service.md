@@ -180,5 +180,141 @@ indexes, serialization and serializers?
 
 ### 3 Service Transactions
 
+Our service needs two operations updating its state:
 
-### 4 Service API 
+- Add a new vehicle entry to the registry
+- Transfer the ownership over the vehicle to another user.
+
+Modifying operations in Exonum are called transactions. Transactions are
+implemented as methods in a service class — a class implementing `Service`
+interface. A transaction method must be annotated with `@Transaction`
+annotation.
+
+Our project already has a template service `MyService` — navigate to it.
+
+#### Add Vehicle Transaction
+
+First, let's define the transaction arguments. As Exonum expects transaction
+arguments in a serialized form, we will define the arguments as a protobuf
+message.
+
+Add a new file `transactions.proto` in `car-registry-messages` 
+(`car-registry-messages/src/main/proto/example/vehicle`).
+
+<!-- 
+todo: Again, shall we include a code example of an empty file
+(with package, option java_package, etc.)?
+-->
+
+Then add the message definition of the _Add Vehicle_ transaction:
+
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
+(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/car/transactions.proto) inside_block:ci-add-vehicle
+<!--/codeinclude-->
+
+Compile the message:
+
+```shell
+mvn generate-sources
+```
+
+---
+
+Next, let's write the transaction method. Navigate back to `MyService`,
+and add the following method:
+
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
+(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-add-vehicle
+<!--/codeinclude-->
+
+The annotation accepts an integral _transaction ID_: an identifier of
+the transaction that service clients use to invoke it.
+
+The method accepts `AddVehicle` class: an auto-generated class from our
+protobuf definition. It also accepts the `TransactionContext` allowing
+the transaction to access the database.
+
+The transaction implementation uses the service data schema `MySchema`
+to access its data.
+
+Note that the transaction throws an `ExecutionException` in case of
+a precondition failure: in this case, an attempt to add a vehicle with
+an existing ID.
+
+<!--
+todo: Shall we add the ids? If so, how do we split them? Or just use the literals?
+-->
+
+Compile the code:
+
+```shell
+mvn compile
+```
+
+#### Transfer the Ownership Transaction
+
+Let's add the second transaction which will change the owner of a vehicle
+in the registry. It needs as its arguments the ID of the vehicle;
+and a new owner.
+
+Navigate to `transactions.proto` and add a message with the arguments:
+
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
+(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/car/transactions.proto) block:ChangeOwner
+<!--/codeinclude-->
+
+Compile the message:
+
+```shell
+mvn generate-sources
+```
+
+Then navigate to the service `MyService` and add an implementation with
+appropriate constants:
+
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
+(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-change-owner
+<!--/codeinclude-->
+
+This transaction is similar to the first. 
+
+Notice how an update of the `owner` field in an existing `Vehicle` value
+is performed. It creates a builder from the existing object with 
+`Vehicle.newBuilder(templateVehicle)` method, updates the field, and builds
+a new object.
+
+Compile the code:
+
+```shell
+mvn compile
+```
+
+<!-- 
+TODO: As an exercise, we may suggest to extend the error checks:
+  - Forbid transfer to yourself
+  - Forbid transfer to empty owner
+-->
+
+#### Service Constructor
+
+Finally, we will add a _service constructor_ — a special type of a transaction,
+that is invoked once when the service is instantiated. We will use it
+to populate our registry with some test data.
+
+It is implemented as the `Service#initialize` method. By default, it has
+an empty implementation in the interface, hence it is not yet present 
+in `MyService`.
+
+Override the `Service#initialize` with the following implementation:
+
+<!--
+TODO: Context here is slightly different — shall we consider unification?
+-->
+
+
+
+### 4 Service API
