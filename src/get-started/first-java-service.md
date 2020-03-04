@@ -144,6 +144,14 @@ Notice that the `access.getProofMap` accepts three parameters:
   are Protocol Buffers messages, we use a corresponding serializer for messages
   of `Vehicle` type.
 
+!!! tip
+    As the [`StandardSerializers.protobuf`][protobuf-serializer] uses reflection
+    to look up the needed methods in the message class, it is recommended
+    to instantiate a protobuf serializer once for each type
+    _and_ keep it in a `static` field.
+
+[protobuf-serializer]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/common/serialization/StandardSerializers.html#protobuf(java.lang.Class)
+
 ??? fail "No Vehicle class?"
     In some IDEs, e.g. IntelliJ IDEA, it might be needed to manually
     mark `car-registry-messages/target/generated-sources/protobuf/java`
