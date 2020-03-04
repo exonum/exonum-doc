@@ -1,7 +1,6 @@
 # Main requirements
 
-# More recent 4.6 versions have inconsistent `Markdown` requirements
-mkdocs-material==4.6.0
+mkdocs-material~=4.6
 mkdocs~=1.0
 
 Jinja2~=2.11
