@@ -49,6 +49,7 @@ markdown_extensions:
 nav:
   # Short description of Exonum, documentation and how to use it
   - 'Home': 'index.md'
+  - 'WIP Your First Java Service': 'get-started/first-java-service.md'
   - 'Get Started':
     # What is Exonum 'as a box', from point of view of external developer
     - 'What is Exonum': 'get-started/what-is-exonum.md'
