@@ -2,9 +2,9 @@
 
 This tutorial is aimed at beginners in Exonum Java. It is an introduction
 into service development in Java. As such, it does not cover some important
-to real-world services topics, like authorization or proofs of authenticity
-for service data, but gives a foundation to learn about that in subsequent
-materials.
+to real-world services topics, like authorization, or proofs of authenticity
+for service data, or testing, but gives a foundation to learn about that
+in subsequent materials.
 
 <!-- todo: What is our introductory page on main Exonum principles and 
   abstractions? -->
@@ -332,3 +332,62 @@ TODO: As an exercise, we may suggest to pass the test data in a "configuration".
     the canonical reference on the topic? -->
 
 ### 4 Service API
+
+In the previous section we have implemented operations modifying the blockchain
+state. Applications usually also need a means to _query_ data. In this section,
+we will add an operation to retrieve a vehicle entry by its ID
+from the registry. This operation will be exposed through REST API.
+
+#### Find Vehicle Service Operation
+
+First, we need to add a query operation to the Service:
+
+<!-- FIXME: Replace lines: selector with inside_block:ci-find-vehicle when
+the bug with braces is resolved: -->
+<!--codeinclude-->
+[MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) lines:137-145 
+<!--/codeinclude-->
+
+Although this query method will be invoked by our code, hence the signature 
+we use may be arbitrary, the signature is similar to the transaction methods:
+it takes the operation arguments and the context (here: `String` ID
+and `BlockchainData` context). 
+
+#### API Controller
+
+<!-- As Exonum does not provide a means to invoke such read operations,
+we will
+-->
+
+Next, we will add a class implementing the REST API of the service.
+It will expose our "find vehicle" operation as a `GET` method.
+
+Create a new `ApiController` class:
+
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/ApiController.java) block:ApiController
+<!--/codeinclude-->
+
+The `ApiController` needs a `MyService` object to query data; and
+a `Node` object to obtain the needed context: `BlockchainData`.
+
+!!! note
+    We encode the response in Protocol Buffers binary format for brevity.
+    The controller may encode it any suitable format (e.g., JSON).
+
+Finally, connect the controller to the service. `MyService` already has
+an empty `createPublicApiHandlers` method, modify it to have:
+
+<!--codeinclude-->
+[MyService.createPublicApiHandlers](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-createPublicApiHandlers
+<!--/codeinclude-->
+
+Compile the code:
+
+```shell
+mvn compile
+```
+
+!!! success
+    That's it with the service implementation!
+
