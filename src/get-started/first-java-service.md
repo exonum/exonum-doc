@@ -106,8 +106,7 @@ in `car-registry-messages`
 (`car-registry-messages/src/main/proto/example/vehicle`):
 
 <!--codeinclude-->
-[vehicle.proto](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/vehicle.proto) 
+[vehicle.proto](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/vehicle.proto) 
 <!--/codeinclude-->
 
 Run `mvn generate-sources` to compile the message.
@@ -131,8 +130,7 @@ We will expose our index through a factory method — a method that will create
 a new `ProofMap`. Use `access.getProofMap` method to create the `vehicles` index:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java) inside_block:ci-vehicles
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java) inside_block:ci-vehicles
 <!--/codeinclude-->
 
 Notice that the `access.getProofMap` accepts three parameters:
@@ -217,8 +215,7 @@ todo: Again, shall we include a code example of an empty file
 Then add the message definition of the _Add Vehicle_ transaction:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/car/transactions.proto) inside_block:ci-add-vehicle
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto) inside_block:ci-add-vehicle
 <!--/codeinclude-->
 
 Compile the message:
@@ -233,8 +230,7 @@ Next, let's write the transaction method. Navigate back to `MyService`,
 and add the following method:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-add-vehicle
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-add-vehicle
 <!--/codeinclude-->
 
 The annotation accepts an integral _transaction ID_: an identifier of
@@ -270,8 +266,7 @@ and a new owner.
 Navigate to `transactions.proto` and add a message with the arguments:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/car/transactions.proto) block:ChangeOwner
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto) block:ChangeOwner
 <!--/codeinclude-->
 
 Compile the message:
@@ -284,8 +279,7 @@ Then navigate to the service `MyService` and add an implementation with
 appropriate constants:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-change-owner
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-change-owner
 <!--/codeinclude-->
 
 This transaction is similar to the first. 
@@ -320,8 +314,7 @@ in `MyService`.
 Override the `Service#initialize` with the following implementation:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
-(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-initialize
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-initialize
 <!--/codeinclude-->
 
 Note that this method delegates to the `addVehicle` transaction method
