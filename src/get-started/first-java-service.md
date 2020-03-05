@@ -319,10 +319,23 @@ in `MyService`.
 
 Override the `Service#initialize` with the following implementation:
 
-<!--
-TODO: Context here is slightly different — shall we consider unification?
+<!--codeinclude-->
+[](../../code-examples/java/exonum-java-binding/testing/src/main/java/com/exonum/binding/test/Bytes.java) block:fromHex
+(code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-initialize
+<!--/codeinclude-->
+
+Note that this method delegates to the `addVehicle` transaction method
+we have added earlier.
+
+<!-- 
+TODO: As an exercise, we may suggest to pass the test data in a "configuration".
+(or some other configuration).
 -->
 
-
+!!! success
+    In this section we have learned how to implement operations modifying
+    the blockchain state: transactions and the service constructor. 
+    <!-- todo: "There are more operations of such type: ..." — what is
+    the canonical reference on the topic? -->
 
 ### 4 Service API
