@@ -300,6 +300,11 @@ mvn compile
 TODO: As an exercise, we may suggest to extend the error checks:
   - Forbid transfer to yourself
   - Forbid transfer to empty owner
+  
+On top of that, we may suggest to fix the following scenario:
+  - Transfer Dave -> John
+  - Transfer John -> Dave
+  - Transfer Dave -> John — FAIL! A seed is needed.
 -->
 
 #### Service Constructor
