@@ -20,7 +20,8 @@ The following software must be installed:
 - JDK 11+
 - Apache Maven 3.6+
 - Python 3.6+
-- Exonum Java 0.10.
+- Exonum Java 0.10
+- cURL.
 
 ## Service Overview
 
@@ -382,12 +383,114 @@ an empty `createPublicApiHandlers` method, modify it to have:
 [MyService.createPublicApiHandlers](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-createPublicApiHandlers
 <!--/codeinclude-->
 
-Compile the code:
+!!! success
+    That's it with the service implementation! Package the _service artifact_
+    and run the integration tests:
+    
+    ```shell
+    mvn verify
+    ```
+    
+    and proceed to the next section, where we will test its operation.
+    
+
+## Test Network
+
+Let's now launch a test network in which we can see our service operation.
+Our project already has a script launching a test network with a single
+validator node: `start-testnet.sh`.
+
+Run the script:
 
 ```shell
-mvn compile
+chmod 744 start-testnet.sh # Allow the script execution, needed once
+./start-testnet.sh
+``` 
+
+When you see messages like the following, the network is active:
+
+```
+[2020-03-05T10:36:24Z INFO  exonum_node::consensus] COMMIT ====== height=4, proposer=0, round=1, committed=0, pool=0, hash=43ac20f8b...
 ```
 
-!!! success
-    That's it with the service implementation!
+Open a separate shell session and check the active services:
 
+```shell
+# You may pipe the response into `jq` to pretty-print it, if you have it
+# installed:
+curl -s http://127.0.0.1:3000/api/system/v1/services # | jq 
+```
+
+You can see in the output the lists of deployed _service artifacts_ and
+_service instances_.
+However, the network has neither our _service artifact_ nor
+an _instance_ of our service. That is natural, because the service
+must be registered in the network first, and then it may be instantiated.
+
+### Service Instantiation
+
+#### Install the Java Launcher
+
+To register a service artifact that we built previously in the network,
+we will need `exonum-launcher` tool. It is a Python application which we
+recommend to install in a [virtual environment][python-venv]: 
+
+```shell
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+[python-venv]: https://docs.python.org/3/library/venv.html
+
+Then install the `exonum-launcher` with the Java runtime support:
+
+```shell
+pip install exonum-launcher-java-plugins
+```
+
+Check it works:
+
+```shell
+python -m exonum_launcher --help
+```
+
+#### Start a Test Instance
+
+Next, we shall place the service artifact into an artifacts directory
+of the node: `testnet/artifacts`.
+
+```shell
+# Create the artifacts directory
+mkdir testnet/artifacts
+# Copy the artifact
+cp car-registry-service/target/car-registry-service-1.0.0-SNAPSHOT-artifact.jar \
+   testnet/artifacts/
+```
+<!--
+TODO: Shall the _node_ (= Java runtime) create an artifacts directory if one
+does not exist already? If it shall, won't it cause problems if we launch
+several nodes locally with the same (not yet existing) artifacts directory?
+-->
+
+<!--
+TODO: Shall we place the burden of copying (= uploading the JAR)
+on the launcher-plugin + Java runtime pair?
+-->
+
+And launch the service:
+
+```shell
+python -m exonum_launcher -i deploy-start-config.yml
+```
+
+The launcher must print the status of the service artifact deploy
+and the service instance start. We can also verify that both operations
+succeeded via the node API:
+
+```shell
+curl -s http://127.0.0.1:3000/api/system/v1/services | jq 
+```
+
+#### Invoke the Service Operations
+
+...
