@@ -55,7 +55,8 @@ Finally, the supervisor service may be implemented in any
 
 !!! tip
     Consult the [`exonum-supervisor` crate docs](https://docs.rs/exonum-supervisor/)
-    for more technical documentation.
+    for more technical documentation and
+    [the description of service endpoints][supervisor-docs].
 
 Service lifecycle events are initiated via *proposal* transactions
 to the supervisor service.
@@ -150,3 +151,4 @@ together and with synchronous lifecycle events (e.g., service instantiation).
 This provides greater flexibility and determinism.
 
 [capability model]: https://en.wikipedia.org/wiki/Capability-based_security
+[supervisor-docs]: https://docs.rs/exonum-supervisor/latest/exonum_supervisor/api/index.html

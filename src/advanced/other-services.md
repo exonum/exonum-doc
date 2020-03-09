@@ -21,6 +21,9 @@ blockchain in a structured way. For example, it allows to:
 - Check execution status of a [service hook](../architecture/services.md#hooks)
 - Submit signed transactions into the blockchain
 
+Detailed description of the HTTP endpoints is available
+in the [crate docs of the service][explorer-docs].
+
 WebSocket API provided by the service allows to:
 
 - Submit signed transactions into the blockchain
@@ -29,6 +32,9 @@ WebSocket API provided by the service allows to:
 - Subscribe to transaction commitment events – a client will receive
   a notification for each new committed transaction. Transactions can be
   optionally filtered by the service ID and method ID within the service.
+
+Detailed description of the WebSocket interface is available
+in the [crate docs][explorer-docs-ws].
 
 Unlike most other services, the explorer does not define any
 transactions.
@@ -83,9 +89,15 @@ about the node state using REST interface.
 
 The following info can be retrieved:
 
-- Information about the current set of artifacts and services
+- Node stats
 - Network connectivity stats
 - Version of Exonum / Rust that the node was compiled with
+
+Additionally, the plugin allows to control some aspects of the node,
+such as adding peer connections and shutting the node down.
+
+The detailed information about HTTP endpoints of the plugin
+is available in the [crate docs][system-api-docs].
 
 ### Usage
 
@@ -95,8 +107,11 @@ may import `SystemApiPlugin` from the crate and plug it
 into the node builder.
 
 [explorer]: https://docs.rs/exonum-explorer-service/
+[explorer-docs]: https:/docs.rs/exonum-explorer-service/latest/exonum_explorer_service/api/index.html
+[explorer-docs-ws]: https://docs.rs/exonum-explorer-service/1.0.0-rc.1/exonum_explorer_service/api/websocket/index.html
 [explorer library]: https://docs.rs/exonum-explorer/
 [exonum-cli]: https://docs.rs/exonum-cli/
 [middleware]: https://docs.rs/exonum-middleware-service/
 [TOCTOU]: https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use
 [system-api]: https://docs.rs/exonum-system-api/
+[system-api-docs]: https://docs.rs/exonum-system-api/latest/exonum_system_api/private/index.html
