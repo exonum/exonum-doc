@@ -17,11 +17,11 @@ The full tutorial code is available in our Git repository.
 
 The following software must be installed:
 
-- JDK 11+
-- Apache Maven 3.6+
-- Python 3.6+
-- Exonum Java 0.10
-- cURL.
+- [JDK 11+](https://jdk.java.net/)
+- [Apache Maven 3.6+](https://maven.apache.org/install.html)
+- [Python 3.6+](https://www.python.org/downloads/)
+- [Exonum Java 0.10](./java-binding.md#installation)
+- [cURL](https://curl.haxx.se/download.html).
 
 ## Service Overview
 
@@ -121,16 +121,21 @@ collections, also known as indexes. Our project already has a template schema
 <!-- todo: Shall we include here a MySchema template (as it is after generation)
 or is it redundant? -->
 
-The `MySchema` has a field `access` of type `Prefixed`, initialized in
+The `MySchema` has a field `access` of type [`Prefixed`][prefixed], initialized in
 its constructor. It is a database access object, which allows to access
 the indexes of this service.
+
+[prefixed]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/storage/database/Prefixed.html
 
 To keep a registry of vehicles indexed by their IDs, we will use a `ProofMap`
 index with `String` keys and `Vehicle` values, named `vehicles`.
 The `ProofMap` ensures that the data is the same
 on each node in the network.
 We will expose our index through a factory method — a method that will create
-a new `ProofMap`. Use `access.getProofMap` method to create the `vehicles` index:
+a new `ProofMap`. Use [`access.getProofMap`][access-get-proof-map] method
+to create the `vehicles` index:
+
+[access-get-proof-map]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/storage/database/Access.html#getProofMap(com.exonum.binding.core.storage.indices.IndexAddress,com.exonum.binding.common.serialization.Serializer,com.exonum.binding.common.serialization.Serializer)
 
 <!--codeinclude-->
 [](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java) inside_block:ci-vehicles
@@ -195,9 +200,12 @@ Our service needs two operations updating its state:
 - Transfer the ownership over the vehicle to another user.
 
 Modifying operations in Exonum are called transactions. Transactions are
-implemented as methods in a service class — a class implementing `Service`
-interface. A transaction method must be annotated with `@Transaction`
-annotation.
+implemented as methods in a service class — a class implementing 
+[`Service`][service-interface] interface. A transaction method must be annotated 
+with [`@Transaction`][transaction-annotation] annotation.
+
+[service-interface]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html
+[transaction-annotation]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/transaction/Transaction.html
 
 Our project already has a template service `MyService` — navigate to it.
 

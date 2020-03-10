@@ -1118,7 +1118,7 @@ Exonum Java Binding provides two plugins:
   to the service on its start and are typically used to customize the behavior
   of a particular service instance.
 
-### Installation
+### Launcher Installation
 
 Follow the instructions in the [plugins Readme][plugins-readme]
 
