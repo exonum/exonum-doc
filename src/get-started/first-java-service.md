@@ -296,17 +296,6 @@ Compile the code:
 mvn compile
 ```
 
-<!-- 
-TODO: As an exercise, we may suggest to extend the error checks:
-  - Forbid transfer to yourself
-  - Forbid transfer to empty owner
-  
-On top of that, we may suggest to fix the following scenario:
-  - Transfer Dave -> John
-  - Transfer John -> Dave
-  - Transfer Dave -> John — FAIL! A seed is needed.
--->
-
 #### Service Constructor
 
 Finally, we will add a _service constructor_ — a special type of a transaction,
@@ -325,11 +314,6 @@ Override the `Service#initialize` with the following implementation:
 
 Note that this method delegates to the `addVehicle` transaction method
 we have added earlier.
-
-<!-- 
-TODO: As an exercise, we may suggest to pass the test data in a "configuration".
-(or some other configuration).
--->
 
 !!! success
     In this section we have learned how to implement operations modifying
@@ -379,7 +363,7 @@ a `Node` object to obtain the needed context: `BlockchainData`.
 
 !!! note
     We encode the response in Protocol Buffers binary format for brevity.
-    The controller may encode it any suitable format (e.g., JSON).
+    The controller may encode it in any suitable format (e.g., JSON).
 
 Finally, connect the controller to the service. `MyService` already has
 an empty `createPublicApiHandlers` method, modify it to have:
@@ -471,10 +455,13 @@ mkdir testnet/artifacts
 cp car-registry-service/target/car-registry-service-1.0.0-SNAPSHOT-artifact.jar \
    testnet/artifacts/
 ```
+
 <!--
 TODO: Shall the _node_ (= Java runtime) create an artifacts directory if one
 does not exist already? If it shall, won't it cause problems if we launch
 several nodes locally with the same (not yet existing) artifacts directory?
+
+It is somewhat annoying to always have to create the dir :-) 
 -->
 
 <!--
@@ -482,15 +469,17 @@ TODO: Shall we place the burden of copying (= uploading the JAR)
 on the launcher-plugin + Java runtime pair?
 -->
 
-And launch the service:
+Launch the service:
 
 ```shell
 python -m exonum_launcher -i deploy-start-config.yml
 ```
 
+Launcher will take the service instance name and other parameters from 
+the configuration file, and submit the request to the node.
 The launcher must print the status of the service artifact deploy
-and the service instance start. We can also verify that both operations
-succeeded via the node API:
+and the service instance start.
+We can also verify that both operations succeeded via the node API:
 
 ```shell
 curl -s http://127.0.0.1:3000/api/system/v1/services | jq 
@@ -498,4 +487,104 @@ curl -s http://127.0.0.1:3000/api/system/v1/services | jq
 
 #### Invoke the Service Operations
 
-...
+We will use a light client application to invoke the service operations.
+Development of service client applications is not covered in this tutorial, 
+but the client for the car registry is provided in the tutorial
+repository as a third module, `car-registry-client`.
+
+If you have not cloned the repository already, clone it and build the client:
+
+```shell
+git clone git@github.com:exonum/exonum-java-binding.git
+cd exonum-java-binding/exonum-java-binding/tutorials/car-registry
+mvn package -pl car-registry-client -am
+``` 
+
+Check it is built successfully:
+
+```shell
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar -h
+```
+
+First, generate an Ed25519 key pair, that the client will use to sign
+the transactions to our service:
+
+```shell
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  keygen
+```
+
+Now, try to add your own vehicles to the blockchain:
+
+```shell
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  add-vehicle -a -n=test-car-registry "My car" "VW" "Polo" "$USER"
+```
+
+Check they are in the registry:
+```shell
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  find-vehicle -n=test-car-registry "My car"
+```
+
+Suppose for a minute, that Emmett Brown has got tired of time travels,
+and decided to transfer his DeLorean to you:
+
+```shell
+# Check the entry before
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  find-vehicle -n=test-car-registry "V2"
+
+# Change the owner to the current user
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  change-owner -a -n=test-car-registry "V2" "$USER"
+
+# See the updated entry
+java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+  find-vehicle -n=test-car-registry "V2"
+```
+
+!!! success
+    Congratulations! You have successfully implemented a simple Exonum
+    service, started a network of nodes, and deployed your application
+    in it!
+
+<!-- 
+TODO: Are there any articles that go well after this tutorial completion
+that we shall mention here?
+-->
+
+## Exercises
+
+**E1**. The transaction [transferring the ownership over a vehicle](#transfer-the-ownership-transaction)
+currently allows transferring it to the same owner
+(e.g., "John Doe" > "John Doe"). It also accepts empty owner field.
+Modify its code to forbid such input arguments.
+
+**E2**. Try the following sequence of operations with a fresh service state:
+
+1. Change the owner of vehicle "V1" to "John Doe"
+2. Change the owner of vehicle "V1" to yourself
+3. Change the owner of vehicle "V1" back to "John Doe".
+    
+The third operation is expected to be rejected at submission because
+the corresponding transaction message is equal to the first
+transaction message, which is already committed. Exonum rejects transactions
+with the same messages (basically, with same arguments and coming from
+the same author) to prevent their replication by another user.
+Modify the transaction so that such operation is possible.
+
+??? help "Hint"
+    A common approach to make transactions with the same arguments from the
+    same author have different messages is to include a _seed_ field. Each 
+    transaction author will have to set it to a unique value (to that author
+    and set of arguments). As a seed, each author may use a counter of submitted 
+    transactions, or a random value.
+
+    You will also have to modify the client application to test the modified
+    service.
+
+**E3**. Add an operation returning all vehicles in the registry.
+
+!!! note
+    You will have to modify the service, its API and the client application.
