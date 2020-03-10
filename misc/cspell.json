@@ -107,6 +107,7 @@
     "serde",
     "serializable",
     "serialization",
+    "serializer",
     "serializers",
     "sodiumoxide",
     "stateful",

@@ -1,5 +1,7 @@
 # First Exonum Java Service Tutorial
 
+<!-- cspell:ignore Lorean, Intelli, testnet -->
+
 This tutorial is aimed at beginners in Exonum Java. It is an introduction
 into service development in Java. As such, it does not cover some important
 to real-world services topics, like authorization, or proofs of authenticity
@@ -403,7 +405,6 @@ inside_block:ci-createPublicApiHandlers
 
     and proceed to the next section, where we will test its operation.
 
-
 ## Test Network
 
 Let's now launch a test network in which we can see our service operation.
@@ -419,9 +420,11 @@ chmod 744 start-testnet.sh # Allow the script execution, needed once
 
 When you see messages like the following, the network is active:
 
-```
+<!-- markdownlint-disable line-length -->
+```text
 [2020-03-05T10:36:24Z INFO  exonum_node::consensus] COMMIT ====== height=4, proposer=0, round=1, committed=0, pool=0, hash=43ac20f8b...
 ```
+<!-- markdownlint-enable line-length -->
 
 Open a separate shell session and check the active services:
 
@@ -543,6 +546,7 @@ java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
 ```
 
 Check they are in the registry:
+
 ```shell
 java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
   find-vehicle -n=test-car-registry "My car"
