@@ -6,12 +6,12 @@ to real-world services topics, like authorization, or proofs of authenticity
 for service data, or testing, but gives a foundation to learn about that
 in subsequent materials.
 
-<!-- todo: Is it the right introductory page on main Exonum principles and 
+<!-- todo: Is it the right introductory page on main Exonum principles and
   abstractions? -->
 It is recommended to read an [Exonum design overview](design-overview.md)
 before proceeding with this tutorial.
 
-The full tutorial code is available in our Git repository. 
+The full tutorial code is available in our Git repository.
 
 ## Prerequisites
 
@@ -45,10 +45,10 @@ mvn archetype:generate \
     -DarchetypeVersion=0.10.0
 ```
 
-<!-- 
+<!--
 todo: Or replace with a non-interactive command, so that we don't rely
-on user input? 
---> 
+on user input?
+-->
 When prompted, enter the values of project properties, for example:
 
 - `com.example.car` for `groupId`
@@ -69,22 +69,22 @@ You shall see in the output that `com.example.car.MyServiceIntegrationTest`
 completed successfully and the build passes.
 
 ??? fail "Getting a build error?"
-    - If you get `java.lang.LinkageError` in the test, check that Exonum Java 
+    - If you get `java.lang.LinkageError` in the test, check that Exonum Java
     is installed correctly. Particularly, check that `EXONUM_HOME` environment
     variable is set to the Exonum Java installation location.
-    See the [installation instructions](./java-binding.md#installation) 
+    See the [installation instructions](./java-binding.md#installation)
     for details.
     - If you get a compilation error `invalid flag: --release`, Maven likely
     uses Java 8 to compile the project. Check:
          - That the Java on `PATH` is 11 or above: `java -version`
-         - That the `JAVA_HOME` environment variable is unset; 
+         - That the `JAVA_HOME` environment variable is unset;
          or points to a JDK installation 11 or above: `echo "$JAVA_HOME"`
 
 #### Skeleton Project Overview
 
 The generated project is a mere "skeleton". It consists of two modules:
 
-- `car-registry-messages` for the definitions of service messages. 
+- `car-registry-messages` for the definitions of service messages.
 - `car-registry-service` for the service business logic.
 
 ### 2 Declare Service Persistent Data
@@ -106,7 +106,7 @@ in `car-registry-messages`
 (`car-registry-messages/src/main/proto/example/vehicle`):
 
 <!--codeinclude-->
-[vehicle.proto](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/vehicle.proto) 
+[vehicle.proto](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/vehicle.proto)
 <!--/codeinclude-->
 
 Run `mvn generate-sources` to compile the message.
@@ -145,7 +145,7 @@ Notice that the `access.getProofMap` accepts three parameters:
 
 - an index _address_ identifying this index in the blockchain
 - two serializers: one for keys and one for values. Exonum needs the serializers
-  to convert objects into bytes and back, as it stores the objects as bytes. 
+  to convert objects into bytes and back, as it stores the objects as bytes.
   For `String` keys, we use a standard serializer. For `Vehicle`s, which
   are Protocol Buffers messages, we use a corresponding serializer for messages
   of `Vehicle` type.
@@ -155,7 +155,7 @@ Notice that the `access.getProofMap` accepts three parameters:
     to look up the needed methods in the message class, it is recommended
     to instantiate a protobuf serializer once for each type
     _and_ keep it in a `static` field, e.g.:
-    
+
     ```java
     private static final Serializer<Vehicle> VEHICLE_SERIALIZER =
         StandardSerializers.protobuf(Vehicle.class);
@@ -168,10 +168,10 @@ Notice that the `access.getProofMap` accepts three parameters:
     mark `car-registry-messages/target/generated-sources/protobuf/java`
     directory as "Generated Sources Root" to be able to import the generated
     classes:
-    
+
     1. Open context menu (right click on the directory)
     2. "Mark Directory As" > "Generated Sources Root"
-  
+
 Compile the project:
 
 ```shell
@@ -182,7 +182,7 @@ mvn compile
 todo: Shall we add a whole file of MySchema?
 -->
 
-<!-- 
+<!--
 Todo: Shall we draw a parallel with the DAO objects in business
 applications?
 -->
@@ -200,8 +200,8 @@ Our service needs two operations updating its state:
 - Transfer the ownership over the vehicle to another user.
 
 Modifying operations in Exonum are called transactions. Transactions are
-implemented as methods in a service class — a class implementing 
-[`Service`][service-interface] interface. A transaction method must be annotated 
+implemented as methods in a service class — a class implementing
+[`Service`][service-interface] interface. A transaction method must be annotated
 with [`@Transaction`][transaction-annotation] annotation.
 
 [service-interface]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html
@@ -215,10 +215,10 @@ First, let's define the transaction arguments. As Exonum expects transaction
 arguments in a serialized form, we will define the arguments as a protobuf
 message.
 
-Add a new file `transactions.proto` in `car-registry-messages` 
+Add a new file `transactions.proto` in `car-registry-messages`
 (`car-registry-messages/src/main/proto/example/vehicle`).
 
-<!-- 
+<!--
 todo: Again, shall we include a code example of an empty file
 (with package, option java_package, etc.)?
 -->
@@ -260,7 +260,7 @@ an existing ID.
 
 <!--
 todo: Shall we add the ids to the example? If so, how do we split ids for
-different transactions? 
+different transactions?
 Or just use the literals?
 -->
 
@@ -295,10 +295,10 @@ appropriate constants:
 [](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-change-owner
 <!--/codeinclude-->
 
-This transaction is similar to the first. 
+This transaction is similar to the first.
 
 Notice how an update of the `owner` field in an existing `Vehicle` value
-is performed. It creates a builder from the existing object with 
+is performed. It creates a builder from the existing object with
 `Vehicle.newBuilder(templateVehicle)` method, updates the field, and builds
 a new object.
 
@@ -315,7 +315,7 @@ that is invoked once when the service is instantiated. We will use it
 to populate our registry with some test data.
 
 It is implemented as the `Service#initialize` method. By default, it has
-an empty implementation in the interface, hence it is not yet present 
+an empty implementation in the interface, hence it is not yet present
 in `MyService`.
 
 Override the `Service#initialize` with the following implementation:
@@ -329,7 +329,7 @@ we have added earlier.
 
 !!! success
     In this section we have learned how to implement operations modifying
-    the blockchain state: transactions and the service constructor. 
+    the blockchain state: transactions and the service constructor.
     <!-- todo: "There are more operations of such type: ..." — what is
     the canonical reference on the topic? Shall we add one? -->
 
@@ -347,13 +347,13 @@ First, we need to add a query operation to the Service:
 <!-- FIXME: Replace lines: selector with inside_block:ci-find-vehicle when
 the bug with braces is resolved: ECR-4318 -->
 <!--codeinclude-->
-[MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) lines:138-146 
+[MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) lines:138-146
 <!--/codeinclude-->
 
-Although this query method will be invoked by our code, hence the signature 
+Although this query method will be invoked by our code, hence the signature
 we use may be arbitrary, the signature is similar to the transaction methods:
 it takes the operation arguments and the context (here: `String` ID
-and `BlockchainData` context). 
+and `BlockchainData` context).
 
 #### API Controller
 
@@ -387,13 +387,13 @@ an empty `createPublicApiHandlers` method, modify it to have:
 !!! success
     That's it with the service implementation! Package the _service artifact_
     and run the integration tests:
-    
+
     ```shell
     mvn verify
     ```
-    
+
     and proceed to the next section, where we will test its operation.
-    
+
 
 ## Test Network
 
@@ -406,7 +406,7 @@ Run the script:
 ```shell
 chmod 744 start-testnet.sh # Allow the script execution, needed once
 ./start-testnet.sh
-``` 
+```
 
 When you see messages like the following, the network is active:
 
@@ -419,7 +419,7 @@ Open a separate shell session and check the active services:
 ```shell
 # You may pipe the response into `jq` to pretty-print it, if you have it
 # installed:
-curl -s http://127.0.0.1:3000/api/system/v1/services # | jq 
+curl -s http://127.0.0.1:3000/api/system/v1/services # | jq
 ```
 
 You can see in the output the lists of deployed _service artifacts_ and
@@ -434,7 +434,7 @@ must be registered in the network first, and then it may be instantiated.
 
 To register a service artifact that we built previously in the network,
 we will need `exonum-launcher` tool. It is a Python application which we
-recommend to install in a [virtual environment][python-venv]: 
+recommend to install in a [virtual environment][python-venv]:
 
 ```shell
 python3 -m venv .venv
@@ -473,7 +473,7 @@ TODO: Shall the _node_ (= Java runtime) create an artifacts directory if one
 does not exist already? If it shall, won't it cause problems if we launch
 several nodes locally with the same (not yet existing) artifacts directory?
 
-It is somewhat annoying to always have to create the dir :-) 
+It is somewhat annoying to always have to create the dir :-)
 -->
 
 <!--
@@ -487,20 +487,20 @@ Launch the service:
 python -m exonum_launcher -i deploy-start-config.yml
 ```
 
-Launcher will take the service instance name and other parameters from 
+Launcher will take the service instance name and other parameters from
 the configuration file, and submit the request to the node.
 The launcher must print the status of the service artifact deploy
 and the service instance start.
 We can also verify that both operations succeeded via the node API:
 
 ```shell
-curl -s http://127.0.0.1:3000/api/system/v1/services | jq 
+curl -s http://127.0.0.1:3000/api/system/v1/services | jq
 ```
 
 #### Invoke the Service Operations
 
 We will use a light client application to invoke the service operations.
-Development of service client applications is not covered in this tutorial, 
+Development of service client applications is not covered in this tutorial,
 but the client for the car registry is provided in the tutorial
 repository as a third module, `car-registry-client`.
 
@@ -510,7 +510,7 @@ If you have not cloned the repository already, clone it and build the client:
 git clone git@github.com:exonum/exonum-java-binding.git
 cd exonum-java-binding/exonum-java-binding/tutorials/car-registry
 mvn package -pl car-registry-client -am
-``` 
+```
 
 Check it is built successfully:
 
@@ -561,7 +561,7 @@ java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
     service, started a network of nodes, and deployed your application
     in it!
 
-<!-- 
+<!--
 TODO: Are there any articles that go well after this tutorial completion
 that we shall mention at its end?
 -->
@@ -578,7 +578,7 @@ Modify its code to forbid such input arguments.
 1. Change the owner of vehicle "V1" to "John Doe"
 2. Change the owner of vehicle "V1" to yourself
 3. Change the owner of vehicle "V1" back to "John Doe".
-    
+
 The third operation is expected to be rejected at submission because
 the corresponding transaction message is equal to the first
 transaction message, which is already committed. Exonum rejects transactions
@@ -588,9 +588,9 @@ Modify the transaction so that such operation is possible.
 
 ??? help "Hint"
     A common approach to make transactions with the same arguments from the
-    same author have different messages is to include a _seed_ field. Each 
+    same author have different messages is to include a _seed_ field. Each
     transaction author will have to set it to a unique value (to that author
-    and set of arguments). As a seed, each author may use a counter of submitted 
+    and set of arguments). As a seed, each author may use a counter of submitted
     transactions, or a random value.
 
     You will also have to modify the client application to test the modified
