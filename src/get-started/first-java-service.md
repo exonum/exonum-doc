@@ -6,10 +6,10 @@ to real-world services topics, like authorization, or proofs of authenticity
 for service data, or testing, but gives a foundation to learn about that
 in subsequent materials.
 
-<!-- todo: What is our introductory page on main Exonum principles and 
+<!-- todo: Is it the right introductory page on main Exonum principles and 
   abstractions? -->
-It is recommended to read an introduction into Exonum before proceeding with
-this tutorial.
+It is recommended to read an [Exonum design overview](design-overview.md)
+before proceeding with this tutorial.
 
 The full tutorial code is available in our Git repository. 
 
@@ -30,7 +30,6 @@ we will implement a vehicle registry. The registry will keep a record of
 vehicles; and allow to create new vehicles, and change their owner.
 It will also provide REST API to query the registry.
 
-<!-- todo: Or just keep going at h2? --> 
 ## Service Implementation
 
 ### 1 Creating a Project
@@ -119,7 +118,8 @@ their persistent data in a _schema_: a set of named, persistent, typed
 collections, also known as indexes. Our project already has a template schema
 `MySchema` — navigate to it.
 
-<!-- todo: Shall we include here a MySchema template or is it redundant? -->
+<!-- todo: Shall we include here a MySchema template (as it is after generation)
+or is it redundant? -->
 
 The `MySchema` has a field `access` of type `Prefixed`, initialized in
 its constructor. It is a database access object, which allows to access
@@ -127,6 +127,8 @@ the indexes of this service.
 
 To keep a registry of vehicles indexed by their IDs, we will use a `ProofMap`
 index with `String` keys and `Vehicle` values, named `vehicles`.
+The `ProofMap` ensures that the data is the same
+on each node in the network.
 We will expose our index through a factory method — a method that will create
 a new `ProofMap`. Use `access.getProofMap` method to create the `vehicles` index:
 
@@ -147,11 +149,16 @@ Notice that the `access.getProofMap` accepts three parameters:
     As the [`StandardSerializers.protobuf`][protobuf-serializer] uses reflection
     to look up the needed methods in the message class, it is recommended
     to instantiate a protobuf serializer once for each type
-    _and_ keep it in a `static` field.
+    _and_ keep it in a `static` field, e.g.:
+    
+    ```java
+    private static final Serializer<Vehicle> VEHICLE_SERIALIZER =
+        StandardSerializers.protobuf(Vehicle.class);
+    ```
 
 [protobuf-serializer]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/common/serialization/StandardSerializers.html#protobuf(java.lang.Class)
 
-??? fail "No Vehicle class?"
+??? fail "Cannot import `Vehicle` class?"
     In some IDEs, e.g. IntelliJ IDEA, it might be needed to manually
     mark `car-registry-messages/target/generated-sources/protobuf/java`
     directory as "Generated Sources Root" to be able to import the generated
@@ -165,11 +172,6 @@ Compile the project:
 ```shell
 mvn compile
 ```
-
-<!--
-Keeping the service data in the `ProofMap` ensures that the data is the same
-on each node in the network.
--->
 
 <!--
 todo: Shall we add a whole file of MySchema?
@@ -249,7 +251,9 @@ a precondition failure: in this case, an attempt to add a vehicle with
 an existing ID.
 
 <!--
-todo: Shall we add the ids? If so, how do we split them? Or just use the literals?
+todo: Shall we add the ids to the example? If so, how do we split ids for
+different transactions? 
+Or just use the literals?
 -->
 
 Compile the code:
@@ -319,7 +323,7 @@ we have added earlier.
     In this section we have learned how to implement operations modifying
     the blockchain state: transactions and the service constructor. 
     <!-- todo: "There are more operations of such type: ..." — what is
-    the canonical reference on the topic? -->
+    the canonical reference on the topic? Shall we add one? -->
 
 ### 4 Service API
 
@@ -333,7 +337,7 @@ from the registry. This operation will be exposed through REST API.
 First, we need to add a query operation to the Service:
 
 <!-- FIXME: Replace lines: selector with inside_block:ci-find-vehicle when
-the bug with braces is resolved: -->
+the bug with braces is resolved: ECR-4318 -->
 <!--codeinclude-->
 [MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) lines:137-145 
 <!--/codeinclude-->
@@ -551,7 +555,7 @@ java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
 
 <!-- 
 TODO: Are there any articles that go well after this tutorial completion
-that we shall mention here?
+that we shall mention at its end?
 -->
 
 ## Exercises
