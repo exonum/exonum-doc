@@ -138,7 +138,8 @@ to create the `vehicles` index:
 [access-get-proof-map]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/storage/database/Access.html#getProofMap(com.exonum.binding.core.storage.indices.IndexAddress,com.exonum.binding.common.serialization.Serializer,com.exonum.binding.common.serialization.Serializer)
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java) inside_block:ci-vehicles
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java)
+inside_block:ci-vehicles
 <!--/codeinclude-->
 
 Notice that the `access.getProofMap` accepts three parameters:
@@ -226,7 +227,8 @@ todo: Again, shall we include a code example of an empty file
 Then add the message definition of the _Add Vehicle_ transaction:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto) inside_block:ci-add-vehicle
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto)
+inside_block:ci-add-vehicle
 <!--/codeinclude-->
 
 Compile the message:
@@ -241,7 +243,8 @@ Next, let's write the transaction method. Navigate back to `MyService`,
 and add the following method:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-add-vehicle
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
+inside_block:ci-add-vehicle
 <!--/codeinclude-->
 
 The annotation accepts an integral _transaction ID_: an identifier of
@@ -279,7 +282,8 @@ and a new owner.
 Navigate to `transactions.proto` and add a message with the arguments:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto) block:ChangeOwner
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-messages/src/main/proto/example/vehicle/transactions.proto)
+block:ChangeOwner
 <!--/codeinclude-->
 
 Compile the message:
@@ -292,7 +296,8 @@ Then navigate to the service `MyService` and add an implementation with
 appropriate constants:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-change-owner
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
+inside_block:ci-change-owner
 <!--/codeinclude-->
 
 This transaction is similar to the first.
@@ -321,7 +326,8 @@ in `MyService`.
 Override the `Service#initialize` with the following implementation:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-initialize
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
+inside_block:ci-initialize
 <!--/codeinclude-->
 
 Note that this method delegates to the `addVehicle` transaction method
@@ -347,7 +353,8 @@ First, we need to add a query operation to the Service:
 <!-- FIXME: Replace lines: selector with inside_block:ci-find-vehicle when
 the bug with braces is resolved: ECR-4318 -->
 <!--codeinclude-->
-[MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) lines:138-146
+[MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
+lines:138-146
 <!--/codeinclude-->
 
 Although this query method will be invoked by our code, hence the signature
@@ -367,7 +374,8 @@ It will expose our "find vehicle" operation as a `GET` method.
 Create a new `ApiController` class:
 
 <!--codeinclude-->
-[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/ApiController.java) block:ApiController
+[](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/ApiController.java)
+block:ApiController
 <!--/codeinclude-->
 
 The `ApiController` needs a `MyService` object to query data; and
@@ -381,7 +389,8 @@ Finally, connect the controller to the service. `MyService` already has
 an empty `createPublicApiHandlers` method, modify it to have:
 
 <!--codeinclude-->
-[MyService.createPublicApiHandlers](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java) inside_block:ci-createPublicApiHandlers
+[MyService.createPublicApiHandlers](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
+inside_block:ci-createPublicApiHandlers
 <!--/codeinclude-->
 
 !!! success
