@@ -127,7 +127,7 @@ The `MySchema` has a field `access` of type [`Prefixed`][prefixed], initialized 
 its constructor. It is a database access object, which allows to access
 the indexes of this service.
 
-[prefixed]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/storage/database/Prefixed.html
+[prefixed]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/storage/database/Prefixed.html
 
 To keep a registry of vehicles indexed by their IDs, we will use a `ProofMap`
 index with `String` keys and `Vehicle` values, named `vehicles`.
@@ -137,7 +137,7 @@ We will expose our index through a factory method — a method that will create
 a new `ProofMap`. Use [`access.getProofMap`][access-get-proof-map] method
 to create the `vehicles` index:
 
-[access-get-proof-map]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/storage/database/Access.html#getProofMap(com.exonum.binding.core.storage.indices.IndexAddress,com.exonum.binding.common.serialization.Serializer,com.exonum.binding.common.serialization.Serializer)
+[access-get-proof-map]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/storage/database/Access.html#getProofMap(com.exonum.binding.core.storage.indices.IndexAddress,com.exonum.binding.common.serialization.Serializer,com.exonum.binding.common.serialization.Serializer)
 
 <!--codeinclude-->
 [](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MySchema.java)
@@ -207,8 +207,8 @@ implemented as methods in a service class — a class implementing
 [`Service`][service-interface] interface. A transaction method must be annotated
 with [`@Transaction`][transaction-annotation] annotation.
 
-[service-interface]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/service/Service.html
-[transaction-annotation]: file:///Users/user/Documents/exonum-java-binding/exonum-java-binding/target/site/apidocs/com/exonum/binding/core/transaction/Transaction.html
+[service-interface]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Service.html
+[transaction-annotation]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/transaction/Transaction.html
 
 Our project already has a template service `MyService` — navigate to it.
 
