@@ -3,10 +3,11 @@
 <!-- cspell:ignore Lorean, Intelli, testnet -->
 
 This tutorial is aimed at beginners in Exonum Java. It is an introduction
-into service development in Java. As such, it does not cover some important
-to real-world services topics, like authorization, or proofs of authenticity
-for service data, or testing, but gives a foundation to learn about that
-in subsequent materials.
+into service development in Java. You will learn how to create an Exonum service,
+start a test network, and deploy your service in it. This introductory
+tutorial, however, omits some important to real-world services topics,
+like authorization, or proofs of authenticity for service data, or testing,
+but gives a foundation to learn about that in subsequent materials.
 
 It is recommended to read an [introduction into Exonum](what-is-exonum.md) 
 and its [design overview](design-overview.md) before proceeding 
@@ -24,13 +25,14 @@ The following software must be installed:
 - [Apache Maven 3.6+](https://maven.apache.org/install.html)
 - [Python 3.6+](https://www.python.org/downloads/)
 - [Exonum Java 0.10](./java-binding.md#installation)
-- [cURL](https://curl.haxx.se/download.html).
+- [cURL](https://curl.haxx.se/download.html)
+- An editor or IDE for Java.
 
 ## Service Overview
 
 Blockchains are often used to implement secure registries. In this tutorial,
 we will implement a vehicle registry. The registry will keep a record of
-vehicles; and allow to create new vehicles, and change their owner.
+vehicles; and allow adding new vehicles and changing their owner.
 It will also provide REST API to query the registry.
 
 ## Service Implementation
@@ -39,7 +41,8 @@ It will also provide REST API to query the registry.
 
 #### Generate from Template
 
-First, create a new service project with a Maven archetype.
+First, open a terminal and run the following command to create a new service
+project with a Maven archetype:
 
 ```shell
 mvn archetype:generate \
@@ -374,6 +377,9 @@ block:ApiController
 
 The `ApiController` needs a `MyService` object to query data; and
 a `Node` object to obtain the needed context: `BlockchainData`.
+It uses [Vert.x Web][vertx-web] to define the endpoints.
+
+[vertx-web]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts
 
 !!! note
     We encode the response in Protocol Buffers binary format for brevity.
