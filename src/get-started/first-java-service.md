@@ -9,8 +9,8 @@ tutorial, however, omits some important to real-world services topics,
 like authorization, or proofs of authenticity for service data, or testing,
 but gives a foundation to learn about that in subsequent materials.
 
-It is recommended to read an [introduction into Exonum](what-is-exonum.md) 
-and its [design overview](design-overview.md) before proceeding 
+It is recommended to read an [introduction into Exonum](what-is-exonum.md)
+and its [design overview](design-overview.md) before proceeding
 with this tutorial.
 
 The full tutorial code is available in our [Git repository][car-registry-git].
@@ -78,7 +78,7 @@ completed successfully and the build passes.
     variable is set to the Exonum Java installation location.
     See the [installation instructions](java-binding.md#installation)
     for details.
-    
+
     If you get a compilation error `invalid flag: --release`, Maven likely
     uses Java 8 to compile the project. Check:
     
