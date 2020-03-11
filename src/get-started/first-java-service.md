@@ -8,12 +8,13 @@ to real-world services topics, like authorization, or proofs of authenticity
 for service data, or testing, but gives a foundation to learn about that
 in subsequent materials.
 
-<!-- todo: Is it the right introductory page on main Exonum principles and
-  abstractions? -->
-It is recommended to read an [Exonum design overview](design-overview.md)
-before proceeding with this tutorial.
+It is recommended to read an [introduction into Exonum](what-is-exonum.md) 
+and its [design overview](design-overview.md) before proceeding 
+with this tutorial.
 
-The full tutorial code is available in our Git repository.
+The full tutorial code is available in our [Git repository][car-registry-git].
+
+[car-registry-git]: https://github.com/exonum/exonum-java-binding/tree/ejb/v0.10.0/exonum-java-binding/tutorials/car-registry
 
 ## Prerequisites
 
@@ -34,7 +35,7 @@ It will also provide REST API to query the registry.
 
 ## Service Implementation
 
-### 1 Creating a Project
+### Creating a Project
 
 #### Generate from Template
 
@@ -42,22 +43,20 @@ First, create a new service project with a Maven archetype.
 
 ```shell
 mvn archetype:generate \
+    -DinteractiveMode=false \
     -DarchetypeGroupId=com.exonum.binding \
     -DarchetypeArtifactId=exonum-java-binding-service-archetype \
-    -DarchetypeVersion=0.10.0
+    -DarchetypeVersion=0.10.0 \
+    -DgroupId=com.example.car \
+    -DartifactId=car-registry \
+    -Dversion=1.0.0-SNAPSHOT
 ```
 
-<!--
-todo: Or replace with a non-interactive command, so that we don't rely
-on user input?
--->
-When prompted, enter the values of project properties, for example:
+We use the following values for service project properties:
 
 - `com.example.car` for `groupId`
 - `car-registry` for `artifactId`
-- `1.0.0-SNAPSHOT` for `version`
-
-Keep the default for `package` and confirm the input.
+- `1.0.0-SNAPSHOT` for `version`.
 
 Verify that the project has been generated correctly and the dependencies
 are installed by running its integration tests:
@@ -71,16 +70,18 @@ You shall see in the output that `com.example.car.MyServiceIntegrationTest`
 completed successfully and the build passes.
 
 ??? fail "Getting a build error?"
-    - If you get `java.lang.LinkageError` in the test, check that Exonum Java
+    If you get `java.lang.LinkageError` in the test, check that Exonum Java
     is installed correctly. Particularly, check that `EXONUM_HOME` environment
     variable is set to the Exonum Java installation location.
-    See the [installation instructions](./java-binding.md#installation)
+    See the [installation instructions](java-binding.md#installation)
     for details.
-    - If you get a compilation error `invalid flag: --release`, Maven likely
+    
+    If you get a compilation error `invalid flag: --release`, Maven likely
     uses Java 8 to compile the project. Check:
-         - That the Java on `PATH` is 11 or above: `java -version`
-         - That the `JAVA_HOME` environment variable is unset;
-         or points to a JDK installation 11 or above: `echo "$JAVA_HOME"`
+    
+    - That the Java on `PATH` is 11 or above: `java -version`
+    - That the `JAVA_HOME` environment variable is unset;
+      or points to a JDK installation 11 or above: `echo "$JAVA_HOME"`
 
 #### Skeleton Project Overview
 
@@ -89,7 +90,7 @@ The generated project is a mere "skeleton". It consists of two modules:
 - `car-registry-messages` for the definitions of service messages.
 - `car-registry-service` for the service business logic.
 
-### 2 Declare Service Persistent Data
+### Declare Service Persistent Data
 
 !!! tip
     Import the project into your IDE if you haven't already.
@@ -116,12 +117,9 @@ Run `mvn generate-sources` to compile the message.
 ---
 
 Next, we will define the persistent data of our service. Exonum Services define
-their persistent data in a _schema_: a set of named, persistent, typed
-collections, also known as indexes. Our project already has a template schema
-`MySchema` — navigate to it.
-
-<!-- todo: Shall we include here a MySchema template (as it is after generation)
-or is it redundant? -->
+their persistent data in a [_schema_](../glossary.md#data-schema):
+a set of named, persistent, typed collections, also known as indexes.
+Our project already has a template schema `MySchema` — navigate to it.
 
 The `MySchema` has a field `access` of type [`Prefixed`][prefixed], initialized in
 its constructor. It is a database access object, which allows to access
@@ -157,7 +155,7 @@ Notice that the `access.getProofMap` accepts three parameters:
     As the [`StandardSerializers.protobuf`][protobuf-serializer] uses reflection
     to look up the needed methods in the message class, it is recommended
     to instantiate a protobuf serializer once for each type
-    _and_ keep it in a `static` field, e.g.:
+    and keep it in a `static` field, e.g.:
 
     ```java
     private static final Serializer<Vehicle> VEHICLE_SERIALIZER =
@@ -182,10 +180,6 @@ mvn compile
 ```
 
 <!--
-todo: Shall we add a whole file of MySchema?
--->
-
-<!--
 Todo: Shall we draw a parallel with the DAO objects in business
 applications?
 -->
@@ -195,15 +189,15 @@ Todo: Shall we include the references to extra info on MerkleDB,
 indexes, serialization and serializers?
 -->
 
-### 3 Service Transactions
+### Service Transactions
 
 Our service needs two operations updating its state:
 
 - Add a new vehicle entry to the registry
 - Transfer the ownership over the vehicle to another user.
 
-Modifying operations in Exonum are called transactions. Transactions are
-implemented as methods in a service class — a class implementing
+Modifying operations in Exonum are called [_transactions_](../glossary.md#transaction).
+Transactions are implemented as methods in a service class — a class implementing
 [`Service`][service-interface] interface. A transaction method must be annotated
 with [`@Transaction`][transaction-annotation] annotation.
 
@@ -257,11 +251,13 @@ protobuf definition. It also accepts the `TransactionContext` allowing
 the transaction to access the database.
 
 The transaction implementation uses the service data schema `MySchema`
-to access its data.
+to access the service data.
 
 Note that the transaction throws an `ExecutionException` in case of
 a precondition failure: in this case, an attempt to add a vehicle with
-an existing ID.
+an existing ID. When Exonum catches an `ExecutionException`, it rolls back
+any changes made by this transaction and records its execution status
+as erroneous.
 
 <!--
 todo: Shall we add the ids to the example? If so, how do we split ids for
@@ -341,7 +337,7 @@ we have added earlier.
     <!-- todo: "There are more operations of such type: ..." — what is
     the canonical reference on the topic? Shall we add one? -->
 
-### 4 Service API
+### Service API
 
 In the previous section we have implemented operations modifying the blockchain
 state. Applications usually also need a means to _query_ data. In this section,
@@ -365,10 +361,6 @@ it takes the operation arguments and the context (here: `String` ID
 and `BlockchainData` context).
 
 #### API Controller
-
-<!-- As Exonum does not provide a means to invoke such read operations,
-we will
--->
 
 Next, we will add a class implementing the REST API of the service.
 It will expose our "find vehicle" operation as a `GET` method.
@@ -396,14 +388,15 @@ inside_block:ci-createPublicApiHandlers
 <!--/codeinclude-->
 
 !!! success
-    That's it with the service implementation! Package the _service artifact_
+    That's it with the service implementation! Package
+    the [_service artifact_](../glossary.md#artifact)
     and run the integration tests:
 
     ```shell
     mvn verify
     ```
 
-    and proceed to the next section, where we will test its operation.
+    and then proceed to the next section, where we will test its operation.
 
 ## Test Network
 
@@ -431,7 +424,7 @@ Open a separate shell session and check the active services:
 ```shell
 # You may pipe the response into `jq` to pretty-print it, if you have it
 # installed:
-curl -s http://127.0.0.1:3000/api/system/v1/services # | jq
+curl -s http://127.0.0.1:3000/api/services/supervisor/services # | jq
 ```
 
 You can see in the output the lists of deployed _service artifacts_ and
@@ -506,7 +499,7 @@ and the service instance start.
 We can also verify that both operations succeeded via the node API:
 
 ```shell
-curl -s http://127.0.0.1:3000/api/system/v1/services | jq
+curl -s http://127.0.0.1:3000/api/services/supervisor/services | jq
 ```
 
 #### Invoke the Service Operations
@@ -538,12 +531,16 @@ java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
   keygen
 ```
 
-Now, try to add your own vehicles to the blockchain:
+Now, try to submit transactions adding your own vehicles to the blockchain:
 
 ```shell
 java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
   add-vehicle -a -n=test-car-registry "My car" "VW" "Polo" "$USER"
 ```
+
+`-a` option requests the client to _await_ the transaction commitment, so that
+we can see its execution result; `-n` specifies the service instance _name_
+that we assigned on its start.
 
 Check they are in the registry:
 
@@ -556,7 +553,7 @@ Suppose for a minute, that Emmett Brown has got tired of time travels,
 and decided to transfer his DeLorean to you:
 
 ```shell
-# Check the entry before
+# Check the entry beforehand
 java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
   find-vehicle -n=test-car-registry "V2"
 
