@@ -52,14 +52,14 @@ mvn archetype:generate \
     -DarchetypeVersion=0.10.0 \
     -DgroupId=com.example.car \
     -DartifactId=car-registry \
-    -Dversion=1.0.0-SNAPSHOT
+    -Dversion=1.0.0
 ```
 
 We use the following values for service project properties:
 
 - `com.example.car` for `groupId`
 - `car-registry` for `artifactId`
-- `1.0.0-SNAPSHOT` for `version`.
+- `1.0.0` for `version`.
 
 Verify that the project has been generated correctly and the dependencies
 are installed by running its integration tests:
@@ -475,7 +475,7 @@ of the node: `testnet/artifacts`.
 # Create the artifacts directory
 mkdir testnet/artifacts
 # Copy the artifact
-cp car-registry-service/target/car-registry-service-1.0.0-SNAPSHOT-artifact.jar \
+cp car-registry-service/target/car-registry-service-1.0.0-artifact.jar \
    testnet/artifacts/
 ```
 
@@ -526,21 +526,21 @@ mvn package -pl car-registry-client -am
 Check it is built successfully:
 
 ```shell
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar -h
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar -h
 ```
 
 First, generate an Ed25519 key pair, that the client will use to sign
 the transactions to our service:
 
 ```shell
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   keygen
 ```
 
 Now, try to submit transactions adding your own vehicles to the blockchain:
 
 ```shell
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   add-vehicle -a -n=test-car-registry "My car" "VW" "Polo" "$USER"
 ```
 
@@ -551,7 +551,7 @@ that we assigned on its start.
 Check they are in the registry:
 
 ```shell
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   find-vehicle -n=test-car-registry "My car"
 ```
 
@@ -560,15 +560,15 @@ and decided to transfer his DeLorean to you:
 
 ```shell
 # Check the entry beforehand
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   find-vehicle -n=test-car-registry "V2"
 
 # Change the owner to the current user
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   change-owner -a -n=test-car-registry "V2" "$USER"
 
 # See the updated entry
-java -jar car-registry-client/target/car-registry-client-1.0.0-SNAPSHOT.jar \
+java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
   find-vehicle -n=test-car-registry "V2"
 ```
 
