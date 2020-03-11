@@ -207,7 +207,7 @@ with [`@Transaction`][transaction-annotation] annotation.
 [service-interface]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Service.html
 [transaction-annotation]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/transaction/Transaction.html
 
-Our project already has a template service `MyService` — navigate to it.
+Our project already has a template service named `MyService`.
 
 #### Add Vehicle Transaction
 
@@ -217,11 +217,6 @@ message.
 
 Add a new file `transactions.proto` in `car-registry-messages`
 (`car-registry-messages/src/main/proto/example/vehicle`).
-
-<!--
-todo: Again, shall we include a code example of an empty file
-(with package, option java_package, etc.)?
--->
 
 Then add the message definition of the _Add Vehicle_ transaction:
 
@@ -238,7 +233,7 @@ mvn generate-sources
 
 ---
 
-Next, let's write the transaction method. Navigate back to `MyService`,
+Next, let's write the transaction method. Navigate to `MyService`
 and add the following method:
 
 <!--codeinclude-->
@@ -256,17 +251,11 @@ the transaction to access the database.
 The transaction implementation uses the service data schema `MySchema`
 to access the service data.
 
-Note that the transaction throws an `ExecutionException` in case of
-a precondition failure: in this case, an attempt to add a vehicle with
-an existing ID. When Exonum catches an `ExecutionException`, it rolls back
+Note that the transaction throws an [`ExecutionException`](java-binding.md#exceptions)
+in case of a precondition failure: in this case, an attempt to add a vehicle
+with an existing ID. When Exonum catches an `ExecutionException`, it rolls back
 any changes made by this transaction and records its execution status
 as erroneous.
-
-<!--
-todo: Shall we add the ids to the example? If so, how do we split ids for
-different transactions?
-Or just use the literals?
--->
 
 Compile the code:
 
