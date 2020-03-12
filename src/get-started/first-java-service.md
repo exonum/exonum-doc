@@ -82,7 +82,7 @@ completed successfully and the build passes.
 
     If you get a compilation error `invalid flag: --release`, Maven likely
     uses Java 8 to compile the project. Check:
-    
+
     - That the Java on `PATH` is 11 or above: `java -version`
     - That the `JAVA_HOME` environment variable is unset;
       or points to a JDK installation 11 or above: `echo "$JAVA_HOME"`
