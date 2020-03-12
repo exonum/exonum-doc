@@ -183,16 +183,6 @@ Compile the project:
 mvn compile
 ```
 
-<!--
-Todo: Shall we draw a parallel with the DAO objects in business
-applications?
--->
-
-<!--
-Todo: Shall we include the references to extra info on MerkleDB,
-indexes, serialization and serializers?
--->
-
 ### Service Transactions
 
 Our service needs two operations updating its state:
@@ -475,6 +465,9 @@ does not exist already? If it shall, won't it cause problems if we launch
 several nodes locally with the same (not yet existing) artifacts directory?
 
 It is somewhat annoying to always have to create the dir :-)
+
+Possibly, we can use ./artifacts (outside testnet/) so that it does not
+get cleaned by either ./start-testnet.sh or mvn clean.
 -->
 
 <!--
@@ -567,11 +560,6 @@ java -jar car-registry-client/target/car-registry-client-1.0.0.jar \
     service, started a network of nodes, and deployed your application
     in it!
 
-<!--
-TODO: Are there any articles that go well after this tutorial completion
-that we shall mention at its end?
--->
-
 ## Exercises
 
 **E1**. The transaction [transferring the ownership over a vehicle](#transfer-the-ownership-transaction)
@@ -606,3 +594,10 @@ Modify the transaction so that such operation is possible.
 
 !!! note
     You will have to modify the service, its API and the client application.
+
+## See Also
+
+- [The Exonum Java User Guide](java-binding.md)
+- Various articles on Exonum architecture: [Services](../architecture/services.md),
+  [Transactions](../architecture/transactions.md), [MerkleDB](../architecture/merkledb.md),
+  etc.
