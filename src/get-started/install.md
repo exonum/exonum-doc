@@ -8,7 +8,8 @@ title: Installation guide
 [Exonum core][exonum] and most [other Exonum repositories][exonum-org] use
 [the Rust programming language][rust] and the corresponding toolchain.
 This document details how to setup development environment for contributing
-to these projects, testing them, and developing using Exonum.
+to these projects, testing them, and developing using Exonum. For developing
+Java services, see Exonum Java [installation instructions](java-binding.md#installation).
 
 !!! note
     Currently, you need to compile the core locally for every application

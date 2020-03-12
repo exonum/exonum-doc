@@ -54,11 +54,11 @@ deployment.
         available in Ubuntu 18.04 or can be installed from a custom PPA.
 
     ```bash tab="Linux (Ubuntu)"
-        sudo apt-get update && sudo apt-get install libsodium-dev
+    sudo apt-get update && sudo apt-get install libsodium-dev
     ```
 
     ```bash tab="Mac OS"
-        brew install libsodium
+    brew install libsodium
     ```
 
 3. Follow the steps in the [After Install](#after-install) section below
@@ -1359,7 +1359,7 @@ For using the library just include the dependency in your `pom.xml`:
 ## See Also
 
 - [Javadocs](https://exonum.com/doc/api/java-binding/0.9.0-rc2/index.html)
-- [Rust instruction](create-service.md)
+- [Vehicle Registry Tutorial](first-java-service.md)
 
 [abstract-service]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/AbstractService.html
 [blockchain]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/blockchain/Blockchain.html
