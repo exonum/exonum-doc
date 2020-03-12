@@ -400,9 +400,11 @@ chmod 744 start-testnet.sh # Allow the script execution, needed once
 When you see messages like the following, the network is active:
 
 <!-- markdownlint-disable line-length -->
+
 ```text
 [2020-03-05T10:36:24Z INFO  exonum_node::consensus] COMMIT ====== height=4, proposer=0, round=1, committed=0, pool=0, hash=43ac20f8b...
 ```
+
 <!-- markdownlint-enable line-length -->
 
 Open a separate shell session and check the active services:
