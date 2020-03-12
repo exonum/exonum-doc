@@ -7,17 +7,18 @@ into service development in Java. You will learn how to create an Exonum service
 start a test network, and deploy your service in it. This introductory
 tutorial, however, omits some important to real-world services topics,
 like authorization, or proofs of authenticity for service data, or testing,
-but gives a foundation to learn about that in subsequent materials.
-
-It is recommended to read an [introduction into Exonum](what-is-exonum.md)
-and its [design overview](design-overview.md) before proceeding
-with this tutorial.
+but gives a solid foundation to learn about that in subsequent materials.
 
 The full tutorial code is available in our [Git repository][car-registry-git].
 
 [car-registry-git]: https://github.com/exonum/exonum-java-binding/tree/ejb/v0.10.0/exonum-java-binding/tutorials/car-registry
 
 ## Prerequisites
+
+It is recommended to read an [introduction into Exonum](what-is-exonum.md)
+and its [design overview](design-overview.md) before proceeding
+with this tutorial. The reader is expected to be familiar with the Java
+programming language.
 
 The following software must be installed:
 
