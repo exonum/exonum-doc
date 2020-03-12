@@ -308,9 +308,9 @@ A transaction method must accept two parameters:
 1. _arguments_ either as a protobuf message or as a `byte[]`.
   Protobuf messages are deserialized using a `#parseFrom(byte[])` method of
   the actual parameter type.
-2. _execution context_ as `TransactionContext`.
+2. _execution context_ as `ExecutionContext`.
 
-The [execution context][transaction-execution-context] provides:
+The [execution context][execution-context] provides:
 
 - A mutable access to the blockchain data, which allows performing modifying
   operations;
@@ -341,7 +341,7 @@ A service schema object can be used to access data collections of this service.
        */
       @Transaction(PUT_TX_ID)
       public void putEntry(Transactions.PutTransactionArgs arguments,
-          TransactionContext context) {
+          ExecutionContext context) {
         FooSchema schema = new FooSchema(context.getServiceData());
         String key = arguments.getKey();
         String value = arguments.getValue();
@@ -1393,7 +1393,7 @@ For using the library just include the dependency in your `pom.xml`:
 [supervisor-service]: ../advanced/supervisor.md
 [time-oracle]: ../advanced/time.md
 [transaction]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/Transaction.html
-[transaction-execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/transaction/TransactionContext.html
+[execution-context]: https://exonum.com/doc/api/java-binding/0.9.0-rc2/com/exonum/binding/core/service/ExecutionContext.html
 [transactions]: ../architecture/transactions.md
 [transactions-messages]: ../architecture/transactions.md#messages
 [vertx-web-docs]: https://vertx.io/docs/vertx-web/java/#_basic_vert_x_web_concepts

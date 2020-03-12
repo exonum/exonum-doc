@@ -236,7 +236,7 @@ The annotation accepts an integral _transaction ID_: an identifier of
 the transaction that service clients use to invoke it.
 
 The method accepts `AddVehicle` class: an auto-generated class from our
-protobuf definition. It also accepts the `TransactionContext` allowing
+protobuf definition. It also accepts the `ExecutionContext` allowing
 the transaction to access the database.
 
 The transaction implementation uses the service data schema `MySchema`
