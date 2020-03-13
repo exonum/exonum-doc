@@ -164,10 +164,6 @@ In Java, implementations of collections are located in
 [a separate package][storage-indices]. Said package documentation
 describes their use.
 
-!!! note
-    `SparseListIndex` is not yet supported in Java. Let us know if it may be
-    useful for you!
-
 Collections are instantiated using a database view. The database view
 works as an index factory. The views may be based on a `Snapshot` — a read-only
 view corresponding to the database state as of the latest committed block;
