@@ -4,4 +4,4 @@ mkdocs~=1.0
 Pygments~=2.5
 pygments-github-lexers~=0.0.5
 mkdocs-material~=4.6
--e git+https://github.com/exonum/mkdocs-codeinclude-plugin@8540916fc5825cfe31aa263cfd4e8092a05525c1#egg=mkdocs_codeinclude_plugin
+-e git+https://github.com/exonum/mkdocs-codeinclude-plugin@cf40bdcfeb11600e1e571b69fe2abae80173971c#egg=mkdocs_codeinclude_plugin
