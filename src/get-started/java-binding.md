@@ -181,16 +181,10 @@ Exonum stores elements in collections as byte arrays. Therefore,
 serializers for values stored in collections must be provided.
 See [Serialization](#serialization) for details.
 
-!!! note "Example of ProofMapIndex Creation"
-    ```java
-    void putEntry(Prefixed access, String key, String value) {
-      var indexAddress = IndexAddress.valueOf("entries");
-      var entries = access.getProofMap(indexAddress,
-          StandardSerializers.string(),
-          StandardSerializers.string());
-      entries.put(key, value);
-    }
-    ```
+<!--codeinclude-->
+[Example of accessing ProofMapIndex](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/ProofMapCreation.java)
+block:putEntry
+<!--/codeinclude-->
 
 A set of named collections constitute a *service schema*. A service schema
 is usually created using a [`Prefixed`](#blockchain-data) database access
