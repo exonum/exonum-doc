@@ -158,7 +158,7 @@ in every block are processed and after all transactions in it are processed.
 All these service handlers may modify the blockchain state.
 
 Depending on the runtime implementation, a service may also receive
-a notification after each block is been committed.
+a notification after each block has been committed.
 
 ### Read Requests
 

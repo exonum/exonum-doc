@@ -135,9 +135,9 @@ To keep a registry of vehicles indexed by their IDs, we will use a `ProofMap`
 index with `String` keys and `Vehicle` values, named `vehicles`.
 The `ProofMap` ensures that the data is the same
 on each node in the network.
-We will expose our index through a factory method — a method that will create
-a new `ProofMap`. Use [`access.getProofMap`][access-get-proof-map] method
-to create the `vehicles` index:
+We will expose our index through a factory method — a method that provides
+access to the `ProofMap`. Use [`Access.getProofMap`][access-get-proof-map] method
+to access the `vehicles` index:
 
 [access-get-proof-map]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/storage/database/Access.html#getProofMap(com.exonum.binding.core.storage.indices.IndexAddress,com.exonum.binding.common.serialization.Serializer,com.exonum.binding.common.serialization.Serializer)
 
@@ -281,7 +281,7 @@ appropriate constants:
 inside_block:ci-change-owner
 <!--/codeinclude-->
 
-This transaction is similar to the first.
+This transaction is similar to the first one.
 
 Notice how an update of the `owner` field in an existing `Vehicle` value
 is performed. It creates a builder from the existing object with
@@ -296,7 +296,7 @@ mvn compile
 
 #### Service Constructor
 
-Finally, we will add a _service constructor_ — a special type of a transaction,
+Finally, we will add a _service constructor_ — a service method
 that is invoked once when the service is instantiated. We will use it
 to populate our registry with some test data.
 
@@ -317,8 +317,8 @@ we have added earlier.
 !!! success
     In this section we have learned how to implement operations modifying
     the blockchain state: transactions and the service constructor.
-    <!-- todo: "There are more operations of such type: ..." — what is
-    the canonical reference on the topic? Shall we add one? -->
+    There are more operations of such type described in [Service Hooks](../architecture/services.md#hooks)
+    section.
 
 ### Service API
 
