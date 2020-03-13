@@ -199,34 +199,10 @@ of all non-grouped Merkelized collections automatically. See
 the [“State Aggregation”](../architecture/merkledb.md#state-aggregation)
 section of MerkleDB documentation for details.
 
-!!! note "Example of a Service Schema with a single Merkelized collection"
-
-    ```java
-    class FooSchema implements Schema {
-      private final Prefixed view;
-
-      /**
-       * Creates a schema given a prefixed database access object.
-       * The database state is determined by the access object.
-       */
-      FooSchema(Prefixed access) {
-        this.view = access;
-      }
-
-      /**
-       * Creates a test ProofMap.
-       *
-       * <p>Such factory methods may be used in transactions and read requests
-       * to create a collection of a certain type and name. Here,
-       * a ProofMap with String keys and values is created with a full name
-       * "<service name>.test-map".
-       */
-      ProofMapIndexProxy<String, String> testMap() {
-        var address = IndexAddress.valueOf("test-map");
-        return view.getProofMap(address, string(), string());
-      }
-    }
-    ```
+<!--codeinclude-->
+[Example of a Service Schema with a single Merkelized collection](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/FooSchema.java)
+block:FooSchema
+<!--/codeinclude-->
 
 #### Blockchain Data
 
