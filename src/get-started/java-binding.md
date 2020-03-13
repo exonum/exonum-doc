@@ -290,41 +290,14 @@ The [execution context][execution-context] provides:
 
 A service schema object can be used to access data collections of this service.
 
-!!! note "Example of a simple transaction"
+<!--codeinclude-->
+[Transaction Example: Service Method](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/FooService.java)
+inside_block:ci_put_tx
+<!--/codeinclude-->
 
-    ```java
-    public final class FooService extends AbstractService {
-
-      /** A numeric identifier of the "put" transaction. */
-      private static final int PUT_TX_ID = 0;
-
-      @Inject
-      public FooService(ServiceInstanceSpec instanceSpec) {
-        super(instanceSpec);
-      }
-
-      /**
-       * Puts an entry (a key-value pair) into the test proof map.
-       *
-       * <p>{@code Transactions.PutTransactionArgs} is a Protoc-generated
-       * class with the transaction method arguments.
-       */
-      @Transaction(PUT_TX_ID)
-      public void putEntry(Transactions.PutTransactionArgs arguments,
-          ExecutionContext context) {
-        FooSchema schema = new FooSchema(context.getServiceData());
-        String key = arguments.getKey();
-        String value = arguments.getValue();
-        schema.testMap()
-            .put(key, value);
-      }
-
-      @Override
-      public void createPublicApiHandlers(Node node, Router router) {
-        // No handlers
-      }
-    }
-    ```
+<!--codeinclude-->
+[Transaction Example: Arguments Message](../../code-examples/java/exonum-java-binding/site-examples/src/main/proto/example/guide/transactions.proto)
+<!--/codeinclude-->
 
 An implementation of the `Transaction` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
