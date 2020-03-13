@@ -331,11 +331,9 @@ from the registry. This operation will be exposed through REST API.
 
 First, we need to add a query operation to the Service:
 
-<!-- FIXME: Replace lines: selector with inside_block:ci-find-vehicle when
-the bug with braces is resolved: ECR-4318 -->
 <!--codeinclude-->
 [MyService.findVehicle](../../code-examples/java/exonum-java-binding/tutorials/car-registry/car-registry-service/src/main/java/com/example/car/MyService.java)
-lines:138-146
+inside_block:ci-find-vehicle
 <!--/codeinclude-->
 
 Although this query method will be invoked by our code, hence the signature
