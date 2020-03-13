@@ -495,19 +495,10 @@ A service module shall:
   2. be annotated with `@org.pf4j.Extension`.
   3. be `public`.
 
-!!! note "Minimalistic Example of Service Module"
-    ```java
-
-    @Extension
-    public class ServiceModule extends AbstractServiceModule {
-
-      @Override
-      protected void configure() {
-        // Define the Service implementation.
-        bind(Service.class).to(CryptocurrencyService.class).in(Singleton.class);
-      }
-    }
-    ```
+<!--codeinclude-->
+[Minimalistic Example of Service Module](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/ServiceModule.java)
+inside_block:ci_service_module
+<!--/codeinclude-->
 
 The fully-qualified name of the module class is recorded in the service artifact
 metadata and is used by the framework to instantiate services.
