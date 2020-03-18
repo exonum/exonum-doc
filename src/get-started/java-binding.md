@@ -164,10 +164,6 @@ In Java, implementations of collections are located in
 [a separate package][storage-indices]. Said package documentation
 describes their use.
 
-!!! note
-    `SparseListIndex` is not yet supported in Java. Let us know if it may be
-    useful for you!
-
 Collections are instantiated using a database view. The database view
 works as an index factory. The views may be based on a `Snapshot` — a read-only
 view corresponding to the database state as of the latest committed block;
@@ -181,16 +177,10 @@ Exonum stores elements in collections as byte arrays. Therefore,
 serializers for values stored in collections must be provided.
 See [Serialization](#serialization) for details.
 
-!!! note "Example of ProofMapIndex Creation"
-    ```java
-    void putEntry(Prefixed access, String key, String value) {
-      var indexAddress = IndexAddress.valueOf("entries");
-      var entries = access.getProofMap(indexAddress,
-          StandardSerializers.string(),
-          StandardSerializers.string());
-      entries.put(key, value);
-    }
-    ```
+<!--codeinclude-->
+[Example of accessing ProofMapIndex](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/ProofMapCreation.java)
+block:putEntry
+<!--/codeinclude-->
 
 A set of named collections constitute a *service schema*. A service schema
 is usually created using a [`Prefixed`](#blockchain-data) database access
@@ -205,34 +195,10 @@ of all non-grouped Merkelized collections automatically. See
 the [“State Aggregation”](../architecture/merkledb.md#state-aggregation)
 section of MerkleDB documentation for details.
 
-!!! note "Example of a Service Schema with a single Merkelized collection"
-
-    ```java
-    class FooSchema implements Schema {
-      private final Prefixed view;
-
-      /**
-       * Creates a schema given a prefixed database access object.
-       * The database state is determined by the access object.
-       */
-      FooSchema(Prefixed access) {
-        this.view = access;
-      }
-
-      /**
-       * Creates a test ProofMap.
-       *
-       * <p>Such factory methods may be used in transactions and read requests
-       * to create a collection of a certain type and name. Here,
-       * a ProofMap with String keys and values is created with a full name
-       * "<service name>.test-map".
-       */
-      ProofMapIndexProxy<String, String> testMap() {
-        var address = IndexAddress.valueOf("test-map");
-        return view.getProofMap(address, string(), string());
-      }
-    }
-    ```
+<!--codeinclude-->
+[Example of a Service Schema with a single Merkelized collection](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/FooSchema.java)
+block:FooSchema
+<!--/codeinclude-->
 
 #### Blockchain Data
 
@@ -320,41 +286,14 @@ The [execution context][execution-context] provides:
 
 A service schema object can be used to access data collections of this service.
 
-!!! note "Example of a simple transaction"
+<!--codeinclude-->
+[Transaction Example: Service Method](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/FooService.java)
+inside_block:ci_put_tx
+<!--/codeinclude-->
 
-    ```java
-    public final class FooService extends AbstractService {
-
-      /** A numeric identifier of the "put" transaction. */
-      private static final int PUT_TX_ID = 0;
-
-      @Inject
-      public FooService(ServiceInstanceSpec instanceSpec) {
-        super(instanceSpec);
-      }
-
-      /**
-       * Puts an entry (a key-value pair) into the test proof map.
-       *
-       * <p>{@code Transactions.PutTransactionArgs} is a Protoc-generated
-       * class with the transaction method arguments.
-       */
-      @Transaction(PUT_TX_ID)
-      public void putEntry(Transactions.PutTransactionArgs arguments,
-          ExecutionContext context) {
-        FooSchema schema = new FooSchema(context.getServiceData());
-        String key = arguments.getKey();
-        String value = arguments.getValue();
-        schema.testMap()
-            .put(key, value);
-      }
-
-      @Override
-      public void createPublicApiHandlers(Node node, Router router) {
-        // No handlers
-      }
-    }
-    ```
+<!--codeinclude-->
+[Transaction Example: Arguments Message](../../code-examples/java/exonum-java-binding/site-examples/src/main/proto/example/guide/transactions.proto)
+<!--/codeinclude-->
 
 An implementation of the `Transaction` method must be a pure function,
 i.e. it must produce the same _observable_ result on all the nodes of the system
@@ -552,19 +491,10 @@ A service module shall:
   2. be annotated with `@org.pf4j.Extension`.
   3. be `public`.
 
-!!! note "Minimalistic Example of Service Module"
-    ```java
-
-    @Extension
-    public class ServiceModule extends AbstractServiceModule {
-
-      @Override
-      protected void configure() {
-        // Define the Service implementation.
-        bind(Service.class).to(CryptocurrencyService.class).in(Singleton.class);
-      }
-    }
-    ```
+<!--codeinclude-->
+[Minimalistic Example of Service Module](../../code-examples/java/exonum-java-binding/site-examples/src/main/java/com/exonum/binding/example/guide/ServiceModule.java)
+inside_block:ci_service_module
+<!--/codeinclude-->
 
 The fully-qualified name of the module class is recorded in the service artifact
 metadata and is used by the framework to instantiate services.
