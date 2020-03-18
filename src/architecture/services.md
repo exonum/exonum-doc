@@ -158,7 +158,7 @@ in every block are processed and after all transactions in it are processed.
 All these service handlers may modify the blockchain state.
 
 Depending on the runtime implementation, a service may also receive
-a notification after each block is been committed.
+a notification after each block has been committed.
 
 ### Read Requests
 
@@ -318,9 +318,9 @@ Here is a list of things to figure out when developing an Exonum service:
   should be provided to the the service locally or stored in the blockchain.)
 
 !!! tip
-    [The Cryptocurrency Tutorial](../get-started/create-service.md)
-    provides a hands-on guide how to build an Exonum service that implements
-    a minimalistic crypto-token.
+    [The Cryptocurrency Tutorial](../get-started/create-service.md) in Rust
+    and [the Vehicle Registry Tutorial](../get-started/first-java-service.md)
+    in Java provide hands-on guides on building Exonum services.
 
 ### Limitations
 
