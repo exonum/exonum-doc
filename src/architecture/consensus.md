@@ -42,8 +42,7 @@ usual assumptions:
 - Validator nodes are assumed to be [partially synchronous][partial_synchrony],
   i.e., their computation performances do not differ much
 - The network is partially synchronous, too. That is, all messages are
- delivered
-  in the finite time which, however, is unknown in advance
+  delivered in the finite time which, however, is unknown in advance
 - Each validator has access to a local **stopwatch** to determine time
   intervals.
   On the other hand, there is no global synchronized time in the system
@@ -55,10 +54,18 @@ consensus) and its successors.
 
 ## Algorithm Overview
 
-The process of reaching consensus on the next block (at the blockchain height
-`H`) consists of several **rounds**, numbered from 1\. The first round starts
-once the
-validator commits the block at height `H - 1`. The onsets of rounds are
+Consensus algorithm in Exonum proceeds in iterations (*epochs*).
+At each epoch, the nodes make a decision as to the transactions
+in the next block and their effect on the blockchain state.
+As an alternative to accepting a new block, the nodes may decide
+to skip block creation for the epoch; this outcome is called *block skip*.
+
+The reasoning for having block skips is outlined [at the end](#block-skips)
+of this article.
+
+The process of reaching consensus at epoch `E` consists of several **rounds**,
+numbered from 1\. The first round starts once the
+validator commits the outcome of epoch `E - 1`. The onsets of rounds are
 determined by the following timetable: rounds start with time intervals
 that linearly increase with the round number.
 As there is no global time,
@@ -67,11 +74,11 @@ rounds may start at different time for different validators.
 When the round number `R` comes, the previous rounds are not completed.
 That is, round `R` means that the validator can process messages
 related to a round with a number no greater than `R`.
-The current state of a validator can be described as a tuple `(H, R)`.
-The `R` part may differ among validators, but the height `H` is usually the
+The current state of a validator can be described as a tuple `(E, R)`.
+The `R` part may differ among validators, but the epoch `E` is usually the
 same.
 If a specific validator is lagging (e.g., during its initial synchronization,
-or if it was switched off for some time), its height may be lower.
+or if it was switched off for some time), its epoch may be lower.
 In this case, the validator can request missing blocks from
 other validators and full nodes in order to quickly synchronize with the rest
 of the network.
@@ -81,22 +88,21 @@ of the network.
 To put it *very* simply, rounds proceed as follows:
 
 1. Each round has a *leader node*. The round leader offers a *proposal*
-   for the next block and broadcasts it across the network. The logic of
-   selecting the leader node is described in a separate algorithm.
+  for the next block or block skip and broadcasts it across the network.
+  The logic of selecting the leader node is described in a separate algorithm.
 2. Validators may vote for the proposal by broadcasting a *prevote* message.
-   A prevote means that the validator has been able to parse the proposal
-   and has all transactions specified in it.
+  A prevote means that the validator has been able to parse the proposal
+  and has all transactions specified in it.
 3. After the validator has collected enough prevotes from a supermajority
-   of other validators, it applies transactions specified in the voted
-   proposal,
-   and broadcasts a *precommit* message. This message contains the result of
-   the proposal execution in the form of [a new state hash](merkledb.md).
-   The precommit expresses that the sender is ready to commit the corresponding
-   proposed block to the blockchain, but needs to see what other validators
-   have to say on the matter just to be sure.
+  of other validators, it applies transactions specified in the voted proposal,
+  and broadcasts a *precommit* message. This message contains the result of
+  the proposal execution in the form of [a new state hash](merkledb.md).
+  The precommit expresses that the sender is ready to commit the corresponding
+  proposed block to the blockchain, but needs to see what other validators
+  have to say on the matter just to be sure.
 4. Finally, if the validator has collected a supermajority of precommits with
-   the same state hash for the same proposal, the proposed block is committed
-   to the blockchain.
+  the same state hash for the same proposal, the proposed block or block skip
+  is committed to the blockchain.
 
 ### Non-Strawman Version
 
@@ -108,7 +114,7 @@ The algorithm above is overly simplified:
 
 - The validator may receive messages in any order because of network delays.
   For example, the validator may receive a prevote or precommit for a block
-  proposal that the validator doesn’t know
+  proposal that the validator does not know
 - There can be validators acting not according to the consensus algorithm.
   Validators may be offline, or they can be corrupted by an adversary. To
   formalize
@@ -120,10 +126,11 @@ The 3-phase consensus (proposals, prevotes and precommits) described above
 is there to make the consensus algorithm operational under these conditions.
 More precisely, the algorithm is required to maintain *safety* and *liveness*:
 
-- Safety means that once a single honest validator has committed a block, no
-  other honest validator will ever commit any other block at the same height
-- Liveness means that honest validators keep committing blocks from time to
-  time
+- Safety means that once a single honest validator has committed a block
+  or a block skip, no other honest validator will ever commit any other outcome
+  at the same epoch
+- Liveness means that honest validators keep deciding on an epoch outcome
+  from time to time
 
 #### Locks
 
@@ -131,7 +138,7 @@ Byzantine validators may send different messages to different validators.
 To maintain safety under these conditions, the Exonum consensus algorithm uses
 the concept of *locks*.
 
-A validator that has collected a +2/3 prevotes for some block proposal locks on
+A validator that has collected a +2/3 prevotes for some proposal locks on
 that proposal. The locked validator does not vote for any other proposal except
 for the proposal on which it is locked. When a new round starts,
 the locked validator immediately sends a prevote indicating
@@ -158,9 +165,9 @@ and which has been discovered during the previous communication with the peer.
 
 !!! note "Example"
     A request is sent if a node receives a consensus message from
-    a height greater than the local height. The peer is supposed to respond
-    with a message that contains transactions in an accepted block, together
-    with a proof that the block is indeed accepted (i.e., precommits of +2/3
+    an epoch greater than the local epoch. The peer is supposed to respond
+    with the contents of the epoch outcome (block with transactions or a block skip),
+    together with a proof of authenticity (i.e., precommits of +2/3
     validators).
 
 There are requests for all consensus messages: proposals, prevotes, and
@@ -180,7 +187,7 @@ On the timeline, these states look the following way (for one of the
 validator nodes):
 
 ```none
-Commit: |  H  |                       | H+1 |                        ...
+Commit: |  E  |                       | E+1 |                        ...
 Round1: |     | R1                    |     | R1                     ...
 Round2: |          | R2               |          | R2                ...
 Round3: |               | R3          |               | R3           ...
@@ -234,14 +241,14 @@ validators.
 
 #### Status
 
-`Status` is an information message about the current height. It is sent with a
-periodicity written in the `status_timeout`
-[global configuration parameter](configuration.md).
+`Status` is an information message about the current node state (in particular,
+its blockchain height and epoch). It is sent with a periodicity determined
+by the `status_timeout` [global configuration parameter](configuration.md).
 
 #### BlockResponse
 
-A `BlockResponse` message contains a block (in the meaning of blockchain) and a
-set of `Precommit` messages that allowed that block to be accepted.
+A `BlockResponse` message contains a block with transaction or a block skip,
+and a set of `Precommit` messages authenticating it.
 `BlockResponse` messages are sent upon request.
 
 #### Connect
@@ -249,7 +256,7 @@ set of `Precommit` messages that allowed that block to be accepted.
 A node sends a `Connect` message to all addresses from the list of its known
 peers during initialization. The message tells the peer to connect to the
 address specified in this message. Each of the receiving nodes respond
-by their own `Connect` messages when `node::Event::Connected` occurs.
+by their own `Connect` messages.
 
 ### Request Messages
 
@@ -268,6 +275,48 @@ obvious.
 
 In comparison with other BFT algorithms, the consensus algorithm in Exonum has
 the following distinctive features.
+
+### Block Skips
+
+!!! warning
+    Block skips are considered an experimental feature and need to be explicitly
+    switched on. (See [node docs] for more details.) In best Rust traditions,
+    you don’t pay for security / safety if you don’t use this feature.
+
+Skipping block creation under certain conditions allows to save on storage
+and processing power of the nodes. Unlike normal blocks, block skips are not
+recorded in the blockchain forever; instead, the nodes store only the latest skip
+if it corresponds to the newest blockchain height. If a node accepts a
+normal block, it erases the skip.
+
+If there are no transactions in the network
+for a prolonged period of time, block skips provide tangible reduction
+in storage space compared to constantly creating empty blocks.
+
+!!! note
+    A curious reader may wonder why the consensus algorithm does not just halt
+    when there are no transactions. The answers lies in the partial network
+    synchronicity assumption underpinning the consensus algorithm. This assumption
+    means that a situation where nodes do not exchange messages is indistinguishable
+    with the situation where nodes are not connected! Thus, block skips provide
+    the “heartbeat” for the network.
+
+    Another reason to use block skips is that they allow to actualize proofs
+    regarding the blockchain state. Since block skips are stored similarly to
+    empty blocks, it is possible to tie a [Merkle proof](../glossary.md#merkle-proof)
+    to the newest skip instead of the newest normal block.
+
+### Customizable Proposal Logic
+
+!!! warning
+    Just like block skips, customizing proposal logic is experimental
+    and need to be explicitly switched on. Consult [node docs] for more details.
+
+The positive effect of block skips is enhanced by the ability of
+nodes to customize the logic how they form block proposals.
+For example, nodes may whitelist / blacklist transactions by the sender,
+prioritize transactions by the addressed service or other parameters,
+implement more flexible transaction limits, and so on.
 
 ### Unbounded Rounds
 
@@ -337,3 +386,4 @@ validators. This has a positive effect on system liveness.
 [wiki:bft]: https://en.wikipedia.org/wiki/Byzantine_fault_tolerance
 [pbft]: http://pmg.csail.mit.edu/papers/osdi99.pdf
 [wiki:hmac]: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
+[node docs]: https://docs.rs/exonum-node/
