@@ -1129,7 +1129,7 @@ artifacts:
     the coordinates (name and version) of the services built-in
     into the node, you may launch the node and request the list of services
     from the [supervisor](../advanced/supervisor.md):
-    
+
     ```shell
     # Replace <public_port> with the node public port.
     #
