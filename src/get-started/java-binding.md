@@ -1115,10 +1115,10 @@ artifacts:
       artifact_filename: "cryptocurrency-demo-0.10.0-artifact.jar"
   time:
     runtime: rust
-    name: "exonum-time:0.13.0-rc.2"
+    name: "exonum-time:1.0.0"
   timestamping:
     runtime: rust
-    name: "exonum-timestamping:0.13.0-rc.2"
+    name: "exonum-timestamping:1.0.0"
 ```
 
 Add a `plugins` section to enable both Java Runtime plugin and Instance
@@ -1320,7 +1320,7 @@ For using the library just include the dependency in your `pom.xml`:
 [node-submit-transaction]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Node.html#submitTransaction(com.exonum.binding.transaction.RawTransaction)
 [slf4j-home]: https://www.slf4j.org/
 [standard-serializers]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/common/serialization/StandardSerializers.html
-[standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/0.13.0-rc.2/exonum_supervisor/
+[standard-supervisor-rustdoc]: https://docs.rs/exonum-supervisor/1.0.0/exonum_supervisor/
 [storage-indices]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/storage/indices/package-summary.html
 [supervisor-service]: ../advanced/supervisor.md
 [time-oracle]: ../advanced/time.md
