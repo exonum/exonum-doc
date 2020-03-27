@@ -862,6 +862,10 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
+These services come pre-deployed in the genesis block.
+See [_Deploy and Start the Service_](#deploy-and-start-the-service)
+for instructions on their instantiation.
+
 ## Node Configuration
 
 Exonum offers a three-step way of the node configuration process. It allows
