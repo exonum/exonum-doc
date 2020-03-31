@@ -31,29 +31,54 @@ The definitions from the
 are used. In particular, +2/3 means more than two thirds of the validators,
 and -1/3 means less than one third.
 
+### Epochs
+
+The consensus algorithm occurs in *epochs*. During each epoch nodes can agree
+on one of the following types of outcomes:
+
+- Apply a **block of transactions**. The nodes need to agree on the ordering
+  of transactions, their effect on the blockchain state and errors that
+  occurred during execution. Besides transactions,
+  [hooks](../../architecture/services.md#hooks) for active services are executed
+  before and after transactions.
+
+- Skip block creation on this epoch, instead approving a **block skip**.
+  Block skips are similar to empty blocks, but they do not entail executing
+  *any* calls. Thus, the blockchain state is unaffected after a block skip
+  (or any number of successive block skips).
+
+An epoch is represented by non-negative integer, which is incremented by one
+each time a decision is made by the network. Note that this integer may differ
+from the blockchain height; the epoch is always greater or equal to the height.
+
+Applying a block increases the blockchain height by one. The block is permanently
+recorded into the node storage. In contrast, applying a block skip does not increase
+the blockchain height. The node stores only the latest block skip, overwriting
+it if a skip is approved at the same blockchain height and the greater epoch.
+If the network approves a normal block, a stored block skip (if any) is erased
+by the node.
+
 ### Rounds
 
-The consensus algorithm proceeds in rounds for each blockchain height
-(i.e., the number of blocks in the blockchain).
-Rounds are numbered from 1\. The onsets of rounds are determined
-by the following timetable:
+The consensus algorithm proceeds in rounds for each epoch.
+Rounds are numbered from 1 and are not synchronized among nodes.
 
-- The first round starts after committing a block at the previous height
-  to the blockchain
-- The second round starts within `first_round_timeout` interval. The default
-  value of the `first_round_timeout` is 3000 ms and can be configured by the
-  network through a new proposal at any time
-- All further round timeouts are calculated according to the following formula:
-  `first_round_timeout + (r-1)*round_timeout_increase`. The
-  `round_timeout_increase` value is a percentage of the `first_round_timeout`.
-  `round_timeout_increase` is defined in the
-  `ConsensusConfig::TIMEOUT_LINEAR_INCREASE_PERCENT` constant and constitutes
-  10% of the `first_round_timeout`.
+The onsets of rounds are determined by the following timetable.
+The first round starts after committing a normal block or a block skip
+at the previous epoch.
+The second round starts within `first_round_timeout` interval,
+The value of which can be configured via
+[consensus configuration](../../architecture/configuration.md#consensus-algorithm-parameters).
+All further round timeouts are calculated according to the following formula:
+
+```text
+first_round_timeout + (r - 1) * round_timeout_increase
+```  
+
+Here, `round_timeout_increase` is 10% of the `first_round_timeout`.
 
 Thus, the duration of rounds gradually increases. This provides the network with
 more time every round to make a decision on a new block.
-
-Rounds are not synchronized among nodes.
 
 ### Pool of Unconfirmed Transactions
 
@@ -66,7 +91,7 @@ necessary, the nodes
 ### Proof-of-Lock
 
 A set of +2/3 `Prevote` messages for the same proposal from the nodes at the
-current round and blockchain height is called _Proof-of-Lock (PoL)_. Nodes
+current round and epoch is called _Proof-of-Lock (PoL)_. Nodes
 store PoL as a part of the node state. The node can have no more than one
 stored PoL.
 
@@ -85,7 +110,7 @@ message processing.
 - `max_propose_timeout`  
   Initial proposal timeout after a new block is committed to the blockchain.
 
-- `propose_timeout_threshold`
+- `propose_timeout_threshold`  
   If the amount of transactions in the pool of unconfirmed transactions of a
   node is larger than the `propose_timeout_threshold` value, the node switches
   from `max_propose_timeout` to `min_propose_timeout`, i.e. generates blocks
@@ -114,9 +139,12 @@ message processing.
 - `current_height`  
   Current blockchain height (i.e., the number of blocks in it).
 
+- `current_epoch`  
+  Current epoch of the consensus algorithm.
+
 - `queued`  
   Queue for consensus messages (`Propose`, `Prevote`, `Precommit`) from a
-  future height or round.
+  future epoch or round.
 
 - `proposes`  
   Hash map with known block proposals.
@@ -148,8 +176,8 @@ The following fields are present in all messages:
 - `validator_id`  
   Index of a validator in the `validators` list in the global configuration.
 
-- `height`  
-  Blockchain height to which the message is related.
+- `epoch`  
+  Epoch of the consensus algorithm to which the message is related.
 
 - `round`  
   Round to which the message is related.
@@ -205,7 +233,7 @@ by [incoming messages](#message-processing) and [timeouts](#timeout-processing).
   for the same known proposal.
 - [Lock](#lock)  
   Occurs when the node replaces [the stored PoL](#proof-of-lock) (or collects
-  its first PoL for the `current_height`).
+  its first PoL for the `current_epoch`).
 - [Commit](#commit)  
   Occurs when the node collects +2/3 `Precommit` messages for the same round for
   the same known proposal. Corresponds to [the Commit node state](../../architecture/consensus.md#node-states-overview).
@@ -214,12 +242,12 @@ The steps performed at each stage are described [below](#stage-processing).
 
 ## Message Processing
 
-Nodes use a message queue based on [the Tokio library][tokio-lib] for message
+Nodes use a message queue based on [the `tokio` library][tokio-lib] for message
 processing. Incoming requests and consensus messages are placed in the queue
 when they are received. The same queue is used for processing timeouts. Timeouts
 are implemented as messages looped to the node itself.
 
-Messages from the next height (i.e., `current_height` + 1) or from a future
+Messages from the next epoch (i.e., `current_epoch + 1`) or from a future
 round are placed into a separate queue (`queued`).
 
 ### Deserialization
@@ -248,23 +276,23 @@ round are placed into a separate queue (`queued`).
 
 ### Consensus Messages Processing
 
-- Do not process the message if it belongs to a future round or height. In
+- Do not process the message if it belongs to a future round or epoch. In
   this case:
 
-    - If the message refers to the height `current_height + 1`, add the
+    - If the message refers to the epoch `current_epoch + 1`, add the
       message to the `queued` queue.
-    - If the message is related to a future height and updates the knowledge
-      of the node about the current blockchain height of the message author,
+    - If the message is related to a future epoch and updates the knowledge
+      of the node about the current epoch of the message author,
       save this information according to [the requests algorithm](requests.md).
 
-- If the message refers to a past height, ignore it.
-- If the message refers to the current height and any round not higher than the
+- If the message refers to a past epoch, ignore it.
+- If the message refers to the current epoch and any round not higher than the
   current one, then:
 
     - Check that the `validator_id` specified in the message is less than the
-    total number of validators.
+      total number of validators.
     - Check the message signature against the public key of the validator with
-    the `validator_id` index.
+      the `validator_id` index.
 
 - If verification is successful, proceed to the message processing according to
   its type.
@@ -342,15 +370,18 @@ round are placed into a separate queue (`queued`).
 
 !!! note
     `BlockResponse` messages are requested by validators if they see a
-    consensus message belonging to a future height. `BlockResponse`
-    messages are not a part of an ordinary consensus message workflow
-    for nodes at the latest blockchain height.
+    consensus message belonging to a future blockchain height or epoch.
+    `BlockResponse` messages are not a part of an ordinary consensus
+    message workflow for nodes at the latest epoch.
 
 - Check the `BlockResponse` message:
 
     - The key in the `to` field must match the key of the node.
     - `block.prev_hash` must match the hash of the latest committed block.
-    - The block height must be equal to the current height of the node.
+    - If the returned value is a normal block, its height must equal
+      the current height of the node. If the returned value is a block skip,
+      its height must equal the previous height (i.e., `current_height - 1`)
+      and its epoch must be greater than `current_epoch`.
     - The number of `Precommit` messages from different validators
       must be sufficient to reach consensus.
     - All `Precommit` messages must be correct.
@@ -358,13 +389,12 @@ round are placed into a separate queue (`queued`).
 - If the checks are successful, then check all transactions in the block for
   correctness. If some transactions are incorrect, stop working and signal about
   an unrecoverable error.
-- Execute all transactions. If the hash of the blockchain state after the
-  execution
+- Execute all transactions. If the hash of the blockchain state after the execution
   diverges from that in the `Block` message, stop working and signal about
   an unrecoverable error.
 
-- Add the block to the blockchain and move to a new height. Set the value
-  of the variable `locked_round` at the new height to `0` .
+- Add the block to the blockchain and move to a new epoch. Set the value
+  of the variable `locked_round` at the new epoch to `0` .
 
 - [Request missing information based on the message](requests.md#receiving-blockresponse).
 
@@ -372,23 +402,23 @@ round are placed into a separate queue (`queued`).
 
 ### Round Timeout
 
-- If the timeout does not match the current height and round, skip further
+- If the timeout does not match the current epoch and round, skip further
   timeout processing.
 - Add a timeout for the `N`th round with the length
   `first_round_timeout * (1 + (N - 1) * q)`,
   where `q = 0.1` is the relative increase in a timeout after each round.
 - Process all messages from `queued` that have become relevant (their round
-  and height coincide with the current ones).
+  and epoch coincide with the current ones).
 - If the node has a saved PoL, send a `Prevote` for `locked_propose` in the new
   round, and proceed to
   [Availability of +2/3 `Prevote`s](#availability-of-23-prevotes).
 - Else, if the node is a leader, form and send `Propose` and `Prevote`
   messages (after expiration of `propose_timeout`, if the node has just
-  moved to a new height).
+  moved to a new epoch).
 
 ### Status Timeout
 
-- If the height of the node has not increased since the timeout was set, then
+- If the epoch of the node has not increased since the timeout was set, then
   broadcast a `Status` message to all peers.
 - Add a timeout for the next `Status` broadcast (its length is specified by
   `status_timeout`).
@@ -450,28 +480,33 @@ round are placed into a separate queue (`queued`).
 
 ### Commit
 
-**Arguments:** block (i.e., a proposal with all known transactions,
+**Arguments:** block or block skip (i.e., a proposal with all known transactions,
 and the `state_hash` resulting from the execution of all transactions in the
 proposal).
 
-- Add a block to the blockchain.
+- Store the block.
 - Push all the transactions from the block to the table of committed
   transactions.
-- Increment `current_height`.
-- Set the value of the variable `locked_round` to `0` at the new height.
+- Increment `current_epoch`. If the block is a normal block, increment `current_height`.
+- Set the value of the variable `locked_round` to `0` at the new epoch.
 - Delete all transactions of the committed block from the pool of unconfirmed
   transactions.
 - If the node is the leader, form and send `Propose` and `Prevote` messages
   after `propose_timeout` expiration.
 - Process all messages from the `queued` that have become relevant (their round
-  and height coincide with the current ones).
+  and epoch coincide with the current ones).
 - Add a timeout for the next round.
 
 ## Properties
 
 !!! note
-    Formal proof of the following properties is coming in a separate white
-    paper.
+    Formal proof of the following properties is proven in
+    [a separate white paper][exonum-wp].
+
+!!! warning
+    The white paper does not consider block skips. While adding other
+    possible consensus outcomes does not influence safety and liveness arguments,
+    it could adversely affect chain quality.
 
 If:
 
@@ -489,7 +524,7 @@ Then the algorithm described above has the following properties:
 - **Safety**  
   If an honest node adds a block to the blockchain, then no other honest node
   can add a different block, confirmed with +2/3 `Precommit` messages, to the
-  blockchain at the same height.
+  blockchain at the same epoch.
 
 - **Liveness**  
   At any point in time, a block will be committed eventually by an honest node
@@ -506,3 +541,4 @@ Then the algorithm described above has the following properties:
 [partial_ordering]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
 [tokio-lib]: https://tokio.rs/
 [partial_synchrony]: http://groups.csail.mit.edu/tds/papers/Lynch/podc84-DLS.pdf
+[exonum-wp]: https://bitfury.com/content/downloads/wp_consensus_181227.pdf

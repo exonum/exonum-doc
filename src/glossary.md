@@ -66,6 +66,8 @@ computing [hashes](#hash) and [digital signing](#digital-signature).
 
 ## Block
 
+**Aka** normal block
+
 An ordered list of [transactions](#transaction) in a blockchain, together
 with the
 authentication by at least 2/3 of the [validators set](#validator), and some
@@ -78,6 +80,20 @@ is used for communication with [light clients](#light-client).
 
 Besides transactions, applying a block to the blockchain state comprises
 executing [hooks](#service-hook) for the currently active services.
+
+## Block Skip
+
+An outcome of the consensus algorithm alternative to approving a [block](#block).
+Like normal blocks, block skips are stored together with authenticating info,
+but they are removed from the storage as soon as a newer skip or a normal block
+is approved.
+
+Applying a block skip to the blockchain state is trivial: no calls to [services](#service)
+are executed, so the blockchain state remains the same.
+
+!!! tip
+    See [*Consensus*](architecture/consensus.md#block-skips) article
+    for reasoning behind block skips.
 
 ## Blockchain
 
@@ -281,6 +297,14 @@ used together with some form of timestamping to provide
 [Blockchains](#blockchain) are a particular kind of distributed ledgers with a
 focus
 on auditability and accountability of the [system maintainers](#maintainer).
+
+## Epoch
+
+**Aka** consensus epoch
+
+A single iteration of the Exonum [consensus algorithm](#consensus),
+which results in accepting a [block](#block) or a [block skip](#block-skip).
+Also, an non-negative, auto-incrementing counter enumerating these iterations.
 
 ## Full Node
 
