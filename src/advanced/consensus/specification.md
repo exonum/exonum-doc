@@ -52,7 +52,7 @@ each time a decision is made by the network. Note that this integer may differ
 from the blockchain height; the epoch is always greater or equal to the height.
 
 Applying a block increases the blockchain height by one. The block is permanently
-recorded into the node storage. In contrast, applying a skip does not increase
+recorded into the node storage. In contrast, applying a block skip does not increase
 the blockchain height. The node stores only the latest block skip, overwriting
 it if a skip is approved at the same blockchain height and the greater epoch.
 If the network approves a normal block, a stored block skip (if any) is erased
