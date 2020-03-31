@@ -45,7 +45,8 @@ lint_html () {
     '"align" attribute on the "(td|th)" element is obsolete' \
     'Document uses.* Unicode Private Use Area' \
     '"main" role is unnecessary for element "main"' \
-    'Consider using "lang=';
+    'Consider using "lang=' \
+    'Duplicate attribute "alt".';
 }
 
 lint_links () {
