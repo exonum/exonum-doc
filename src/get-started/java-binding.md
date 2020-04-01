@@ -1102,7 +1102,8 @@ aliases are used in other parts of the configuration for readability and easier
 refactoring. Java artifacts also need the name of the JAR file in the
 `spec: artifact_filename` field of the artifacts directory. The present example
 shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
-the `timestamping` and `time` oracle services.
+the `timestamping` and `time` oracle services. Please note, that Rust services
+are pre-deployed in the genesis block, so we don't use `action` field for them.
 
 ```yaml
 artifacts:
@@ -1111,6 +1112,7 @@ artifacts:
     name: "com.exonum.examples:cryptocurrency-demo:0.9.0-rc2"
     spec:
       artifact_filename: "cryptocurrency-demo-0.9.0-rc2-artifact.jar"
+    action: deploy
   time:
     runtime: rust
     name: "exonum-time:0.13.0-rc.2"
@@ -1157,8 +1159,10 @@ YAML dictionary.
 instances:
   xnm-token:
     artifact: cryptocurrency
+    action: start
   time-oracle:
     artifact: time
+    action: start
 ```
 
 To instantiate a service which requires configuration parameters,
@@ -1184,6 +1188,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       format: "properties"
       from_file: "configs/timestamping.properties"
@@ -1206,6 +1211,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       sources: "proto_sources"
       config_message_source: "service.proto"
