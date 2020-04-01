@@ -862,6 +862,10 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
+These services come pre-deployed in the genesis block.
+See [_Deploy and Start the Service_](#deploy-and-start-the-service)
+for instructions on their instantiation.
+
 ## Node Configuration
 
 Exonum offers a three-step way of the node configuration process. It allows
@@ -1118,6 +1122,21 @@ artifacts:
     runtime: rust
     name: "exonum-timestamping:0.13.0-rc.2"
 ```
+
+!!! tip
+    Exonum Java comes with some [built-in artifacts](#built-in-services),
+    which are already deployed. To see an up-to-date information on
+    the coordinates (name and version) of the services built-in
+    into the node, you may launch the node and request the list of services
+    from the [supervisor](../advanced/supervisor.md):
+
+    ```shell
+    # Replace <public_port> with the node public port.
+    #
+    # You may also pipe the response into `jq` to pretty-print it,
+    # if you have jq installed:
+    curl -s http://127.0.0.1:<public_port>/api/services/supervisor/services # | jq
+    ```
 
 Add a `plugins` section to enable both Java Runtime plugin and Instance
 Configuration plugin. The runtime plugin is enabled for a specific runtime
