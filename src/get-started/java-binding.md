@@ -94,7 +94,7 @@ follow the instructions in [Contribution Guide][how-to-build].
     export PATH="$PATH:$EXONUM_HOME/bin"
     ```
 
-2. Install [JDK 11][jdk].
+2. Install JDK 11.
 
 3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
@@ -1312,7 +1312,6 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
 [java.util.Properties]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html#load(java.io.Reader)
-[jdk]: https://jdk.java.net/java-se-ri/11
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
