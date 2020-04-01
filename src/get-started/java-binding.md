@@ -1103,7 +1103,8 @@ refactoring. Java artifacts also need the name of the JAR file in the
 `spec: artifact_filename` field of the artifacts directory. The present example
 shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
 the `timestamping` and `time` oracle services. Please note, that Rust services
-are pre-deployed in the genesis block, so we don't use `action` field for them.
+are pre-deployed in the genesis block, so we do not specify `action: deploy` for
+them.
 
 ```yaml
 artifacts:
