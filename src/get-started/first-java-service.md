@@ -22,7 +22,7 @@ programming language.
 
 The following software must be installed:
 
-- [JDK 11+](https://jdk.java.net/)
+- JDK 11
 - [Apache Maven 3.6+](https://maven.apache.org/install.html)
 - [Python 3.6+](https://www.python.org/downloads/)
 - [Exonum Java 0.10](./java-binding.md#installation)

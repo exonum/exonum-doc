@@ -94,7 +94,7 @@ follow the instructions in [Contribution Guide][how-to-build].
     export PATH="$PATH:$EXONUM_HOME/bin"
     ```
 
-2. Install the [latest JDK][jdk].
+2. Install JDK 11.
 
 3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
@@ -864,6 +864,10 @@ Currently Java Binding includes the following built-in services:
   Time oracle allows user services to access the calendar time supplied by
   validator nodes to the blockchain.
 
+These services come pre-deployed in the genesis block.
+See [_Deploy and Start the Service_](#deploy-and-start-the-service)
+for instructions on their instantiation.
+
 ## Node Configuration
 
 Exonum offers a three-step way of the node configuration process. It allows
@@ -1104,7 +1108,9 @@ aliases are used in other parts of the configuration for readability and easier
 refactoring. Java artifacts also need the name of the JAR file in the
 `spec: artifact_filename` field of the artifacts directory. The present example
 shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
-the `timestamping` and `time` oracle services.
+the `timestamping` and `time` oracle services. Please note, that Rust services
+are pre-deployed in the genesis block, so we do not specify `action: deploy` for
+them.
 
 ```yaml
 artifacts:
@@ -1113,6 +1119,7 @@ artifacts:
     name: "com.exonum.examples:cryptocurrency-demo:0.10.0"
     spec:
       artifact_filename: "cryptocurrency-demo-0.10.0-artifact.jar"
+    action: deploy
   time:
     runtime: rust
     name: "exonum-time:1.0.0"
@@ -1120,6 +1127,21 @@ artifacts:
     runtime: rust
     name: "exonum-timestamping:1.0.0"
 ```
+
+!!! tip
+    Exonum Java comes with some [built-in artifacts](#built-in-services),
+    which are already deployed. To see an up-to-date information on
+    the coordinates (name and version) of the services built-in
+    into the node, you may launch the node and request the list of services
+    from the [supervisor](../advanced/supervisor.md):
+
+    ```shell
+    # Replace <public_port> with the node public port.
+    #
+    # You may also pipe the response into `jq` to pretty-print it,
+    # if you have jq installed:
+    curl -s http://127.0.0.1:<public_port>/api/services/supervisor/services # | jq
+    ```
 
 Add a `plugins` section to enable both Java Runtime plugin and Instance
 Configuration plugin. The runtime plugin is enabled for a specific runtime
@@ -1159,8 +1181,10 @@ YAML dictionary.
 instances:
   xnm-token:
     artifact: cryptocurrency
+    action: start
   time-oracle:
     artifact: time
+    action: start
 ```
 
 To instantiate a service which requires configuration parameters,
@@ -1186,6 +1210,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       format: "properties"
       from_file: "configs/timestamping.properties"
@@ -1208,6 +1233,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       sources: "proto_sources"
       config_message_source: "service.proto"
@@ -1308,7 +1334,6 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.10.0/CONTRIBUTING.md#how-to-build
 [java.util.Properties]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html#load(java.io.Reader)
-[jdk]: https://jdk.java.net/
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
