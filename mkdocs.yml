@@ -9,6 +9,9 @@ theme:
     primary: 'light green'
     accent: 'lime'
 
+plugins:
+  - codeinclude
+
 extra_css:
   - assets/stylesheets/extra.css
 extra_javascript:
@@ -62,6 +65,8 @@ nav:
     - 'Cryptocurrency Advanced Tutorial': 'get-started/data-proofs.md'
     # A tutorial on applying light client for Exonum services
     - 'Light Client Tutorial': 'get-started/light-client.md'
+    # A tutorial on Java service development
+    - 'Java Service Tutorial': 'get-started/first-java-service.md'
     - 'Java Binding User Guide': 'get-started/java-binding.md'
   - 'Architecture':
     # Includes guidelines for services
@@ -92,7 +97,7 @@ nav:
     # Supervisor service documentation
     - 'Supervisor': 'advanced/supervisor.md'
     # Anchoring service documentation with Segwit
-    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'    
+    - 'Bitcoin Anchoring': 'advanced/bitcoin-anchoring.md'
     # Time service
     - 'Time Oracle': 'advanced/time.md'
     # Other useful services
