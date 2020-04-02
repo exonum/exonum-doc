@@ -94,7 +94,7 @@ follow the instructions in [Contribution Guide][how-to-build].
     export PATH="$PATH:$EXONUM_HOME/bin"
     ```
 
-2. Install the [latest JDK][jdk].
+2. Install JDK 11.
 
 3. Install [Maven 3][maven-install] which is essential for developing and building
   Java service.
@@ -1106,7 +1106,9 @@ aliases are used in other parts of the configuration for readability and easier
 refactoring. Java artifacts also need the name of the JAR file in the
 `spec: artifact_filename` field of the artifacts directory. The present example
 shows how to add the Java `cryptocurrency-demo` service, and two Rust services —
-the `timestamping` and `time` oracle services.
+the `timestamping` and `time` oracle services. Please note, that Rust services
+are pre-deployed in the genesis block, so we do not specify `action: deploy` for
+them.
 
 ```yaml
 artifacts:
@@ -1115,6 +1117,7 @@ artifacts:
     name: "com.exonum.examples:cryptocurrency-demo:0.9.0-rc2"
     spec:
       artifact_filename: "cryptocurrency-demo-0.9.0-rc2-artifact.jar"
+    action: deploy
   time:
     runtime: rust
     name: "exonum-time:0.13.0-rc.2"
@@ -1176,8 +1179,10 @@ YAML dictionary.
 instances:
   xnm-token:
     artifact: cryptocurrency
+    action: start
   time-oracle:
     artifact: time
+    action: start
 ```
 
 To instantiate a service which requires configuration parameters,
@@ -1203,6 +1208,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       format: "properties"
       from_file: "configs/timestamping.properties"
@@ -1225,6 +1231,7 @@ Requires the following parameters:
 instances:
   timestamping:
     artifact: timestamping
+    action: start
     config:
       sources: "proto_sources"
       config_message_source: "service.proto"
@@ -1325,7 +1332,6 @@ For using the library just include the dependency in your `pom.xml`:
 [homebrew]: https://github.com/Homebrew/brew#homebrew
 [how-to-build]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.9.0-rc2/CONTRIBUTING.md#how-to-build
 [java.util.Properties]: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Properties.html#load(java.io.Reader)
-[jdk]: https://jdk.java.net/
 [libsodium]: https://download.libsodium.org/doc/
 [log4j-docs]: https://logging.apache.org/log4j/2.x/manual/index.html
 [log4j-home]: https://logging.apache.org/log4j
