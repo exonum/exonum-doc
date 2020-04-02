@@ -8,11 +8,12 @@ by the supermajority of node administrators.
 More precisely, the supervisor service is controlling
 the following activities:
 
-- Service artifact deployment
-- Service instances creation
+- Deploying service artifacts and unloading unused artifacts
+- Instantiating services
+- Changing configuration of instantiated services
+- Changing a state of instantiated services: stopping, freezing, resuming,
+  and initiating data migrations
 - Changing consensus configuration
-- Changing service instances configuration
-- Migrating service data
 
 The remaining part of the article will mainly focus on the reference
 implementation of the supervisor, i.e., the `exonum-supervisor` crate.
@@ -54,7 +55,8 @@ Finally, the supervisor service may be implemented in any
 
 !!! tip
     Consult the [`exonum-supervisor` crate docs](https://docs.rs/exonum-supervisor/)
-    for more technical documentation.
+    for more technical documentation and
+    [the description of service endpoints][supervisor-docs].
 
 Service lifecycle events are initiated via *proposal* transactions
 to the supervisor service.
@@ -149,3 +151,4 @@ together and with synchronous lifecycle events (e.g., service instantiation).
 This provides greater flexibility and determinism.
 
 [capability model]: https://en.wikipedia.org/wiki/Capability-based_security
+[supervisor-docs]: https://docs.rs/exonum-supervisor/latest/exonum_supervisor/api/index.html

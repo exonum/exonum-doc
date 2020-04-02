@@ -40,10 +40,12 @@ They are guaranteed to be the same for all nodes in the blockchain network.
     state. If the call results differ, the consensus algorithm may stall,
     or an audit of the blockchain by auditing nodes may fail.
 
-During blockchain operation, services may be instantiated, stopped and resumed,
-and migrated to a newer version (which may include asynchronous data migration).
-The lifecycle events are managed by the core, but controlled by the supervisor
-service. In the reference supervisor implementation, the lifecycle events are
+During blockchain operation, services may be instantiated, stopped,
+frozen, resumed, and migrated to a newer version
+(which may include asynchronous data migration).
+These lifecycle events are managed by the core, but controlled
+by the [supervisor service](../advanced/supervisor.md).
+In the reference supervisor implementation, the lifecycle events are
 authorized by the administrators of the blockchain nodes.
 
 !!! tip
@@ -148,10 +150,14 @@ A service may react to the following events of
 [its lifecycle](../architecture/service-lifecycle.md):
 
 - Service initialization
-- Service being resumed
+- Service being resumed from the frozen or stopped state.
 
 Both these events accept service-specific arguments, which can be
 used for service (re-)configuration.
+The service can signal an error during instantiation or resuming;
+this means that the requested state transition is impossible,
+for example, due to failing constraints. In this case, the transition
+will not be performed.
 
 A service also receives notifications before any transactions
 in every block are processed and after all transactions in it are processed.
@@ -256,7 +262,7 @@ Exonum datatypes to JSON for communication with light clients.
 
 ### Fault Tolerance in Migration Scripts
 
-Migration scripts may be stopped at any time, simply because
+Migration scripts may be terminated at any time, simply because
 a node executing the script may be stopped by the admin or crash because of
 unrelated reasons. It is important to ensure that migration scripts
 are *fault-tolerant* under these conditions, that is, if a node is restarted

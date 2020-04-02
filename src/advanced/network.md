@@ -141,14 +141,21 @@ Endpoints for a Rust service are prefixed with `/api/services/{service_name}`,
 where `{service_name}` is a string service identifier.
 
 !!! note
+    For historic reasons, the explorer service endpoints have
+    `/api/explorer` prefix.
+
+The endpoints of built-in Rust services, such as the [supervisor](supervisor.md)
+or the [blockchain explorer](other-services.md#explorer), are documented
+in the relevant crates on [docs.rs](https://docs.rs/), usually in the `api` module
+docs. For example, the docs for the reference supervisor implementation are available
+in the [`exonum-supervisor` crate docs][supervisor-docs].
+
+!!! note
     There is no unified format for naming endpoints (e.g., passing parameters
     for GET endpoints via path components and/or query parameters).
     Thus, services need to use best practices for REST APIs.
 
-!!! note
-    For historic reasons, the explorer service endpoints have
-    `/api/explorer` prefix.
-
 [whitepaper]: https://bitfury.com/content/downloads/wp_consensus_181227.pdf
 [noise]: https://noiseprotocol.org/
 [DH]: https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+[supervisor-docs]: https://docs.rs/exonum-supervisor/latest/exonum_supervisor/api/index.html

@@ -20,6 +20,10 @@ For any questions on the upcoming implementations feel free to contact us in
 
 ## Previous Accomplishments
 
+!!! tip
+    Consult the [core changelog] and [Java binding changelog] for
+    more details on implemented features.
+
 - A major milestone for Exonum was transition to *dynamic* services, that is,
   services that can be instantiated after the blockchain is launched.
 - Together with dynamic services, we have implemented first-class support
@@ -50,23 +54,6 @@ with minor releases each 1.5–2 months.
 
 ## Nearest Milestones
 
-### Artifact Unloading
-
-In 1.0, artifacts cannot be unloaded from a runtime; once an artifact is loaded,
-it must forever be available. Naturally, we want to change this situation and
-allow to unload artifacts by implementing the corresponding workflow
-in the core and [supervisor](glossary.md#supervisor).
-
-### Freezing Services
-
-In 1.0, services may be *stopped*, which requires from the runtime to unload
-all ways for a service to interact with the external world. For example,
-both Rust and Java runtimes need to remove HTTP API handlers of the service.
-We plan to implement service *freezing*, after which the service state is
-immutable, but the immutable handlers (e.g., HTTP API) remain active.
-
-## Intermediate Term
-
 ### Finalizing Service Interfaces
 
 Exonum 1.0 ships with the [*interfaces*](glossary.md#interface)
@@ -77,15 +64,6 @@ However, interface specification is not yet stabilized, and so far
 there is no interface description language to express them. With finalization,
 interfaces can provide a powerful tool to compose service functionality.
 
-### Deferred Calls
-
-A *deferred call* is a call to a service executing after the invoking call
-has returned (cf. `defer` in Golang). Deferred calls can provide
-an easy way to isolate internal calls to the services without requiring
-changes to the storage engine. (In Exonum 1.0, only upper-level calls are
-isolated, internal calls are not. Cf. inability to catch exceptions
-in Solidity.)
-
 ### Service Authorization with Data
 
 As of 1.0, it is possible to authorize an [internal call](glossary.md#internal-call)
@@ -95,6 +73,17 @@ this kind of authorization can be applied to a significantly wider range
 of scenarios. For example, a single multisig service will be able to
 serve an unlimited number of user groups, thus maximizing code reuse
 and reducing storage / compute overhead.
+
+## Medium Term
+
+### Deferred Calls
+
+A *deferred call* is a call to a service executing after the invoking call
+has returned (cf. `defer` in Golang). Deferred calls can provide
+an easy way to isolate internal calls to the services without requiring
+changes to the storage engine. (In Exonum 1.0, only upper-level calls are
+isolated, internal calls are not. Cf. inability to catch exceptions
+in Solidity.)
 
 ### Capabilities for Services
 
@@ -156,3 +145,5 @@ this functionality within the node would allow to automate the process
 and make it more fault-tolerant.
 
 [capabilities framework]: https://en.wikipedia.org/wiki/Capability-based_security
+[core changelog]: https://github.com/exonum/exonum/blob/master/CHANGELOG.md
+[Java binding changelog]: https://github.com/exonum/exonum-java-binding/blob/master/exonum-java-binding/CHANGELOG.md

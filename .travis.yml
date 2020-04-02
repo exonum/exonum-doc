@@ -37,7 +37,7 @@ jobs:
             export REQUIREMENTS_FILE=requirements.txt
           fi
       install:
-        - pip install -r "$REQUIREMENTS_FILE" -r dev-requirements.txt --src 3rd-party
+        - pip install --upgrade -r "$REQUIREMENTS_FILE" -r dev-requirements.txt --src 3rd-party
         - nvm install 12 && nvm use 12
         - npm install
         - python -m mkdocs --version

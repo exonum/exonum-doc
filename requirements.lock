@@ -1,20 +1,18 @@
 # Main requirements
+mkdocs-material==4.6.3
+mkdocs==1.1
 Jinja2==2.11.1
-mkdocs==1.0.4
-Pygments==2.5.2
+Pygments==2.6.1
 pygments-github-lexers==0.0.5
-mkdocs-material==4.6.0
 -e git+https://github.com/exonum/mkdocs-codeinclude-plugin@cf40bdcfeb11600e1e571b69fe2abae80173971c#egg=mkdocs_codeinclude_plugin
 ## The following requirements were added by pip freeze:
 Click==7.0
-htmlmin==0.1.12
-jsmin==2.2.2
+future==0.17.1
 livereload==2.6.1
-Markdown==3.1.1
+lunr[languages]==0.5.6
+Markdown==3.2.1
 MarkupSafe==1.1.1
-mkdocs-minify-plugin==0.2.1
-pep562==1.0
-pymdown-extensions==6.2.1
+pymdown-extensions==6.3
 PyYAML==5.1
 six==1.12.0
-tornado==5.1.1
+tornado==6.0.3
