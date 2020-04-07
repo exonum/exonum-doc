@@ -59,6 +59,9 @@ const generateVersionedDocs = async (versions) => {
     versionedMkdocs.theme.custom_dir = '../theme'
     fs.writeFileSync(`./version/${version}.yml`, YAML.stringify(versionedMkdocs, 7), 'utf8')
     fse.copySync(`./src`, newSrc)
+    if (fse.pathExistsSync(`./code-examples`)) {
+      fse.copySync(`./code-examples`, `./version/code-examples`, {overwrite: true})
+    }
     await git.checkout(returnToBranch)
     await mkdocsBuild(`./version/${version}`, configFile)
   }
