@@ -85,7 +85,7 @@ It is a good idea to preview your changes locally before sending a pull request.
 To build the docs you need installed:
 - [Python](http://python.org/) version 3.7+
 - [python-pip](https://pip.readthedocs.io/en/stable/installing/)
-- Node  version 10+ (actually verified on v10.16.0 and v12)
+- Node version 10+ (actually verified on v10.16.0 and v12)
 
 ### Installation
 
@@ -97,8 +97,8 @@ cd exonum-doc
 git submodule update --init --recursive
 ```
 
-_If you build the docs locally it is recommended to use
-python virtual environment:_
+If you build the docs locally it is recommended to use
+python virtual environment:
 ```
 python3 -m venv .env
 source .env/bin/activate
