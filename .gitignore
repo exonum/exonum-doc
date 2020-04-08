@@ -18,3 +18,6 @@ version/
 
 # 3rd-party Python eggs installed in 'edit' mode
 3rd-party/
+
+# Python virtual environment
+.env
