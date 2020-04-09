@@ -11,7 +11,7 @@ but gives a solid foundation to learn about that in subsequent materials.
 
 The full tutorial code is available in our [Git repository][car-registry-git].
 
-[car-registry-git]: https://github.com/exonum/exonum-java-binding/tree/ejb/v0.10.0/exonum-java-binding/tutorials/car-registry
+[car-registry-git]: https://github.com/exonum/exonum-java-binding/tree/tutorial/v0.10.0/exonum-java-binding/tutorials/car-registry
 
 ## Prerequisites
 
