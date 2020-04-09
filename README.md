@@ -80,6 +80,13 @@ for the front matter. Be advised for possible discrepancies.
 
 It is a good idea to preview your changes locally before sending a pull request. 
 
+### Requirements
+
+To build the docs you need installed:
+- [Python](http://python.org/) version 3.7+
+- [python-pip](https://pip.readthedocs.io/en/stable/installing/)
+- Node version 10+ (actually verified on v10.16.0 and v12)
+
 ### Installation
 
 Fetch and initialize the repository:
@@ -90,7 +97,13 @@ cd exonum-doc
 git submodule update --init --recursive
 ```
 
-First, you need to install [Python](http://python.org/) and [python-pip](https://pip.readthedocs.io/en/stable/installing/).
+If you build the docs locally it is recommended to use
+python virtual environment:
+```
+python3 -m venv .env
+source .env/bin/activate
+```
+
 Then, install the `mkdocs` theme together with its dependencies:
 
 <!-- Remove 3rd-party in ECR-4265 -->
@@ -113,8 +126,6 @@ utilize Npm package manager, so you can install them using
 ```
 npm install
 ```
-
-(you will need Node 8+ installed).
 
 ### Viewing Documents Locally
 
