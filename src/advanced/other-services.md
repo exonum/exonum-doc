@@ -108,7 +108,7 @@ into the node builder.
 
 [explorer]: https://docs.rs/exonum-explorer-service/
 [explorer-docs]: https://docs.rs/exonum-explorer-service/latest/exonum_explorer_service/api/index.html
-[explorer-docs-ws]: https://docs.rs/exonum-explorer-service/1.0.0-rc.1/exonum_explorer_service/api/websocket/index.html
+[explorer-docs-ws]: https://docs.rs/exonum-explorer-service/1.0.0/exonum_explorer_service/api/websocket/index.html
 [explorer library]: https://docs.rs/exonum-explorer/
 [exonum-cli]: https://docs.rs/exonum-cli/
 [middleware]: https://docs.rs/exonum-middleware-service/
