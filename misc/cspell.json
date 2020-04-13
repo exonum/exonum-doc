@@ -3,6 +3,7 @@
   "language": "en",
   "dictionaries": ["en_US", "softwareTerms"],
   "words": [
+    "abortable",
     "Actix",
     "actix",
     "atomicity",
