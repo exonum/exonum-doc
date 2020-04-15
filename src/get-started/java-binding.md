@@ -1322,7 +1322,7 @@ For using the library just include the dependency in your `pom.xml`:
 [abstract-service]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/AbstractService.html
 [blockchain]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/blockchain/Blockchain.html
 [brew-install]: https://docs.brew.sh/Installation
-[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.10.0/exonum-java-binding/service-archetype/src/main/resources/archetype-resources/pom.xml
+[build-description]: https://github.com/exonum/exonum-java-binding/blob/ejb/v0.10.0/exonum-java-binding/service-archetype/src/main/resources-filtered/archetype-resources/pom.xml
 [configurable]: https://exonum.com/doc/api/java-binding/0.10.0/com/exonum/binding/core/service/Configurable.html
 [docker-for-windows]: https://docs.docker.com/docker-for-windows/
 [env_logger-docs]: https://docs.rs/env_logger/0.6.2/env_logger/#enabling-logging
