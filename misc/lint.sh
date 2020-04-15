@@ -46,7 +46,7 @@ lint_html () {
     'Document uses.* Unicode Private Use Area' \
     '"main" role is unnecessary for element "main"' \
     'Consider using "lang=' \
-    'Duplicate attribute "alt".';
+    'An "img" element must have an "alt" attribute, except under certain conditions';
 }
 
 lint_links () {

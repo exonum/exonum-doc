@@ -7,7 +7,8 @@ title: Requests in consensus algorithm
 
 **Requests** are used to obtain unknown information from nodes that signal the
 presence of such information via consensus messages (for example, via a message
-indicating a blockchain height greater than the local blockchain height). The
+indicating a consensus algorithm [epoch](specification.md#epochs)
+greater than the local epoch). The
 algorithm for generating and handling requests is an integral part of
 [the Exonum consensus algorithm][consensus].
 
@@ -34,9 +35,11 @@ Byzantine. The receiving node saves this information in
 
 ### Any Consensus Message
 
-- The message author is at the height implied by the message.
-- The author has blocks corresponding to all lesser heights.
-- The author has +2/3 `Precommit` messages for each of the previous blocks.
+- The message author is at the epoch implied by the message.
+- The author has blocks corresponding to all lesser epochs.
+- The author has +2/3 `Precommit` messages for each of the previous blocks,
+  and possibly for the latest [block skip](specification.md#epochs)
+  if a block skip was approved at the latest epoch.
 
 ### `Prevote`
 
@@ -100,8 +103,8 @@ Requests a `Propose` message from a node. It has the following fields:
 
 - **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **height**: uint64  
-  Height of the blockchain for which information is requested.
+- **epoch**: uint64  
+  Epoch for which information is requested.
 - **propose_hash**: exonum.Hash  
   Hash of the proposal for which information is requested.
 
@@ -120,10 +123,10 @@ Requests `Prevote` messages from a node. It has the following fields:
 
 - **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
-- **height**: uint64  
-  Blockchain height for which information is requested.
+- **epoch**: uint64  
+  Epoch for which information is requested.
 - **round**: uint32  
-  Round number (at the blockchain height specified in `height` field) for which
+  Round number (at the epoch specified in `epoch` field) for which
   information is requested.
 - **propose_hash**: exonum.Hash  
   Hash of the proposal for which information is requested.
@@ -136,12 +139,17 @@ Requests `Prevote` messages from a node. It has the following fields:
 
 ### `BlockRequest`
 
-Requests a committed block from a node. It has the following fields:
+Requests a committed block or a block skip from a node.
+It has the following fields:
 
 - **to**: exonum.PublicKey  
   Public key of the node to which the request was sent.
 - **height**: uint64  
-  Height of the blockchain for which information is requested.
+  Height of the blockchain to retrieve.
+- **epoch**: uint64  
+  Epoch for which to retrieve a block skip as a fallback option.
+  `epoch = 0` is used to indicate that the sender is not interested
+  in the fallback.
 
 ### `PeersRequest`
 
@@ -165,7 +173,7 @@ which includes the number of request attempts made and a list of
 `RequestState` for each request is placed into a hash map where the key is
 the identifier
 of the requested data (hash for `Propose` and `Transactions`, round and hash  
-for `Prevotes`, height for `Block`). When the requested information is
+for `Prevotes`, height and epoch for `Block`). When the requested information is
 obtained, the node deletes the `RequestState` for the corresponding request
 (cancels the request).
 
@@ -181,15 +189,14 @@ Cancelling a request means cancelling the corresponding timeout as well.
 If the received transaction is the last one required for a known `Propose`,
 cancel the corresponding `TransactionsRequest`.
 
-### Receiving Consensus Message from a Bigger Height
+### Receiving Consensus Message from a Greater Epoch
 
-- Update info about the height of the blockchain on the corresponding node.
-- Send `BlockRequest` for the current height (height of the latest
-  committed block + 1) to the message author, if such a request was not
-  sent earlier.
+- Update info about the epoch on the corresponding node.
+- Send `BlockRequest` for the current epoch to the message author,
+  if such a request was not sent earlier.
 
-All events below are applicable only if the height of the message is the same
-as the validator’s height.
+All events below are applicable only if the epoch of the message is the same
+as the validator’s epoch.
 
 ### Receiving `Propose`
 
@@ -225,11 +232,11 @@ as the validator’s height.
 ### Receiving `BlockResponse`
 
 - Request the following block in the blockchain from the node (if one exists)
-  that sent any message from the height greater than the current height + 1. If
-  there are several such nodes, request is sent to the one from which the
-  message from the height greater than current height + 1 was delivered first.
-- Update current height after committing the block locally.
-- Cancel `BlockRequest` for the height at which the block has just been
+  which is known to have blocks at a greater blockchain height.
+- Alternatively, if there are nodes with the same height and greater epoch,
+  send `BlockRequest` to one of them.
+- Update current epoch / height after committing the block locally.
+- Cancel `BlockRequest` for the epoch at which the block has just been
   committed.
 
 ### Peers Timeout
@@ -237,7 +244,7 @@ as the validator’s height.
 Send a `PeersRequest` request to a random peer (auditor or validator) from the
 list of known peers specified in [local configuration][config#peers].
 
-### Move to New Height
+### Move to New Epoch
 
 Cancel all requests.
 
@@ -258,9 +265,9 @@ received by a node.
 
 ### `ProposeRequest`
 
-- If the message corresponds to a height that is not equal to the current
-  height of the node, ignore the message.
-- If the node has `Propose` with the corresponding hash at the given height,
+- If the message corresponds to an epoch that is not equal to the current
+  epoch of the node, ignore the message.
+- If the node has `Propose` with the corresponding hash at the given epoch,
   send it.
 
 ### `TransactionsRequest`
@@ -271,17 +278,20 @@ pool of unconfirmed transactions.
 
 ### `PrevotesRequest`
 
-- If the message does not match the height at which the node is, ignore the
+- If the message does not match the epoch at which the node is, ignore the
   message.
 - Send as individual messages all the corresponding `Prevote`s except
   those that the requestor has.
 
 ### `BlockRequest`
 
-- If the message corresponds to a height not less than that of the node,
-  ignore the message.
-- Form a `BlockResponse` message from the blockchain data and send it to the
-  requestor.
+`BlockResponse` message is sent as the response. Which block or block skip
+is sent, depends on the following rules:
+
+- If the `epoch` is set to 0, it is a block at the specified `height`.
+- If the `epoch != 0`, it is a block at the specified `height`
+  (if it is known to the node), or the latest block skip with the epoch
+  greater or equal to the `epoch` mentioned in the message.
 
 ### `PeersRequest`
 

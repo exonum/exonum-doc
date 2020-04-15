@@ -15,3 +15,9 @@ npm-debug.log
 # Generated docs
 site/
 version/
+
+# 3rd-party Python eggs installed in 'edit' mode
+3rd-party/
+
+# Python virtual environment
+.env

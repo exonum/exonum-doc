@@ -255,7 +255,8 @@ authenticity of data stored in light clients could still be verified.
 ## What’s Next
 
 - [Read about the Exonum design](design-overview.md)
-- [Build your first Exonum application](create-service.md)
+- Build your first Exonum application in [Java](first-java-service.md)
+  or [Rust](create-service.md)
 - [Find out about Exonum planned features and milestones](../roadmap.md)
 - [Learn how to contribute to Exonum development](../contributing.md)
 

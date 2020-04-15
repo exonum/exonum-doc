@@ -8,7 +8,8 @@ as a [Rust service][rust-time-oracle], which has a [Java proxy][java-time-oracle
 
 !!! tip
     Consult [service crate docs](https://docs.rs/exonum-time/) for details
-    about interfaces provided by the service.
+    about interfaces provided by the service, including the description
+    of its HTTP API.
 
 ## The Problem
 

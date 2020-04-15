@@ -291,7 +291,7 @@ the anchoring [crate documentation][anchoring-crate-doc].
 [bitcoind]: https://bitcoin.org/en/bitcoin-core/
 [transaction_malleability]: https://en.bitcoin.it/wiki/Transaction_malleability#Segwit
 [segwit]: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki
-[btc_anchoring_sync]: https://github.com/exonum/exonum-btc-anchoring/blob/master/src/bin/btc_anchoring_sync.rs
+[btc_anchoring_sync]: https://github.com/exonum/exonum-btc-anchoring/blob/master/examples/btc_anchoring_sync.rs
 [maintenance-guide]: https://github.com/exonum/exonum-btc-anchoring/blob/master/guides/maintenance.md
 [newbie-guide]: https://github.com/exonum/exonum-btc-anchoring/blob/master/guides/newbie.md
 [anchoring-crate-doc]: https://docs.rs/exonum-btc-anchoring/latest/exonum_btc_anchoring/api/index.html
