@@ -199,6 +199,6 @@ to keep the system operational.
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [origin-header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 [ConsensusConfig]: https://docs.rs/exonum/latest/exonum/blockchain/config/struct.ConsensusConfig.html
-[GenesisConfig]: https://docs.rs/exonum/latest/exonum/blockchain/struct.GenesisConfig.html
+[GenesisConfig]: https://docs.rs/exonum/latest/exonum/blockchain/config/struct.GenesisConfig.html
 [exonum-node]: https://docs.rs/exonum-node
-[exonum-cli]: https://docs.rs/exonum-cli
+[exonum-cli]: https://docs.rs/exonum-cli     
