@@ -31,7 +31,7 @@ we need to add the following lines to the project’s `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-exonum-testkit = "1.0.0-rc.1"
+exonum-testkit = "1.0.0"
 ```
 
 ## Testing Kinds

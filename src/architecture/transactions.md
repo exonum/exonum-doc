@@ -320,4 +320,4 @@ at the verification step.
 [wiki:idempotent]: https://en.wikipedia.org/wiki/Idempotence
 [cryptocurrency]: https://github.com/exonum/exonum/blob/master/examples/cryptocurrency
 [Protobuf]: https://developers.google.com/protocol-buffers
-[ExecutionError]: https://docs.rs/exonum/1.0.0-rc.1/exonum/runtime/struct.ExecutionError.html
+[ExecutionError]: https://docs.rs/exonum/1.0.0/exonum/runtime/struct.ExecutionError.html

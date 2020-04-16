@@ -9,8 +9,8 @@ theme:
     primary: 'light green'
     accent: 'lime'
 
-plugins:
-  - codeinclude
+#plugins:
+#  - codeinclude
 
 extra_css:
   - assets/stylesheets/extra.css
@@ -65,6 +65,8 @@ nav:
     - 'Cryptocurrency Advanced Tutorial': 'get-started/data-proofs.md'
     # A tutorial on applying light client for Exonum services
     - 'Light Client Tutorial': 'get-started/light-client.md'
+    # Data migration tutorial
+    - 'Data Migration Tutorial': 'get-started/migrate-service.md'
     # A tutorial on Java service development
     - 'Java Service Tutorial': 'get-started/first-java-service.md'
     - 'Java Binding User Guide': 'get-started/java-binding.md'
