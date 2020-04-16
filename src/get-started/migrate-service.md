@@ -34,7 +34,7 @@ has evolved significantly:
 Without data migration mechanism, it would be necessary to support
 the legacy data separately (thus bloating the codebase and reducing maintainability),
 hard-code it into service initialization,
-or abandon it altogether. Migration provides a swift solution to this problem.
+or abandon it altogether. Migration provides a swift solution for this problem.
 
 ## Writing Migration Script
 
