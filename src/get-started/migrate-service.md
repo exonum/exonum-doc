@@ -156,7 +156,7 @@ impl MigrateData for CryptocurrencyService {
 `LinearMigrations` type allows to choose which script(s) to execute
 given the initial service version.
 The provided migration scripts are associated with a semantic version
-for service data after migration. In our case, we have a single script,
+for the service data after migration. In our case, we have a single script,
 which we’ve just defined; it is associated with version 0.2.0.
 
 ## Testing Migrations
