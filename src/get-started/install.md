@@ -33,10 +33,10 @@ below.
 
 ### MacOS
 
-Install the necessary libraries using [Homebrew][homebrew]:
+Install the necessary dependencies using [Homebrew][homebrew]:
 
 ```shell
-brew install libsodium rocksdb pkg-config protobuf
+brew install jq libsodium rocksdb pkg-config protobuf
 ```
 
 ### Linux
@@ -47,7 +47,7 @@ use
 ```shell
 add-apt-repository ppa:exonum/rocksdb
 apt-get update
-apt-get install build-essential libsodium-dev libsnappy-dev libssl-dev \
+apt-get install build-essential jq libsodium-dev libsnappy-dev libssl-dev \
     librocksdb6.2 pkg-config clang-7 lldb-7 lld-7
 ```
 
