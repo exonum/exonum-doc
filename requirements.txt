@@ -7,4 +7,4 @@ Jinja2~=2.11
 Pygments~=2.5
 pygments-github-lexers~=0.0.5
 
-mkdocs_codeinclude_plugin==0.0.1
+mkdocs_codeinclude_plugin==0.2.0

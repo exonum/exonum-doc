@@ -9,8 +9,9 @@ theme:
     primary: 'light green'
     accent: 'lime'
 
-#plugins:
-#  - codeinclude
+plugins:
+  - codeinclude:
+      title_mode: pymdownx.tabbed
 
 extra_css:
   - assets/stylesheets/extra.css
