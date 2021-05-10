@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "description": "JS dependencies for Exonum docs",
-  "dependencies": {},
   "devDependencies": {
     "cspell": "^4.0.63",
     "fs-extra": "^8.1.0",
