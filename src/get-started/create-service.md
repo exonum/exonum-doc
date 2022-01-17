@@ -44,9 +44,11 @@ authors = ["Your Name <your@email.com>"]
 exonum = "1.0.0"
 exonum-crypto = "1.0.0"
 exonum-derive = "1.0.0"
+exonum-merkledb = "1.0.0"
 exonum-proto = "1.0.0"
 exonum-rust-runtime = "1.0.0"
 
+anyhow = "1.0"
 failure = "0.1.5"
 protobuf = "2.8.0"
 serde = "1.0"
@@ -112,7 +114,7 @@ syntax = "proto3";
 
 // Allows to use `exonum.PublicKey` structure already described in `exonum`
 // library.
-import "types.proto";
+import "exonum/crypto/types.proto";
 
 // Wallet structure used to persist data within the service.
 message Wallet {
