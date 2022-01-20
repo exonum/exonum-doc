@@ -1,0 +1,503 @@
+openapi: 3.0.0
+info:
+  title: Configuration Update Service
+  version: 0.9.0
+  description: >
+    **Configuration update service** allows modifying
+    [the global configuration](https://exonum.com/doc/architecture/configuration/)
+    by the means of _proposing_ a new configuration
+    and voting for proposed configurations among the validators.
+
+    The global configuration may need to be modified for various reasons:
+
+    * Changes in the validator set (validators being added, replaced, or removed).
+
+    * Fine tuning of the consensus algorithm parameters.
+
+    * Changes in the global configuration of services
+      (e.g., the anchoring interval in
+      [the anchoring service](https://exonum.com/doc/advanced/bitcoin-anchoring/))
+
+servers:
+- url: http://example.com/api/services/configuration/v1
+
+tags:
+- name: Read Requests
+  description: Public read-only API available to everybody.
+- name: Private API
+  description: Maintenance API for Exonum node administrators.
+
+paths:
+  /configs/actual:
+    get:
+      tags: [Read Requests]
+      summary: Get actual configuration
+      description: >
+        Looks up the actual global configuration.
+      responses:
+        200:
+          description: >
+            Actual global configuration.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigHashInfo"
+
+  /configs/following:
+    get:
+      tags: [Read Requests]
+      summary: Get following configuration
+      description: >
+        Looks up the locked-in following configuration which hasn’t taken effect yet.
+        Returns `null` if no configuration is locked in.
+      responses:
+        200:
+          description: >
+            Following configuration, if present.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ConfigHashInfo"
+                  - nullable: true
+
+  /configs:
+    get:
+      tags: [Read Requests]
+      summary: Get configuration by hash
+      description: >
+        Looks up configuration (including proposals) by the hash.
+      parameters:
+        - in: query
+          name: hash
+          required: true
+          description: Hash of configuration to look up.
+          schema:
+            $ref: "#/components/schemas/Hash"
+      responses:
+        200:
+          description: >
+            Found configuration (with proposals).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigInfo"
+
+  /configs/votes:
+    get:
+      tags: [Read Requests]
+      summary: Get votes for configuration
+      description: >
+        Looks up votes for a configuration proposal by the configuration hash.
+      parameters:
+        - in: query
+          name: hash
+          required: true
+          description: Hash of configuration to look up.
+          schema:
+            $ref: "#/components/schemas/Hash"
+      responses:
+        200:
+          description: >
+            A nullable JSON array containing votes for the configuration,
+            where each vote is the JSON serialization of the corresponding vote transaction.
+            Indexing of the votes in the array corresponds to
+            the indexing of validator public keys in the actual configuration.
+
+            If a vote from the validator is absent,
+            then `null` is returned at the corresponding index.
+
+            If the configuration with `hash` is absent,
+            `null` is returned instead of the whole array.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VotesInfo"
+
+  /configs/committed:
+    get:
+      tags: [Read Requests]
+      summary: Get committed configurations
+      description: >
+        Looks up all committed configurations,
+        optionally filtered by the activation height and/or the previous configuration hash.
+      parameters:
+        - $ref: "#/components/parameters/FilterQuery.previous_cfg_hash"
+        - $ref: "#/components/parameters/FilterQuery.actual_from"
+      responses:
+        200:
+          description: >
+            Found configurations returned as array.
+            The elements of the array are ordered by the order
+            in which configuration proposals were committed as transactions
+            to the Exonum blockchain.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConfigHashInfo"
+
+  /configs/proposed:
+    get:
+      tags: [Read Requests]
+      summary: Get proposed configurations
+      description: >
+        Looks up all proposed configurations,
+        optionally filtered by the activation height and/or the previous configuration hash.
+      parameters:
+        - $ref: "#/components/parameters/FilterQuery.previous_cfg_hash"
+        - $ref: "#/components/parameters/FilterQuery.actual_from"
+      responses:
+        200:
+          description: >
+            Found configurations returned as array.
+            The elements of the array are ordered by the order
+            in which configuration proposals were committed as transactions
+            to the Exonum blockchain.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProposeHashInfo"
+
+  /configs/postpropose:
+    post:
+      tags: [Private API]
+      summary: Submit configuration proposal
+      description: >
+        Creates a `Propose` transaction.
+        The `from` field of the transaction and its signature are computed automatically
+        based on the identity of the node that processes the POST request:
+        `from` is set to the node’s public key,
+        and the signature is computed based on the corresponding private key
+        stored in [the local configuration](https://exonum.com/doc/architecture/configuration/).
+      requestBody:
+        description: Proposed configuration in JSON format.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StoredConfiguration"
+      responses:
+        200:
+          description: >
+            JSON object with transaction and configuration hashes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tx_hash:
+                    allOf:
+                      - $ref: "#/components/schemas/Hash"
+                      - description: Hash of the corresponding `Propose` transaction.
+                  cfg_hash:
+                    allOf:
+                      - $ref: "#/components/schemas/Hash"
+                      - description: >
+                          Hash of the proposed configuration.
+                          Should be used as `config_hash_vote_for` parameter of `postvote` requests.
+
+  /config/postvote:
+    post:
+      tags: [Private API]
+      summary: Submit vote for proposal
+      description: >
+        Creates a `Vote` transaction.
+        As with the previous endpoint,
+        the `from` field of the transaction and its signature are computed automatically.
+      requestBody:
+        description: Hash of the configuration to vote for.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hash:
+                  allOf:
+                    - $ref: "#/components/schemas/Hash"
+                    - description: Hash of the configuration to vote for.
+      responses:
+        200:
+          description: >
+            JSON object with transaction hash.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tx_hash:
+                    allOf:
+                      - $ref: "#/components/schemas/Hash"
+                      - description: >
+                          Hash of the corresponding `Vote` transaction.
+
+  /config/postagainst:
+    post:
+      tags: [Private API]
+      summary: Submit vote against proposal
+      description: >
+        Creates a `VoteAgainst` transaction.
+        As with the previous endpoint,
+        the `from` field of the transaction and its signature are computed automatically.
+      requestBody:
+        description: Hash of the configuration to vote against.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hash:
+                  allOf:
+                    - $ref: "#/components/schemas/Hash"
+                    - description: Hash of the configuration to vote against.
+      responses:
+        200:
+          description: >
+            JSON object with transaction hash.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tx_hash:
+                    allOf:
+                      - $ref: "#/components/schemas/Hash"
+                      - description: >
+                          Hash of the corresponding `VoteAgainst` transaction.
+
+components:
+  schemas:
+    Hash:
+      type: string
+      pattern: "^[0-9a-f]{64}$"
+      example: "272913062630e0e6ec3f7db1db91811052b829f0fdf1f27a0aec212f1684cf76"
+      description: >
+        Hexadecimal string representing a hash (64 hex digits).
+    PublicKey:
+      type: string
+      pattern: "^[0-9a-f]{64}$"
+      example: "dcb46dceaeb7d0eab7b6ed000f317f2ab9f7c8423ec9a6a602d81c0979e1333a"
+      description: >
+        Hexadecimal string representing a public key (64 hex digits).
+    Height:
+      type: integer
+      description: Exonum block height.
+      minimum: 0
+      maximum: 18446744073709551615
+    Milliseconds:
+      type: integer
+      description: Time duration in milliseconds.
+      minimum: 0
+      maximum: 18446744073709551615
+    StoredConfiguration:
+      type: object
+      description: StoredConfiguration
+      properties:
+        previous_cfg_hash:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: >
+                Hash of the previous configuration
+                which can be used to find that configuration.
+                For the configuration in the genesis block
+                `hash` is just an array of zeros.
+        actual_from:
+          allOf:
+            - $ref: "#/components/schemas/Height"
+            - description: >
+                The height starting from which this configuration becomes actual.
+        validator_keys:
+          type: array
+          description: >
+            List of validators consensus and service public keys.
+          items:
+            type: object
+            properties:
+              consensus_key:
+                allOf:
+                  - $ref: "#/components/schemas/PublicKey"
+                  - description: >
+                      Consensus key is used for messages related to the consensus algorithm.
+              service_key:
+                allOf:
+                  - $ref: "#/components/schemas/PublicKey"
+                  - description: >
+                      Service key is used for services.
+        consensus:
+          type: object
+          description: >
+            Consensus algorithm parameters.
+          properties:
+            round_timeout:
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Interval between rounds (milliseconds).
+            status_timeout:
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Period of sending a Status message (milliseconds).
+            peers_timeout:
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Peer exchange timeout (milliseconds).
+            txs_block_limit:
+              type: integer
+              minimum: 0
+              maximum: 4294967295
+              description: Maximum number of transactions per block.
+            max_message_len:
+              type: integer
+              minimum: 1048576
+              maximum: 4294967295
+              description: >
+                Maximum message length (in bytes).
+                The range of possible values for this parameter is between 1MB and 2^32-1 bytes.
+            min_propose_timeout:
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Minimal propose timeout (milliseconds).
+            max_propose_timeout:
+              allOf:
+                - $ref: "#/components/schemas/Milliseconds"
+                - description: Maximal propose timeout (milliseconds).
+            propose_timeout_threshold:
+              type: integer
+              minimum: 0
+              maximum: 4294967295
+              description: Amount of transactions in pool to start use `min_propose_timeout`.
+        majority_count:
+          type: integer
+          minimum: 0
+          maximum: 65535
+          nullable: true
+          description: >
+            Number of votes required to commit the new configuration.
+            Defaults to 2/3 + 1 of total validator number if not set.
+        services:
+          type: object
+          description: >
+            Services specific variables.
+            Keys are service names and values are JSON configuration objects.
+    ConfigInfo:
+      type: object
+      properties:
+        committed_config:
+          allOf:
+            - $ref: "#/components/schemas/StoredConfiguration"
+            - nullable: true
+            - description: >
+                Configuration with the specified hash.
+                Or `null` if only a proposal is present.
+        propose:
+          allOf:
+            - $ref: "#/components/schemas/ProposeData"
+            - nullable: true
+            - description: >
+                Proposal for the retrieved configuration.
+                Or `null` if the configuration is not a result of a proposal
+                (the genesis configuration).
+    ConfigHashInfo:
+      type: object
+      properties:
+        hash:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: Hash of the actual configuration.
+        config:
+          $ref: "#/components/schemas/StoredConfiguration"
+        propose:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - nullable: true
+              description: >
+                Hash of the corresponding `Propose` transaction.
+                `null` if this is genesis configuration.
+        votes:
+          $ref: "#/components/schemas/VotesInfo"
+    ProposeHashInfo:
+      type: object
+      properties:
+        hash:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: >
+                Hash of the proposed configuration.
+        propose_data:
+          allOf:
+            - $ref: "#/components/schemas/ProposeData"
+            - description: Proposed configuration.
+    VotesInfo:
+      type: array
+      nullable: true
+      items:
+        $ref: "#/components/schemas/VotingDecision"
+    VotingDecision:
+      type: object
+      nullable: true
+      description: >
+        A vote for or against a configuration with specified hash.
+        May be `null` if a vote from a particular validator is absent.
+      properties:
+        vote_for:
+          type: string
+          enum: [yea, nay]
+        from:
+          allOf:
+            - $ref: "#/components/schemas/PublicKey"
+            - description: Public key of the sender of this vote.
+        cfg_hash:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: Hash of the configuration that this vote is for.
+    ProposeData:
+      type: object
+      description: ProposeData
+      properties:
+        tx_propose:
+          type: object
+          description: Proposal transaction.
+          properties:
+            from:
+              allOf:
+                - $ref: "#/components/schemas/PublicKey"
+                - description: Public key of the sender of this proposal.
+            cfg:
+              type: string
+              description: >
+                Configuration serialized in JSON format.
+                Must be convertible to `StoredConfiguration`.
+        votes_history_hash:
+          allOf:
+            - $ref: "#/components/schemas/Hash"
+            - description: Merkle root of all votes for the proposal.
+        num_validators:
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
+          description: Number of eligible voting validators.
+
+  parameters:
+    FilterQuery.previous_cfg_hash:
+      in: query
+      name: previous_cfg_hash
+      default: null
+      nullable: true
+      description: >
+        If present, filters configurations by the specified previous configuration hash.
+      schema:
+        $ref: "#/components/schemas/Hash"
+    FilterQuery.actual_from:
+      in: query
+      name: actual_from
+      default: 0
+      nullable: true
+      description: >
+        If present, filters configurations by the specified minimum for the height
+        from which the configuration became actual.
+      schema:
+        $ref: "#/components/schemas/Height"
